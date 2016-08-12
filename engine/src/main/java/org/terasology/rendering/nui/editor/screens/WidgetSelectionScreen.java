@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.screens;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UpdateListener;
@@ -74,16 +75,19 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "ok", button -> {
             String selection = availableWidgets.getSelection().toString();
+            JsonTree childNode;
+            if (node.getValue().getType() == JsonTreeValue.Type.ARRAY) {
+                ClassMetadata metadata = widgets.get(selection);
+                childNode = NUIEditorNodeUtils.createNewWidget(selection, "newWidget", false);
 
-            ClassMetadata metadata = widgets.get(selection);
-
-            JsonTree childNode = NUIEditorNodeUtils.createNewWidget(selection, "newWidget", false);
-
-            // If the widget is an UILayout override, add a "contents" array node.
-            if (UILayout.class.isAssignableFrom(metadata.getType())) {
-                childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
+                // If the widget is an UILayout override, add a "contents" array node.
+                if (UILayout.class.isAssignableFrom(metadata.getType())) {
+                    childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
+                }
+            } else {
+                childNode = new JsonTree(new JsonTreeValue(selection, null, JsonTreeValue.Type.OBJECT));
+                childNode.setExpanded(true);
             }
-
             node.addChild(childNode);
 
             closeListeners.forEach(UpdateListener::onAction);

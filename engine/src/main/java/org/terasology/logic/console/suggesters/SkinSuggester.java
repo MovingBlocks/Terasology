@@ -16,10 +16,11 @@
 package org.terasology.logic.console.suggesters;
 
 import org.terasology.assets.management.AssetManager;
-import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.skin.UISkin;
 
-public final class ScreenSuggester extends AssetSuggester {
-    public ScreenSuggester(AssetManager assetManager) {
-        super(UIElement.class, assetManager);
+public final class SkinSuggester extends AssetSuggester {
+    public SkinSuggester(AssetManager assetManager) {
+        super(UISkin.class, assetManager);
     }
 }
+

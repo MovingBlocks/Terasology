@@ -26,6 +26,8 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.editor.screens.PlaceholderScreen;
+import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layouts.RowLayout;
@@ -45,7 +47,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
+public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     private static JsonTree inputTree;
 
     @BeforeClass
@@ -55,7 +57,7 @@ public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
         context.put(CanvasRenderer.class, new HeadlessCanvasRenderer());
         context.put(NUIManager.class, new NUIManagerInternal(context.get(CanvasRenderer.class), context));
 
-        File file = new File(ContextMenuBuilderTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
+        File file = new File(ContextMenuUtilsTest.class.getClassLoader().getResource("contextMenuBuilderInput.ui").getFile());
         String content = null;
         try {
             content = Files.toString(file, Charsets.UTF_8);
@@ -69,7 +71,7 @@ public class ContextMenuBuilderTest extends TerasologyTestingEnvironment {
     public void testNodeTypes() {
         JsonTree currentNode = inputTree;
 
-        assertEquals(PlaceholderScreenLayer.class, getNodeType(currentNode));
+        assertEquals(PlaceholderScreen.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");
         assertEquals(RelativeLayout.class, getNodeType(currentNode));
         currentNode = currentNode.getChildWithKey("contents");

@@ -25,7 +25,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
@@ -41,6 +40,7 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
@@ -59,29 +59,33 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
     private static final Logger logger = LoggerFactory.getLogger(UISkinFormat.class);
     private Gson gson;
 
-
     public UISkinFormat() {
         super("skin");
         gson = new GsonBuilder()
-                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-                .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(Font.class))
-                .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
-                .registerTypeAdapter(TextureRegion.class, new TextureRegionTypeAdapter())
-                .registerTypeAdapter(Color.class, new JsonTypeHandlerAdapter<>(new ColorTypeHandler()))
-                .registerTypeAdapter(Optional.class, new OptionalTextureRegionTypeAdapter())
-                .create();
+            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+            .registerTypeAdapter(Font.class, new AssetTypeAdapter<>(Font.class))
+            .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
+            .registerTypeAdapter(TextureRegion.class, new TextureRegionTypeAdapter())
+            .registerTypeAdapter(Color.class, new JsonTypeHandlerAdapter<>(new ColorTypeHandler()))
+            .registerTypeAdapter(Optional.class, new OptionalTextureRegionTypeAdapter())
+            .create();
     }
 
     @Override
     public UISkinData load(ResourceUrn urn, List<AssetDataFile> inputs) throws IOException {
         try (JsonReader reader = new JsonReader(new InputStreamReader(inputs.get(0).openStream(), Charsets.UTF_8))) {
             reader.setLenient(true);
-            return gson.fromJson(reader, UISkinData.class);
+            UISkinData data = gson.fromJson(reader, UISkinData.class);
+            data.setSource(inputs.get(0));
+            return data;
         } catch (JsonParseException e) {
             throw new IOException("Failed to load skin '" + urn + "'", e);
         }
     }
 
+    public UISkinData load(JsonElement element) throws IOException {
+        return gson.fromJson(element, UISkinData.class);
+    }
 
     private static class TextureRegionTypeAdapter implements JsonDeserializer<TextureRegion> {
 
@@ -142,7 +146,6 @@ public class UISkinFormat extends AbstractAssetFileFormat<UISkinData> {
                     } else {
                         logger.warn("Failed to resolve UIWidget class {}, skipping style information", entry.getKey());
                     }
-
 
                 }
             }

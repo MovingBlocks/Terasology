@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.itemRendering.StringTextIconRenderer;
@@ -54,9 +54,9 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
                     JsonTreeValue childValue = child.getValue();
 
                     if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
-                        if (childValue.getKey().equalsIgnoreCase("type")) {
+                        if ("type".equals(childValue.getKey())) {
                             resultString += String.format("\"type\": \"%s\"", childValue.getValue());
-                        } else if (childValue.getKey().equalsIgnoreCase("id")) {
+                        } else if ("id".equals(childValue.getKey())) {
                             resultString += String.format("; \"id\": \"%s\"", childValue.getValue());
                         }
                     }
@@ -86,11 +86,13 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
                 // If the node has no type and is a root node, do not draw an icon.
                 if (node.isRoot()) {
                     return null;
+                } else if (!node.isRoot() && "elements".equals(node.getParent().getValue().getKey())) {
+                    textureName = node.getValue().getKey();
                 } else {
                     for (Tree<JsonTreeValue> child : node.getChildren()) {
                         JsonTreeValue childValue = child.getValue();
                         if (childValue.getType() == JsonTreeValue.Type.KEY_VALUE_PAIR
-                            && childValue.getKey().equalsIgnoreCase("type")) {
+                            && "type".equals(childValue.getKey())) {
                             textureName = (String) childValue.getValue();
                         }
                     }

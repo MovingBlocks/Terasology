@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.suggesters;
+package org.terasology.rendering.nui.editor.screens;
 
-import org.terasology.assets.management.AssetManager;
-import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.CoreScreenLayer;
 
-public final class ScreenSuggester extends AssetSuggester {
-    public ScreenSuggester(AssetManager assetManager) {
-        super(UIElement.class, assetManager);
+/**
+ * An empty screen layer override to be used for a new tree.
+ */
+public class PlaceholderScreen extends CoreScreenLayer {
+    @Override
+    public void initialise() {
+
     }
 }

@@ -1,5 +1,5 @@
 {
-    "type": "engine:nuiEditorScreen",
+    "type": "engine:nuiSkinEditorScreen",
     "skin": "engine:nuiEditorScreen",
     "contents": {
         "type": "migLayout",
@@ -13,13 +13,25 @@
                 "id": "selectedScreen",
                 "updateContent": false,
                 "layoutInfo": {
-                    "cc": "cell 1 0, spany 2"
+                    "cc": "cell 1 1"
                 }
             },
             {
                 "type": "migLayout",
                 "layoutInfo": {
-                    "cc": "cell 0 2, spanx 3"
+                    "cc": "cell 1 0"
+                },
+                "contents": [
+                    {
+                        "type": "UIDropdownScrollable",
+                        "id": "availableScreens"
+                    }
+                ]
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 2, spanx 2"
                 },
                 "contents": [
                     {

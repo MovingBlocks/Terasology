@@ -15,14 +15,13 @@
  */
 package org.terasology.rendering.nui.editor;
 
-import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
-/**
- * An empty screen layer override to be used for a new tree.
- */
-public class PlaceholderScreenLayer extends CoreScreenLayer {
-    @Override
-    public void initialise() {
-
-    }
+@RegisterBindButton(id = "nuiSkinEditor", description = "${engine:menu#binding-nui-skin-editor}", category = "nui")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F11)
+public class NUISkinEditorButton extends BindButtonEvent {
 }

@@ -1,5 +1,5 @@
 {
-    "type": "PlaceholderScreenLayer",
+    "type": "PlaceholderScreen",
     "contents": {
         "type": "relativeLayout",
         "contents": [

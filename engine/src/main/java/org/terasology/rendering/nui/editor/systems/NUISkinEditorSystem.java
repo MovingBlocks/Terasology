@@ -13,48 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.systems;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.editor.NUISkinEditorButton;
+import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
 
 @RegisterSystem
-@Share(NUIEditorSystem.class)
-public class NUIEditorSystem extends BaseComponentSystem {
-    private static final String NUI_EDITOR_URN = "engine:nuiEditorScreen";
-
+@Share(NUISkinEditorSystem.class)
+public class NUISkinEditorSystem extends AbstractEditorSystem {
     @In
     private NUIManager nuiManager;
 
-    /**
-     * Whether the editor is currently active.
-     */
     private boolean editorActive;
 
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
-    public void showEditor(NUIEditorButton event, EntityRef entity) {
+    @ReceiveEvent(components = ClientComponent.class,
+                  priority = EventPriority.PRIORITY_CRITICAL)
+    public void showEditor(NUISkinEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             toggleEditor();
             event.consume();
         }
     }
 
+    @Override
     public void toggleEditor() {
-        nuiManager.toggleScreen(NUI_EDITOR_URN);
+        nuiManager.toggleScreen(NUISkinEditorScreen.ASSET_URI);
         editorActive = !editorActive;
     }
 
-    /**
-     * @return Whether the editor is currently active.
-     */
+    @Override
     public boolean isEditorActive() {
         return editorActive;
     }

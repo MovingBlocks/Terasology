@@ -41,7 +41,7 @@ public class UIData implements AssetData {
     }
 
     /**
-     * @param source The {@AssetDataFile} this asset has been loaded from.
+     * @param source The {@link AssetDataFile} this asset has been loaded from.
      */
     public void setSource(AssetDataFile source) {
         this.source = source;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -47,7 +47,7 @@ public class NUIEditorTextEntryBuilder {
                 Double valueDouble = Double.parseDouble(value);
                 return new JsonTree(new JsonTreeValue(null, valueDouble, JsonTreeValue.Type.VALUE));
             } catch (NumberFormatException e) {
-                if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                     return new JsonTree(new JsonTreeValue(null, Boolean.parseBoolean(value), JsonTreeValue.Type.VALUE));
                 } else {
                     return new JsonTree(new JsonTreeValue(null, value, JsonTreeValue.Type.VALUE));

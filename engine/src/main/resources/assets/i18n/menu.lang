@@ -22,6 +22,7 @@
     "binding-jump": "binding-jump",
     "binding-left": "binding-left",
     "binding-nui-editor": "binding-nui-editor",
+    "binding-nui-skin-editor": "binding-nui-skin-editor",
     "binding-pause": "binding-pause",
     "binding-right": "binding-right",
     "binding-show-online-players": "binding-show-online-players",

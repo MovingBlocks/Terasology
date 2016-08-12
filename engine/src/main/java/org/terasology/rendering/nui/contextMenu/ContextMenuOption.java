@@ -18,11 +18,15 @@ package org.terasology.rendering.nui.contextMenu;
 import java.util.function.Consumer;
 
 /**
- * A single option in a context menu level.
+ * A single option in a context menu.
  *
  * @param <E> The type of the object passed to the option.
  */
-public class ContextMenuOption<E> {
+public class ContextMenuOption<E> implements AbstractContextMenuItem {
+    /**
+     * The name of the option.
+     */
+    private String name;
     /**
      * A consumer operation.
      */
@@ -37,10 +41,19 @@ public class ContextMenuOption<E> {
      */
     private boolean finalized;
 
-    public ContextMenuOption(Consumer<E> consumer, E object, boolean finalized) {
+    public ContextMenuOption(String name, Consumer<E> consumer, E object, boolean finalized) {
+        this.name = name;
         this.consumer = consumer;
         this.object = object;
         this.finalized = finalized;
+    }
+
+    public void select() {
+        consumer.accept(object);
+    }
+
+    public boolean isFinalized() {
+        return finalized;
     }
 
     /**
@@ -57,18 +70,8 @@ public class ContextMenuOption<E> {
         return object;
     }
 
-    /**
-     * @return Whether the option is final (i.e. on selection closes the context menu
-     * and triggers the relevant listeners, if any)
-     */
-    public boolean isFinalized() {
-        return finalized;
-    }
-
-    /**
-     * Perform the consumer operation on the input object instance.
-     */
-    public void accept() {
-        consumer.accept(object);
+    @Override
+    public String toString() {
+        return name;
     }
 }

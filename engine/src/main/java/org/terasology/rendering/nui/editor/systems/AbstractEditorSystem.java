@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.suggesters;
+package org.terasology.rendering.nui.editor.systems;
 
-import org.terasology.assets.management.AssetManager;
-import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 
-public final class ScreenSuggester extends AssetSuggester {
-    public ScreenSuggester(AssetManager assetManager) {
-        super(UIElement.class, assetManager);
-    }
+public abstract class AbstractEditorSystem extends BaseComponentSystem {
+    /**
+     * Toggles the editor's visibility state.
+     */
+    public abstract void toggleEditor();
+
+    /**
+     * @return Whether the editor is currently active.
+     */
+    public abstract boolean isEditorActive();
 }

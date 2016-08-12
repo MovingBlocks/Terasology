@@ -35,7 +35,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.editor.NUIEditorSystem;
+import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
+import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
@@ -97,6 +98,10 @@ public class StateMainMenu implements GameState {
         NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
         context.put(NUIEditorSystem.class, nuiEditorSystem);
         componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
+
+        NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
+        context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
+        componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
 
         inputSystem = context.get(InputSystem.class);
 

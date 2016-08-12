@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.utils;
 
 import com.google.common.collect.Queues;
 import com.google.gson.annotations.SerializedName;
@@ -22,7 +22,10 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.editor.screens.NUIEditorScreen;
+import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
+import org.terasology.rendering.nui.skin.UIStyleFragment;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.utilities.ReflectionUtil;
@@ -42,7 +45,7 @@ public class NUIEditorNodeUtils {
      */
     public static JsonTree createNewScreen() {
         JsonTree tree = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
-        tree.addChild(new JsonTreeValue("type", "PlaceholderScreenLayer", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        tree.addChild(new JsonTreeValue("type", "PlaceholderScreen", JsonTreeValue.Type.KEY_VALUE_PAIR));
         tree.addChild(new JsonTreeValue("skin", "engine:default", JsonTreeValue.Type.KEY_VALUE_PAIR));
 
         JsonTree layout = new JsonTree(new JsonTreeValue("contents", null, JsonTreeValue.Type.OBJECT));
@@ -56,6 +59,17 @@ public class NUIEditorNodeUtils {
         contents.addChild(label);
         layout.addChild(contents);
         tree.addChild(layout);
+        return tree;
+    }
+
+    /**
+     * @return The {@link JsonTree} to be used as an initial skin template within {@link NUISkinEditorScreen}.
+     */
+    public static JsonTree createNewSkin() {
+        JsonTree tree = new JsonTree(new JsonTreeValue(null, null, JsonTreeValue.Type.OBJECT));
+        tree.addChild(new JsonTreeValue("inherit", "default", JsonTreeValue.Type.KEY_VALUE_PAIR));
+        tree.addChild(new JsonTreeValue("elements", null, JsonTreeValue.Type.OBJECT));
+        tree.addChild(new JsonTreeValue("families", null, JsonTreeValue.Type.OBJECT));
         return tree;
     }
 
@@ -118,7 +132,7 @@ public class NUIEditorNodeUtils {
             } else {
                 if (List.class.isAssignableFrom(currentClass) &&
                     n.getValue().getKey() == null &&
-                    n.getParent().getValue().getKey().equals("contents")) {
+                    "contents".equals(n.getParent().getValue().getKey())) {
                     // Transition from a "contents" list to a UIWidget.
                     currentClass = UIWidget.class;
                 } else {
@@ -137,10 +151,10 @@ public class NUIEditorNodeUtils {
                         layoutClass = currentClass;
                     }
 
-                    if (UILayout.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("contents")) {
+                    if (UILayout.class.isAssignableFrom(currentClass) && "contents".equals(n.getValue().getKey())) {
                         // "contents" fields of a layout are always (widget) lists.
                         currentClass = List.class;
-                    } else if (UIWidget.class.isAssignableFrom(currentClass) && n.getValue().getKey().equals("layoutInfo")) {
+                    } else if (UIWidget.class.isAssignableFrom(currentClass) && "layoutInfo".equals(n.getValue().getKey())) {
                         // Set currentClass to the layout hint type for the active layout.
                         currentClass = (Class) ReflectionUtil.getTypeParameter(activeLayoutClass.getGenericSuperclass(), 0);
                     } else {
@@ -179,6 +193,59 @@ public class NUIEditorNodeUtils {
                 .getWidgetMetadataLibrary()
                 .resolve(type, ModuleContext.getContext())
                 .getType();
+        }
+        return currentClass;
+    }
+
+    /**
+     * @param node       A node in an asset tree.
+     * @param nuiManager The {@link NUIManager} to be used for widget type resolution.
+     * @return The type of the field this node represents.
+     */
+    public static Class getSkinNodeClass(JsonTree node, NUIManager nuiManager) {
+        Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
+
+        // Create a stack with the root node at the top and the argument at the bottom.
+        JsonTree currentNode = node;
+        while (!currentNode.isRoot()) {
+            pathToRoot.push(currentNode);
+            currentNode = (JsonTree) currentNode.getParent();
+        }
+        pathToRoot.push(currentNode);
+
+        // Start iterating from top to bottom.
+        Class currentClass = null;
+        for (JsonTree n : pathToRoot) {
+            if (n.isRoot()) {
+                currentClass = UIStyleFragment.class;
+            } else {
+                if ("elements".equals(n.getValue().getKey()) || "families".equals(n.getValue().getKey())) {
+                    currentClass = null;
+                } else if (n.getParent().getValue().getKey() != null
+                           && ("elements".equals(n.getParent().getValue().getKey())
+                               || "families".equals(n.getParent().getValue().getKey()))) {
+                    currentClass = UIStyleFragment.class;
+                } else {
+                    String value = n.getValue().toString();
+                    Set<Field> fields = ReflectionUtils.getAllFields(currentClass);
+                    Optional<Field> newField = fields
+                        .stream().filter(f -> f.getName().equalsIgnoreCase(value)).findFirst();
+
+                    if (newField.isPresent()) {
+                        currentClass = newField.get().getType();
+                    } else {
+                        Optional<Field> serializedNameField = fields
+                            .stream()
+                            .filter(f -> f.isAnnotationPresent(SerializedName.class)
+                                         && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
+                        if (serializedNameField.isPresent()) {
+                            currentClass = serializedNameField.get().getType();
+                        } else {
+                            return null;
+                        }
+                    }
+                }
+            }
         }
         return currentClass;
     }

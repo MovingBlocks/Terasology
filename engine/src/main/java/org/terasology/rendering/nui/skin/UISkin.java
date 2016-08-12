@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.skin;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.format.AssetDataFile;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
@@ -25,6 +26,8 @@ import org.terasology.rendering.nui.UIWidget;
 public class UISkin extends Asset<UISkinData> {
 
     private UISkinData skinData;
+
+    private transient AssetDataFile source;
 
     public UISkin(ResourceUrn urn, AssetType<?, UISkinData> assetType, UISkinData data) {
         super(urn, assetType);
@@ -34,6 +37,7 @@ public class UISkin extends Asset<UISkinData> {
     @Override
     protected void doReload(UISkinData data) {
         this.skinData = data;
+        this.source = data.getSource();
     }
 
     public UIStyle getDefaultStyle() {
@@ -78,5 +82,9 @@ public class UISkin extends Asset<UISkinData> {
 
     public Iterable<? extends String> getFamilies() {
         return skinData.skinFamilies.keySet();
+    }
+
+    public AssetDataFile getSource() {
+        return source;
     }
 }
