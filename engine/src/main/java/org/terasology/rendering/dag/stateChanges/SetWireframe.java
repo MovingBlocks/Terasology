@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import java.util.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetWireframeTask;
@@ -54,9 +55,14 @@ public final class SetWireframe implements StateChange {
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetWireframe) {
-            return this.enabled == ((SetWireframe) stateChange).isEnabled();
+    public int hashCode() {
+        return Objects.hashCode(enabled);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SetWireframe) {
+            return this.enabled == ((SetWireframe) obj).isEnabled();
         }
 
         return false;

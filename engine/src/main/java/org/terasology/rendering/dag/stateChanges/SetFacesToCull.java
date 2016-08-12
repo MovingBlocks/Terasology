@@ -15,31 +15,29 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetFacesToCullTask;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetFacesToCull implements StateChange {
     private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
-    private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL11.GL_BACK, "GL_BACK",
-            GL11.GL_FRONT, "GL_FRONT",
-            GL11.GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
+    private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL_BACK, "GL_BACK",
+            GL_FRONT, "GL_FRONT",
+            GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
     private SetFacesToCullTask task;
     private int mode;
 
     public SetFacesToCull(int mode) {
-        if (mode != GL_BACK
-                && mode != GL_FRONT
-                && mode != GL_FRONT_AND_BACK) {
+        if (!modeNameMap.containsKey(mode)) {
             throw new IllegalArgumentException("Mode must be GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.");
         }
         this.mode = mode;
@@ -64,9 +62,14 @@ public final class SetFacesToCull implements StateChange {
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetFacesToCull) {
-            return mode == ((SetFacesToCull) stateChange).getMode();
+    public int hashCode() {
+        return Objects.hashCode(mode);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SetFacesToCull) {
+            return mode == ((SetFacesToCull) obj).getMode();
         }
         return false;
     }

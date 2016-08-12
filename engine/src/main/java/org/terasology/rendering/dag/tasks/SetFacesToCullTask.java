@@ -22,6 +22,9 @@ import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 /**
  * TODO: Add javadocs
  */
+// TODO: review the possibility of making task classes private, contained in the StateChange implementation
+// TODO: they are associated with. Rationale: module developers shouldn't be able to reach or instantiate these classes
+// TODO: directly: only the StateChange classes.
 public final class SetFacesToCullTask implements RenderPipelineTask {
     private int mode;
 

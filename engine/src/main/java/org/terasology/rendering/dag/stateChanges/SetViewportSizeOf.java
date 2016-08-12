@@ -19,6 +19,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
+import java.util.Objects;
+import org.terasology.rendering.dag.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
@@ -69,9 +71,14 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetViewportSizeOf) {
-            return this.fboName.equals(((SetViewportSizeOf) stateChange).getFboName());
+    public int hashCode() {
+        return Objects.hashCode(fboName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SetViewportSizeOf) {
+            return this.fboName.equals(((SetViewportSizeOf) obj).getFboName());
         }
         return false;
     }

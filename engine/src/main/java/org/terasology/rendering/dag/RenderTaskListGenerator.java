@@ -90,7 +90,7 @@ public final class RenderTaskListGenerator {
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.remove(stateChange.getClass());
 
-                        } else if (!stateChange.isEqualTo(persistentStateChange)) { // another new method, just for readability
+                        } else if (!stateChange.equals(persistentStateChange)) { // another new method, just for readability
                             // non-redundant state change of the same subType but different value, becomes new map entry
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
@@ -119,8 +119,7 @@ public final class RenderTaskListGenerator {
             intermediateList.add(node);
             // Add state changes to reset all desired state changes back to default.
             for (StateChange stateChange : node.getDesiredStateChanges()) {
-                StateChange defaultInstance = stateChange.getDefaultInstance();
-                intermediateList.add(defaultInstance);
+                intermediateList.add(stateChange.getDefaultInstance());
             }
         }
         logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug

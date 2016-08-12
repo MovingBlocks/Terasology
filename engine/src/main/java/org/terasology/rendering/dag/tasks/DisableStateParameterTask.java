@@ -17,25 +17,26 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetStateParameter;
 
 /**
  * TODO: Add javadocs
  */
 public final class DisableStateParameterTask implements RenderPipelineTask {
-    private int capability;
+    private int parameter;
+    private String parameterName;
 
-    public DisableStateParameterTask(int capability) {
-        this.capability = capability;
+    public DisableStateParameterTask(int parameter, String parameterName) {
+        this.parameter = parameter;
+        this.parameterName = parameterName;
     }
 
     @Override
     public void execute() {
-        glDisable(this.capability);
+        glDisable(this.parameter);
     }
 
     @Override
     public String toString() {
-        return String.format("%21s: disabled", SetStateParameter.getParameterName(capability));
+        return String.format("%21s: disabled", parameterName);
     }
 }

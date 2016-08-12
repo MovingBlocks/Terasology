@@ -17,25 +17,26 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.GL11.glEnable;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetStateParameter;
 
 /**
  * TODO: Add javadocs
  */
 public final class EnableStateParameterTask implements RenderPipelineTask {
-    private int capability;
+    private int parameter;
+    private String parameterName;
 
-    public EnableStateParameterTask(int capability) {
-        this.capability = capability;
+    public EnableStateParameterTask(int parameter, String parameterName) {
+        this.parameter = parameter;
+        this.parameterName = parameterName;
     }
 
     @Override
     public void execute() {
-        glEnable(capability);
+        glEnable(parameter);
     }
 
     @Override
     public String toString() {
-        return String.format("%21s: enabled", SetStateParameter.getParameterName(capability));
+        return String.format("%21s: enabled", parameterName);
     }
 }

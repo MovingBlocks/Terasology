@@ -15,9 +15,7 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-import org.lwjgl.opengl.GL11;
+import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
@@ -26,10 +24,6 @@ import org.terasology.rendering.dag.StateChange;
  * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
  */
 public abstract class SetStateParameter implements StateChange {
-    private static Map<Integer, String> paramaterMap = ImmutableMap.of(GL11.GL_BLEND, "GL_BLEND",
-            GL11.GL_DEPTH_TEST, "GL_DEPTH_TEST",
-            GL11.GL_STENCIL_TEST, "GL_STENCIL_TEST",
-            GL11.GL_CULL_FACE, "GL_CULL_FACE");
     private boolean enabled;
 
     SetStateParameter(boolean enabled) {
@@ -37,9 +31,14 @@ public abstract class SetStateParameter implements StateChange {
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetStateParameter) {
-            return this.enabled == ((SetStateParameter) stateChange).isEnabled();
+    public int hashCode() {
+        return Objects.hashCode(enabled);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SetStateParameter) {
+            return this.enabled == ((SetStateParameter) obj).isEnabled();
         }
         return false;
     }
@@ -69,9 +68,5 @@ public abstract class SetStateParameter implements StateChange {
         }
 
         return String.format(": capability %s", status);
-    }
-
-    public static String getParameterName(int capability) {
-        return paramaterMap.get(capability);
     }
 }

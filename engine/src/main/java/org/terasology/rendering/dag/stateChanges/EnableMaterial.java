@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import com.google.common.base.Objects;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
@@ -59,9 +60,14 @@ public final class EnableMaterial implements StateChange {
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof EnableMaterial) {
-            return materialName.equals(((EnableMaterial) stateChange).getMaterialName());
+    public int hashCode() {
+        return Objects.hashCode(materialName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof EnableMaterial) {
+            return materialName.equals(((EnableMaterial) obj).getMaterialName());
         }
         return false;
     }

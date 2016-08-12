@@ -26,6 +26,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
  */
 public class EnableFaceCulling extends SetStateParameter {
     private static final int PARAMETER = GL_CULL_FACE;
+    private static final String PARAMETER_NAME = "GL_CULL_FACE";
     private static StateChange defaultInstance = new EnableFaceCulling(false);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
@@ -36,8 +37,8 @@ public class EnableFaceCulling extends SetStateParameter {
 
     private EnableFaceCulling(boolean enabled) {
         super(enabled);
-        disablingTask = new DisableStateParameterTask(PARAMETER);
-        enablingTask = new EnableStateParameterTask(PARAMETER);
+        disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
+        enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }
 
     @Override

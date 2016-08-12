@@ -24,8 +24,5 @@ public interface StateChange {
 
     RenderPipelineTask generateTask();
 
-    // TODO: investigate a better way?
-    boolean isEqualTo(StateChange stateChange);
-
     boolean isTheDefaultInstance();
 }
