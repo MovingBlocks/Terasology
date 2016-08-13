@@ -251,6 +251,7 @@ public final class Terasology {
                 NO_SAVE_GAMES,
                 NO_SOUND,
                 NO_SPLASH,
+                OVERRIDE_DEFAULT_CONFIG + "<path>",
                 SERVER_PORT + "<port>");
 
         StringBuilder optText = new StringBuilder();
@@ -325,7 +326,6 @@ public final class Terasology {
                 isHeadless = true;
                 crashReportEnabled = false;
                 splashEnabled = false;
-                soundEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
                 System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
             } else if (arg.equals(NO_CRASH_REPORT)) {
