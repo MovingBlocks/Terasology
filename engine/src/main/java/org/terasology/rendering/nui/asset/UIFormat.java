@@ -51,6 +51,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -82,6 +83,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     }
 
     public UIData load(JsonElement element) throws IOException {
+        return load(element, null);
+    }
+
+    public UIData load(JsonElement element, Locale otherLocale) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
@@ -97,7 +102,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         }
 
         // override the String TypeAdapter from the serialization library
-        gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem));
+        gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem, otherLocale));
         Gson gson = gsonBuilder.create();
         return gson.fromJson(element, UIData.class);
     }
@@ -105,15 +110,18 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     private static final class I18nStringTypeAdapter implements JsonDeserializer<String> {
 
         private final TranslationSystem translationSystem;
+        private final Locale otherLocale;
 
-        public I18nStringTypeAdapter(TranslationSystem translationSystem) {
+        public I18nStringTypeAdapter(TranslationSystem translationSystem, Locale otherLocale) {
             this.translationSystem = translationSystem;
+            this.otherLocale = otherLocale;
         }
 
         @Override
         public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String text = json.getAsString();
-            return translationSystem.translate(text);
+            return otherLocale == null ?
+                    translationSystem.translate(text) : translationSystem.translate(text, otherLocale);
         }
     }
 

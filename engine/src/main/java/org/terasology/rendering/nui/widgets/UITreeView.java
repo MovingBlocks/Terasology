@@ -283,6 +283,14 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
+    public void delete(Tree<T> node) {
+        if (node.getParent() != null) {
+            node.getParent().removeChild(node);
+
+            fireUpdateListeners();
+        }
+    }
+
     public TreeModel<T> getModel() {
         return model.get();
     }
@@ -454,7 +462,7 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    private boolean removeSelected() {
+    public boolean removeSelected() {
         if (state.getSelectedIndex() != null) {
             model.get().removeNode(state.getSelectedIndex());
             state.setSelectedIndex(null);

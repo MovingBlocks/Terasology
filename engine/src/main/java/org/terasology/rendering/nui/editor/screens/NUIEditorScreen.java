@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.editor.screens;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -52,9 +53,7 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -105,6 +104,10 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
+    /**
+     * An alternative locale to be used for screen rendering.
+     */
+    private Locale alternativeLocale;
 
     @Override
     public void initialise() {
@@ -158,6 +161,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
             nuiEditorMenuTreeBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
             return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
@@ -172,6 +176,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
         WidgetUtil.trySubscribe(this, "undo", button -> undo());
         WidgetUtil.trySubscribe(this, "redo", button -> redo());
+        WidgetUtil.trySubscribe(this, "close", button -> nuiEditorSystem.toggleEditor());
 
         updateConfig();
     }
@@ -232,10 +237,11 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     public void resetPreviewWidget() {
         try {
             JsonElement element = JsonTreeConverter.deserialize(getEditor().getRoot());
-            UIWidget widget = new UIFormat().load(element).getRootWidget();
+            UIWidget widget = new UIFormat().load(element, alternativeLocale).getRootWidget();
             selectedScreenBox.setContent(widget);
         } catch (Throwable t) {
-            selectedScreenBox.setContent(new UILabel(ExceptionUtils.getStackTrace(t)));
+            String truncatedStackTrace = Joiner.on(System.lineSeparator()).join(Arrays.copyOfRange(ExceptionUtils.getStackFrames(t), 0, 10));
+            selectedScreenBox.setContent(new UILabel(truncatedStackTrace));
         }
     }
 
@@ -247,6 +253,13 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
+        if (nuiEditorConfig.getAlternativeLocale() != null
+            && !nuiEditorConfig.getAlternativeLocale().equals(alternativeLocale)) {
+            alternativeLocale = nuiEditorConfig.getAlternativeLocale();
+            if (selectedAsset != null) {
+                resetPreviewWidget();
+            }
+        }
     }
 
     /**
@@ -282,7 +295,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
             } else if (type == JsonTreeValue.Type.OBJECT &&
-                       !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+                !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
             } else if (type == JsonTreeValue.Type.ARRAY) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();

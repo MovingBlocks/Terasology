@@ -58,6 +58,11 @@
                         "type": "UIButton",
                         "id": "settings",
                         "text": "Settings"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "Close"
                     }
                 ]
             },

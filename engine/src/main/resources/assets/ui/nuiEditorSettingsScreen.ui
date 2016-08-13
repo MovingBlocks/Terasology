@@ -44,6 +44,20 @@
                             ]
                         },
                         {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "Preview screen locale:"
+                                },
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "alternativeLocale"
+                                }
+                            ]
+                        },
+                        {
                             "type": "UISpace",
                             "size": [
                                 1,

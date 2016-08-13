@@ -51,6 +51,7 @@ public class NUIEditorMenuTreeBuilder {
     public static final String OPTION_ADD_EXTENDED = "Add...";
     public static final String OPTION_ADD_WIDGET = "Add Widget";
     public static final String OPTION_COPY = "Copy";
+    public static final String OPTION_DELETE = "Delete";
     public static final String OPTION_EDIT = "Edit";
     public static final String OPTION_PASTE = "Paste";
 
@@ -102,9 +103,13 @@ public class NUIEditorMenuTreeBuilder {
 
         // Unless the node is an OBJECT child of an ARRAY (should always have an empty key), add the edit option.
         if (type != JsonTreeValue.Type.NULL && !(type == JsonTreeValue.Type.OBJECT
-                                                 && !node.isRoot()
-                                                 && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+            && !node.isRoot()
+            && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             primaryTree.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node);
+        }
+
+        if (!node.isRoot()) {
+            primaryTree.addOption(OPTION_DELETE, externalConsumers.get(OPTION_DELETE), node);
         }
 
         return primaryTree;
@@ -117,7 +122,7 @@ public class NUIEditorMenuTreeBuilder {
 
         // Create the ADD_EXTENDED level.
         if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
-                                                 && !"elements".equals(node.getValue().getKey()))) {
+            && !"elements".equals(node.getValue().getKey()))) {
             MenuTree addTree = createAddSkinContextMenu(node);
             primaryTree.addSubmenu(addTree);
         }
@@ -278,7 +283,7 @@ public class NUIEditorMenuTreeBuilder {
 
     private JsonTreeValue.Type getNodeType(Field field, Object value) {
         return Enum.class.isAssignableFrom(field.getType()) || value instanceof UISkin
-               || value instanceof Boolean || value instanceof String || value instanceof Number
+            || value instanceof Boolean || value instanceof String || value instanceof Number
             ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT;
     }
 

@@ -160,6 +160,11 @@ public class JsonEditorTreeView extends UITreeView<JsonTreeValue> {
         setSelectedIndex(null);
     }
 
+    public void deleteNode(JsonTree node) {
+        delete(node);
+        setSelectedIndex(null);
+    }
+
     public void setContextMenuTreeProducer(Function<JsonTree, MenuTree> contextMenuTreeProducer) {
         this.contextMenuTreeProducer = contextMenuTreeProducer;
     }

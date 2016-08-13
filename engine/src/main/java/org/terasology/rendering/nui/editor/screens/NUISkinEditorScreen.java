@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.editor.screens;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -32,6 +33,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
@@ -55,9 +57,7 @@ import org.terasology.utilities.Assets;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -103,6 +103,10 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
+    /**
+     * An alternative locale to be used for screen rendering.
+     */
+    private Locale alternativeLocale;
 
     @Override
     public void initialise() {
@@ -172,6 +176,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
+            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
             nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
             nuiEditorMenuTreeBuilder.subscribeAddContextMenu(() -> getEditor().fireUpdateListeners());
             return nuiEditorMenuTreeBuilder.createPrimarySkinContextMenu(node);
@@ -192,6 +197,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
         WidgetUtil.trySubscribe(this, "undo", button -> undo());
         WidgetUtil.trySubscribe(this, "redo", button -> redo());
+        WidgetUtil.trySubscribe(this, "close", button -> nuiSkinEditorSystem.toggleEditor());
 
         updateConfig();
     }
@@ -241,13 +247,29 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     public void resetPreviewWidget() {
         if (selectedScreen != null) {
             try {
-                JsonElement element = JsonTreeConverter.deserialize(getEditor().getRoot());
-                UISkinData data = new UISkinFormat().load(element);
-                UIWidget widget = assetManager.getAsset(selectedScreen, UIElement.class).get().getRootWidget();
-                widget.setSkin(Assets.generateAsset(data, UISkin.class));
-                selectedScreenBox.setContent(widget);
+                JsonElement skinElement = JsonTreeConverter.deserialize(getEditor().getRoot());
+                UISkinData data = new UISkinFormat().load(skinElement);
+                AssetDataFile source = assetManager
+                    .getAsset(selectedScreen, UIElement.class)
+                    .get()
+                    .getSource();
+
+                String content;
+                try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
+                    reader.setLenient(true);
+                    content = new JsonParser().parse(reader).toString();
+                }
+                if (content != null) {
+                    JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
+                    JsonElement screenElement = JsonTreeConverter.deserialize(node);
+                    UIWidget widget = new UIFormat().load(screenElement, alternativeLocale).getRootWidget();
+                    widget.setSkin(Assets.generateAsset(data, UISkin.class));
+                    selectedScreenBox.setContent(widget);
+                }
+
             } catch (Throwable t) {
-                selectedScreenBox.setContent(new UILabel(ExceptionUtils.getStackTrace(t)));
+                String truncatedStackTrace = Joiner.on(System.lineSeparator()).join(Arrays.copyOfRange(ExceptionUtils.getStackFrames(t), 0, 10));
+                selectedScreenBox.setContent(new UILabel(truncatedStackTrace));
             }
         }
     }
@@ -260,6 +282,13 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
+        if (nuiEditorConfig.getAlternativeLocale() != null
+            && !nuiEditorConfig.getAlternativeLocale().equals(alternativeLocale)) {
+            alternativeLocale = nuiEditorConfig.getAlternativeLocale();
+            if (selectedScreen != null) {
+                resetPreviewWidget();
+            }
+        }
     }
 
     /**
@@ -276,7 +305,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
         } else if (type == JsonTreeValue.Type.OBJECT &&
-                   !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+            !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
         } else if (type == JsonTreeValue.Type.ARRAY) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();

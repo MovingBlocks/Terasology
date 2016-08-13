@@ -15,27 +15,63 @@
  */
 package org.terasology.rendering.nui.editor.screens;
 
+import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.engine.SimpleUri;
+import org.terasology.i18n.TranslationProject;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.layers.mainMenu.settings.LocaleRenderer;
+import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+@SuppressWarnings("unchecked")
 public class NUIEditorSettingsScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsScreen");
 
     @In
     private Config config;
 
+    @In
+    private TranslationSystem translationSystem;
+
+    private UIDropdownScrollable<Locale> alternativeLocale;
+
     @Override
     public void initialise() {
         WidgetUtil.tryBindCheckbox(this, "disableIcons", BindHelper.bindBeanProperty("disableIcons", config.getNuiEditor(), Boolean.TYPE));
         WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
+        alternativeLocale = find("alternativeLocale", UIDropdownScrollable.class);
+        if (alternativeLocale != null) {
+            TranslationProject menuProject = translationSystem.getProject(new SimpleUri("engine:menu"));
+            List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
+            alternativeLocale.setOptions(Lists.newArrayList(locales));
+            alternativeLocale.setVisibleOptions(5);
+            alternativeLocale.setOptionRenderer(new LocaleRenderer(translationSystem));
+
+            if (config.getNuiEditor().getAlternativeLocale() != null) {
+                alternativeLocale.setSelection(config.getNuiEditor().getAlternativeLocale());
+            } else {
+                alternativeLocale.setSelection(config.getSystem().getLocale());
+            }
+        }
     }
 
     @Override
     public void onClosed() {
+        if (!alternativeLocale.getSelection().equals(config.getNuiEditor().getAlternativeLocale())) {
+            config.getNuiEditor().setAlternativeLocale(alternativeLocale.getSelection());
+        }
+
         if (getManager().isOpen(NUIEditorScreen.ASSET_URI)) {
             ((NUIEditorScreen) getManager().getScreen(NUIEditorScreen.ASSET_URI)).updateConfig();
         }
