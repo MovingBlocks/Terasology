@@ -90,7 +90,7 @@ public final class RenderTaskListGenerator {
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.remove(stateChange.getClass());
 
-                        } else if (!stateChange.equals(persistentStateChange)) { // another new method, just for readability
+                        } else if (!stateChange.equals(persistentStateChange)) {
                             // non-redundant state change of the same subType but different value, becomes new map entry
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);

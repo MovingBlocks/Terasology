@@ -37,12 +37,11 @@ public final class SetFacesToCull implements StateChange {
     private int mode;
 
     public SetFacesToCull(int mode) {
-        if (mode != GL_BACK
-                && mode != GL_FRONT
-                && mode != GL_FRONT_AND_BACK) {
+        if (mode == GL_BACK || mode == GL_FRONT || mode == GL_FRONT_AND_BACK) {
+            this.mode = mode;
+        } else {
             throw new IllegalArgumentException("Mode must be GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.");
         }
-        this.mode = mode;
     }
 
     public int getMode() {
