@@ -35,6 +35,40 @@ With *server* rights you can terminate the server gracefully via `shutdownServer
 
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
+It is also possible to provide a configuration file which overrides the default configuration on startup. This file can be passed using the `-overrideDefaultConfig=<pathToFile>`. Settings from this file will be copied to the generated `config.cfg`. After that changes in the `config.cfg` have priority, so further modifications in the override file will not modify the server values. It not required to pass an entire configuration file. A typical example would be:
+
+```
+{
+  "defaultModSelection": {
+    "modules": [
+      "MyModule"
+    ],
+    "defaultGameplayModuleName": "MyModule"
+  },
+  "worldGeneration": {
+    "worldTitle": "World Title",
+    "defaultSeed": "custom seed for the server",
+    "defaultGenerator": "MyModule:MyWorldgen"
+  },
+  "moduleConfigs": {},
+  "network": {
+    "servers": [
+      {
+        "name": "localhost",
+        "address": "localhost",
+        "port": 25777,
+        "active": true
+      }
+    ],
+    "upstreamBandwidth": 1024,
+    "serverPort": 25777,
+    "masterServer": "meta.terasology.org"
+  }
+}
+```
+
+To set the gameplay module, the world generator and some basic server settings.
+
 If you include the "CheatsForAll" module in config for a server then you can bypass a lot of the admin setup as every player will be able to use `cheat` commands, like `giveBlock` - however, keep in mind then everybody can cheat, this is really more for testing :-)
 
 Alternatively you can run from source and supply parameters for game configuration. For instance here is how you would launch with ThroughoutTheAges active, our most complete setting. Keep in mind the module list may change any day, check in the game client what modules highlight with TTA selected to confirm.

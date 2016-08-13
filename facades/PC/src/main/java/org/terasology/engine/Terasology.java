@@ -347,9 +347,7 @@ public final class Terasology {
             System.out.println((recognized ? "Recognized" : "Invalid") + " argument: " + arg);
         }
 
-        try
-
-        {
+        try {
             if (homePath != null) {
                 PathManager.getInstance().useOverrideHomePath(homePath);
             } else {
