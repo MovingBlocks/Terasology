@@ -37,8 +37,8 @@ import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
-import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
+import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
@@ -53,7 +53,11 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
