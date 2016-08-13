@@ -172,7 +172,7 @@ public final class Terasology {
 
         SplashScreenBuilder builder = new SplashScreenBuilder();
 
-        String[] imgFiles = new String[]{
+        String[] imgFiles = new String[] {
                 "splash_1.png",
                 "splash_2.png",
                 "splash_3.png",
@@ -180,7 +180,7 @@ public final class Terasology {
                 "splash_5.png"
         };
 
-        Point[] imgOffsets = new Point[]{
+        Point[] imgOffsets = new Point[] {
                 new Point(0, 0),
                 new Point(150, 0),
                 new Point(300, 0),
@@ -188,7 +188,7 @@ public final class Terasology {
                 new Point(630, 0)
         };
 
-        EngineStatus[] trigger = new EngineStatus[]{
+        EngineStatus[] trigger = new EngineStatus[] {
                 TerasologyEngineStatus.PREPARING_SUBSYSTEMS,
                 TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER,
                 TerasologyEngineStatus.INITIALIZING_ASSET_TYPES,
