@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableStencilTest extends SetStateParameter {
+public final class EnableStencilTest extends SetStateParameter {
     private static final int PARAMETER = GL_STENCIL_TEST;
     private static final String PARAMETER_NAME = "GL_STENCIL_TEST";
     private static StateChange defaultInstance = new EnableStencilTest(false);

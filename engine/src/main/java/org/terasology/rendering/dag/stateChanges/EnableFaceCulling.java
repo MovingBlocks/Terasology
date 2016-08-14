@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableFaceCulling extends SetStateParameter {
+public final class EnableFaceCulling extends SetStateParameter {
     private static final int PARAMETER = GL_CULL_FACE;
     private static final String PARAMETER_NAME = "GL_CULL_FACE";
     private static StateChange defaultInstance = new EnableFaceCulling(false);

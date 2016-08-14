@@ -64,7 +64,7 @@ public class LightShaftsNode extends AbstractNode {
 
     @Override
     public void process() {
-        if (renderingConfig.isLightShafts()) {
+        if (renderingConfig.isLightShafts()) { // TODO: define state changes after this check is eliminated
             PerformanceMonitor.startActivity("rendering/lightShafts");
             lightShaftsFBO = displayResolutionDependentFBOs.get(LIGHT_SHAFTS);
 

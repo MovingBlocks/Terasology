@@ -75,7 +75,7 @@ public class OutlineNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.isOutline()) {
+        if (renderingConfig.isOutline()) { // TODO: define state changes after this check is eliminated
             PerformanceMonitor.startActivity("rendering/outline");
             outlineFBO = displayResolutionDependentFBOs.get(OUTLINE);
 

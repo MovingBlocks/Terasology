@@ -94,7 +94,7 @@ public class BloomPassesNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.isBloom()) {
+        if (renderingConfig.isBloom()) { // TODO: define state changes after this check is eliminated
             PerformanceMonitor.startActivity("rendering/bloomPasses");
             // TODO: review - would it make sense to split these operations into one highpass node and
             // TODO: three blur nodes with different parameters?

@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableBlending extends SetStateParameter {
+public final class EnableBlending extends SetStateParameter {
     private static final int PARAMETER = GL_BLEND;
     private static final String PARAMETER_NAME = "GL_BLEND";
     private static StateChange defaultInstance = new EnableBlending(false);

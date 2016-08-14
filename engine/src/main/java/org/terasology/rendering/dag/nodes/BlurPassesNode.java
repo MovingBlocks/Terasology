@@ -82,7 +82,7 @@ public class BlurPassesNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.getBlurIntensity() != 0) {
+        if (renderingConfig.getBlurIntensity() != 0) { // TODO: define state changes after this check is eliminated
             PerformanceMonitor.startActivity("rendering/blurPasses");
 
             sceneBlur0 = displayResolutionDependentFBOs.get(BLUR_0);

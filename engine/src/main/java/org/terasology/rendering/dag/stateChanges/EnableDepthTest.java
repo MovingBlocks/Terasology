@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 /**
  * TODO: Add javadocs
  */
-public class EnableDepthTest extends SetStateParameter {
+public final class EnableDepthTest extends SetStateParameter {
     private static final int PARAMETER = GL_DEPTH_TEST;
     private static final String PARAMETER_NAME = "GL_DEPTH_TEST";
     private static StateChange defaultInstance = new EnableDepthTest(false);

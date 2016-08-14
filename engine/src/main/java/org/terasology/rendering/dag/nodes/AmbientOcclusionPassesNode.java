@@ -75,12 +75,13 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.isSsao()) {
+        if (renderingConfig.isSsao()) { // TODO: define state changes after this check is eliminated
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
             ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED);
             ssaoFBO = displayResolutionDependentFBOs.get(SSAO);
 
+            // TODO: separate this node into two nodes with using methods below
             generateSSAO();
             generateBlurredSSAO();
             PerformanceMonitor.endActivity();
