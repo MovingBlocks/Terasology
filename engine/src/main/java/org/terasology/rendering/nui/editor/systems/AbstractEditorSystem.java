@@ -17,6 +17,9 @@ package org.terasology.rendering.nui.editor.systems;
 
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 
+/**
+ * A base system for the NUI screen/skin editor systems.
+ */
 public abstract class AbstractEditorSystem extends BaseComponentSystem {
     /**
      * Toggles the editor's visibility state.

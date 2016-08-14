@@ -24,9 +24,12 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.editor.NUISkinEditorButton;
-import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
+import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
+import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
 
+/**
+ * The back-end system for the NUI skin editor.
+ */
 @RegisterSystem
 @Share(NUISkinEditorSystem.class)
 public class NUISkinEditorSystem extends AbstractEditorSystem {

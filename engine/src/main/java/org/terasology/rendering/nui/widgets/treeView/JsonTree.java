@@ -15,8 +15,10 @@
  */
 package org.terasology.rendering.nui.widgets.treeView;
 
+import com.google.gson.JsonElement;
+
 /**
- * A tree representation of a JSON hierarchy, constructed from a {@link com.google.gson.JsonElement}.
+ * A tree representation of a JSON hierarchy, constructed from a {@link JsonElement}.
  */
 public class JsonTree extends Tree<JsonTreeValue> {
     public JsonTree(JsonTreeValue childValue) {

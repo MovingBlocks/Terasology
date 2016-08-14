@@ -24,6 +24,7 @@ import java.util.Optional;
 /**
  * @param <T> Type of objects stored in the underlying tree.
  */
+@SuppressWarnings("unchecked")
 public class TreeModel<T> {
     /**
      * A list of nodes, fetched from a {@code Tree} iterator.

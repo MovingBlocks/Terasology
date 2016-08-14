@@ -21,7 +21,7 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
- * UIData contains a UI widget that has been loaded from a UI asset, ready to be added to the
+ * UIData contains a UI widget that has been loaded from a UI asset.
  */
 @API
 public class UIData implements AssetData {

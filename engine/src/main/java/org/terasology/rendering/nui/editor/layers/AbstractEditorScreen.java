@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -22,8 +22,10 @@ import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -41,6 +43,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
+/**
+ * A base screen for the NUI screen/skin editors.
+ */
 public abstract class AbstractEditorScreen extends CoreScreenLayer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -83,6 +88,9 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param node The node to be edited.
      */
     protected abstract void editNode(JsonTree node);
+
+    @In
+    private Config config;
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -145,16 +153,15 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      */
     protected void addWidget(JsonTree node) {
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+
         WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
             .getScreen(WidgetSelectionScreen.ASSET_URI);
         widgetSelectionScreen.setNode(node);
-        widgetSelectionScreen.subscribeClose(() -> {
-            getEditor().fireUpdateListeners();
-        });
+        widgetSelectionScreen.subscribeClose(() -> getEditor().fireUpdateListeners());
     }
 
     /**
-     * Deserializes the current state of the editor and copies it to the system clipboard.
+     * De-serializes the current state of the editor and copies it to the system clipboard.
      */
     protected void copyJson() {
         if (getEditor().getModel() != null) {
@@ -215,6 +222,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
         if (node.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
             // If the node is a key/value pair, select the value of the node.
+
             if (node.getValue().getValue() instanceof String) {
                 inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":\"".length(), true);
                 inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length() - "\"".length(), false);
@@ -224,10 +232,12 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
             }
         } else {
             // Otherwise fully select the contents of the node.
+
             inlineEditorEntry.setCursorPosition(0, true);
             inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
         }
     }
+
 
     protected void setEditorSystem(AbstractEditorSystem editorSystem) {
         this.editorSystem = editorSystem;

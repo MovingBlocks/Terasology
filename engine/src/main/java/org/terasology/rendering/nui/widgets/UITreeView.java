@@ -462,7 +462,7 @@ public class UITreeView<T> extends CoreWidget {
         return false;
     }
 
-    public boolean removeSelected() {
+    private boolean removeSelected() {
         if (state.getSelectedIndex() != null) {
             model.get().removeNode(state.getSelectedIndex());
             state.setSelectedIndex(null);
@@ -703,7 +703,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * A set of tree node sub-listeners.
      */
-    private class TreeViewListenerSet {
+    private final class TreeViewListenerSet {
         /**
          * The top listener.
          */

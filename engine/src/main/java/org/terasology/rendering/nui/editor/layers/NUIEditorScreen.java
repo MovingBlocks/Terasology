@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -67,16 +67,15 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public final class NUIEditorScreen extends AbstractEditorScreen {
 
-    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorScreen");
 
     // Editor widget identifiers.
     private static final String AVAILABLE_ASSETS_ID = "availableAssets";
     private static final String EDITOR_TREE_VIEW_ID = "editor";
     private static final String SELECTED_SCREEN_ID = "selectedScreen";
-
     private static final String CREATE_NEW_SCREEN = "New Screen";
+
+    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     /**
      * Used to retrieve & dispose of {@link UIElement} assets.
@@ -135,43 +134,48 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         availableAssetList.removeIf(asset -> asset.equals(WidgetSelectionScreen.ASSET_URI.toString()));
         Collections.sort(availableAssetList);
 
-        availableAssetDropdown.setOptions(availableAssetList);
-        availableAssetDropdown.bindSelection(new Binding<String>() {
-            @Override
-            public String get() {
-                return selectedAsset;
-            }
-
-            @Override
-            public void set(String value) {
-                if (CREATE_NEW_SCREEN.equals(value)) {
-                    resetState(NUIEditorNodeUtils.createNewScreen());
-                    selectedAsset = value;
-                } else {
-                    selectAsset(new ResourceUrn(value));
+        if (availableAssetDropdown != null) {
+            availableAssetDropdown.setOptions(availableAssetList);
+            availableAssetDropdown.bindSelection(new Binding<String>() {
+                @Override
+                public String get() {
+                    return selectedAsset;
                 }
-            }
-        });
 
-        editor.subscribeTreeViewUpdate(() -> {
-            getEditor().addToHistory();
-            resetPreviewWidget();
-            updateConfig();
-        });
+                @Override
+                public void set(String value) {
+                    // Construct a new screen tree (or de-serialize from an existing asset)
+                    if (CREATE_NEW_SCREEN.equals(value)) {
+                        resetState(NUIEditorNodeUtils.createNewScreen());
+                        selectedAsset = value;
+                    } else {
+                        selectAsset(new ResourceUrn(value));
+                    }
+                }
+            });
+        }
 
-        editor.setContextMenuTreeProducer(node -> {
-            NUIEditorMenuTreeBuilder nuiEditorMenuTreeBuilder = new NUIEditorMenuTreeBuilder();
-            nuiEditorMenuTreeBuilder.setManager(getManager());
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
-            nuiEditorMenuTreeBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
-            return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
-        });
+        if (editor != null) {
+            editor.subscribeTreeViewUpdate(() -> {
+                getEditor().addToHistory();
+                resetPreviewWidget();
+                updateConfig();
+            });
 
-        editor.setEditor(this::editNode, getManager());
+            editor.setContextMenuTreeProducer(node -> {
+                NUIEditorMenuTreeBuilder nuiEditorMenuTreeBuilder = new NUIEditorMenuTreeBuilder();
+                nuiEditorMenuTreeBuilder.setManager(getManager());
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
+                nuiEditorMenuTreeBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
+                return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
+            });
+
+            editor.setEditor(this::editNode, getManager());
+        }
 
         // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button ->
@@ -255,8 +259,12 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     @Override
     protected void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
+
+        // Update the editor's item renderer.
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
+
+        // Update the alternative locale. If it has been updated, change the preview widget's locale.
         if (nuiEditorConfig.getAlternativeLocale() != null
             && !nuiEditorConfig.getAlternativeLocale().equals(alternativeLocale)) {
             alternativeLocale = nuiEditorConfig.getAlternativeLocale();
@@ -272,11 +280,13 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     @Override
     protected void editNode(JsonTree node) {
         Class nodeClass = null;
+
         try {
-            nodeClass = NUIEditorNodeUtils
-                .getNodeClass((JsonTree) node.getParent(), getManager())
-                .getDeclaredField(node.getValue().getKey())
-                .getType();
+            Class parentClass = NUIEditorNodeUtils.getNodeClass((JsonTree) node.getParent(), getManager());
+
+            if (parentClass != null) {
+                nodeClass = parentClass.getDeclaredField(node.getValue().getKey()).getType();
+            }
         } catch (NullPointerException | NoSuchFieldException ignored) {
         }
 
@@ -286,9 +296,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 .getScreen(EnumEditorScreen.ASSET_URI);
             enumEditorScreen.setNode(node);
             enumEditorScreen.setEnumClass(nodeClass);
-            enumEditorScreen.subscribeClose(() -> {
-                getEditor().fireUpdateListeners();
-            });
+            enumEditorScreen.subscribeClose(() -> getEditor().fireUpdateListeners());
         } else {
             JsonTreeValue.Type type = node.getValue().getType();
 
@@ -298,8 +306,8 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createValueEditor();
             } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
-            } else if (type == JsonTreeValue.Type.OBJECT &&
-                !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+            } else if (type == JsonTreeValue.Type.OBJECT
+                && !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
             } else if (type == JsonTreeValue.Type.ARRAY) {
                 inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();

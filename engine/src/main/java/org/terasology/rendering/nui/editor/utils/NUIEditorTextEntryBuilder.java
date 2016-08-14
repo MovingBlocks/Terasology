@@ -27,15 +27,21 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
 import java.util.Map;
 
-public class NUIEditorTextEntryBuilder {
+/**
+ * A utility class to create {@link UITextEntry} instances used as inline editors
+ * in the NUI editor.
+ */
+public final class NUIEditorTextEntryBuilder {
+
+    private NUIEditorTextEntryBuilder() {
+    }
+
     private static UITextEntry<JsonTree> createEditorEntry(UITextEntry.Formatter<JsonTree> formatter,
                                                            UITextEntry.Parser<JsonTree> parser) {
         UITextEntry<JsonTree> editorEntry = new UITextEntry<>();
         editorEntry.setFormatter(formatter);
         editorEntry.setParser(parser);
-        editorEntry.subscribe(widget -> {
-            editorEntry.onLoseFocus();
-        });
+        editorEntry.subscribe(widget -> editorEntry.onLoseFocus());
         return editorEntry;
     }
 

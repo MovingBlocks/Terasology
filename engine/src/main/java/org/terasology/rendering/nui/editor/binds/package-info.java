@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+@API
+@InputCategory(id = "nui", displayName = "${engine:menu#category-nui}")
+package org.terasology.rendering.nui.editor.binds;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
-
-@RegisterBindButton(id = "nuiEditor", description = "${engine:menu#binding-nui-editor}", category = "nui")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F10)
-public class NUIEditorButton extends BindButtonEvent {
-}
+import org.terasology.input.InputCategory;
+import org.terasology.module.sandbox.API;

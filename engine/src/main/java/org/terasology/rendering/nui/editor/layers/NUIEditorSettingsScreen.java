@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
@@ -33,6 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * The screen to modify NUI screen/skin editor settings.
+ */
 @SuppressWarnings("unchecked")
 public class NUIEditorSettingsScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsScreen");
@@ -49,8 +52,10 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
     public void initialise() {
         WidgetUtil.tryBindCheckbox(this, "disableIcons", BindHelper.bindBeanProperty("disableIcons", config.getNuiEditor(), Boolean.TYPE));
         WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
+
         alternativeLocale = find("alternativeLocale", UIDropdownScrollable.class);
         if (alternativeLocale != null) {
+            // Build the list of available locales and set the dropdown's options to them.
             TranslationProject menuProject = translationSystem.getProject(new SimpleUri("engine:menu"));
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
             Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
@@ -58,6 +63,7 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
             alternativeLocale.setVisibleOptions(5);
             alternativeLocale.setOptionRenderer(new LocaleRenderer(translationSystem));
 
+            // If an alternative locale has been previously selected, select it; otherwise select the system locale.
             if (config.getNuiEditor().getAlternativeLocale() != null) {
                 alternativeLocale.setSelection(config.getNuiEditor().getAlternativeLocale());
             } else {

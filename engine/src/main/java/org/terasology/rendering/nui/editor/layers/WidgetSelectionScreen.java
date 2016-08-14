@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -37,13 +37,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A screen to select a widget from the list of available widgets
+ * and add it as a child of a specified {@link JsonTree}.
+ */
+@SuppressWarnings("unchecked")
 public class WidgetSelectionScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:widgetSelectionScreen");
 
     /**
      * The dropdown containing the values of {@code widgets}.
      */
-    private UIDropdownScrollable availableWidgets;
+    private UIDropdownScrollable<String> availableWidgets;
     /**
      * The {@link JsonTree} a selected widget is to be added to.
      */
@@ -69,18 +74,21 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
             }
         }
 
-        List options = Lists.newArrayList(widgets.keySet());
+        List<String> options = Lists.newArrayList(widgets.keySet());
         Collections.sort(options);
         availableWidgets.setOptions(options);
 
+        // Add the widget as a child of the node.
         WidgetUtil.trySubscribe(this, "ok", button -> {
-            String selection = availableWidgets.getSelection().toString();
+            String selection = availableWidgets.getSelection();
             JsonTree childNode;
             if (node.getValue().getType() == JsonTreeValue.Type.ARRAY) {
                 ClassMetadata metadata = widgets.get(selection);
+
+                // Get the widget tree from a utility method.
                 childNode = NUIEditorNodeUtils.createNewWidget(selection, "newWidget", false);
 
-                // If the widget is an UILayout override, add a "contents" array node.
+                // If the widget is an UILayout override, also add a "contents" array node to the tree.
                 if (UILayout.class.isAssignableFrom(metadata.getType())) {
                     childNode.addChild(new JsonTreeValue("contents", null, JsonTreeValue.Type.ARRAY));
                 }
@@ -101,9 +109,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "cancel", button -> {
-            getManager().closeScreen(ASSET_URI);
-        });
+        WidgetUtil.trySubscribe(this, "cancel", button -> getManager().closeScreen(ASSET_URI));
     }
 
     public void setNode(JsonTree node) {

@@ -180,14 +180,14 @@ public abstract class Tree<T> {
         return true;
     }
 
-    private boolean isChildOf(Tree<T> parent) {
-        if (this.parent == parent) {
+    private boolean isChildOf(Tree<T> node) {
+        if (this.parent == node) {
             return true;
         }
         if (this.isRoot()) {
             return false;
         }
-        return this.parent.isChildOf(parent);
+        return this.parent.isChildOf(node);
     }
 
     public int indexOf(Tree<T> child) {

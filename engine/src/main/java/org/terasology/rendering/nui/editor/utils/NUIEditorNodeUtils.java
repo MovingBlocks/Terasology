@@ -22,8 +22,8 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.editor.screens.NUIEditorScreen;
-import org.terasology.rendering.nui.editor.screens.NUISkinEditorScreen;
+import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
+import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
 import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
 import org.terasology.rendering.nui.skin.UIStyleFragment;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
@@ -36,9 +36,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class NUIEditorNodeUtils {
+@SuppressWarnings("unchecked")
+public final class NUIEditorNodeUtils {
     private static final String SAMPLE_LABEL_TEXT = "Welcome to the Terasology NUI editor!\r\n" + "TODO: add tiny " +
-                                                    "tutorial, keybinds etc.";
+        "tutorial, keybinds etc.";
+
+    private NUIEditorNodeUtils() {
+    }
 
     /**
      * @return The {@link JsonTree} to be used as an initial screen template within {@link NUIEditorScreen}.
@@ -130,9 +134,9 @@ public class NUIEditorNodeUtils {
                     .resolve(type, ModuleContext.getContext())
                     .getType();
             } else {
-                if (List.class.isAssignableFrom(currentClass) &&
-                    n.getValue().getKey() == null &&
-                    "contents".equals(n.getParent().getValue().getKey())) {
+                if (List.class.isAssignableFrom(currentClass)
+                    && n.getValue().getKey() == null
+                    && "contents".equals(n.getParent().getValue().getKey())) {
                     // Transition from a "contents" list to a UIWidget.
                     currentClass = UIWidget.class;
                 } else {
@@ -169,7 +173,7 @@ public class NUIEditorNodeUtils {
                             Optional<Field> serializedNameField = fields
                                 .stream()
                                 .filter(f -> f.isAnnotationPresent(SerializedName.class)
-                                             && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
+                                    && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
                             if (serializedNameField.isPresent()) {
                                 currentClass = serializedNameField.get().getType();
                             } else {
@@ -199,10 +203,9 @@ public class NUIEditorNodeUtils {
 
     /**
      * @param node       A node in an asset tree.
-     * @param nuiManager The {@link NUIManager} to be used for widget type resolution.
      * @return The type of the field this node represents.
      */
-    public static Class getSkinNodeClass(JsonTree node, NUIManager nuiManager) {
+    public static Class getSkinNodeClass(JsonTree node) {
         Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
 
         // Create a stack with the root node at the top and the argument at the bottom.
@@ -222,8 +225,8 @@ public class NUIEditorNodeUtils {
                 if ("elements".equals(n.getValue().getKey()) || "families".equals(n.getValue().getKey())) {
                     currentClass = null;
                 } else if (n.getParent().getValue().getKey() != null
-                           && ("elements".equals(n.getParent().getValue().getKey())
-                               || "families".equals(n.getParent().getValue().getKey()))) {
+                    && ("elements".equals(n.getParent().getValue().getKey())
+                    || "families".equals(n.getParent().getValue().getKey()))) {
                     currentClass = UIStyleFragment.class;
                 } else {
                     String value = n.getValue().toString();
@@ -237,7 +240,7 @@ public class NUIEditorNodeUtils {
                         Optional<Field> serializedNameField = fields
                             .stream()
                             .filter(f -> f.isAnnotationPresent(SerializedName.class)
-                                         && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
+                                && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
                         if (serializedNameField.isPresent()) {
                             currentClass = serializedNameField.get().getType();
                         } else {
