@@ -89,9 +89,6 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      */
     protected abstract void editNode(JsonTree node);
 
-    @In
-    private Config config;
-
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown()) {
@@ -237,7 +234,6 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
             inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
         }
     }
-
 
     protected void setEditorSystem(AbstractEditorSystem editorSystem) {
         this.editorSystem = editorSystem;
