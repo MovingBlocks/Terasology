@@ -23,7 +23,7 @@ import org.terasology.rendering.dag.StateChange;
  * TODO: Add javadocs
  * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
  */
-public abstract class SetStateParameter implements StateChange {
+abstract class SetStateParameter implements StateChange {
     private boolean enabled;
 
     SetStateParameter(boolean enabled) {
