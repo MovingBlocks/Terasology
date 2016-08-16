@@ -69,7 +69,7 @@ public class NUIEditorMenuTreeBuilder {
     /**
      * Listeners fired when one of the options within {@code LEVEL_ADD_EXTENDED} is selected.
      */
-    private List<UpdateListener> addContextMenuListeners = Lists.newArrayList();
+    private List<Consumer<JsonTree>> addContextMenuListeners = Lists.newArrayList();
 
     public void setManager(NUIManager manager) {
         this.nuiManager = manager;
@@ -79,7 +79,7 @@ public class NUIEditorMenuTreeBuilder {
         externalConsumers.put(key, value);
     }
 
-    public void subscribeAddContextMenu(UpdateListener listener) {
+    public void subscribeAddContextMenu(Consumer<JsonTree> listener) {
         addContextMenuListeners.add(listener);
     }
 
@@ -150,22 +150,34 @@ public class NUIEditorMenuTreeBuilder {
         if (type == JsonTreeValue.Type.ARRAY) {
             // Add generic item addition options.
             addTree.addOption("Boolean value", n -> {
-                n.addChild(new JsonTreeValue(null, false, JsonTreeValue.Type.VALUE));
-                addContextMenuListeners.forEach(UpdateListener::onAction);
+                JsonTree child = new JsonTree(new JsonTreeValue(null, false, JsonTreeValue.Type.VALUE));
+                n.addChild(child);
+                for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                    listener.accept(child);
+                }
             }, node);
             addTree.addOption("Number value", n -> {
-                n.addChild(new JsonTreeValue(null, 0.0f, JsonTreeValue.Type.VALUE));
-                addContextMenuListeners.forEach(UpdateListener::onAction);
+                JsonTree child = new JsonTree((new JsonTreeValue(null, 0.0f, JsonTreeValue.Type.VALUE)));
+                n.addChild(child);
+                for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                    listener.accept(n);
+                }
             }, node);
             addTree.addOption("String value", n -> {
-                n.addChild(new JsonTreeValue(null, "", JsonTreeValue.Type.VALUE));
-                addContextMenuListeners.forEach(UpdateListener::onAction);
+                JsonTree child = new JsonTree((new JsonTreeValue(null, "", JsonTreeValue.Type.VALUE)));
+                n.addChild(child);
+                for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                    listener.accept(child);
+                }
             }, node);
         } else if (type == JsonTreeValue.Type.OBJECT) {
             // Add a generic key/value pair addition option.
             addTree.addOption("Key/value pair", n -> {
-                n.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
-                addContextMenuListeners.forEach(UpdateListener::onAction);
+                JsonTree child = new JsonTree((new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR)));
+                n.addChild(child);
+                for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                    listener.accept(child);
+                }
             }, node);
 
             populateContextMenu(node, addTree, false);
@@ -182,14 +194,20 @@ public class NUIEditorMenuTreeBuilder {
             if ("families".equals(node.getValue().getKey())) {
                 // Add an option to add a family for a "families" node.
                 addTree.addOption("New family", n -> {
-                    n.addChild(new JsonTreeValue("", null, JsonTreeValue.Type.OBJECT));
-                    n.getChildAt(0).setExpanded(true);
-                    addContextMenuListeners.forEach(UpdateListener::onAction);
+                    JsonTree child = new JsonTree(new JsonTreeValue("", null, JsonTreeValue.Type.OBJECT));
+                    child.setExpanded(true);
+                    n.addChild(child);
+                    for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                        listener.accept(child);
+                    }
                 }, node);
             } else {
                 addTree.addOption("Key/value pair", n -> {
-                    n.addChild(new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
-                    addContextMenuListeners.forEach(UpdateListener::onAction);
+                    JsonTree child = new JsonTree((new JsonTreeValue("", "", JsonTreeValue.Type.KEY_VALUE_PAIR)));
+                    n.addChild(child);
+                    for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                        listener.accept(child);
+                    }
                 }, node);
 
                 populateContextMenu(node, addTree, true);
@@ -216,8 +234,10 @@ public class NUIEditorMenuTreeBuilder {
                     if (!node.hasChildWithKey(name)) {
                         addTree.addOption(name, n -> {
                             try {
-                                createChild(name, node, field, clazz);
-                                addContextMenuListeners.forEach(UpdateListener::onAction);
+                                JsonTree child = createChild(name, node, field, clazz);
+                                for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                                    listener.accept(child);
+                                }
                             } catch (IllegalAccessException | InstantiationException e) {
                                 logger.warn("Could not add child", e);
                             }
@@ -230,7 +250,7 @@ public class NUIEditorMenuTreeBuilder {
         }
     }
 
-    private void createChild(String name, JsonTree node, Field field, Class clazz)
+    private JsonTree createChild(String name, JsonTree node, Field field, Class clazz)
         throws IllegalAccessException, InstantiationException {
         JsonTreeValue childValue = new JsonTreeValue();
         childValue.setKey(name);
@@ -242,7 +262,7 @@ public class NUIEditorMenuTreeBuilder {
         } else {
             if (isWidget(field)) {
                 createWidgetChild(name, node);
-                return;
+                return null;
             } else {
                 childValue.setValue(getFieldValue(field, clazz));
                 childValue.setType(getNodeType(field, getFieldValue(field, clazz)));
@@ -252,6 +272,7 @@ public class NUIEditorMenuTreeBuilder {
         JsonTree child = new JsonTree(childValue);
         child.setExpanded(true);
         node.addChild(child);
+        return child;
     }
 
     private boolean isWidget(Field field) throws IllegalAccessException {
@@ -304,7 +325,8 @@ public class NUIEditorMenuTreeBuilder {
                 value = !(Boolean) value;
             }
 
-            return value != null ? value : newInstance(field.getType());
+            return (value != null || Binding.class.isAssignableFrom(field.getType()))
+                ? value : newInstance(field.getType());
         }
     }
 

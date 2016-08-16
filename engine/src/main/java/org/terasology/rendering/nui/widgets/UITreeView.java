@@ -338,7 +338,8 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void setNodeMode(Canvas canvas, Tree<T> node, TreeViewListenerSet listenerSet) {
-        if (state.getSelectedIndex() != null && Objects.equals(node, model.get().getNode(state.getSelectedIndex()))) {
+        if (state.getSelectedIndex() != null
+            && node.equals(model.get().getNode(state.getSelectedIndex()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listenerSet.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);

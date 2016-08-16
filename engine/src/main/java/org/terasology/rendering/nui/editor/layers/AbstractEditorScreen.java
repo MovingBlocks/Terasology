@@ -22,13 +22,12 @@ import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
@@ -57,6 +56,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * The editor widget.
      */
     private JsonEditorTreeView editor;
+    /**
+     *
+     */
+    private boolean unsavedChangesPresent;
 
     /**
      * Selects the current asset to be edited.
@@ -70,7 +73,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      *
      * @param node The node based on which the editor's state is to be reset.
      */
-    protected abstract void resetState(JsonTree node);
+    protected abstract void resetStateInternal(JsonTree node);
 
     /**
      * Resets the preview widget based on the editor's current state.
@@ -88,6 +91,13 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param node The node to be edited.
      */
     protected abstract void editNode(JsonTree node);
+
+    /**
+     * Adds a widget selected by the user to the specified node.
+     *
+     * @param node The node to add a new widget to.
+     */
+    protected abstract void addWidget(JsonTree node);
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -143,18 +153,18 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         }
     }
 
-    /**
-     * Adds a widget selected by the user to the specified node.
-     *
-     * @param node The node to add a new widget to.
-     */
-    protected void addWidget(JsonTree node) {
-        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
-
-        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
-            .getScreen(WidgetSelectionScreen.ASSET_URI);
-        widgetSelectionScreen.setNode(node);
-        widgetSelectionScreen.subscribeClose(() -> getEditor().fireUpdateListeners());
+    protected void resetState(JsonTree node) {
+        if (unsavedChangesPresent) {
+            ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+            confirmPopup.setMessage("Unsaved changes!", "It looks like you've been editing something!" +
+                "\r\nAll unsaved changes will be lost. Continue anyway?");
+            confirmPopup.setOkHandler(() -> {
+                setUnsavedChangesPresent(false);
+                resetStateInternal(node);
+            });
+        } else {
+            resetStateInternal(node);
+        }
     }
 
     /**
@@ -245,5 +255,9 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
     protected void setEditor(JsonEditorTreeView editor) {
         this.editor = editor;
+    }
+
+    protected void setUnsavedChangesPresent(boolean value) {
+        this.unsavedChangesPresent = value;
     }
 }

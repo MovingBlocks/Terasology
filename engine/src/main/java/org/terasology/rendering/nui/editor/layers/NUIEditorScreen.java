@@ -42,6 +42,7 @@ import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
@@ -104,6 +105,10 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
      */
     private String selectedAsset;
     /**
+     *
+     */
+    private String selectedAssetPending;
+    /**
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
@@ -145,9 +150,9 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 @Override
                 public void set(String value) {
                     // Construct a new screen tree (or de-serialize from an existing asset)
+                    selectedAssetPending = value;
                     if (CREATE_NEW_SCREEN.equals(value)) {
                         resetState(NUIEditorNodeUtils.createNewScreen());
-                        selectedAsset = value;
                     } else {
                         selectAsset(new ResourceUrn(value));
                     }
@@ -160,6 +165,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 getEditor().addToHistory();
                 resetPreviewWidget();
                 updateConfig();
+                setUnsavedChangesPresent(true);
             });
 
             editor.setContextMenuTreeProducer(node -> {
@@ -170,7 +176,14 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
                 nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
                 nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
-                nuiEditorMenuTreeBuilder.subscribeAddContextMenu(editor::fireUpdateListeners);
+                nuiEditorMenuTreeBuilder.subscribeAddContextMenu(n -> {
+                    editor.fireUpdateListeners();
+
+                    editor.getModel().getNode(editor.getSelectedIndex()).setExpanded(true);
+                    editor.getModel().resetNodes();
+                    editor.setSelectedIndex(editor.getModel().indexOf(n));
+                    editNode(n);
+                });
                 return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
             });
 
@@ -210,17 +223,14 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
 
             if (content != null) {
                 JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
+                selectedAssetPending = urn.toString();
                 resetState(node);
-                selectedAsset = urn.toString();
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void resetState(JsonTree node) {
+    protected void resetStateInternal(JsonTree node) {
         getEditor().setTreeViewModel(node, true);
         resetPreviewWidget();
 
@@ -236,6 +246,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         }
 
         updateConfig();
+        selectedAsset = selectedAssetPending;
     }
 
     /**
@@ -332,5 +343,27 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 focusInlineEditor(node, inlineEditorEntry);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addWidget(JsonTree node) {
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
+            .getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setNode(node);
+        widgetSelectionScreen.subscribeClose(() -> {
+            JsonTree widget = node.getChildAt(node.getChildren().size() - 1);
+            widget.setExpanded(true);
+            getEditor().fireUpdateListeners();
+
+            // Automatically edit the id of a newly added widget.
+            getEditor().getModel().resetNodes();
+            getEditor().setSelectedIndex(getEditor().getModel().indexOf(widget.getChildWithKey("id")));
+            editNode(widget.getChildWithKey("id"));
+        });
     }
 }
