@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.RenderingConfig;
+import org.terasology.rendering.dag.nodes.WorldReflectionNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector4f;
@@ -25,7 +28,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 
 import java.util.Optional;
 
@@ -92,7 +94,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
         RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
 
         // TODO move texture binding and setting into nodes
@@ -123,11 +125,11 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureEffects", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffersManager.bindFboColorTexture("sceneReflected");
+        dynamicFBM.bindFboColorTexture(WorldReflectionNode.REFLECTED_URN);
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffersManager.bindFboColorTexture("sceneOpaque");
+        dynamicFBM.bindFboColorTexture(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
         program.setInt("texSceneOpaque", texId++, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame

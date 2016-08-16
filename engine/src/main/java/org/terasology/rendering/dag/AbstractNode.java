@@ -15,43 +15,78 @@
  */
 package org.terasology.rendering.dag;
 
+import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
+import java.util.Map;
 import java.util.Set;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.In;
+import org.terasology.rendering.opengl.BaseFBM;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.StaticFBM;
 
 /**
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
+
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private StaticFBM staticFBM;
+
+    @In
+    private DynamicFBM dynamicFBM;
 
     private Set<StateChange> desiredStateChanges;
-    private Set<String> fboNames;
+    private Map<ResourceUrn, Set<BaseFBM>> fboUsages;
 
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
-        fboNames = Sets.newHashSet();
+        fboUsages = Maps.newHashMap();
     }
 
-    protected void requireFBO(FBOConfig fboConfig) {
+    protected void requireStaticFBO(FBOConfig fboConfig) {
+        requireFBO(fboConfig, staticFBM);
+    }
 
-        if (!frameBuffersManager.isFBOConfigAvailable(fboConfig.getTitle())) {
-            frameBuffersManager.generateFBOWith(fboConfig);
+    protected void requireDynamicFBO(FBOConfig fboConfig) {
+        requireFBO(fboConfig, dynamicFBM);
+    }
+
+    protected void requireFBO(FBOConfig fboConfig, BaseFBM frameBuffersManager) {
+        ResourceUrn urn = fboConfig.getResourceUrn();
+        if (!frameBuffersManager.isFBOAvailable(urn)) {
+            frameBuffersManager.allocateFBO(fboConfig);
         }
-        fboNames.add(fboConfig.toString());
+
+        if (!fboUsages.containsKey(urn)) {
+            Set<BaseFBM> fbms = Sets.newHashSet();
+            fbms.add(frameBuffersManager);
+            fboUsages.put(urn, fbms);
+        } else {
+            fboUsages.get(urn).add(frameBuffersManager);
+        }
+    }
+
+    protected void requireFBO(DefaultDynamicFBOs defaultDynamicFBO) {
+        requireFBO(defaultDynamicFBO.getFboConfig(), dynamicFBM);
     }
 
     @Override
     public void dispose() {
-        for (String fboName : fboNames) {
-            frameBuffersManager.removeUsage(fboName); // TODO: better naming?
+        for (Map.Entry<ResourceUrn, Set<BaseFBM>> entry : fboUsages.entrySet()) {
+            ResourceUrn urn = entry.getKey();
+            Set<BaseFBM> fbms = entry.getValue();
+
+            for (BaseFBM fbm : fbms) {
+                fbm.release(urn);
+            }
         }
+        fboUsages.clear();
     }
 
     protected boolean addDesiredStateChange(StateChange stateChange) {

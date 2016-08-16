@@ -15,13 +15,15 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -34,9 +36,11 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class PrePostCompositeNode extends AbstractNode {
+    public static final ResourceUrn REFLECTIVE_REFRACTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
+
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     @In
     private WorldRenderer worldRenderer;
@@ -49,9 +53,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
-        requireFBO(new FBOConfig("sceneOpaquePingPong", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneReflectiveRefractive", 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireDynamicFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
     }
 
     /**
@@ -62,9 +64,9 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        sceneOpaquePingPong = dynamicFBM.getFBO(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn());
+        sceneReflectiveRefractive = dynamicFBM.getFBO(REFLECTIVE_REFRACTIVE_URN);
 
         // TODO: verify if there should be bound textures here.
         sceneOpaquePingPong.bind();
@@ -77,7 +79,8 @@ public class PrePostCompositeNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        frameBuffersManager.swapSceneOpaqueFBOs();
+        dynamicFBM.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn(), DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();
     }

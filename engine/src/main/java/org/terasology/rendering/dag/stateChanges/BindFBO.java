@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.rendering.dag.FBOManagerSubscriber;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.opengl.BaseFBM;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.BindFBOTask;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 
 /**
  * TODO: Add javadocs
@@ -27,22 +28,25 @@ import org.terasology.rendering.opengl.FrameBuffersManager;
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
-    private static final String DEFAULT_FRAME_BUFFER_NAME = "display";
-    private static FrameBuffersManager frameBuffersManager;
-    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_NAME);
-    private String fboName;
+    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+
+    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_URN);
+
     private BindFBOTask task;
+    private BaseFBM fbm;
+    private final ResourceUrn resourceUrn;
 
-    public BindFBO(String fboName) {
-        this.fboName = fboName;
+    public BindFBO(ResourceUrn resourceUrn, BaseFBM fbm) {
+        this.fbm = fbm;
+        this.resourceUrn = resourceUrn;
     }
 
-    public String getFboName() {
-        return fboName;
+    private BindFBO(ResourceUrn resourceUrn) {
+        this.resourceUrn = resourceUrn;
     }
 
-    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
-        BindFBO.frameBuffersManager = frameBuffersManager;
+    public ResourceUrn getResourceUrn() {
+        return resourceUrn;
     }
 
     @Override
@@ -59,14 +63,14 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     public RenderPipelineTask generateTask() {
         if (task == null) {
             // Subscription is only needed if fboID is different than default frame buffer id.
-            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
-                task = new BindFBOTask(frameBuffersManager.getFBO(fboName).fboId, fboName);
-                frameBuffersManager.subscribe(this);
+            if (!resourceUrn.equals(DEFAULT_FRAME_BUFFER_URN)) {
+                task = new BindFBOTask(fbm.getFBO(resourceUrn).fboId, resourceUrn);
+                fbm.subscribe(this);
             } else {
-                task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_NAME);
+                task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_URN);
             }
         } else {
-            if (!fboName.equals(DEFAULT_FRAME_BUFFER_NAME)) {
+            if (!resourceUrn.equals(DEFAULT_FRAME_BUFFER_URN)) {
                 update();
             }
         }
@@ -76,18 +80,18 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof BindFBO) {
-            return this.fboName.equals(((BindFBO) stateChange).getFboName());
+            return this.resourceUrn.equals(((BindFBO) stateChange).getResourceUrn());
         }
         return false;
     }
 
     @Override
     public void update() {
-        task.setFboId(frameBuffersManager.getFBO(fboName).fboId);
+        task.setFboId(fbm.getFBO(resourceUrn).fboId);
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
+        return String.format("%21s: %s", this.getClass().getSimpleName(), resourceUrn);
     }
 }

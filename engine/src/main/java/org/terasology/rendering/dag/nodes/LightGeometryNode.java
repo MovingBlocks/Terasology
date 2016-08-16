@@ -24,9 +24,9 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -52,7 +52,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 public class LightGeometryNode extends AbstractNode {
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     @In
     private WorldRenderer worldRenderer;
@@ -66,7 +66,6 @@ public class LightGeometryNode extends AbstractNode {
     @Override
     public void initialise() {
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
     }
 
     @Override
@@ -90,7 +89,7 @@ public class LightGeometryNode extends AbstractNode {
         graphicState.postRenderCleanupLightGeometryStencil();
         */
 
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
         // LightGeometry requires a cleanup
         cleanupSceneOpaque();
         preRenderSetupLightGeometry();
@@ -139,7 +138,6 @@ public class LightGeometryNode extends AbstractNode {
      * Resets the state after the rendering of the Opaque scene.
      */
     private void cleanupSceneOpaque() {
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         setRenderBufferMask(sceneOpaque, true, true, true); // TODO: probably redundant - verify
         bindDisplay();
     }

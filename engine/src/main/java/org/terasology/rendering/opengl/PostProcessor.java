@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 
 /**
  * The term "Post Processing" is in analogy to what occurs in the world of Photography:
@@ -73,7 +74,7 @@ import java.util.Date;
 public class PostProcessor {
     private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
 
-    private FrameBuffersManager buffersManager;
+    private DynamicFBM buffersManager;
 
     private boolean isTakingScreenshot;
 
@@ -93,7 +94,7 @@ public class PostProcessor {
      *
      * @param buffersManager An FrameBuffersManager instance, required to obtain FBO references.
      */
-    public PostProcessor(FrameBuffersManager buffersManager) {
+    public PostProcessor(DynamicFBM buffersManager) {
         this.buffersManager = buffersManager;
     }
 
@@ -152,7 +153,7 @@ public class PostProcessor {
             return;
         }
 
-        FBO sceneFinal = buffersManager.getFBO("sceneFinal");
+        FBO sceneFinal = buffersManager.getFBO(DefaultDynamicFBOs.Final.getResourceUrn());
         int width = sceneFinal.width();
         int height = sceneFinal.height();
 

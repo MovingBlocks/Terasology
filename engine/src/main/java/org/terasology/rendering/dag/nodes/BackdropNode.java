@@ -15,14 +15,16 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -35,6 +37,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
  * TODO: Diagram of this node
  */
 public class BackdropNode extends WireframeCapableNode {
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
+
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -43,7 +47,7 @@ public class BackdropNode extends WireframeCapableNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     private Camera playerCamera;
     private FBO sceneOpaque;
@@ -53,14 +57,13 @@ public class BackdropNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneReflectiveRefractive", 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireDynamicFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
         initialClearing();
 
@@ -87,7 +90,7 @@ public class BackdropNode extends WireframeCapableNode {
      */
     // It's unclear why these buffers need to be cleared while all the others don't...
     private void initialClearing() {
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneReflectiveRefractive = dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN);
         sceneOpaque.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         sceneReflectiveRefractive.bind();

@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
@@ -28,10 +29,13 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.StaticFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -45,7 +49,18 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add node of this diagram
  */
 public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
+    public static final ResourceUrn SCENE_16_URN = new ResourceUrn("engine:scene16");
+    public static final ResourceUrn SCENE_8_URN = new ResourceUrn("engine:scene8");
+    public static final ResourceUrn SCENE_4_URN = new ResourceUrn("engine:scene4");
+    public static final ResourceUrn SCENE_2_URN = new ResourceUrn("engine:scene2");
+    public static final ResourceUrn SCENE_1_URN = new ResourceUrn("engine:scene1");
+    public static final ResourceUrn SCENE_PRE_POST_URN = new ResourceUrn("engine:scenePrePost");
+
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
+
+    private PBO frontReadbackPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back
+    private PBO backReadbackPBO;    // into the CPU. This data is then used in the context of
+    private PBO currentReadbackPBO; // eye adaptation.
 
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
@@ -66,7 +81,11 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private StaticFBM staticFBM;
+
+    @In
+    private DynamicFBM dynamicFBM;
+
 
     @In
     private Config config;
@@ -91,15 +110,24 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        requireFBO(new FBOConfig("scene16", 16, 16, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("scene8", 8, 8, FBO.Type.DEFAULT).setStatic());
-        requireFBO(new FBOConfig("scene4", 4, 4, FBO.Type.DEFAULT).setStatic());
-        requireFBO(new FBOConfig("scene2", 2, 2, FBO.Type.DEFAULT).setStatic());
-        requireFBO(new FBOConfig("scene1", 1, 1, FBO.Type.DEFAULT).setStatic());
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("scenePrePost", 1.0f, FBO.Type.HDR));
+        requireStaticFBO(new FBOConfig(SCENE_16_URN, 16, 16, FBO.Type.DEFAULT));
+        requireStaticFBO(new FBOConfig(SCENE_8_URN, 8, 8, FBO.Type.DEFAULT));
+        requireStaticFBO(new FBOConfig(SCENE_4_URN, 4, 4, FBO.Type.DEFAULT));
+        requireStaticFBO(new FBOConfig(SCENE_2_URN, 2, 2, FBO.Type.DEFAULT));
+        requireStaticFBO(new FBOConfig(SCENE_1_URN, 1, 1, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR));
 
         obtainStaticFBOs();
+        createPBOs();
+    }
+
+
+    private void createPBOs() {
+        // Technically these are not Frame Buffer Objects but Pixel Buffer Objects.
+        // Their instantiation and assignments are done here because they are static buffers.
+        frontReadbackPBO = new PBO(1, 1);
+        backReadbackPBO = new PBO(1, 1);
+        currentReadbackPBO = frontReadbackPBO;
     }
 
     /**
@@ -114,11 +142,16 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
             downSampleSceneInto1x1pixelsBuffer();
 
-            frameBuffersManager.getCurrentReadbackPBO().copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            currentReadbackPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
-            frameBuffersManager.swapReadbackPBOs();
+            // Swaps the readback PBOs, so that the one previously used for writing is now used for reading and vice versa.
+            if (currentReadbackPBO == frontReadbackPBO) {
+                currentReadbackPBO = backReadbackPBO;
+            } else {
+                currentReadbackPBO = frontReadbackPBO;
+            }
 
-            pixels = frameBuffersManager.getCurrentReadbackPBO().readBackPixels();
+            pixels = currentReadbackPBO.readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -161,8 +194,8 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        scenePrePost = dynamicFBM.getFBO(SCENE_PRE_POST_URN);
 
         downSampler.enable();
 
@@ -206,10 +239,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
      * only if eye adaptation is enabled: an NPE would be thrown only in that case.
      */
     private void obtainStaticFBOs() {
-        downSampledScene[4] = frameBuffersManager.getFBO("scene16");
-        downSampledScene[3] = frameBuffersManager.getFBO("scene8");
-        downSampledScene[2] = frameBuffersManager.getFBO("scene4");
-        downSampledScene[1] = frameBuffersManager.getFBO("scene2");
-        downSampledScene[0] = frameBuffersManager.getFBO("scene1");
+        downSampledScene[4] = staticFBM.getFBO(SCENE_16_URN);
+        downSampledScene[3] = staticFBM.getFBO(SCENE_8_URN);
+        downSampledScene[2] = staticFBM.getFBO(SCENE_4_URN);
+        downSampledScene[1] = staticFBM.getFBO(SCENE_2_URN);
+        downSampledScene[0] = staticFBM.getFBO(SCENE_1_URN);
     }
 }

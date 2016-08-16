@@ -15,15 +15,17 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -36,9 +38,10 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class OutlineNode extends AbstractNode {
+    public static final ResourceUrn OUTLINE_URN = new ResourceUrn("engine:outline");
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     @In
     private WorldRenderer worldRenderer;
@@ -55,8 +58,7 @@ public class OutlineNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         outline = worldRenderer.getMaterial("engine:prog.sobel");
-        requireFBO(new FBOConfig("outline", 1.0f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireDynamicFBO(new FBOConfig(OUTLINE_URN, 1.0f, FBO.Type.DEFAULT));
     }
 
     /**
@@ -74,8 +76,8 @@ public class OutlineNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isOutline()) {
             PerformanceMonitor.startActivity("rendering/outline");
-            outlineFBO = frameBuffersManager.getFBO("outline");
-            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+            outlineFBO = dynamicFBM.getFBO(OUTLINE_URN);
+            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
             outline.enable();
 

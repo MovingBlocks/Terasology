@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -23,9 +24,10 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -38,6 +40,10 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class BloomPassesNode extends AbstractNode {
+    public static final ResourceUrn HIGH_PASS_URN = new ResourceUrn("engine:sceneHighPass");
+    public static final ResourceUrn BLOOM_0_URN = new ResourceUrn("engine:sceneBloom0");
+    public static final ResourceUrn BLOOM_1_URN = new ResourceUrn("engine:sceneBloom1");
+    public static final ResourceUrn BLOOM_2_URN = new ResourceUrn("engine:sceneBloom2");
 
     @Range(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.05f;
@@ -49,10 +55,10 @@ public class BloomPassesNode extends AbstractNode {
     private Config config;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private WorldRenderer worldRenderer;
 
     @In
-    private WorldRenderer worldRenderer;
+    private DynamicFBM dynamicFBM;
 
     private RenderingConfig renderingConfig;
     private Material highPass;
@@ -68,11 +74,10 @@ public class BloomPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
-        requireFBO(new FBOConfig("sceneHighPass", 1.0f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneBloom0", 0.5f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneBloom1", 0.25f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneBloom2", 0.125f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireDynamicFBO(new FBOConfig(HIGH_PASS_URN, 1.0f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(BLOOM_0_URN, 0.5f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(BLOOM_1_URN, 0.25f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(BLOOM_2_URN, 0.125f, FBO.Type.DEFAULT));
     }
 
     /**
@@ -90,11 +95,11 @@ public class BloomPassesNode extends AbstractNode {
             PerformanceMonitor.startActivity("rendering/bloomPasses");
             // TODO: review - would it make sense to split these operations into one highpass node and
             // TODO: three blur nodes with different parameters?
-            sceneBloom0 = frameBuffersManager.getFBO("sceneBloom0");
-            sceneBloom1 = frameBuffersManager.getFBO("sceneBloom1");
-            sceneBloom2 = frameBuffersManager.getFBO("sceneBloom2");
-            sceneHighPass = frameBuffersManager.getFBO("sceneHighPass");
-            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+            sceneBloom0 = dynamicFBM.getFBO(BLOOM_0_URN);
+            sceneBloom1 = dynamicFBM.getFBO(BLOOM_1_URN);
+            sceneBloom2 = dynamicFBM.getFBO(BLOOM_2_URN);
+            sceneHighPass = dynamicFBM.getFBO(HIGH_PASS_URN);
+            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
             generateHighPass();
             generateBloom(sceneBloom0);

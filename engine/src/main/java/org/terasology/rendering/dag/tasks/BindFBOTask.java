@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
@@ -25,11 +26,11 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 public final class BindFBOTask implements RenderPipelineTask {
 
     private int fboId;
-    private String fboName;
+    private final ResourceUrn resourceUrn;
 
-    public BindFBOTask(int fboId, String fboName) {
+    public BindFBOTask(int fboId, ResourceUrn resourceUrn) {
         this.fboId = fboId;
-        this.fboName = fboName;
+        this.resourceUrn = resourceUrn;
     }
 
     @Override
@@ -43,6 +44,6 @@ public final class BindFBOTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), resourceUrn, fboId);
     }
 }

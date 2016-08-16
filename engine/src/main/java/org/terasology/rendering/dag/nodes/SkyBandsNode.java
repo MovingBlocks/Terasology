@@ -15,15 +15,17 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -38,25 +40,28 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
  * TODO: Separate this node into multiple SkyBandNode's
  */
 public class SkyBandsNode extends WireframeCapableNode {
-    private static final String SCENE_OPAQUE_FBO = "sceneOpaque";
+    public static final ResourceUrn SKY_BAND_0_URN = new ResourceUrn("engine:sceneSkyBand0");
+    public static final ResourceUrn SKY_BAND_1_URN = new ResourceUrn("engine:sceneSkyBand1");
+
     @In
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     private RenderingConfig renderingConfig;
     private Material blurShader;
     private FBO sceneOpaque;
     private FBO sceneSkyBand0;
+    private FBO sceneSkyBand1;
     private Camera playerCamera;
+
 
     @Override
     public void initialise() {
         super.initialise();
-        requireFBO(new FBOConfig(SCENE_OPAQUE_FBO, 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneSkyBand0", 0.0625f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneSkyBand1", 0.03125f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(SKY_BAND_0_URN, 0.0625f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(SKY_BAND_1_URN, 0.03125f, FBO.Type.DEFAULT));
 
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
@@ -67,12 +72,12 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/skyBands");
 
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
         setRenderBufferMask(sceneOpaque, true, true, true);
         if (renderingConfig.isInscattering()) {
-            sceneSkyBand0 = frameBuffersManager.getFBO("sceneSkyBand0");
-            FBO sceneSkyBand1 = frameBuffersManager.getFBO("sceneSkyBand1");
+            sceneSkyBand0 = dynamicFBM.getFBO(SKY_BAND_0_URN);
+            sceneSkyBand1 = dynamicFBM.getFBO(SKY_BAND_1_URN);
 
             generateSkyBand(sceneSkyBand0);
             generateSkyBand(sceneSkyBand1);

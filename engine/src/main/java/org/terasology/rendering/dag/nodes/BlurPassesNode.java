@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -22,9 +23,10 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -37,6 +39,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class BlurPassesNode extends AbstractNode {
+    public static final ResourceUrn BLUR_0_URN = new ResourceUrn("engine:sceneBlur0");
+    public static final ResourceUrn BLUR_1_URN = new ResourceUrn("engine:sceneBlur1");
+    public static final ResourceUrn TONE_MAPPED_URN = new ResourceUrn("engine:sceneToneMapped");
 
     @Range(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
@@ -48,7 +53,7 @@ public class BlurPassesNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     private RenderingConfig renderingConfig;
     private Material blur;
@@ -61,10 +66,9 @@ public class BlurPassesNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
-        requireFBO(new FBOConfig("sceneBlur0", 0.5f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneBlur1", 0.5f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneToneMapped", 1.0f, FBO.Type.HDR));
+        requireDynamicFBO(new FBOConfig(BLUR_0_URN, 0.5f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(BLUR_1_URN, 0.5f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(TONE_MAPPED_URN, 1.0f, FBO.Type.HDR));
     }
 
     /**
@@ -79,10 +83,10 @@ public class BlurPassesNode extends AbstractNode {
         if (renderingConfig.getBlurIntensity() != 0) {
             PerformanceMonitor.startActivity("rendering/blurPasses");
 
-            sceneBlur0 = frameBuffersManager.getFBO("sceneBlur0");
-            sceneBlur1 = frameBuffersManager.getFBO("sceneBlur1");
-            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-            sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
+            sceneBlur0 = dynamicFBM.getFBO(BLUR_0_URN);
+            sceneBlur1 = dynamicFBM.getFBO(BLUR_1_URN);
+            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+            sceneToneMapped = dynamicFBM.getFBO(TONE_MAPPED_URN);
 
             generateBlur(sceneBlur0);
             generateBlur(sceneBlur1);

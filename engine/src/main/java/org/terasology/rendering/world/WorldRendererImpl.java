@@ -63,11 +63,12 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBM;
+import org.terasology.rendering.opengl.fbms.StaticFBM;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -127,10 +128,13 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
-    private FrameBuffersManager frameBuffersManager;
     private PostProcessor postProcessor;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
+
+    private DynamicFBM dynamicFBM;
+    private ShadowMapResolutionDependentFBM shadowMapResolutionDependentFBM;
+    private StaticFBM staticFBM;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -176,15 +180,21 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        frameBuffersManager = new FrameBuffersManager();
+        dynamicFBM = new DynamicFBM();
+        staticFBM = new StaticFBM();
+        shadowMapResolutionDependentFBM = new ShadowMapResolutionDependentFBM();
 
-        context.put(FrameBuffersManager.class, frameBuffersManager);
+        context.put(DynamicFBM.class, dynamicFBM);
+        context.put(StaticFBM.class, staticFBM);
+        context.put(ShadowMapResolutionDependentFBM.class, shadowMapResolutionDependentFBM);
 
-        postProcessor = new PostProcessor(frameBuffersManager);
+        postProcessor = new PostProcessor(dynamicFBM);
         context.put(PostProcessor.class, postProcessor);
 
-        frameBuffersManager.setPostProcessor(postProcessor);
-        frameBuffersManager.initialize();
+        dynamicFBM.setPostProcessor(postProcessor);
+        dynamicFBM.initialise();
+        staticFBM.initialise();
+        shadowMapResolutionDependentFBM.initialise();
 
         shaderManager.initShaders();
         initMaterials();
@@ -262,8 +272,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initStateChanges() {
-        SetViewportSizeOf.setFrameBuffersManager(frameBuffersManager);
-        BindFBO.setFrameBuffersManager(frameBuffersManager);
+        SetViewportSizeOf.setDynamicFBM(dynamicFBM);
     }
 
     @Override
@@ -326,7 +335,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            frameBuffersManager.preRenderUpdate();
+            dynamicFBM.update();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }

@@ -16,8 +16,7 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.base.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 
 /**
  * Builder class to simplify the syntax creating an FBO.
@@ -30,19 +29,15 @@ import org.slf4j.LoggerFactory;
  * existing FBO with the same title.
  */
 public class FBOConfig {
-    private static final Logger logger = LoggerFactory.getLogger(FBOConfig.class);
-
-    private FBO generatedFBO;
-    private String title;
+    private ResourceUrn resourceUrn;
     private FBO.Dimensions dimensions;
     private FBO.Type type;
+
 
     private boolean useDepthBuffer;
     private boolean useNormalBuffer;
     private boolean useLightBuffer;
     private boolean useStencilBuffer;
-    private boolean isStatic;
-    private boolean isRelativeToScreenSize;
     private float scale;
     /**
      * Constructs an FBO builder capable of building the two most basic FBOs:
@@ -52,7 +47,7 @@ public class FBOConfig {
      * <p>
      * Example: FBO basicFBO = new FBObuilder("basic", new Dimensions(1920, 1080), Type.DEFAULT).build();
      *
-     * @param title      A string identifier, the title is used to later manipulate the FBO through
+     * @param resourceUrn      A string identifier, the title is used to later manipulate the FBO through
      *                   methods such as LwjglRenderingProcess.getFBO(title) and LwjglRenderingProcess.bindFBO(title).
      * @param dimensions A Dimensions object providing width and height information.
      * @param type       Type.DEFAULT will result in a 32 bit color buffer attached to the FBO. (GL_RGBA, GL11.GL_UNSIGNED_BYTE, GL_LINEAR)
@@ -60,51 +55,41 @@ public class FBOConfig {
      *                   Type.NO_COLOR will result in -no- color buffer attached to the FBO
      *                   (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
      */
-    public FBOConfig(String title, FBO.Dimensions dimensions, FBO.Type type) {
-        this.title = title;
+    public FBOConfig(ResourceUrn resourceUrn, FBO.Dimensions dimensions, FBO.Type type) {
+        this.resourceUrn = resourceUrn;
         this.dimensions = dimensions;
         this.type = type;
-        this.isStatic = false;
-        isRelativeToScreenSize = false;
     }
 
     /**
      * Same as the previous FBObuilder constructor, but taking in input
      * explicit, integer width and height instead of a Dimensions object.
      */
-    public FBOConfig(String title, int width, int height, FBO.Type type) {
-        this(title, new FBO.Dimensions(width, height), type);
+    public FBOConfig(ResourceUrn resourceUrn, int width, int height, FBO.Type type) {
+        this(resourceUrn, new FBO.Dimensions(width, height), type);
     }
 
-    public FBOConfig(String title, float scale, FBO.Type type) {
+    public FBOConfig(ResourceUrn resourceUrn, float scale, FBO.Type type) {
         Preconditions.checkArgument(scale != 0, "scale can not be zero.");
-        this.title = title;
+        this.resourceUrn = resourceUrn;
         this.type = type;
         this.scale = scale;
-        this.isRelativeToScreenSize = true;
     }
 
-    public FBOConfig(String title, float scale, FBO.Type type, boolean isStatic) {
-        this(title, scale, type);
-        this.isStatic = isStatic;
+    public FBOConfig(ResourceUrn resourceUrn, FBO.Type type) {
+        this.resourceUrn = resourceUrn;
+        this.type = type;
     }
 
-    public boolean isFBODynamic() {
-        return !this.isStatic;
-    }
-/*
- *  * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
+   /*
+    * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
     * @param useNormalBuffer If true the FBO will have a 32 bit normals buffer attached to it. (GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR)
     * @param useLightBuffer If true the FBO will have 32/64 bit light buffer attached to it, depending if Type is DEFAULT/HDR.
-*                       (GL_RGBA/GL_RGBA16F_ARB, GL_UNSIGNED_BYTE/GL_HALF_FLOAT_ARB, GL_LINEAR)
+    *                       (GL_RGBA/GL_RGBA16F_ARB, GL_UNSIGNED_BYTE/GL_HALF_FLOAT_ARB, GL_LINEAR)
     * @param useStencilBuffer If true the depth buffer will also have an 8 bit Stencil buffer associated with it.
     *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
-                *                         */
-
-    public FBOConfig setStatic() {
-        this.isStatic = true;
-        return this;
-    }
+    *
+    */
 
     /**
      * Sets the builder to generate, allocate and attach a 24 bit depth buffer to the FrameBuffer to be built.
@@ -154,51 +139,38 @@ public class FBOConfig {
         return this;
     }
 
-    /**
-     * Given information set through the constructor and the use*Buffer() methods, builds and returns
-     * an FBO instance, inclusive the underlying OpenGL FrameBuffer and any requested attachments.
-     * <p>
-     * The FBO is also automatically registered with the LwjglRenderingProcess through its title string.
-     * This allows its retrieval and binding through methods such as getFBO(String title) and
-     * bindFBO(String title). If another FBO is registered with the same title, it is disposed and
-     * the new FBO registered in its place.
-     * <p>
-     * This method is effectively mono-use: calling it more than once will return the exact same FBO
-     * returned the first time. To build a new FBO with identical or different characteristics it's
-     * necessary to instantiate a new builder.
-     *
-     * @return An FBO. Make sure to check it with FBO.getStatus() before using it.
-     */
-    public FBO generate(FBO.Dimensions fullScale) {
-        // TODO: Investigate whether removing this would cause any problems
-        if (generatedFBO != null) {
-            return generatedFBO;
-        }
 
-        if (isRelativeToScreenSize) {
-            if (dimensions == null || dimensions.areDifferentFrom(fullScale)) {
-                dimensions = new FBO.Dimensions(fullScale);
-                dimensions.multiplySelfBy(scale);
-            }
-        }
-
-        generatedFBO = FBO.create(title, dimensions, type, useDepthBuffer, useNormalBuffer, useLightBuffer, useStencilBuffer);
-        handleIncompleteAndUnexpectedStatus(generatedFBO);
-        return generatedFBO;
+    // TODO: rename them in future
+    // TODO: add javadocs
+    public boolean isUseDepthBuffer() {
+        return useDepthBuffer;
     }
 
-
-    private void handleIncompleteAndUnexpectedStatus(FBO fbo) {
-        // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
-        // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
-        if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-            logger.error("FBO " + title + " is incomplete. Look earlier in the log for details.");
-        } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-            logger.error("FBO " + title + " has generated an unexpected status code. Look earlier in the log for details.");
-        }
+    public boolean isUseNormalBuffer() {
+        return useNormalBuffer;
     }
 
-    public String getTitle() {
-        return title;
+    public boolean isUseLightBuffer() {
+        return useLightBuffer;
+    }
+
+    public boolean isUseStencilBuffer() {
+        return useStencilBuffer;
+    }
+
+    public FBO.Type getType() {
+        return type;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public FBO.Dimensions getDimensions() {
+        return dimensions;
+    }
+
+    public ResourceUrn getResourceUrn() {
+        return resourceUrn;
     }
 }

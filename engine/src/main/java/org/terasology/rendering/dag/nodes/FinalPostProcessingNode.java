@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -25,10 +26,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -43,6 +45,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Break into two different nodes
  */
 public class FinalPostProcessingNode extends AbstractNode {
+    public static final ResourceUrn OC_UNDISTORTED_URN = new ResourceUrn("engine:ocUndistorted");
 
     @In
     private WorldRenderer worldRenderer;
@@ -54,7 +57,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     private PostProcessor postProcessor;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
@@ -78,9 +81,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("ocUndistorted", 1.0f, FBO.Type.DEFAULT));
-        requireFBO(new FBOConfig("sceneFinal", 1.0f, FBO.Type.DEFAULT));
+        requireDynamicFBO(new FBOConfig(OC_UNDISTORTED_URN, 1.0f, FBO.Type.DEFAULT));
     }
 
     /**
@@ -104,9 +105,9 @@ public class FinalPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
-        ocUndistorted = frameBuffersManager.getFBO("ocUndistorted");
-        sceneFinal = frameBuffersManager.getFBO("sceneFinal");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        ocUndistorted = dynamicFBM.getFBO(OC_UNDISTORTED_URN);
+        sceneFinal = dynamicFBM.getFBO(DefaultDynamicFBOs.Final.getResourceUrn());
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
         fullScale = sceneOpaque.dimensions();
 

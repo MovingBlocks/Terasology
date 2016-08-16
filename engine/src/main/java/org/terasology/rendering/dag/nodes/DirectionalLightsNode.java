@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -24,9 +25,10 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -47,6 +49,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
  * TODO: Diagram of this node
  */
 public class DirectionalLightsNode extends AbstractNode {
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
     private BackdropProvider backdropProvider;
@@ -55,7 +58,7 @@ public class DirectionalLightsNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
@@ -72,9 +75,7 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        requireFBO(new FBOConfig("sceneOpaquePingPong", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
-        requireFBO(new FBOConfig("sceneReflectiveRefractive", 1.0f, FBO.Type.HDR).useNormalBuffer());
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireDynamicFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
 
         initMainDirectionalLight();
     }
@@ -90,7 +91,7 @@ public class DirectionalLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
         sceneOpaque.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
@@ -138,8 +139,8 @@ public class DirectionalLightsNode extends AbstractNode {
         sceneOpaque.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneOpaquePingPong = dynamicFBM.getFBO(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn());
+        sceneReflectiveRefractive = dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN);
 
         sceneOpaquePingPong.bind();
         setRenderBufferMask(sceneOpaquePingPong, true, true, true);
@@ -152,7 +153,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        frameBuffersManager.swapSceneOpaqueFBOs();
+        dynamicFBM.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn(), DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

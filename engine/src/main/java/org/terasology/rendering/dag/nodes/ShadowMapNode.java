@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
@@ -28,6 +29,9 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBM;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
@@ -46,7 +50,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends AbstractNode {
-    private static final String SCENE_SHADOW_MAP = "sceneShadowMap";
+    public static final ResourceUrn SHADOW_MAP_URN = new ResourceUrn("engine:sceneShadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
@@ -65,6 +69,9 @@ public class ShadowMapNode extends AbstractNode {
     @In
     private BackdropProvider backdropProvider;
 
+    @In
+    private ShadowMapResolutionDependentFBM shadowMapResolutionDependentFBM;
+
     private Material shadowMapShader;
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
@@ -79,8 +86,11 @@ public class ShadowMapNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
 
-        addDesiredStateChange(new BindFBO(SCENE_SHADOW_MAP));
-        addDesiredStateChange(new SetViewportSizeOf(SCENE_SHADOW_MAP));
+        requireFBO(new FBOConfig(SHADOW_MAP_URN, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBM);
+
+        // TODO: fix them
+        addDesiredStateChange(new BindFBO(SHADOW_MAP_URN, shadowMapResolutionDependentFBM));
+        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP_URN, shadowMapResolutionDependentFBM));
     }
 
     @Override

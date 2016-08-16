@@ -18,9 +18,10 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -37,12 +38,12 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
         PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
 
         // TODO: move into a node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        buffersManager.bindFboColorTexture("scenePrePost");
+        dynamicFBM.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST_URN);
 
         // TODO: move into a material?
         program.setInt("texScene", 0, true);

@@ -15,14 +15,16 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -35,12 +37,13 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class InitialPostProcessingNode extends AbstractNode {
+    public static final ResourceUrn SCENE_PRE_POST_URN = new ResourceUrn("engine:scenePrePost");
 
     @In
     private Config config;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DynamicFBM dynamicFBM;
 
     @In
     private WorldRenderer worldRenderer;
@@ -52,8 +55,8 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
-        requireFBO(new FBOConfig("scenePrePost", 1.0f, FBO.Type.HDR));
-        requireFBO(new FBOConfig("sceneOpaque", 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer());
+        requireDynamicFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR));
+
     }
 
     /**
@@ -64,8 +67,8 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        scenePrePost = dynamicFBM.getFBO(SCENE_PRE_POST_URN);
+        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
         initialPost.enable();
 
         // TODO: verify what the inputs are

@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -29,6 +30,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,7 +45,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends AbstractNode {
-    private static final String SCENE_REFLECTED_FBO = "sceneReflected";
+    public static final ResourceUrn REFLECTED_URN = new ResourceUrn("engine:sceneReflected");
 
     @In
     private RenderQueuesHelper renderQueues;
@@ -57,6 +59,9 @@ public class WorldReflectionNode extends AbstractNode {
     @In
     private BackdropRenderer backdropRenderer;
 
+    @In
+    private DynamicFBM dynamicFBM;
+
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
@@ -64,13 +69,13 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireFBO(new FBOConfig(SCENE_REFLECTED_FBO, 0.5f, FBO.Type.DEFAULT).useDepthBuffer());
+        requireDynamicFBO(new FBOConfig(REFLECTED_URN, 0.5f, FBO.Type.DEFAULT).useDepthBuffer());
 
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO(SCENE_REFLECTED_FBO));
-        addDesiredStateChange(new SetViewportSizeOf(SCENE_REFLECTED_FBO));
+        addDesiredStateChange(new BindFBO(REFLECTED_URN, dynamicFBM));
+        addDesiredStateChange(new SetViewportSizeOf(REFLECTED_URN, dynamicFBM));
     }
 
     @Override

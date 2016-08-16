@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DynamicFBM;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -47,8 +48,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in superclass and monitor from there?
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
-        FBO scene = buffersManager.getFBO("sceneOpaque");
+        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
+        FBO scene = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
 
         int texId = 0;
 
