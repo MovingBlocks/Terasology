@@ -356,6 +356,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             .getScreen(WidgetSelectionScreen.ASSET_URI);
         widgetSelectionScreen.setNode(node);
         widgetSelectionScreen.subscribeClose(() -> {
+            node.setExpanded(true);
             JsonTree widget = node.getChildAt(node.getChildren().size() - 1);
             widget.setExpanded(true);
             getEditor().fireUpdateListeners();
