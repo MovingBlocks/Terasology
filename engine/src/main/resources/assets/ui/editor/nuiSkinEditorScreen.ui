@@ -36,6 +36,11 @@
                 "contents": [
                     {
                         "type": "UIButton",
+                        "id": "save",
+                        "text": "Save Changes"
+                    },
+                    {
+                        "type": "UIButton",
                         "id": "copy",
                         "text": "Copy Tree"
                     },

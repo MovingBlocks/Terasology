@@ -257,6 +257,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         this.editor = editor;
     }
 
+    protected boolean areUnsavedChangesPresent() {
+        return unsavedChangesPresent;
+    }
+
     protected void setUnsavedChangesPresent(boolean value) {
         this.unsavedChangesPresent = value;
     }

@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.editor.layers;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -36,6 +37,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.contextMenu.ContextMenuScreen;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
 import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
@@ -43,8 +45,10 @@ import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITextEntry;
@@ -52,6 +56,16 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -189,6 +203,32 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
 
             editor.setEditor(this::editNode, getManager());
         }
+
+        UIButton save = find("save", UIButton.class);
+        save.bindEnabled(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return CREATE_NEW_SCREEN.equals(selectedAsset) || areUnsavedChangesPresent();
+            }
+        });
+        save.subscribe(button -> {
+            FileDialog dialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+            dialog.setFile(CREATE_NEW_SCREEN.equals(selectedAsset) ? "*.ui" : selectedAsset.split(":")[1] + ".ui");
+            dialog.setVisible(true);
+            String directoryString = dialog.getDirectory();
+            String fileString = dialog.getFile();
+            dialog.dispose();
+            if (directoryString != null && fileString != null) {
+                File file = new File(directoryString + fileString);
+                try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+                    JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
+                    String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
+                    outputStream.write(jsonString.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         // Set the handlers for the editor buttons.
         WidgetUtil.trySubscribe(this, "settings", button ->
