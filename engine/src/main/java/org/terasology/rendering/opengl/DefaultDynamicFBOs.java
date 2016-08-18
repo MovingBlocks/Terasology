@@ -16,16 +16,17 @@
 package org.terasology.rendering.opengl;
 
 import org.terasology.assets.ResourceUrn;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * TODO: Add javadocs
  */
 public enum DefaultDynamicFBOs {
-    READ_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), 1.0f, FBO.Type.HDR)
+    READ_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), FULL_SCALE, FBO.Type.HDR)
             .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
-    WRITE_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), 1.0f, FBO.Type.HDR)
+    WRITE_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), FULL_SCALE, FBO.Type.HDR)
             .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
-    FINAL(new FBOConfig(new ResourceUrn("engine:sceneFinal"), 1.0f, FBO.Type.DEFAULT));
+    FINAL(new FBOConfig(new ResourceUrn("engine:sceneFinal"), FULL_SCALE, FBO.Type.DEFAULT));
 
     private final FBOConfig fboConfig;
     private FBO fbo;
