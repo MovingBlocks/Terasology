@@ -25,10 +25,10 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 public final class SetViewportSizeOfTask implements RenderPipelineTask {
     private int width;
     private int height;
-    private ResourceUrn resourceUrn;
+    private ResourceUrn fboName;
 
-    public SetViewportSizeOfTask(ResourceUrn resourceUrn) {
-        this.resourceUrn = resourceUrn;
+    public SetViewportSizeOfTask(ResourceUrn fboName) {
+        this.fboName = fboName;
     }
 
     public void setDimensions(int w, int h) {
@@ -43,6 +43,6 @@ public final class SetViewportSizeOfTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), resourceUrn, width, height);
+        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
     }
 }

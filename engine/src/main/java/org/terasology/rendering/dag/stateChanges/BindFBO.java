@@ -33,20 +33,20 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_URN);
 
     private BindFBOTask task;
-    private BaseFBOsManager fbm;
-    private final ResourceUrn resourceUrn;
+    private BaseFBOsManager frameBuffersManager;
+    private final ResourceUrn fboName;
 
-    public BindFBO(ResourceUrn resourceUrn, BaseFBOsManager fbm) {
-        this.fbm = fbm;
-        this.resourceUrn = resourceUrn;
+    public BindFBO(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
+        this.frameBuffersManager = frameBuffersManager;
+        this.fboName = fboName;
     }
 
-    private BindFBO(ResourceUrn resourceUrn) {
-        this.resourceUrn = resourceUrn;
+    private BindFBO(ResourceUrn fboName) {
+        this.fboName = fboName;
     }
 
-    public ResourceUrn getResourceUrn() {
-        return resourceUrn;
+    public ResourceUrn getFboName() {
+        return fboName;
     }
 
     @Override
@@ -63,14 +63,14 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     public RenderPipelineTask generateTask() {
         if (task == null) {
             // Subscription is only needed if fboID is different than default frame buffer id.
-            if (!resourceUrn.equals(DEFAULT_FRAME_BUFFER_URN)) {
-                task = new BindFBOTask(fbm.get(resourceUrn).fboId, resourceUrn);
-                fbm.subscribe(this);
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_URN)) {
+                task = new BindFBOTask(frameBuffersManager.get(fboName).fboId, fboName);
+                frameBuffersManager.subscribe(this);
             } else {
                 task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_URN);
             }
         } else {
-            if (!resourceUrn.equals(DEFAULT_FRAME_BUFFER_URN)) {
+            if (!fboName.equals(DEFAULT_FRAME_BUFFER_URN)) {
                 update();
             }
         }
@@ -80,18 +80,18 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof BindFBO) {
-            return this.resourceUrn.equals(((BindFBO) stateChange).getResourceUrn());
+            return this.fboName.equals(((BindFBO) stateChange).getFboName());
         }
         return false;
     }
 
     @Override
     public void update() {
-        task.setFboId(fbm.get(resourceUrn).fboId);
+        task.setFboId(frameBuffersManager.get(fboName).fboId);
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s", this.getClass().getSimpleName(), resourceUrn);
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 }

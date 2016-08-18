@@ -32,17 +32,17 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
     private static DynamicFBOsManager dynamicFBOsManager;
 
-    private BaseFBOsManager fbm;
+    private BaseFBOsManager frameBuffersManager;
     private SetViewportSizeOfTask task;
-    private ResourceUrn resourceUrn;
+    private ResourceUrn fboName;
 
-    public SetViewportSizeOf(ResourceUrn resourceUrn, BaseFBOsManager fbm) {
-        this.fbm = fbm;
-        this.resourceUrn = resourceUrn;
+    public SetViewportSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
+        this.frameBuffersManager = frameBuffersManager;
+        this.fboName = fboName;
     }
 
-    private SetViewportSizeOf(ResourceUrn resourceUrn) {
-        this.resourceUrn = resourceUrn;
+    private SetViewportSizeOf(ResourceUrn fboName) {
+        this.fboName = fboName;
     }
 
     public static void setDynamicFBOsManager(DynamicFBOsManager dynamicFBOsManager) {
@@ -58,10 +58,10 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     public RenderPipelineTask generateTask() {
         if (task == null) {
             if (isTheDefaultInstance()) {
-                fbm = dynamicFBOsManager;
+                frameBuffersManager = dynamicFBOsManager;
             }
-            task = new SetViewportSizeOfTask(resourceUrn);
-            fbm.subscribe(this);
+            task = new SetViewportSizeOfTask(fboName);
+            frameBuffersManager.subscribe(this);
             update();
         }
 
@@ -71,7 +71,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public boolean isEqualTo(StateChange stateChange) {
         if (stateChange instanceof SetViewportSizeOf) {
-            return this.resourceUrn.equals(((SetViewportSizeOf) stateChange).getResourceUrn());
+            return this.fboName.equals(((SetViewportSizeOf) stateChange).getFboName());
         }
         return false;
     }
@@ -83,16 +83,16 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        FBO fbo = fbm.get(resourceUrn);
+        FBO fbo = frameBuffersManager.get(fboName);
         task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s", this.getClass().getSimpleName(), resourceUrn);
+        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 
-    public ResourceUrn getResourceUrn() {
-        return resourceUrn;
+    public ResourceUrn getFboName() {
+        return fboName;
     }
 }

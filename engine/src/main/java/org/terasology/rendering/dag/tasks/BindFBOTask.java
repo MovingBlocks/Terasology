@@ -26,11 +26,11 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 public final class BindFBOTask implements RenderPipelineTask {
 
     private int fboId;
-    private final ResourceUrn resourceUrn;
+    private final ResourceUrn fboName;
 
-    public BindFBOTask(int fboId, ResourceUrn resourceUrn) {
+    public BindFBOTask(int fboId, ResourceUrn fboName) {
         this.fboId = fboId;
-        this.resourceUrn = resourceUrn;
+        this.fboName = fboName;
     }
 
     @Override
@@ -44,6 +44,6 @@ public final class BindFBOTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), resourceUrn, fboId);
+        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 }
