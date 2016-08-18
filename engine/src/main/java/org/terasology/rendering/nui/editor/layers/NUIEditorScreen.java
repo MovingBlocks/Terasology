@@ -239,6 +239,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                     JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
                     String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
                     outputStream.write(jsonString.getBytes());
+                    setUnsavedChangesPresent(false);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
