@@ -46,7 +46,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         // TODO: obtain once in the superclass and monitor from there?
         DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = CoreRegistry.get(ShadowMapResolutionDependentFBOs.class);
-        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         int texId = 0;
         if (sceneOpaque != null) {

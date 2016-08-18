@@ -49,7 +49,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
 
         // TODO: obtain once in superclass and monitor from there?
         DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
-        FBO scene = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        FBO scene = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         int texId = 0;
 

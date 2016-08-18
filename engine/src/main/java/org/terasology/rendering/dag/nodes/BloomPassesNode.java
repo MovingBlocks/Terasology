@@ -99,7 +99,7 @@ public class BloomPassesNode extends AbstractNode {
             sceneBloom1 = dynamicFBOsManager.get(BLOOM_1_URN);
             sceneBloom2 = dynamicFBOsManager.get(BLOOM_2_URN);
             sceneHighPass = dynamicFBOsManager.get(HIGH_PASS_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
             generateHighPass();
             generateBloom(sceneBloom0);

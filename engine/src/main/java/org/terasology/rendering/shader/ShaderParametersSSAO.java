@@ -92,7 +92,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName()); // TODO: switch from CoreRegistry to Context.
+        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
 
         int texId = 0;
 

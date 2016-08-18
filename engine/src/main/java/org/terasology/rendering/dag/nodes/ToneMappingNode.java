@@ -69,7 +69,7 @@ public class ToneMappingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
         sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         toneMapping.enable();
 

@@ -21,9 +21,11 @@ import org.terasology.assets.ResourceUrn;
  * TODO: Add javadocs
  */
 public enum DefaultDynamicFBOs {
-    ReadOnlyGBuffer(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
-    WriteOnlyGBuffer(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), 1.0f, FBO.Type.HDR).useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
-    Final(new FBOConfig(new ResourceUrn("engine:sceneFinal"), 1.0f, FBO.Type.DEFAULT));
+    READ_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), 1.0f, FBO.Type.HDR)
+            .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
+    WRITE_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), 1.0f, FBO.Type.HDR)
+            .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
+    FINAL(new FBOConfig(new ResourceUrn("engine:sceneFinal"), 1.0f, FBO.Type.DEFAULT));
 
     private final FBOConfig fboConfig;
 

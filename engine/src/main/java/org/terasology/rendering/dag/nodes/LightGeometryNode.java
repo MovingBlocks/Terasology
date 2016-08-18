@@ -89,7 +89,7 @@ public class LightGeometryNode extends AbstractNode {
         graphicState.postRenderCleanupLightGeometryStencil();
         */
 
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         // LightGeometry requires a cleanup
         cleanupSceneOpaque();
         preRenderSetupLightGeometry();

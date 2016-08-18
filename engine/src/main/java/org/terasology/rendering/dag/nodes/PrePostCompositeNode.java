@@ -64,8 +64,8 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
-        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WriteOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
         sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE_URN);
 
         // TODO: verify if there should be bound textures here.
@@ -79,7 +79,7 @@ public class PrePostCompositeNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getName(), DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();

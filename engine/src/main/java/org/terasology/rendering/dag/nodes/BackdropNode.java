@@ -63,7 +63,7 @@ public class BackdropNode extends WireframeCapableNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         initialClearing();
 

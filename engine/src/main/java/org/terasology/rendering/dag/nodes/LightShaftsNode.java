@@ -66,7 +66,7 @@ public class LightShaftsNode extends AbstractNode {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightShafts");
             lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are

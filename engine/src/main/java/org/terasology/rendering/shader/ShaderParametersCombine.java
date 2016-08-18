@@ -56,7 +56,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         int texId = 0;
         // TODO: obtain these objects once in superclass and add there monitoring functionality as needed?
         DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
-        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         // TODO: move texture bindings to the appropriate nodes
         if (sceneOpaque != null) {

@@ -39,7 +39,7 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in superclass? The super class could then have the monitoring functionality.
-        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName()); // TODO: switch from CoreRegistry to Context.
+        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
 
         // TODO: move to node
         if (scene != null) {

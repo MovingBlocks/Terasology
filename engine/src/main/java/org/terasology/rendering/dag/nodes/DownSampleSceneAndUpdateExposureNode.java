@@ -192,7 +192,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
 
         downSampler.enable();

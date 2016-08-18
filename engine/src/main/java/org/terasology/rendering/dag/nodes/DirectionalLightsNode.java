@@ -91,7 +91,7 @@ public class DirectionalLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         sceneOpaque.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
@@ -139,7 +139,7 @@ public class DirectionalLightsNode extends AbstractNode {
         sceneOpaque.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WriteOnlyGBuffer.getName());
+        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
         sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
 
         sceneOpaquePingPong.bind();
@@ -153,7 +153,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getName(), DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

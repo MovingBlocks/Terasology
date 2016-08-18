@@ -26,9 +26,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.Final;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.ReadOnlyGBuffer;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WriteOnlyGBuffer;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
@@ -67,9 +67,9 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
     }
 
     private void generateDefaultFBOs() {
-        generateDefaultFBO(ReadOnlyGBuffer);
-        generateDefaultFBO(WriteOnlyGBuffer);
-        generateDefaultFBO(Final);
+        generateDefaultFBO(READ_ONLY_GBUFFER);
+        generateDefaultFBO(WRITE_ONLY_GBUFFER);
+        generateDefaultFBO(FINAL);
     }
 
     private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
@@ -83,7 +83,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
      */
     public void update() {
         updateFullScale();
-        if (get(ReadOnlyGBuffer.getName()).dimensions().areDifferentFrom(fullScale)) {
+        if (get(READ_ONLY_GBUFFER.getName()).dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
         }
@@ -113,7 +113,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
      * @return a ByteBuffer or null
      */
     public ByteBuffer getSceneFinalRawData() {
-        FBO fboSceneFinal = get(ReadOnlyGBuffer.getName());
+        FBO fboSceneFinal = get(READ_ONLY_GBUFFER.getName());
         if (fboSceneFinal == null) {
             logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
             return null;

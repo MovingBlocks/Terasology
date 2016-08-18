@@ -72,7 +72,7 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/skyBands");
 
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         setRenderBufferMask(sceneOpaque, true, true, true);
         if (renderingConfig.isInscattering()) {

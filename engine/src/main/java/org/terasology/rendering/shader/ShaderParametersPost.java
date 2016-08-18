@@ -85,7 +85,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        FBO sceneCombined = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        FBO sceneCombined = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         if (sceneCombined != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

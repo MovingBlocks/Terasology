@@ -29,7 +29,7 @@ import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
     private static DynamicFBOsManager dynamicFBOsManager;
 
     private BaseFBOsManager fbm;

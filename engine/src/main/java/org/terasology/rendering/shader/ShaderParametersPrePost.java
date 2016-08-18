@@ -65,7 +65,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor config parameter by subscribing to it

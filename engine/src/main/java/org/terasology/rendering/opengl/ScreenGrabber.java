@@ -119,7 +119,7 @@ public class ScreenGrabber {
             return;
         }
 
-        FBO sceneFinal = buffersManager.get(DefaultDynamicFBOs.Final.getName());
+        FBO sceneFinal = buffersManager.get(DefaultDynamicFBOs.FINAL.getName());
         int width = sceneFinal.width();
         int height = sceneFinal.height();
 

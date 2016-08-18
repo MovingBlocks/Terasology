@@ -62,7 +62,7 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
-        requireFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getConfig(), dynamicFBOsManager);
+        requireFBO(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getConfig(), dynamicFBOsManager);
         requireFBO(new FBOConfig(SSAO_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
         requireFBO(new FBOConfig(SSAO_BLURRED_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
@@ -79,7 +79,7 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         if (renderingConfig.isSsao()) {
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
             ssaoBlurredFBO = dynamicFBOsManager.get(SSAO_BLURRED_URN);
             ssaoFBO = dynamicFBOsManager.get(SSAO_URN);
 

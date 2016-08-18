@@ -77,7 +77,7 @@ public class OutlineNode extends AbstractNode {
         if (renderingConfig.isOutline()) {
             PerformanceMonitor.startActivity("rendering/outline");
             outlineFBO = dynamicFBOsManager.get(OUTLINE_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
             outline.enable();
 

@@ -53,7 +53,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
 
 
         // TODO: review - might have to go into a debug node
-        final ResourceUrn sceneOpaqueUrn = DefaultDynamicFBOs.ReadOnlyGBuffer.getName();
+        final ResourceUrn sceneOpaqueUrn = DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName();
 
 
         switch (config.getRendering().getDebug().getStage()) {

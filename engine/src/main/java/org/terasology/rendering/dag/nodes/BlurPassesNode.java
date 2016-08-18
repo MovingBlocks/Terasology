@@ -85,7 +85,7 @@ public class BlurPassesNode extends AbstractNode {
 
             sceneBlur0 = dynamicFBOsManager.get(BLUR_0_URN);
             sceneBlur1 = dynamicFBOsManager.get(BLUR_1_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
             sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
 
             generateBlur(sceneBlur0);

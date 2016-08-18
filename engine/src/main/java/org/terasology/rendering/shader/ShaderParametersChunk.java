@@ -129,7 +129,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         program.setInt("texSceneOpaque", texId++, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame

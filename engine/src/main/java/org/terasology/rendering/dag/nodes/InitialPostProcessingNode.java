@@ -68,7 +68,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
         scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         initialPost.enable();
 
         // TODO: verify what the inputs are

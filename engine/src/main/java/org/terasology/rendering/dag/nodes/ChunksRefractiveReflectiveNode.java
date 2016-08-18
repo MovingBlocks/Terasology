@@ -106,7 +106,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void update() {
         // TODO: renames, maybe?
-        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         sceneOpaque.attachDepthBufferTo(dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN));
     }
 }

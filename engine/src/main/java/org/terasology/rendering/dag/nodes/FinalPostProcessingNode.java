@@ -106,8 +106,8 @@ public class FinalPostProcessingNode extends AbstractNode {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
         ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED_URN);
-        sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.Final.getName());
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.FINAL.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         fullScale = sceneOpaque.dimensions();
 

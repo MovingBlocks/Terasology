@@ -42,7 +42,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new BindFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getName(), dynamicFBOsManager)); // TODO: might be removed, verify it
+        addDesiredStateChange(new BindFBO(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName(), dynamicFBOsManager)); // TODO: might be removed, verify it
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
@@ -73,7 +73,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
      */
     private void preRenderSetupSimpleBlendMaterials() {
-        dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName()).setRenderBufferMask(true, true, true);
+        dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()).setRenderBufferMask(true, true, true);
         GL11.glEnable(GL_BLEND);
         GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
         GL11.glDepthMask(false);
