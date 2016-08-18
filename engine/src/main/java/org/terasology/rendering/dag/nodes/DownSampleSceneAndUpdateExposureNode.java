@@ -140,9 +140,8 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
             downSampleSceneInto1x1pixelsBuffer();
 
             writeOnlyPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
-            pixels = readOnlyPBO.readBackPixels();
-
             swapPBOs();
+            pixels = readOnlyPBO.readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
