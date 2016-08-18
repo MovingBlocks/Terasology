@@ -111,14 +111,13 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), immutableFBOs);
-        requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), immutableFBOs);
-        requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), immutableFBOs);
-        requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), immutableFBOs);
-        requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[4] = requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[3] = requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[2] = requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[1] = requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[0] = requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
         requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
 
-        obtainStaticFBOs();
         createPBOs();
     }
 
@@ -223,23 +222,4 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
         PerformanceMonitor.endActivity();
     }
 
-    /**
-     * Fetches a number of static FBOs from the FrameBuffersManager instance and initializes a number of
-     * internal references with them. They are called "static" as they do not change over the lifetime
-     * of a PostProcessor instance.
-     * <p>
-     * This method must to be called at least once for the PostProcessor instance to function, but does
-     * not need to be called additional times.
-     * <p>
-     * Failure to call this method -may- result in a NullPointerException. This is due to the
-     * downsampleSceneAndUpdateExposure() method relying on these FBOs. But this method is fully executed
-     * only if eye adaptation is enabled: an NPE would be thrown only in that case.
-     */
-    private void obtainStaticFBOs() {
-        downSampledScene[4] = immutableFBOs.get(SCENE_16);
-        downSampledScene[3] = immutableFBOs.get(SCENE_8);
-        downSampledScene[2] = immutableFBOs.get(SCENE_4);
-        downSampledScene[1] = immutableFBOs.get(SCENE_2);
-        downSampledScene[0] = immutableFBOs.get(SCENE_1);
-    }
 }

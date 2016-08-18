@@ -28,7 +28,7 @@ public interface BaseFBOsManager {
 
     void release(ResourceUrn fboName);
 
-    void request(FBOConfig fboConfig);
+    FBO request(FBOConfig fboConfig);
 
     FBO get(ResourceUrn fboName);
 

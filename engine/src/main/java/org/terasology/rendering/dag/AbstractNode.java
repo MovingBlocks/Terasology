@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 /**
@@ -42,17 +43,17 @@ public abstract class AbstractNode implements Node {
         fboUsages = Maps.newHashMap();
     }
 
-    protected void requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
+    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
             fboUsages.put(fboName, frameBuffersManager);
         } else {
             logger.warn("FBO " + fboName + " is already requested.");
-            return;
+            return frameBuffersManager.get(fboName);
         }
 
-        frameBuffersManager.request(fboConfig);
+        return frameBuffersManager.request(fboConfig);
     }
 
     @Override

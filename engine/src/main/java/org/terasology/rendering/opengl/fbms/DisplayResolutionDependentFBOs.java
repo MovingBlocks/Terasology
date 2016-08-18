@@ -47,16 +47,19 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     }
 
     @Override
-    public void request(FBOConfig fboConfig) {
+    public FBO request(FBOConfig fboConfig) {
+        FBO fbo;
         ResourceUrn fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
             if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
+            fbo = fboLookup.get(fboConfig.getName());
         } else {
-            generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+            fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
         retain(fboName);
+        return fbo;
     }
 
     private void generateDefaultFBOs() {

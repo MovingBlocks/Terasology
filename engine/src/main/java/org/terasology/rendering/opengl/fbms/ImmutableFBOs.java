@@ -17,6 +17,7 @@ package org.terasology.rendering.opengl.fbms;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 /**
@@ -26,15 +27,18 @@ import org.terasology.rendering.opengl.FBOConfig;
 public class ImmutableFBOs extends AbstractFBOsManager {
 
     @Override
-    public void request(FBOConfig fboConfig) {
+    public FBO request(FBOConfig fboConfig) {
+        FBO fbo;
         ResourceUrn fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
             if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
+            fbo = fboLookup.get(fboConfig.getName());
         } else {
-            generateWithDimensions(fboConfig, fboConfig.getDimensions());
+            fbo = generateWithDimensions(fboConfig, fboConfig.getDimensions());
         }
         retain(fboName);
+        return fbo;
     }
 }
