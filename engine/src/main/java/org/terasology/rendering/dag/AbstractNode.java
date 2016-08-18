@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
