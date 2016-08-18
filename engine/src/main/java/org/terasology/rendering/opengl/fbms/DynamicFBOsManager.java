@@ -22,7 +22,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.context.Context;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
@@ -43,12 +43,12 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
     // this logic one32thScale would have to be named one1024thResolution and the otherwise
     // straightforward connection between variable names and dimensions would have been lost. -- manu3d
     private FBO.Dimensions fullScale;
-
-    private Config config = CoreRegistry.get(Config.class);
-    private RenderingConfig renderingConfig = config.getRendering();
+    private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
-    public DynamicFBOsManager() {
+    public DynamicFBOsManager(Context context) {
+        this.renderingConfig = context.get(Config.class).getRendering();
+
         fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
         generateDefaultFBOs();
     }
@@ -144,16 +144,9 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
-    /**
-     * Sets an internal reference to the PostProcessor instance. This reference is used to inform the PostProcessor
-     * instance that changes have occurred and that it should refresh its references to the FBOs it uses.
-     *
-     * @param screenGrabber a PostProcessor instance
-     */
     public void setScreenGrabber(ScreenGrabber screenGrabber) {
         this.screenGrabber = screenGrabber;
     }
-
 
     /**
      * TODO: add javadocs
@@ -166,4 +159,6 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         fboLookup.put(resourceUrn1, fboLookup.get(resourceUrn));
         fboLookup.put(resourceUrn, fbo);
     }
+
+
 }
