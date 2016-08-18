@@ -74,10 +74,10 @@ public class BloomPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
-        requireDynamicFBO(new FBOConfig(HIGH_PASS_URN, 1.0f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(BLOOM_0_URN, 0.5f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(BLOOM_1_URN, 0.25f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(BLOOM_2_URN, 0.125f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig(HIGH_PASS_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_0_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_1_URN, 0.25f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_2_URN, 0.125f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

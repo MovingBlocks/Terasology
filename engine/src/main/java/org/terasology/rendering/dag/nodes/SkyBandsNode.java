@@ -60,8 +60,8 @@ public class SkyBandsNode extends WireframeCapableNode {
     @Override
     public void initialise() {
         super.initialise();
-        requireDynamicFBO(new FBOConfig(SKY_BAND_0_URN, 0.0625f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(SKY_BAND_1_URN, 0.03125f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig(SKY_BAND_0_URN, 0.0625f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SKY_BAND_1_URN, 0.03125f, FBO.Type.DEFAULT), dynamicFBOsManager);
 
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");

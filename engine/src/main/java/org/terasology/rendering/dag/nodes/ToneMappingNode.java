@@ -54,7 +54,7 @@ public class ToneMappingNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireDynamicFBO(new FBOConfig(TONE_MAPPED_URN, 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig(TONE_MAPPED_URN, 1.0f, FBO.Type.HDR), dynamicFBOsManager);
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 

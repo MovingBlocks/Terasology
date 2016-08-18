@@ -75,7 +75,7 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        requireDynamicFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
 
         initMainDirectionalLight();
     }

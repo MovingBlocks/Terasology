@@ -62,9 +62,9 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
-        requireFBO(DefaultDynamicFBOs.ReadOnlyGBuffer);
-        requireDynamicFBO(new FBOConfig(SSAO_URN, 1.0f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(SSAO_BLURRED_URN, 1.0f, FBO.Type.DEFAULT));
+        requireFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getConfig(), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SSAO_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SSAO_BLURRED_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

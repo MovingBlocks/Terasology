@@ -26,7 +26,7 @@ public interface BaseFBOsManager {
 
     boolean unsubscribe(FBOManagerSubscriber subscriber);
 
-    void release(ResourceUrn resourceUrn);
+    void release(ResourceUrn fboName);
 
     void request(FBOConfig fboConfig);
 

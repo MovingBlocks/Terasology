@@ -58,7 +58,7 @@ public class LightShaftsNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
-        requireDynamicFBO(new FBOConfig(LIGHT_SHAFTS_URN, 0.5f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig(LIGHT_SHAFTS_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     @Override

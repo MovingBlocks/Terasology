@@ -112,20 +112,20 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     /**
      * TODO: add javadoc
      *
-     * @param resourceUrn
+     * @param fboName
      */
     @Override
-    public void release(ResourceUrn resourceUrn) {
-        Preconditions.checkArgument(fboUsageCountMap.containsKey(resourceUrn), "The given fbo is not used.");
+    public void release(ResourceUrn fboName) {
+        Preconditions.checkArgument(fboUsageCountMap.containsKey(fboName), "The given fbo is not used.");
 
-        if (fboUsageCountMap.get(resourceUrn) != 1) {
-            int usageCount = fboUsageCountMap.get(resourceUrn);
-            fboUsageCountMap.put(resourceUrn, usageCount - 1);
+        if (fboUsageCountMap.get(fboName) != 1) {
+            int usageCount = fboUsageCountMap.get(fboName);
+            fboUsageCountMap.put(fboName, usageCount - 1);
         } else {
-            get(resourceUrn).dispose();
-            fboLookup.remove(resourceUrn);
-            if (fboConfigs.containsKey(resourceUrn)) {
-                fboConfigs.remove(resourceUrn);
+            get(fboName).dispose();
+            fboLookup.remove(fboName);
+            if (fboConfigs.containsKey(fboName)) {
+                fboConfigs.remove(fboName);
             }
         }
     }

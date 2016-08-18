@@ -57,7 +57,7 @@ public class BackdropNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        requireDynamicFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     @Override

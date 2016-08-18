@@ -69,7 +69,7 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireDynamicFBO(new FBOConfig(REFLECTED_URN, 0.5f, FBO.Type.DEFAULT).useDepthBuffer());
+        requireFBO(new FBOConfig(REFLECTED_URN, 0.5f, FBO.Type.DEFAULT).useDepthBuffer(), dynamicFBOsManager);
 
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");

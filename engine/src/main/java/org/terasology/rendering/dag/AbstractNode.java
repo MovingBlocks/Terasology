@@ -22,24 +22,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.registry.In;
 import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
-import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
 
 /**
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
-
-    @In
-    private StaticFBOsManager staticFBOsManager;
-
-    @In
-    private DynamicFBOsManager dynamicFBOsManager;
 
     private Set<StateChange> desiredStateChanges;
     private Map<ResourceUrn, BaseFBOsManager> fboUsages;
@@ -50,14 +40,6 @@ public abstract class AbstractNode implements Node {
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
         fboUsages = Maps.newHashMap();
-    }
-
-    protected void requireStaticFBO(FBOConfig fboConfig) {
-        requireFBO(fboConfig, staticFBOsManager);
-    }
-
-    protected void requireDynamicFBO(FBOConfig fboConfig) {
-        requireFBO(fboConfig, dynamicFBOsManager);
     }
 
     protected void requireFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
@@ -71,10 +53,6 @@ public abstract class AbstractNode implements Node {
         }
 
         frameBuffersManager.request(fboConfig);
-    }
-
-    protected void requireFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        requireFBO(defaultDynamicFBO.getConfig(), dynamicFBOsManager);
     }
 
     @Override

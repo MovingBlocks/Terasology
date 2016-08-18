@@ -55,7 +55,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
-        requireDynamicFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR), dynamicFBOsManager);
 
     }
 

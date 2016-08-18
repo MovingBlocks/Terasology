@@ -66,9 +66,9 @@ public class BlurPassesNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
-        requireDynamicFBO(new FBOConfig(BLUR_0_URN, 0.5f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(BLUR_1_URN, 0.5f, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(TONE_MAPPED_URN, 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig(BLUR_0_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLUR_1_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(TONE_MAPPED_URN, 1.0f, FBO.Type.HDR), dynamicFBOsManager);
     }
 
     /**

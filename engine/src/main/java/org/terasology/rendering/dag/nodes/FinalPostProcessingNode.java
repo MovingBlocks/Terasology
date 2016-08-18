@@ -81,7 +81,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
-        requireDynamicFBO(new FBOConfig(OC_UNDISTORTED_URN, 1.0f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig(OC_UNDISTORTED_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

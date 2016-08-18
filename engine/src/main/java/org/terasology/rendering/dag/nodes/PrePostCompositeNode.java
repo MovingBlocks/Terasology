@@ -53,7 +53,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
-        requireDynamicFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
+        requireFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     /**

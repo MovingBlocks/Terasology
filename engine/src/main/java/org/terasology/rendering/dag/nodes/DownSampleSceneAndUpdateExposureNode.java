@@ -110,12 +110,12 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        requireStaticFBO(new FBOConfig(SCENE_16_URN, 16, 16, FBO.Type.DEFAULT));
-        requireStaticFBO(new FBOConfig(SCENE_8_URN, 8, 8, FBO.Type.DEFAULT));
-        requireStaticFBO(new FBOConfig(SCENE_4_URN, 4, 4, FBO.Type.DEFAULT));
-        requireStaticFBO(new FBOConfig(SCENE_2_URN, 2, 2, FBO.Type.DEFAULT));
-        requireStaticFBO(new FBOConfig(SCENE_1_URN, 1, 1, FBO.Type.DEFAULT));
-        requireDynamicFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR));
+        requireFBO(new FBOConfig(SCENE_16_URN, 16, 16, FBO.Type.DEFAULT), staticFBOsManager);
+        requireFBO(new FBOConfig(SCENE_8_URN, 8, 8, FBO.Type.DEFAULT), staticFBOsManager);
+        requireFBO(new FBOConfig(SCENE_4_URN, 4, 4, FBO.Type.DEFAULT), staticFBOsManager);
+        requireFBO(new FBOConfig(SCENE_2_URN, 2, 2, FBO.Type.DEFAULT), staticFBOsManager);
+        requireFBO(new FBOConfig(SCENE_1_URN, 1, 1, FBO.Type.DEFAULT), staticFBOsManager);
+        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR), dynamicFBOsManager);
 
         obtainStaticFBOs();
         createPBOs();

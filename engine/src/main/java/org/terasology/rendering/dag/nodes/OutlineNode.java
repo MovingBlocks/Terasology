@@ -58,7 +58,7 @@ public class OutlineNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         outline = worldRenderer.getMaterial("engine:prog.sobel");
-        requireDynamicFBO(new FBOConfig(OUTLINE_URN, 1.0f, FBO.Type.DEFAULT));
+        requireFBO(new FBOConfig(OUTLINE_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
