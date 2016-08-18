@@ -15,30 +15,24 @@
  */
 package org.terasology.rendering.opengl;
 
-import org.terasology.assets.ResourceUrn;
-
 /**
  * TODO: Add javadocs
  */
-public interface BaseFBM {
+public enum ScalingFactors {
+    FULL_SCALE(1.0f),
+    HALF_SCALE(0.5f),
+    QUARTER_SCALE(0.25f),
+    ONE_8TH_SCALE(0.125f),
+    ONE_16TH_SCALE(0.0625f),
+    ONE_32TH_SCALE(0.03125f);
 
-    boolean subscribe(FBOManagerSubscriber subscriber);
+    private final float scale;
 
-    boolean unsubscribe(FBOManagerSubscriber subscriber);
+    ScalingFactors(float scale) {
+        this.scale = scale;
+    }
 
-    void release(ResourceUrn resourceUrn);
-
-    void request(FBOConfig fboConfig);
-
-    FBO getFBO(ResourceUrn resourceUrn);
-
-    boolean bindFboColorTexture(ResourceUrn resourceUrn);
-
-    boolean bindFboDepthTexture(ResourceUrn resourceUrn);
-
-    boolean bindFboNormalsTexture(ResourceUrn resourceUrn);
-
-    boolean bindFboLightBufferTexture(ResourceUrn resourceUrn);
-
-
+    public float getScale() {
+        return scale;
+    }
 }

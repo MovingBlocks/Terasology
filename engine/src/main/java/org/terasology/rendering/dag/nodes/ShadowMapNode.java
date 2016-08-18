@@ -31,7 +31,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBM;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
@@ -70,7 +70,7 @@ public class ShadowMapNode extends AbstractNode {
     private BackdropProvider backdropProvider;
 
     @In
-    private ShadowMapResolutionDependentFBM shadowMapResolutionDependentFBM;
+    private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
 
     private Material shadowMapShader;
     private RenderingConfig renderingConfig;
@@ -86,11 +86,11 @@ public class ShadowMapNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
 
-        requireFBO(new FBOConfig(SHADOW_MAP_URN, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBM);
+        requireFBO(new FBOConfig(SHADOW_MAP_URN, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
 
         // TODO: fix them
-        addDesiredStateChange(new BindFBO(SHADOW_MAP_URN, shadowMapResolutionDependentFBM));
-        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP_URN, shadowMapResolutionDependentFBM));
+        addDesiredStateChange(new BindFBO(SHADOW_MAP_URN, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP_URN, shadowMapResolutionDependentFBOs));
     }
 
     @Override

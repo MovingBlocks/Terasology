@@ -25,7 +25,7 @@ import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -45,7 +45,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private FBO sceneReflectiveRefractive;
     private Camera playerCamera;
@@ -54,7 +54,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        dynamicFBM.subscribe(this);
+        dynamicFBOsManager.subscribe(this);
         requireDynamicFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer());
     }
 
@@ -82,7 +82,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
      * accommodate the rendering of the water surface from an underwater point of view.
      */
     private void preRenderSetupSceneReflectiveRefractive() {
-        sceneReflectiveRefractive = dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN);
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
         sceneReflectiveRefractive.bind();
 
         // Make sure the water surface is rendered if the player is underwater.
@@ -106,7 +106,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void update() {
         // TODO: renames, maybe?
-        FBO sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-        sceneOpaque.attachDepthBufferTo(dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN));
+        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaque.attachDepthBufferTo(dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN));
     }
 }

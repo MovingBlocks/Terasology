@@ -23,7 +23,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -40,7 +40,7 @@ public class PrePostCompositeNode extends AbstractNode {
 
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -64,9 +64,9 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-        sceneOpaquePingPong = dynamicFBM.getFBO(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn());
-        sceneReflectiveRefractive = dynamicFBM.getFBO(REFLECTIVE_REFRACTIVE_URN);
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WriteOnlyGBuffer.getName());
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE_URN);
 
         // TODO: verify if there should be bound textures here.
         sceneOpaquePingPong.bind();
@@ -79,7 +79,7 @@ public class PrePostCompositeNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        dynamicFBM.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn(), DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getName(), DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();

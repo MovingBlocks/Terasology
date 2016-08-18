@@ -70,8 +70,8 @@ import org.terasology.assets.ResourceUrn;
 /**
  * TODO: fix above, add javadocs
  */
-public abstract class AbstractFBM implements BaseFBM {
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractFBM.class);
+public abstract class AbstractFBOsManager implements BaseFBOsManager {
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
     protected Map<ResourceUrn, FBOConfig> fboConfigs = Maps.newHashMap();
     protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
     protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
@@ -122,7 +122,7 @@ public abstract class AbstractFBM implements BaseFBM {
             int usageCount = fboUsageCountMap.get(resourceUrn);
             fboUsageCountMap.put(resourceUrn, usageCount - 1);
         } else {
-            getFBO(resourceUrn).dispose();
+            get(resourceUrn).dispose();
             fboLookup.remove(resourceUrn);
             if (fboConfigs.containsKey(resourceUrn)) {
                 fboConfigs.remove(resourceUrn);
@@ -135,18 +135,18 @@ public abstract class AbstractFBM implements BaseFBM {
      *
      * If no FBO is associated with the given name, false is returned and an error is logged.
      *
-     * @param resourceUrn the urn of an FBO
+     * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboColorTexture(ResourceUrn resourceUrn) {
-        FBO fbo = fboLookup.get(resourceUrn);
+    public boolean bindFboColorTexture(ResourceUrn fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO color texture since the requested " + resourceUrn + " FBO could not be found!");
+        logger.error("Failed to bind FBO color texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
@@ -155,18 +155,18 @@ public abstract class AbstractFBM implements BaseFBM {
      *
      * If no FBO is associated with the given name, false is returned and an error is logged.
      *
-     * @param resourceUrn the urn of an FBO
+     * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboDepthTexture(ResourceUrn resourceUrn) {
-        FBO fbo = fboLookup.get(resourceUrn);
+    public boolean bindFboDepthTexture(ResourceUrn fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindDepthTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO depth texture since the requested " + resourceUrn + " FBO could not be found!");
+        logger.error("Failed to bind FBO depth texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
@@ -175,19 +175,19 @@ public abstract class AbstractFBM implements BaseFBM {
      *
      * If no FBO is associated with the given name, false is returned and an error is logged.
      *
-     * @param resourceUrn the urn of an FBO
+     * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboNormalsTexture(ResourceUrn resourceUrn) {
-        FBO fbo = fboLookup.get(resourceUrn);
+    public boolean bindFboNormalsTexture(ResourceUrn fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindNormalsTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO normals texture since the requested " + resourceUrn + " FBO could not be found!");
+        logger.error("Failed to bind FBO normals texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
@@ -196,19 +196,19 @@ public abstract class AbstractFBM implements BaseFBM {
      *
      * If no FBO is associated with the given name, false is returned and an error is logged.
      *
-     * @param resourceUrn the urn of an FBO
+     * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboLightBufferTexture(ResourceUrn resourceUrn) {
-        FBO fbo = fboLookup.get(resourceUrn);
+    public boolean bindFboLightBufferTexture(ResourceUrn fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
             fbo.bindLightBufferTexture();
             return true;
         }
 
-        logger.error("Failed to bind FBO light buffer texture since the requested " + resourceUrn + " FBO could not be found!");
+        logger.error("Failed to bind FBO light buffer texture since the requested " + fboName + " FBO could not be found!");
         return false;
     }
 
@@ -218,15 +218,15 @@ public abstract class AbstractFBM implements BaseFBM {
      *
      * If no FBO maps to the given name, null is returned and an error is logged.
      *
-     * @param resourceUrn
+     * @param fboName
      * @return an FBO or null
      */
     @Override
-    public FBO getFBO(ResourceUrn resourceUrn) {
-        FBO fbo = fboLookup.get(resourceUrn);
+    public FBO get(ResourceUrn fboName) {
+        FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.error("Failed to retrieve FBO '" + resourceUrn + "'!");
+            logger.error("Failed to retrieve FBO '" + fboName + "'!");
         }
 
         return fbo;

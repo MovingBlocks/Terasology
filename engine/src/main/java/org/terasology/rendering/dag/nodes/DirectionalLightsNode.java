@@ -28,7 +28,7 @@ import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -58,7 +58,7 @@ public class DirectionalLightsNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
@@ -91,7 +91,7 @@ public class DirectionalLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
         sceneOpaque.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
@@ -139,8 +139,8 @@ public class DirectionalLightsNode extends AbstractNode {
         sceneOpaque.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneOpaquePingPong = dynamicFBM.getFBO(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn());
-        sceneReflectiveRefractive = dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN);
+        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WriteOnlyGBuffer.getName());
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
 
         sceneOpaquePingPong.bind();
         setRenderBufferMask(sceneOpaquePingPong, true, true, true);
@@ -153,7 +153,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
 
-        dynamicFBM.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getResourceUrn(), DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WriteOnlyGBuffer.getName(), DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
         sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

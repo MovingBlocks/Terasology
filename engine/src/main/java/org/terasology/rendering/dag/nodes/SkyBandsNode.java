@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -47,7 +47,7 @@ public class SkyBandsNode extends WireframeCapableNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private RenderingConfig renderingConfig;
     private Material blurShader;
@@ -72,12 +72,12 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/skyBands");
 
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         setRenderBufferMask(sceneOpaque, true, true, true);
         if (renderingConfig.isInscattering()) {
-            sceneSkyBand0 = dynamicFBM.getFBO(SKY_BAND_0_URN);
-            sceneSkyBand1 = dynamicFBM.getFBO(SKY_BAND_1_URN);
+            sceneSkyBand0 = dynamicFBOsManager.get(SKY_BAND_0_URN);
+            sceneSkyBand1 = dynamicFBOsManager.get(SKY_BAND_1_URN);
 
             generateSkyBand(sceneSkyBand0);
             generateSkyBand(sceneSkyBand1);

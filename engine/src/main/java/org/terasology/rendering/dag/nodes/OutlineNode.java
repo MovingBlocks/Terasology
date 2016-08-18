@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -41,7 +41,7 @@ public class OutlineNode extends AbstractNode {
     public static final ResourceUrn OUTLINE_URN = new ResourceUrn("engine:outline");
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -76,8 +76,8 @@ public class OutlineNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isOutline()) {
             PerformanceMonitor.startActivity("rendering/outline");
-            outlineFBO = dynamicFBM.getFBO(OUTLINE_URN);
-            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+            outlineFBO = dynamicFBOsManager.get(OUTLINE_URN);
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
             outline.enable();
 

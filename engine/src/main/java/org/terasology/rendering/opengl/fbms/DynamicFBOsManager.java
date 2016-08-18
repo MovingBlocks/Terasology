@@ -24,20 +24,20 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
-import org.terasology.rendering.opengl.AbstractFBM;
+import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.Final;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.ReadOnlyGBuffer;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WriteOnlyGBuffer;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.ScreenGrabber;
 
 /**
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class DynamicFBM extends AbstractFBM {
+public class DynamicFBOsManager extends AbstractFBOsManager {
     // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
     // -both- fullScale's dimensions halved, leading to -a quarter- of its resolution. Following
     // this logic one32thScale would have to be named one1024thResolution and the otherwise
@@ -46,9 +46,9 @@ public class DynamicFBM extends AbstractFBM {
 
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
 
-    public DynamicFBM() {
+    public DynamicFBOsManager() {
         fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
         generateDefaultFBOs();
     }
@@ -73,7 +73,7 @@ public class DynamicFBM extends AbstractFBM {
     }
 
     private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        FBOConfig fboConfig = defaultDynamicFBO.getFboConfig();
+        FBOConfig fboConfig = defaultDynamicFBO.getConfig();
         generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
     }
 
@@ -83,7 +83,7 @@ public class DynamicFBM extends AbstractFBM {
      */
     public void update() {
         updateFullScale();
-        if (getFBO(ReadOnlyGBuffer.getResourceUrn()).dimensions().areDifferentFrom(fullScale)) {
+        if (get(ReadOnlyGBuffer.getName()).dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
         }
@@ -113,7 +113,7 @@ public class DynamicFBM extends AbstractFBM {
      * @return a ByteBuffer or null
      */
     public ByteBuffer getSceneFinalRawData() {
-        FBO fboSceneFinal = getFBO(ReadOnlyGBuffer.getResourceUrn());
+        FBO fboSceneFinal = get(ReadOnlyGBuffer.getName());
         if (fboSceneFinal == null) {
             logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
             return null;
@@ -129,7 +129,7 @@ public class DynamicFBM extends AbstractFBM {
     }
 
     private void updateFullScale() {
-        if (postProcessor.isNotTakingScreenshot()) {
+        if (screenGrabber.isNotTakingScreenshot()) {
             fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
             if (renderingConfig.isOculusVrSupport()) {
                 fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
@@ -148,10 +148,10 @@ public class DynamicFBM extends AbstractFBM {
      * Sets an internal reference to the PostProcessor instance. This reference is used to inform the PostProcessor
      * instance that changes have occurred and that it should refresh its references to the FBOs it uses.
      *
-     * @param postProcessor a PostProcessor instance
+     * @param screenGrabber a PostProcessor instance
      */
-    public void setPostProcessor(PostProcessor postProcessor) {
-        this.postProcessor = postProcessor;
+    public void setScreenGrabber(ScreenGrabber screenGrabber) {
+        this.screenGrabber = screenGrabber;
     }
 
 

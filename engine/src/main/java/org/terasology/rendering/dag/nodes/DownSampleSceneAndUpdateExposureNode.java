@@ -33,9 +33,9 @@ import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
-import org.terasology.rendering.opengl.PostProcessor;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
-import org.terasology.rendering.opengl.fbms.StaticFBM;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -81,10 +81,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private StaticFBM staticFBM;
+    private StaticFBOsManager staticFBOsManager;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
 
     @In
@@ -94,7 +94,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private BackdropProvider backdropProvider;
 
     @In
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
     private FBO sceneOpaque;
@@ -123,8 +123,6 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
 
     private void createPBOs() {
-        // Technically these are not Frame Buffer Objects but Pixel Buffer Objects.
-        // Their instantiation and assignments are done here because they are static buffers.
         frontReadbackPBO = new PBO(1, 1);
         backReadbackPBO = new PBO(1, 1);
         currentReadbackPBO = frontReadbackPBO;
@@ -179,14 +177,14 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
                 targetExposure = hdrMinExposure;
             }
 
-            postProcessor.setExposure(TeraMath.lerp(postProcessor.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
+            screenGrabber.setExposure(TeraMath.lerp(screenGrabber.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
 
             PerformanceMonitor.endActivity();
         } else {
             if (backdropProvider.getDaylight() == 0.0) {
-                postProcessor.setExposure(hdrMaxExposureNight);
+                screenGrabber.setExposure(hdrMaxExposureNight);
             } else {
-                postProcessor.setExposure(hdrExposureDefault);
+                screenGrabber.setExposure(hdrExposureDefault);
             }
         }
 
@@ -194,8 +192,8 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-        scenePrePost = dynamicFBM.getFBO(SCENE_PRE_POST_URN);
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
 
         downSampler.enable();
 
@@ -239,10 +237,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
      * only if eye adaptation is enabled: an NPE would be thrown only in that case.
      */
     private void obtainStaticFBOs() {
-        downSampledScene[4] = staticFBM.getFBO(SCENE_16_URN);
-        downSampledScene[3] = staticFBM.getFBO(SCENE_8_URN);
-        downSampledScene[2] = staticFBM.getFBO(SCENE_4_URN);
-        downSampledScene[1] = staticFBM.getFBO(SCENE_2_URN);
-        downSampledScene[0] = staticFBM.getFBO(SCENE_1_URN);
+        downSampledScene[4] = staticFBOsManager.get(SCENE_16_URN);
+        downSampledScene[3] = staticFBOsManager.get(SCENE_8_URN);
+        downSampledScene[2] = staticFBOsManager.get(SCENE_4_URN);
+        downSampledScene[1] = staticFBOsManager.get(SCENE_2_URN);
+        downSampledScene[0] = staticFBOsManager.get(SCENE_1_URN);
     }
 }

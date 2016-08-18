@@ -26,7 +26,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -52,7 +52,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 public class LightGeometryNode extends AbstractNode {
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -89,7 +89,7 @@ public class LightGeometryNode extends AbstractNode {
         graphicState.postRenderCleanupLightGeometryStencil();
         */
 
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
         // LightGeometry requires a cleanup
         cleanupSceneOpaque();
         preRenderSetupLightGeometry();

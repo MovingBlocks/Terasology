@@ -22,7 +22,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.AbstractFBM;
+import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
@@ -30,12 +30,12 @@ import org.terasology.rendering.opengl.FBOConfig;
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class ShadowMapResolutionDependentFBM extends AbstractFBM implements PropertyChangeListener {
+public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
     private FBO.Dimensions shadowMapResolution;
 
-    public ShadowMapResolutionDependentFBM() {
+    public ShadowMapResolutionDependentFBOs() {
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
         int resolution = renderingConfig.getShadowMapResolution();
         shadowMapResolution = new FBO.Dimensions(resolution, resolution);

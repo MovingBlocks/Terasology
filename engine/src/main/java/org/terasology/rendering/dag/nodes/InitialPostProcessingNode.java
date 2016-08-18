@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -43,7 +43,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     private Config config;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -67,8 +67,8 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = dynamicFBM.getFBO(SCENE_PRE_POST_URN);
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
         initialPost.enable();
 
         // TODO: verify what the inputs are

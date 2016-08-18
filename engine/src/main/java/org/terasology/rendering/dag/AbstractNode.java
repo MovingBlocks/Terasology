@@ -23,11 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.In;
-import org.terasology.rendering.opengl.BaseFBM;
+import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
-import org.terasology.rendering.opengl.fbms.StaticFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
 
 /**
  * TODO: Add javadocs
@@ -36,13 +36,13 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     @In
-    private StaticFBM staticFBM;
+    private StaticFBOsManager staticFBOsManager;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private Set<StateChange> desiredStateChanges;
-    private Map<ResourceUrn, BaseFBM> fboUsages;
+    private Map<ResourceUrn, BaseFBOsManager> fboUsages;
 
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
@@ -53,14 +53,14 @@ public abstract class AbstractNode implements Node {
     }
 
     protected void requireStaticFBO(FBOConfig fboConfig) {
-        requireFBO(fboConfig, staticFBM);
+        requireFBO(fboConfig, staticFBOsManager);
     }
 
     protected void requireDynamicFBO(FBOConfig fboConfig) {
-        requireFBO(fboConfig, dynamicFBM);
+        requireFBO(fboConfig, dynamicFBOsManager);
     }
 
-    protected void requireFBO(FBOConfig fboConfig, BaseFBM frameBuffersManager) {
+    protected void requireFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
@@ -74,15 +74,15 @@ public abstract class AbstractNode implements Node {
     }
 
     protected void requireFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        requireFBO(defaultDynamicFBO.getFboConfig(), dynamicFBM);
+        requireFBO(defaultDynamicFBO.getConfig(), dynamicFBOsManager);
     }
 
     @Override
     public void dispose() {
-        for (Map.Entry<ResourceUrn, BaseFBM> entry : fboUsages.entrySet()) {
+        for (Map.Entry<ResourceUrn, BaseFBOsManager> entry : fboUsages.entrySet()) {
             ResourceUrn fboName = entry.getKey();
-            BaseFBM baseFBM = entry.getValue();
-            baseFBM.release(fboName);
+            BaseFBOsManager baseFBOsManager = entry.getValue();
+            baseFBOsManager.release(fboName);
         }
 
         fboUsages.clear();

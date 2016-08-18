@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -44,7 +44,7 @@ public class LightShaftsNode extends AbstractNode {
     private Config config;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -65,8 +65,8 @@ public class LightShaftsNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightShafts");
-            lightShaftsFBO = dynamicFBM.getFBO(LIGHT_SHAFTS_URN);
-            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+            lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS_URN);
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are

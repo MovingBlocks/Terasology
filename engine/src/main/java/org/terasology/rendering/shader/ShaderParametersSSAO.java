@@ -19,7 +19,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -92,7 +92,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = CoreRegistry.get(DynamicFBM.class).getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName()); // TODO: switch from CoreRegistry to Context.
 
         int texId = 0;
 

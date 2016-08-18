@@ -29,8 +29,8 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.PostProcessor;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -54,10 +54,10 @@ public class FinalPostProcessingNode extends AbstractNode {
     private Config config;
 
     @In
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
@@ -105,9 +105,9 @@ public class FinalPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
-        ocUndistorted = dynamicFBM.getFBO(OC_UNDISTORTED_URN);
-        sceneFinal = dynamicFBM.getFBO(DefaultDynamicFBOs.Final.getResourceUrn());
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED_URN);
+        sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.Final.getName());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         fullScale = sceneOpaque.dimensions();
 
@@ -127,7 +127,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     }
 
     private void renderFinalMonoImage() {
-        if (postProcessor.isNotTakingScreenshot()) {
+        if (screenGrabber.isNotTakingScreenshot()) {
             bindDisplay();
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
@@ -138,7 +138,7 @@ public class FinalPostProcessingNode extends AbstractNode {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
 
-            postProcessor.saveScreenshot();
+            screenGrabber.saveScreenshot();
             // when saving a screenshot we do not send the image to screen,
             // to avoid the brief one-frame flicker of the screenshot
 
@@ -151,7 +151,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(RenderingStage renderingStage) {
-        if (postProcessor.isNotTakingScreenshot()) { // TODO: verify if this works
+        if (screenGrabber.isNotTakingScreenshot()) { // TODO: verify if this works
             sceneFinal.bind();
         } else {
             ocUndistorted.bind();
@@ -168,14 +168,14 @@ public class FinalPostProcessingNode extends AbstractNode {
                 // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
                 renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
-                if (postProcessor.isNotTakingScreenshot()) {
+                if (screenGrabber.isNotTakingScreenshot()) {
                     bindDisplay();
                     applyOculusDistortion(sceneFinal);
 
                 } else {
                     sceneFinal.bind();
                     applyOculusDistortion(ocUndistorted);
-                    postProcessor.saveScreenshot();
+                    screenGrabber.saveScreenshot();
                     // when saving a screenshot we do NOT send the image to screen,
                     // to avoid the brief flicker of the screenshot for one frame
                 }
@@ -194,7 +194,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         inputBuffer.bindTexture();
         ocDistortion.setInt("texInputBuffer", texId, true);
 
-        if (postProcessor.isNotTakingScreenshot()) {
+        if (screenGrabber.isNotTakingScreenshot()) {
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);

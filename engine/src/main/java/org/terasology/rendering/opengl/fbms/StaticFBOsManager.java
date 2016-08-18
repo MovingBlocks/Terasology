@@ -16,14 +16,14 @@
 package org.terasology.rendering.opengl.fbms;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.opengl.AbstractFBM;
+import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBOConfig;
 
 /**
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class StaticFBM extends AbstractFBM {
+public class StaticFBOsManager extends AbstractFBOsManager {
 
     @Override
     public void request(FBOConfig fboConfig) {

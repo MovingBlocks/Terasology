@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -53,7 +53,7 @@ public class BlurPassesNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private RenderingConfig renderingConfig;
     private Material blur;
@@ -83,10 +83,10 @@ public class BlurPassesNode extends AbstractNode {
         if (renderingConfig.getBlurIntensity() != 0) {
             PerformanceMonitor.startActivity("rendering/blurPasses");
 
-            sceneBlur0 = dynamicFBM.getFBO(BLUR_0_URN);
-            sceneBlur1 = dynamicFBM.getFBO(BLUR_1_URN);
-            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-            sceneToneMapped = dynamicFBM.getFBO(TONE_MAPPED_URN);
+            sceneBlur0 = dynamicFBOsManager.get(BLUR_0_URN);
+            sceneBlur1 = dynamicFBOsManager.get(BLUR_1_URN);
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
 
             generateBlur(sceneBlur0);
             generateBlur(sceneBlur1);

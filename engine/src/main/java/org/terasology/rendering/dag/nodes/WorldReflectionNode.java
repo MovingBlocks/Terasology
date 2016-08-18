@@ -30,7 +30,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -60,7 +60,7 @@ public class WorldReflectionNode extends AbstractNode {
     private BackdropRenderer backdropRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private Camera playerCamera;
     private Material chunkShader;
@@ -74,8 +74,8 @@ public class WorldReflectionNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO(REFLECTED_URN, dynamicFBM));
-        addDesiredStateChange(new SetViewportSizeOf(REFLECTED_URN, dynamicFBM));
+        addDesiredStateChange(new BindFBO(REFLECTED_URN, dynamicFBOsManager));
+        addDesiredStateChange(new SetViewportSizeOf(REFLECTED_URN, dynamicFBOsManager));
     }
 
     @Override

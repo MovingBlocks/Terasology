@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -42,7 +42,7 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     public static final ResourceUrn SSAO_BLURRED_URN = new ResourceUrn("engine:ssaoBlurred");
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     @In
     private WorldRenderer worldRenderer;
@@ -79,9 +79,9 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         if (renderingConfig.isSsao()) {
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
-            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-            ssaoBlurredFBO = dynamicFBM.getFBO(SSAO_BLURRED_URN);
-            ssaoFBO = dynamicFBM.getFBO(SSAO_URN);
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+            ssaoBlurredFBO = dynamicFBOsManager.get(SSAO_BLURRED_URN);
+            ssaoFBO = dynamicFBOsManager.get(SSAO_URN);
 
             generateSSAO();
             generateBlurredSSAO();

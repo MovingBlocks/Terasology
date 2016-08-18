@@ -24,7 +24,7 @@ import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -47,7 +47,7 @@ public class BackdropNode extends WireframeCapableNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private Camera playerCamera;
     private FBO sceneOpaque;
@@ -63,7 +63,7 @@ public class BackdropNode extends WireframeCapableNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         initialClearing();
 
@@ -90,7 +90,7 @@ public class BackdropNode extends WireframeCapableNode {
      */
     // It's unclear why these buffers need to be cleared while all the others don't...
     private void initialClearing() {
-        sceneReflectiveRefractive = dynamicFBM.getFBO(REFRACTIVE_REFLECTIVE_URN);
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
         sceneOpaque.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         sceneReflectiveRefractive.bind();

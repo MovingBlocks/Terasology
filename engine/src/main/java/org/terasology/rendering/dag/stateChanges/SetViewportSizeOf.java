@@ -16,27 +16,27 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.opengl.BaseFBM;
+import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
-    private static DynamicFBM dynamicFBM;
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
+    private static DynamicFBOsManager dynamicFBOsManager;
 
-    private BaseFBM fbm;
+    private BaseFBOsManager fbm;
     private SetViewportSizeOfTask task;
     private ResourceUrn resourceUrn;
 
-    public SetViewportSizeOf(ResourceUrn resourceUrn, BaseFBM fbm) {
+    public SetViewportSizeOf(ResourceUrn resourceUrn, BaseFBOsManager fbm) {
         this.fbm = fbm;
         this.resourceUrn = resourceUrn;
     }
@@ -45,8 +45,8 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         this.resourceUrn = resourceUrn;
     }
 
-    public static void setDynamicFBM(DynamicFBM dynamicFBM) {
-        SetViewportSizeOf.dynamicFBM = dynamicFBM;
+    public static void setDynamicFBOsManager(DynamicFBOsManager dynamicFBOsManager) {
+        SetViewportSizeOf.dynamicFBOsManager = dynamicFBOsManager;
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     public RenderPipelineTask generateTask() {
         if (task == null) {
             if (isTheDefaultInstance()) {
-                fbm = dynamicFBM;
+                fbm = dynamicFBOsManager;
             }
             task = new SetViewportSizeOfTask(resourceUrn);
             fbm.subscribe(this);
@@ -83,7 +83,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        FBO fbo = fbm.getFBO(resourceUrn);
+        FBO fbo = fbm.get(resourceUrn);
         task.setDimensions(fbo.width(), fbo.height());
     }
 

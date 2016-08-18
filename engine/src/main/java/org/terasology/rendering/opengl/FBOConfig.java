@@ -82,16 +82,6 @@ public class FBOConfig {
         this.type = type;
     }
 
-   /*
-    * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
-    * @param useNormalBuffer If true the FBO will have a 32 bit normals buffer attached to it. (GL_RGBA, GL_UNSIGNED_BYTE, GL_LINEAR)
-    * @param useLightBuffer If true the FBO will have 32/64 bit light buffer attached to it, depending if Type is DEFAULT/HDR.
-    *                       (GL_RGBA/GL_RGBA16F_ARB, GL_UNSIGNED_BYTE/GL_HALF_FLOAT_ARB, GL_LINEAR)
-    * @param useStencilBuffer If true the depth buffer will also have an 8 bit Stencil buffer associated with it.
-    *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
-    *
-    */
-
     /**
      * Sets the builder to generate, allocate and attach a 24 bit depth buffer to the FrameBuffer to be built.
      * If useStencilBuffer() is also used, an 8 bit stencil buffer will also be associated with the depth buffer.

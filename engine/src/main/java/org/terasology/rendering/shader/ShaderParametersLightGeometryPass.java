@@ -19,8 +19,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
@@ -44,9 +44,9 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in the superclass and monitor from there?
-        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
-        ShadowMapResolutionDependentFBM shadowMapResolutionDependentFBM = CoreRegistry.get(ShadowMapResolutionDependentFBM.class);
-        FBO sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = CoreRegistry.get(ShadowMapResolutionDependentFBOs.class);
+        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         int texId = 0;
         if (sceneOpaque != null) {
@@ -68,7 +68,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             // TODO: move into node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            shadowMapResolutionDependentFBM.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP_URN);
+            shadowMapResolutionDependentFBOs.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP_URN);
             program.setInt("texSceneShadowMap", texId++, true);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera(); // TODO: shadowMapNode.camera here

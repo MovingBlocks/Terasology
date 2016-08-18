@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -56,18 +56,18 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
         // TODO: obtain these only once in superclass and monitor from there?
         CameraTargetSystem cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
-        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
+        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
 
         // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBM.bindFboColorTexture(ToneMappingNode.TONE_MAPPED_URN);
+        dynamicFBOsManager.bindFboColorTexture(ToneMappingNode.TONE_MAPPED_URN);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor property rather than check every frame
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBM.getFBO(BlurPassesNode.BLUR_1_URN).bindTexture();
+            dynamicFBOsManager.get(BlurPassesNode.BLUR_1_URN).bindTexture();
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
@@ -85,7 +85,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        FBO sceneCombined = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        FBO sceneCombined = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         if (sceneCombined != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

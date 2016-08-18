@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.ScreenGrabber;
 
 /**
  */
@@ -62,7 +62,7 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F12:
-                CoreRegistry.get(PostProcessor.class).takeScreenshot();
+                CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
                 break;
             default:

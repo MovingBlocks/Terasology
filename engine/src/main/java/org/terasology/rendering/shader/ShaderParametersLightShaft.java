@@ -25,7 +25,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -48,8 +48,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in superclass and monitor from there?
-        DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
-        FBO scene = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
+        FBO scene = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
         int texId = 0;
 

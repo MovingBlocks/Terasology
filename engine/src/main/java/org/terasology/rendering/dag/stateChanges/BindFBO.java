@@ -16,7 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.opengl.BaseFBM;
+import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
@@ -33,10 +33,10 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_URN);
 
     private BindFBOTask task;
-    private BaseFBM fbm;
+    private BaseFBOsManager fbm;
     private final ResourceUrn resourceUrn;
 
-    public BindFBO(ResourceUrn resourceUrn, BaseFBM fbm) {
+    public BindFBO(ResourceUrn resourceUrn, BaseFBOsManager fbm) {
         this.fbm = fbm;
         this.resourceUrn = resourceUrn;
     }
@@ -64,7 +64,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
         if (task == null) {
             // Subscription is only needed if fboID is different than default frame buffer id.
             if (!resourceUrn.equals(DEFAULT_FRAME_BUFFER_URN)) {
-                task = new BindFBOTask(fbm.getFBO(resourceUrn).fboId, resourceUrn);
+                task = new BindFBOTask(fbm.get(resourceUrn).fboId, resourceUrn);
                 fbm.subscribe(this);
             } else {
                 task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_URN);
@@ -87,7 +87,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        task.setFboId(fbm.getFBO(resourceUrn).fboId);
+        task.setFboId(fbm.get(resourceUrn).fboId);
     }
 
     @Override

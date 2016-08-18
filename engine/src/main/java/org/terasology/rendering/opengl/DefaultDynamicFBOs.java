@@ -31,16 +31,16 @@ public enum DefaultDynamicFBOs {
         this.fboConfig = fboConfig;
     }
 
-    public FBOConfig getFboConfig() {
+    public FBOConfig getConfig() {
         return fboConfig;
     }
 
-    public ResourceUrn getResourceUrn() {
+    public ResourceUrn getName() {
         return fboConfig.getName();
     }
 
     @Override
     public String toString() {
-        return getResourceUrn().toString();
+        return getName().toString();
     }
 }

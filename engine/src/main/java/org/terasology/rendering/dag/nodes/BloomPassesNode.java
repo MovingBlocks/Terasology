@@ -27,7 +27,7 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -58,7 +58,7 @@ public class BloomPassesNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBM dynamicFBM;
+    private DynamicFBOsManager dynamicFBOsManager;
 
     private RenderingConfig renderingConfig;
     private Material highPass;
@@ -95,11 +95,11 @@ public class BloomPassesNode extends AbstractNode {
             PerformanceMonitor.startActivity("rendering/bloomPasses");
             // TODO: review - would it make sense to split these operations into one highpass node and
             // TODO: three blur nodes with different parameters?
-            sceneBloom0 = dynamicFBM.getFBO(BLOOM_0_URN);
-            sceneBloom1 = dynamicFBM.getFBO(BLOOM_1_URN);
-            sceneBloom2 = dynamicFBM.getFBO(BLOOM_2_URN);
-            sceneHighPass = dynamicFBM.getFBO(HIGH_PASS_URN);
-            sceneOpaque = dynamicFBM.getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+            sceneBloom0 = dynamicFBOsManager.get(BLOOM_0_URN);
+            sceneBloom1 = dynamicFBOsManager.get(BLOOM_1_URN);
+            sceneBloom2 = dynamicFBOsManager.get(BLOOM_2_URN);
+            sceneHighPass = dynamicFBOsManager.get(HIGH_PASS_URN);
+            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.ReadOnlyGBuffer.getName());
 
             generateHighPass();
             generateBloom(sceneBloom0);

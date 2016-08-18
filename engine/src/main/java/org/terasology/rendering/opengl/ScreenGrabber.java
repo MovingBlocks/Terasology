@@ -33,48 +33,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 
-/**
- * The term "Post Processing" is in analogy to what occurs in the world of Photography:
- * first a number of shots are taken on location or in a studio. The resulting images
- * are then post-processed to achieve specific aesthetic or technical goals.
- *
- * In the context of Terasology, the WorldRenderer takes care of "taking the shots
- * on location" (a world of 3D data such as vertices, uv coordinates and so on)
- * while the PostProcessor starts from the resulting 2D buffers (which in most
- * cases can be thought as images) and through a series of steps it generates the
- * image seen on screen or saved in a screenshot.
- *
- * Most PostProcessor methods represent a single step of the process. I.e the
- * method generateLightShafts() only adds light shafts to the image.
- *
- * Also, most methods follow a typical pattern of operations:
- * 1) enable a material (a shader bundled with its control parameters)
- * 2) bind zero or more 2D buffers to sample from
- * 3) bind and configure an FBO to output to
- * 4) render a quad, usually covering the whole buffer area, but sometimes less
- *
- * Finally, post-processing can be thought as a part of the rendering pipeline,
- * the set of conceptually atomic steps (sometimes called "passes") that eventually
- * leads to the final image. In practice however these steps are not really arranged
- * in a "line" where a given step takes the output of the previous step and provides
- * an input to the next one. Some steps have no dependencies on previous steps and
- * only provide the basis for further processing. Other steps have instead one or
- * more inputs and in turn become the input to one or more further passes.
- *
- * The rendering pipeline the methods of the PostProcessor contribute to is therefore
- * better thought as a Directed Acyclic Graph (DAG) in which each step is a node
- * that might or might not have previous nodes in input but will always have at least
- * an output, with the final writing to the default framebuffer (the display) or
- * to a screenshot file.
- */
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
-public class PostProcessor {
-    private static final Logger logger = LoggerFactory.getLogger(PostProcessor.class);
+public class ScreenGrabber {
+    private static final Logger logger = LoggerFactory.getLogger(ScreenGrabber.class);
 
-    private DynamicFBM buffersManager;
+    private DynamicFBOsManager buffersManager;
 
     private boolean isTakingScreenshot;
 
@@ -94,7 +60,7 @@ public class PostProcessor {
      *
      * @param buffersManager An FrameBuffersManager instance, required to obtain FBO references.
      */
-    public PostProcessor(DynamicFBM buffersManager) {
+    public ScreenGrabber(DynamicFBOsManager buffersManager) {
         this.buffersManager = buffersManager;
     }
 
@@ -153,7 +119,7 @@ public class PostProcessor {
             return;
         }
 
-        FBO sceneFinal = buffersManager.getFBO(DefaultDynamicFBOs.Final.getResourceUrn());
+        FBO sceneFinal = buffersManager.get(DefaultDynamicFBOs.Final.getName());
         int width = sceneFinal.width();
         int height = sceneFinal.height();
 
