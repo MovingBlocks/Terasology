@@ -59,9 +59,9 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
 
-    private PBO frontReadbackPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back
-    private PBO backReadbackPBO;    // into the CPU. This data is then used in the context of
-    private PBO currentReadbackPBO; // eye adaptation.
+    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
+    private PBO readOnlyPBO;    // This data is then used in the context of eye adaptation.
+    private PBO temporaryPBO;
 
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
@@ -124,9 +124,8 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
 
     private void createPBOs() {
-        frontReadbackPBO = new PBO(1, 1);
-        backReadbackPBO = new PBO(1, 1);
-        currentReadbackPBO = frontReadbackPBO;
+        writeOnlyPBO = new PBO(1, 1);
+        readOnlyPBO = new PBO(1, 1);
     }
 
     /**
@@ -141,16 +140,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
             downSampleSceneInto1x1pixelsBuffer();
 
-            currentReadbackPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            writeOnlyPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            pixels = readOnlyPBO.readBackPixels();
 
-            // Swaps the readback PBOs, so that the one previously used for writing is now used for reading and vice versa.
-            if (currentReadbackPBO == frontReadbackPBO) {
-                currentReadbackPBO = backReadbackPBO;
-            } else {
-                currentReadbackPBO = frontReadbackPBO;
-            }
-
-            pixels = currentReadbackPBO.readBackPixels();
+            swapPBOs();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -189,6 +182,12 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
             }
         }
 
+    }
+
+    private void swapPBOs() {
+        temporaryPBO = readOnlyPBO;
+        readOnlyPBO = writeOnlyPBO;
+        writeOnlyPBO = temporaryPBO;
     }
 
     private void downSampleSceneInto1x1pixelsBuffer() {
