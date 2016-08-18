@@ -35,7 +35,6 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Diagram of this node
@@ -103,7 +102,7 @@ public class SkyBandsNode extends WireframeCapableNode {
         }
 
         skyBand.bind();
-        setRenderBufferMask(skyBand, true, false, false);
+        skyBand.setRenderBufferMask(true, false, false);
 
         setViewportToSizeOf(skyBand);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
