@@ -289,10 +289,10 @@ public final class FBO {
         return FBO.create(config.getName(),
                 dimensions,
                 config.getType(),
-                config.isUseDepthBuffer(),
-                config.isUseNormalBuffer(),
-                config.isUseLightBuffer(),
-                config.isUseStencilBuffer());
+                config.hasDepthBuffer(),
+                config.hasNormalBuffer(),
+                config.hasLightBuffer(),
+                config.hasStencilBuffer());
     }
 
 

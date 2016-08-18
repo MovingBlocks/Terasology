@@ -137,22 +137,20 @@ public class FBOConfig {
         return this;
     }
 
-
-    // TODO: rename them in future
     // TODO: add javadocs
-    public boolean isUseDepthBuffer() {
+    public boolean hasDepthBuffer() {
         return useDepthBuffer;
     }
 
-    public boolean isUseNormalBuffer() {
+    public boolean hasNormalBuffer() {
         return useNormalBuffer;
     }
 
-    public boolean isUseLightBuffer() {
+    public boolean hasLightBuffer() {
         return useLightBuffer;
     }
 
-    public boolean isUseStencilBuffer() {
+    public boolean hasStencilBuffer() {
         return useStencilBuffer;
     }
 
