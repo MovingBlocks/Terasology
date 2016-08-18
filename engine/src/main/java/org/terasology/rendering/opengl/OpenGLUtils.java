@@ -73,34 +73,16 @@ public final class OpenGLUtils {
         glViewport(0, 0, fbo.width(), fbo.height());
     }
 
+    public static void setViewportToSizeOf(DefaultDynamicFBOs defaultDynamicFBO) {
+        glViewport(0, 0, defaultDynamicFBO.width(), defaultDynamicFBO.height());
+    }
+
     /**
      * Unbinds any currently bound FBO and binds the default Frame Buffer,
      * which is usually the Display (be it the full screen or a window).
      */
     public static void bindDisplay() {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    }
-
-    /**
-     * Sets the state to render in wireframe.
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True enables wireframe rendering. False, does nothing.
-     */
-    public static void enableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
-
-    /**
-     * Disables wireframe rendering. Used together with enableWireFrameIf().
-     *
-     * @param wireframeIsEnabledInRenderingDebugConfig If True disables wireframe rendering. False, does nothing.
-     */
-    public static void disableWireframeIf(boolean wireframeIsEnabledInRenderingDebugConfig) {
-        if (wireframeIsEnabledInRenderingDebugConfig) {
-            GL11.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
     }
 
 

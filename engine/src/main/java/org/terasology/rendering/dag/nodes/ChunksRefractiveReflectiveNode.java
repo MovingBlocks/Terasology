@@ -21,7 +21,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -107,7 +107,6 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void update() {
         // TODO: renames, maybe?
-        FBO sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-        sceneOpaque.attachDepthBufferTo(dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN));
+        READ_ONLY_GBUFFER.attachDepthBufferTo(dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN));
     }
 }

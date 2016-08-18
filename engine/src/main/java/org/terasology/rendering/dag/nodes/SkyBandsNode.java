@@ -22,7 +22,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
@@ -53,7 +53,7 @@ public class SkyBandsNode extends WireframeCapableNode {
 
     private RenderingConfig renderingConfig;
     private Material blurShader;
-    private FBO sceneOpaque;
+
     private FBO sceneSkyBand0;
     private FBO sceneSkyBand1;
     private Camera playerCamera;
@@ -75,9 +75,7 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/skyBands");
 
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-
-        setRenderBufferMask(sceneOpaque, true, true, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         if (renderingConfig.isInscattering()) {
             sceneSkyBand0 = dynamicFBOsManager.get(SKY_BAND_0_URN);
             sceneSkyBand1 = dynamicFBOsManager.get(SKY_BAND_1_URN);
@@ -86,7 +84,7 @@ public class SkyBandsNode extends WireframeCapableNode {
             generateSkyBand(sceneSkyBand1);
         }
 
-        sceneOpaque.bind();
+        READ_ONLY_GBUFFER.bind();
 
         playerCamera.lookThrough();
 
@@ -99,7 +97,7 @@ public class SkyBandsNode extends WireframeCapableNode {
         blurShader.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
         if (skyBand == sceneSkyBand0) {
-            sceneOpaque.bindTexture();
+            READ_ONLY_GBUFFER.bindTexture();
         } else {
             sceneSkyBand0.bindTexture();
         }
@@ -113,6 +111,6 @@ public class SkyBandsNode extends WireframeCapableNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 }

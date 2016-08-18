@@ -29,7 +29,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
@@ -98,7 +98,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
-    private FBO sceneOpaque;
+
     private FBO scenePrePost;
     private FBO downSampledFBO;
     private FBO[] downSampledScene = new FBO[5];
@@ -193,7 +193,6 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
 
         downSampler.enable();
@@ -220,7 +219,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
             bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }

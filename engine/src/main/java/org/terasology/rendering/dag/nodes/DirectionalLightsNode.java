@@ -26,6 +26,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -65,7 +66,7 @@ public class DirectionalLightsNode extends AbstractNode {
     private LightComponent mainDirectionalLight = new LightComponent();
 
     private Camera playerCamera;
-    private FBO sceneOpaque;
+
     private Material lightGeometryShader;
     private Material lightBufferPass;
     private FBO sceneOpaquePingPong;
@@ -92,8 +93,7 @@ public class DirectionalLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-        sceneOpaque.bind();
+        READ_ONLY_GBUFFER.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
@@ -108,7 +108,7 @@ public class DirectionalLightsNode extends AbstractNode {
 
         glEnable(GL_DEPTH_TEST);
 
-        setRenderBufferMask(sceneOpaque, true, true, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         bindDisplay();
 
         applyLightBufferPass();
@@ -125,19 +125,19 @@ public class DirectionalLightsNode extends AbstractNode {
         int texId = 0;
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindTexture();
+        READ_ONLY_GBUFFER.bindTexture();
         lightBufferPass.setInt("texSceneOpaque", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindDepthTexture();
+        READ_ONLY_GBUFFER.bindDepthTexture();
         lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindNormalsTexture();
+        READ_ONLY_GBUFFER.bindNormalsTexture();
         lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindLightBufferTexture();
+        READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
         sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
@@ -152,9 +152,9 @@ public class DirectionalLightsNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getName());
+        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

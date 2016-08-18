@@ -74,7 +74,8 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
 
     private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
         FBOConfig fboConfig = defaultDynamicFBO.getConfig();
-        generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+        FBO fbo = generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+        defaultDynamicFBO.setFbo(fbo);
     }
 
     /**
@@ -91,8 +92,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
 
     private void disposeAllFBOs() {
         for (ResourceUrn urn : fboConfigs.keySet()) {
-            FBO fbo = fboLookup.get(urn);
-            fbo.dispose();
+            fboLookup.get(urn).dispose();
             fboLookup.remove(urn);
         }
         fboLookup.clear();

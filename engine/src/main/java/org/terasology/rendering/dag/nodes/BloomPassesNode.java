@@ -24,7 +24,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -67,7 +67,6 @@ public class BloomPassesNode extends AbstractNode {
     private RenderingConfig renderingConfig;
     private Material highPass;
     private Material blur;
-    private FBO sceneOpaque;
     private FBO sceneBloom0;
     private FBO sceneBloom1;
     private FBO sceneBloom2;
@@ -103,7 +102,6 @@ public class BloomPassesNode extends AbstractNode {
             sceneBloom1 = dynamicFBOsManager.get(BLOOM_1_URN);
             sceneBloom2 = dynamicFBOsManager.get(BLOOM_2_URN);
             sceneHighPass = dynamicFBOsManager.get(HIGH_PASS_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
             generateHighPass();
             generateBloom(sceneBloom0);
@@ -120,12 +118,12 @@ public class BloomPassesNode extends AbstractNode {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindTexture();
+        READ_ONLY_GBUFFER.bindTexture();
         highPass.setInt("tex", texId);
 
         // TODO: Investigate why this is here
 //        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-//        buffers.sceneOpaque.bindDepthTexture();
+//        buffers.READ_ONLY_GBUFFER.bindDepthTexture();
 //        program.setInt("texDepth", texId++);
 
         sceneHighPass.bind();
@@ -136,7 +134,7 @@ public class BloomPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay(); // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 
     private void generateBloom(FBO sceneBloom) {
@@ -160,7 +158,7 @@ public class BloomPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER);    // TODO: verify this is necessary
     }
 
 }

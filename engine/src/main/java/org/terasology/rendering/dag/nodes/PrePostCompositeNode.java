@@ -21,6 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -47,7 +48,7 @@ public class PrePostCompositeNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     private Material prePostComposite;
-    private FBO sceneOpaque;
+
     private FBO sceneOpaquePingPong;
     private FBO sceneReflectiveRefractive;
 
@@ -65,7 +66,6 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
         sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE_URN);
 
@@ -78,11 +78,11 @@ public class PrePostCompositeNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getName());
 
-        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
+        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();
     }
 }

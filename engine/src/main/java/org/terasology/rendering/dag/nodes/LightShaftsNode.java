@@ -22,7 +22,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -53,7 +53,7 @@ public class LightShaftsNode extends AbstractNode {
     private RenderingConfig renderingConfig;
     private Material lightShaftsShader;
     private FBO lightShaftsFBO;
-    private FBO sceneOpaque;
+
 
     @Override
     public void initialise() {
@@ -67,7 +67,6 @@ public class LightShaftsNode extends AbstractNode {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightShafts");
             lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are
@@ -79,7 +78,7 @@ public class LightShaftsNode extends AbstractNode {
             renderFullscreenQuad();
 
             bindDisplay();     // TODO: verify this is necessary
-            setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+            setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
             PerformanceMonitor.endActivity();
         }

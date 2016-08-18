@@ -27,6 +27,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -71,7 +72,7 @@ public class FinalPostProcessingNode extends AbstractNode {
 
     private FBO sceneFinal;
     private FBO ocUndistorted;
-    private FBO sceneOpaque;
+
 
     @Override
     public void initialise() {
@@ -108,9 +109,8 @@ public class FinalPostProcessingNode extends AbstractNode {
 
         ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED_URN);
         sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.FINAL.getName());
-        sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
-        fullScale = sceneOpaque.dimensions();
+        fullScale = READ_ONLY_GBUFFER.dimensions();
 
         if (!renderingDebugConfig.isEnabled()) {
             finalPost.enable();
@@ -145,7 +145,7 @@ public class FinalPostProcessingNode extends AbstractNode {
 
             // This is needed to avoid the UI (which is not currently saved within the
             // screenshot) being rendered for one frame with buffers.sceneFinal size.
-            setViewportToSizeOf(sceneOpaque);
+            setViewportToSizeOf(READ_ONLY_GBUFFER);
         }
     }
 

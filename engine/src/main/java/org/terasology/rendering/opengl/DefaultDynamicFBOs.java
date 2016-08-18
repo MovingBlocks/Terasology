@@ -28,6 +28,7 @@ public enum DefaultDynamicFBOs {
     FINAL(new FBOConfig(new ResourceUrn("engine:sceneFinal"), 1.0f, FBO.Type.DEFAULT));
 
     private final FBOConfig fboConfig;
+    private FBO fbo;
 
     DefaultDynamicFBOs(FBOConfig fboConfig) {
         this.fboConfig = fboConfig;
@@ -41,8 +42,56 @@ public enum DefaultDynamicFBOs {
         return fboConfig.getName();
     }
 
+    public FBO getFbo() {
+        return fbo;
+    }
+
+    public void setFbo(FBO fbo) {
+        this.fbo = fbo;
+    }
+
     @Override
     public String toString() {
         return getName().toString();
+    }
+
+    public int height() {
+        return fbo.height();
+    }
+
+    public int width() {
+        return fbo.width();
+    }
+
+    public void bind() {
+        fbo.bind();
+    }
+
+    public void setRenderBufferMask(boolean color, boolean normal, boolean lightBuffer) {
+        fbo.setRenderBufferMask(color, normal, lightBuffer);
+    }
+
+    public void bindTexture() {
+        fbo.bindTexture();
+    }
+
+    public void attachDepthBufferTo(FBO frameBuffersObject) {
+        fbo.attachDepthBufferTo(frameBuffersObject);
+    }
+
+    public void bindDepthTexture() {
+        fbo.bindDepthTexture();
+    }
+
+    public void bindNormalsTexture() {
+        fbo.bindNormalsTexture();
+    }
+
+    public void bindLightBufferTexture() {
+        fbo.bindLightBufferTexture();
+    }
+
+    public FBO.Dimensions dimensions() {
+        return fbo.dimensions();
     }
 }

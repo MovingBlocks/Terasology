@@ -23,7 +23,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -61,7 +61,7 @@ public class BlurPassesNode extends AbstractNode {
     private Material blur;
     private FBO sceneBlur0;
     private FBO sceneBlur1;
-    private FBO sceneOpaque;
+
     private FBO sceneToneMapped;
 
     @Override
@@ -87,7 +87,6 @@ public class BlurPassesNode extends AbstractNode {
 
             sceneBlur0 = dynamicFBOsManager.get(BLUR_0_URN);
             sceneBlur1 = dynamicFBOsManager.get(BLUR_1_URN);
-            sceneOpaque = dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
             sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
 
             generateBlur(sceneBlur0);
@@ -115,6 +114,6 @@ public class BlurPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay(); // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 }
