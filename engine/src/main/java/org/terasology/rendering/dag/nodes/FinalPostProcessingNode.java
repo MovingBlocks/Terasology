@@ -26,7 +26,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -70,7 +70,6 @@ public class FinalPostProcessingNode extends AbstractNode {
     private Material debug;
     private Material ocDistortion;
 
-    private FBO sceneFinal;
     private FBO ocUndistorted;
 
 
@@ -108,7 +107,6 @@ public class FinalPostProcessingNode extends AbstractNode {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
         ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED_URN);
-        sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.FINAL.getName());
 
         fullScale = READ_ONLY_GBUFFER.dimensions();
 
@@ -133,7 +131,7 @@ public class FinalPostProcessingNode extends AbstractNode {
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
-            sceneFinal.bind();
+            FINAL.bind();
 
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
@@ -153,7 +151,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(RenderingStage renderingStage) {
         if (screenGrabber.isNotTakingScreenshot()) { // TODO: verify if this works
-            sceneFinal.bind();
+            FINAL.bind();
         } else {
             ocUndistorted.bind();
         }
@@ -171,10 +169,10 @@ public class FinalPostProcessingNode extends AbstractNode {
 
                 if (screenGrabber.isNotTakingScreenshot()) {
                     bindDisplay();
-                    applyOculusDistortion(sceneFinal);
+                    applyOculusDistortion(FINAL.getFbo());
 
                 } else {
-                    sceneFinal.bind();
+                    FINAL.bind();
                     applyOculusDistortion(ocUndistorted);
                     screenGrabber.saveScreenshot();
                     // when saving a screenshot we do NOT send the image to screen,
