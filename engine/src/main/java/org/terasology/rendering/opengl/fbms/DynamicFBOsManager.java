@@ -122,6 +122,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
+    // TODO: Pairing FBOs for swapping functionality
     public void swapReadWriteBuffers() {
         FBO fbo = READ_ONLY_GBUFFER.getFbo();
         READ_ONLY_GBUFFER.setFbo(WRITE_ONLY_GBUFFER.getFbo());
