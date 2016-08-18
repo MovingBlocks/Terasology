@@ -87,7 +87,14 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         if (get(READ_ONLY_GBUFFER.getName()).dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
+            updateDefaultFBOs();
         }
+    }
+
+    private void updateDefaultFBOs() {
+        READ_ONLY_GBUFFER.setFbo(fboLookup.get(READ_ONLY_GBUFFER.getName()));
+        WRITE_ONLY_GBUFFER.setFbo(fboLookup.get(WRITE_ONLY_GBUFFER.getName()));
+        FINAL.setFbo(fboLookup.get(FINAL.getName()));
     }
 
     private void disposeAllFBOs() {
@@ -148,17 +155,11 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         this.screenGrabber = screenGrabber;
     }
 
-    /**
-     * TODO: add javadocs
-     *
-     * @param resourceUrn
-     * @param resourceUrn1
-     */
-    public void swap(ResourceUrn resourceUrn, ResourceUrn resourceUrn1) {
-        FBO fbo = fboLookup.get(resourceUrn1);
-        fboLookup.put(resourceUrn1, fboLookup.get(resourceUrn));
-        fboLookup.put(resourceUrn, fbo);
+    public void swapReadWriteBuffers() {
+        FBO fbo = READ_ONLY_GBUFFER.getFbo();
+        READ_ONLY_GBUFFER.setFbo(WRITE_ONLY_GBUFFER.getFbo());
+        WRITE_ONLY_GBUFFER.setFbo(fbo);
+        fboLookup.put(READ_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getFbo());
+        fboLookup.put(WRITE_ONLY_GBUFFER.getName(), WRITE_ONLY_GBUFFER.getFbo());
     }
-
-
 }

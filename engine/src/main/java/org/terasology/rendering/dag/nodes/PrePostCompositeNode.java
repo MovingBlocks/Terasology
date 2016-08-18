@@ -20,8 +20,8 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -49,7 +49,7 @@ public class PrePostCompositeNode extends AbstractNode {
 
     private Material prePostComposite;
 
-    private FBO sceneOpaquePingPong;
+
     private FBO sceneReflectiveRefractive;
 
     @Override
@@ -66,13 +66,12 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
         sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE_URN);
 
         // TODO: verify if there should be bound textures here.
-        sceneOpaquePingPong.bind();
+        WRITE_ONLY_GBUFFER.bind();
 
-        setViewportToSizeOf(sceneOpaquePingPong);
+        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -80,7 +79,7 @@ public class PrePostCompositeNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getName());
+        dynamicFBOsManager.swapReadWriteBuffers();
 
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();

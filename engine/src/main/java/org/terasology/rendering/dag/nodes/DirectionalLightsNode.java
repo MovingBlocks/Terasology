@@ -25,8 +25,8 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -34,7 +34,6 @@ import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -69,7 +68,7 @@ public class DirectionalLightsNode extends AbstractNode {
 
     private Material lightGeometryShader;
     private Material lightBufferPass;
-    private FBO sceneOpaquePingPong;
+
     private FBO sceneReflectiveRefractive;
 
     @Override
@@ -140,13 +139,12 @@ public class DirectionalLightsNode extends AbstractNode {
         READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneOpaquePingPong = dynamicFBOsManager.get(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName());
         sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
 
-        sceneOpaquePingPong.bind();
-        setRenderBufferMask(sceneOpaquePingPong, true, true, true);
+        WRITE_ONLY_GBUFFER.bind();
+        WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
-        setViewportToSizeOf(sceneOpaquePingPong);
+        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -154,7 +152,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swap(DefaultDynamicFBOs.WRITE_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getName());
+        dynamicFBOsManager.swapReadWriteBuffers();
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }
