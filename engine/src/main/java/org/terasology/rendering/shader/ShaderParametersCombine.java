@@ -77,7 +77,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO sceneReflectiveRefractive = dynamicFBOsManager.get(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE_URN);
+        FBO sceneReflectiveRefractive = dynamicFBOsManager.get(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE);
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -109,14 +109,14 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO_BLURRED_URN);
+            dynamicFBOsManager.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO_BLURRED);
             program.setInt("texSsao", texId++, true);
         }
 
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(OutlineNode.OUTLINE_URN);
+            dynamicFBOsManager.bindFboColorTexture(OutlineNode.OUTLINE);
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
@@ -132,7 +132,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(SkyBandsNode.SKY_BAND_1_URN);
+            dynamicFBOsManager.bindFboColorTexture(SkyBandsNode.SKY_BAND_1);
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

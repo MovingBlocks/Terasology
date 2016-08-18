@@ -46,7 +46,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends AbstractNode {
-    public static final ResourceUrn REFLECTED_URN = new ResourceUrn("engine:sceneReflected");
+    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
 
     @In
     private RenderQueuesHelper renderQueues;
@@ -70,13 +70,13 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireFBO(new FBOConfig(REFLECTED_URN, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), dynamicFBOsManager);
 
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO(REFLECTED_URN, dynamicFBOsManager));
-        addDesiredStateChange(new SetViewportSizeOf(REFLECTED_URN, dynamicFBOsManager));
+        addDesiredStateChange(new BindFBO(REFLECTED, dynamicFBOsManager));
+        addDesiredStateChange(new SetViewportSizeOf(REFLECTED, dynamicFBOsManager));
     }
 
     @Override

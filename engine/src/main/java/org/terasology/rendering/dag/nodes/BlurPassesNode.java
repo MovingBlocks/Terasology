@@ -41,9 +41,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class BlurPassesNode extends AbstractNode {
-    public static final ResourceUrn BLUR_0_URN = new ResourceUrn("engine:sceneBlur0");
-    public static final ResourceUrn BLUR_1_URN = new ResourceUrn("engine:sceneBlur1");
-    public static final ResourceUrn TONE_MAPPED_URN = new ResourceUrn("engine:sceneToneMapped");
+    public static final ResourceUrn BLUR_0 = new ResourceUrn("engine:sceneBlur0");
+    public static final ResourceUrn BLUR_1 = new ResourceUrn("engine:sceneBlur1");
+    public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped");
 
     @Range(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
@@ -68,9 +68,9 @@ public class BlurPassesNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
-        requireFBO(new FBOConfig(BLUR_0_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLUR_1_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(TONE_MAPPED_URN, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(BLUR_0, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(BLUR_1, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
     }
 
     /**
@@ -85,9 +85,9 @@ public class BlurPassesNode extends AbstractNode {
         if (renderingConfig.getBlurIntensity() != 0) {
             PerformanceMonitor.startActivity("rendering/blurPasses");
 
-            sceneBlur0 = dynamicFBOsManager.get(BLUR_0_URN);
-            sceneBlur1 = dynamicFBOsManager.get(BLUR_1_URN);
-            sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
+            sceneBlur0 = dynamicFBOsManager.get(BLUR_0);
+            sceneBlur1 = dynamicFBOsManager.get(BLUR_1);
+            sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED);
 
             generateBlur(sceneBlur0);
             generateBlur(sceneBlur1);

@@ -44,10 +44,10 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class BloomPassesNode extends AbstractNode {
-    public static final ResourceUrn HIGH_PASS_URN = new ResourceUrn("engine:sceneHighPass");
-    public static final ResourceUrn BLOOM_0_URN = new ResourceUrn("engine:sceneBloom0");
-    public static final ResourceUrn BLOOM_1_URN = new ResourceUrn("engine:sceneBloom1");
-    public static final ResourceUrn BLOOM_2_URN = new ResourceUrn("engine:sceneBloom2");
+    public static final ResourceUrn HIGH_PASS = new ResourceUrn("engine:sceneHighPass");
+    public static final ResourceUrn BLOOM_0 = new ResourceUrn("engine:sceneBloom0");
+    public static final ResourceUrn BLOOM_1 = new ResourceUrn("engine:sceneBloom1");
+    public static final ResourceUrn BLOOM_2 = new ResourceUrn("engine:sceneBloom2");
 
     @Range(min = 0.0f, max = 5.0f)
     private float bloomHighPassThreshold = 0.05f;
@@ -77,10 +77,10 @@ public class BloomPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
-        requireFBO(new FBOConfig(HIGH_PASS_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_0_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_1_URN, QUARTER_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_2_URN, ONE_8TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(HIGH_PASS, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(BLOOM_0, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(BLOOM_1, QUARTER_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(BLOOM_2, ONE_8TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
@@ -98,10 +98,10 @@ public class BloomPassesNode extends AbstractNode {
             PerformanceMonitor.startActivity("rendering/bloomPasses");
             // TODO: review - would it make sense to split these operations into one highpass node and
             // TODO: three blur nodes with different parameters?
-            sceneBloom0 = dynamicFBOsManager.get(BLOOM_0_URN);
-            sceneBloom1 = dynamicFBOsManager.get(BLOOM_1_URN);
-            sceneBloom2 = dynamicFBOsManager.get(BLOOM_2_URN);
-            sceneHighPass = dynamicFBOsManager.get(HIGH_PASS_URN);
+            sceneBloom0 = dynamicFBOsManager.get(BLOOM_0);
+            sceneBloom1 = dynamicFBOsManager.get(BLOOM_1);
+            sceneBloom2 = dynamicFBOsManager.get(BLOOM_2);
+            sceneHighPass = dynamicFBOsManager.get(HIGH_PASS);
 
             generateHighPass();
             generateBloom(sceneBloom0);

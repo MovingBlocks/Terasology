@@ -37,7 +37,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
  * TODO: Diagram of this node
  */
 public class BackdropNode extends WireframeCapableNode {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
 
     @In
@@ -56,7 +56,7 @@ public class BackdropNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class BackdropNode extends WireframeCapableNode {
      */
     // It's unclear why these buffers need to be cleared while all the others don't...
     private void initialClearing() {
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE);
         READ_ONLY_GBUFFER.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         sceneReflectiveRefractive.bind();

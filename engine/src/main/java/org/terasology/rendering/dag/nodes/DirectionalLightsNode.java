@@ -50,7 +50,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
  * TODO: Diagram of this node
  */
 public class DirectionalLightsNode extends AbstractNode {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
     private BackdropProvider backdropProvider;
@@ -76,7 +76,7 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
 
         initMainDirectionalLight();
     }
@@ -139,7 +139,7 @@ public class DirectionalLightsNode extends AbstractNode {
         READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE_URN);
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE);
 
         WRITE_ONLY_GBUFFER.bind();
         WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);

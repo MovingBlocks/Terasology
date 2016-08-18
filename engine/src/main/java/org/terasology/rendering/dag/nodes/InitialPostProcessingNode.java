@@ -38,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class InitialPostProcessingNode extends AbstractNode {
-    public static final ResourceUrn SCENE_PRE_POST_URN = new ResourceUrn("engine:scenePrePost");
+    public static final ResourceUrn SCENE_PRE_POST = new ResourceUrn("engine:scenePrePost");
 
     @In
     private Config config;
@@ -56,7 +56,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
-        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
 
     }
 
@@ -68,7 +68,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
+        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST);
         initialPost.enable();
 
         // TODO: verify what the inputs are

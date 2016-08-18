@@ -59,7 +59,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         switch (config.getRendering().getDebug().getStage()) {
             case SHADOW_MAP:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                shadowMapResolutionDependentFBOs.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP_URN);
+                shadowMapResolutionDependentFBOs.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP);
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_COLOR:
@@ -85,17 +85,17 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE_URN);
+                dynamicFBOsManager.bindFboColorTexture(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO_URN);
+                dynamicFBOsManager.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SOBEL:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(OutlineNode.OUTLINE_URN);
+                dynamicFBOsManager.bindFboColorTexture(OutlineNode.OUTLINE);
                 program.setInt("texDebug", texId++, true);
                 break;
             case BAKED_OCCLUSION:
@@ -115,22 +115,22 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case BLOOM:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.BLOOM_2_URN);
+                dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.BLOOM_2);
                 program.setInt("texDebug", texId++, true);
                 break;
             case HIGH_PASS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.HIGH_PASS_URN);
+                dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.HIGH_PASS);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SKY_BAND:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(SkyBandsNode.SKY_BAND_1_URN);
+                dynamicFBOsManager.bindFboColorTexture(SkyBandsNode.SKY_BAND_1);
                 program.setInt("texDebug", texId++, true);
                 break;
             case LIGHT_SHAFTS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBOsManager.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_URN);
+                dynamicFBOsManager.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
                 program.setInt("texDebug", texId++, true);
                 break;
             default:

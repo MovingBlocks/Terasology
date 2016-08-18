@@ -39,7 +39,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class OutlineNode extends AbstractNode {
-    public static final ResourceUrn OUTLINE_URN = new ResourceUrn("engine:outline");
+    public static final ResourceUrn OUTLINE = new ResourceUrn("engine:outline");
 
     @In
     private DynamicFBOsManager dynamicFBOsManager;
@@ -59,7 +59,7 @@ public class OutlineNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         outline = worldRenderer.getMaterial("engine:prog.sobel");
-        requireFBO(new FBOConfig(OUTLINE_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(OUTLINE, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
@@ -77,7 +77,7 @@ public class OutlineNode extends AbstractNode {
     public void process() {
         if (renderingConfig.isOutline()) {
             PerformanceMonitor.startActivity("rendering/outline");
-            outlineFBO = dynamicFBOsManager.get(OUTLINE_URN);
+            outlineFBO = dynamicFBOsManager.get(OUTLINE);
 
             outline.enable();
 

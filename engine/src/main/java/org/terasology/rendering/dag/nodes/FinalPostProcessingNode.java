@@ -47,7 +47,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Break into two different nodes
  */
 public class FinalPostProcessingNode extends AbstractNode {
-    public static final ResourceUrn OC_UNDISTORTED_URN = new ResourceUrn("engine:ocUndistorted");
+    public static final ResourceUrn OC_UNDISTORTED = new ResourceUrn("engine:ocUndistorted");
 
     @In
     private WorldRenderer worldRenderer;
@@ -82,7 +82,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
-        requireFBO(new FBOConfig(OC_UNDISTORTED_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(OC_UNDISTORTED, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
@@ -106,7 +106,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
-        ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED_URN);
+        ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED);
 
         fullScale = READ_ONLY_GBUFFER.dimensions();
 

@@ -50,12 +50,12 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add node of this diagram
  */
 public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
-    public static final ResourceUrn SCENE_16_URN = new ResourceUrn("engine:scene16");
-    public static final ResourceUrn SCENE_8_URN = new ResourceUrn("engine:scene8");
-    public static final ResourceUrn SCENE_4_URN = new ResourceUrn("engine:scene4");
-    public static final ResourceUrn SCENE_2_URN = new ResourceUrn("engine:scene2");
-    public static final ResourceUrn SCENE_1_URN = new ResourceUrn("engine:scene1");
-    public static final ResourceUrn SCENE_PRE_POST_URN = new ResourceUrn("engine:scenePrePost");
+    public static final ResourceUrn SCENE_16 = new ResourceUrn("engine:scene16");
+    public static final ResourceUrn SCENE_8 = new ResourceUrn("engine:scene8");
+    public static final ResourceUrn SCENE_4 = new ResourceUrn("engine:scene4");
+    public static final ResourceUrn SCENE_2 = new ResourceUrn("engine:scene2");
+    public static final ResourceUrn SCENE_1 = new ResourceUrn("engine:scene1");
+    public static final ResourceUrn SCENE_PRE_POST = new ResourceUrn("engine:scenePrePost");
 
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
 
@@ -111,12 +111,12 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        requireFBO(new FBOConfig(SCENE_16_URN, 16, 16, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_8_URN, 8, 8, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_4_URN, 4, 4, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_2_URN, 2, 2, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_1_URN, 1, 1, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), staticFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), staticFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), staticFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), staticFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), staticFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
 
         obtainStaticFBOs();
         createPBOs();
@@ -192,7 +192,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST_URN);
+        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST);
 
         downSampler.enable();
 
@@ -236,10 +236,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
      * only if eye adaptation is enabled: an NPE would be thrown only in that case.
      */
     private void obtainStaticFBOs() {
-        downSampledScene[4] = staticFBOsManager.get(SCENE_16_URN);
-        downSampledScene[3] = staticFBOsManager.get(SCENE_8_URN);
-        downSampledScene[2] = staticFBOsManager.get(SCENE_4_URN);
-        downSampledScene[1] = staticFBOsManager.get(SCENE_2_URN);
-        downSampledScene[0] = staticFBOsManager.get(SCENE_1_URN);
+        downSampledScene[4] = staticFBOsManager.get(SCENE_16);
+        downSampledScene[3] = staticFBOsManager.get(SCENE_8);
+        downSampledScene[2] = staticFBOsManager.get(SCENE_4);
+        downSampledScene[1] = staticFBOsManager.get(SCENE_2);
+        downSampledScene[0] = staticFBOsManager.get(SCENE_1);
     }
 }

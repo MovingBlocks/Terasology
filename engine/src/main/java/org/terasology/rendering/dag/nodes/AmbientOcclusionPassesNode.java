@@ -39,8 +39,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class AmbientOcclusionPassesNode extends AbstractNode {
-    public static final ResourceUrn SSAO_URN = new ResourceUrn("engine:ssao");
-    public static final ResourceUrn SSAO_BLURRED_URN = new ResourceUrn("engine:ssaoBlurred");
+    public static final ResourceUrn SSAO = new ResourceUrn("engine:ssao");
+    public static final ResourceUrn SSAO_BLURRED = new ResourceUrn("engine:ssaoBlurred");
 
     @In
     private DynamicFBOsManager dynamicFBOsManager;
@@ -62,8 +62,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
-        requireFBO(new FBOConfig(SSAO_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(SSAO_BLURRED_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SSAO, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SSAO_BLURRED, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
@@ -78,8 +78,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         if (renderingConfig.isSsao()) {
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
-            ssaoBlurredFBO = dynamicFBOsManager.get(SSAO_BLURRED_URN);
-            ssaoFBO = dynamicFBOsManager.get(SSAO_URN);
+            ssaoBlurredFBO = dynamicFBOsManager.get(SSAO_BLURRED);
+            ssaoFBO = dynamicFBOsManager.get(SSAO);
 
             generateSSAO();
             generateBlurredSSAO();

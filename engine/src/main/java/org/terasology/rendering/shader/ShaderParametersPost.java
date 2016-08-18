@@ -61,13 +61,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
         // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(ToneMappingNode.TONE_MAPPED_URN);
+        dynamicFBOsManager.bindFboColorTexture(ToneMappingNode.TONE_MAPPED);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor property rather than check every frame
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.get(BlurPassesNode.BLUR_1_URN).bindTexture();
+            dynamicFBOsManager.get(BlurPassesNode.BLUR_1).bindTexture();
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {

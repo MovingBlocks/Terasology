@@ -43,7 +43,7 @@ public class ShaderParametersHdr extends ShaderParametersBase {
 
         // TODO: move into a node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        dynamicFBOsManager.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST_URN);
+        dynamicFBOsManager.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST);
 
         // TODO: move into a material?
         program.setInt("texScene", 0, true);

@@ -50,7 +50,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends AbstractNode {
-    public static final ResourceUrn SHADOW_MAP_URN = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP = new ResourceUrn("engine:sceneShadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
@@ -86,11 +86,11 @@ public class ShadowMapNode extends AbstractNode {
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
 
-        requireFBO(new FBOConfig(SHADOW_MAP_URN, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
 
         // TODO: fix them
-        addDesiredStateChange(new BindFBO(SHADOW_MAP_URN, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP_URN, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(SHADOW_MAP, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
     }
 
     @Override

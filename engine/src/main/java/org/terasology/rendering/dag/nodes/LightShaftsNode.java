@@ -39,7 +39,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class LightShaftsNode extends AbstractNode {
-    public static final ResourceUrn LIGHT_SHAFTS_URN = new ResourceUrn("engine:lightShafts");
+    public static final ResourceUrn LIGHT_SHAFTS = new ResourceUrn("engine:lightShafts");
 
     @In
     private Config config;
@@ -59,14 +59,14 @@ public class LightShaftsNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
-        requireFBO(new FBOConfig(LIGHT_SHAFTS_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     @Override
     public void process() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightShafts");
-            lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS_URN);
+            lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS);
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are

@@ -38,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class PrePostCompositeNode extends AbstractNode {
-    public static final ResourceUrn REFLECTIVE_REFRACTIVE_URN = new ResourceUrn("engine:sceneReflectiveRefractive");
+    public static final ResourceUrn REFLECTIVE_REFRACTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
 
     @In
@@ -55,7 +55,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
-        requireFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_URN, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     /**
@@ -66,7 +66,7 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE_URN);
+        sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE);
 
         // TODO: verify if there should be bound textures here.
         WRITE_ONLY_GBUFFER.bind();

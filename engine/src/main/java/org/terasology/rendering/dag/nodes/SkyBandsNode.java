@@ -42,8 +42,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
  * TODO: Separate this node into multiple SkyBandNode's
  */
 public class SkyBandsNode extends WireframeCapableNode {
-    public static final ResourceUrn SKY_BAND_0_URN = new ResourceUrn("engine:sceneSkyBand0");
-    public static final ResourceUrn SKY_BAND_1_URN = new ResourceUrn("engine:sceneSkyBand1");
+    public static final ResourceUrn SKY_BAND_0 = new ResourceUrn("engine:sceneSkyBand0");
+    public static final ResourceUrn SKY_BAND_1 = new ResourceUrn("engine:sceneSkyBand1");
 
     @In
     private WorldRenderer worldRenderer;
@@ -63,8 +63,8 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
 
-        requireFBO(new FBOConfig(SKY_BAND_0_URN, ONE_16TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(SKY_BAND_1_URN, ONE_32TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SKY_BAND_0, ONE_16TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SKY_BAND_1, ONE_32TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
 
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
@@ -77,8 +77,8 @@ public class SkyBandsNode extends WireframeCapableNode {
 
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         if (renderingConfig.isInscattering()) {
-            sceneSkyBand0 = dynamicFBOsManager.get(SKY_BAND_0_URN);
-            sceneSkyBand1 = dynamicFBOsManager.get(SKY_BAND_1_URN);
+            sceneSkyBand0 = dynamicFBOsManager.get(SKY_BAND_0);
+            sceneSkyBand1 = dynamicFBOsManager.get(SKY_BAND_1);
 
             generateSkyBand(sceneSkyBand0);
             generateSkyBand(sceneSkyBand1);

@@ -42,7 +42,7 @@ public abstract class AbstractNode implements Node {
         fboUsages = Maps.newHashMap();
     }
 
-    protected void requireFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
+    protected void requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {

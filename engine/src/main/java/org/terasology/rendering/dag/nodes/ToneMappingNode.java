@@ -38,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class ToneMappingNode extends AbstractNode {
-    public static final ResourceUrn TONE_MAPPED_URN = new ResourceUrn("engine:sceneToneMapped"); // HDR tone mapping
+    public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped"); // HDR tone mapping
 
     @In
     private DynamicFBOsManager dynamicFBOsManager;
@@ -54,7 +54,7 @@ public class ToneMappingNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireFBO(new FBOConfig(TONE_MAPPED_URN, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
@@ -68,7 +68,7 @@ public class ToneMappingNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
-        sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED_URN);
+        sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED);
 
         toneMapping.enable();
 

@@ -71,7 +71,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.BLOOM_2_URN);
+            dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.BLOOM_2);
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -82,7 +82,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_URN);
+            dynamicFBOsManager.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
             program.setInt("texLightShafts", texId++, true);
         }
 
