@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import java.nio.ByteBuffer;
 import org.terasology.assets.ResourceUrn;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
@@ -95,5 +96,9 @@ public enum DefaultDynamicFBOs {
 
     public FBO.Dimensions dimensions() {
         return fbo.dimensions();
+    }
+
+    public ByteBuffer getSceneFinalRawData() {
+        return fbo.getSceneFinalRawData();
     }
 }

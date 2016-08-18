@@ -25,10 +25,8 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import org.terasology.assets.ResourceUrn;
@@ -431,6 +429,22 @@ public final class FBO {
                 fbo.setStatus(Status.UNEXPECTED);
                 break;
         }
+    }
+
+    /**
+     * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
+     * If the FBO "sceneFinal" is unavailable, returns null.
+     *
+     * @return a ByteBuffer or null
+     */
+    public ByteBuffer getSceneFinalRawData() {
+        ByteBuffer buffer = BufferUtils.createByteBuffer(this.width() * this.height() * 4);
+
+        this.bindTexture();
+        GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        FBO.unbindTexture();
+
+        return buffer;
     }
 
     private static void createColorBuffer(FBO fbo, Dimensions dimensions, Type type) {

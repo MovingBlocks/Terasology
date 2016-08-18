@@ -15,10 +15,7 @@
  */
 package org.terasology.rendering.opengl.fbms;
 
-import java.nio.ByteBuffer;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -107,29 +104,6 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         }
 
         notifySubscribers();
-    }
-
-
-    /**
-     * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
-     * If the FBO "sceneFinal" is unavailable, returns null.
-     *
-     * @return a ByteBuffer or null
-     */
-    public ByteBuffer getSceneFinalRawData() { 
-        FBO fboSceneFinal = get(READ_ONLY_GBUFFER.getName());
-        if (fboSceneFinal == null) {
-            logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
-            return null;
-        }
-
-        ByteBuffer buffer = BufferUtils.createByteBuffer(fboSceneFinal.width() * fboSceneFinal.height() * 4);
-
-        fboSceneFinal.bindTexture();
-        GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        FBO.unbindTexture();
-
-        return buffer;
     }
 
     private void updateFullScale() {

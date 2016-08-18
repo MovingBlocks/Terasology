@@ -531,7 +531,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
-        screenGrabber.dispose();
     }
 
     @Override

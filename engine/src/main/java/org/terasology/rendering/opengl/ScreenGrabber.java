@@ -34,16 +34,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
 public class ScreenGrabber {
     private static final Logger logger = LoggerFactory.getLogger(ScreenGrabber.class);
 
-    private DynamicFBOsManager dynamicFBOsManager;
     private RenderingConfig renderingConfig;
-    private ThreadManager threadManager = CoreRegistry.get(ThreadManager.class);
+    private ThreadManager threadManager;
     private float currentExposure;
     private boolean isTakingScreenshot;
 
@@ -51,19 +50,8 @@ public class ScreenGrabber {
      * @param context
      */
     public ScreenGrabber(Context context) {
-        this.dynamicFBOsManager = context.get(DynamicFBOsManager.class);
+        threadManager = CoreRegistry.get(ThreadManager.class);
         renderingConfig = context.get(Config.class).getRendering();
-    }
-
-    /**
-     * Disposes of the PostProcessor instance.
-     */
-    // Not strictly necessary given the simplicity of the objects being nulled,
-    // it is probably a good habit to have a dispose() method. It both properly
-    // dispose support objects and it clearly marks the end of a PostProcessor
-    // instance's lifecycle.
-    public void dispose() {
-        dynamicFBOsManager = null;
     }
 
     /**
@@ -104,15 +92,14 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        final ByteBuffer buffer = dynamicFBOsManager.getSceneFinalRawData();
+        final ByteBuffer buffer = FINAL.getSceneFinalRawData();
         if (buffer == null) {
             logger.error("No screenshot data available. No screenshot will be saved.");
             return;
         }
 
-        FBO sceneFinal = dynamicFBOsManager.get(DefaultDynamicFBOs.FINAL.getName());
-        int width = sceneFinal.width();
-        int height = sceneFinal.height();
+        int width = FINAL.width();
+        int height = FINAL.height();
 
         Runnable task = () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
