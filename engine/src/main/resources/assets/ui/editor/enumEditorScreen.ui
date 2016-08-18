@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Enum Editor",
+                            "text": "${engine:menu#enum-editor-title}",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Select a new value for the enum:"
+                            "text": "${engine:menu#enum-editor-prompt}"
                         },
                         {
                             "type": "UISpace",

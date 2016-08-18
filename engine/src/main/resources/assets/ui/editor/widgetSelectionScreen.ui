@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Widget Selection",
+                            "text": "${engine:menu#widget-selection-title}",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Select a widget to add:"
+                            "text": "${engine:menu#widget-selection-prompt}"
                         },
                         {
                             "type": "UISpace",

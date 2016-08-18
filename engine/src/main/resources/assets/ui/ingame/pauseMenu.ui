@@ -57,7 +57,7 @@
             {
                 "type": "UIButton",
                 "id": "devTools",
-                "text": "Developer Tools",
+                "text": "${engine:menu#dev-tools-title}",
                 "layoutInfo": {
                     "use-content-width": true,
                     "use-content-height": true,

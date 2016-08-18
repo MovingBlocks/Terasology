@@ -31,7 +31,6 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.contextMenu.MenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.widgets.UpdateListener;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 

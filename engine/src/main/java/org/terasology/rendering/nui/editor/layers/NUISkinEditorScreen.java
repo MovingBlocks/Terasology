@@ -43,7 +43,6 @@ import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.nui.skin.UISkinFormat;
@@ -58,8 +57,13 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.utilities.Assets;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Component;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -231,21 +235,44 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             }
         });
         save.subscribe(button -> {
-            FileDialog dialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
-            dialog.setFile(CREATE_NEW_SKIN.equals(selectedAsset) ? "*.skin" : selectedAsset.split(":")[1] + ".skin");
-            dialog.setVisible(true);
-            String directoryString = dialog.getDirectory();
-            String fileString = dialog.getFile();
-            dialog.dispose();
-            if (directoryString != null && fileString != null) {
-                File file = new File(directoryString + fileString);
+            // Save the current look and feel.
+            LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
+
+            // (Temporarily) set the look and feel to the system default.
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ignored) {
+            }
+
+            // Configure the file chooser.
+            JFileChooser fileChooser = new JFileChooser() {
+                @Override
+                protected JDialog createDialog(Component parent) {
+                    JDialog dialog = super.createDialog(parent);
+                    dialog.setLocationByPlatform(true);
+                    dialog.setAlwaysOnTop(true);
+                    return dialog;
+                }
+            };
+            fileChooser.setSelectedFile(new File(CREATE_NEW_SKIN.equals(selectedAsset)
+                ? "untitled.skin" : selectedAsset.split(":")[1] + ".skin"));
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Skin asset file (*.skin)", "skin"));
+            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
                 try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+                    // Serialize tree contents and save to selected file.
                     JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
                     String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
                     outputStream.write(jsonString.getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+            // Reload the look and feel.
+            try {
+                UIManager.setLookAndFeel(currentLookAndFeel);
+            } catch (UnsupportedLookAndFeelException ignored) {
             }
         });
 

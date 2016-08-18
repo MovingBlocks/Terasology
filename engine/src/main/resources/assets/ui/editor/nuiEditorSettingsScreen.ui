@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "NUI Editor Settings",
+                            "text": "${engine:menu#nui-editor-settings-title}",
                             "family": "title"
                         },
                         {
@@ -35,7 +35,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "Disable tree view icons:"
+                                    "text": "${engine:menu#nui-editor-disable-icons}"
                                 },
                                 {
                                     "type": "UICheckbox",
@@ -49,7 +49,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "Preview screen locale:"
+                                    "text": "${engine:menu#nui-editor-alternative-locale}"
                                 },
                                 {
                                     "type": "UIDropdownScrollable",

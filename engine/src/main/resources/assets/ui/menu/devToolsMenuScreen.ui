@@ -20,7 +20,7 @@
             },
             {
                 "type": "UILabel",
-                "text": "Developer Tools",
+                "text": "${engine:menu#dev-tools-title}",
                 "family": "title",
                 "id": "subtitle",
                 "layoutInfo": {
@@ -53,17 +53,17 @@
                     {
                         "type": "UIButton",
                         "id": "nuiEditor",
-                        "text": "NUI Editor"
+                        "text": "${engine:menu#dev-tools-nui-editor}"
                     },
                     {
                         "type": "UIButton",
                         "id": "nuiSkinEditor",
-                        "text": "NUI Skin Editor"
+                        "text": "${engine:menu#dev-tools-skin-editor}"
                     },
                     {
                         "type": "UIButton",
                         "id": "btEditor",
-                        "text": "Behaviour Tree Editor"
+                        "text": "${engine:menu#dev-tools-bt-editor}"
                     },
                     {
                         "type": "UISpace",
