@@ -19,6 +19,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.In;
 import org.terasology.rendering.opengl.BaseFBM;
@@ -31,6 +33,7 @@ import org.terasology.rendering.opengl.fbms.StaticFBM;
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     @In
     private StaticFBM staticFBM;
@@ -39,7 +42,7 @@ public abstract class AbstractNode implements Node {
     private DynamicFBM dynamicFBM;
 
     private Set<StateChange> desiredStateChanges;
-    private Map<ResourceUrn, Set<BaseFBM>> fboUsages;
+    private Map<ResourceUrn, BaseFBM> fboUsages;
 
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
@@ -58,18 +61,16 @@ public abstract class AbstractNode implements Node {
     }
 
     protected void requireFBO(FBOConfig fboConfig, BaseFBM frameBuffersManager) {
-        ResourceUrn urn = fboConfig.getResourceUrn();
-        if (!frameBuffersManager.isFBOAvailable(urn)) {
-            frameBuffersManager.allocateFBO(fboConfig);
+        ResourceUrn fboName = fboConfig.getName();
+
+        if (!fboUsages.containsKey(fboName)) {
+            fboUsages.put(fboName, frameBuffersManager);
+        } else {
+            logger.warn("FBO " + fboName + " is already requested.");
+            return;
         }
 
-        if (!fboUsages.containsKey(urn)) {
-            Set<BaseFBM> fbms = Sets.newHashSet();
-            fbms.add(frameBuffersManager);
-            fboUsages.put(urn, fbms);
-        } else {
-            fboUsages.get(urn).add(frameBuffersManager);
-        }
+        frameBuffersManager.request(fboConfig);
     }
 
     protected void requireFBO(DefaultDynamicFBOs defaultDynamicFBO) {
@@ -78,14 +79,12 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public void dispose() {
-        for (Map.Entry<ResourceUrn, Set<BaseFBM>> entry : fboUsages.entrySet()) {
-            ResourceUrn urn = entry.getKey();
-            Set<BaseFBM> fbms = entry.getValue();
-
-            for (BaseFBM fbm : fbms) {
-                fbm.release(urn);
-            }
+        for (Map.Entry<ResourceUrn, BaseFBM> entry : fboUsages.entrySet()) {
+            ResourceUrn fboName = entry.getKey();
+            BaseFBM baseFBM = entry.getValue();
+            baseFBM.release(fboName);
         }
+
         fboUsages.clear();
     }
 

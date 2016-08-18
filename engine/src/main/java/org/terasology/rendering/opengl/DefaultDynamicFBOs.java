@@ -36,7 +36,7 @@ public enum DefaultDynamicFBOs {
     }
 
     public ResourceUrn getResourceUrn() {
-        return fboConfig.getResourceUrn();
+        return fboConfig.getName();
     }
 
     @Override

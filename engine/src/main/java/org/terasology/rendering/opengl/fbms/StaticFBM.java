@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl.fbms;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.AbstractFBM;
 import org.terasology.rendering.opengl.FBOConfig;
 
@@ -25,17 +26,15 @@ import org.terasology.rendering.opengl.FBOConfig;
 public class StaticFBM extends AbstractFBM {
 
     @Override
-    public void initialise() {
-        super.initialise();
-    }
-
-    @Override
-    public void allocateFBO(FBOConfig fboConfig) {
-        if (fboUsageCountMap.containsKey(fboConfig.getResourceUrn())) {
-            throw new IllegalArgumentException("There is already an FBO inside StaticFBMK, named as: " + fboConfig.getResourceUrn());
+    public void request(FBOConfig fboConfig) {
+        ResourceUrn fboName = fboConfig.getName();
+        if (fboConfigs.containsKey(fboName)) {
+            if (!fboConfig.equals(fboConfigs.get(fboName))) {
+                throw new IllegalArgumentException("Requested FBO is already available with different configuration");
+            }
+        } else {
+            generate(fboConfig, fboConfig.getDimensions());
         }
-
-        retain(fboConfig.getResourceUrn());
-        generate(fboConfig, fboConfig.getDimensions());
+        retain(fboName);
     }
 }

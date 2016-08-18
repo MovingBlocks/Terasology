@@ -43,18 +43,16 @@ public class ShadowMapResolutionDependentFBM extends AbstractFBM implements Prop
     }
 
     @Override
-    public void initialise() {
-        super.initialise();
-    }
-
-    @Override
-    public void allocateFBO(FBOConfig fboConfig) {
-        if (fboUsageCountMap.containsKey(fboConfig.getResourceUrn())) {
-            throw new IllegalArgumentException("There is already an FBO inside ShadowMapResolutionDependentFBM, named as: " + fboConfig.getResourceUrn());
+    public void request(FBOConfig fboConfig) {
+        ResourceUrn fboName = fboConfig.getName();
+        if (fboConfigs.containsKey(fboName)) {
+            if (!config.equals(fboConfigs.get(fboName))) {
+                throw new IllegalArgumentException("Requested FBO is already available with different configuration");
+            }
+        } else {
+            generate(fboConfig, shadowMapResolution);
         }
-
-        retain(fboConfig.getResourceUrn());
-        generate(fboConfig, shadowMapResolution);
+        retain(fboName);
     }
 
 

@@ -286,7 +286,7 @@ public final class FBO {
      * @return The resuting FBO object wrapping a FrameBuffer and its attachments. Use getStatus() before use to verify completeness.
      */
     public static FBO create(FBOConfig config, FBO.Dimensions dimensions) {
-        return FBO.create(config.getResourceUrn(),
+        return FBO.create(config.getName(),
                 dimensions,
                 config.getType(),
                 config.isUseDepthBuffer(),

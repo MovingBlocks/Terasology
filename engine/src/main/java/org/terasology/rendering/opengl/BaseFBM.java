@@ -22,19 +22,15 @@ import org.terasology.assets.ResourceUrn;
  */
 public interface BaseFBM {
 
-    void initialise();
-
     boolean subscribe(FBOManagerSubscriber subscriber);
 
     boolean unsubscribe(FBOManagerSubscriber subscriber);
 
     void release(ResourceUrn resourceUrn);
 
-    void allocateFBO(FBOConfig fboConfig);
+    void request(FBOConfig fboConfig);
 
     FBO getFBO(ResourceUrn resourceUrn);
-
-    boolean isFBOAvailable(ResourceUrn resourceUrn);
 
     boolean bindFboColorTexture(ResourceUrn resourceUrn);
 
@@ -43,4 +39,6 @@ public interface BaseFBM {
     boolean bindFboNormalsTexture(ResourceUrn resourceUrn);
 
     boolean bindFboLightBufferTexture(ResourceUrn resourceUrn);
+
+
 }

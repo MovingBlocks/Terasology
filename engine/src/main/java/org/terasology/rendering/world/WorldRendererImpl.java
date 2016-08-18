@@ -192,9 +192,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(PostProcessor.class, postProcessor);
 
         dynamicFBM.setPostProcessor(postProcessor);
-        dynamicFBM.initialise();
-        staticFBM.initialise();
-        shadowMapResolutionDependentFBM.initialise();
 
         shaderManager.initShaders();
         initMaterials();

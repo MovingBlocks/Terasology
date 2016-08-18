@@ -72,20 +72,11 @@ import org.terasology.assets.ResourceUrn;
  */
 public abstract class AbstractFBM implements BaseFBM {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBM.class);
-    protected Map<ResourceUrn, FBOConfig> fboConfigs;
-    protected Map<ResourceUrn, FBO> fboLookup;
-    protected Map<ResourceUrn, Integer> fboUsageCountMap;
+    protected Map<ResourceUrn, FBOConfig> fboConfigs = Maps.newHashMap();
+    protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
+    protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
 
-
-    private Set<FBOManagerSubscriber> fboManagerSubscribers;
-
-    @Override
-    public void initialise() {
-        fboLookup = Maps.newHashMap();
-        fboUsageCountMap = Maps.newHashMap();
-        fboConfigs = Maps.newHashMap();
-        fboManagerSubscribers = Sets.newHashSet();
-    }
+    private Set<FBOManagerSubscriber> fboManagerSubscribers = Sets.newHashSet();
 
     protected FBO generate(FBOConfig fboConfig, FBO.Dimensions dimensions) {
         FBO fbo = FBO.create(fboConfig, dimensions);
@@ -93,12 +84,12 @@ public abstract class AbstractFBM implements BaseFBM {
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
         // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?
         if (fbo.getStatus() == FBO.Status.INCOMPLETE) {
-            logger.error("FBO " + fboConfig.getResourceUrn() + " is incomplete. Look earlier in the log for details.");
+            logger.error("FBO " + fboConfig.getName() + " is incomplete. Look earlier in the log for details.");
         } else if (fbo.getStatus() == FBO.Status.UNEXPECTED) {
-            logger.error("FBO " + fboConfig.getResourceUrn() + " has generated an unexpected status code. Look earlier in the log for details.");
+            logger.error("FBO " + fboConfig.getName() + " has generated an unexpected status code. Look earlier in the log for details.");
         }
-        fboLookup.put(fboConfig.getResourceUrn(), fbo);
-        fboConfigs.put(fboConfig.getResourceUrn(), fboConfig);
+        fboLookup.put(fboConfig.getName(), fbo);
+        fboConfigs.put(fboConfig.getName(), fboConfig);
         return fbo;
     }
 
@@ -110,12 +101,12 @@ public abstract class AbstractFBM implements BaseFBM {
 
 
     protected void retain(ResourceUrn resourceUrn) {
-        if (!fboUsageCountMap.containsKey(resourceUrn)) {
+        if (fboUsageCountMap.containsKey(resourceUrn)) {
+            int usageCount = fboUsageCountMap.get(resourceUrn) + 1;
+            fboUsageCountMap.put(resourceUrn, usageCount);
+        } else {
             fboUsageCountMap.put(resourceUrn, 1);
-            return;
         }
-        int usageCount = fboUsageCountMap.get(resourceUrn) + 1;
-        fboUsageCountMap.put(resourceUrn, usageCount);
     }
 
     /**
@@ -127,15 +118,15 @@ public abstract class AbstractFBM implements BaseFBM {
     public void release(ResourceUrn resourceUrn) {
         Preconditions.checkArgument(fboUsageCountMap.containsKey(resourceUrn), "The given fbo is not used.");
 
-        if (fboUsageCountMap.get(resourceUrn) == 1) {
+        if (fboUsageCountMap.get(resourceUrn) != 1) {
+            int usageCount = fboUsageCountMap.get(resourceUrn);
+            fboUsageCountMap.put(resourceUrn, usageCount - 1);
+        } else {
             getFBO(resourceUrn).dispose();
             fboLookup.remove(resourceUrn);
             if (fboConfigs.containsKey(resourceUrn)) {
                 fboConfigs.remove(resourceUrn);
             }
-        } else {
-            int usageCount = fboUsageCountMap.get(resourceUrn);
-            fboUsageCountMap.put(resourceUrn, usageCount - 1);
         }
     }
 
@@ -260,10 +251,5 @@ public abstract class AbstractFBM implements BaseFBM {
     @Override
     public boolean unsubscribe(FBOManagerSubscriber subscriber) {
         return fboManagerSubscribers.remove(subscriber);
-    }
-
-    @Override
-    public boolean isFBOAvailable(ResourceUrn resourceUrn) {
-        return fboConfigs.containsKey(resourceUrn);
     }
 }

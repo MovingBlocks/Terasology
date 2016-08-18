@@ -26,6 +26,9 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.AbstractFBM;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.Final;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.ReadOnlyGBuffer;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WriteOnlyGBuffer;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PostProcessor;
@@ -45,15 +48,34 @@ public class DynamicFBM extends AbstractFBM {
     private RenderingConfig renderingConfig = config.getRendering();
     private PostProcessor postProcessor;
 
-    @Override
-    public void initialise() {
-        super.initialise();
+    public DynamicFBM() {
         fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
-        allocateFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getFboConfig());
-        allocateFBO(DefaultDynamicFBOs.WriteOnlyGBuffer.getFboConfig());
-        allocateFBO(DefaultDynamicFBOs.Final.getFboConfig());
+        generateDefaultFBOs();
     }
 
+    @Override
+    public void request(FBOConfig fboConfig) {
+        ResourceUrn fboName = fboConfig.getName();
+        if (fboConfigs.containsKey(fboName)) {
+            if (!fboConfig.equals(fboConfigs.get(fboName))) {
+                throw new IllegalArgumentException("Requested FBO is already available with different configuration");
+            }
+        } else {
+            generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+        }
+        retain(fboName);
+    }
+
+    private void generateDefaultFBOs() {
+        generateDefaultFBO(ReadOnlyGBuffer);
+        generateDefaultFBO(WriteOnlyGBuffer);
+        generateDefaultFBO(Final);
+    }
+
+    private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
+        FBOConfig fboConfig = defaultDynamicFBO.getFboConfig();
+        generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+    }
 
     /**
      * Invoked before real-rendering starts
@@ -61,30 +83,26 @@ public class DynamicFBM extends AbstractFBM {
      */
     public void update() {
         updateFullScale();
-        if (getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn()).dimensions().areDifferentFrom(fullScale)) {
+        if (getFBO(ReadOnlyGBuffer.getResourceUrn()).dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
         }
     }
 
     private void disposeAllFBOs() {
-        FBO fbo;
         for (ResourceUrn urn : fboConfigs.keySet()) {
-            fbo = fboLookup.get(urn);
-            if (fbo != null) {
-                fbo.dispose();
-                fboLookup.remove(urn);
-
-            } else {
-                logger.error("Failed to delete FBO '" + urn + "': it doesn't exist!");
-            }
+            FBO fbo = fboLookup.get(urn);
+            fbo.dispose();
+            fboLookup.remove(urn);
         }
+        fboLookup.clear();
     }
 
     private void createFBOs() {
         for (FBOConfig fboConfig : fboConfigs.values()) {
             generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
+
         notifySubscribers();
     }
 
@@ -95,7 +113,7 @@ public class DynamicFBM extends AbstractFBM {
      * @return a ByteBuffer or null
      */
     public ByteBuffer getSceneFinalRawData() {
-        FBO fboSceneFinal = getFBO(DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn());
+        FBO fboSceneFinal = getFBO(ReadOnlyGBuffer.getResourceUrn());
         if (fboSceneFinal == null) {
             logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
             return null;
@@ -134,18 +152,6 @@ public class DynamicFBM extends AbstractFBM {
      */
     public void setPostProcessor(PostProcessor postProcessor) {
         this.postProcessor = postProcessor;
-    }
-
-    @Override
-    public void allocateFBO(FBOConfig fboConfig) {
-        if (fboUsageCountMap.containsKey(fboConfig.getResourceUrn())) {
-            throw new IllegalArgumentException("There is already an FBO inside DynamicFBM, named as: " + fboConfig.getResourceUrn());
-        }
-
-        retain(fboConfig.getResourceUrn());
-        // generate fbo from fboConfig relative to Display size * it's scale
-        generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
-
     }
 
 
