@@ -280,12 +280,11 @@ public final class FBO {
      *
      * Check FBO create(String title, Dimensions dimensions, Type type ...) for more.
      * @param config A FBOConfig object that stores information used for creating FBO.
-     * @param dimensions A Dimensions object wrapping width and height of the FBO.
      * @return The resuting FBO object wrapping a FrameBuffer and its attachments. Use getStatus() before use to verify completeness.
      */
-    public static FBO create(FBOConfig config, FBO.Dimensions dimensions) {
+    public static FBO create(FBOConfig config) {
         return FBO.create(config.getName(),
-                dimensions,
+                config.getDimensions(),
                 config.getType(),
                 config.hasDepthBuffer(),
                 config.hasNormalBuffer(),

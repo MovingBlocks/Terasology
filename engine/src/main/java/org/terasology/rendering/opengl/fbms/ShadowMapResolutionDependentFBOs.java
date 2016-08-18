@@ -39,7 +39,6 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
         int resolution = renderingConfig.getShadowMapResolution();
         shadowMapResolution = new FBO.Dimensions(resolution, resolution);
-
     }
 
     @Override
@@ -50,11 +49,10 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
         } else {
-            generate(fboConfig, shadowMapResolution);
+            generateWithDimensions(fboConfig, shadowMapResolution);
         }
         retain(fboName);
     }
-
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -73,7 +71,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
                         fbo.dispose();
                     }
                 }
-                FBO shadowMapResDependentFBO = generate(fboConfig, shadowMapResolution);
+                FBO shadowMapResDependentFBO = generateWithDimensions(fboConfig, shadowMapResolution);
                 if (shadowMapResDependentFBO.getStatus() == FBO.Status.DISPOSED) {
                     logger.warn("Failed to generate ShadowMap FBO. Turning off shadows.");
                     renderingConfig.setDynamicShadows(false);
@@ -83,7 +81,5 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
                 fboLookup.put(resourceUrn, shadowMapResDependentFBO);
             }
         }
-
-
     }
 }

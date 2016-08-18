@@ -78,8 +78,9 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
 
     private Set<FBOManagerSubscriber> fboManagerSubscribers = Sets.newHashSet();
 
-    protected FBO generate(FBOConfig fboConfig, FBO.Dimensions dimensions) {
-        FBO fbo = FBO.create(fboConfig, dimensions);
+    protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
+        fboConfig.setDimensions(dimensions);
+        FBO fbo = FBO.create(fboConfig);
 
         // At this stage it's unclear what should be done in this circumstances as I (manu3d) do not know what
         // the effects of using an incomplete FrameBuffer are. Throw an exception? Live with visual artifacts?

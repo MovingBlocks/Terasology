@@ -170,6 +170,10 @@ public class FBOConfig {
         return fboName;
     }
 
+    public void setDimensions(FBO.Dimensions dimensions) {
+        this.dimensions = dimensions;
+    }
+
     @Override
     public int hashCode() {
         // TODO: add scale and dimension
@@ -193,5 +197,4 @@ public class FBOConfig {
         }
         return false;
     }
-
 }

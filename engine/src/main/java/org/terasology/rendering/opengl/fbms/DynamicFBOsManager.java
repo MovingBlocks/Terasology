@@ -54,7 +54,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
         } else {
-            generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+            generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
         retain(fboName);
     }
@@ -67,7 +67,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
 
     private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
         FBOConfig fboConfig = defaultDynamicFBO.getConfig();
-        FBO fbo = generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+        FBO fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         defaultDynamicFBO.setFbo(fbo);
     }
 
@@ -100,7 +100,7 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
 
     private void createFBOs() {
         for (FBOConfig fboConfig : fboConfigs.values()) {
-            generate(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+            generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
 
         notifySubscribers();

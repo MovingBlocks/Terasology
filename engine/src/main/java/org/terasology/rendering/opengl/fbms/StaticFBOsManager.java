@@ -33,7 +33,7 @@ public class StaticFBOsManager extends AbstractFBOsManager {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
         } else {
-            generate(fboConfig, fboConfig.getDimensions());
+            generateWithDimensions(fboConfig, fboConfig.getDimensions());
         }
         retain(fboName);
     }
