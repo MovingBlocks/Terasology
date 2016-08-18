@@ -22,6 +22,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * TODO: Add javadocs
  */
 public enum DefaultDynamicFBOs {
+    // TODO: investigate ways to make these nameless.
     READ_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), FULL_SCALE, FBO.Type.HDR)
             .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
     WRITE_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), FULL_SCALE, FBO.Type.HDR)
