@@ -30,6 +30,7 @@ import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DynamicFBM;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBM;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -47,14 +48,16 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         int texId = 0;
 
         DynamicFBM dynamicFBM = CoreRegistry.get(DynamicFBM.class);
+        ShadowMapResolutionDependentFBM shadowMapResolutionDependentFBM = CoreRegistry.get(ShadowMapResolutionDependentFBM.class);
 
         // TODO: review - might have to go into a debug node
         final ResourceUrn sceneOpaqueUrn = DefaultDynamicFBOs.ReadOnlyGBuffer.getResourceUrn();
 
+
         switch (config.getRendering().getDebug().getStage()) {
             case SHADOW_MAP:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                dynamicFBM.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP_URN);
+                shadowMapResolutionDependentFBM.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP_URN);
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_COLOR:
