@@ -38,10 +38,6 @@ import org.terasology.rendering.opengl.ScreenGrabber;
  * TODO: Better naming
  */
 public class DynamicFBOsManager extends AbstractFBOsManager {
-    // I could have named them fullResolution, halfResolution and so on. But halfScale is actually
-    // -both- fullScale's dimensions halved, leading to -a quarter- of its resolution. Following
-    // this logic one32thScale would have to be named one1024thResolution and the otherwise
-    // straightforward connection between variable names and dimensions would have been lost. -- manu3d
     private FBO.Dimensions fullScale;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
@@ -113,13 +109,14 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         notifySubscribers();
     }
 
+
     /**
      * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
      * If the FBO "sceneFinal" is unavailable, returns null.
      *
      * @return a ByteBuffer or null
      */
-    public ByteBuffer getSceneFinalRawData() {
+    public ByteBuffer getSceneFinalRawData() { 
         FBO fboSceneFinal = get(READ_ONLY_GBUFFER.getName());
         if (fboSceneFinal == null) {
             logger.error("FBO sceneFinal is unavailable: cannot return data from it.");
