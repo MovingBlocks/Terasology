@@ -180,6 +180,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
+        screenGrabber = new ScreenGrabber(context);
+        context.put(ScreenGrabber.class, screenGrabber);
+
         dynamicFBOsManager = new DynamicFBOsManager(context);
         staticFBOsManager = new StaticFBOsManager();
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
@@ -187,11 +190,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(DynamicFBOsManager.class, dynamicFBOsManager);
         context.put(StaticFBOsManager.class, staticFBOsManager);
         context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
-
-        screenGrabber = new ScreenGrabber(context);
-        context.put(ScreenGrabber.class, screenGrabber);
-
-        dynamicFBOsManager.setScreenGrabber(screenGrabber);
 
         shaderManager.initShaders();
         initMaterials();

@@ -40,8 +40,8 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
     private ScreenGrabber screenGrabber;
 
     public DynamicFBOsManager(Context context) {
-        this.renderingConfig = context.get(Config.class).getRendering();
-
+        renderingConfig = context.get(Config.class).getRendering();
+        screenGrabber = context.get(ScreenGrabber.class);
         fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
         generateDefaultFBOs();
     }
@@ -120,10 +120,6 @@ public class DynamicFBOsManager extends AbstractFBOsManager {
         }
 
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
-    }
-
-    public void setScreenGrabber(ScreenGrabber screenGrabber) {
-        this.screenGrabber = screenGrabber;
     }
 
     public void swapReadWriteBuffers() {
