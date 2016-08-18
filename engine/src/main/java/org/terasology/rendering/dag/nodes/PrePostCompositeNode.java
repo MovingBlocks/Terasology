@@ -25,7 +25,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -42,7 +42,7 @@ public class PrePostCompositeNode extends AbstractNode {
 
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -55,7 +55,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
-        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
     }
 
     /**
@@ -66,7 +66,7 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
         prePostComposite.enable();
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFLECTIVE_REFRACTIVE);
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE);
 
         // TODO: verify if there should be bound textures here.
         WRITE_ONLY_GBUFFER.bind();
@@ -79,7 +79,7 @@ public class PrePostCompositeNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swapReadWriteBuffers();
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
         PerformanceMonitor.endActivity();

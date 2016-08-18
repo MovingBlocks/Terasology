@@ -35,8 +35,8 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
-import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -82,10 +82,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private StaticFBOsManager staticFBOsManager;
+    private ImmutableFBOs immutableFBOs;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
 
     @In
@@ -111,12 +111,12 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), staticFBOsManager);
-        requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), staticFBOsManager);
-        requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), staticFBOsManager);
-        requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), staticFBOsManager);
-        requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), staticFBOsManager);
-        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
 
         obtainStaticFBOs();
         createPBOs();
@@ -192,7 +192,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST);
+        scenePrePost = displayResolutionDependentFBOs.get(SCENE_PRE_POST);
 
         downSampler.enable();
 
@@ -236,10 +236,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
      * only if eye adaptation is enabled: an NPE would be thrown only in that case.
      */
     private void obtainStaticFBOs() {
-        downSampledScene[4] = staticFBOsManager.get(SCENE_16);
-        downSampledScene[3] = staticFBOsManager.get(SCENE_8);
-        downSampledScene[2] = staticFBOsManager.get(SCENE_4);
-        downSampledScene[1] = staticFBOsManager.get(SCENE_2);
-        downSampledScene[0] = staticFBOsManager.get(SCENE_1);
+        downSampledScene[4] = immutableFBOs.get(SCENE_16);
+        downSampledScene[3] = immutableFBOs.get(SCENE_8);
+        downSampledScene[2] = immutableFBOs.get(SCENE_4);
+        downSampledScene[1] = immutableFBOs.get(SCENE_2);
+        downSampledScene[0] = immutableFBOs.get(SCENE_1);
     }
 }

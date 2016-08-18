@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.config.RenderingConfig;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector4f;
@@ -94,7 +94,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
-        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
         RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
 
         // TODO move texture binding and setting into nodes
@@ -125,11 +125,11 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureEffects", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(WorldReflectionNode.REFLECTED);
+        displayResolutionDependentFBOs.bindFboColorTexture(WorldReflectionNode.REFLECTED);
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        displayResolutionDependentFBOs.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         program.setInt("texSceneOpaque", texId++, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame

@@ -25,7 +25,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -44,7 +44,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     private Config config;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -56,7 +56,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
-        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
 
     }
 
@@ -68,7 +68,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = dynamicFBOsManager.get(SCENE_PRE_POST);
+        scenePrePost = displayResolutionDependentFBOs.get(SCENE_PRE_POST);
         initialPost.enable();
 
         // TODO: verify what the inputs are

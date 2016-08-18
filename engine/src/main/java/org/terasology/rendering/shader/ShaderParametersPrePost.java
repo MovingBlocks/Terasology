@@ -21,7 +21,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
@@ -55,7 +55,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: often used objects: perhaps to be obtained in BaseMaterial?
-        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
@@ -65,13 +65,13 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        dynamicFBOsManager.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        displayResolutionDependentFBOs.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(BloomPassesNode.BLOOM_2);
+            displayResolutionDependentFBOs.bindFboColorTexture(BloomPassesNode.BLOOM_2);
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -82,7 +82,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            dynamicFBOsManager.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
+            displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
             program.setInt("texLightShafts", texId++, true);
         }
 

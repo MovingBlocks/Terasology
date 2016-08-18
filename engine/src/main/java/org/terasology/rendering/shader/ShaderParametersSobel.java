@@ -21,7 +21,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -39,7 +39,7 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in superclass? The super class could then have the monitoring functionality.
-        FBO scene = CoreRegistry.get(DynamicFBOsManager.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
+        FBO scene = CoreRegistry.get(DisplayResolutionDependentFBOs.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
 
         // TODO: move to node
         if (scene != null) {

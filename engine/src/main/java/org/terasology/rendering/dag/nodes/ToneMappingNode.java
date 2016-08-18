@@ -25,7 +25,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -41,7 +41,7 @@ public class ToneMappingNode extends AbstractNode {
     public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped"); // HDR tone mapping
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -54,7 +54,7 @@ public class ToneMappingNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
@@ -68,7 +68,7 @@ public class ToneMappingNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
-        sceneToneMapped = dynamicFBOsManager.get(TONE_MAPPED);
+        sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
 
         toneMapping.enable();
 

@@ -27,7 +27,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -49,7 +49,7 @@ public class SkyBandsNode extends WireframeCapableNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
     private Material blurShader;
@@ -63,8 +63,8 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
 
-        requiresFBO(new FBOConfig(SKY_BAND_0, ONE_16TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requiresFBO(new FBOConfig(SKY_BAND_1, ONE_32TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SKY_BAND_0, ONE_16TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SKY_BAND_1, ONE_32TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
 
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
@@ -77,8 +77,8 @@ public class SkyBandsNode extends WireframeCapableNode {
 
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         if (renderingConfig.isInscattering()) {
-            sceneSkyBand0 = dynamicFBOsManager.get(SKY_BAND_0);
-            sceneSkyBand1 = dynamicFBOsManager.get(SKY_BAND_1);
+            sceneSkyBand0 = displayResolutionDependentFBOs.get(SKY_BAND_0);
+            sceneSkyBand1 = displayResolutionDependentFBOs.get(SKY_BAND_1);
 
             generateSkyBand(sceneSkyBand0);
             generateSkyBand(sceneSkyBand1);

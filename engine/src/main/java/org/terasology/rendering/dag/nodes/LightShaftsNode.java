@@ -26,7 +26,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -45,7 +45,7 @@ public class LightShaftsNode extends AbstractNode {
     private Config config;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -59,14 +59,14 @@ public class LightShaftsNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
-        requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
 
     @Override
     public void process() {
         if (renderingConfig.isLightShafts()) {
             PerformanceMonitor.startActivity("rendering/lightShafts");
-            lightShaftsFBO = dynamicFBOsManager.get(LIGHT_SHAFTS);
+            lightShaftsFBO = displayResolutionDependentFBOs.get(LIGHT_SHAFTS);
 
             lightShaftsShader.enable();
             // TODO: verify what the inputs are

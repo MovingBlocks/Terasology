@@ -23,7 +23,7 @@ import org.terasology.rendering.opengl.FBOConfig;
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class StaticFBOsManager extends AbstractFBOsManager {
+public class ImmutableFBOs extends AbstractFBOsManager {
 
     @Override
     public void request(FBOConfig fboConfig) {

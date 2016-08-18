@@ -32,7 +32,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -59,7 +59,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     private ScreenGrabber screenGrabber;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
@@ -82,7 +82,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
-        requiresFBO(new FBOConfig(OC_UNDISTORTED, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(OC_UNDISTORTED, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
 
     /**
@@ -106,7 +106,7 @@ public class FinalPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
-        ocUndistorted = dynamicFBOsManager.get(OC_UNDISTORTED);
+        ocUndistorted = displayResolutionDependentFBOs.get(OC_UNDISTORTED);
 
         fullScale = READ_ONLY_GBUFFER.dimensions();
 

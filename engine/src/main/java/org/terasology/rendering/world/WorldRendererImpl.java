@@ -66,9 +66,9 @@ import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
-import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
+import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -132,9 +132,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-    private StaticFBOsManager staticFBOsManager;
+    private ImmutableFBOs immutableFBOs;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -183,12 +183,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         screenGrabber = new ScreenGrabber(context);
         context.put(ScreenGrabber.class, screenGrabber);
 
-        dynamicFBOsManager = new DynamicFBOsManager(context);
-        staticFBOsManager = new StaticFBOsManager();
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
+        immutableFBOs = new ImmutableFBOs();
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
-        context.put(DynamicFBOsManager.class, dynamicFBOsManager);
-        context.put(StaticFBOsManager.class, staticFBOsManager);
+        context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
+        context.put(ImmutableFBOs.class, immutableFBOs);
         context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
@@ -268,7 +268,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initStateChanges() {
-        SetViewportSizeOf.setDynamicFBOsManager(dynamicFBOsManager);
+        SetViewportSizeOf.setDisplayResolutionDependentFBOs(displayResolutionDependentFBOs);
     }
 
     @Override
@@ -331,7 +331,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            dynamicFBOsManager.update();
+            displayResolutionDependentFBOs.update();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }

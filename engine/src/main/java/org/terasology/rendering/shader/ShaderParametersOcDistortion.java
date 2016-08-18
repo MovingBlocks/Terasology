@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Combine shader program.
@@ -36,7 +36,7 @@ public class ShaderParametersOcDistortion extends ShaderParametersBase {
         // TODO: convert the next three lines in a public method somewhere.
         // TODO: In the BaseMaterial class perhaps? Or an even more generic utility class?
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        CoreRegistry.get(DynamicFBOsManager.class).bindFboColorTexture(DefaultDynamicFBOs.FINAL.getName()); // TODO: switch from CoreRegistry to Context.
+        CoreRegistry.get(DisplayResolutionDependentFBOs.class).bindFboColorTexture(DefaultDynamicFBOs.FINAL.getName()); // TODO: switch from CoreRegistry to Context.
         program.setInt("texSceneFinal", texId++, true);
     }
 

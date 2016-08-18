@@ -21,7 +21,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.ScreenGrabber;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -38,12 +38,12 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        DynamicFBOsManager dynamicFBOsManager = CoreRegistry.get(DynamicFBOsManager.class); // TODO: switch from CoreRegistry to Context.
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
         ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
 
         // TODO: move into a node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        dynamicFBOsManager.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST);
+        displayResolutionDependentFBOs.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST);
 
         // TODO: move into a material?
         program.setInt("texScene", 0, true);

@@ -26,7 +26,7 @@ import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * TODO: Add diagram of this node
@@ -37,12 +37,12 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
     private ComponentSystemManager componentSystemManager;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new BindFBO(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName(), dynamicFBOsManager)); // TODO: might be removed, verify it
+        addDesiredStateChange(new BindFBO(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs)); // TODO: might be removed, verify it
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
@@ -73,7 +73,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
      */
     private void preRenderSetupSimpleBlendMaterials() {
-        dynamicFBOsManager.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()).setRenderBufferMask(true, true, true);
+        displayResolutionDependentFBOs.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()).setRenderBufferMask(true, true, true);
         GL11.glEnable(GL_BLEND);
         GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
         GL11.glDepthMask(false);

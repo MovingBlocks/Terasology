@@ -26,7 +26,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -43,7 +43,7 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     public static final ResourceUrn SSAO_BLURRED = new ResourceUrn("engine:ssaoBlurred");
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -62,8 +62,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
-        requiresFBO(new FBOConfig(SSAO, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requiresFBO(new FBOConfig(SSAO_BLURRED, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(SSAO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SSAO_BLURRED, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
 
     /**
@@ -78,8 +78,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         if (renderingConfig.isSsao()) {
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
-            ssaoBlurredFBO = dynamicFBOsManager.get(SSAO_BLURRED);
-            ssaoFBO = dynamicFBOsManager.get(SSAO);
+            ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED);
+            ssaoFBO = displayResolutionDependentFBOs.get(SSAO);
 
             generateSSAO();
             generateBlurredSSAO();

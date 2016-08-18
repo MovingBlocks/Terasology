@@ -23,14 +23,14 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
     private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-    private static DynamicFBOsManager dynamicFBOsManager;
+    private static DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private BaseFBOsManager frameBuffersManager;
     private SetViewportSizeOfTask task;
@@ -45,8 +45,8 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         this.fboName = fboName;
     }
 
-    public static void setDynamicFBOsManager(DynamicFBOsManager dynamicFBOsManager) {
-        SetViewportSizeOf.dynamicFBOsManager = dynamicFBOsManager;
+    public static void setDisplayResolutionDependentFBOs(DisplayResolutionDependentFBOs displayResolutionDependentFBOs) {
+        SetViewportSizeOf.displayResolutionDependentFBOs = displayResolutionDependentFBOs;
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     public RenderPipelineTask generateTask() {
         if (task == null) {
             if (isTheDefaultInstance()) {
-                frameBuffersManager = dynamicFBOsManager;
+                frameBuffersManager = displayResolutionDependentFBOs;
             }
             task = new SetViewportSizeOfTask(fboName);
             frameBuffersManager.subscribe(this);

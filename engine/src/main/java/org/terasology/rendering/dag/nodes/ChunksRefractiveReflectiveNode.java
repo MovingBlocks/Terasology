@@ -26,7 +26,7 @@ import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -46,7 +46,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private FBO sceneReflectiveRefractive;
     private Camera playerCamera;
@@ -55,8 +55,8 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        dynamicFBOsManager.subscribe(this);
-        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        displayResolutionDependentFBOs.subscribe(this);
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
      * accommodate the rendering of the water surface from an underwater point of view.
      */
     private void preRenderSetupSceneReflectiveRefractive() {
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE);
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
         sceneReflectiveRefractive.bind();
 
         // Make sure the water surface is rendered if the player is underwater.
@@ -107,6 +107,6 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @Override
     public void update() {
         // TODO: renames, maybe?
-        READ_ONLY_GBUFFER.attachDepthBufferTo(dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE));
+        READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
     }
 }

@@ -34,12 +34,12 @@ import org.terasology.rendering.opengl.ScreenGrabber;
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class DynamicFBOsManager extends AbstractFBOsManager {
+public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     private FBO.Dimensions fullScale;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
-    public DynamicFBOsManager(Context context) {
+    public DisplayResolutionDependentFBOs(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
         screenGrabber = context.get(ScreenGrabber.class);
         fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());

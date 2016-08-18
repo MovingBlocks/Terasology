@@ -30,7 +30,7 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUF
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -59,7 +59,7 @@ public class DirectionalLightsNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private DynamicFBOsManager dynamicFBOsManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
@@ -76,7 +76,7 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
 
         initMainDirectionalLight();
     }
@@ -139,7 +139,7 @@ public class DirectionalLightsNode extends AbstractNode {
         READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneReflectiveRefractive = dynamicFBOsManager.get(REFRACTIVE_REFLECTIVE);
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
         WRITE_ONLY_GBUFFER.bind();
         WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
@@ -152,7 +152,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        dynamicFBOsManager.swapReadWriteBuffers();
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }
