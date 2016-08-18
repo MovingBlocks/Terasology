@@ -24,6 +24,7 @@ import org.terasology.rendering.dag.WireframeCapableNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -57,7 +58,7 @@ public class BackdropNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     @Override

@@ -70,6 +70,13 @@ public class FBOConfig {
         this(fboName, new FBO.Dimensions(width, height), type);
     }
 
+    public FBOConfig(ResourceUrn fboName, ScalingFactors factors, FBO.Type type) {
+        this.fboName = fboName;
+        this.type = type;
+        this.scale = factors.getScale();
+    }
+
+
     public FBOConfig(ResourceUrn fboName, float scale, FBO.Type type) {
         Preconditions.checkArgument(scale != 0, "scale can not be zero.");
         this.fboName = fboName;

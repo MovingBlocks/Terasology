@@ -27,6 +27,10 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -74,10 +78,10 @@ public class BloomPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
         highPass = worldRenderer.getMaterial("engine:prog.highp"); // TODO: rename shader to highPass
-        requireFBO(new FBOConfig(HIGH_PASS_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_0_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_1_URN, 0.25f, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(BLOOM_2_URN, 0.125f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(HIGH_PASS_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_0_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_1_URN, QUARTER_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(BLOOM_2_URN, ONE_8TH_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

@@ -25,6 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -58,7 +59,7 @@ public class LightShaftsNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
-        requireFBO(new FBOConfig(LIGHT_SHAFTS_URN, 0.5f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(LIGHT_SHAFTS_URN, HALF_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     @Override

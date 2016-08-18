@@ -33,6 +33,7 @@ import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.opengl.fbms.StaticFBOsManager;
@@ -115,7 +116,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
         requireFBO(new FBOConfig(SCENE_4_URN, 4, 4, FBO.Type.DEFAULT), staticFBOsManager);
         requireFBO(new FBOConfig(SCENE_2_URN, 2, 2, FBO.Type.DEFAULT), staticFBOsManager);
         requireFBO(new FBOConfig(SCENE_1_URN, 1, 1, FBO.Type.DEFAULT), staticFBOsManager);
-        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, 1.0f, FBO.Type.HDR), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SCENE_PRE_POST_URN, FULL_SCALE, FBO.Type.HDR), dynamicFBOsManager);
 
         obtainStaticFBOs();
         createPBOs();

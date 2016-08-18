@@ -30,6 +30,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -69,7 +70,7 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requireFBO(new FBOConfig(REFLECTED_URN, 0.5f, FBO.Type.DEFAULT).useDepthBuffer(), dynamicFBOsManager);
+        requireFBO(new FBOConfig(REFLECTED_URN, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), dynamicFBOsManager);
 
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");

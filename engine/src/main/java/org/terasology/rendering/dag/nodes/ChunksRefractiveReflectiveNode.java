@@ -25,6 +25,7 @@ import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -55,7 +56,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
         dynamicFBOsManager.subscribe(this);
-        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, 1.0f, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
+        requireFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_URN, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), dynamicFBOsManager);
     }
 
     @Override

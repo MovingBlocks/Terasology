@@ -29,6 +29,7 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
@@ -81,7 +82,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
-        requireFBO(new FBOConfig(OC_UNDISTORTED_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(OC_UNDISTORTED_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

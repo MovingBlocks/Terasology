@@ -25,6 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -58,7 +59,7 @@ public class OutlineNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         outline = worldRenderer.getMaterial("engine:prog.sobel");
-        requireFBO(new FBOConfig(OUTLINE_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(OUTLINE_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**

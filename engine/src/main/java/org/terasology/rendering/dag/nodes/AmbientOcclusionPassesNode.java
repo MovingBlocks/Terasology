@@ -25,6 +25,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DynamicFBOsManager;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -63,8 +64,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
         requireFBO(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getConfig(), dynamicFBOsManager);
-        requireFBO(new FBOConfig(SSAO_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
-        requireFBO(new FBOConfig(SSAO_BLURRED_URN, 1.0f, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SSAO_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
+        requireFBO(new FBOConfig(SSAO_BLURRED_URN, FULL_SCALE, FBO.Type.DEFAULT), dynamicFBOsManager);
     }
 
     /**
