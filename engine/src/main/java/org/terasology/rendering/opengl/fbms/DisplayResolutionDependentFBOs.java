@@ -46,6 +46,18 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         generateDefaultFBOs();
     }
 
+    private void generateDefaultFBOs() {
+        generateDefaultFBO(READ_ONLY_GBUFFER);
+        generateDefaultFBO(WRITE_ONLY_GBUFFER);
+        generateDefaultFBO(FINAL);
+    }
+
+    private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
+        FBOConfig fboConfig = defaultDynamicFBO.getConfig();
+        FBO fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
+        defaultDynamicFBO.setFbo(fbo);
+    }
+
     @Override
     public FBO request(FBOConfig fboConfig) {
         FBO fbo;
@@ -60,18 +72,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         }
         retain(fboName);
         return fbo;
-    }
-
-    private void generateDefaultFBOs() {
-        generateDefaultFBO(READ_ONLY_GBUFFER);
-        generateDefaultFBO(WRITE_ONLY_GBUFFER);
-        generateDefaultFBO(FINAL);
-    }
-
-    private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        FBOConfig fboConfig = defaultDynamicFBO.getConfig();
-        FBO fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
-        defaultDynamicFBO.setFbo(fbo);
     }
 
     /**
@@ -96,7 +96,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     private void disposeAllFBOs() {
         for (ResourceUrn urn : fboConfigs.keySet()) {
             fboLookup.get(urn).dispose();
-            fboLookup.remove(urn);
         }
         fboLookup.clear();
     }
