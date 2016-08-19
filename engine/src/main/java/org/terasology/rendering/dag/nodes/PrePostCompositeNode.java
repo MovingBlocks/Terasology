@@ -82,6 +82,9 @@ public class PrePostCompositeNode extends AbstractNode {
         displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
+        // TODO: verify why we can't move the buffer attachment to before the swap by using WRITE_ONLY_GBUFFER instead.
+        // TODO: See right-side streaks in https://cloud.githubusercontent.com/assets/136392/17794231/456f542a-65b6-11e6-83bb-f2cc3f10ee66.png
+
         PerformanceMonitor.endActivity();
     }
 }
