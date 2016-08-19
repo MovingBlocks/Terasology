@@ -63,13 +63,12 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
             int shadowMapResFromSettings = (int) evt.getNewValue();
             shadowMapResolution = new FBO.Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
 
-
             for (Map.Entry<ResourceUrn, FBOConfig> entry : fboConfigs.entrySet()) {
-                ResourceUrn resourceUrn = entry.getKey();
+                ResourceUrn fboName = entry.getKey();
                 FBOConfig fboConfig = entry.getValue();
 
-                if (fboLookup.containsKey(resourceUrn)) {
-                    FBO fbo = fboLookup.get(resourceUrn);
+                if (fboLookup.containsKey(fboName)) {
+                    FBO fbo = fboLookup.get(fboName);
                     if (fbo != null) { // TODO: validate if necessary
                         fbo.dispose();
                     }
@@ -81,7 +80,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
                     break;
                 }
 
-                fboLookup.put(resourceUrn, shadowMapResDependentFBO);
+                fboLookup.put(fboName, shadowMapResDependentFBO);
             }
         }
     }
