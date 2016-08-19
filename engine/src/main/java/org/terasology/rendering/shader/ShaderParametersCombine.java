@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -56,24 +56,23 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         int texId = 0;
         // TODO: obtain these objects once in superclass and add there monitoring functionality as needed?
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
-        FBO sceneOpaque = displayResolutionDependentFBOs.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
 
         // TODO: move texture bindings to the appropriate nodes
-        if (sceneOpaque != null) {
+        if (READ_ONLY_GBUFFER.getFbo() != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindTexture();
+            READ_ONLY_GBUFFER.bindTexture();
             program.setInt("texSceneOpaque", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindDepthTexture();
+            READ_ONLY_GBUFFER.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindNormalsTexture();
+            READ_ONLY_GBUFFER.bindNormalsTexture();
             program.setInt("texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindLightBufferTexture();
+            READ_ONLY_GBUFFER.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
