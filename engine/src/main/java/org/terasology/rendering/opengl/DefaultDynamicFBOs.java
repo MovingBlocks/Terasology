@@ -98,7 +98,7 @@ public enum DefaultDynamicFBOs {
         return fbo.dimensions();
     }
 
-    public ByteBuffer getSceneFinalRawData() {
-        return fbo.getSceneFinalRawData();
+    public ByteBuffer getColorBufferRawData() {
+        return fbo.getColorBufferRawData();
     }
 }

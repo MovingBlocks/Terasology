@@ -431,12 +431,10 @@ public final class FBO {
     }
 
     /**
-     * Returns the content of the color buffer of the FBO "sceneFinal", from GPU memory as a ByteBuffer.
-     * If the FBO "sceneFinal" is unavailable, returns null.
-     *
+     * Returns the content of the color buffer from GPU memory as a ByteBuffer.
      * @return a ByteBuffer or null
      */
-    public ByteBuffer getSceneFinalRawData() {
+    public ByteBuffer getColorBufferRawData() {
         ByteBuffer buffer = BufferUtils.createByteBuffer(this.width() * this.height() * 4);
 
         this.bindTexture();

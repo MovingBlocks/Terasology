@@ -92,7 +92,7 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        final ByteBuffer buffer = FINAL.getSceneFinalRawData();
+        final ByteBuffer buffer = FINAL.getColorBufferRawData();
         if (buffer == null) {
             logger.error("No screenshot data available. No screenshot will be saved.");
             return;
