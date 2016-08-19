@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateIngame;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 
 import java.util.List;
 
@@ -54,10 +53,11 @@ public class SceneProperties implements PropertyProvider {
             result.addAll(new ReflectionProvider(backdropRenderer, ingameContext).getProperties());
         }
 
-        FrameBuffersManager renderingProcess = ingameContext.get(FrameBuffersManager.class);
+        // TODO: fix this
+        /*FrameBuffersManager renderingProcess = ingameContext.get(FrameBuffersManager.class);
         if (renderingProcess != null) {
             result.addAll(new ReflectionProvider(renderingProcess, ingameContext).getProperties());
-        }
+        }*/
         return result;
     }
 }

@@ -22,28 +22,27 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * TODO: Add diagram of this node
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
 
-    private static final String SCENE_OPAQUE_FBO = "sceneOpaque";
-
     @In
     private ComponentSystemManager componentSystemManager;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
 
     @Override
     public void initialise() {
-        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_FBO));
+        addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs)); // TODO: might be removed, verify it
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
     }
 
@@ -74,7 +73,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      * be reversed, not eliminated, by re-enabling writing to the Depth Buffer.
      */
     private void preRenderSetupSimpleBlendMaterials() {
-        frameBuffersManager.getFBO(SCENE_OPAQUE_FBO).setRenderBufferMask(true, true, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         GL11.glEnable(GL_BLEND);
         GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
         GL11.glDepthMask(false);

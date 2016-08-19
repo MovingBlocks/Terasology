@@ -15,25 +15,30 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Diagram of this node
  */
 public class BackdropNode extends WireframeCapableNode {
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
+
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -42,27 +47,26 @@ public class BackdropNode extends WireframeCapableNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
-    private FBO sceneOpaque;
     private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
 
         initialClearing();
 
-        sceneOpaque.bind();
-        setRenderBufferMask(sceneOpaque, true, true, true);
+        READ_ONLY_GBUFFER.bind();
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
         playerCamera.lookThroughNormalized();
         /**
@@ -73,7 +77,7 @@ public class BackdropNode extends WireframeCapableNode {
          * This is due to the SkySphere requiring a state and the SkyBands requiring a slightly
          * different one.
          */
-        setRenderBufferMask(sceneOpaque, true, false, false);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);
         backdropRenderer.render(playerCamera);
 
         PerformanceMonitor.endActivity();
@@ -84,8 +88,8 @@ public class BackdropNode extends WireframeCapableNode {
      */
     // It's unclear why these buffers need to be cleared while all the others don't...
     private void initialClearing() {
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
-        sceneOpaque.bind();
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+        READ_ONLY_GBUFFER.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         sceneReflectiveRefractive.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

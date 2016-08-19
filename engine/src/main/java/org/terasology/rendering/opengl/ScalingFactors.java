@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
-
-//TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
-
-import java.util.Set;
+package org.terasology.rendering.opengl;
 
 /**
  * TODO: Add javadocs
  */
-public interface Node {
+public enum ScalingFactors {
+    FULL_SCALE(1.0f),
+    HALF_SCALE(0.5f),
+    QUARTER_SCALE(0.25f),
+    ONE_8TH_SCALE(0.125f),
+    ONE_16TH_SCALE(0.0625f),
+    ONE_32TH_SCALE(0.03125f);
 
-    void initialise();
+    private final float scale;
 
-    void process();
+    ScalingFactors(float scale) {
+        this.scale = scale;
+    }
 
-    // TODO: invoked when Node is removed from RenderGraph
-    void dispose();
-
-    Set<StateChange> getDesiredStateChanges();
-
-    RenderPipelineTask generateTask();
-
-    void setTaskListGenerator(RenderTaskListGenerator taskListGenerator);
+    public float getScale() {
+        return scale;
+    }
 }

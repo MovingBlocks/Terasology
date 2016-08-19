@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,14 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
+import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.OutlineNode;
+import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.nui.properties.Range;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -50,29 +55,28 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
         int texId = 0;
         // TODO: obtain these objects once in superclass and add there monitoring functionality as needed?
-        FrameBuffersManager frameBuffersManager = CoreRegistry.get(FrameBuffersManager.class);
-        FBO sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
         // TODO: move texture bindings to the appropriate nodes
-        if (sceneOpaque != null) {
+        if (READ_ONLY_GBUFFER.getFbo() != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindTexture();
+            READ_ONLY_GBUFFER.bindTexture();
             program.setInt("texSceneOpaque", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindDepthTexture();
+            READ_ONLY_GBUFFER.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindNormalsTexture();
+            READ_ONLY_GBUFFER.bindNormalsTexture();
             program.setInt("texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindLightBufferTexture();
+            READ_ONLY_GBUFFER.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        FBO sceneReflectiveRefractive = displayResolutionDependentFBOs.get(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE);
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -104,14 +108,14 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            frameBuffersManager.bindFboColorTexture("ssaoBlurred");
+            displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO_BLURRED);
             program.setInt("texSsao", texId++, true);
         }
 
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            frameBuffersManager.bindFboColorTexture("outline");
+            displayResolutionDependentFBOs.bindFboColorTexture(OutlineNode.OUTLINE);
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
@@ -127,7 +131,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            frameBuffersManager.bindFboColorTexture("sceneSkyBand1");
+            displayResolutionDependentFBOs.bindFboColorTexture(SkyBandsNode.SKY_BAND_1);
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

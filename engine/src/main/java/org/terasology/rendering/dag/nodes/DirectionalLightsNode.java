@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -24,12 +25,15 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -46,6 +50,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
  * TODO: Diagram of this node
  */
 public class DirectionalLightsNode extends AbstractNode {
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
     private BackdropProvider backdropProvider;
@@ -54,16 +59,16 @@ public class DirectionalLightsNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
 
     private Camera playerCamera;
-    private FBO sceneOpaque;
+
     private Material lightGeometryShader;
     private Material lightBufferPass;
-    private FBO sceneOpaquePingPong;
+
     private FBO sceneReflectiveRefractive;
 
     @Override
@@ -71,6 +76,8 @@ public class DirectionalLightsNode extends AbstractNode {
         playerCamera = worldRenderer.getActiveCamera();
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+
         initMainDirectionalLight();
     }
 
@@ -85,8 +92,7 @@ public class DirectionalLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/directionallights");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        sceneOpaque.bind();
+        READ_ONLY_GBUFFER.bind();
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
@@ -101,7 +107,7 @@ public class DirectionalLightsNode extends AbstractNode {
 
         glEnable(GL_DEPTH_TEST);
 
-        setRenderBufferMask(sceneOpaque, true, true, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         bindDisplay();
 
         applyLightBufferPass();
@@ -118,36 +124,35 @@ public class DirectionalLightsNode extends AbstractNode {
         int texId = 0;
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindTexture();
+        READ_ONLY_GBUFFER.bindTexture();
         lightBufferPass.setInt("texSceneOpaque", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindDepthTexture();
+        READ_ONLY_GBUFFER.bindDepthTexture();
         lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindNormalsTexture();
+        READ_ONLY_GBUFFER.bindNormalsTexture();
         lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindLightBufferTexture();
+        READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneOpaquePingPong = frameBuffersManager.getFBO("sceneOpaquePingPong");
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
-        sceneOpaquePingPong.bind();
-        setRenderBufferMask(sceneOpaquePingPong, true, true, true);
+        WRITE_ONLY_GBUFFER.bind();
+        WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
-        setViewportToSizeOf(sceneOpaquePingPong);
+        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
-        frameBuffersManager.swapSceneOpaqueFBOs();
-        sceneOpaque.attachDepthBufferTo(sceneReflectiveRefractive);
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
+        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

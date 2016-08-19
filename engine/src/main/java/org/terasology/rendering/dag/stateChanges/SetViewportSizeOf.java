@@ -15,30 +15,38 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.rendering.dag.FBOManagerSubscriber;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
-    private static final String DEFAULT_FBO = "sceneOpaque";
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DEFAULT_FBO);
-    private static FrameBuffersManager frameBuffersManager;
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+    private static DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
+    private BaseFBOsManager frameBuffersManager;
     private SetViewportSizeOfTask task;
+    private ResourceUrn fboName;
 
-    private String fboName;
-
-    public SetViewportSizeOf(String fboName) {
+    public SetViewportSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
+        this.frameBuffersManager = frameBuffersManager;
         this.fboName = fboName;
     }
 
-    public static void setFrameBuffersManager(FrameBuffersManager frameBuffersManager) {
-        SetViewportSizeOf.frameBuffersManager = frameBuffersManager;
+    private SetViewportSizeOf(ResourceUrn fboName) {
+        this.fboName = fboName;
+    }
+
+    public static void setDisplayResolutionDependentFBOs(DisplayResolutionDependentFBOs displayResolutionDependentFBOs) {
+        SetViewportSizeOf.displayResolutionDependentFBOs = displayResolutionDependentFBOs;
     }
 
     @Override
@@ -49,6 +57,9 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
+            if (isTheDefaultInstance()) {
+                frameBuffersManager = displayResolutionDependentFBOs;
+            }
             task = new SetViewportSizeOfTask(fboName);
             frameBuffersManager.subscribe(this);
             update();
@@ -72,7 +83,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        FBO fbo = frameBuffersManager.getFBO(fboName);
+        FBO fbo = frameBuffersManager.get(fboName);
         task.setDimensions(fbo.width(), fbo.height());
     }
 
@@ -81,7 +92,7 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
         return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
     }
 
-    public String getFboName() {
+    public ResourceUrn getFboName() {
         return fboName;
     }
 }

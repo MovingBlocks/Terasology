@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.LightShaftsNode;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
@@ -25,7 +29,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -52,7 +55,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: often used objects: perhaps to be obtained in BaseMaterial?
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
@@ -62,13 +65,13 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        buffersManager.bindFboColorTexture("sceneOpaque");
+        displayResolutionDependentFBOs.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isBloom()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            buffersManager.bindFboColorTexture("sceneBloom2");
+            displayResolutionDependentFBOs.bindFboColorTexture(BloomPassesNode.BLOOM_2);
             program.setInt("texBloom", texId++, true);
 
             program.setFloat("bloomFactor", bloomFactor, true);
@@ -79,7 +82,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            buffersManager.bindFboColorTexture("lightShafts");
+            displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
             program.setInt("texLightShafts", texId++, true);
         }
 

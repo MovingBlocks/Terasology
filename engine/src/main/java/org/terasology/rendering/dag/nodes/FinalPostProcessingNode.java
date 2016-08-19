@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -25,9 +26,13 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -42,6 +47,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Break into two different nodes
  */
 public class FinalPostProcessingNode extends AbstractNode {
+    public static final ResourceUrn OC_UNDISTORTED = new ResourceUrn("engine:ocUndistorted");
 
     @In
     private WorldRenderer worldRenderer;
@@ -50,10 +56,10 @@ public class FinalPostProcessingNode extends AbstractNode {
     private Config config;
 
     @In
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
@@ -64,9 +70,8 @@ public class FinalPostProcessingNode extends AbstractNode {
     private Material debug;
     private Material ocDistortion;
 
-    private FBO sceneFinal;
     private FBO ocUndistorted;
-    private FBO sceneOpaque;
+
 
     @Override
     public void initialise() {
@@ -77,6 +82,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post"); // TODO: rename shader to finalPost
         debug = worldRenderer.getMaterial("engine:prog.debug");
         // TODO: rethink debug strategy in light of the DAG-based architecture
+        requiresFBO(new FBOConfig(OC_UNDISTORTED, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
 
     /**
@@ -100,11 +106,9 @@ public class FinalPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/finalPostProcessing");
 
-        ocUndistorted = frameBuffersManager.getFBO("ocUndistorted");
-        sceneFinal = frameBuffersManager.getFBO("sceneFinal");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        ocUndistorted = displayResolutionDependentFBOs.get(OC_UNDISTORTED);
 
-        fullScale = sceneOpaque.dimensions();
+        fullScale = READ_ONLY_GBUFFER.dimensions();
 
         if (!renderingDebugConfig.isEnabled()) {
             finalPost.enable();
@@ -122,32 +126,32 @@ public class FinalPostProcessingNode extends AbstractNode {
     }
 
     private void renderFinalMonoImage() {
-        if (postProcessor.isNotTakingScreenshot()) {
+        if (screenGrabber.isNotTakingScreenshot()) {
             bindDisplay();
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
 
         } else {
-            sceneFinal.bind();
+            FINAL.bind();
 
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
             renderFullscreenQuad(0, 0, fullScale.width(), fullScale.height());
 
-            postProcessor.saveScreenshot();
+            screenGrabber.saveScreenshot();
             // when saving a screenshot we do not send the image to screen,
             // to avoid the brief one-frame flicker of the screenshot
 
             // This is needed to avoid the UI (which is not currently saved within the
             // screenshot) being rendered for one frame with buffers.sceneFinal size.
-            setViewportToSizeOf(sceneOpaque);
+            setViewportToSizeOf(READ_ONLY_GBUFFER);
         }
     }
 
     // TODO: have a flag to invert the eyes (Cross Eye 3D), as mentioned in
     // TODO: http://forum.terasology.org/threads/happy-coding.1018/#post-11264
     private void renderFinalStereoImage(RenderingStage renderingStage) {
-        if (postProcessor.isNotTakingScreenshot()) { // TODO: verify if this works
-            sceneFinal.bind();
+        if (screenGrabber.isNotTakingScreenshot()) { // TODO: verify if this works
+            FINAL.bind();
         } else {
             ocUndistorted.bind();
         }
@@ -163,14 +167,14 @@ public class FinalPostProcessingNode extends AbstractNode {
                 // no glClear() here: the rendering for the second eye is being added besides the first eye's rendering
                 renderFullscreenQuad(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height());
 
-                if (postProcessor.isNotTakingScreenshot()) {
+                if (screenGrabber.isNotTakingScreenshot()) {
                     bindDisplay();
-                    applyOculusDistortion(sceneFinal);
+                    applyOculusDistortion(FINAL.getFbo());
 
                 } else {
-                    sceneFinal.bind();
+                    FINAL.bind();
                     applyOculusDistortion(ocUndistorted);
-                    postProcessor.saveScreenshot();
+                    screenGrabber.saveScreenshot();
                     // when saving a screenshot we do NOT send the image to screen,
                     // to avoid the brief flicker of the screenshot for one frame
                 }
@@ -189,7 +193,7 @@ public class FinalPostProcessingNode extends AbstractNode {
         inputBuffer.bindTexture();
         ocDistortion.setInt("texInputBuffer", texId, true);
 
-        if (postProcessor.isNotTakingScreenshot()) {
+        if (screenGrabber.isNotTakingScreenshot()) {
             updateOcShaderParametersForVP(0, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.LEFT_EYE);
             renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
             updateOcShaderParametersForVP(fullScale.width() / 2 + 1, 0, fullScale.width() / 2, fullScale.height(), RenderingStage.RIGHT_EYE);

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -22,8 +23,12 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -36,6 +41,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class BlurPassesNode extends AbstractNode {
+    public static final ResourceUrn BLUR_0 = new ResourceUrn("engine:sceneBlur0");
+    public static final ResourceUrn BLUR_1 = new ResourceUrn("engine:sceneBlur1");
+    public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped");
 
     @Range(min = 0.0f, max = 16.0f)
     private float overallBlurRadiusFactor = 0.8f;
@@ -47,19 +55,22 @@ public class BlurPassesNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
     private Material blur;
     private FBO sceneBlur0;
     private FBO sceneBlur1;
-    private FBO sceneOpaque;
+
     private FBO sceneToneMapped;
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
+        requiresFBO(new FBOConfig(BLUR_0, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(BLUR_1, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
     }
 
     /**
@@ -74,10 +85,9 @@ public class BlurPassesNode extends AbstractNode {
         if (renderingConfig.getBlurIntensity() != 0) {
             PerformanceMonitor.startActivity("rendering/blurPasses");
 
-            sceneBlur0 = frameBuffersManager.getFBO("sceneBlur0");
-            sceneBlur1 = frameBuffersManager.getFBO("sceneBlur1");
-            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-            sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
+            sceneBlur0 = displayResolutionDependentFBOs.get(BLUR_0);
+            sceneBlur1 = displayResolutionDependentFBOs.get(BLUR_1);
+            sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
 
             generateBlur(sceneBlur0);
             generateBlur(sceneBlur1);
@@ -104,6 +114,6 @@ public class BlurPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay(); // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 }

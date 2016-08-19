@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -27,6 +28,10 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -41,7 +46,7 @@ import static org.lwjgl.opengl.GL11.glClear;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends AbstractNode {
-    private static final String SCENE_REFLECTED_FBO = "sceneReflected";
+    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
 
     @In
     private RenderQueuesHelper renderQueues;
@@ -55,6 +60,9 @@ public class WorldReflectionNode extends AbstractNode {
     @In
     private BackdropRenderer backdropRenderer;
 
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
@@ -62,11 +70,13 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
+        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new BindFBO(SCENE_REFLECTED_FBO));
-        addDesiredStateChange(new SetViewportSizeOf(SCENE_REFLECTED_FBO));
+        addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportSizeOf(REFLECTED, displayResolutionDependentFBOs));
     }
 
     @Override

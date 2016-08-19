@@ -15,14 +15,19 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -30,29 +35,36 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Diagram of this node
  * TODO: Separate this node into multiple SkyBandNode's
  */
 public class SkyBandsNode extends WireframeCapableNode {
+    public static final ResourceUrn SKY_BAND_0 = new ResourceUrn("engine:sceneSkyBand0");
+    public static final ResourceUrn SKY_BAND_1 = new ResourceUrn("engine:sceneSkyBand1");
 
     @In
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
     private Material blurShader;
-    private FBO sceneOpaque;
+
     private FBO sceneSkyBand0;
+    private FBO sceneSkyBand1;
     private Camera playerCamera;
+
 
     @Override
     public void initialise() {
         super.initialise();
+
+        requiresFBO(new FBOConfig(SKY_BAND_0, ONE_16TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SKY_BAND_1, ONE_32TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+
         renderingConfig = config.getRendering();
         blurShader = worldRenderer.getMaterial("engine:prog.blur");
         playerCamera = worldRenderer.getActiveCamera();
@@ -62,18 +74,16 @@ public class SkyBandsNode extends WireframeCapableNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/skyBands");
 
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-
-        setRenderBufferMask(sceneOpaque, true, true, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         if (renderingConfig.isInscattering()) {
-            sceneSkyBand0 = frameBuffersManager.getFBO("sceneSkyBand0");
-            FBO sceneSkyBand1 = frameBuffersManager.getFBO("sceneSkyBand1");
+            sceneSkyBand0 = displayResolutionDependentFBOs.get(SKY_BAND_0);
+            sceneSkyBand1 = displayResolutionDependentFBOs.get(SKY_BAND_1);
 
             generateSkyBand(sceneSkyBand0);
             generateSkyBand(sceneSkyBand1);
         }
 
-        sceneOpaque.bind();
+        READ_ONLY_GBUFFER.bind();
 
         playerCamera.lookThrough();
 
@@ -86,13 +96,13 @@ public class SkyBandsNode extends WireframeCapableNode {
         blurShader.setFloat2("texelSize", 1.0f / skyBand.width(), 1.0f / skyBand.height(), true);
 
         if (skyBand == sceneSkyBand0) {
-            sceneOpaque.bindTexture();
+            READ_ONLY_GBUFFER.bindTexture();
         } else {
             sceneSkyBand0.bindTexture();
         }
 
         skyBand.bind();
-        setRenderBufferMask(skyBand, true, false, false);
+        skyBand.setRenderBufferMask(true, false, false);
 
         setViewportToSizeOf(skyBand);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
@@ -100,6 +110,6 @@ public class SkyBandsNode extends WireframeCapableNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 }

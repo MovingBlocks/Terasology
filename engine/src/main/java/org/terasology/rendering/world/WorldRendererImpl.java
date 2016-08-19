@@ -63,11 +63,12 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.FrameBuffersManager;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -127,10 +128,13 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private final RenderingDebugConfig renderingDebugConfig;
-    private FrameBuffersManager frameBuffersManager;
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
+
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
+    private ImmutableFBOs immutableFBOs;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -176,14 +180,16 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        frameBuffersManager = new FrameBuffersManager();
-        context.put(FrameBuffersManager.class, frameBuffersManager);
+        screenGrabber = new ScreenGrabber(context);
+        context.put(ScreenGrabber.class, screenGrabber);
 
-        postProcessor = new PostProcessor(frameBuffersManager);
-        context.put(PostProcessor.class, postProcessor);
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
+        immutableFBOs = new ImmutableFBOs();
+        shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
-        frameBuffersManager.setPostProcessor(postProcessor);
-        frameBuffersManager.initialize();
+        context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
+        context.put(ImmutableFBOs.class, immutableFBOs);
+        context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
         initMaterials();
@@ -215,6 +221,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
         Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
+        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
         Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(ChunksRefractiveReflectiveNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
@@ -261,8 +268,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initStateChanges() {
-        SetViewportSizeOf.setFrameBuffersManager(frameBuffersManager);
-        BindFBO.setFrameBuffersManager(frameBuffersManager);
+        SetViewportSizeOf.setDisplayResolutionDependentFBOs(displayResolutionDependentFBOs);
     }
 
     @Override
@@ -325,7 +331,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderableWorld.generateVBOs();
             secondsSinceLastFrame = 0;
 
-            frameBuffersManager.preRenderUpdate();
+            displayResolutionDependentFBOs.update();
 
             millisecondsSinceRenderingStart += secondsSinceLastFrame * 1000;  // updates the variable animations are based on.
         }
@@ -523,7 +529,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
-        postProcessor.dispose();
     }
 
     @Override

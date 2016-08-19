@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.GL11.glViewport;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
@@ -24,9 +25,9 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 public final class SetViewportSizeOfTask implements RenderPipelineTask {
     private int width;
     private int height;
-    private String fboName;
+    private ResourceUrn fboName;
 
-    public SetViewportSizeOfTask(String fboName) {
+    public SetViewportSizeOfTask(ResourceUrn fboName) {
         this.fboName = fboName;
     }
 

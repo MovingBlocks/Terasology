@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.tasks;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
@@ -25,9 +26,9 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 public final class BindFBOTask implements RenderPipelineTask {
 
     private int fboId;
-    private String fboName;
+    private final ResourceUrn fboName;
 
-    public BindFBOTask(int fboId, String fboName) {
+    public BindFBOTask(int fboId, ResourceUrn fboName) {
         this.fboId = fboId;
         this.fboName = fboName;
     }

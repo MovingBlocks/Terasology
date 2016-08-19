@@ -15,14 +15,18 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -35,9 +39,11 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Add diagram of this node
  */
 public class AmbientOcclusionPassesNode extends AbstractNode {
+    public static final ResourceUrn SSAO = new ResourceUrn("engine:ssao");
+    public static final ResourceUrn SSAO_BLURRED = new ResourceUrn("engine:ssaoBlurred");
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -46,7 +52,6 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
     private Config config;
 
     private RenderingConfig renderingConfig;
-    private FBO sceneOpaque;
     private FBO ssaoBlurredFBO;
     private FBO ssaoFBO;
     private Material ssaoShader;
@@ -57,6 +62,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
+        requiresFBO(new FBOConfig(SSAO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SSAO_BLURRED, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
 
     /**
@@ -71,9 +78,8 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         if (renderingConfig.isSsao()) {
             PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
             // TODO: consider moving these into initialise without breaking existing implementation
-            sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-            ssaoBlurredFBO = frameBuffersManager.getFBO("ssaoBlurred");
-            ssaoFBO = frameBuffersManager.getFBO("ssao");
+            ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED);
+            ssaoFBO = displayResolutionDependentFBOs.get(SSAO);
 
             generateSSAO();
             generateBlurredSSAO();
@@ -95,7 +101,7 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay(); // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 
     private void generateBlurredSSAO() {
@@ -112,6 +118,6 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay(); // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque); // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
     }
 }

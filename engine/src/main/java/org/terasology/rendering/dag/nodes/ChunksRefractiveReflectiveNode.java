@@ -16,12 +16,17 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -31,7 +36,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 /**
  * TODO: Diagram of this node
  */
-public class ChunksRefractiveReflectiveNode extends AbstractNode {
+public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOManagerSubscriber {
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
     private RenderQueuesHelper renderQueues;
@@ -40,7 +46,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private FBO sceneReflectiveRefractive;
     private Camera playerCamera;
@@ -49,6 +55,8 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
+        displayResolutionDependentFBOs.subscribe(this);
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
     }
 
     @Override
@@ -75,7 +83,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
      * accommodate the rendering of the water surface from an underwater point of view.
      */
     private void preRenderSetupSceneReflectiveRefractive() {
-        sceneReflectiveRefractive = frameBuffersManager.getFBO("sceneReflectiveRefractive");
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
         sceneReflectiveRefractive.bind();
 
         // Make sure the water surface is rendered if the player is underwater.
@@ -94,5 +102,11 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode {
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
         bindDisplay();
+    }
+
+    @Override
+    public void update() {
+        // TODO: renames, maybe?
+        READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
     }
 }

@@ -17,6 +17,9 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.rendering.dag.nodes.ShadowMapNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
@@ -24,8 +27,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -41,22 +42,22 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in the superclass and monitor from there?
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
-        FBO sceneOpaque = buffersManager.getFBO("sceneOpaque");
+        // TODO: switch from CoreRegistry to Context.
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = CoreRegistry.get(ShadowMapResolutionDependentFBOs.class);
 
         int texId = 0;
-        if (sceneOpaque != null) {
+        if (READ_ONLY_GBUFFER.getFbo() != null) {
             // TODO: move content of this block into the node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindDepthTexture();
+            READ_ONLY_GBUFFER.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindNormalsTexture();
+            READ_ONLY_GBUFFER.bindNormalsTexture();
             program.setInt("texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneOpaque.bindLightBufferTexture();
+            READ_ONLY_GBUFFER.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
@@ -64,7 +65,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             // TODO: move into node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            buffersManager.bindFboDepthTexture("sceneShadowMap");
+            shadowMapResolutionDependentFBOs.bindFboDepthTexture(ShadowMapNode.SHADOW_MAP);
             program.setInt("texSceneShadowMap", texId++, true);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera(); // TODO: shadowMapNode.camera here

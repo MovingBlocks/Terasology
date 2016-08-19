@@ -15,13 +15,17 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -34,23 +38,26 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class InitialPostProcessingNode extends AbstractNode {
+    public static final ResourceUrn SCENE_PRE_POST = new ResourceUrn("engine:scenePrePost");
 
     @In
     private Config config;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
 
     private FBO scenePrePost;
-    private FBO sceneOpaque;
+
     private Material initialPost;
 
     @Override
     public void initialise() {
         initialPost = worldRenderer.getMaterial("engine:prog.prePost"); // TODO: rename shader to scenePrePost
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+
     }
 
     /**
@@ -61,8 +68,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         // Initial Post-Processing: chromatic aberration, light shafts, 1/8th resolution bloom, vignette
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        scenePrePost = displayResolutionDependentFBOs.get(SCENE_PRE_POST);
         initialPost.enable();
 
         // TODO: verify what the inputs are
@@ -74,7 +80,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }

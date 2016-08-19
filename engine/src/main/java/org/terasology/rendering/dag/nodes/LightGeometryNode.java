@@ -24,8 +24,8 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -43,7 +43,6 @@ import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 
 /**
  * TODO: Diagram of this node
@@ -51,7 +50,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setRenderBufferMask;
 public class LightGeometryNode extends AbstractNode {
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -60,7 +59,7 @@ public class LightGeometryNode extends AbstractNode {
     private EntityManager entityManager;
 
     private Material lightGeometryShader;
-    private FBO sceneOpaque;
+
 
     @Override
     public void initialise() {
@@ -88,7 +87,6 @@ public class LightGeometryNode extends AbstractNode {
         graphicState.postRenderCleanupLightGeometryStencil();
         */
 
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
         // LightGeometry requires a cleanup
         cleanupSceneOpaque();
         preRenderSetupLightGeometry();
@@ -116,10 +114,10 @@ public class LightGeometryNode extends AbstractNode {
 
     // TODO: figure how lighting works and what this does
     private void preRenderSetupLightGeometry() {
-        sceneOpaque.bind();
+        READ_ONLY_GBUFFER.bind();
 
         // Only write to the light buffer
-        setRenderBufferMask(sceneOpaque, false, false, true);
+        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
 
         glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 
@@ -137,8 +135,7 @@ public class LightGeometryNode extends AbstractNode {
      * Resets the state after the rendering of the Opaque scene.
      */
     private void cleanupSceneOpaque() {
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        setRenderBufferMask(sceneOpaque, true, true, true); // TODO: probably redundant - verify
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: probably redundant - verify
         bindDisplay();
     }
 }

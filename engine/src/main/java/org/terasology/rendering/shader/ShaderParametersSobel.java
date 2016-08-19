@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -37,8 +38,8 @@ public class ShaderParametersSobel extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        // TODO: obtain once in superclass? The superclass could then have the monitoring functionality.
-        FBO scene = CoreRegistry.get(FrameBuffersManager.class).getFBO("sceneOpaque");
+        // TODO: obtain once in superclass? The super class could then have the monitoring functionality.
+        FBO scene = CoreRegistry.get(DisplayResolutionDependentFBOs.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
 
         // TODO: move to node
         if (scene != null) {

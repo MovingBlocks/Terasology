@@ -15,13 +15,17 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
+import org.terasology.rendering.opengl.FBOConfig;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -34,8 +38,10 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add diagram of this node
  */
 public class ToneMappingNode extends AbstractNode {
+    public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped"); // HDR tone mapping
+
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
@@ -45,10 +51,10 @@ public class ToneMappingNode extends AbstractNode {
 
     private Material toneMapping;
     private FBO sceneToneMapped;
-    private FBO sceneOpaque;
 
     @Override
     public void initialise() {
+        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
     }
 
@@ -62,8 +68,7 @@ public class ToneMappingNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
-        sceneToneMapped = frameBuffersManager.getFBO("sceneToneMapped");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
+        sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
 
         toneMapping.enable();
 
@@ -74,7 +79,7 @@ public class ToneMappingNode extends AbstractNode {
         renderFullscreenQuad();
 
         bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }

@@ -15,25 +15,56 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 
 /**
  * TODO: Add javadocs
  */
 public abstract class AbstractNode implements Node {
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
+
     private Set<StateChange> desiredStateChanges;
+    private Map<ResourceUrn, BaseFBOsManager> fboUsages;
+
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
-    private List<Range<Integer>> rangeList;
 
     protected AbstractNode() {
         desiredStateChanges = Sets.newLinkedHashSet();
-        rangeList = Lists.newArrayList();
+        fboUsages = Maps.newHashMap();
+    }
+
+    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
+        ResourceUrn fboName = fboConfig.getName();
+
+        if (!fboUsages.containsKey(fboName)) {
+            fboUsages.put(fboName, frameBuffersManager);
+        } else {
+            logger.warn("FBO " + fboName + " is already requested.");
+            return frameBuffersManager.get(fboName);
+        }
+
+        return frameBuffersManager.request(fboConfig);
+    }
+
+    @Override
+    public void dispose() {
+        for (Map.Entry<ResourceUrn, BaseFBOsManager> entry : fboUsages.entrySet()) {
+            ResourceUrn fboName = entry.getKey();
+            BaseFBOsManager baseFBOsManager = entry.getValue();
+            baseFBOsManager.release(fboName);
+        }
+
+        fboUsages.clear();
     }
 
     protected boolean addDesiredStateChange(StateChange stateChange) {

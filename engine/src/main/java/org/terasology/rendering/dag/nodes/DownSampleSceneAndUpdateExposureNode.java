@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
@@ -28,9 +29,14 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FrameBuffersManager;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.PBO;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -44,7 +50,18 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * TODO: Add node of this diagram
  */
 public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
+    public static final ResourceUrn SCENE_16 = new ResourceUrn("engine:scene16");
+    public static final ResourceUrn SCENE_8 = new ResourceUrn("engine:scene8");
+    public static final ResourceUrn SCENE_4 = new ResourceUrn("engine:scene4");
+    public static final ResourceUrn SCENE_2 = new ResourceUrn("engine:scene2");
+    public static final ResourceUrn SCENE_1 = new ResourceUrn("engine:scene1");
+    public static final ResourceUrn SCENE_PRE_POST = new ResourceUrn("engine:scenePrePost");
+
     private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
+
+    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
+    private PBO readOnlyPBO;    // This data is then used in the context of eye adaptation.
+    private PBO temporaryPBO;
 
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
@@ -65,7 +82,11 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private FrameBuffersManager frameBuffersManager;
+    private ImmutableFBOs immutableFBOs;
+
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
 
     @In
     private Config config;
@@ -74,10 +95,10 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private BackdropProvider backdropProvider;
 
     @In
-    private PostProcessor postProcessor;
+    private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
-    private FBO sceneOpaque;
+
     private FBO scenePrePost;
     private FBO downSampledFBO;
     private FBO[] downSampledScene = new FBO[5];
@@ -90,7 +111,20 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         downSampler = worldRenderer.getMaterial("engine:prog.down");         // TODO: rename shader to downSampler
-        obtainStaticFBOs();
+        downSampledScene[4] = requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[3] = requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[2] = requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[1] = requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene[0] = requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
+        requiresFBO(new FBOConfig(SCENE_PRE_POST, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+
+        createPBOs();
+    }
+
+
+    private void createPBOs() {
+        writeOnlyPBO = new PBO(1, 1);
+        readOnlyPBO = new PBO(1, 1);
     }
 
     /**
@@ -105,11 +139,9 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
 
             downSampleSceneInto1x1pixelsBuffer();
 
-            frameBuffersManager.getCurrentReadbackPBO().copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
-
-            frameBuffersManager.swapReadbackPBOs();
-
-            pixels = frameBuffersManager.getCurrentReadbackPBO().readBackPixels();
+            writeOnlyPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            swapPBOs();
+            pixels = readOnlyPBO.readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -137,23 +169,28 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
                 targetExposure = hdrMinExposure;
             }
 
-            postProcessor.setExposure(TeraMath.lerp(postProcessor.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
+            screenGrabber.setExposure(TeraMath.lerp(screenGrabber.getExposure(), targetExposure, hdrExposureAdjustmentSpeed));
 
             PerformanceMonitor.endActivity();
         } else {
             if (backdropProvider.getDaylight() == 0.0) {
-                postProcessor.setExposure(hdrMaxExposureNight);
+                screenGrabber.setExposure(hdrMaxExposureNight);
             } else {
-                postProcessor.setExposure(hdrExposureDefault);
+                screenGrabber.setExposure(hdrExposureDefault);
             }
         }
 
     }
 
+    private void swapPBOs() {
+        temporaryPBO = readOnlyPBO;
+        readOnlyPBO = writeOnlyPBO;
+        writeOnlyPBO = temporaryPBO;
+    }
+
     private void downSampleSceneInto1x1pixelsBuffer() {
         PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-        sceneOpaque = frameBuffersManager.getFBO("sceneOpaque");
-        scenePrePost = frameBuffersManager.getFBO("scenePrePost");
+        scenePrePost = displayResolutionDependentFBOs.get(SCENE_PRE_POST);
 
         downSampler.enable();
 
@@ -179,28 +216,9 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
             bindDisplay(); // TODO: probably can be removed or moved out of the loop
         }
 
-        setViewportToSizeOf(sceneOpaque);    // TODO: verify this is necessary
+        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }
 
-    /**
-     * Fetches a number of static FBOs from the FrameBuffersManager instance and initializes a number of
-     * internal references with them. They are called "static" as they do not change over the lifetime
-     * of a PostProcessor instance.
-     * <p>
-     * This method must to be called at least once for the PostProcessor instance to function, but does
-     * not need to be called additional times.
-     * <p>
-     * Failure to call this method -may- result in a NullPointerException. This is due to the
-     * downsampleSceneAndUpdateExposure() method relying on these FBOs. But this method is fully executed
-     * only if eye adaptation is enabled: an NPE would be thrown only in that case.
-     */
-    private void obtainStaticFBOs() {
-        downSampledScene[4] = frameBuffersManager.getFBO("scene16");
-        downSampledScene[3] = frameBuffersManager.getFBO("scene8");
-        downSampledScene[2] = frameBuffersManager.getFBO("scene4");
-        downSampledScene[1] = frameBuffersManager.getFBO("scene2");
-        downSampledScene[0] = frameBuffersManager.getFBO("scene1");
-    }
 }

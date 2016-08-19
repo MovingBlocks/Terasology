@@ -18,9 +18,10 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.FrameBuffersManager;
-import org.terasology.rendering.opengl.PostProcessor;
+import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -37,17 +38,17 @@ public class ShaderParametersHdr extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FrameBuffersManager buffersManager = CoreRegistry.get(FrameBuffersManager.class);
-        PostProcessor postProcessor = CoreRegistry.get(PostProcessor.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
+        ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
 
         // TODO: move into a node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        buffersManager.bindFboColorTexture("scenePrePost");
+        displayResolutionDependentFBOs.bindFboColorTexture(InitialPostProcessingNode.SCENE_PRE_POST);
 
         // TODO: move into a material?
         program.setInt("texScene", 0, true);
         // TODO: move to DownSampleSceneAndUpdateExposure
-        program.setFloat("exposure", postProcessor.getExposure() * exposureBias, true);
+        program.setFloat("exposure", screenGrabber.getExposure() * exposureBias, true);
         program.setFloat("whitePoint", whitePoint, true);
     }
 
