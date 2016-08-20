@@ -47,7 +47,8 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 
 /**
- * TODO: Diagram of this node
+ * TODO: Break this node into several nodes
+ * TODO: For doing that worldRenderer.renderLightComponent must be eliminated somehow
  */
 public class DirectionalLightsNode extends AbstractNode {
     public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");

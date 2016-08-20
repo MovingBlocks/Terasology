@@ -45,6 +45,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 /**
  * TODO: Add diagram of this node
  * TODO: Break into two different nodes
+ * TODO: Add desired state changes after breaking into different nodes
  */
 public class FinalPostProcessingNode extends AbstractNode {
     public static final ResourceUrn OC_UNDISTORTED = new ResourceUrn("engine:ocUndistorted");

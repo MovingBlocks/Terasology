@@ -47,7 +47,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: Add node of this diagram
+ * TODO: Break this node into several nodes
+ * TODO: Rework on dependency of ScreenGrabber's set/getExposure()
  */
 public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     public static final ResourceUrn SCENE_16 = new ResourceUrn("engine:scene16");
