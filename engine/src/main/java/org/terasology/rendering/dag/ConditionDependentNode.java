@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.dag;
 
-import com.google.api.client.util.Lists;
+import com.google.common.collect.Lists;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
