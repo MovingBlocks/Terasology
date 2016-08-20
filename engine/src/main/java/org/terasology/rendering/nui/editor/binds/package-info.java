@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+@API
+@InputCategory(id = "nui", displayName = "${engine:menu#category-nui}")
+package org.terasology.rendering.nui.editor.binds;
 
-import org.terasology.rendering.nui.CoreScreenLayer;
-
-/**
- * An empty screen layer override to be used for a new tree.
- */
-public class PlaceholderScreen extends CoreScreenLayer {
-    @Override
-    public void initialise() {
-
-    }
-}
+import org.terasology.input.InputCategory;
+import org.terasology.module.sandbox.API;

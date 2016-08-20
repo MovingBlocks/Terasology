@@ -1,5 +1,5 @@
 {
-    "type": "engine:NUIEditorSettingsScreen",
+    "type": "engine:widgetSelectionScreen",
     "skin": "popup",
     "contents": {
         "type": "relativeLayout",
@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "NUI Editor Settings",
+                            "text": "${engine:menu#widget-selection-title}",
                             "family": "title"
                         },
                         {
@@ -30,18 +30,8 @@
                             ]
                         },
                         {
-                            "type": "RowLayout",
-                            "horizontalSpacing": 8,
-                            "contents": [
-                                {
-                                    "type": "UILabel",
-                                    "text": "Disable tree view icons:"
-                                },
-                                {
-                                    "type": "UICheckbox",
-                                    "id": "disableIcons"
-                                }
-                            ]
+                            "type": "UILabel",
+                            "text": "${engine:menu#widget-selection-prompt}"
                         },
                         {
                             "type": "UISpace",
@@ -51,9 +41,31 @@
                             ]
                         },
                         {
-                            "type": "UIButton",
-                            "text": "${engine:menu#back}",
-                            "id": "close"
+                            "type": "UIDropdownScrollable",
+                            "id": "availableWidgets"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-ok}",
+                                    "id": "ok"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-cancel}",
+                                    "id": "cancel"
+                                }
+                            ]
                         }
                     ]
                 }

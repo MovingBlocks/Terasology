@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -27,6 +27,7 @@ import org.terasology.input.device.KeyboardDevice;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.widgets.treeView.JsonTree;
@@ -39,8 +40,16 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+/**
+ * A base screen for the NUI screen/skin editors.
+ */
 public abstract class AbstractEditorScreen extends CoreScreenLayer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -52,6 +61,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * The editor widget.
      */
     private JsonEditorTreeView editor;
+    /**
+     * Whether unsaved changes in the editor are present.
+     */
+    private boolean unsavedChangesPresent;
 
     /**
      * Selects the current asset to be edited.
@@ -65,7 +78,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      *
      * @param node The node based on which the editor's state is to be reset.
      */
-    protected abstract void resetState(JsonTree node);
+    protected abstract void resetStateInternal(JsonTree node);
 
     /**
      * Resets the preview widget based on the editor's current state.
@@ -83,6 +96,13 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param node The node to be edited.
      */
     protected abstract void editNode(JsonTree node);
+
+    /**
+     * Adds a widget selected by the user to the specified node.
+     *
+     * @param node The node to add a new widget to.
+     */
+    protected abstract void addWidget(JsonTree node);
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -139,22 +159,60 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     }
 
     /**
-     * Adds a widget selected by the user to the specified node.
+     * Resets the editor's state based on a specified {@link JsonTree}.
      *
-     * @param node The node to add a new widget to.
+     * @param node The {@link JsonTree} to reset the state from.
      */
-    protected void addWidget(JsonTree node) {
-        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
-        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
-            .getScreen(WidgetSelectionScreen.ASSET_URI);
-        widgetSelectionScreen.setNode(node);
-        widgetSelectionScreen.subscribeClose(() -> {
-            getEditor().fireUpdateListeners();
-        });
+    protected void resetState(JsonTree node) {
+        if (unsavedChangesPresent) {
+            ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+            confirmPopup.setMessage("Unsaved changes!", "It looks like you've been editing something!" +
+                "\r\nAll unsaved changes will be lost. Continue anyway?");
+            confirmPopup.setOkHandler(() -> {
+                setUnsavedChangesPresent(false);
+                resetStateInternal(node);
+            });
+        } else {
+            resetStateInternal(node);
+        }
     }
 
     /**
-     * Deserializes the current state of the editor and copies it to the system clipboard.
+     * Saves the contents of the editor as a JSON string to a specified file.
+     *
+     * @param file The file to save to.
+     */
+    protected void saveToFile(File file) {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            saveToFile(outputStream);
+        } catch (IOException e) {
+            logger.warn("Could not save asset", e);
+        }
+    }
+
+    /**
+     * Saves the contents of the editor as a JSON string to a specified file.
+     *
+     * @param path The path to save to.
+     */
+    protected void saveToFile(Path path) {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
+            saveToFile(outputStream);
+        } catch (IOException e) {
+            logger.warn("Could not save asset", e);
+        }
+    }
+
+    private void saveToFile(BufferedOutputStream outputStream) throws IOException {
+        // Serialize tree contents and save to selected file.
+        JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
+        String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
+        outputStream.write(jsonString.getBytes());
+        setUnsavedChangesPresent(false);
+    }
+
+    /**
+     * De-serializes the current state of the editor and copies it to the system clipboard.
      */
     protected void copyJson() {
         if (getEditor().getModel() != null) {
@@ -215,6 +273,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
         if (node.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
             // If the node is a key/value pair, select the value of the node.
+
             if (node.getValue().getValue() instanceof String) {
                 inlineEditorEntry.setCursorPosition(node.getValue().getKey().length() + "\"\":\"".length(), true);
                 inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length() - "\"".length(), false);
@@ -224,6 +283,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
             }
         } else {
             // Otherwise fully select the contents of the node.
+
             inlineEditorEntry.setCursorPosition(0, true);
             inlineEditorEntry.setCursorPosition(inlineEditorEntry.getText().length(), false);
         }
@@ -239,5 +299,13 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
     protected void setEditor(JsonEditorTreeView editor) {
         this.editor = editor;
+    }
+
+    protected boolean areUnsavedChangesPresent() {
+        return unsavedChangesPresent;
+    }
+
+    protected void setUnsavedChangesPresent(boolean unsavedChangesPresent) {
+        this.unsavedChangesPresent = unsavedChangesPresent;
     }
 }

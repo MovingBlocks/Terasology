@@ -283,6 +283,14 @@ public class UITreeView<T> extends CoreWidget {
         }
     }
 
+    public void delete(Tree<T> node) {
+        if (node.getParent() != null) {
+            node.getParent().removeChild(node);
+
+            fireUpdateListeners();
+        }
+    }
+
     public TreeModel<T> getModel() {
         return model.get();
     }
@@ -330,7 +338,8 @@ public class UITreeView<T> extends CoreWidget {
     }
 
     private void setNodeMode(Canvas canvas, Tree<T> node, TreeViewListenerSet listenerSet) {
-        if (state.getSelectedIndex() != null && Objects.equals(node, model.get().getNode(state.getSelectedIndex()))) {
+        if (state.getSelectedIndex() != null
+            && node.equals(model.get().getNode(state.getSelectedIndex()))) {
             canvas.setMode(ACTIVE_MODE);
         } else if (listenerSet.isMouseOver()) {
             canvas.setMode(isEnabled() ? HOVER_MODE : HOVER_DISABLED_MODE);
@@ -695,7 +704,7 @@ public class UITreeView<T> extends CoreWidget {
     /**
      * A set of tree node sub-listeners.
      */
-    private class TreeViewListenerSet {
+    private final class TreeViewListenerSet {
         /**
          * The top listener.
          */

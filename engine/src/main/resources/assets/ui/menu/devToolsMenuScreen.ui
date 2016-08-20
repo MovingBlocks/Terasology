@@ -1,0 +1,84 @@
+{
+    "type": "engine:DevToolsMenuScreen",
+    "skin": "mainmenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "text": "${engine:menu#dev-tools-title}",
+                "family": "title",
+                "id": "subtitle",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "columnLayout",
+                "verticalSpacing": 8,
+                "family": "menu-options",
+                "layoutInfo": {
+                    "width": 280,
+                    "height": 288,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "subtitle"
+                    },
+                    "position-bottom": {
+                        "offset": 32
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "id": "nuiEditor",
+                        "text": "${engine:menu#dev-tools-nui-editor}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "nuiSkinEditor",
+                        "text": "${engine:menu#dev-tools-skin-editor}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "btEditor",
+                        "text": "${engine:menu#dev-tools-bt-editor}"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [
+                            1,
+                            104
+                        ]
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "${engine:menu#back}"
+                    }
+                ]
+            }
+        ]
+    }
+}

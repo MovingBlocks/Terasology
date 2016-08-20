@@ -13,34 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.layers.ingame;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
+import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 
-public class NUIEditorSettingsScreen extends CoreScreenLayer {
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiEditorSettingsScreen");
+/**
+ *
+ */
+public class DevToolsMenuScreen extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:devToolsMenuScreen");
 
     @In
-    private Config config;
+    private NUIEditorSystem nuiEditorSystem;
+    @In
+    private NUISkinEditorSystem nuiSkinEditorSystem;
 
     @Override
     public void initialise() {
-        WidgetUtil.tryBindCheckbox(this, "disableIcons", BindHelper.bindBeanProperty("disableIcons", config.getNuiEditor(), Boolean.TYPE));
+        WidgetUtil.trySubscribe(this, "nuiEditor", button -> nuiEditorSystem.toggleEditor());
+        WidgetUtil.trySubscribe(this, "nuiSkinEditor", button -> nuiSkinEditorSystem.toggleEditor());
+        WidgetUtil.trySubscribe(this, "btEditor", button -> getManager().toggleScreen("engine:behaviorEditorScreen"));
         WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
     }
 
     @Override
-    public void onClosed() {
-        if (getManager().isOpen(NUIEditorScreen.ASSET_URI)) {
-            ((NUIEditorScreen) getManager().getScreen(NUIEditorScreen.ASSET_URI)).updateConfig();
-        }
-        if (getManager().isOpen(NUISkinEditorScreen.ASSET_URI)) {
-            ((NUISkinEditorScreen) getManager().getScreen(NUISkinEditorScreen.ASSET_URI)).updateConfig();
-        }
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

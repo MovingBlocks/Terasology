@@ -51,11 +51,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * The UILoader handles loading UI widgets from json format files.
+ * Handles loading UI widgets from json format files.
  */
 @RegisterAssetFileFormat
 public class UIFormat extends AbstractAssetFileFormat<UIData> {
@@ -82,6 +83,10 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     }
 
     public UIData load(JsonElement element) throws IOException {
+        return load(element, null);
+    }
+
+    public UIData load(JsonElement element, Locale otherLocale) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         TranslationSystem translationSystem = CoreRegistry.get(TranslationSystem.class);
         TypeSerializationLibrary library = new TypeSerializationLibrary(CoreRegistry.get(TypeSerializationLibrary.class));
@@ -89,15 +94,15 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         library.add(Border.class, new BorderTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
-                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-                .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
-                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
+            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+            .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
+            .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
         for (Class<?> handledType : library.getCoreTypes()) {
             gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
         }
 
         // override the String TypeAdapter from the serialization library
-        gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem));
+        gsonBuilder.registerTypeAdapter(String.class, new I18nStringTypeAdapter(translationSystem, otherLocale));
         Gson gson = gsonBuilder.create();
         return gson.fromJson(element, UIData.class);
     }
@@ -105,15 +110,18 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
     private static final class I18nStringTypeAdapter implements JsonDeserializer<String> {
 
         private final TranslationSystem translationSystem;
+        private final Locale otherLocale;
 
-        public I18nStringTypeAdapter(TranslationSystem translationSystem) {
+        public I18nStringTypeAdapter(TranslationSystem translationSystem, Locale otherLocale) {
             this.translationSystem = translationSystem;
+            this.otherLocale = otherLocale;
         }
 
         @Override
         public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String text = json.getAsString();
-            return translationSystem.translate(text);
+            return otherLocale == null
+                ? translationSystem.translate(text) : translationSystem.translate(text, otherLocale);
         }
     }
 
@@ -180,9 +188,9 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
             for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 String name = entry.getKey();
                 if (!ID_FIELD.equals(name)
-                        && !CONTENTS_FIELD.equals(name)
-                        && !TYPE_FIELD.equals(name)
-                        && !LAYOUT_INFO_FIELD.equals(name)) {
+                    && !CONTENTS_FIELD.equals(name)
+                    && !TYPE_FIELD.equals(name)
+                    && !LAYOUT_INFO_FIELD.equals(name)) {
                     unknownFields.add(name);
                 }
             }
@@ -222,7 +230,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                 UILayout<LayoutHint> layout = (UILayout<LayoutHint>) element;
 
                 Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
-                        ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
+                    ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
                 if (jsonObject.has(CONTENTS_FIELD)) {
                     for (JsonElement child : jsonObject.getAsJsonArray(CONTENTS_FIELD)) {
                         UIWidget childElement = context.deserialize(child, UIWidget.class);
@@ -231,7 +239,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
                                 if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
-                                        && childObject.has(LAYOUT_INFO_FIELD)) {
+                                    && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }

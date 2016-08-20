@@ -11,7 +11,7 @@
     },
     "families" : {
         "title" : {
-            "font" : "title"
+            "font" : "NotoSans-Regular-Medium"
         }
     }
 }

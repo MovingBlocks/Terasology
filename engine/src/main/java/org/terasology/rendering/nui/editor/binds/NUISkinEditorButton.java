@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor;
+package org.terasology.rendering.nui.editor.binds;
 
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
@@ -21,7 +21,10 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
-@RegisterBindButton(id = "nuiEditor", description = "${engine:menu#binding-nui-editor}", category = "nui")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F10)
-public class NUIEditorButton extends BindButtonEvent {
+/**
+ * Button that opens the NUI skin editor, or closes it if it's active.
+ */
+@RegisterBindButton(id = "nuiSkinEditor", description = "${engine:menu#binding-nui-skin-editor}", category = "nui")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F11)
+public class NUISkinEditorButton extends BindButtonEvent {
 }

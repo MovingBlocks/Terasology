@@ -25,6 +25,9 @@ import org.terasology.utilities.Assets;
 
 import java.util.Optional;
 
+/**
+ * Renders NUI editor nodes along with an icon depending on their types.
+ */
 public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue> {
     private static final String ARRAY_TEXTURE_NAME = "array";
     private static final String ATTRIBUTE_TEXTURE_NAME = "attribute";
@@ -111,14 +114,10 @@ public class NUIEditorItemRenderer extends StringTextIconRenderer<JsonTreeValue>
             return null;
         }
 
-        if (textureName != null) {
-            Optional<Texture> texture = Assets.getTexture(String.format("engine:editor_%s", textureName));
-            if (texture.isPresent()) {
-                return texture.get();
-            }
-        }
+        Optional<Texture> texture = Assets.getTexture(textureName != null
+            ? String.format("engine:editor_%s", textureName)
+            : ICON_BLANK);
 
-        // Use a transparent 16x16 icon for consistent child rendering.
-        return Assets.getTexture(ICON_BLANK).get();
+        return texture.isPresent() ? texture.get() : null;
     }
 }

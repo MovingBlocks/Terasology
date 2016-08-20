@@ -26,7 +26,7 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.input.InputSystem;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.editor.screens.PlaceholderScreen;
+import org.terasology.rendering.nui.editor.layers.PlaceholderScreen;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;

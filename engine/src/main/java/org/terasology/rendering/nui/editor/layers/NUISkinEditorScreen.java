@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -28,15 +29,19 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.PathModule;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.asset.UIFormat;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
-import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorItemRenderer;
+import org.terasology.rendering.nui.editor.utils.NUIEditorMenuTreeBuilder;
 import org.terasology.rendering.nui.editor.utils.NUIEditorNodeUtils;
 import org.terasology.rendering.nui.editor.utils.NUIEditorTextEntryBuilder;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
@@ -45,6 +50,7 @@ import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.nui.skin.UISkinFormat;
 import org.terasology.rendering.nui.widgets.JsonEditorTreeView;
 import org.terasology.rendering.nui.widgets.UIBox;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITextEntry;
@@ -53,17 +59,27 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTreeConverter;
 import org.terasology.rendering.nui.widgets.treeView.JsonTreeValue;
 import org.terasology.utilities.Assets;
 
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Component;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public final class NUISkinEditorScreen extends AbstractEditorScreen {
-
-    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:nuiSkinEditorScreen");
 
@@ -72,6 +88,8 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     private static final String EDITOR_TREE_VIEW_ID = "editor";
     private static final String SELECTED_SCREEN_ID = "selectedScreen";
     private static final String CREATE_NEW_SKIN = "New Skin";
+
+    private Logger logger = LoggerFactory.getLogger(NUIEditorScreen.class);
 
     /**
      * Used to retrieve {@link UISkin} assets.
@@ -84,6 +102,11 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     @In
     private Config config;
     /**
+     * Used to get the {@link Path} of an asset.
+     */
+    @In
+    private ModuleManager moduleManager;
+    /**
      * Used to toggle the editor screen on ESCAPE.
      */
     @In
@@ -92,9 +115,21 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     private UIBox selectedScreenBox;
 
     /**
+     * A dropdown containing available asset identifiers.
+     */
+    private UIDropdownScrollable<String> availableAssetDropdown;
+    /**
      * The Urn of the currently edited asset.
      */
     private String selectedAsset;
+    /**
+     * The Urn of the asset that will be selected after a response to a user prompt.
+     */
+    private String selectedAssetPending;
+    /**
+     *
+     */
+    private Path selectedAssetPath;
     /**
      * The Urn of the currently selected preview screen.
      */
@@ -103,11 +138,15 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      * The widget used as an inline node editor.
      */
     private UITextEntry<JsonTree> inlineEditorEntry;
+    /**
+     * An alternative locale to be used for screen rendering.
+     */
+    private Locale alternativeLocale;
 
     @Override
     public void initialise() {
         // Retrieve the widgets based on their identifiers.
-        UIDropdownScrollable<String> availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
+        availableAssetDropdown = find(AVAILABLE_ASSETS_ID, UIDropdownScrollable.class);
         UIDropdownScrollable<ResourceUrn> availableScreenDropdown = find(AVAILABLE_SCREENS_ID, UIDropdownScrollable.class);
         JsonEditorTreeView editor = find(EDITOR_TREE_VIEW_ID, JsonEditorTreeView.class);
         selectedScreenBox = find(SELECTED_SCREEN_ID, UIBox.class);
@@ -132,9 +171,11 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
 
                 @Override
                 public void set(String value) {
+                    // Construct a new skin tree (or de-serialize from an existing asset)
+                    selectedAssetPending = value;
                     if (CREATE_NEW_SKIN.equals(value)) {
+                        selectedAssetPath = null;
                         resetState(NUIEditorNodeUtils.createNewSkin());
-                        selectedAsset = value;
                     } else {
                         selectAsset(new ResourceUrn(value));
                     }
@@ -166,23 +207,89 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             });
         }
 
-        editor.setContextMenuTreeProducer(node -> {
-            NUIEditorMenuTreeBuilder nuiEditorMenuTreeBuilder = new NUIEditorMenuTreeBuilder();
-            nuiEditorMenuTreeBuilder.setManager(getManager());
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
-            nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
-            nuiEditorMenuTreeBuilder.subscribeAddContextMenu(() -> getEditor().fireUpdateListeners());
-            return nuiEditorMenuTreeBuilder.createPrimarySkinContextMenu(node);
+        if (editor != null) {
+            editor.setContextMenuTreeProducer(node -> {
+                NUIEditorMenuTreeBuilder nuiEditorMenuTreeBuilder = new NUIEditorMenuTreeBuilder();
+                nuiEditorMenuTreeBuilder.setManager(getManager());
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_COPY, getEditor()::copyNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_PASTE, getEditor()::pasteNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_EDIT, this::editNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
+                nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
+                nuiEditorMenuTreeBuilder.subscribeAddContextMenu(n -> {
+                    getEditor().fireUpdateListeners();
+
+                    // Automatically edit a node that's been added.
+                    getEditor().getModel().getNode(getEditor().getSelectedIndex()).setExpanded(true);
+                    getEditor().getModel().resetNodes();
+                    getEditor().setSelectedIndex(getEditor().getModel().indexOf(n));
+                    editNode(n);
+                });
+                return nuiEditorMenuTreeBuilder.createPrimarySkinContextMenu(node);
+            });
+
+            editor.setEditor(this::editNode, getManager());
+
+            editor.subscribeTreeViewUpdate(() -> {
+                getEditor().addToHistory();
+                resetPreviewWidget();
+                updateConfig();
+                setUnsavedChangesPresent(true);
+            });
+        }
+
+
+        UIButton save = find("save", UIButton.class);
+        save.bindEnabled(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return CREATE_NEW_SKIN.equals(selectedAsset) || areUnsavedChangesPresent();
+            }
         });
+        save.subscribe(button -> {
+            // Save the current look and feel.
+            LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
 
-        editor.setEditor(this::editNode, getManager());
+            // (Temporarily) set the look and feel to the system default.
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ignored) {
+            }
 
-        editor.subscribeTreeViewUpdate(() -> {
-            editor.addToHistory();
-            resetPreviewWidget();
-            updateConfig();
+            // Configure the file chooser.
+            JFileChooser fileChooser = new JFileChooser() {
+                @Override
+                protected JDialog createDialog(Component parent) {
+                    JDialog dialog = super.createDialog(parent);
+                    dialog.setLocationByPlatform(true);
+                    dialog.setAlwaysOnTop(true);
+                    return dialog;
+                }
+            };
+
+            fileChooser.setSelectedFile(new File(CREATE_NEW_SKIN.equals(selectedAsset)
+                ? "untitled.skin" : selectedAsset.split(":")[1] + ".skin"));
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Skin asset file (*.skin)", "skin"));
+
+            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                saveToFile(fileChooser.getSelectedFile());
+            }
+
+            // Reload the look and feel.
+            try {
+                UIManager.setLookAndFeel(currentLookAndFeel);
+            } catch (UnsupportedLookAndFeelException ignored) {
+            }
+        });
+        UIButton override = find("override", UIButton.class);
+        override.bindEnabled(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return selectedAssetPath != null && areUnsavedChangesPresent();
+            }
+        });
+        override.subscribe(button -> {
+            saveToFile(selectedAssetPath);
         });
 
         // Set the handlers for the editor buttons.
@@ -192,6 +299,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "paste", button -> pasteJson());
         WidgetUtil.trySubscribe(this, "undo", button -> undo());
         WidgetUtil.trySubscribe(this, "redo", button -> redo());
+        WidgetUtil.trySubscribe(this, "close", button -> nuiSkinEditorSystem.toggleEditor());
 
         updateConfig();
     }
@@ -201,11 +309,26 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     @Override
     public void selectAsset(ResourceUrn urn) {
+        boolean isLoaded = assetManager.isLoaded(urn, UISkin.class);
         Optional<UISkin> asset = assetManager.getAsset(urn, UISkin.class);
         if (asset.isPresent()) {
             UISkin skin = asset.get();
-
+            if (!isLoaded) {
+                asset.get().dispose();
+            }
             AssetDataFile source = skin.getSource();
+
+            List<String> path = source.getPath();
+            Name moduleName = new Name(path.get(0));
+            if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+                path.add(source.getFilename());
+                String[] pathArray = path.toArray(new String[path.size()]);
+
+                // Copy all the elements after the first to a separate array for getPath().
+                String first = pathArray[0];
+                String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
+                selectedAssetPath = moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+            }
 
             String content = null;
             try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
@@ -217,21 +340,20 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
 
             if (content != null) {
                 JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
+                selectedAssetPending = urn.toString();
                 resetState(node);
-                selectedAsset = urn.toString();
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void resetState(JsonTree node) {
+    protected void resetStateInternal(JsonTree node) {
         getEditor().setTreeViewModel(node, true);
         resetPreviewWidget();
+
         getEditor().clearHistory();
         updateConfig();
+        selectedAsset = selectedAssetPending;
     }
 
     /**
@@ -241,13 +363,38 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     public void resetPreviewWidget() {
         if (selectedScreen != null) {
             try {
-                JsonElement element = JsonTreeConverter.deserialize(getEditor().getRoot());
-                UISkinData data = new UISkinFormat().load(element);
-                UIWidget widget = assetManager.getAsset(selectedScreen, UIElement.class).get().getRootWidget();
-                widget.setSkin(Assets.generateAsset(data, UISkin.class));
-                selectedScreenBox.setContent(widget);
+                // Construct a UISkinData instance.
+                JsonElement skinElement = JsonTreeConverter.deserialize(getEditor().getRoot());
+                UISkinData data = new UISkinFormat().load(skinElement);
+
+                // Get the selected screen asset.
+                Optional<UIElement> sourceAsset = assetManager
+                    .getAsset(selectedScreen, UIElement.class);
+
+                if (!sourceAsset.isPresent()) {
+                    throw new FileNotFoundException(String.format("Asset %s not found", selectedScreen));
+                }
+
+                AssetDataFile source = sourceAsset.get().getSource();
+                String content;
+                try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
+                    reader.setLenient(true);
+                    content = new JsonParser().parse(reader).toString();
+                }
+                if (content != null) {
+                    JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
+                    JsonElement screenElement = JsonTreeConverter.deserialize(node);
+                    UIWidget widget = new UIFormat().load(screenElement, alternativeLocale).getRootWidget();
+
+                    // Set the screen's skin using the previously generated UISkinData.
+                    widget.setSkin(Assets.generateAsset(data, UISkin.class));
+                    selectedScreenBox.setContent(widget);
+                }
+
             } catch (Throwable t) {
-                selectedScreenBox.setContent(new UILabel(ExceptionUtils.getStackTrace(t)));
+                String truncatedStackTrace = Joiner.on(System.lineSeparator())
+                    .join(Arrays.copyOfRange(ExceptionUtils.getStackFrames(t), 0, 10));
+                selectedScreenBox.setContent(new UILabel(truncatedStackTrace));
             }
         }
     }
@@ -258,8 +405,17 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     @Override
     protected void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
+
+        // Update the editor's item renderer.
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
+        if (nuiEditorConfig.getAlternativeLocale() != null
+            && !nuiEditorConfig.getAlternativeLocale().equals(alternativeLocale)) {
+            alternativeLocale = nuiEditorConfig.getAlternativeLocale();
+            if (selectedScreen != null) {
+                resetPreviewWidget();
+            }
+        }
     }
 
     /**
@@ -275,8 +431,8 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createValueEditor();
         } else if (type == JsonTreeValue.Type.KEY_VALUE_PAIR) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createKeyValueEditor();
-        } else if (type == JsonTreeValue.Type.OBJECT &&
-                   !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+        } else if (type == JsonTreeValue.Type.OBJECT
+            && !(!node.isRoot() && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createObjectEditor();
         } else if (type == JsonTreeValue.Type.ARRAY) {
             inlineEditorEntry = NUIEditorTextEntryBuilder.createArrayEditor();
@@ -300,5 +456,23 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             getEditor().setAlternativeWidget(inlineEditorEntry);
             focusInlineEditor(node, inlineEditorEntry);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addWidget(JsonTree node) {
+        getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
+
+        // Initialise and show the widget selection screen.
+        WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
+            .getScreen(WidgetSelectionScreen.ASSET_URI);
+        widgetSelectionScreen.setNode(node);
+        widgetSelectionScreen.subscribeClose(() -> {
+            JsonTree widget = node.getChildAt(node.getChildren().size() - 1);
+            widget.setExpanded(true);
+            getEditor().fireUpdateListeners();
+        });
     }
 }

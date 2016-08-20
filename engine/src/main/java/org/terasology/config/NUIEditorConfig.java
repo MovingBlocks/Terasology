@@ -15,11 +15,14 @@
  */
 package org.terasology.config;
 
+import java.util.Locale;
+
 /**
  *
  */
 public class NUIEditorConfig {
     private boolean disableIcons;
+    private Locale alternativeLocale;
 
     public boolean isDisableIcons() {
         return disableIcons;
@@ -27,5 +30,13 @@ public class NUIEditorConfig {
 
     public void setDisableIcons(boolean disableIcons) {
         this.disableIcons = disableIcons;
+    }
+
+    public Locale getAlternativeLocale() {
+        return alternativeLocale;
+    }
+
+    public void setAlternativeLocale(Locale alternativeLocale) {
+        this.alternativeLocale = alternativeLocale;
     }
 }

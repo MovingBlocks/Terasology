@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.editor.screens;
+package org.terasology.rendering.nui.editor.layers;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -29,6 +29,10 @@ import org.terasology.rendering.nui.widgets.treeView.JsonTree;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A popup to edit a {@link JsonTree} with an enum type.
+ */
+@SuppressWarnings("unchecked")
 public class EnumEditorScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:enumEditorScreen");
 
@@ -37,7 +41,7 @@ public class EnumEditorScreen extends CoreScreenLayer {
      */
     private UIDropdownScrollable enumValues;
     /**
-     *
+     * The node to be edited.
      */
     private JsonTree node;
     /**
@@ -50,6 +54,7 @@ public class EnumEditorScreen extends CoreScreenLayer {
         enumValues = find("enumValues", UIDropdownScrollable.class);
 
         WidgetUtil.trySubscribe(this, "ok", button -> {
+            // Apply the changes to the node.
             node.getValue().setValue(enumValues.getSelection().toString());
             closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
@@ -58,6 +63,7 @@ public class EnumEditorScreen extends CoreScreenLayer {
         find("ok", UIButton.class).bindEnabled(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
+                // Disable the OK button if no changes were made.
                 return enumValues.getSelection() != null;
             }
         });
@@ -74,7 +80,6 @@ public class EnumEditorScreen extends CoreScreenLayer {
     public void setEnumClass(Class clazz) {
         enumValues.setOptions(Arrays.asList(clazz.getEnumConstants()));
     }
-
 
     public void subscribeClose(UpdateListener listener) {
         Preconditions.checkNotNull(listener);

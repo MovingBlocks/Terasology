@@ -24,28 +24,43 @@
                 "contents": [
                     {
                         "type": "UIButton",
+                        "id": "override",
+                        "text": "${engine:menu#nui-editor-override}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "save",
+                        "text": "${engine:menu#nui-editor-save}"
+                    },
+                    {
+                        "type": "UIButton",
                         "id": "copy",
-                        "text": "Copy Tree"
+                        "text": "${engine:menu#nui-editor-copy}"
                     },
                     {
                         "type": "UIButton",
                         "id": "paste",
-                        "text": "Paste Tree"
+                        "text": "${engine:menu#nui-editor-paste}"
                     },
                     {
                         "type": "UIButton",
                         "id": "undo",
-                        "text": "Undo"
+                        "text": "${engine:menu#nui-editor-undo}"
                     },
                     {
                         "type": "UIButton",
                         "id": "redo",
-                        "text": "Redo"
+                        "text": "${engine:menu#nui-editor-redo}"
                     },
                     {
                         "type": "UIButton",
                         "id": "settings",
-                        "text": "Settings"
+                        "text": "${engine:menu#settings-title}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "${engine:menu#nui-editor-close}"
                     }
                 ]
             },

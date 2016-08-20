@@ -1,5 +1,5 @@
 {
-    "type": "engine:widgetSelectionScreen",
+    "type": "engine:NUIEditorSettingsScreen",
     "skin": "popup",
     "contents": {
         "type": "relativeLayout",
@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Widget Selection",
+                            "text": "${engine:menu#nui-editor-settings-title}",
                             "family": "title"
                         },
                         {
@@ -30,42 +30,44 @@
                             ]
                         },
                         {
-                            "type": "UILabel",
-                            "text": "Select a widget to add:"
-                        },
-                        {
-                            "type": "UISpace",
-                            "size": [
-                                1,
-                                16
-                            ]
-                        },
-                        {
-                            "type": "UIDropdownScrollable",
-                            "id": "availableWidgets"
-                        },
-                        {
-                            "type": "UISpace",
-                            "size": [
-                                1,
-                                16
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-disable-icons}"
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "disableIcons"
+                                }
                             ]
                         },
                         {
                             "type": "RowLayout",
-                            "horizontalSpacing": 16,
+                            "horizontalSpacing": 8,
                             "contents": [
                                 {
-                                    "type": "UIButton",
-                                    "text": "${engine:menu#dialog-ok}",
-                                    "id": "ok"
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-alternative-locale}"
                                 },
                                 {
-                                    "type": "UIButton",
-                                    "text": "${engine:menu#dialog-cancel}",
-                                    "id": "cancel"
+                                    "type": "UIDropdownScrollable",
+                                    "id": "alternativeLocale"
                                 }
                             ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UIButton",
+                            "text": "${engine:menu#back}",
+                            "id": "close"
                         }
                     ]
                 }
