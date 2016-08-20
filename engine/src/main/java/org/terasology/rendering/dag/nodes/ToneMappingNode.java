@@ -19,9 +19,10 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -30,8 +31,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
@@ -49,13 +48,13 @@ public class ToneMappingNode extends AbstractNode {
     @In
     private Config config;
 
-    private Material toneMapping;
-    private FBO sceneToneMapped;
-
     @Override
     public void initialise() {
         requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
-        toneMapping = worldRenderer.getMaterial("engine:prog.hdr"); // TODO: rename shader to toneMapping)
+
+        addDesiredStateChange(new BindFBO(TONE_MAPPED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial("engine:prog.hdr")); // TODO: rename shader to toneMapping)
+        addDesiredStateChange(new SetViewportSizeOf(TONE_MAPPED, displayResolutionDependentFBOs));
     }
 
     /**
@@ -68,18 +67,9 @@ public class ToneMappingNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
-        sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
 
-        toneMapping.enable();
-
-        sceneToneMapped.bind();
-        setViewportToSizeOf(sceneToneMapped);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // TODO: verify this is necessary
-
         renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
         PerformanceMonitor.endActivity();
     }
