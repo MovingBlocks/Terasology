@@ -22,6 +22,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
+ * Button that opens the NUI screen editor, or closes it if it's active.
  */
 @RegisterBindButton(id = "nuiEditor", description = "${engine:menu#binding-nui-editor}", category = "nui")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F10)

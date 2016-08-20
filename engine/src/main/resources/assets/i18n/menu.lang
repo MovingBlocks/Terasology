@@ -130,6 +130,7 @@
     "nui-editor-close": "nui-editor-close",
     "nui-editor-copy": "nui-editor-copy",
     "nui-editor-disable-icons": "nui-editor-disable-icons",
+    "nui-editor-override": "nui-editor-override",
     "nui-editor-paste": "nui-editor-paste",
     "nui-editor-redo": "nui-editor-redo",
     "nui-editor-save": "nui-editor-save",

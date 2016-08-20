@@ -54,6 +54,7 @@ public class EnumEditorScreen extends CoreScreenLayer {
         enumValues = find("enumValues", UIDropdownScrollable.class);
 
         WidgetUtil.trySubscribe(this, "ok", button -> {
+            // Apply the changes to the node.
             node.getValue().setValue(enumValues.getSelection().toString());
             closeListeners.forEach(UpdateListener::onAction);
             getManager().closeScreen(ASSET_URI);
@@ -62,6 +63,7 @@ public class EnumEditorScreen extends CoreScreenLayer {
         find("ok", UIButton.class).bindEnabled(new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
+                // Disable the OK button if no changes were made.
                 return enumValues.getSelection() != null;
             }
         });

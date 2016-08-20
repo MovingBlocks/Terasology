@@ -40,7 +40,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * A base screen for the NUI screen/skin editors.
@@ -57,7 +62,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      */
     private JsonEditorTreeView editor;
     /**
-     *
+     * Whether unsaved changes in the editor are present.
      */
     private boolean unsavedChangesPresent;
 
@@ -153,6 +158,11 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Resets the editor's state based on a specified {@link JsonTree}.
+     *
+     * @param node The {@link JsonTree} to reset the state from.
+     */
     protected void resetState(JsonTree node) {
         if (unsavedChangesPresent) {
             ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
@@ -165,6 +175,40 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         } else {
             resetStateInternal(node);
         }
+    }
+
+    /**
+     * Saves the contents of the editor as a JSON string to a specified file.
+     *
+     * @param file The file to save to.
+     */
+    protected void saveToFile(File file) {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            saveToFile(outputStream);
+        } catch (IOException e) {
+            logger.warn("Could not save asset", e);
+        }
+    }
+
+    /**
+     * Saves the contents of the editor as a JSON string to a specified file.
+     *
+     * @param path The path to save to.
+     */
+    protected void saveToFile(Path path) {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
+            saveToFile(outputStream);
+        } catch (IOException e) {
+            logger.warn("Could not save asset", e);
+        }
+    }
+
+    private void saveToFile(BufferedOutputStream outputStream) throws IOException {
+        // Serialize tree contents and save to selected file.
+        JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
+        String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
+        outputStream.write(jsonString.getBytes());
+        setUnsavedChangesPresent(false);
     }
 
     /**
@@ -261,7 +305,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         return unsavedChangesPresent;
     }
 
-    protected void setUnsavedChangesPresent(boolean value) {
-        this.unsavedChangesPresent = value;
+    protected void setUnsavedChangesPresent(boolean unsavedChangesPresent) {
+        this.unsavedChangesPresent = unsavedChangesPresent;
     }
 }

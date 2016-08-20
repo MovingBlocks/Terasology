@@ -36,6 +36,11 @@
                 "contents": [
                     {
                         "type": "UIButton",
+                        "id": "override",
+                        "text": "${engine:menu#nui-editor-override}"
+                    },
+                    {
+                        "type": "UIButton",
                         "id": "save",
                         "text": "${engine:menu#nui-editor-save}"
                     },

@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.editor.layers;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -30,6 +29,9 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.PathModule;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -64,12 +66,11 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.Component;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +102,11 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     @In
     private Config config;
     /**
+     * Used to get the {@link Path} of an asset.
+     */
+    @In
+    private ModuleManager moduleManager;
+    /**
      * Used to toggle the editor screen on ESCAPE.
      */
     @In
@@ -109,7 +115,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     private UIBox selectedScreenBox;
 
     /**
-     *
+     * A dropdown containing available asset identifiers.
      */
     private UIDropdownScrollable<String> availableAssetDropdown;
     /**
@@ -117,9 +123,13 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     private String selectedAsset;
     /**
-     *
+     * The Urn of the asset that will be selected after a response to a user prompt.
      */
     private String selectedAssetPending;
+    /**
+     *
+     */
+    private Path selectedAssetPath;
     /**
      * The Urn of the currently selected preview screen.
      */
@@ -164,6 +174,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                     // Construct a new skin tree (or de-serialize from an existing asset)
                     selectedAssetPending = value;
                     if (CREATE_NEW_SKIN.equals(value)) {
+                        selectedAssetPath = null;
                         resetState(NUIEditorNodeUtils.createNewSkin());
                     } else {
                         selectAsset(new ResourceUrn(value));
@@ -208,6 +219,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                 nuiEditorMenuTreeBuilder.subscribeAddContextMenu(n -> {
                     getEditor().fireUpdateListeners();
 
+                    // Automatically edit a node that's been added.
                     getEditor().getModel().getNode(getEditor().getSelectedIndex()).setExpanded(true);
                     getEditor().getModel().resetNodes();
                     getEditor().setSelectedIndex(getEditor().getModel().indexOf(n));
@@ -254,20 +266,13 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                     return dialog;
                 }
             };
+
             fileChooser.setSelectedFile(new File(CREATE_NEW_SKIN.equals(selectedAsset)
                 ? "untitled.skin" : selectedAsset.split(":")[1] + ".skin"));
             fileChooser.setFileFilter(new FileNameExtensionFilter("Skin asset file (*.skin)", "skin"));
+
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
-                    // Serialize tree contents and save to selected file.
-                    JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
-                    String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
-                    outputStream.write(jsonString.getBytes());
-                    setUnsavedChangesPresent(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                saveToFile(fileChooser.getSelectedFile());
             }
 
             // Reload the look and feel.
@@ -275,6 +280,16 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                 UIManager.setLookAndFeel(currentLookAndFeel);
             } catch (UnsupportedLookAndFeelException ignored) {
             }
+        });
+        UIButton override = find("override", UIButton.class);
+        override.bindEnabled(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return selectedAssetPath != null && areUnsavedChangesPresent();
+            }
+        });
+        override.subscribe(button -> {
+            saveToFile(selectedAssetPath);
         });
 
         // Set the handlers for the editor buttons.
@@ -294,11 +309,26 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     @Override
     public void selectAsset(ResourceUrn urn) {
+        boolean isLoaded = assetManager.isLoaded(urn, UISkin.class);
         Optional<UISkin> asset = assetManager.getAsset(urn, UISkin.class);
         if (asset.isPresent()) {
             UISkin skin = asset.get();
-
+            if (!isLoaded) {
+                asset.get().dispose();
+            }
             AssetDataFile source = skin.getSource();
+
+            List<String> path = source.getPath();
+            Name moduleName = new Name(path.get(0));
+            if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+                path.add(source.getFilename());
+                String[] pathArray = path.toArray(new String[path.size()]);
+
+                // Copy all the elements after the first to a separate array for getPath().
+                String first = pathArray[0];
+                String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
+                selectedAssetPath = moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+            }
 
             String content = null;
             try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
@@ -320,6 +350,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     protected void resetStateInternal(JsonTree node) {
         getEditor().setTreeViewModel(node, true);
         resetPreviewWidget();
+
         getEditor().clearHistory();
         updateConfig();
         selectedAsset = selectedAssetPending;
@@ -361,7 +392,8 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                 }
 
             } catch (Throwable t) {
-                String truncatedStackTrace = Joiner.on(System.lineSeparator()).join(Arrays.copyOfRange(ExceptionUtils.getStackFrames(t), 0, 10));
+                String truncatedStackTrace = Joiner.on(System.lineSeparator())
+                    .join(Arrays.copyOfRange(ExceptionUtils.getStackFrames(t), 0, 10));
                 selectedScreenBox.setContent(new UILabel(truncatedStackTrace));
             }
         }
@@ -433,6 +465,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     protected void addWidget(JsonTree node) {
         getManager().pushScreen(WidgetSelectionScreen.ASSET_URI, WidgetSelectionScreen.class);
 
+        // Initialise and show the widget selection screen.
         WidgetSelectionScreen widgetSelectionScreen = (WidgetSelectionScreen) getManager()
             .getScreen(WidgetSelectionScreen.ASSET_URI);
         widgetSelectionScreen.setNode(node);

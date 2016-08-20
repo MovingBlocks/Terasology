@@ -36,6 +36,11 @@ public final class NUIEditorTextEntryBuilder {
     private NUIEditorTextEntryBuilder() {
     }
 
+    /**
+     * @param formatter A text entry formatter.
+     * @param parser    A text entry parser.
+     * @return A {@link UITextEntry} with the given formatter and parser.
+     */
     private static UITextEntry<JsonTree> createEditorEntry(UITextEntry.Formatter<JsonTree> formatter,
                                                            UITextEntry.Parser<JsonTree> parser) {
         UITextEntry<JsonTree> editorEntry = new UITextEntry<>();
@@ -45,6 +50,9 @@ public final class NUIEditorTextEntryBuilder {
         return editorEntry;
     }
 
+    /**
+     * @return A {@link UITextEntry} to be used to edit a JSON value node.
+     */
     public static UITextEntry<JsonTree> createValueEditor() {
         UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().toString();
 
@@ -64,6 +72,9 @@ public final class NUIEditorTextEntryBuilder {
         return createEditorEntry(formatter, parser);
     }
 
+    /**
+     * @return A {@link UITextEntry} to be used to edit a JSON key/value node.
+     */
     public static UITextEntry<JsonTree> createKeyValueEditor() {
         UITextEntry.Formatter<JsonTree> formatter = value -> {
             JsonObject jsonObject = new JsonObject();
@@ -114,6 +125,9 @@ public final class NUIEditorTextEntryBuilder {
         return createEditorEntry(formatter, parser);
     }
 
+    /**
+     * @return A {@link UITextEntry} to be used to edit a JSON array node.
+     */
     public static UITextEntry<JsonTree> createArrayEditor() {
         UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
 
@@ -122,6 +136,9 @@ public final class NUIEditorTextEntryBuilder {
         return createEditorEntry(formatter, parser);
     }
 
+    /**
+     * @return A {@link UITextEntry} to be used to edit a JSON object node.
+     */
     public static UITextEntry<JsonTree> createObjectEditor() {
         UITextEntry.Formatter<JsonTree> formatter = value -> value.getValue().getKey();
 

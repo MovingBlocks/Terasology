@@ -227,6 +227,7 @@ public class NUIEditorMenuTreeBuilder {
         if (clazz != null) {
             for (Field field : ReflectionUtils.getAllFields(clazz)) {
                 if ((!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class))
+                    // Exclude static final fields, as they shouldn't be modified.
                     && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
                     field.setAccessible(true);
                     String name = getNodeName(field);
@@ -295,11 +296,20 @@ public class NUIEditorMenuTreeBuilder {
         node.addChild(widgetTree);
     }
 
+    /**
+     * @param field A class field.
+     * @return The name of the field as it would appear in a JSON file.
+     */
     private String getNodeName(Field field) {
         return field.isAnnotationPresent(SerializedName.class)
             ? field.getAnnotation(SerializedName.class).value() : field.getName();
     }
 
+    /**
+     * @param field A class field.
+     * @param value The value of the field.
+     * @return The type of a JSON node that would contain the field.
+     */
     private JsonTreeValue.Type getNodeType(Field field, Object value) {
         return Enum.class.isAssignableFrom(field.getType()) || value instanceof UISkin
             || value instanceof Boolean || value instanceof String || value instanceof Number
