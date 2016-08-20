@@ -30,6 +30,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.module.PathModule;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
@@ -235,6 +236,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                 resetPreviewWidget();
                 updateConfig();
                 setUnsavedChangesPresent(true);
+                updateAutosave();
             });
         }
 
@@ -273,6 +275,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
 
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 saveToFile(fileChooser.getSelectedFile());
+                deleteAutosave();
             }
 
             // Reload the look and feel.
@@ -290,6 +293,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         });
         override.subscribe(button -> {
             saveToFile(selectedAssetPath);
+            deleteAutosave();
         });
 
         // Set the handlers for the editor buttons.
@@ -302,6 +306,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "close", button -> nuiSkinEditorSystem.toggleEditor());
 
         updateConfig();
+        readAutosave();
     }
 
     /**
@@ -474,5 +479,10 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
             widget.setExpanded(true);
             getEditor().fireUpdateListeners();
         });
+    }
+
+    @Override
+    protected Path getAutosaveFile() {
+        return PathManager.getInstance().getHomePath().resolve("nuiSkinEditorAutosave.json");
     }
 }

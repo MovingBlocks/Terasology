@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -44,7 +45,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 
 /**
@@ -103,6 +106,11 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param node The node to add a new widget to.
      */
     protected abstract void addWidget(JsonTree node);
+
+    /**
+     * @return The path to the backup autosave file.
+     */
+    protected abstract Path getAutosaveFile();
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -170,6 +178,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
                 "\r\nAll unsaved changes will be lost. Continue anyway?");
             confirmPopup.setOkHandler(() -> {
                 setUnsavedChangesPresent(false);
+                deleteAutosave();
                 resetStateInternal(node);
             });
         } else {
@@ -185,6 +194,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected void saveToFile(File file) {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             saveToFile(outputStream);
+            setUnsavedChangesPresent(false);
         } catch (IOException e) {
             logger.warn("Could not save asset", e);
         }
@@ -198,8 +208,48 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected void saveToFile(Path path) {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
             saveToFile(outputStream);
+            setUnsavedChangesPresent(false);
         } catch (IOException e) {
             logger.warn("Could not save asset", e);
+        }
+    }
+
+    /**
+     * Updates the autosave file with the current state of the tree.
+     */
+    protected void updateAutosave() {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(getAutosaveFile()))) {
+            saveToFile(outputStream);
+        } catch (IOException e) {
+            logger.warn("Could not save to autosave file", e);
+        }
+    }
+
+    /**
+     * Resets the editor based on the state of the autosave file.
+     */
+    protected void readAutosave() {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(Files.newInputStream(getAutosaveFile())))) {
+            reader.setLenient(true);
+            String content = new JsonParser().parse(reader).toString();
+            JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
+            resetState(node);
+            setUnsavedChangesPresent(true);
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            logger.warn("Could not load autosaved info", e);
+        }
+    }
+
+    /**
+     * Deletes the autosave file.
+     */
+    protected void deleteAutosave() {
+        try {
+            Files.delete(getAutosaveFile());
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            logger.warn("Could not delete autosave file", e);
         }
     }
 
@@ -208,7 +258,6 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
         String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
         outputStream.write(jsonString.getBytes());
-        setUnsavedChangesPresent(false);
     }
 
     /**
