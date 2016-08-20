@@ -24,21 +24,19 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 /**
  * TODO: Add javadocs
  */
-public final class EnableDepthTest extends SetStateParameter {
+public final class DisableDepthTest extends SetStateParameter {
     private static final int PARAMETER = GL_DEPTH_TEST;
     private static final String PARAMETER_NAME = "GL_DEPTH_TEST";
-    private static StateChange defaultInstance = new EnableDepthTest(false);
-    private static RenderPipelineTask enablingTask;
-    private static RenderPipelineTask disablingTask;
+    private static StateChange defaultInstance = new DisableDepthTest(true);
+    private static RenderPipelineTask enablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
+    private static RenderPipelineTask disablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
 
-    public EnableDepthTest() {
-        this(true);
+    public DisableDepthTest() {
+        this(false);
     }
 
-    private EnableDepthTest(boolean enabled) {
+    private DisableDepthTest(boolean enabled) {
         super(enabled);
-        disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
-        enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }
 
     @Override

@@ -23,32 +23,26 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
+import org.terasology.rendering.dag.stateChanges.EnableBlending;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
 import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
  * TODO: Diagram of this node
  */
 public class LightGeometryNode extends AbstractNode {
-
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
@@ -57,13 +51,16 @@ public class LightGeometryNode extends AbstractNode {
 
     @In
     private EntityManager entityManager;
-
     private Material lightGeometryShader;
-
 
     @Override
     public void initialise() {
         lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
+        addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER));
+        addDesiredStateChange(new DisableDepthTest());
+        addDesiredStateChange(new EnableBlending());
+        addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
     }
 
     @Override
@@ -87,8 +84,10 @@ public class LightGeometryNode extends AbstractNode {
         graphicState.postRenderCleanupLightGeometryStencil();
         */
 
+        // TODO: I removed cleanup and verified that final image was not changed.
+        // TODO: It would be better to have this verified by other eyes as well. -tdgunes
         // LightGeometry requires a cleanup
-        cleanupSceneOpaque();
+
         preRenderSetupLightGeometry();
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
@@ -99,43 +98,16 @@ public class LightGeometryNode extends AbstractNode {
             // TODO: find a more elegant way
             worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
-        postRenderCleanupLightGeometry();
+
         PerformanceMonitor.endActivity();
-
-    }
-
-    // TODO: figure how lighting works and what this does
-    private void postRenderCleanupLightGeometry() {
-        glDisable(GL_STENCIL_TEST);
-        glCullFace(GL_BACK);
-
-        bindDisplay();
     }
 
     // TODO: figure how lighting works and what this does
     private void preRenderSetupLightGeometry() {
-        READ_ONLY_GBUFFER.bind();
-
         // Only write to the light buffer
         READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
-
         glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-        glDepthMask(true);
-        glDisable(GL_DEPTH_TEST);
-
-        glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
     }
 
-    /**
-     * Resets the state after the rendering of the Opaque scene.
-     */
-    private void cleanupSceneOpaque() {
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: probably redundant - verify
-        bindDisplay();
-    }
 }
