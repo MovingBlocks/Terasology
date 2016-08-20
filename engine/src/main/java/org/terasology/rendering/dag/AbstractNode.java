@@ -32,16 +32,11 @@ import org.terasology.rendering.opengl.FBOConfig;
 public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
-    private Set<StateChange> desiredStateChanges;
-    private Map<ResourceUrn, BaseFBOsManager> fboUsages;
-
+    private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
+    private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator;
-
-    protected AbstractNode() {
-        desiredStateChanges = Sets.newLinkedHashSet();
-        fboUsages = Maps.newHashMap();
-    }
+    private boolean enabled = true;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
@@ -97,5 +92,15 @@ public abstract class AbstractNode implements Node {
 
     public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {
         this.taskListGenerator = taskListGenerator;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

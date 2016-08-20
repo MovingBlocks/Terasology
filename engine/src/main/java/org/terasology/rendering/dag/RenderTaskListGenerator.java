@@ -114,12 +114,14 @@ public final class RenderTaskListGenerator {
     private void generateIntermediateList(List<Node> orderedNodes) {
         intermediateList.clear();
         for (Node node : orderedNodes) {
-            node.setTaskListGenerator(this);
-            intermediateList.addAll(node.getDesiredStateChanges());
-            intermediateList.add(node);
-            // Add state changes to reset all desired state changes back to default.
-            for (StateChange stateChange : node.getDesiredStateChanges()) {
-                intermediateList.add(stateChange.getDefaultInstance());
+            if (node.isEnabled()) {
+                node.setTaskListGenerator(this);
+                intermediateList.addAll(node.getDesiredStateChanges());
+                intermediateList.add(node);
+                // Add state changes to reset all desired state changes back to default.
+                for (StateChange stateChange : node.getDesiredStateChanges()) {
+                    intermediateList.add(stateChange.getDefaultInstance());
+                }
             }
         }
         logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug

@@ -21,7 +21,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.nui.properties.Range;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
@@ -40,7 +40,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 /**
  * TODO: Add diagram of this node
  */
-public class BlurPassesNode extends AbstractNode {
+public class BlurPassesNode extends ConditionDependentNode {
     public static final ResourceUrn BLUR_0 = new ResourceUrn("engine:sceneBlur0");
     public static final ResourceUrn BLUR_1 = new ResourceUrn("engine:sceneBlur1");
     public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped");
@@ -68,6 +68,9 @@ public class BlurPassesNode extends AbstractNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         blur = worldRenderer.getMaterial("engine:prog.blur");
+
+        renderingConfig.subscribe(RenderingConfig.BLUR_INTENSITY, this);
+        requiresCondition(() -> renderingConfig.getBlurIntensity() != 0);
         requiresFBO(new FBOConfig(BLUR_0, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(BLUR_1, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
@@ -82,17 +85,15 @@ public class BlurPassesNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.getBlurIntensity() != 0) { // TODO: define state changes after this check is eliminated
-            PerformanceMonitor.startActivity("rendering/blurPasses");
+        PerformanceMonitor.startActivity("rendering/blurPasses");
 
-            sceneBlur0 = displayResolutionDependentFBOs.get(BLUR_0);
-            sceneBlur1 = displayResolutionDependentFBOs.get(BLUR_1);
-            sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
+        sceneBlur0 = displayResolutionDependentFBOs.get(BLUR_0);
+        sceneBlur1 = displayResolutionDependentFBOs.get(BLUR_1);
+        sceneToneMapped = displayResolutionDependentFBOs.get(TONE_MAPPED);
 
-            generateBlur(sceneBlur0);
-            generateBlur(sceneBlur1);
-            PerformanceMonitor.endActivity();
-        }
+        generateBlur(sceneBlur0);
+        generateBlur(sceneBlur1);
+        PerformanceMonitor.endActivity();
     }
 
     private void generateBlur(FBO sceneBlur) {
