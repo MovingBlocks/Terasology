@@ -18,8 +18,10 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
@@ -40,22 +42,21 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 public class PrePostCompositeNode extends AbstractNode {
     public static final ResourceUrn REFLECTIVE_REFRACTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
-
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
     private WorldRenderer worldRenderer;
 
-    private Material prePostComposite;
-
-
     private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
-        prePostComposite = worldRenderer.getMaterial("engine:prog.combine");
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new EnableMaterial("engine:prog.combine"));
+        addDesiredStateChange(new BindFBO(WRITE_ONLY_GBUFFER));
+        // TODO: verify if there should be bound textures after bind.
+        addDesiredStateChange(new SetViewportSizeOf(WRITE_ONLY_GBUFFER));
     }
 
     /**
@@ -65,13 +66,8 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
-        prePostComposite.enable();
         sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE);
 
-        // TODO: verify if there should be bound textures here.
-        WRITE_ONLY_GBUFFER.bind();
-
-        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
@@ -84,7 +80,6 @@ public class PrePostCompositeNode extends AbstractNode {
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
         // TODO: verify why we can't move the buffer attachment to before the swap by using WRITE_ONLY_GBUFFER instead.
         // TODO: See right-side streaks in https://cloud.githubusercontent.com/assets/136392/17794231/456f542a-65b6-11e6-83bb-f2cc3f10ee66.png
-
         PerformanceMonitor.endActivity();
     }
 }

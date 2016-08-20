@@ -63,7 +63,6 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -207,8 +206,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
-        initStateChanges();
-
         NodeFactory nodeFactory = new NodeFactory(context);
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
@@ -265,10 +262,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
 
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
-    }
-
-    private void initStateChanges() {
-        SetViewportSizeOf.setDisplayResolutionDependentFBOs(displayResolutionDependentFBOs);
     }
 
     @Override

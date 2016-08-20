@@ -24,30 +24,27 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChange {
-    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
-    private static DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private static SetViewportSizeOf defaultInstance = new SetViewportSizeOf(READ_ONLY_GBUFFER);
 
     private BaseFBOsManager frameBuffersManager;
     private SetViewportSizeOfTask task;
     private ResourceUrn fboName;
+    private DefaultDynamicFBOs defaultDynamicFBO;
 
     public SetViewportSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
         this.frameBuffersManager = frameBuffersManager;
         this.fboName = fboName;
     }
 
-    private SetViewportSizeOf(ResourceUrn fboName) {
-        this.fboName = fboName;
-    }
-
-    public static void setDisplayResolutionDependentFBOs(DisplayResolutionDependentFBOs displayResolutionDependentFBOs) {
-        SetViewportSizeOf.displayResolutionDependentFBOs = displayResolutionDependentFBOs;
+    public SetViewportSizeOf(DefaultDynamicFBOs defaultDynamicFBO) {
+        this.defaultDynamicFBO = defaultDynamicFBO;
+        this.frameBuffersManager = defaultDynamicFBO.getFrameBufferManager();
+        this.fboName = defaultDynamicFBO.getName();
     }
 
     @Override
@@ -58,9 +55,6 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            if (isTheDefaultInstance()) {
-                frameBuffersManager = displayResolutionDependentFBOs;
-            }
             task = new SetViewportSizeOfTask(fboName);
             frameBuffersManager.subscribe(this);
             update();
@@ -89,8 +83,12 @@ public final class SetViewportSizeOf implements FBOManagerSubscriber, StateChang
 
     @Override
     public void update() {
-        FBO fbo = frameBuffersManager.get(fboName);
-        task.setDimensions(fbo.width(), fbo.height());
+        if (defaultDynamicFBO == null) {
+            FBO fbo = frameBuffersManager.get(fboName);
+            task.setDimensions(fbo.width(), fbo.height());
+        } else {
+            task.setDimensions(defaultDynamicFBO.width(), defaultDynamicFBO.height());
+        }
     }
 
     @Override

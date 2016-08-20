@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
@@ -35,11 +36,16 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     private BindFBOTask task;
     private BaseFBOsManager frameBuffersManager;
-    private final ResourceUrn fboName;
+    private ResourceUrn fboName;
 
     public BindFBO(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
         this.frameBuffersManager = frameBuffersManager;
         this.fboName = fboName;
+    }
+
+    public BindFBO(DefaultDynamicFBOs defaultDynamicFBO) {
+        // TODO: consider removing this constructor whenever defaultDynamicFBOs are nameless
+        this(defaultDynamicFBO.getName(), defaultDynamicFBO.getFrameBufferManager());
     }
 
     private BindFBO(ResourceUrn fboName) {

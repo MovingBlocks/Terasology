@@ -32,6 +32,7 @@ public enum DefaultDynamicFBOs {
 
     private final FBOConfig fboConfig;
     private FBO fbo;
+    private BaseFBOsManager frameBufferManager;
 
     DefaultDynamicFBOs(FBOConfig fboConfig) {
         this.fboConfig = fboConfig;
@@ -100,5 +101,13 @@ public enum DefaultDynamicFBOs {
 
     public ByteBuffer getColorBufferRawData() {
         return fbo.getColorBufferRawData();
+    }
+
+    public BaseFBOsManager getFrameBufferManager() {
+        return frameBufferManager;
+    }
+
+    public void setFrameBufferManager(BaseFBOsManager frameBufferManager) {
+        this.frameBufferManager = frameBufferManager;
     }
 }
