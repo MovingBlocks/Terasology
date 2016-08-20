@@ -22,9 +22,10 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
+import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
@@ -39,11 +40,13 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-
     @Override
     public void initialise() {
         addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs)); // TODO: might be removed, verify it
         // TODO: review - might be redundant to setRenderBufferMask(sceneOpaque) again at the end of the process() method
+
+        addDesiredStateChange(new EnableBlending());
+        addDesiredStateChange(new DisableDepthMask());
     }
 
     @Override
@@ -55,7 +58,6 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
             renderer.renderAlphaBlend();
         }
 
-        postRenderCleanupSimpleBlendMaterials();
         PerformanceMonitor.endActivity();
     }
 
@@ -74,23 +76,11 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      */
     private void preRenderSetupSimpleBlendMaterials() {
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
-        GL11.glEnable(GL_BLEND);
         GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // (*)
-        GL11.glDepthMask(false);
 
         // (*) In this context SRC is Foreground. This effectively says:
         // Resulting RGB = ForegroundRGB * ForegroundAlpha + BackgroundRGB * (1 - ForegroundAlpha)
         // Which might still look complicated, but it's actually the most typical alpha-driven composite.
         // A neat tool to play with this settings can be found here: http://www.andersriggelsen.dk/glblendfunc.php
-    }
-
-    /**
-     * Resets the state after the rendering of semi-opaque/semi-transparent objects.
-     * <p>
-     * See preRenderSetupSimpleBlendMaterials() for additional information.
-     */
-    private void postRenderCleanupSimpleBlendMaterials() {
-        GL11.glDisable(GL_BLEND);
-        GL11.glDepthMask(true);
     }
 }
