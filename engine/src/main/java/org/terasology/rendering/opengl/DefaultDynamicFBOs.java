@@ -24,6 +24,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  */
 public enum DefaultDynamicFBOs {
     // TODO: investigate ways to make these nameless.
+    // TODO: investigate how to remove special handling of default FBOs in state changes (especially BindFBO and SetViewportToSizeOf)
     READ_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), FULL_SCALE, FBO.Type.HDR)
             .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer()),
     WRITE_ONLY_GBUFFER(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), FULL_SCALE, FBO.Type.HDR)

@@ -21,7 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
@@ -54,7 +54,7 @@ public class PrePostCompositeNode extends AbstractNode {
         addDesiredStateChange(new EnableMaterial("engine:prog.combine"));
         addDesiredStateChange(new BindFBO(WRITE_ONLY_GBUFFER));
         // TODO: verify if there should be bound textures after bind.
-        addDesiredStateChange(new SetViewportSizeOf(WRITE_ONLY_GBUFFER));
+        addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
     }
 
     /**

@@ -22,7 +22,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -54,7 +54,7 @@ public class ToneMappingNode extends AbstractNode {
 
         addDesiredStateChange(new BindFBO(TONE_MAPPED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial("engine:prog.hdr")); // TODO: rename shader to toneMapping)
-        addDesiredStateChange(new SetViewportSizeOf(TONE_MAPPED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED, displayResolutionDependentFBOs));
     }
 
     /**

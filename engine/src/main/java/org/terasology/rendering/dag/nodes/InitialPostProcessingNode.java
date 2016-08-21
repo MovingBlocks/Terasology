@@ -22,7 +22,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -55,7 +55,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         addDesiredStateChange(new EnableMaterial("engine:prog.prePost")); // TODO: rename shader to scenePrePost
         // TODO: verify what the inputs are
         addDesiredStateChange(new BindFBO(SCENE_PRE_POST, displayResolutionDependentFBOs)); // TODO: see if we could write this straight into sceneOpaque
-        addDesiredStateChange(new SetViewportSizeOf(SCENE_PRE_POST, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_PRE_POST, displayResolutionDependentFBOs));
     }
 
     /**

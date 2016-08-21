@@ -23,7 +23,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -60,7 +60,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial("engine:prog.lightshaft")); // TODO: rename shader to lightShafts
         addDesiredStateChange(new BindFBO(LIGHT_SHAFTS, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportSizeOf(LIGHT_SHAFTS, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS, displayResolutionDependentFBOs));
     }
 
     @Override

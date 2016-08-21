@@ -28,7 +28,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
@@ -90,7 +90,7 @@ public class ShadowMapNode extends AbstractNode {
 
         // TODO: fix them
         addDesiredStateChange(new BindFBO(SHADOW_MAP, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
     }
 
     @Override

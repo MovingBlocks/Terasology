@@ -22,12 +22,12 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 /**
  * TODO: Add javadocs
  */
-public final class SetViewportSizeOfTask implements RenderPipelineTask {
+public final class SetViewportToSizeOfTask implements RenderPipelineTask {
     private int width;
     private int height;
     private ResourceUrn fboName;
 
-    public SetViewportSizeOfTask(ResourceUrn fboName) {
+    public SetViewportToSizeOfTask(ResourceUrn fboName) {
         this.fboName = fboName;
     }
 
