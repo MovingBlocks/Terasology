@@ -32,9 +32,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 /**
  * TODO: Add diagram of this node
@@ -66,17 +64,12 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE);
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
-
         displayResolutionDependentFBOs.swapReadWriteBuffers();
 
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE);
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
         // TODO: verify why we can't move the buffer attachment to before the swap by using WRITE_ONLY_GBUFFER instead.
         // TODO: See right-side streaks in https://cloud.githubusercontent.com/assets/136392/17794231/456f542a-65b6-11e6-83bb-f2cc3f10ee66.png
