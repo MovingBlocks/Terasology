@@ -85,6 +85,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
             disposeAllFBOs();
             createFBOs();
             updateDefaultFBOs();
+            notifySubscribers();
         }
     }
 
@@ -105,8 +106,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         for (FBOConfig fboConfig : fboConfigs.values()) {
             generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
-
-        notifySubscribers();
     }
 
     private void updateFullScale() {
