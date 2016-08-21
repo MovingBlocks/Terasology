@@ -106,6 +106,8 @@ public class LightGeometryNode extends AbstractNode {
     private void preRenderSetupLightGeometry() {
         // Only write to the light buffer
         READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
+
+        // TODO: define glStencilFunc and glBlendFunc as StateChange.
         glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
     }
