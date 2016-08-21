@@ -99,6 +99,7 @@
     "nui-editor-alternative-locale": "Preview widget locale",
     "nui-editor-close": "Close",
     "nui-editor-copy": "Copy",
+    "nui-editor-disable-autosave": "Disable autosave",
     "nui-editor-disable-icons": "Disable tree view icons",
     "nui-editor-override": "Save",
     "nui-editor-paste": "Paste",

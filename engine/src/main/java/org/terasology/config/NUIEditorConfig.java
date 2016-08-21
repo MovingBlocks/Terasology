@@ -22,6 +22,7 @@ import java.util.Locale;
  */
 public class NUIEditorConfig {
     private boolean disableIcons;
+    private boolean disableAutosave;
     private Locale alternativeLocale;
 
     public boolean isDisableIcons() {
@@ -38,5 +39,13 @@ public class NUIEditorConfig {
 
     public void setAlternativeLocale(Locale alternativeLocale) {
         this.alternativeLocale = alternativeLocale;
+    }
+
+    public boolean isDisableAutosave() {
+        return disableAutosave;
+    }
+
+    public void setDisableAutosave(boolean disableAutosave) {
+        this.disableAutosave = disableAutosave;
     }
 }

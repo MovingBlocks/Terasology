@@ -129,6 +129,7 @@
     "nui-editor-alternative-locale": "nui-editor-alternative-locale",
     "nui-editor-close": "nui-editor-close",
     "nui-editor-copy": "nui-editor-copy",
+    "nui-editor-disable-autosave": "nui-editor-disable-autosave",
     "nui-editor-disable-icons": "nui-editor-disable-icons",
     "nui-editor-override": "nui-editor-override",
     "nui-editor-paste": "nui-editor-paste",

@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
@@ -73,6 +74,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * Whether the autosave has been loaded.
      */
     private boolean autosaveLoaded;
+    /**
+     * Whether autosaving (&loading autosaved files) should be disabled.
+     */
+    private boolean disableAutosave;
 
     /**
      * Selects the current asset to be edited.
@@ -116,6 +121,18 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @return The path to the backup autosave file.
      */
     protected abstract Path getAutosaveFile();
+
+    /**
+     * @return The currently selected asset (or alternative state, i.e. new screen)
+     */
+    protected abstract String getSelectedAsset();
+
+    /**
+     * Sets the selected asset to a specific value.
+     *
+     * @param selectedAsset The value to set the selected asset to.
+     */
+    protected abstract void setSelectedAsset(String selectedAsset);
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -236,10 +253,19 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * Updates the autosave file with the current state of the tree.
      */
     protected void updateAutosave() {
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(getAutosaveFile()))) {
-            saveToFile(outputStream);
-        } catch (IOException e) {
-            logger.warn("Could not save to autosave file", e);
+        if (!disableAutosave) {
+            try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(getAutosaveFile()))) {
+                JsonElement editorContents = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
+
+                JsonObject autosaveObject = new JsonObject();
+                autosaveObject.addProperty("selectedAsset", getSelectedAsset());
+                autosaveObject.add("editorContents", editorContents);
+
+                String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(autosaveObject);
+                outputStream.write(jsonString.getBytes());
+            } catch (IOException e) {
+                logger.warn("Could not save to autosave file", e);
+            }
         }
     }
 
@@ -247,15 +273,22 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * Resets the editor based on the state of the autosave file.
      */
     protected void loadAutosave() {
-        try (JsonReader reader = new JsonReader(new InputStreamReader(Files.newInputStream(getAutosaveFile())))) {
-            reader.setLenient(true);
-            String content = new JsonParser().parse(reader).toString();
-            JsonTree node = JsonTreeConverter.serialize(new JsonParser().parse(content));
-            resetState(node);
-            setUnsavedChangesPresent(true);
-        } catch (NoSuchFileException ignored) {
-        } catch (IOException e) {
-            logger.warn("Could not load autosaved info", e);
+        if (!disableAutosave) {
+            try (JsonReader reader = new JsonReader(new InputStreamReader(Files.newInputStream(getAutosaveFile())))) {
+                reader.setLenient(true);
+                String autosaveString = new JsonParser().parse(reader).toString();
+
+                JsonObject autosaveObject = new JsonParser().parse(autosaveString).getAsJsonObject();
+                String selectedAsset = autosaveObject.get("selectedAsset").getAsString();
+                setSelectedAsset(selectedAsset);
+                JsonTree editorContents = JsonTreeConverter.serialize(autosaveObject.get("editorContents"));
+                resetState(editorContents);
+
+                setUnsavedChangesPresent(true);
+            } catch (NoSuchFileException ignored) {
+            } catch (IOException e) {
+                logger.warn("Could not load autosaved info", e);
+            }
         }
     }
 
@@ -374,5 +407,12 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
     protected void setUnsavedChangesPresent(boolean unsavedChangesPresent) {
         this.unsavedChangesPresent = unsavedChangesPresent;
+    }
+
+    protected void setDisableAutosave(boolean disableAutosave) {
+        this.disableAutosave = disableAutosave;
+        if (disableAutosave) {
+            deleteAutosave();
+        }
     }
 }

@@ -128,7 +128,7 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
      */
     private String selectedAssetPending;
     /**
-     *
+     * The path to the currently selected asset. Null if no path exists.
      */
     private Path selectedAssetPath;
     /**
@@ -410,6 +410,8 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
     protected void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
 
+        setDisableAutosave(nuiEditorConfig.isDisableAutosave());
+
         // Update the editor's item renderer.
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
@@ -480,8 +482,30 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Path getAutosaveFile() {
         return PathManager.getInstance().getHomePath().resolve("nuiSkinEditorAutosave.json");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getSelectedAsset() {
+        return selectedAsset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setSelectedAsset(String selectedAsset) {
+        this.selectedAsset = selectedAsset;
+
+        // Also prevent the asset being reset.
+        this.selectedAssetPending = selectedAsset;
     }
 }
