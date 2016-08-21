@@ -24,8 +24,14 @@ import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.exceptions.InvalidUrnException;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.module.PathModule;
+import org.terasology.naming.Name;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
@@ -51,12 +57,20 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A base screen for the NUI screen/skin editors.
  */
 public abstract class AbstractEditorScreen extends CoreScreenLayer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * Used to get the {@link Path} of an asset.
+     */
+    @In
+    private ModuleManager moduleManager;
 
     /**
      * The editor system.
@@ -133,6 +147,13 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param selectedAsset The value to set the selected asset to.
      */
     protected abstract void setSelectedAsset(String selectedAsset);
+
+    /**
+     * Reset the stored path to an asset file based on an asset urn.
+     *
+     * @param urn The asset urn.
+     */
+    protected abstract void setSelectedAssetPath(ResourceUrn urn);
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -281,6 +302,13 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
                 JsonObject autosaveObject = new JsonParser().parse(autosaveString).getAsJsonObject();
                 String selectedAsset = autosaveObject.get("selectedAsset").getAsString();
                 setSelectedAsset(selectedAsset);
+
+                try {
+                    ResourceUrn urn = new ResourceUrn(selectedAsset);
+                    setSelectedAssetPath(urn);
+                } catch (InvalidUrnException ignored) {
+                }
+
                 JsonTree editorContents = JsonTreeConverter.serialize(autosaveObject.get("editorContents"));
                 resetState(editorContents);
 
@@ -309,6 +337,21 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
         String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
         outputStream.write(jsonString.getBytes());
+    }
+
+    protected Path getPath(AssetDataFile source) {
+        List<String> path = source.getPath();
+        Name moduleName = new Name(path.get(0));
+        if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+            path.add(source.getFilename());
+            String[] pathArray = path.toArray(new String[path.size()]);
+
+            // Copy all the elements after the first to a separate array for getPath().
+            String first = pathArray[0];
+            String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
+            return moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+        }
+        return null;
     }
 
     /**
