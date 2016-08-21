@@ -21,6 +21,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
@@ -31,7 +32,6 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
  * TODO: Diagram of this node
@@ -48,7 +48,6 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private FBO sceneReflectiveRefractive;
     private Camera playerCamera;
     private boolean isHeadUnderWater;
 
@@ -57,6 +56,7 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
         playerCamera = worldRenderer.getActiveCamera();
         displayResolutionDependentFBOs.subscribe(this);
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
     }
 
     @Override
@@ -83,9 +83,6 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
      * accommodate the rendering of the water surface from an underwater point of view.
      */
     private void preRenderSetupSceneReflectiveRefractive() {
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
-        sceneReflectiveRefractive.bind();
-
         // Make sure the water surface is rendered if the player is underwater.
         if (isHeadUnderWater) {
             GL11.glDisable(GL11.GL_CULL_FACE);
@@ -101,7 +98,6 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
         if (isHeadUnderWater) {
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
-        bindDisplay();
     }
 
     @Override

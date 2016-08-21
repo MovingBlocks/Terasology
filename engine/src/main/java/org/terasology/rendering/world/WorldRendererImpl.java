@@ -63,7 +63,6 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -207,8 +206,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
-        initStateChanges();
-
         NodeFactory nodeFactory = new NodeFactory(context);
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
@@ -265,10 +262,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
 
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
-    }
-
-    private void initStateChanges() {
-        SetViewportSizeOf.setDisplayResolutionDependentFBOs(displayResolutionDependentFBOs);
     }
 
     @Override
@@ -544,6 +537,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public boolean isHeadUnderWater() {
+        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
+        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
         Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
 
         // Compensate for waves

@@ -15,6 +15,15 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -25,30 +34,20 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.logic.LightComponent;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
 import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glStencilFunc;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 
 /**
- * TODO: Diagram of this node
+ * TODO: Add desired state changes
  */
 public class LightGeometryNode extends AbstractNode {
-
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
@@ -57,9 +56,7 @@ public class LightGeometryNode extends AbstractNode {
 
     @In
     private EntityManager entityManager;
-
     private Material lightGeometryShader;
-
 
     @Override
     public void initialise() {
@@ -101,7 +98,6 @@ public class LightGeometryNode extends AbstractNode {
         }
         postRenderCleanupLightGeometry();
         PerformanceMonitor.endActivity();
-
     }
 
     // TODO: figure how lighting works and what this does

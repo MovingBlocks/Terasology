@@ -56,6 +56,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         FBOConfig fboConfig = defaultDynamicFBO.getConfig();
         FBO fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         defaultDynamicFBO.setFbo(fbo);
+        defaultDynamicFBO.setFrameBufferManager(this);
     }
 
     @Override
@@ -84,6 +85,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
             disposeAllFBOs();
             createFBOs();
             updateDefaultFBOs();
+            notifySubscribers();
         }
     }
 
@@ -104,8 +106,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         for (FBOConfig fboConfig : fboConfigs.values()) {
             generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
         }
-
-        notifySubscribers();
     }
 
     private void updateFullScale() {
@@ -131,5 +131,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         WRITE_ONLY_GBUFFER.setFbo(fbo);
         fboLookup.put(READ_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getFbo());
         fboLookup.put(WRITE_ONLY_GBUFFER.getName(), WRITE_ONLY_GBUFFER.getFbo());
+        notifySubscribers();
     }
 }

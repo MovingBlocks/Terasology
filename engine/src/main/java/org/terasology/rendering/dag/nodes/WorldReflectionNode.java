@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -27,18 +26,21 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.dag.stateChanges.SetViewportSizeOf;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
 
 /**
  * Diagram of this node can be viewed from:
@@ -70,23 +72,23 @@ public class WorldReflectionNode extends AbstractNode {
 
     @Override
     public void initialise() {
-        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-
         this.renderingConfig = config.getRendering();
         this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
         this.playerCamera = worldRenderer.getActiveCamera();
+
+        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/worldReflection");
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GL11.glCullFace(GL11.GL_FRONT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify if necessary
         playerCamera.setReflected(true);
-
         playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
         // TODO: convert backdropRenderer into a BackdropNode.
         backdropRenderer.render(playerCamera);
@@ -99,11 +101,7 @@ public class WorldReflectionNode extends AbstractNode {
             worldRenderer.renderChunks(renderQueues.chunksOpaqueReflection, ChunkMesh.RenderPhase.OPAQUE, playerCamera, WorldRendererImpl.ChunkRenderMode.REFLECTION);
             chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
         }
-
         playerCamera.setReflected(false);
-
-        GL11.glCullFace(GL11.GL_BACK);
-
 
         PerformanceMonitor.endActivity();
     }

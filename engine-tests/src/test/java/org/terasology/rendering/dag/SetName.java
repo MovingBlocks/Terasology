@@ -16,9 +16,12 @@
 package org.terasology.rendering.dag;
 
 
+import com.google.common.base.Objects;
+
 public class SetName implements StateChange {
     private static SetName defaultInstance = new SetName("bar");
     private SetNameTask task;
+
     private String name;
 
     SetName(String name) {
@@ -39,9 +42,14 @@ public class SetName implements StateChange {
     }
 
     @Override
-    public boolean isEqualTo(StateChange stateChange) {
-        if (stateChange instanceof SetName) {
-            return this.name.equals(((SetName) stateChange).name);
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SetName) {
+            return name.equals(((SetName) obj).getName());
         }
         return false;
     }
@@ -54,6 +62,10 @@ public class SetName implements StateChange {
     @Override
     public String toString() {
         return String.format("%s: %s", this.getClass().getSimpleName(), name);
+    }
+
+    public String getName() {
+        return name;
     }
 }
 

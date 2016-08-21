@@ -21,7 +21,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.ConditionDependentNode;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -38,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 /**
  * TODO: Add diagram of this node
  */
-public class AmbientOcclusionPassesNode extends AbstractNode {
+public class AmbientOcclusionPassesNode extends ConditionDependentNode {
     public static final ResourceUrn SSAO = new ResourceUrn("engine:ssao");
     public static final ResourceUrn SSAO_BLURRED = new ResourceUrn("engine:ssaoBlurred");
 
@@ -62,6 +62,9 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
         renderingConfig = config.getRendering();
         ssaoShader = worldRenderer.getMaterial("engine:prog.ssao");
         ssaoBlurredShader = worldRenderer.getMaterial("engine:prog.ssaoBlur");
+
+        renderingConfig.subscribe(renderingConfig.SSAO, this);
+        requiresCondition(() -> renderingConfig.isSsao());
         requiresFBO(new FBOConfig(SSAO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(SSAO_BLURRED, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
     }
@@ -75,16 +78,15 @@ public class AmbientOcclusionPassesNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.isSsao()) {
-            PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
-            // TODO: consider moving these into initialise without breaking existing implementation
-            ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED);
-            ssaoFBO = displayResolutionDependentFBOs.get(SSAO);
+        PerformanceMonitor.startActivity("rendering/ambientOcclusionPasses");
+        // TODO: consider moving these into initialise without breaking existing implementation
+        ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED);
+        ssaoFBO = displayResolutionDependentFBOs.get(SSAO);
 
-            generateSSAO();
-            generateBlurredSSAO();
-            PerformanceMonitor.endActivity();
-        }
+        // TODO: separate this node into two nodes with using methods below
+        generateSSAO();
+        generateBlurredSSAO();
+        PerformanceMonitor.endActivity();
     }
 
     private void generateSSAO() {

@@ -20,25 +20,23 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.AbstractNode;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * TODO: Add diagram of this node
  */
-public class OutlineNode extends AbstractNode {
+public class OutlineNode extends ConditionDependentNode {
     public static final ResourceUrn OUTLINE = new ResourceUrn("engine:outline");
 
     @In
@@ -51,15 +49,16 @@ public class OutlineNode extends AbstractNode {
     private Config config;
 
     private RenderingConfig renderingConfig;
-    private Material outline;
-    private FBO outlineFBO;
-
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        outline = worldRenderer.getMaterial("engine:prog.sobel");
+        renderingConfig.subscribe(renderingConfig.OUTLINE, this);
+        requiresCondition(() -> renderingConfig.isOutline());
         requiresFBO(new FBOConfig(OUTLINE, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new EnableMaterial("engine:prog.sobel"));
+        // TODO: verify inputs: shouldn't there be a texture binding here?
+        addDesiredStateChange(new BindFBO(OUTLINE, displayResolutionDependentFBOs));
     }
 
     /**
@@ -75,23 +74,12 @@ public class OutlineNode extends AbstractNode {
      */
     @Override
     public void process() {
-        if (renderingConfig.isOutline()) {
-            PerformanceMonitor.startActivity("rendering/outline");
-            outlineFBO = displayResolutionDependentFBOs.get(OUTLINE);
+        PerformanceMonitor.startActivity("rendering/outline");
 
-            outline.enable();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
+        renderFullscreenQuad();
 
-            // TODO: verify inputs: shouldn't there be a texture binding here?
-            outlineFBO.bind();
+        PerformanceMonitor.endActivity();
 
-            setViewportToSizeOf(outlineFBO);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-            renderFullscreenQuad();
-
-            bindDisplay();  // TODO: verify this is necessary
-            setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
-            PerformanceMonitor.endActivity();
-        }
     }
 }

@@ -15,43 +15,19 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import java.util.Objects;
+import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetWireframeTask;
 
 /**
  * TODO: Add javadocs
+ * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
  */
-public final class SetWireframe implements StateChange {
-    private static SetWireframe defaultInstance = new SetWireframe(false);
-    private static SetWireframeTask enablingTask;
-    private static SetWireframeTask disablingTask;
-
+abstract class SetStateParameter implements StateChange {
     private boolean enabled;
 
-    public SetWireframe(boolean enabled) {
+    SetStateParameter(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    @Override
-    public StateChange getDefaultInstance() {
-        return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (enabled) {
-            if (enablingTask == null) {
-                enablingTask = new SetWireframeTask(true);
-            }
-            return enablingTask;
-        } else {
-            if (disablingTask == null) {
-                disablingTask = new SetWireframeTask(false);
-            }
-            return disablingTask;
-        }
     }
 
     @Override
@@ -61,10 +37,9 @@ public final class SetWireframe implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetWireframe) {
-            return this.enabled == ((SetWireframe) obj).isEnabled();
+        if (obj instanceof SetStateParameter) {
+            return this.enabled == ((SetStateParameter) obj).isEnabled();
         }
-
         return false;
     }
 
@@ -73,9 +48,17 @@ public final class SetWireframe implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+    public RenderPipelineTask generateTask() {
+        if (enabled) {
+            return getEnablingTask();
+        } else {
+            return getDisablingTask();
+        }
     }
+
+    protected abstract RenderPipelineTask getDisablingTask();
+
+    protected abstract RenderPipelineTask getEnablingTask();
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
@@ -84,6 +67,6 @@ public final class SetWireframe implements StateChange {
             status = "enabled";
         }
 
-        return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);
+        return String.format(": capability %s", status);
     }
 }

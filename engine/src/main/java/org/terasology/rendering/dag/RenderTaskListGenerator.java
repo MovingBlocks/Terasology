@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +90,7 @@ public final class RenderTaskListGenerator {
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.remove(stateChange.getClass());
 
-                        } else if (!stateChange.isEqualTo(persistentStateChange)) { // another new method, just for readability
+                        } else if (!stateChange.equals(persistentStateChange)) {
                             // non-redundant state change of the same subType but different value, becomes new map entry
                             taskList.add(stateChange.generateTask());
                             persistentStateChanges.put(stateChange.getClass(), stateChange);
@@ -116,13 +115,14 @@ public final class RenderTaskListGenerator {
         intermediateList.clear();
         for (Node node : orderedNodes) {
             node.setTaskListGenerator(this);
-            intermediateList.addAll(node.getDesiredStateChanges());
-            intermediateList.add(node);
-            // Add state changes to reset all desired state changes back to default.
-            for (StateChange stateChange : node.getDesiredStateChanges()) {
-                intermediateList.add(stateChange.getDefaultInstance());
+            if (node.isEnabled()) {
+                intermediateList.addAll(node.getDesiredStateChanges());
+                intermediateList.add(node);
+                // Add state changes to reset all desired state changes back to default.
+                for (StateChange stateChange : node.getDesiredStateChanges()) {
+                    intermediateList.add(stateChange.getDefaultInstance());
+                }
             }
-
         }
         logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
     }

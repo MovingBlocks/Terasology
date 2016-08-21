@@ -37,11 +37,9 @@ public class ObjectsOpaqueNode extends WireframeCapableNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/objectsOpaque");
-
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
-
         PerformanceMonitor.endActivity();
     }
 }

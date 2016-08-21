@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.tasks;
+
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
  * TODO: Add javadocs
  */
-public interface StateChange {
+public final class SetDepthMaskTask implements RenderPipelineTask {
+    private boolean enabled;
 
-    StateChange getDefaultInstance();
+    public SetDepthMaskTask(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-    RenderPipelineTask generateTask();
+    @Override
+    public void execute() {
+        glDepthMask(enabled);
+    }
 
-    boolean isTheDefaultInstance();
+    @Override
+    public String toString() {
+        return String.format("%s: %s", this.getClass().getSimpleName(), enabled);
+    }
 }

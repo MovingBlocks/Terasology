@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.tasks;
+
+import static org.lwjgl.opengl.GL20.glUseProgram;
+import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
  * TODO: Add javadocs
  */
-public interface StateChange {
+public final class DisableMaterialTask implements RenderPipelineTask {
 
-    StateChange getDefaultInstance();
+    @Override
+    public void execute() {
+        glUseProgram(0);
+    }
 
-    RenderPipelineTask generateTask();
-
-    boolean isTheDefaultInstance();
+    @Override
+    public String toString() {
+        return String.format("%21s(0)", this.getClass().getSimpleName());
+    }
 }

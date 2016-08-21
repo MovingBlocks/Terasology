@@ -20,9 +20,10 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.AbstractNode;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -31,14 +32,12 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
  * TODO: Add diagram of this node
  */
-public class LightShaftsNode extends AbstractNode {
+public class LightShaftsNode extends ConditionDependentNode {
     public static final ResourceUrn LIGHT_SHAFTS = new ResourceUrn("engine:lightShafts");
 
     @In
@@ -51,36 +50,26 @@ public class LightShaftsNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     private RenderingConfig renderingConfig;
-    private Material lightShaftsShader;
-    private FBO lightShaftsFBO;
-
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        lightShaftsShader = worldRenderer.getMaterial("engine:prog.lightshaft"); // TODO: rename shader to lightShafts
+
+        renderingConfig.subscribe(renderingConfig.LIGHT_SHAFTS, this);
+        requiresCondition(() -> renderingConfig.isLightShafts());
         requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new EnableMaterial("engine:prog.lightshaft")); // TODO: rename shader to lightShafts
+        addDesiredStateChange(new BindFBO(LIGHT_SHAFTS, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS, displayResolutionDependentFBOs));
     }
 
     @Override
     public void process() {
-        if (renderingConfig.isLightShafts()) {
-            PerformanceMonitor.startActivity("rendering/lightShafts");
-            lightShaftsFBO = displayResolutionDependentFBOs.get(LIGHT_SHAFTS);
+        PerformanceMonitor.startActivity("rendering/lightShafts");
 
-            lightShaftsShader.enable();
-            // TODO: verify what the inputs are
-            lightShaftsFBO.bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
+        renderFullscreenQuad();
 
-            setViewportToSizeOf(lightShaftsFBO);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-            renderFullscreenQuad();
-
-            bindDisplay();     // TODO: verify this is necessary
-            setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
-
-            PerformanceMonitor.endActivity();
-        }
+        PerformanceMonitor.endActivity();
     }
 }
