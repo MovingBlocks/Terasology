@@ -17,6 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import org.terasology.config.Config;
 import org.terasology.config.SystemConfig;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
@@ -101,6 +102,7 @@ public final class Terasology {
     private static final String NO_SOUND = "-noSound";
     private static final String NO_SPLASH = "-noSplash";
     private static final String SERVER_PORT = "-serverPort=";
+    private static final String OVERRIDE_DEFAULT_CONFIG = "-overrideDefaultConfig=";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
@@ -249,6 +251,7 @@ public final class Terasology {
                 NO_SAVE_GAMES,
                 NO_SOUND,
                 NO_SPLASH,
+                OVERRIDE_DEFAULT_CONFIG + "<path>",
                 SERVER_PORT + "<port>");
 
         StringBuilder optText = new StringBuilder();
@@ -282,6 +285,8 @@ public final class Terasology {
         System.out.println("To disable the splash screen use the " + NO_SPLASH + " launch argument.");
         System.out.println();
         System.out.println("To change the port the server is hosted on use the " + SERVER_PORT + " launch argument.");
+        System.out.println();
+        System.out.println("To override the default generated config (useful for headless server) use the " + OVERRIDE_DEFAULT_CONFIG + " launch argument");
         System.out.println();
         System.out.println("Examples:");
         System.out.println();
@@ -320,6 +325,7 @@ public final class Terasology {
             } else if (arg.equals(START_HEADLESS)) {
                 isHeadless = true;
                 crashReportEnabled = false;
+                splashEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
                 System.setProperty(SystemConfig.SAVED_GAMES_ENABLED_PROPERTY, "false");
             } else if (arg.equals(NO_CRASH_REPORT)) {
@@ -332,6 +338,8 @@ public final class Terasology {
                 loadLastGame = true;
             } else if (arg.startsWith(SERVER_PORT)) {
                 System.setProperty(ConfigurationSubsystem.SERVER_PORT_PROPERTY, arg.substring(SERVER_PORT.length()));
+            } else if (arg.startsWith(OVERRIDE_DEFAULT_CONFIG)) {
+                System.setProperty(Config.PROPERTY_OVERRIDE_DEFAULT_CONFIG, arg.substring(OVERRIDE_DEFAULT_CONFIG.length()));
             } else {
                 recognized = false;
             }
@@ -351,7 +359,6 @@ public final class Terasology {
             System.exit(0);
         }
     }
-
 
     private static void populateSubsystems(TerasologyEngineBuilder builder) {
         if (isHeadless) {
