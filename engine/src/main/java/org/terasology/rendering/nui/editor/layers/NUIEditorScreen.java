@@ -276,7 +276,6 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "close", button -> nuiEditorSystem.toggleEditor());
 
         updateConfig();
-        readAutosave();
     }
 
     /**

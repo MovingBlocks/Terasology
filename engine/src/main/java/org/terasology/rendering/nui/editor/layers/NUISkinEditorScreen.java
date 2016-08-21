@@ -306,7 +306,6 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
         WidgetUtil.trySubscribe(this, "close", button -> nuiSkinEditorSystem.toggleEditor());
 
         updateConfig();
-        readAutosave();
     }
 
     /**

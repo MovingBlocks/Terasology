@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -68,6 +69,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * Whether unsaved changes in the editor are present.
      */
     private boolean unsavedChangesPresent;
+    /**
+     * Whether the autosave has been loaded.
+     */
+    private boolean autosaveLoaded;
 
     /**
      * Selects the current asset to be edited.
@@ -111,6 +116,15 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @return The path to the backup autosave file.
      */
     protected abstract Path getAutosaveFile();
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (!autosaveLoaded) {
+            loadAutosave();
+            autosaveLoaded = true;
+        }
+    }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -228,7 +242,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     /**
      * Resets the editor based on the state of the autosave file.
      */
-    protected void readAutosave() {
+    protected void loadAutosave() {
         try (JsonReader reader = new JsonReader(new InputStreamReader(Files.newInputStream(getAutosaveFile())))) {
             reader.setLenient(true);
             String content = new JsonParser().parse(reader).toString();
