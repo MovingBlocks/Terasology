@@ -88,7 +88,13 @@ public class LightGeometryNode extends AbstractNode {
         // TODO: It would be better to have this verified by other eyes as well. -tdgunes
         // LightGeometry requires a cleanup
 
-        preRenderSetupLightGeometry();
+        // TODO: figure how lighting works and what this does
+        // Only write to the light buffer
+        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
+
+        // TODO: define glStencilFunc and glBlendFunc as StateChange.
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -101,15 +107,4 @@ public class LightGeometryNode extends AbstractNode {
 
         PerformanceMonitor.endActivity();
     }
-
-    // TODO: figure how lighting works and what this does
-    private void preRenderSetupLightGeometry() {
-        // Only write to the light buffer
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
-
-        // TODO: define glStencilFunc and glBlendFunc as StateChange.
-        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-    }
-
 }
