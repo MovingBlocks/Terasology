@@ -35,7 +35,7 @@ public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
-    private RenderTaskListGenerator taskListGenerator;
+    private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
     private boolean enabled = true;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
