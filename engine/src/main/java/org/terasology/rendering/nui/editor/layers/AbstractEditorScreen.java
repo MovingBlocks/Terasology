@@ -120,6 +120,10 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        // If the autosave is loaded in initialise(), the preview widget is updated before interface component
+        // sizes are set, which breaks the editor's layout.
+        // Therefore, the autosave is loaded after the first onDraw() call.
         if (!autosaveLoaded) {
             loadAutosave();
             autosaveLoaded = true;
