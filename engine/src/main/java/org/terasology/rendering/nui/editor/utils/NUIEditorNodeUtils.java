@@ -38,8 +38,9 @@ import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public final class NUIEditorNodeUtils {
-    private static final String SAMPLE_LABEL_TEXT = "Welcome to the Terasology NUI editor!\r\n" + "TODO: add tiny " +
-        "tutorial, keybinds etc.";
+    private static final String SAMPLE_LABEL_TEXT = "Welcome to the Terasology NUI editor!\r\n" +
+        "Visit https://github.com/Terasology/TutorialNui/wiki for a quick overview of the editor,\r\n" +
+        "as well as the NUI framework itself.";
 
     private NUIEditorNodeUtils() {
     }
