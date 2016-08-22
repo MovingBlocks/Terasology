@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
-
-import org.terasology.module.sandbox.API;
-import org.terasology.rendering.assets.material.Material;
 
 /**
- * Interface for all shader parameters. Shader parameters can
- * be used to automatically set shader parameters when the
- * corresponding shader program gets activated.
- *
+ * TODO: Add javadocs
  */
-@API
-public interface ShaderParameters {
+@API package org.terasology.rendering.dag.stateChanges;
 
-    void initialParameters(Material material);
+import org.terasology.module.sandbox.API;
 
-    void applyParameters(Material material);
-}
+
+

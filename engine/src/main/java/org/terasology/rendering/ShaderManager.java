@@ -15,8 +15,10 @@
  */
 package org.terasology.rendering;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.shader.ShaderParameters;
 
 public interface ShaderManager {
 
@@ -29,6 +31,8 @@ public interface ShaderManager {
     Material getActiveMaterial();
 
     void recompileAllShaders();
+
+    void loadShader(ResourceUrn shaderName, ShaderParameters shaderParameters);
 
     /**
      * Enables the default shader program.

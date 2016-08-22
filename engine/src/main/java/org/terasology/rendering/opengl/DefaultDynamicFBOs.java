@@ -17,11 +17,13 @@ package org.terasology.rendering.opengl;
 
 import java.nio.ByteBuffer;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.module.sandbox.API;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * TODO: Add javadocs
  */
+@API
 public enum DefaultDynamicFBOs {
     // TODO: investigate ways to make these nameless.
     // TODO: investigate how to remove special handling of default FBOs in state changes (especially BindFBO and SetViewportToSizeOf)

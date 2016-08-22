@@ -19,6 +19,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
@@ -66,6 +68,12 @@ public interface WorldRenderer {
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
      */
     void onChunkUnloaded(Vector3i chunkPos);
+
+    void setRenderGraph(RenderGraph renderGraph);
+
+    void setShadowMapNode(ShadowMapNode shadowNode);
+
+    void clear();
 
     /**
      * Lists the stages the rendering engine may go through on a given frame.

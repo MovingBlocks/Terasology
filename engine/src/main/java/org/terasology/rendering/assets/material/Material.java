@@ -24,6 +24,7 @@ import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -32,6 +33,7 @@ import java.nio.FloatBuffer;
 
 /**
  */
+@API
 public abstract class Material extends Asset<MaterialData> {
 
     protected Material(ResourceUrn urn, AssetType<?, MaterialData> assetType) {

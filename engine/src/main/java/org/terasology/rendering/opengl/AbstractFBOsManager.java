@@ -110,6 +110,17 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         }
     }
 
+    @Override
+    public void clear() {
+        for (FBO fbo : fboLookup.values()) {
+            fbo.dispose();
+        }
+        fboConfigs.clear();
+        fboLookup.clear();
+        fboUsageCountMap.clear();
+        fboManagerSubscribers.clear();
+    }
+
     /**
      * TODO: add javadoc
      *
