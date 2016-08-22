@@ -25,13 +25,12 @@ import org.codehaus.plexus.util.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.exceptions.InvalidUrnException;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.NUIEditorConfig;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.PathModule;
-import org.terasology.naming.Name;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -103,12 +102,6 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     private Config config;
 
     /**
-     * Used to get the {@link Path} of an asset.
-     */
-    @In
-    private ModuleManager moduleManager;
-
-    /**
      * Used to toggle the editor screen on ESCAPE.
      */
     @In
@@ -123,13 +116,13 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
      */
     private String selectedAsset;
     /**
-     *
-     */
-    private Path selectedAssetPath;
-    /**
      * The Urn of the asset that will be selected after a response to a user prompt.
      */
     private String selectedAssetPending;
+    /**
+     * The path to the currently selected asset. Null if no path for the asset exists.
+     */
+    private Path selectedAssetPath;
     /**
      * The widget used as an inline node editor.
      */
@@ -183,6 +176,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 resetPreviewWidget();
                 updateConfig();
                 setUnsavedChangesPresent(true);
+                updateAutosave();
             });
 
             editor.setContextMenuTreeProducer(node -> {
@@ -242,6 +236,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
 
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 saveToFile(fileChooser.getSelectedFile());
+                deleteAutosave();
             }
 
             // Reload the look and feel.
@@ -260,6 +255,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         });
         override.subscribe(button -> {
             saveToFile(selectedAssetPath);
+            deleteAutosave();
         });
 
         // Set the handlers for the editor buttons.
@@ -288,19 +284,6 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             }
 
             AssetDataFile source = element.getSource();
-
-            List<String> path = source.getPath();
-            Name moduleName = new Name(path.get(0));
-            if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
-                path.add(source.getFilename());
-                String[] pathArray = path.toArray(new String[path.size()]);
-
-                // Copy all the elements after the first to a separate array for getPath().
-                String first = pathArray[0];
-                String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
-                selectedAssetPath = moduleManager.getEnvironment().getFileSystem().getPath(first, more);
-            }
-
             String content = null;
             try (JsonReader reader = new JsonReader(new InputStreamReader(source.openStream(), Charsets.UTF_8))) {
                 reader.setLenient(true);
@@ -317,6 +300,9 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void resetStateInternal(JsonTree node) {
         getEditor().setTreeViewModel(node, true);
@@ -325,6 +311,11 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         getEditor().clearHistory();
         updateConfig();
         selectedAsset = selectedAssetPending;
+        try {
+            ResourceUrn urn = new ResourceUrn(selectedAsset);
+            setSelectedAssetPath(urn);
+        } catch (InvalidUrnException ignored) {
+        }
     }
 
     /**
@@ -351,6 +342,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
     protected void updateConfig() {
         NUIEditorConfig nuiEditorConfig = config.getNuiEditor();
 
+        setDisableAutosave(nuiEditorConfig.isDisableAutosave());
         // Update the editor's item renderer.
         getEditor().setItemRenderer(nuiEditorConfig.isDisableIcons()
             ? new ToStringTextRenderer<>() : new NUIEditorItemRenderer(getEditor().getModel()));
@@ -448,5 +440,51 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
             getEditor().setSelectedIndex(getEditor().getModel().indexOf(widget.getChildWithKey("id")));
             editNode(widget.getChildWithKey("id"));
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Path getAutosaveFile() {
+        return PathManager.getInstance().getHomePath().resolve("nuiEditorAutosave.json");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getSelectedAsset() {
+        return selectedAsset;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setSelectedAsset(String selectedAsset) {
+        this.selectedAsset = selectedAsset;
+
+        // Also prevent the asset being reset.
+        this.selectedAssetPending = selectedAsset;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setSelectedAssetPath(ResourceUrn urn) {
+        boolean isLoaded = assetManager.isLoaded(urn, UIElement.class);
+        Optional<UIElement> asset = assetManager.getAsset(urn, UIElement.class);
+        if (asset.isPresent()) {
+            UIElement element = asset.get();
+            if (!isLoaded) {
+                asset.get().dispose();
+            }
+
+            AssetDataFile source = element.getSource();
+            selectedAssetPath = getPath(source);
+        }
     }
 }

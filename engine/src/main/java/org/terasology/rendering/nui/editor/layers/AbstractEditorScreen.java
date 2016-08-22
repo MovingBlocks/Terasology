@@ -17,13 +17,22 @@ package org.terasology.rendering.nui.editor.layers;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.assets.exceptions.InvalidUrnException;
+import org.terasology.assets.format.AssetDataFile;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.Keyboard;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.module.PathModule;
+import org.terasology.naming.Name;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.editor.systems.AbstractEditorSystem;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -44,14 +53,24 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A base screen for the NUI screen/skin editors.
  */
 public abstract class AbstractEditorScreen extends CoreScreenLayer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * Used to get the {@link Path} of an asset.
+     */
+    @In
+    private ModuleManager moduleManager;
 
     /**
      * The editor system.
@@ -65,6 +84,14 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * Whether unsaved changes in the editor are present.
      */
     private boolean unsavedChangesPresent;
+    /**
+     * Whether the autosave has been loaded.
+     */
+    private boolean autosaveLoaded;
+    /**
+     * Whether autosaving (&loading autosaved files) should be disabled.
+     */
+    private boolean disableAutosave;
 
     /**
      * Selects the current asset to be edited.
@@ -103,6 +130,43 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
      * @param node The node to add a new widget to.
      */
     protected abstract void addWidget(JsonTree node);
+
+    /**
+     * @return The path to the backup autosave file.
+     */
+    protected abstract Path getAutosaveFile();
+
+    /**
+     * @return The currently selected asset (or alternative state, i.e. new screen)
+     */
+    protected abstract String getSelectedAsset();
+
+    /**
+     * Sets the selected asset to a specific value.
+     *
+     * @param selectedAsset The value to set the selected asset to.
+     */
+    protected abstract void setSelectedAsset(String selectedAsset);
+
+    /**
+     * Reset the stored path to an asset file based on an asset urn.
+     *
+     * @param urn The asset urn.
+     */
+    protected abstract void setSelectedAssetPath(ResourceUrn urn);
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        // If the autosave is loaded in initialise(), the preview widget is updated before interface component
+        // sizes are set, which breaks the editor's layout.
+        // Therefore, the autosave is loaded after the first onDraw() call.
+        if (!autosaveLoaded) {
+            loadAutosave();
+            autosaveLoaded = true;
+        }
+    }
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
@@ -170,6 +234,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
                 "\r\nAll unsaved changes will be lost. Continue anyway?");
             confirmPopup.setOkHandler(() -> {
                 setUnsavedChangesPresent(false);
+                deleteAutosave();
                 resetStateInternal(node);
             });
         } else {
@@ -185,6 +250,7 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected void saveToFile(File file) {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             saveToFile(outputStream);
+            setUnsavedChangesPresent(false);
         } catch (IOException e) {
             logger.warn("Could not save asset", e);
         }
@@ -198,8 +264,71 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
     protected void saveToFile(Path path) {
         try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
             saveToFile(outputStream);
+            setUnsavedChangesPresent(false);
         } catch (IOException e) {
             logger.warn("Could not save asset", e);
+        }
+    }
+
+    /**
+     * Updates the autosave file with the current state of the tree.
+     */
+    protected void updateAutosave() {
+        if (!disableAutosave) {
+            try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(getAutosaveFile()))) {
+                JsonElement editorContents = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
+
+                JsonObject autosaveObject = new JsonObject();
+                autosaveObject.addProperty("selectedAsset", getSelectedAsset());
+                autosaveObject.add("editorContents", editorContents);
+
+                String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(autosaveObject);
+                outputStream.write(jsonString.getBytes());
+            } catch (IOException e) {
+                logger.warn("Could not save to autosave file", e);
+            }
+        }
+    }
+
+    /**
+     * Resets the editor based on the state of the autosave file.
+     */
+    protected void loadAutosave() {
+        if (!disableAutosave) {
+            try (JsonReader reader = new JsonReader(new InputStreamReader(Files.newInputStream(getAutosaveFile())))) {
+                reader.setLenient(true);
+                String autosaveString = new JsonParser().parse(reader).toString();
+
+                JsonObject autosaveObject = new JsonParser().parse(autosaveString).getAsJsonObject();
+                String selectedAsset = autosaveObject.get("selectedAsset").getAsString();
+                setSelectedAsset(selectedAsset);
+
+                try {
+                    ResourceUrn urn = new ResourceUrn(selectedAsset);
+                    setSelectedAssetPath(urn);
+                } catch (InvalidUrnException ignored) {
+                }
+
+                JsonTree editorContents = JsonTreeConverter.serialize(autosaveObject.get("editorContents"));
+                resetState(editorContents);
+
+                setUnsavedChangesPresent(true);
+            } catch (NoSuchFileException ignored) {
+            } catch (IOException e) {
+                logger.warn("Could not load autosaved info", e);
+            }
+        }
+    }
+
+    /**
+     * Deletes the autosave file.
+     */
+    protected void deleteAutosave() {
+        try {
+            Files.delete(getAutosaveFile());
+        } catch (NoSuchFileException ignored) {
+        } catch (IOException e) {
+            logger.warn("Could not delete autosave file", e);
         }
     }
 
@@ -208,7 +337,21 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
         JsonElement json = JsonTreeConverter.deserialize(getEditor().getModel().getNode(0).getRoot());
         String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(json);
         outputStream.write(jsonString.getBytes());
-        setUnsavedChangesPresent(false);
+    }
+
+    protected Path getPath(AssetDataFile source) {
+        List<String> path = source.getPath();
+        Name moduleName = new Name(path.get(0));
+        if (moduleManager.getEnvironment().get(moduleName) instanceof PathModule) {
+            path.add(source.getFilename());
+            String[] pathArray = path.toArray(new String[path.size()]);
+
+            // Copy all the elements after the first to a separate array for getPath().
+            String first = pathArray[0];
+            String[] more = Arrays.copyOfRange(pathArray, 1, pathArray.length);
+            return moduleManager.getEnvironment().getFileSystem().getPath(first, more);
+        }
+        return null;
     }
 
     /**
@@ -307,5 +450,12 @@ public abstract class AbstractEditorScreen extends CoreScreenLayer {
 
     protected void setUnsavedChangesPresent(boolean unsavedChangesPresent) {
         this.unsavedChangesPresent = unsavedChangesPresent;
+    }
+
+    protected void setDisableAutosave(boolean disableAutosave) {
+        this.disableAutosave = disableAutosave;
+        if (disableAutosave) {
+            deleteAutosave();
+        }
     }
 }

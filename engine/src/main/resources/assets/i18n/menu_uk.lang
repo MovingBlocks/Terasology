@@ -109,6 +109,7 @@
     "nui-editor-alternative-locale": "Мова попереднього перегляду",
     "nui-editor-close": "Закрити",
     "nui-editor-copy": "Копіювати",
+    "nui-editor-disable-autosave": "Відключити автозберігання",
     "nui-editor-disable-icons": "Відключити іконки",
     "nui-editor-override": "Зберегти",
     "nui-editor-paste": "Вставити",

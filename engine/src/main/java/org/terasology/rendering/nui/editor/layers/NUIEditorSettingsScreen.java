@@ -50,6 +50,7 @@ public class NUIEditorSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        WidgetUtil.tryBindCheckbox(this, "disableAutosave", BindHelper.bindBeanProperty("disableAutosave", config.getNuiEditor(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "disableIcons", BindHelper.bindBeanProperty("disableIcons", config.getNuiEditor(), Boolean.TYPE));
         WidgetUtil.trySubscribe(this, "close", button -> getManager().closeScreen(ASSET_URI));
 

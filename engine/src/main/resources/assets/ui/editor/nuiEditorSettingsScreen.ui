@@ -49,6 +49,20 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-disable-autosave}"
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "disableAutosave"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
                                     "text": "${engine:menu#nui-editor-alternative-locale}"
                                 },
                                 {
