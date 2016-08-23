@@ -21,6 +21,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -56,11 +63,6 @@ import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  */
@@ -209,6 +211,54 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         }
         return null;
+    }
+
+    @Override
+    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        Set<RenderableChunk> dirtiedChunks = new HashSet<>();
+        Set<BlockChange> changedBlocks = new HashSet<>();
+        Map<Vector3i, Block> result = new HashMap<>(blocks.size());
+
+        for (Map.Entry<Vector3i, Block> entry : blocks.entrySet()) {
+            Vector3i worldPos = entry.getKey();
+            Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
+            CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+
+            if (chunk != null) {
+                Block type = entry.getValue();
+                Vector3i blockPos = ChunkMath.calcBlockPos(worldPos);
+                chunk.writeLock();
+                Block oldBlockType = chunk.setBlock(blockPos, type);
+                chunk.writeUnlock();
+                if (oldBlockType != type) {
+                    BlockChange oldChange = blockChanges.get(worldPos);
+                    if (oldChange == null) {
+                        blockChanges.put(worldPos, new BlockChange(worldPos, oldBlockType, type));
+                    } else {
+                        oldChange.setTo(type);
+                    }
+                    for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+                        RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+                        if (dirtiedChunk != null) {
+                            dirtiedChunks.add(dirtiedChunk);
+                        }
+                    }
+                    changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
+                }
+                result.put(worldPos, oldBlockType);
+            } else {
+                result.put(worldPos, null);
+            }
+        }
+
+        for (RenderableChunk chunk : dirtiedChunks) {
+            chunk.setDirty(true);
+        }
+        for (BlockChange change : changedBlocks) {
+            notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
+        }
+
+        return result;
     }
 
     private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {

@@ -21,13 +21,9 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-
-import java.util.Map;
 
 /**
  */
@@ -38,8 +34,6 @@ public class BlockPlacingSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {WorldComponent.class}, priority = EventPriority.PRIORITY_TRIVIAL)
     public void placeBlockInWorld(PlaceBlocks event, EntityRef world) {
-        for (Map.Entry<Vector3i, Block> blockEntry : event.getBlocks().entrySet()) {
-            worldProvider.setBlock(blockEntry.getKey(), blockEntry.getValue());
-        }
+        worldProvider.setBlocks(event.getBlocks());
     }
 }
