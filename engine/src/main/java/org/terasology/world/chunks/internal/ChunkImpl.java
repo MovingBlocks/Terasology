@@ -85,7 +85,7 @@ public class ChunkImpl implements Chunk {
 
     private boolean disposed;
     private boolean ready;
-    private boolean dirty;
+    private volatile boolean dirty;
     private boolean animated;
 
     // Rendering
@@ -122,35 +122,6 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void readLock() {
-        readWriteLock.readLock().lock();
-    }
-
-    @Override
-    public void readUnlock() {
-        readWriteLock.readLock().unlock();
-    }
-
-    @Override
-    public void writeLock() {
-        readWriteLock.writeLock().lock();
-    }
-
-    @Override
-    public void writeUnlock() {
-        readWriteLock.writeLock().unlock();
-    }
-
-    @Override
-    public boolean isLocked() {
-        if (readWriteLock.writeLock().tryLock()) {
-            readWriteLock.writeLock().unlock();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public Vector3i getPosition() {
         return new Vector3i(chunkPos);
     }
@@ -162,12 +133,7 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void setDirty(boolean dirty) {
-        writeLock();
-        try {
-            this.dirty = dirty;
-        } finally {
-            writeUnlock();
-        }
+        this.dirty = dirty;
     }
 
     @Override
@@ -539,9 +505,9 @@ public class ChunkImpl implements Chunk {
         disposed = true;
         ready = false;
         disposeMesh();
-        lightData = null;
-        sunlightData = null;
-        sunlightRegenData = null;
+        /*
+         * Explicitly do not clear data, so that background threads that work with the chunk can finish.
+         */
         ChunkMonitor.fireChunkDisposed(this);
     }
 

@@ -220,30 +220,6 @@ public interface ChunkView {
      */
     void setDirtyAround(Region3i blockRegion);
 
-    /**
-     * Locks the chunk view, enabling write operations
-     */
-    void writeLock();
-
-    /**
-     * Unlocks the chunk view, disabling write operations
-     */
-    void writeUnlock();
-
-    /**
-     * Locks the chunk view, enabling write operations
-     */
-    void readLock();
-
-    /**
-     * Unlocks the chunk view, disabling write operations
-     */
-    void readUnlock();
-
-    /**
-     * @return Whether the chunk view is locked and hence whether write operations are allowed.
-     */
-    boolean isLocked();
 
     /**
      * @return Whether the chunk view is still valid - will be false if a chunk has been unloaded since the chunk

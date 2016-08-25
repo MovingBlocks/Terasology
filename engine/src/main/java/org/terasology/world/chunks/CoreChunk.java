@@ -85,16 +85,6 @@ public interface CoreChunk {
 
     Region3i getRegion();
 
-    void writeLock();
-
-    void writeUnlock();
-
-    void readLock();
-
-    void readUnlock();
-
-    boolean isLocked();
-
     int getEstimatedMemoryConsumptionInBytes();
 
     ChunkBlockIterator getBlockIterator();
