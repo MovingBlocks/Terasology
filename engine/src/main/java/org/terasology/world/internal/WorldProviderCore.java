@@ -15,8 +15,7 @@
  */
 package org.terasology.world.internal;
 
-import java.util.Collection;
-import java.util.Map;
+import com.google.api.client.util.Maps;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -25,6 +24,9 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Provides the basic interface for all world providers.
@@ -112,7 +114,16 @@ public interface WorldProviderCore {
      * @return A mapping from world position to previous block type.
      * The value of a map entry is Null if the change failed (because the necessary chunk was not loaded)
      */
-    Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks);
+    default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        Map<Vector3i, Block> resultMap = Maps.newHashMap();
+        for (Map.Entry<Vector3i, Block> entry: blocks.entrySet()) {
+            Block oldBlock = setBlock(entry.getKey(), entry.getValue());
+            resultMap.put(entry.getKey(), oldBlock);
+        }
+        return resultMap;
+    }
+
+
 
     /**
      * Changes the biome at the given position.
