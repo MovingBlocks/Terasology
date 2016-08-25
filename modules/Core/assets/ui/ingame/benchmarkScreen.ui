@@ -1,0 +1,87 @@
+{
+    "type": "Core:BenchmarkScreen",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 300,
+                    "position-left": {},
+                    "position-vertical-center": {},
+                    "height": 300
+                },
+                "content": {
+                    "type": "engine:RelativeLayout",
+                    "contents": [
+                        {
+                            "type": "engine:RelativeLayout",
+                            "id": "header",
+                            "layoutInfo": {
+                                "height": 30
+                            },
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "Benchmark",
+                                    "layoutInfo": {
+                                        "position-left": {},
+                                        "use-content-width": true
+                                    }
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "X",
+                                    "id": "closeButton",
+                                    "layoutInfo": {
+                                        "use-content-height": true,
+                                        "position-top": {},
+                                        "position-right": {},
+                                        "use-content-width": true
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "engine:UIDropdownScrollable",
+                            "id": "dropdown",
+                            "layoutInfo": {
+                                "position-top": {
+                                    "widget": "header",
+                                    "target": "BOTTOM"
+                                },
+                                "use-content-height": true
+                            }
+                        },
+                        {
+                            "type": "UIText",
+                            "text": "",
+                            "id": "textArea",
+                            "layoutInfo": {
+                                "position-top": {
+                                    "widget": "dropdown",
+                                    "target": "BOTTOM"
+                                },
+                                "position-bottom": {
+                                    "widget": "startStopButton",
+                                    "target": "TOP"
+                                }
+                            },
+                            "multiline": true,
+                            "readOnly": true
+                        },
+                        {
+                            "type": "UIButton",
+                            "text": "Start Benchmark",
+                            "layoutInfo": {
+                                "use-content-height": true,
+                                "position-bottom": {}
+                            },
+                            "id": "startStopButton"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
