@@ -15,7 +15,7 @@
  */
 package org.terasology.world.internal;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
