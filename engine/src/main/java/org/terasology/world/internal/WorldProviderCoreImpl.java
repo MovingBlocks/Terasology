@@ -21,13 +21,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -63,6 +56,14 @@ import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  */
@@ -185,6 +186,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block setBlock(Vector3i worldPos, Block type) {
+        /*
+         * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
+         * command "showSCreen BenchmarkScreen".
+         */
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -215,6 +220,10 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        /*
+         * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
+         * command "showSCreen BenchmarkScreen".
+         */
         Set<RenderableChunk> dirtiedChunks = new HashSet<>();
         Set<BlockChange> changedBlocks = new HashSet<>();
         Map<Vector3i, Block> result = new HashMap<>(blocks.size());
