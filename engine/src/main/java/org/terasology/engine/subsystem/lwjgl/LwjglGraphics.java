@@ -213,7 +213,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     }
 
     private void initDisplay() {
-        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card");
+        logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
         try {
             lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
