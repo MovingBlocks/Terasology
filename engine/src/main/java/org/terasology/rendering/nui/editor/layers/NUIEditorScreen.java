@@ -188,13 +188,16 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
                 nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_DELETE, getEditor()::deleteNode);
                 nuiEditorMenuTreeBuilder.putConsumer(NUIEditorMenuTreeBuilder.OPTION_ADD_WIDGET, this::addWidget);
                 nuiEditorMenuTreeBuilder.subscribeAddContextMenu(n -> {
-                    editor.fireUpdateListeners();
+                    getEditor().fireUpdateListeners();
 
                     // Automatically edit a node that's been added.
-                    editor.getModel().getNode(editor.getSelectedIndex()).setExpanded(true);
-                    editor.getModel().resetNodes();
-                    editor.setSelectedIndex(editor.getModel().indexOf(n));
-                    editNode(n);
+                    if (n.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                        getEditor().getModel().getNode(getEditor().getSelectedIndex()).setExpanded(true);
+
+                        getEditor().getModel().resetNodes();
+                        getEditor().setSelectedIndex(getEditor().getModel().indexOf(n));
+                        editNode(n);
+                    }
                 });
                 return nuiEditorMenuTreeBuilder.createPrimaryContextMenu(node);
             });
@@ -365,7 +368,7 @@ public final class NUIEditorScreen extends AbstractEditorScreen {
         Class nodeClass = null;
 
         try {
-            Class parentClass = NUIEditorNodeUtils.getNodeClass((JsonTree) node.getParent(), getManager());
+            Class parentClass = NUIEditorNodeUtils.getNodeInfo((JsonTree) node.getParent(), getManager()).getNodeClass();
 
             if (parentClass != null) {
                 nodeClass = parentClass.getDeclaredField(node.getValue().getKey()).getType();
