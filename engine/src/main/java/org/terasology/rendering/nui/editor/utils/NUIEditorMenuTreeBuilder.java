@@ -217,30 +217,44 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     private void populateContextMenu(JsonTree node, MenuTree addTree, boolean isSkin) {
-        Class clazz;
+        NUIEditorNodeUtils.NodeInfo nodeInfo;
         if (isSkin) {
-            clazz = NUIEditorNodeUtils.getSkinNodeClass(node);
+            nodeInfo = NUIEditorNodeUtils.getSkinNodeInfo(node);
         } else {
-            clazz = NUIEditorNodeUtils.getNodeClass(node, nuiManager);
+            nodeInfo = NUIEditorNodeUtils.getNodeInfo(node, nuiManager);
         }
 
-        if (clazz != null) {
-            for (Field field : ReflectionUtils.getAllFields(clazz)) {
-                if ((!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class))
-                    // Exclude static final fields, as they shouldn't be modified.
-                    && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
-                    field.setAccessible(true);
-                    String name = getNodeName(field);
-                    if (!node.hasChildWithKey(name)) {
-                        addTree.addOption(name, n -> {
-                            try {
-                                JsonTree child = createChild(name, node, field, clazz);
-                                for (Consumer<JsonTree> listener : addContextMenuListeners) {
-                                    listener.accept(child);
+        if (nodeInfo != null) {
+            Class clazz = nodeInfo.getNodeClass();
+            if (clazz != null) {
+                for (Field field : ReflectionUtils.getAllFields(clazz)) {
+                    if ((!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class))
+                        // Exclude static final fields, as they shouldn't be modified.
+                        && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
+                        field.setAccessible(true);
+                        String name = getNodeName(field);
+                        if (!node.hasChildWithKey(name)) {
+                            addTree.addOption(name, n -> {
+                                try {
+                                    JsonTree child = createChild(name, node, field, clazz);
+                                    for (Consumer<JsonTree> listener : addContextMenuListeners) {
+                                        listener.accept(child);
+                                    }
+                                } catch (IllegalAccessException | InstantiationException e) {
+                                    logger.warn("Could not add child", e);
                                 }
-                            } catch (IllegalAccessException | InstantiationException e) {
-                                logger.warn("Could not add child", e);
-                            }
+                            }, node);
+                        }
+                    }
+                }
+                // If the node is part of a layout, add an option to add the layoutInfo node.
+                if (nodeInfo.getLayoutClass() != null) {
+                    String layoutInfo = "layoutInfo";
+                    if (!node.hasChildWithKey(layoutInfo)) {
+                        addTree.addOption(layoutInfo, n -> {
+                            JsonTree child = new JsonTree(new JsonTreeValue(layoutInfo, null, JsonTreeValue.Type.OBJECT));
+                            child.setExpanded(true);
+                            n.addChild(child);
                         }, node);
                     }
                 }

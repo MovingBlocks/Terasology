@@ -107,12 +107,7 @@ public final class NUIEditorNodeUtils {
         return widget;
     }
 
-    /**
-     * @param node       A node in an asset tree.
-     * @param nuiManager The {@link NUIManager} to be used for widget type resolution.
-     * @return The type of the field this node represents.
-     */
-    public static Class getNodeClass(JsonTree node, NUIManager nuiManager) {
+    private static Deque<JsonTree> getPathToRoot(JsonTree node) {
         Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
 
         // Create a stack with the root node at the top and the argument at the bottom.
@@ -122,6 +117,16 @@ public final class NUIEditorNodeUtils {
             currentNode = (JsonTree) currentNode.getParent();
         }
         pathToRoot.push(currentNode);
+        return pathToRoot;
+    }
+
+    /**
+     * @param node       A node in an asset tree.
+     * @param nuiManager The {@link NUIManager} to be used for widget type resolution.
+     * @return The info about this node's type.
+     */
+    public static NodeInfo getNodeInfo(JsonTree node, NUIManager nuiManager) {
+        Deque<JsonTree> pathToRoot = getPathToRoot(node);
 
         // Start iterating from top to bottom.
         Class currentClass = null;
@@ -199,51 +204,43 @@ public final class NUIEditorNodeUtils {
                 .resolve(type, ModuleContext.getContext())
                 .getType();
         }
-        return currentClass;
+        return new NodeInfo(currentClass, activeLayoutClass);
     }
 
     /**
-     * @param node       A node in an asset tree.
-     * @return The type of the field this node represents.
+     * @param node A node in an asset tree.
+     * @return The info about this node's type.
      */
-    public static Class getSkinNodeClass(JsonTree node) {
-        Deque<JsonTree> pathToRoot = Queues.newArrayDeque();
-
-        // Create a stack with the root node at the top and the argument at the bottom.
-        JsonTree currentNode = node;
-        while (!currentNode.isRoot()) {
-            pathToRoot.push(currentNode);
-            currentNode = (JsonTree) currentNode.getParent();
-        }
-        pathToRoot.push(currentNode);
+    public static NodeInfo getSkinNodeInfo(JsonTree node) {
+        Deque<JsonTree> pathToRoot = getPathToRoot(node);
 
         // Start iterating from top to bottom.
-        Class currentClass = null;
+        Class nodeClass = null;
         for (JsonTree n : pathToRoot) {
             if (n.isRoot()) {
-                currentClass = UIStyleFragment.class;
+                nodeClass = UIStyleFragment.class;
             } else {
                 if ("elements".equals(n.getValue().getKey()) || "families".equals(n.getValue().getKey())) {
-                    currentClass = null;
+                    nodeClass = null;
                 } else if (n.getParent().getValue().getKey() != null
                     && ("elements".equals(n.getParent().getValue().getKey())
                     || "families".equals(n.getParent().getValue().getKey()))) {
-                    currentClass = UIStyleFragment.class;
+                    nodeClass = UIStyleFragment.class;
                 } else {
                     String value = n.getValue().toString();
-                    Set<Field> fields = ReflectionUtils.getAllFields(currentClass);
+                    Set<Field> fields = ReflectionUtils.getAllFields(nodeClass);
                     Optional<Field> newField = fields
                         .stream().filter(f -> f.getName().equalsIgnoreCase(value)).findFirst();
 
                     if (newField.isPresent()) {
-                        currentClass = newField.get().getType();
+                        nodeClass = newField.get().getType();
                     } else {
                         Optional<Field> serializedNameField = fields
                             .stream()
                             .filter(f -> f.isAnnotationPresent(SerializedName.class)
                                 && f.getAnnotation(SerializedName.class).value().equals(value)).findFirst();
                         if (serializedNameField.isPresent()) {
-                            currentClass = serializedNameField.get().getType();
+                            nodeClass = serializedNameField.get().getType();
                         } else {
                             return null;
                         }
@@ -251,6 +248,33 @@ public final class NUIEditorNodeUtils {
                 }
             }
         }
-        return currentClass;
+        return new NodeInfo(nodeClass, null);
+    }
+
+    /**
+     * Contains information about a node's types.
+     */
+    public static class NodeInfo {
+        /**
+         * The type of the field this node represents.
+         */
+        private Class nodeClass;
+        /**
+         * The type of the layout this node is a part of. null if it's not a part of a layout.
+         */
+        private Class layoutClass;
+
+        public NodeInfo(Class nodeClass, Class layoutClass) {
+            this.nodeClass = nodeClass;
+            this.layoutClass = layoutClass;
+        }
+
+        public Class getNodeClass() {
+            return nodeClass;
+        }
+
+        public Class getLayoutClass() {
+            return layoutClass;
+        }
     }
 }

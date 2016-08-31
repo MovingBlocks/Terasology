@@ -218,10 +218,13 @@ public final class NUISkinEditorScreen extends AbstractEditorScreen {
                     getEditor().fireUpdateListeners();
 
                     // Automatically edit a node that's been added.
-                    getEditor().getModel().getNode(getEditor().getSelectedIndex()).setExpanded(true);
-                    getEditor().getModel().resetNodes();
-                    getEditor().setSelectedIndex(getEditor().getModel().indexOf(n));
-                    editNode(n);
+                    if (n.getValue().getType() == JsonTreeValue.Type.KEY_VALUE_PAIR) {
+                        getEditor().getModel().getNode(getEditor().getSelectedIndex()).setExpanded(true);
+
+                        getEditor().getModel().resetNodes();
+                        getEditor().setSelectedIndex(getEditor().getModel().indexOf(n));
+                        editNode(n);
+                    }
                 });
                 return nuiEditorMenuTreeBuilder.createPrimarySkinContextMenu(node);
             });
