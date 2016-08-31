@@ -90,6 +90,6 @@ public class ContextMenuUtilsTest extends TerasologyTestingEnvironment {
     }
 
     private Class getNodeType(JsonTree node) {
-        return NUIEditorNodeUtils.getNodeInfo(node, context.get(NUIManager.class));
+        return NUIEditorNodeUtils.getNodeInfo(node, context.get(NUIManager.class)).getNodeClass();
     }
 }
