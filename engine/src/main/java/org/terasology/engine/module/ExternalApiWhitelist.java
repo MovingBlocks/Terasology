@@ -90,6 +90,10 @@ public final class ExternalApiWhitelist {
             .add(java.awt.datatransfer.UnsupportedFlavorException.class)
             .add(java.nio.ByteBuffer.class)
             .add(java.nio.IntBuffer.class)
+            .add(org.lwjgl.opengl.GL11.class)
+            .add(org.lwjgl.opengl.GL13.class)
+            .add(org.terasology.rendering.opengl.OpenGLUtils.class)
+            .add(org.terasology.rendering.world.WorldRenderer.class)
             .build();
 
     private ExternalApiWhitelist() {
