@@ -38,6 +38,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
 * [CustomOreGen](https://github.com/Terasology/CustomOreGen) - library containing an ore distribution algorithm based on [JRoush's CustomOreGen](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1282294-1-4-6-v2-custom-ore-generation-updated-jan-5th)
 * [DamagingBlocks](https://github.com/Terasology/DamagingBlocks) - allows blocks like lava to hurt the player
+* [Dialogs](https://github.com/Terasology/Dialogs) - supports opening dialogs for interactions with NPCs and such
 * [Durability](https://github.com/Terasology/Durability) - library module to support destructible items (wear and tear eventually breaks them)
 * [DynamicCities](https://github.com/Terasology/DynamicCities) - variant of Cities that places then grows cities dynamically over time 
 * [Economy](https://github.com/Terasology/Economy) - a module to simulate a basic supply & demand economy system
@@ -68,6 +69,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MarkovChains](https://github.com/Terasology/MarkovChains) - Library module with some pseudo random math stuff
 * [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
+* [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
@@ -85,8 +87,9 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [PolyWorld](https://github.com/Terasology/PolyWorld) - creates very neat island worlds based on the [map generating algorithm by Amit Patel of Red Blob Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock portal`
 * [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
+* [Potions](https://github.com/Terasology/Potions) - contains a set of assorted potions the player can consume to gain various effects
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
-* ~~[Rails](https://github.com/Terasology/Rails) - railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts~~ (broken, waiting for author's return)
+* [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Seasons](https://github.com/Terasology/Seasons) - adds seasons to the game
 * [ShatteredPlanes](https://github.com/Terasology/ShatteredPlanes) - a world generator focused on canyons, sky islands, and other somewhat radical terrain features
@@ -101,8 +104,13 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [SubstanceMatters](https://github.com/Terasology/SubstanceMatters) - library for the definition and usage of materials in various contexts, such as tools with dynamic looks based on material
 * [Tasks](https://github.com/Terasology/Tasks) - allows for the definition of tasks/quests
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
+* [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
+* [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
+* [TutorialGraphicTweaks](https://github.com/Terasology/TutorialGraphicTweaks) - GSOC 2016 project tutorial / docs. Contains examples of how to modify rendering from a module
+* [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 * [Valentines](https://github.com/Terasology/Valentines) - What is love? Gooey don't hurt me, don't hurt me, no more ... ♫
+* [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
