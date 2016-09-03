@@ -16,16 +16,15 @@
 
 package org.terasology.math;
 
+import java.util.Collection;
+import java.util.Iterator;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
-import java.util.Iterator;
-
 /**
  * Describes an axis-aligned bounded space in 3D integer.
- *
  */
 public final class Region3i implements Iterable<Vector3i> {
     public static final Region3i EMPTY = new Region3i();
@@ -102,6 +101,28 @@ public final class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(min, max);
     }
 
+    /**
+     * Creates a {@link Region3i} that describes the bounding box for the given positions.
+     * <p>
+     * The bounding box of a set of positions is the smallest region such that the region encompasses all those points.
+     * The bounding box for the empty set is the empty region.
+     *
+     * @param positions a (possibly empty) list of positions
+     * @return the smallest region encompassing all given positions.
+     */
+    public static Region3i createBoundingBox(Collection<Vector3i> positions) {
+        if (positions.isEmpty()) {
+            return Region3i.EMPTY;
+        }
+        Vector3i min = Vector3i.one().mul(Integer.MAX_VALUE);
+        Vector3i max = Vector3i.one().mul(Integer.MIN_VALUE);
+        positions.forEach(pos -> {
+            min.min(pos);
+            max.max(pos);
+        });
+        return createFromMinMax(min, max);
+    }
+
     public boolean isEmpty() {
         return size.x + size.y + size().z == 0;
     }
@@ -168,9 +189,11 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     * @param other
-     * @return The region that is encompassed by both this and other. If they
-     * do not overlap then the empty region is returned
+     * Creates a new {@link Region3i} for the region encompassed by both this and other.
+     * If the two regions do not overlap the empty region is returned.
+     *
+     * @param other the region to intersect
+     * @return the region that is encompassed by both this and other, the empty region if they do not overlap
      */
     public Region3i intersect(Region3i other) {
         Vector3i intersectMin = min();
@@ -182,8 +205,10 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     * @param other
-     * @return An iterator over the positions in this region that aren't in other
+     * Returns an {@link Iterator} over the positions of this region that are not encompassed by other.
+     *
+     * @param other the region to subtract
+     * @return an iterator over the positions in this region that aren't in other
      */
     public Iterator<Vector3i> subtract(Region3i other) {
         return new SubtractiveIterator(other);
@@ -192,8 +217,8 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * Creates a new region that is the same as this region but expanded in all directions by the given amount
      *
-     * @param amount
-     * @return A new region
+     * @param amount amount to expand in all directions
+     * @return the original region expanded in all directions by amount
      */
     public Region3i expand(int amount) {
         Vector3i expandedMin = min();
@@ -231,8 +256,10 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     * @param offset
-     * @return A copy of the region offset by the given value
+     * Creates a new region from this moved by the given offset.
+     *
+     * @param offset the offset to move this region
+     * @return a copy of this region that is offset by the given value
      */
     public Region3i move(BaseVector3i offset) {
         Vector3i newMin = min();
@@ -241,20 +268,32 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     * @param pos
-     * @return Whether this region includes pos
+     * Checks whether this region encompasses the given position.
+     *
+     * @param pos the position to check
+     * @return whether this region includes pos
      */
     public boolean encompasses(BaseVector3i pos) {
         return encompasses(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    /**
+     * Checks whether this region encompasses the position given by (x, y, z).
+     *
+     * @param x position on the x-axis
+     * @param y position on the y-axis
+     * @param z position on the z-axis
+     * @return whether this region includes position (x, y, z)
+     */
     public boolean encompasses(int x, int y, int z) {
         return (x >= min.x) && (y >= min.y) && (z >= min.z) && (x < min.x + size.x) && (y < min.y + size.y) && (z < min.z + size.z);
     }
 
     /**
-     * @param pos
-     * @return The nearest position within the region to the given pos.
+     * Returns the point of this region that is closest to the given position.
+     *
+     * @param pos the position to check
+     * @return the nearest position within the region to the given pos
      */
     public Vector3i getNearestPointTo(BaseVector3i pos) {
         Vector3i result = new Vector3i(pos);

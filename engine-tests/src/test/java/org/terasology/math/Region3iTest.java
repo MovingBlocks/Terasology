@@ -17,12 +17,13 @@
 package org.terasology.math;
 
 import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.terasology.math.geom.Vector3i;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -76,6 +77,31 @@ public class Region3iTest {
                 new Vector3i(-2, 4, 0), new Vector3i(-2, 107, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 4, -16));
         for (int i = 0; i < vec1.size(); ++i) {
             assertEquals(expectedRegion, Region3i.createBounded(vec1.get(i), vec2.get(i)));
+        }
+    }
+
+    @Test
+    public void testCreateBoundingBox() {
+        List<List<Vector3i>> vec = Arrays.asList(
+                Collections.emptyList(),
+                Collections.singletonList(new Vector3i(-2, 4, -16)),
+                Arrays.asList(new Vector3i(-2, 4, -16), new Vector3i(4, 4, -16), new Vector3i(-2, 107, -16), new Vector3i(-2, 4, 0),
+                        new Vector3i(4, 107, -16), new Vector3i(4, 4, 0), new Vector3i(-2, 107, 0), new Vector3i(4, 107, 0))
+        );
+
+
+        List<Region3i> expectedRegions = Arrays.asList(
+                Region3i.EMPTY,
+                Region3i.createFromMinMax(new Vector3i(-2, 4, -16), new Vector3i(-2, 4, -16)),
+                Region3i.createFromMinMax(new Vector3i(-2, 4, -16), new Vector3i(4, 107, 0))
+        );
+
+        for (int i = 0; i < vec.size(); i++) {
+            Region3i region = Region3i.createBoundingBox(vec.get(i));
+            assertEquals(expectedRegions.get(i), region);
+            for (Vector3i pos : vec.get(i)) {
+                assertTrue(region.encompasses(pos));
+            }
         }
     }
 
