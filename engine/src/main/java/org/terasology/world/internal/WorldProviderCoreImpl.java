@@ -21,6 +21,12 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -33,6 +39,7 @@ import org.terasology.world.WorldComponent;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.entity.placement.CheckPlacementPermissionEvent;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
@@ -56,14 +63,6 @@ import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  */
@@ -184,12 +183,23 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         return true;
     }
 
+    private boolean canPlaceBlocks(CheckPlacementPermissionEvent event) {
+        getWorldEntity().send(event);
+        boolean consumed = event.isConsumed();
+        return !consumed;
+    }
+
     @Override
-    public Block setBlock(Vector3i worldPos, Block type) {
+    public boolean setBlock(Vector3i worldPos, Block type, EntityRef instigator) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
+        CheckPlacementPermissionEvent event = new CheckPlacementPermissionEvent(worldPos, instigator);
+        if (!canPlaceBlocks(event)) {
+            return false;
+        }
+
         Vector3i chunkPos = ChunkMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -212,21 +222,30 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 }
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
-            return oldBlockType;
+            return true;
 
         }
-        return null;
+        return false;
     }
 
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+    public boolean setBlocks(Map<Vector3i, Block> blocks, EntityRef instigator) {
         /*
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
+        Set<Vector3i> placementPositions = blocks.keySet();
+        Region3i boundingBox = Region3i.createBoundingBox(placementPositions);
+        CheckPlacementPermissionEvent event = new CheckPlacementPermissionEvent(boundingBox, instigator);
+
+        if (!canPlaceBlocks(event)) {
+            return false;
+        }
+
+        boolean successful = true;
+
         Set<RenderableChunk> dirtiedChunks = new HashSet<>();
         Set<BlockChange> changedBlocks = new HashSet<>();
-        Map<Vector3i, Block> result = new HashMap<>(blocks.size());
 
         for (Map.Entry<Vector3i, Block> entry : blocks.entrySet()) {
             Vector3i worldPos = entry.getKey();
@@ -254,9 +273,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     }
                     changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
-                result.put(worldPos, oldBlockType);
             } else {
-                result.put(worldPos, null);
+                //TODO: how to handle unloaded chunks? "skip and continue", or "break and return"?
+                successful = false;
             }
         }
 
@@ -267,7 +286,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
         }
 
-        return result;
+        return successful;
     }
 
     private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {

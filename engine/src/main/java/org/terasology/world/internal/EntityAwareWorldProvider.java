@@ -21,6 +21,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.math.RoundingMode;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -53,14 +60,6 @@ import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
-
-import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  */
@@ -114,16 +113,35 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block type) {
+    public boolean setBlock(Vector3i pos, Block type, EntityRef instigator) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
-            if (oldType != null) {
+            Block oldType = blockEntity.getComponent(BlockComponent.class).getBlock();
+            if (super.setBlock(pos, type, instigator)) {
                 updateBlockEntity(blockEntity, pos, oldType, type, false, Collections.<Class<? extends Component>>emptySet());
+                return true;
             }
-            return oldType;
         }
-        return null;
+        return false;
+    }
+
+    @Override
+    public boolean setBlocks(Map<Vector3i, Block> blocks, EntityRef instigator) {
+        if (GameThread.isCurrentThread()) {
+            Map<Vector3i, Block> oldTypes = Maps.newHashMapWithExpectedSize(blocks.size());
+            for (Vector3i pos : blocks.keySet()) {
+                oldTypes.put(pos, getBlock(pos.x, pos.y, pos.z));
+            }
+
+            if (super.setBlocks(blocks, instigator)) {
+                for (Vector3i pos : blocks.keySet()) {
+                    EntityRef blockEntity = getBlockEntityAt(pos);
+                    Block type = blockEntity.getComponent(BlockComponent.class).getBlock();
+                    updateBlockEntity(blockEntity, pos, oldTypes.get(pos), type, false, Collections.<Class<? extends Component>>emptySet());
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -131,11 +149,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
-            if (oldType != null) {
+            Block oldType = getBlock(pos.x, pos.y, pos.z);
+            if (super.setBlock(pos, type, EntityRef.NULL)) {
                 updateBlockEntity(blockEntity, pos, oldType, type, false, Sets.newHashSet(components));
+                return oldType;
             }
-            return oldType;
         }
         return null;
     }
@@ -171,11 +189,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public Block setBlockForceUpdateEntity(Vector3i pos, Block type) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getBlockEntityAt(pos);
-            Block oldType = super.setBlock(pos, type);
-            if (oldType != null) {
+            Block oldType = blockEntity.getComponent(BlockComponent.class).getBlock();
+            if (super.setBlock(pos, type)) {
                 updateBlockEntity(blockEntity, pos, oldType, type, true, Collections.<Class<? extends Component>>emptySet());
+                return oldType;
             }
-            return oldType;
         }
         return null;
     }

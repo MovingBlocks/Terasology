@@ -19,7 +19,6 @@ package org.terasology.testUtil;
 import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
@@ -103,22 +102,18 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        Block old = blocks.put(pos, type);
-        if (old == null) {
-            return air;
-        }
-        return old;
+    public boolean setBlock(Vector3i pos, Block type, EntityRef instigator) {
+        //TODO: send check permission event?
+        blocks.put(pos, type);
+        return true;
     }
 
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocksToPlace) {
-        Map<Vector3i, Block> result = new HashMap<>(blocks.size());
+    public boolean setBlocks(Map<Vector3i, Block> blocksToPlace) {
         for (Map.Entry<Vector3i, Block> entry : blocksToPlace.entrySet()) {
-            Block b = setBlock(entry.getKey(), entry.getValue());
-            result.put(entry.getKey(), b);
+            blocks.put(entry.getKey(), entry.getValue());
         }
-        return result;
+        return true;
     }
 
     @Override

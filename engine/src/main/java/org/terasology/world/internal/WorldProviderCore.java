@@ -15,7 +15,8 @@
  */
 package org.terasology.world.internal;
 
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.Map;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3i;
@@ -24,9 +25,6 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Provides the basic interface for all world providers.
@@ -97,33 +95,46 @@ public interface WorldProviderCore {
     boolean isRegionRelevant(Region3i region);
 
     /**
-     * Places a block of a specific type at a given position
+     * Places a block of a specific type at a given position.
+     * <p>
+     * Placing a block can fail because the affected chunk was not loaded or if setting a block at the given position is not permitted
+     * (see {@link org.terasology.world.block.entity.placement.CheckPlacementPermissionEvent}).
      *
-     * @param pos  The world position to change
-     * @param type The type of the block to set
-     * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
+     * @param pos  he world position to change
+     * @param type the type of the block to set
+     * @return true if the placement was successful, false if the change failed
      */
-    Block setBlock(Vector3i pos, Block type);
+    default boolean setBlock(Vector3i pos, Block type) {
+        return setBlock(pos, type, EntityRef.NULL);
+    }
+
+    boolean setBlock(Vector3i pos, Block type, EntityRef instigator);
 
     /**
      * Places all given blocks of specific types at their corresponding positions
-     * </p>
-     * Chunks are
+     * <p>
+     * Placmeent of blocks can fail because the affected chunk(s) are not loaded or block placement is not permitted for some position within blocks.
+     * (see {@link org.terasology.world.block.entity.placement.CheckPlacementPermissionEvent}).
      *
-     * @param blocks A mapping from world position to change to the type of block to set
-     * @return A mapping from world position to previous block type.
-     * The value of a map entry is Null if the change failed (because the necessary chunk was not loaded)
+     * @param blocks a mapping from world positions subject to change to the type of block to set
+     * @return true if the placement was successful, false if the change failed
      */
-    default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
-        Map<Vector3i, Block> resultMap = Maps.newHashMap();
-        for (Map.Entry<Vector3i, Block> entry: blocks.entrySet()) {
-            Block oldBlock = setBlock(entry.getKey(), entry.getValue());
-            resultMap.put(entry.getKey(), oldBlock);
-        }
-        return resultMap;
+    default boolean setBlocks(Map<Vector3i, Block> blocks) {
+        return setBlocks(blocks, EntityRef.NULL);
     }
 
+    default boolean setBlocks(Map<Vector3i, Block> blocks, EntityRef instigator) {
+        for (Map.Entry<Vector3i, Block> entry : blocks.entrySet()) {
+            if (!setBlock(entry.getKey(), entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    //TODO boolean setBlocks(Map<Vector3i, Block> blocks, List<Region3i> placementRegions);
+
+    //TODO boolean setBlocks(Map<Vector3i, Block> blocks, List<Region3i> placementRegions, EntityRef instigator);
 
     /**
      * Changes the biome at the given position.

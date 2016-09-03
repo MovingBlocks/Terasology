@@ -93,13 +93,13 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public Block setBlock(Vector3i pos, Block type) {
-        return base.setBlock(pos, type);
+    public boolean setBlock(Vector3i pos, Block type, EntityRef instigator) {
+        return base.setBlock(pos, type, instigator);
     }
 
     @Override
-    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
-        return base.setBlocks(blocks);
+    public boolean setBlocks(Map<Vector3i, Block> blocks, EntityRef instigator) {
+        return base.setBlocks(blocks, instigator);
     }
 
     @Override
