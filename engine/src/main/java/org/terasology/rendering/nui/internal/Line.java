@@ -18,15 +18,33 @@ package org.terasology.rendering.nui.internal;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.terasology.math.geom.Rect2i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Color;
 
 import java.nio.FloatBuffer;
+import java.util.Objects;
 
 /**
- * see http://artgrammer.blogspot.de/2011/05/drawing-nearly-perfect-2d-line-segments.html
+ *
  */
 public class Line {
-    public void draw(float x1, float y1, float x2, float y2, float width, Color color, Color background, float alpha) {
+    /**
+     * Draws a 2D line segment in OpenGL.
+     *
+     * @param x1         The X-coordinate of the segment's start point.
+     * @param y1         The Y-coordinate of the segment's start point.
+     * @param x2         The X-coordinate of the segment's end point.
+     * @param y2         The Y-coordinate of the segment's end point.
+     * @param width      Thickness of the line in pixels.
+     * @param color      The line color.
+     * @param background The background color. Ignored if alpha blending is used.
+     * @param alpha      The alpha channel. If set to 0, alpha blending is not used.
+     * @see <a href="http://artgrammer.blogspot.de/2011/05/drawing-nearly-perfect-2d-line-segments.html">
+     * Drawing nearly perfect 2D line segments in OpenGL
+     * </a>
+     */
+    public static void draw(float x1, float y1, float x2, float y2, float width, Color color, Color background, float alpha) {
         GL20.glUseProgram(0);
         GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
@@ -168,43 +186,43 @@ public class Line {
 
         //draw the line by triangle strip
         float[] lineVertex =
-                {
-                        x1 - tx - rx, y1 - ty - ry,    //fading edge1
-                        x2 - tx - rx, y2 - ty - ry,
-                        x1 - tx, y1 - ty,        //core
-                        x2 - tx, y2 - ty,
-                        x1 + tx, y1 + ty,
-                        x2 + tx, y2 + ty,
-                        x1 + tx + rx, y1 + ty + ry,    //fading edge2
-                        x2 + tx + rx, y2 + ty + ry
-                };
+            {
+                x1 - tx - rx, y1 - ty - ry,    //fading edge1
+                x2 - tx - rx, y2 - ty - ry,
+                x1 - tx, y1 - ty,        //core
+                x2 - tx, y2 - ty,
+                x1 + tx, y1 + ty,
+                x2 + tx, y2 + ty,
+                x1 + tx + rx, y1 + ty + ry,    //fading edge2
+                x2 + tx + rx, y2 + ty + ry
+            };
         GL11.glVertexPointer(2, 0, wrap(lineVertex));
 
         if (!alphaBlend) {
             float[] lineColor =
-                    {
-                            bRed, bGreen, bBlue,
-                            bRed, bGreen, bBlue,
-                            cRed, cGreen, cBlue,
-                            cRed, cGreen, cBlue,
-                            cRed, cGreen, cBlue,
-                            cRed, cGreen, cBlue,
-                            bRed, bGreen, bBlue,
-                            bRed, bGreen, bBlue
-                    };
+                {
+                    bRed, bGreen, bBlue,
+                    bRed, bGreen, bBlue,
+                    cRed, cGreen, cBlue,
+                    cRed, cGreen, cBlue,
+                    cRed, cGreen, cBlue,
+                    cRed, cGreen, cBlue,
+                    bRed, bGreen, bBlue,
+                    bRed, bGreen, bBlue
+                };
             GL11.glColorPointer(3, 0, wrap(lineColor));
         } else {
             float[] lineColor =
-                    {
-                            cRed, cGreen, cBlue, 0,
-                            cRed, cGreen, cBlue, 0,
-                            cRed, cGreen, cBlue, a,
-                            cRed, cGreen, cBlue, a,
-                            cRed, cGreen, cBlue, a,
-                            cRed, cGreen, cBlue, a,
-                            cRed, cGreen, cBlue, 0,
-                            cRed, cGreen, cBlue, 0
-                    };
+                {
+                    cRed, cGreen, cBlue, 0,
+                    cRed, cGreen, cBlue, 0,
+                    cRed, cGreen, cBlue, a,
+                    cRed, cGreen, cBlue, a,
+                    cRed, cGreen, cBlue, a,
+                    cRed, cGreen, cBlue, a,
+                    cRed, cGreen, cBlue, 0,
+                    cRed, cGreen, cBlue, 0
+                };
             GL11.glColorPointer(4, 0, wrap(lineColor));
         }
 
@@ -218,43 +236,43 @@ public class Line {
         if (width >= 3) {
             //draw cap
             lineVertex = new float[]
-                    {
-                            x1 - rx + cx, y1 - ry + cy,    //cap1
-                            x1 + rx + cx, y1 + ry + cy,
-                            x1 - tx - rx, y1 - ty - ry,
-                            x1 + tx + rx, y1 + ty + ry,
-                            x2 - rx - cx, y2 - ry - cy,    //cap2
-                            x2 + rx - cx, y2 + ry - cy,
-                            x2 - tx - rx, y2 - ty - ry,
-                            x2 + tx + rx, y2 + ty + ry
-                    };
+                {
+                    x1 - rx + cx, y1 - ry + cy,    //cap1
+                    x1 + rx + cx, y1 + ry + cy,
+                    x1 - tx - rx, y1 - ty - ry,
+                    x1 + tx + rx, y1 + ty + ry,
+                    x2 - rx - cx, y2 - ry - cy,    //cap2
+                    x2 + rx - cx, y2 + ry - cy,
+                    x2 - tx - rx, y2 - ty - ry,
+                    x2 + tx + rx, y2 + ty + ry
+                };
             GL11.glVertexPointer(2, 0, wrap(lineVertex));
 
             if (!alphaBlend) {
                 float[] lineColor =
-                        {
-                                bRed, bGreen, bBlue,    //cap1
-                                bRed, bGreen, bBlue,
-                                cRed, cGreen, cBlue,
-                                cRed, cGreen, cBlue,
-                                bRed, bGreen, bBlue,    //cap2
-                                bRed, bGreen, bBlue,
-                                cRed, cGreen, cBlue,
-                                cRed, cGreen, cBlue
-                        };
+                    {
+                        bRed, bGreen, bBlue,    //cap1
+                        bRed, bGreen, bBlue,
+                        cRed, cGreen, cBlue,
+                        cRed, cGreen, cBlue,
+                        bRed, bGreen, bBlue,    //cap2
+                        bRed, bGreen, bBlue,
+                        cRed, cGreen, cBlue,
+                        cRed, cGreen, cBlue
+                    };
                 GL11.glColorPointer(3, 0, wrap(lineColor));
             } else {
                 float[] lineColor =
-                        {
-                                cRed, cGreen, cBlue, 0,    //cap1
-                                cRed, cGreen, cBlue, 0,
-                                cRed, cGreen, cBlue, a,
-                                cRed, cGreen, cBlue, a,
-                                cRed, cGreen, cBlue, 0,    //cap2
-                                cRed, cGreen, cBlue, 0,
-                                cRed, cGreen, cBlue, a,
-                                cRed, cGreen, cBlue, a
-                        };
+                    {
+                        cRed, cGreen, cBlue, 0,    //cap1
+                        cRed, cGreen, cBlue, 0,
+                        cRed, cGreen, cBlue, a,
+                        cRed, cGreen, cBlue, a,
+                        cRed, cGreen, cBlue, 0,    //cap2
+                        cRed, cGreen, cBlue, 0,
+                        cRed, cGreen, cBlue, a,
+                        cRed, cGreen, cBlue, a
+                    };
                 GL11.glColorPointer(4, 0, wrap(lineColor));
             }
 
@@ -268,10 +286,80 @@ public class Line {
 
     }
 
-    private FloatBuffer wrap(float[] data) {
+    private static FloatBuffer wrap(float[] data) {
         FloatBuffer buf = BufferUtils.createFloatBuffer(data.length);
         buf.put(data);
         buf.rewind();
         return buf;
+    }
+
+    public static LineCoordinates getLineCoordinates(int startX, int startY, int endX, int endY, Rect2i baseRegion, Rect2i cropRegion) {
+        Rect2i region = Rect2i.createFromMinAndMax(Math.min(startX, endX), Math.min(startY, endY),
+            Math.max(startX, endX), Math.max(startY, endY));
+        Rect2i absoluteRegion = relativeToAbsolute(region, baseRegion);
+        Rect2i finalRegion = cropRegion.intersect(absoluteRegion);
+
+        if (!finalRegion.isEmpty()) {
+            int sx = startX > endX ? finalRegion.maxX() : finalRegion.minX();
+            int sy = startY > endY ? finalRegion.maxY() : finalRegion.minY();
+            int ex = startX > endX ? finalRegion.minX() : finalRegion.maxX();
+            int ey = startY > endY ? finalRegion.minY() : finalRegion.maxY();
+            return new LineCoordinates(new Vector2i(sx, sy), new Vector2i(ex, ey));
+        } else {
+            return null;
+        }
+    }
+
+    public static Rect2i relativeToAbsolute(Rect2i region, Rect2i baseRegion) {
+        return Rect2i.createFromMinAndSize(region.minX() + baseRegion.minX(), region.minY() + baseRegion.minY(), region.width(), region.height());
+    }
+
+    /**
+     * Helper class that wraps a line's start and end points.
+     */
+    public static class LineCoordinates {
+        /**
+         * The start point.
+         */
+        private Vector2i start;
+        /**
+         * The end point.
+         */
+        private Vector2i end;
+
+        public LineCoordinates(Vector2i start, Vector2i end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public Vector2i getStart() {
+            return this.start;
+        }
+
+        public Vector2i getEnd() {
+            return this.end;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.start, this.end);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || !(o instanceof LineCoordinates)) {
+                return false;
+            }
+            if (o == this) {
+                return true;
+            }
+            LineCoordinates other = (LineCoordinates) o;
+            return this.start.equals(other.start) && this.end.equals(other.end);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("[%s %s]", this.start, this.end);
+        }
     }
 }

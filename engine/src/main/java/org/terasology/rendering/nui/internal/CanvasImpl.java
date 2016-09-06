@@ -21,7 +21,6 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.engine.Time;
@@ -61,6 +60,7 @@ import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.utilities.Assets;
 
 import java.util.Deque;
 import java.util.Iterator;
@@ -179,7 +179,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         mouseOverRegions.stream().filter(region -> !newMouseOverRegions.contains(region)).forEach(region ->
-                region.listener.onMouseLeave());
+            region.listener.onMouseLeave());
 
         if (clickedRegion != null && !interactionRegions.contains(clickedRegion)) {
             clickedRegion = null;
@@ -208,7 +208,7 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
         boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
-                && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
+            && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
         lastClickPosition.set(pos);
         lastClickButton = button;
         lastClickTime = time.getGameTimeInMs();
@@ -430,7 +430,7 @@ public class CanvasImpl implements CanvasControl {
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
             drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(),
-                    style.getVerticalTextAlignment());
+                style.getVerticalTextAlignment());
         } else {
             drawTextRaw(text, style.getFont(), style.getTextColor(), style.isTextUnderlined(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
@@ -585,8 +585,8 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh) {
         drawTextureRaw(texture, region, mode,
-                (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
-                (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
+            (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
+            (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
@@ -618,8 +618,8 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, int ux, int uy, int uw, int uh) {
         drawTextureRawBordered(texture, region, border, tile,
-                (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
-                (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
+            (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
+            (float) uw / texture.getWidth(), (float) uh / texture.getHeight());
     }
 
     @Override
@@ -718,21 +718,13 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawLine(int startX, int startY, int endX, int endY, Color color) {
-        Rect2i region = Rect2i.createFromMinAndMax(Math.min(startX, endX), Math.min(startY, endY),
-                Math.max(startX, endX), Math.max(startY, endY));
-        Rect2i absoluteRegion = relativeToAbsolute(region);
-        Rect2i finalRegion = state.cropRegion.intersect(absoluteRegion);
+        Line.LineCoordinates lc = Line.getLineCoordinates(startX, startY, endX, endY, state.drawRegion, state.cropRegion);
 
-        if (!finalRegion.isEmpty()) {
-            int sx = startX >= endX ? finalRegion.minX() : finalRegion.maxX();
-            int sy = startY >= endY ? finalRegion.minY() : finalRegion.maxY();
-            int ex = startX >= endX ? finalRegion.maxX() : finalRegion.minX();
-            int ey = startY >= endY ? finalRegion.maxY() : finalRegion.minY();
-
+        if (lc != null) {
             if (state.drawOnTop) {
-                drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
+                drawOnTopOperations.add(new DrawLineOperation(lc.getStart().x, lc.getStart().y, lc.getEnd().x, lc.getEnd().y, color));
             } else {
-                renderer.drawLine(sx, sy, ex, ey, color);
+                renderer.drawLine(lc.getStart().x, lc.getStart().y, lc.getEnd().x, lc.getEnd().y, color);
             }
         }
     }
@@ -744,7 +736,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
-        return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
+        return Line.relativeToAbsolute(region, state.drawRegion);
     }
 
     /**
