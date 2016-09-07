@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class LineTest {
-    private static final int RANDOM_TEST_COUNT = 25;
     private Rect2i cropRegion;
 
     @Before
@@ -34,50 +33,46 @@ public class LineTest {
 
     @Test
     public void testRelativeToAbsolute() {
-        for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
-            Rect2i relativeRegion = Rect2i.createFromMinAndMax(shortRnd(), shortRnd(), shortRnd(), shortRnd());
+        Rect2i relativeRegion = Rect2i.createFromMinAndMax(5, 10, 20, 15);
 
-            assertEquals(Line.relativeToAbsolute(relativeRegion, cropRegion),
-                Rect2i.createFromMinAndSize(cropRegion.minX() + relativeRegion.minX(), cropRegion.minY() + relativeRegion.minY(),
-                    relativeRegion.width(), relativeRegion.height()));
-        }
+        assertEquals(Line.relativeToAbsolute(relativeRegion, cropRegion),
+            Rect2i.createFromMinAndSize(cropRegion.minX() + relativeRegion.minX(), cropRegion.minY() + relativeRegion.minY(),
+                relativeRegion.width(), relativeRegion.height()));
     }
 
     @Test
     public void testLineCoordinatesNoIntersection() {
-        for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
-            // Line is located in the bottom left, outside the region
-            int sx = cropRegion.minX() - shortRnd();
-            int sy = cropRegion.minY() - shortRnd();
-            int ex = cropRegion.minX() - shortRnd();
-            int ey = cropRegion.minY() - shortRnd();
+        //Line is located in the bottom left, outside the region
+        int sx = cropRegion.minX() - 5;
+        int sy = cropRegion.minY() - 5;
+        int ex = cropRegion.minX() - 5;
+        int ey = cropRegion.minY() - 5;
 
-            assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
+        assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
 
-            // Top left
-            sx = cropRegion.minX() - shortRnd();
-            sy = cropRegion.maxY() + shortRnd();
-            ex = cropRegion.minX() - shortRnd();
-            ey = cropRegion.maxY() + shortRnd();
+        // Top left
+        sx = cropRegion.minX() - 5;
+        sy = cropRegion.maxY() + 5;
+        ex = cropRegion.minX() - 5;
+        ey = cropRegion.maxY() + 5;
 
-            assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
+        assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
 
-            // Bottom right
-            sx = cropRegion.maxX() + shortRnd();
-            sy = cropRegion.minY() - shortRnd();
-            ex = cropRegion.maxX() + shortRnd();
-            ey = cropRegion.maxY() - shortRnd();
+        // Bottom right
+        sx = cropRegion.maxX() + 5;
+        sy = cropRegion.minY() - 5;
+        ex = cropRegion.maxX() + 5;
+        ey = cropRegion.maxY() - 5;
 
-            assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
+        assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
 
-            // Top right
-            sx = cropRegion.maxX() + shortRnd();
-            sy = cropRegion.maxY() + shortRnd();
-            ex = cropRegion.maxX() + shortRnd();
-            ey = cropRegion.maxY() + shortRnd();
+        // Top right
+        sx = cropRegion.maxX() + 5;
+        sy = cropRegion.maxY() + 5;
+        ex = cropRegion.maxX() + 5;
+        ey = cropRegion.maxY() + 5;
 
-            assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
-        }
+        assertNull(Line.getLineCoordinates(sx, sy, ex, ey, Rect2i.EMPTY, cropRegion));
     }
 
     @Test
@@ -93,10 +88,4 @@ public class LineTest {
             Line.getLineCoordinates(20, 25, 40, 40, Rect2i.EMPTY, cropRegion));
     }
 
-    /**
-     * @return A random integer ranging from 1 to 5 (inclusive)
-     */
-    private int shortRnd() {
-        return (int) (Math.random() * 5) + 1;
-    }
 }
