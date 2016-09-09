@@ -164,17 +164,16 @@ public final class ChunkMeshUpdateManager {
             ChunkMesh newMesh;
             ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
             if (chunkView != null) {
+                /*
+                 * Important set dirty flag first, so that a concurrent modification of the chunk in the mean time we
+                 * will end up with a dirty chunk.
+                 */
                 c.setDirty(false);
-                chunkView.readLock();
-                try {
-                    if (chunkView.isValidView()) {
-                        newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
+                if (chunkView.isValidView()) {
+                    newMesh = tessellator.generateMesh(chunkView, ChunkConstants.SIZE_Y, 0);
 
-                        c.setPendingMesh(newMesh);
-                        ChunkMonitor.fireChunkTessellated(c.getPosition(), newMesh);
-                    }
-                } finally {
-                    chunkView.readUnlock();
+                    c.setPendingMesh(newMesh);
+                    ChunkMonitor.fireChunkTessellated(c.getPosition(), newMesh);
                 }
 
             }

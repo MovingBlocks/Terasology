@@ -27,7 +27,6 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.liquid.LiquidData;
 
 /**
@@ -46,10 +45,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     private Block defaultBlock;
 
-    private ThreadLocal<Boolean> locked = new ThreadLocal<>();
-
     public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset, Block defaultBlock) {
-        locked.set(false);
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
@@ -156,9 +152,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setBlock(int blockX, int blockY, int blockZ, Block type) {
-        if (!locked.get()) {
-            throw new IllegalStateException("Attempted to modify block though an unlocked view");
-        } else if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setBlock(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
         } else {
@@ -173,9 +167,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setBiome(int blockX, int blockY, int blockZ, Biome biome) {
-        if (!locked.get()) {
-            throw new IllegalStateException("Attempted to modify biome though an unlocked view");
-        } else if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             Vector3i pos = ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
             chunks[chunkIndex].setBiome(pos.x, pos.y, pos.z, biome);
@@ -206,7 +198,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setLiquid(int x, int y, int z, LiquidData newState) {
-        if (locked.get() && blockRegion.encompasses(x, y, z)) {
+        if (blockRegion.encompasses(x, y, z)) {
             int chunkIndex = relChunkIndex(x, y, z);
             chunks[chunkIndex].setLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
         } else {
@@ -221,11 +213,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
-        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setLight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
-        } else if (!locked.get()) {
-            throw new IllegalStateException("Attempted to modify light though an unlocked view");
         } else {
             logger.warn("Attempted to set light at a position not encompassed by the view");
         }
@@ -238,7 +228,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
-        if (locked.get() && blockRegion.encompasses(blockX, blockY, blockZ)) {
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
             chunks[chunkIndex].setSunlight(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), light);
         } else {
@@ -266,45 +256,6 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         for (Vector3i pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
-    }
-
-    @Override
-    public void writeLock() {
-        if (!locked.get()) {
-            for (RenderableChunk chunk : chunks) {
-                chunk.writeLock();
-            }
-            locked.set(true);
-        }
-    }
-
-    @Override
-    public void writeUnlock() {
-        if (locked.get()) {
-            locked.set(false);
-            for (RenderableChunk chunk : chunks) {
-                chunk.writeUnlock();
-            }
-        }
-    }
-
-    @Override
-    public void readLock() {
-        for (RenderableChunk chunk : chunks) {
-            chunk.readLock();
-        }
-    }
-
-    @Override
-    public void readUnlock() {
-        for (RenderableChunk chunk : chunks) {
-            chunk.readUnlock();
-        }
-    }
-
-    @Override
-    public boolean isLocked() {
-        return locked.get();
     }
 
     @Override
