@@ -17,26 +17,24 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.context.Context;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.BaseQuat4f;
 import org.terasology.math.geom.BaseVector2i;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Rect2f;
+import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
@@ -52,6 +50,7 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
 import org.terasology.rendering.opengl.LwjglFrameBufferObject;
+import org.terasology.utilities.Assets;
 
 import java.nio.FloatBuffer;
 import java.util.Iterator;
@@ -88,7 +87,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private Mesh billboard;
-    private Line line = new Line();
 
     private Material textureMat;
 
@@ -239,7 +237,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     @Override
     public void drawLine(int sx, int sy, int ex, int ey, Color color) {
-        line.draw(sx, sy, ex, ey, 2, color, color, 0);
+        Line.draw(sx, sy, ex, ey, 2, color, color, 0);
     }
 
     @Override
