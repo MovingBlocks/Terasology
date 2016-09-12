@@ -25,7 +25,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.oculusVr.OculusVrHelper;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;

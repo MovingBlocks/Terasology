@@ -138,7 +138,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.shaderManager = context.get(ShaderManager.class);
-        if (renderingConfig.isOculusVrSupport()) {
+        if (renderingConfig.isVrSupport()) {
             this.vrProvider = new OpenVRProvider();
             playerCamera = new OpenVRStereoCamera(this.vrProvider);
             currentRenderingStage = RenderingStage.LEFT_EYE;
@@ -235,7 +235,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
-        if (renderingConfig.isOculusVrSupport()) {
+        if (renderingConfig.isVrSupport()) {
             Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
             ((CopyToVRFrameBuffersNode)copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
             renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");

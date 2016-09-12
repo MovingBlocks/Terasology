@@ -54,7 +54,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String LIGHT_SHAFTS = "LightShafts";
     public static final String EYE_ADAPTATION = "EyeAdaptation";
     public static final String BLOOM = "Bloom";
-    public static final String OCULUS_VR_SUPPORT = "OculusVrSupport";
+    public static final String VR_SUPPORT = "VrSupport";
     public static final String MAX_TEXTURE_ATLAS_RESOLUTION = "MaxTextureAtlasResolution";
     public static final String MAX_CHUNKS_USED_FOR_SHADOW_MAPPING = "MaxChunksUsedForShadowMapping";
     public static final String SHADOW_MAP_RESOLUTION = "ShadowMapResolution";
@@ -101,7 +101,7 @@ public class RenderingConfig extends AbstractSubscribable {
     private boolean eyeAdaptation;
     private boolean bloom;
     private boolean dynamicShadows;
-    private boolean oculusVrSupport;
+    private boolean vrSupport;
     private int maxTextureAtlasResolution;
     private int maxChunksUsedForShadowMapping;
     private int shadowMapResolution;
@@ -328,7 +328,7 @@ public class RenderingConfig extends AbstractSubscribable {
     }
 
     public boolean isMotionBlur() {
-        return motionBlur && !isOculusVrSupport();
+        return motionBlur && !isVrSupport();
     }
 
     public void setMotionBlur(boolean motionBlur) {
@@ -397,14 +397,14 @@ public class RenderingConfig extends AbstractSubscribable {
         propertyChangeSupport.firePropertyChange(BLOOM, oldValue, this.bloom);
     }
 
-    public boolean isOculusVrSupport() {
-        return oculusVrSupport;
+    public boolean isVrSupport() {
+        return vrSupport;
     }
 
-    public void setOculusVrSupport(boolean oculusVrSupport) {
-        boolean oldValue = this.oculusVrSupport;
-        this.oculusVrSupport = oculusVrSupport;
-        propertyChangeSupport.firePropertyChange(OCULUS_VR_SUPPORT, oldValue, this.oculusVrSupport);
+    public void setVrSupport(boolean vrSupport) {
+        boolean oldValue = this.vrSupport;
+        this.vrSupport = vrSupport;
+        propertyChangeSupport.firePropertyChange(VR_SUPPORT, oldValue, this.vrSupport);
     }    
 
     public int getMaxTextureAtlasResolution() {

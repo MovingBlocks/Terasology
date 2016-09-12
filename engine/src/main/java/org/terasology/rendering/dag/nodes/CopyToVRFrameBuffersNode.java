@@ -90,8 +90,8 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
             debug.enable();
         }
 
-        if (!renderingConfig.isOculusVrSupport()) {
-            // Do nothing. We shouldn't create this node if isOculusVrSupport() is not set, so this
+        if (!renderingConfig.isVrSupport()) {
+            // Do nothing. We shouldn't create this node if isVrSupport() is not set, so this
             // code is unlikely to be reached.
         } else {
             renderFinalStereoImage(worldRenderer.getCurrentRenderStage());

@@ -17,7 +17,6 @@ package org.terasology.engine.modes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.TeraOVR;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -43,7 +42,6 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.world.chunks.ChunkProvider;
@@ -95,15 +93,6 @@ public class StateIngame implements GameState {
         networkSystem = context.get(NetworkSystem.class);
         storageManager = context.get(StorageManager.class);
 
-        if (context.get(Config.class).getRendering().isOculusVrSupport()
-                && OculusVrHelper.isNativeLibraryLoaded()) {
-
-            logger.info("Trying to initialize Oculus SDK...");
-            TeraOVR.initSDK();
-
-            logger.info("Updating Oculus projection parameters from device...");
-            OculusVrHelper.updateFromDevice();
-        }
         // Show or hide the HUD according to the settings
         nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
             @Override
@@ -115,11 +104,6 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose() {
-        if (context.get(Config.class).getRendering().isOculusVrSupport() && OculusVrHelper.isNativeLibraryLoaded()) {
-            logger.info("Shutting down Oculus SDK...");
-            TeraOVR.clear();
-        }
-
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
@@ -205,7 +189,7 @@ public class StateIngame implements GameState {
         display.prepareToRender();
 
         if (worldRenderer != null) {
-            if (!context.get(Config.class).getRendering().isOculusVrSupport()) {
+            if (!context.get(Config.class).getRendering().isVrSupport()) {
                 worldRenderer.render(RenderingStage.MONO);
             } else {
                 worldRenderer.render(RenderingStage.LEFT_EYE);
