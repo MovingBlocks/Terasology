@@ -49,7 +49,7 @@ public class BorderTypeHandler extends SimpleTypeHandler<Border> {
 
     @Override
     public Border deserialize(PersistedData data, DeserializationContext context) {
-        if (data.isValueMap()) {
+        if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
             return new Border(map.getAsInteger(LEFT_FIELD), map.getAsInteger(RIGHT_FIELD), map.getAsInteger(TOP_FIELD), map.getAsInteger(BOTTOM_FIELD));
         }
