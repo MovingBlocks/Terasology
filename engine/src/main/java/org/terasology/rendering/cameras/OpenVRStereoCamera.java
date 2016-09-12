@@ -240,7 +240,7 @@ public class OpenVRStereoCamera extends Camera {
         org.joml.Matrix4f rightEyePose = vrProvider.vrState.getEyePose(1);
         float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
                 + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
-                + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2));
+                + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
         if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2))  < 0.25)  {
