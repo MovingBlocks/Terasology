@@ -75,15 +75,18 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
         operationsToInvoke.stream().filter(EntityRef::exists).forEach(delayedEntity -> {
             final DelayedActionComponent delayedActions = delayedEntity.getComponent(DelayedActionComponent.class);
 
-            final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
-            saveOrRemoveComponent(delayedEntity, delayedActions);
+            // If there is a DelayedActionComponent, proceed.
+            if (delayedActions != null) {
+                final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
+                saveOrRemoveComponent(delayedEntity, delayedActions);
 
-            if (!delayedActions.isEmpty()) {
-                delayedOperationsSortedByTime.put(delayedActions.getLowestWakeUp(), delayedEntity);
-            }
+                if (!delayedActions.isEmpty()) {
+                    delayedOperationsSortedByTime.put(delayedActions.getLowestWakeUp(), delayedEntity);
+                }
 
-            for (String actionId : actionIds) {
-                delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
+                for (String actionId : actionIds) {
+                    delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
+                }
             }
         });
     }
@@ -104,15 +107,18 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
         operationsToInvoke.stream().filter(EntityRef::exists).forEach(periodicEntity -> {
             final PeriodicActionComponent periodicActionComponent = periodicEntity.getComponent(PeriodicActionComponent.class);
 
-            final Set<String> actionIds = periodicActionComponent.getTriggeredActionsAndReschedule(currentWorldTime);
-            saveOrRemoveComponent(periodicEntity, periodicActionComponent);
+            // If there is a PeriodicActionComponent, proceed.
+            if (periodicActionComponent != null) {
+                final Set<String> actionIds = periodicActionComponent.getTriggeredActionsAndReschedule(currentWorldTime);
+                saveOrRemoveComponent(periodicEntity, periodicActionComponent);
 
-            if (!periodicActionComponent.isEmpty()) {
-                periodicOperationsSortedByTime.put(periodicActionComponent.getLowestWakeUp(), periodicEntity);
-            }
+                if (!periodicActionComponent.isEmpty()) {
+                    periodicOperationsSortedByTime.put(periodicActionComponent.getLowestWakeUp(), periodicEntity);
+                }
 
-            for (String actionId : actionIds) {
-                periodicEntity.send(new PeriodicActionTriggeredEvent(actionId));
+                for (String actionId : actionIds) {
+                    periodicEntity.send(new PeriodicActionTriggeredEvent(actionId));
+                }
             }
         });
     }
