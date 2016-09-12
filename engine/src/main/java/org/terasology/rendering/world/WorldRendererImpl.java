@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -34,35 +35,14 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
+import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
-import org.terasology.rendering.dag.nodes.BackdropNode;
-import org.terasology.rendering.dag.nodes.BloomPassesNode;
-import org.terasology.rendering.dag.nodes.BlurPassesNode;
-import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
-import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
-import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
-import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
-import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
-import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
-import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
-import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
-import org.terasology.rendering.dag.nodes.LightGeometryNode;
-import org.terasology.rendering.dag.nodes.LightShaftsNode;
-import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
-import org.terasology.rendering.dag.nodes.OutlineNode;
-import org.terasology.rendering.dag.nodes.OverlaysNode;
-import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
-import org.terasology.rendering.dag.nodes.ShadowMapNode;
-import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
-import org.terasology.rendering.dag.nodes.SkyBandsNode;
-import org.terasology.rendering.dag.nodes.ToneMappingNode;
-import org.terasology.rendering.dag.nodes.WorldReflectionNode;
+import org.terasology.rendering.dag.nodes.*;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -134,6 +114,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
+    private OpenVRProvider vrProvider = null;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -158,11 +139,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.shaderManager = context.get(ShaderManager.class);
-
         if (renderingConfig.isOculusVrSupport()) {
-            playerCamera = new OculusStereoCamera();
+            this.vrProvider = new OpenVRProvider();
+            playerCamera = new OpenVRStereoCamera(this.vrProvider);
             currentRenderingStage = RenderingStage.LEFT_EYE;
-
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = RenderingStage.MONO;
@@ -257,6 +237,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        if (renderingConfig.isOculusVrSupport()) {
+            Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
+            ((CopyToVRFrameBuffersNode)copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
+            renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+        }
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
