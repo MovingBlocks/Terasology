@@ -1,4 +1,4 @@
-package openvrprovider;
+package org.terasology.rendering.openvrprovider;
 
 /* Mainly used to locate the OpenVR library on different platforms. */
 public class OSValidator {

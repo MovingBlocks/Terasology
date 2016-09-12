@@ -1,4 +1,4 @@
-package openvrprovider;
+package org.terasology.rendering.openvrprovider;
 
 import jopenvr.*;
 import org.joml.Matrix4f;

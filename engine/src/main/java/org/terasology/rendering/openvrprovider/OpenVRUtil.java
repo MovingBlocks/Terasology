@@ -1,4 +1,4 @@
-package openvrprovider;
+package org.terasology.rendering.openvrprovider;
 
 import jopenvr.HmdMatrix34_t;
 import jopenvr.HmdMatrix44_t;

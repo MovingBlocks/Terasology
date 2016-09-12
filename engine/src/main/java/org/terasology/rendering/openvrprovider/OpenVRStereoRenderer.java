@@ -1,4 +1,4 @@
-package openvrprovider;
+package org.terasology.rendering.openvrprovider;
 
 import jopenvr.JOpenVRLibrary;
 import org.lwjgl.opengl.EXTFramebufferObject;

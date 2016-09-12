@@ -1,4 +1,4 @@
-package openvrprovider;
+package org.terasology.rendering.openvrprovider;
 
 import com.sun.jna.Memory;
 import com.sun.jna.NativeLibrary;
@@ -8,8 +8,8 @@ import jopenvr.JOpenVRLibrary.EVREventType;
 
 import java.nio.IntBuffer;
 
-import static openvrprovider.ControllerListener.LEFT_CONTROLLER;
-import static openvrprovider.ControllerListener.RIGHT_CONTROLLER;
+import static org.terasology.rendering.openvrprovider.ControllerListener.LEFT_CONTROLLER;
+import static org.terasology.rendering.openvrprovider.ControllerListener.RIGHT_CONTROLLER;
 
 /* This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
  * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
