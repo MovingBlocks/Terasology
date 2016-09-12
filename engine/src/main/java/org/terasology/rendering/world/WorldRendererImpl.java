@@ -235,13 +235,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
-        renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
-
         if (renderingConfig.isOculusVrSupport()) {
             Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
             ((CopyToVRFrameBuffersNode)copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
             renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         }
+        renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
