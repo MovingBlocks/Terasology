@@ -10,14 +10,14 @@ import java.util.List;
 OpenVRProvider automatically updates this.
  */
 public class OpenVRState {
-    public static int LEFT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Left;
-    public static int RIGHT_EYE = JOpenVRLibrary.EVREye.EVREye_Eye_Right;
+    public static int leftEye = JOpenVRLibrary.EVREye.EVREye_Eye_Left;
+    public static int rightEye = JOpenVRLibrary.EVREye.EVREye_Eye_Right;
+
+    // Controllers
+    private static Matrix4f[] controllerPose = new Matrix4f[2];
+    private static VRControllerState_t[] lastControllerState = new VRControllerState_t[2];
 
     private List<ControllerListener> controllerListeners = new ArrayList<>();
-
-    public void addControllerListener(ControllerListener toAdd) {
-        controllerListeners.add(toAdd);
-    }
 
     // In the head frame
     private Matrix4f[] eyePoses = new Matrix4f[2];
@@ -26,11 +26,12 @@ public class OpenVRState {
     // In the tracking system intertial frame
     private Matrix4f headPose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
-    // Controllers
-    private static Matrix4f[] controllerPose = new Matrix4f[2];
-    private static VRControllerState_t[] lastControllerState = new VRControllerState_t[2];
 
-    OpenVRState() {
+    public void addControllerListener(ControllerListener toAdd) {
+        controllerListeners.add(toAdd);
+    }
+
+    public OpenVRState() {
         for (int c = 0; c < 2; c++) {
             lastControllerState[c] = new VRControllerState_t();
             controllerPose[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -68,8 +69,8 @@ public class OpenVRState {
 
     public void updateControllerButtonState(
             VRControllerState_t[] controllerStateReference) {
-        for (int c = 0; c < 2; c++) //each controller
-        {
+        // each controller{
+        for (int c = 0; c < 2; c++) {
             // store previous state
             if (lastControllerState[c].ulButtonPressed != controllerStateReference[c].ulButtonPressed) {
                 for (ControllerListener listener : controllerListeners) {
@@ -80,8 +81,8 @@ public class OpenVRState {
             lastControllerState[c].ulButtonPressed = controllerStateReference[c].ulButtonPressed;
             lastControllerState[c].ulButtonTouched = controllerStateReference[c].ulButtonTouched;
 
-            for (int i = 0; i < 5; i++) //5 axes but only [0] and [1] is anything, trigger and touchpad
-            {
+            // 5 axes but only [0] and [1] is anything, trigger and touchpad
+            for (int i = 0; i < 5; i++) {
                 if (controllerStateReference[c].rAxis[i] != null) {
                     lastControllerState[c].rAxis[i].x = controllerStateReference[c].rAxis[i].x;
                     lastControllerState[c].rAxis[i].y = controllerStateReference[c].rAxis[i].y;

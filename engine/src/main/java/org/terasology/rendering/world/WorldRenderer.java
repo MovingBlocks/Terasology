@@ -76,8 +76,8 @@ public interface WorldRenderer {
      * a single rendering stage every frame, called MONO.
      *
      * Stereo mode is for stereoscopic displays: every frame the rendering engine first goes through
-     * the LEFT_EYE rendering stage and then the RIGHT_EYE rendering stage. Each stage produces
-     * an image and the two images are then combined at the end of the RIGHT_EYE stage.
+     * the leftEye rendering stage and then the rightEye rendering stage. Each stage produces
+     * an image and the two images are then combined at the end of the rightEye stage.
      *
      * Notice that the renderer has no explicit notion of mono/stereo. It only knows which stage is the current one.
      */
@@ -122,7 +122,7 @@ public interface WorldRenderer {
      * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
      * or to a file, when grabbing a screenshot.
      *
-     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
+     * @param renderingStage "MONO" for standard rendering and "leftEye" or "rightEye" for stereoscopic displays.
      */
     void render(RenderingStage renderingStage);
 

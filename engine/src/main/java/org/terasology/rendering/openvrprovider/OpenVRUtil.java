@@ -49,22 +49,6 @@ public class OpenVRUtil {
         );
     }
 
-    public static void sleepNanos(long nanoDuration) {
-        final long end = System.nanoTime() + nanoDuration;
-        long timeLeft = nanoDuration;
-        do {
-            try {
-                if (timeLeft > SLEEP_PRECISION) {
-                    Thread.sleep(1);
-                } else if (timeLeft > SPIN_YIELD_PRECISION) {
-                    Thread.sleep(0);
-                }
-            } catch (Exception e) {
-            }
-            timeLeft = end - System.nanoTime();
-        } while (timeLeft > 0);
-    }
-
     public static VRControllerState_t createZeroControllerState() {
         VRControllerState_t state = new VRControllerState_t();
         // controller not connected, clear state

@@ -41,7 +41,30 @@ import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.nodes.*;
+import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
+import org.terasology.rendering.dag.nodes.BackdropNode;
+import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
+import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
+import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
+import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
+import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
+import org.terasology.rendering.dag.nodes.CopyToVRFrameBuffersNode;
+import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
+import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
+import org.terasology.rendering.dag.nodes.LightGeometryNode;
+import org.terasology.rendering.dag.nodes.LightShaftsNode;
+import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.nodes.OutlineNode;
+import org.terasology.rendering.dag.nodes.OverlaysNode;
+import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
+import org.terasology.rendering.dag.nodes.ShadowMapNode;
+import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
+import org.terasology.rendering.dag.nodes.SkyBandsNode;
+import org.terasology.rendering.dag.nodes.ToneMappingNode;
+import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -113,7 +136,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
-    private OpenVRProvider vrProvider = null;
+    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -237,7 +260,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         if (renderingConfig.isVrSupport()) {
             Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
-            ((CopyToVRFrameBuffersNode)copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
+            ((CopyToVRFrameBuffersNode) copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
             renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         }
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
@@ -333,7 +356,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
      * reflections, 2D filters...).
      *
-     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
+     * @param renderingStage "MONO" for standard rendering and "leftEye" or "rightEye" for stereoscopic displays.
      */
     @Override
     public void render(RenderingStage renderingStage) {

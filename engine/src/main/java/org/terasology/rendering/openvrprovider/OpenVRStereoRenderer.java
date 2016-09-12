@@ -16,13 +16,15 @@ public class OpenVRStereoRenderer {
     private int eyeTextureIDs[] = new int[2];
     private int eyeFBOIds[] = new int[2];
 
-    public OpenVRStereoRenderer(OpenVRProvider _vrProvider, int lwidth, int lheight) {
-        vrProvider = _vrProvider;
+    public OpenVRStereoRenderer(OpenVRProvider vrProviderIn, int lwidth, int lheight) {
+        vrProvider = vrProviderIn;
         createRenderTexture(lwidth, lheight);
     }
 
     public void deleteRenderTextures() {
-        if (eyeTextureIDs[0] > 0) GL11.glDeleteTextures(eyeTextureIDs[0]);
+        if (eyeTextureIDs[0] > 0) {
+            GL11.glDeleteTextures(eyeTextureIDs[0]);
+        }
     }
 
     public void createRenderTexture(int lwidth, int lheight) {

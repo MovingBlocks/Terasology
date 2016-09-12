@@ -32,37 +32,33 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  *
  */
 public class OpenVRStereoCamera extends Camera {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OpenVRStereoCamera.class);
 
-    protected Matrix4f projTranslationLeftEye = new Matrix4f();
-    protected Matrix4f projTranslationRightEye = new Matrix4f();
+    private Matrix4f projectionMatrixLeftEye = new Matrix4f();
+    private Matrix4f projectionMatrixRightEye = new Matrix4f();
 
-    protected Matrix4f projectionMatrixLeftEye = new Matrix4f();
-    protected Matrix4f projectionMatrixRightEye = new Matrix4f();
+    private Matrix4f inverseProjectionMatrixLeftEye = new Matrix4f();
+    private Matrix4f inverseProjectionMatrixRightEye = new Matrix4f();
 
-    protected Matrix4f inverseProjectionMatrixLeftEye = new Matrix4f();
-    protected Matrix4f inverseProjectionMatrixRightEye = new Matrix4f();
+    private Matrix4f inverseViewProjectionMatrixLeftEye = new Matrix4f();
+    private Matrix4f inverseViewProjectionMatrixRightEye = new Matrix4f();
 
-    protected Matrix4f inverseViewProjectionMatrixLeftEye = new Matrix4f();
-    protected Matrix4f inverseViewProjectionMatrixRightEye = new Matrix4f();
+    private Matrix4f viewMatrixLeftEye = new Matrix4f();
+    private Matrix4f viewMatrixRightEye = new Matrix4f();
 
-    protected Matrix4f viewMatrixLeftEye = new Matrix4f();
-    protected Matrix4f viewMatrixRightEye = new Matrix4f();
+    private Matrix4f viewMatrixReflectedLeftEye = new Matrix4f();
+    private Matrix4f viewMatrixReflectedRightEye = new Matrix4f();
 
-    protected Matrix4f viewMatrixReflectedLeftEye = new Matrix4f();
-    protected Matrix4f viewMatrixReflectedRightEye = new Matrix4f();
+    private ViewFrustum viewFrustumLeftEye = new ViewFrustum();
+    private ViewFrustum viewFrustumRightEye = new ViewFrustum();
+    private ViewFrustum viewFrustumReflectedLeftEye = new ViewFrustum();
+    private ViewFrustum viewFrustumReflectedRightEye = new ViewFrustum();
 
-    protected ViewFrustum viewFrustumLeftEye = new ViewFrustum();
-    protected ViewFrustum viewFrustumRightEye = new ViewFrustum();
-    protected ViewFrustum viewFrustumReflectedLeftEye = new ViewFrustum();
-    protected ViewFrustum viewFrustumReflectedRightEye = new ViewFrustum();
+    private Matrix4f viewProjectionMatrixLeftEye = new Matrix4f();
+    private Matrix4f viewProjectionMatrixRightEye = new Matrix4f();
 
-    protected Matrix4f viewProjectionMatrixLeftEye = new Matrix4f();
-    protected Matrix4f viewProjectionMatrixRightEye = new Matrix4f();
-
-    protected Matrix4f viewTranslationLeftEye = new Matrix4f();
-    protected Matrix4f viewTranslationRightEye = new Matrix4f();
-    OpenVRProvider vrProvider = null;
+    private Matrix4f viewTranslationLeftEye = new Matrix4f();
+    private Matrix4f viewTranslationRightEye = new Matrix4f();
+    private OpenVRProvider vrProvider;
 
     public OpenVRStereoCamera(OpenVRProvider provider) {
         vrProvider = provider;
@@ -215,24 +211,23 @@ public class OpenVRStereoCamera extends Camera {
         updateMatrices(activeFov);
     }
 
-    void jomlMatrix4f(org.joml.Matrix4f matrixInput, org.terasology.math.geom.Matrix4f matrixOut)
-    {
-        matrixOut.set(0,0,matrixInput.m00());
-        matrixOut.set(0,1,matrixInput.m10());
-        matrixOut.set(0,2,matrixInput.m20());
-        matrixOut.set(0,3,matrixInput.m30());
-        matrixOut.set(1,0,matrixInput.m01());
-        matrixOut.set(1,1,matrixInput.m11());
-        matrixOut.set(1,2,matrixInput.m21());
-        matrixOut.set(1,3,matrixInput.m31());
-        matrixOut.set(2,0,matrixInput.m02());
-        matrixOut.set(2,1,matrixInput.m12());
-        matrixOut.set(2,2,matrixInput.m22());
-        matrixOut.set(2,3,matrixInput.m32());
-        matrixOut.set(3,0,matrixInput.m03());
-        matrixOut.set(3,1,matrixInput.m13());
-        matrixOut.set(3,2,matrixInput.m23());
-        matrixOut.set(3,3,matrixInput.m33());
+    private void jomlMatrix4f(org.joml.Matrix4f matrixInput, org.terasology.math.geom.Matrix4f matrixOut) {
+        matrixOut.set(0, 0, matrixInput.m00());
+        matrixOut.set(0, 1, matrixInput.m10());
+        matrixOut.set(0, 2, matrixInput.m20());
+        matrixOut.set(0, 3, matrixInput.m30());
+        matrixOut.set(1, 0, matrixInput.m01());
+        matrixOut.set(1, 1, matrixInput.m11());
+        matrixOut.set(1, 2, matrixInput.m21());
+        matrixOut.set(1, 3, matrixInput.m31());
+        matrixOut.set(2, 0, matrixInput.m02());
+        matrixOut.set(2, 1, matrixInput.m12());
+        matrixOut.set(2, 2, matrixInput.m22());
+        matrixOut.set(2, 3, matrixInput.m32());
+        matrixOut.set(3, 0, matrixInput.m03());
+        matrixOut.set(3, 1, matrixInput.m13());
+        matrixOut.set(3, 2, matrixInput.m23());
+        matrixOut.set(3, 3, matrixInput.m33());
     }
 
     @Override
@@ -243,19 +238,20 @@ public class OpenVRStereoCamera extends Camera {
         org.joml.Matrix4f rightEyeProjection = vrProvider.vrState.getEyeProjectionMatrix(1);
         org.joml.Matrix4f leftEyePose = vrProvider.vrState.getEyePose(0);
         org.joml.Matrix4f rightEyePose = vrProvider.vrState.getEyePose(1);
-        float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(),2)
-                + Math.pow(leftEyePose.m31() - rightEyePose.m31(),2)
-                + Math.pow(leftEyePose.m32() - rightEyePose.m32(),2));
+        float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
+                + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
+                + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2));
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
-        if (Math.sqrt(Math.pow(leftEyePose.m30(),2) + Math.pow(leftEyePose.m31(),2) + Math.pow(leftEyePose.m32(),2))  < 0.25)
+        if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2))  < 0.25)  {
             return;
-        jomlMatrix4f(leftEyeProjection,projectionMatrixLeftEye);
-        jomlMatrix4f(rightEyeProjection,projectionMatrixRightEye);
+        }
+        jomlMatrix4f(leftEyeProjection, projectionMatrixLeftEye);
+        jomlMatrix4f(rightEyeProjection, projectionMatrixRightEye);
         projectionMatrix = projectionMatrixLeftEye;
 
-        jomlMatrix4f(leftEyePose,viewMatrixLeftEye);
-        jomlMatrix4f(rightEyePose,viewMatrixRightEye);
+        jomlMatrix4f(leftEyePose, viewMatrixLeftEye);
+        jomlMatrix4f(rightEyePose, viewMatrixRightEye);
 
         viewMatrix = viewMatrixLeftEye;
         normViewMatrix = viewMatrixLeftEye;

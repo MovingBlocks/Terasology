@@ -19,7 +19,6 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.openvrprovider.OpenVRStereoRenderer;
 import org.lwjgl.opengl.GL11;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
@@ -28,7 +27,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
-import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -39,9 +37,8 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 public class CopyToVRFrameBuffersNode extends AbstractNode {
-    public static final ResourceUrn OC_UNDISTORTED = new ResourceUrn("engine:ocUndistorted");
-    private OpenVRProvider vrProvider = null;
-    private OpenVRStereoRenderer vrRenderer = null;
+    private OpenVRProvider vrProvider;
+    private OpenVRStereoRenderer vrRenderer;
 
     @In
     private WorldRenderer worldRenderer;
@@ -57,14 +54,10 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
 
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
-
-    private FBO.Dimensions fullScale;
-
     private Material finalPost;
     private Material debug;
 
-    public void setOpenVRProvider(OpenVRProvider providerToSet)
-    {
+    public void setOpenVRProvider(OpenVRProvider providerToSet) {
         this.vrProvider = providerToSet;
     }
 
@@ -79,8 +72,6 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
         addDesiredStateChange(new BindFBO(FINAL));
     }
 
-    /**
-     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
@@ -91,8 +82,7 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
         }
 
         if (!renderingConfig.isVrSupport()) {
-            // Do nothing. We shouldn't create this node if isVrSupport() is not set, so this
-            // code is unlikely to be reached.
+            logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
         } else {
             renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         }
