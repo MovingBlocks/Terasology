@@ -68,7 +68,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         shader.enable();
 
         // Draw the skysphere
-        drawSkysphere();
+        drawSkysphere(camera.getzFar());
 
         if (camera.isReflected()) {
             glCullFace(GL_FRONT);
@@ -79,7 +79,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         glDepthMask(true);
     }
 
-    private void drawSkysphere() {
+    private void drawSkysphere(float zFar) {
         if (displayListSphere == -1) {
             displayListSphere = glGenLists(1);
 
@@ -88,7 +88,8 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(1024, 16, 128);
+            float skyBoxDistance = (zFar > 1024 ? 1024.0f : zFar*0.95f);
+            sphere.draw(skyBoxDistance, 16, 128);
 
             glEndList();
         }

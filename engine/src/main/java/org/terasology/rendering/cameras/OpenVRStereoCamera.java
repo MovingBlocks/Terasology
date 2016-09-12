@@ -67,6 +67,8 @@ public class OpenVRStereoCamera extends Camera {
 
     public OpenVRStereoCamera(OpenVRProvider provider) {
         vrProvider = provider;
+        // OpenVR's projection matrix is such that this is approximately true.
+        zFar = 400.0f;
     }
 
     @Override
