@@ -59,6 +59,10 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
 
     public void setOpenVRProvider(OpenVRProvider providerToSet) {
         this.vrProvider = providerToSet;
+        if (this.vrProvider != null && this.vrRenderer == null) {
+            this.vrProvider.init();
+            this.vrRenderer = new OpenVRStereoRenderer(this.vrProvider, 1280, 720);
+        }
     }
 
 
@@ -92,10 +96,6 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     }
 
     private void renderFinalStereoImage(RenderingStage renderingStage) {
-        if (this.vrRenderer == null) {
-            this.vrProvider.init();
-            this.vrRenderer = new OpenVRStereoRenderer(this.vrProvider, 1280, 720);
-        }
         switch (renderingStage) {
             case LEFT_EYE:
                 vrProvider.updateState();
