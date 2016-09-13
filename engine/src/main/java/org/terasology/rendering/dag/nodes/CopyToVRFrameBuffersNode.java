@@ -37,6 +37,10 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
+    // TODO: make these configurable options
+    private static final int VR_FRAMEBUFFER_WIDTH = 1280;
+    private static final int VR_FRAMEBUFFER_HEIGHT = 720;
+
     private OpenVRProvider vrProvider;
     private OpenVRStereoRenderer vrRenderer;
 
@@ -61,7 +65,7 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
         this.vrProvider = providerToSet;
         if (this.vrProvider != null && this.vrRenderer == null) {
             this.vrProvider.init();
-            this.vrRenderer = new OpenVRStereoRenderer(this.vrProvider, 1280, 720);
+            this.vrRenderer = new OpenVRStereoRenderer(this.vrProvider, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_WIDTH);
         }
     }
 
@@ -102,7 +106,7 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
                 org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT(
                         org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(0));
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                renderFullscreenQuad(0, 0, 1280, 720);
+                renderFullscreenQuad(0, 0, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_HEIGHT);
 
                 break;
 
@@ -110,7 +114,7 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT(
                         org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(1));
-                renderFullscreenQuad(0, 0, 1280, 720);
+                renderFullscreenQuad(0, 0, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_HEIGHT);
                 vrProvider.submitFrame();
                 GL11.glFinish();
                 break;
