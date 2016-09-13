@@ -233,6 +233,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
+        ((CopyToVRFrameBuffersNode) copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
 
         RenderGraph renderGraph = new RenderGraph();
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
@@ -258,11 +260,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
-        if (renderingConfig.isVrSupport()) {
-            Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
-            ((CopyToVRFrameBuffersNode) copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
-            renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
-        }
+        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();

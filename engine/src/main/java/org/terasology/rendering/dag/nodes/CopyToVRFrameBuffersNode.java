@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.openvrprovider.OpenVRStereoRenderer;
@@ -25,7 +26,6 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.AbstractNode;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
-public class CopyToVRFrameBuffersNode extends AbstractNode {
+public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     private OpenVRProvider vrProvider;
     private OpenVRStereoRenderer vrRenderer;
 
@@ -70,6 +70,7 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
         finalPost = worldRenderer.getMaterial("engine:prog.post");
         debug = worldRenderer.getMaterial("engine:prog.debug");
         addDesiredStateChange(new BindFBO(FINAL));
+        requiresCondition(() -> renderingConfig.isVrSupport());
     }
 
     @Override
