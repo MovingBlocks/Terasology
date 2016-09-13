@@ -163,12 +163,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.shaderManager = context.get(ShaderManager.class);
         if (renderingConfig.isVrSupport()) {
             this.vrProvider = new OpenVRProvider();
+            this.vrProvider.init();
             playerCamera = new OpenVRStereoCamera(this.vrProvider);
             currentRenderingStage = RenderingStage.LEFT_EYE;
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = RenderingStage.MONO;
         }
+        context.put(OpenVRProvider.class, vrProvider);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
@@ -234,7 +236,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
-        ((CopyToVRFrameBuffersNode) copyToVRFrameBufferNode).setOpenVRProvider(this.vrProvider);
 
         RenderGraph renderGraph = new RenderGraph();
         renderGraph.addNode(shadowMapNode, "shadowMapNode");

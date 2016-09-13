@@ -24,7 +24,6 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -40,8 +39,8 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
     // TODO: make these configurable options
-    private boolean openVrInitialized = false;
 
+    @In
     private OpenVRProvider vrProvider;
 
     @In
@@ -56,39 +55,23 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
     private Material finalPost;
     private FBO leftEye;
     private FBO rightEye;
 
-    public void setOpenVRProvider(OpenVRProvider providerToSet) {
-        this.vrProvider = providerToSet;
-    }
-
-
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        renderingDebugConfig = renderingConfig.getDebug();
-
         finalPost = worldRenderer.getMaterial("engine:prog.post");
         requiresCondition(() -> renderingConfig.isVrSupport());
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
         rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO,FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
-    }
-
-    @Override
-    public void process() {
-        PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
-        logger.info("Process");
-        if (this.vrProvider != null && !openVrInitialized) {
-            openVrInitialized = true;
+        if (this.vrProvider != null) {
             logger.info("Left eye FBOID:" + Integer.toString(leftEye.fboId));
             logger.info("Right eye FBOID:" + Integer.toString(leftEye.fboId));
-            this.vrProvider.init();
             logger.info("OpenVR init done.");
             vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
@@ -99,14 +82,18 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
-        finalPost.enable();
+    }
 
+    @Override
+    public void process() {
+        PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
+        logger.info("Process");
+        finalPost.enable();
         if (!renderingConfig.isVrSupport()) {
             logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
         } else {
             renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         }
-
         PerformanceMonitor.endActivity();
     }
 
