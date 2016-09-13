@@ -97,7 +97,6 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
         }
         switch (renderingStage) {
             case LEFT_EYE:
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 vrProvider.updateState();
                 org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT(
                         org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(0));
@@ -113,8 +112,6 @@ public class CopyToVRFrameBuffersNode extends AbstractNode {
                 renderFullscreenQuad(0, 0, 1280, 720);
                 vrProvider.submitFrame();
                 GL11.glFinish();
-                break;
-            case MONO:
                 break;
         }
     }
