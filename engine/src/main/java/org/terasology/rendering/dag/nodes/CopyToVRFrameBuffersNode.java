@@ -59,7 +59,6 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     private RenderingDebugConfig renderingDebugConfig;
     private RenderingConfig renderingConfig;
     private Material finalPost;
-    private Material debug;
     private FBO leftEye;
     private FBO rightEye;
 
@@ -74,7 +73,6 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
         renderingDebugConfig = renderingConfig.getDebug();
 
         finalPost = worldRenderer.getMaterial("engine:prog.post");
-        debug = worldRenderer.getMaterial("engine:prog.debug");
         requiresCondition(() -> renderingConfig.isVrSupport());
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
@@ -101,11 +99,7 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
-        if (!renderingDebugConfig.isEnabled()) {
-            finalPost.enable();
-        } else {
-            debug.enable();
-        }
+        finalPost.enable();
 
         if (!renderingConfig.isVrSupport()) {
             logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
