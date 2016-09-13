@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import jopenvr.JOpenVRLibrary;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.openvrprovider.OpenVRStereoRenderer;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -26,23 +28,21 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+import static org.lwjgl.opengl.GL11.*;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
+    private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
+    private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
     // TODO: make these configurable options
-    private static final int VR_FRAMEBUFFER_WIDTH = 1280;
-    private static final int VR_FRAMEBUFFER_HEIGHT = 720;
+    private boolean openVrInitialized = false;
 
     private OpenVRProvider vrProvider;
-    private OpenVRStereoRenderer vrRenderer;
 
     @In
     private WorldRenderer worldRenderer;
@@ -60,13 +60,11 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     private RenderingConfig renderingConfig;
     private Material finalPost;
     private Material debug;
+    private FBO leftEye;
+    private FBO rightEye;
 
     public void setOpenVRProvider(OpenVRProvider providerToSet) {
         this.vrProvider = providerToSet;
-        if (this.vrProvider != null && this.vrRenderer == null) {
-            this.vrProvider.init();
-            this.vrRenderer = new OpenVRStereoRenderer(this.vrProvider, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_WIDTH);
-        }
     }
 
 
@@ -77,13 +75,32 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
 
         finalPost = worldRenderer.getMaterial("engine:prog.post");
         debug = worldRenderer.getMaterial("engine:prog.debug");
-        addDesiredStateChange(new BindFBO(FINAL));
         requiresCondition(() -> renderingConfig.isVrSupport());
+        leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
+                FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
+        rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO,FULL_SCALE,
+                FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
+        logger.info("Process");
+        if (this.vrProvider != null && !openVrInitialized) {
+            openVrInitialized = true;
+            logger.info("Left eye FBOID:" + Integer.toString(leftEye.fboId));
+            logger.info("Right eye FBOID:" + Integer.toString(leftEye.fboId));
+            this.vrProvider.init();
+            logger.info("OpenVR init done.");
+            vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
+            vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
+            vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
+            vrProvider.texType[0].write();
+            vrProvider.texType[1].handle = rightEye.colorBufferTextureId;
+            vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
+            vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
+            vrProvider.texType[1].write();
+        }
         if (!renderingDebugConfig.isEnabled()) {
             finalPost.enable();
         } else {
@@ -103,18 +120,15 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
         switch (renderingStage) {
             case LEFT_EYE:
                 vrProvider.updateState();
-                org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT(
-                        org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(0));
+                leftEye.bind();
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                renderFullscreenQuad(0, 0, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_HEIGHT);
-
+                renderFullscreenQuad();
                 break;
 
             case RIGHT_EYE:
+                rightEye.bind();
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT(
-                        org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT, vrRenderer.getTextureHandleForEyeFramebuffer(1));
-                renderFullscreenQuad(0, 0, VR_FRAMEBUFFER_WIDTH, VR_FRAMEBUFFER_HEIGHT);
+                renderFullscreenQuad();
                 vrProvider.submitFrame();
                 GL11.glFinish();
                 break;
