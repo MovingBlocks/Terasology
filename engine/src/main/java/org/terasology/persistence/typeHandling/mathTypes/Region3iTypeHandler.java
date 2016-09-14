@@ -49,7 +49,7 @@ public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
 
     @Override
     public Region3i deserialize(PersistedData data, DeserializationContext context) {
-        if (data.isValueMap()) {
+        if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
             Vector3i min = context.deserializeAs(map.get(MIN_FIELD), Vector3i.class);
             Vector3i size = context.deserializeAs(map.get(SIZE_FIELD), Vector3i.class);

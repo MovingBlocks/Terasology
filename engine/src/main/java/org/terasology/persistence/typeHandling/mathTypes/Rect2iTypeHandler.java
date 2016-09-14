@@ -49,7 +49,7 @@ public class Rect2iTypeHandler extends SimpleTypeHandler<Rect2i> {
 
     @Override
     public Rect2i deserialize(PersistedData data, DeserializationContext context) {
-        if (data.isValueMap()) {
+        if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
             Vector2i min = context.deserializeAs(map.get(MIN_FIELD), Vector2i.class);
             Vector2i size = context.deserializeAs(map.get(SIZE_FIELD), Vector2i.class);

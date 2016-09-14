@@ -48,7 +48,7 @@ public class Rect2fTypeHandler extends SimpleTypeHandler<Rect2f> {
 
     @Override
     public Rect2f deserialize(PersistedData data, DeserializationContext context) {
-        if (data.isValueMap()) {
+        if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
             Vector2f min = context.deserializeAs(map.get(MIN_FIELD), Vector2f.class);
             Vector2f size = context.deserializeAs(map.get(SIZE_FIELD), Vector2f.class);
