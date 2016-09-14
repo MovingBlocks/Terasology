@@ -355,7 +355,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
      * reflections, 2D filters...).
      *
-     * @param renderingStage "MONO" for standard rendering and "leftEye" or "rightEye" for stereoscopic displays.
+     * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
      */
     @Override
     public void render(RenderingStage renderingStage) {
