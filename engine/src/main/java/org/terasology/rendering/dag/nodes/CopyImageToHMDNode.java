@@ -88,7 +88,6 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
-        logger.info("Process");
         FINAL.bindTexture();
         if (!renderingConfig.isVrSupport()) {
             logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
