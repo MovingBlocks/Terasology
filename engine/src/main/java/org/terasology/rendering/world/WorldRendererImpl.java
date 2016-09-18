@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
@@ -51,7 +52,7 @@ import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
 import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
-import org.terasology.rendering.dag.nodes.CopyToVRFrameBuffersNode;
+import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.dag.nodes.LightGeometryNode;
@@ -235,7 +236,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyToVRFrameBuffersNode.class);
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
 
         RenderGraph renderGraph = new RenderGraph();
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
@@ -261,8 +263,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
-        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
+        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();

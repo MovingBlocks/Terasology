@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import jopenvr.JOpenVRLibrary;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
@@ -26,16 +27,17 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import static org.lwjgl.opengl.GL11.*;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
+
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
-public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
+public class CopyImageToHMDNode extends ConditionDependentNode {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
     // TODO: make these configurable options
@@ -56,14 +58,12 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
-    private Material finalPost;
     private FBO leftEye;
     private FBO rightEye;
 
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        finalPost = worldRenderer.getMaterial("engine:prog.post");
         requiresCondition(() -> renderingConfig.isVrSupport());
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
@@ -82,13 +82,14 @@ public class CopyToVRFrameBuffersNode extends ConditionDependentNode {
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
+        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
         logger.info("Process");
-        finalPost.enable();
+        FINAL.bindTexture();
         if (!renderingConfig.isVrSupport()) {
             logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
         } else {
