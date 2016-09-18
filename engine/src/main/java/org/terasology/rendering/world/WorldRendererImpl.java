@@ -88,8 +88,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
  *
- * This implementation includes support for Oculus VR, a head mounted display. No other stereoscopic displays are
- * supported at this stage: see https://github.com/MovingBlocks/Terasology/issues/2111 for updates.
+ * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
  *
  * This implementation works closely with a number of support objects, in particular:
  *
@@ -358,7 +357,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * or to a file, when grabbing a screenshot.
      *
      * In this particular implementation this method can be called once per frame, when rendering to a standard display,
-     * or twice, each time with a different rendering stage, when rendering to the OculusVR head mounted display.
+     * or twice, each time with a different rendering stage, when rendering to the head mounted display.
      *
      * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
