@@ -24,6 +24,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import static org.lwjgl.opengl.GL11.*;
 
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -48,6 +49,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
 
     @Override
     public void initialise() {
+        requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN,displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
@@ -55,12 +57,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        if (worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE) {
-            logger.info("Process");
-            FINAL.bindTexture();
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            renderFullscreenQuad();
-        }
+        logger.info("Process");
+        FINAL.bindTexture();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }
 }
