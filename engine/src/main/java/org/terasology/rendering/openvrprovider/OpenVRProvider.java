@@ -69,19 +69,40 @@ public class OpenVRProvider {
     }
 
     public boolean init() {
-        try {
-            if (!initializeOpenVRLibrary()) {
-                return false;
-            }
-            initializeJOpenVR();
-            initOpenVRCompositor(true);
-            initOpenVROverlay();
-            initOpenVROSettings();
-        } catch (Exception e) {
+        if (!initializeOpenVRLibrary()) {
             return false;
         }
+        if (!initializeJOpenVR())
+            return false;
+        int nAttempts = 0;
+        boolean bSuccess = false;
+
+        // OpenVR has a race condition here - it is necessary
+        // to initialize the overlay, but certain operations
+        // that appear to take place outside of the main thread
+        // seem to prevent that from happening if it's done too
+        // soon after OpenVR is initialized. This loop waits a
+        // reasonable amount of time and makes several attempts.
+        // In my testing, it works all of the time.
+        while (!bSuccess && nAttempts < 10) {
+            try {
+                Thread.sleep(300);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            bSuccess = initOpenVRCompositor(true);
+            nAttempts++;
+        }
+        if (!initOpenVROverlay())
+            return false;
+        if (!initOpenVROSettings())
+            return false;
         initialized = true;
         return true;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public void shutdown() {
@@ -108,23 +129,22 @@ public class OpenVRProvider {
         }
     }
 
-    private boolean initializeOpenVRLibrary() throws Exception {
+    private boolean initializeOpenVRLibrary() {
         if (initialized) {
             return true;
         }
         logger.info("Adding OpenVR search path: " + NativeHelper.getOpenVRLibPath());
         NativeLibrary.addSearchPath("openvr_api", NativeHelper.getOpenVRLibPath());
 
-        if (jopenvr.JOpenVRLibrary.VR_IsHmdPresent() == 1) {
-            logger.info("VR Headset detected.");
-        } else {
+        if (jopenvr.JOpenVRLibrary.VR_IsHmdPresent() != 1) {
             logger.info("VR Headset not detected.");
             return false;
         }
+        logger.info("VR Headset detected.");
         return true;
     }
 
-    private static void initializeJOpenVR() throws Exception {
+    private static boolean initializeJOpenVR() {
         hmdErrorStore = IntBuffer.allocate(1);
         vrSystem = null;
         JOpenVRLibrary.VR_InitInternal(hmdErrorStore, JOpenVRLibrary.EVRApplicationType.EVRApplicationType_VRApplication_Scene);
@@ -133,7 +153,9 @@ public class OpenVRProvider {
             vrSystem = new VR_IVRSystem_FnTable(JOpenVRLibrary.VR_GetGenericInterface(JOpenVRLibrary.IVRSystem_Version, hmdErrorStore));
         }
         if (vrSystem == null || hmdErrorStore.get(0) != 0) {
-            throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
+            String errorString = jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0);
+            logger.info("vrSystem initialization failed:" + errorString);
+            return false;
         } else {
 
             vrSystem.setAutoSynch(false);
@@ -154,32 +176,39 @@ public class OpenVRProvider {
                 hmdTrackedDevicePoses[i].setAutoSynch(false);
             }
         }
+        return true;
     }
 
     // needed for in-game keyboard
-    private static void initOpenVROverlay() throws Exception {
+    private static boolean initOpenVROverlay() {
         vrOverlay = new VR_IVROverlay_FnTable(JOpenVRLibrary.VR_GetGenericInterface(JOpenVRLibrary.IVROverlay_Version, hmdErrorStore));
         if (hmdErrorStore.get(0) == 0) {
             vrOverlay.setAutoSynch(false);
             vrOverlay.read();
             logger.info("OpenVR Overlay initialized OK.");
         } else {
-            throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
+            String errorString = jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0);
+            logger.info("vrOverlay initialization failed:" + errorString);
+            return false;
         }
+        return true;
     }
 
-    private static void initOpenVROSettings() throws Exception {
+    private static boolean initOpenVROSettings() {
         vrSettings = new VR_IVRSettings_FnTable(JOpenVRLibrary.VR_GetGenericInterface(JOpenVRLibrary.IVRSettings_Version, hmdErrorStore));
         if (hmdErrorStore.get(0) == 0) {
             vrSettings.setAutoSynch(false);
             vrSettings.read();
             logger.info("OpenVR Settings initialized OK.");
         } else {
-            throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
+            String errorString = jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0);
+            logger.info("OpenVROSettings initialization failed:" + errorString);
+            return false;
         }
+        return true;
     }
 
-    private void initOpenVRCompositor(boolean set) throws Exception {
+    private boolean initOpenVRCompositor(boolean set) {
         if (set && vrSystem != null) {
             vrCompositor = new VR_IVRCompositor_FnTable(JOpenVRLibrary.VR_GetGenericInterface(JOpenVRLibrary.IVRCompositor_Version, hmdErrorStore));
             if (hmdErrorStore.get(0) == 0) {
@@ -188,7 +217,9 @@ public class OpenVRProvider {
                 vrCompositor.read();
                 vrCompositor.SetTrackingSpace.apply(JOpenVRLibrary.ETrackingUniverseOrigin.ETrackingUniverseOrigin_TrackingUniverseStanding);
             } else {
-                throw new Exception(jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0));
+                String errorString = jopenvr.JOpenVRLibrary.VR_GetVRInitErrorAsEnglishDescription(hmdErrorStore.get(0)).getString(0);
+                logger.info("vrCompositor initialization failed:" + errorString);
+                return false;
             }
         }
         if (vrCompositor == null) {
@@ -216,6 +247,7 @@ public class OpenVRProvider {
 
         }
         logger.info("OpenVR Compositor initialized OK.");
+        return true;
 
     }
 

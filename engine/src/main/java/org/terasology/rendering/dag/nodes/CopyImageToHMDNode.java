@@ -64,7 +64,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        requiresCondition(() -> renderingConfig.isVrSupport());
+        requiresCondition(() -> (renderingConfig.isVrSupport()
+                && vrProvider != null
+                && vrProvider.isInitialized() ));
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
         rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO,FULL_SCALE,

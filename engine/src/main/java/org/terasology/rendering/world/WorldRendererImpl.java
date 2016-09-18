@@ -171,7 +171,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
                 currentRenderingStage = RenderingStage.MONO;
-                this.renderingConfig.setVrSupport(false);
             }
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
