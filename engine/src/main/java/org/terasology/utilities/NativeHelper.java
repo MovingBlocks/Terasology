@@ -75,6 +75,10 @@ public final class NativeHelper {
 
     }
 
+    public static boolean isWindows() {
+        return isWin32() || isWin64();
+    }
+
     public static boolean isLinux64() {
 
         return (OS.contains("linux") && ARCHITECTURE.contains("64"));
@@ -109,7 +113,8 @@ public final class NativeHelper {
     }
 
     public static String getOpenVRLibPath() {
-        if (getOsString().contains("win")) {
+        logger.debug("OS string" + OS.toString());
+        if (isWindows()) {
             return USER_DIRECTORY + "\\openvr_natives\\" + getOsString();
         }
         return USER_DIRECTORY + "/openvr_natives/" + getOsString();
