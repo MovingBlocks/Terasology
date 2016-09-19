@@ -32,6 +32,7 @@ public interface Node {
     void dispose();
 
     Set<StateChange> getDesiredStateChanges();
+    Set<StateChange> getDesiredStateResets();
 
     RenderPipelineTask generateTask();
 
@@ -40,4 +41,5 @@ public interface Node {
     boolean isEnabled();
 
     void setEnabled(boolean enabled);
+
 }

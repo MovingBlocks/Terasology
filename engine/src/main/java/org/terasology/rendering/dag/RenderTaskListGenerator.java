@@ -19,117 +19,204 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.dag.tasks.MarkerTask;
+
 import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Add javadocs
+ * Instances of this class are responsible for generating the the list of tasks
+ * the renderer executes to (eventually) generate the image shown to the user.
+ *
+ * Tasks are generated out of an ordered list of nodes in the render graph. Each node provides the set
+ * of state changes it needs. Tasks are generated for each state change unless they are redundant.
+ * State changes from a node are redundant if the previous node want the exact same state change.
+ *
+ * After tasks for the non-redundant state changes desired by a node have been generated a task
+ * is appended to the list, to execute the node's process() method, which is where any rendering
+ * actually happens.
+ *
+ * Finally, each node also provides a list of state change resets: state changes bringing a property
+ * back to its default. Tasks are generated also these unless they'd be redundant. A state change
+ * reset is redundant if the next node needs to set that property to a non-default value.
+ *
+ * It should be noted that nodes are skipped if they are disabled.
+ *
  */
 public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
-    private List<Object> intermediateList;
     private List<RenderPipelineTask> taskList;
     private List<Node> nodeList;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
-        intermediateList = Lists.newArrayList();
     }
 
-    public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
-        nodeList = orderedNodes;
-        generateIntermediateList(orderedNodes);
-        generateTaskList();
-        return taskList;
-    }
+    private void logIntermediateRendererListForDebugging(List<Node> orderedNodes) {
+        logger.info("----- INTERMEDIATE RENDERER LIST --------------------------------");
 
-    private void logList(String title, List<?> list) {
-        logger.info(title);
-        for (Object o : list) {
-            logger.info(o.toString());
+        for (Node node : orderedNodes) {
+            if (node.isEnabled()) {
+
+                // printing out node name
+                logger.info(String.format(("## Node: %s"), node.getClass().getSimpleName()));
+
+                // printing out individual desired state changes
+                for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
+                    logger.info(desiredStateChange.toString());
+                }
+
+                // printing out process() statement
+                logger.info(String.format("%s.process()", node.toString()));
+
+                // printing out individual state resets
+                for (StateChange desiredStateReset : node.getDesiredStateResets()) {
+                    logger.info(desiredStateReset.toString());
+                }
+            }
         }
     }
 
-    private void generateTaskList() {
+    /**
+     * See the RenderTaskListGenerator class Javadoc for an overview of what this method does.
+     *
+     * @param orderedNodes a list of Node instances, ordered to reflect the dependencies between them,
+     *                     i.e. Node A must be processed before Node B to work correctly.
+     * @return an optimized list of RenderPipelineTask instances,
+     *         ready to be iterated over to execute a frame worth of rendering
+     */
+
+    public List<RenderPipelineTask> generateFrom(List<Node> orderedNodes) {
+
+        long startTimeInNanoSeconds = System.nanoTime();
+
         // TODO: Optimization task: verify if we can avoid clearing the whole list
         // TODO: whenever changes in the render graph or in the intermediate list arise
         // TODO: think about refactoring (a heavy method)
 
-        StateChange stateChange;
+        nodeList = orderedNodes;
+        taskList.clear();
+        Node nextEnabledNode;
         StateChange persistentStateChange;
         Map persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
-        Map intranodesStateChanges = Maps.newHashMap();
 
-        taskList.clear();
+        int currentIndex = 0;
 
-        for (Object object : intermediateList) {
+        for (Node node : orderedNodes) {
+            node.setTaskListGenerator(this); // currently required as nodes trigger a refresh of the tasklist
 
-            if (object instanceof StateChange) {
-                intranodesStateChanges.put(object.getClass(), object);
+            if (node.isEnabled()) {
 
-            } else {
-                for (Object preCastStateChange : intranodesStateChanges.values()) {
-                    stateChange = (StateChange) preCastStateChange;
+                if (logger.isInfoEnabled()) {
+                    // Marker tasks just add a dividing line to the logger output
+                    taskList.add(new MarkerTask(node.getClass().getSimpleName()));
+                }
 
-                    persistentStateChange = (StateChange) persistentStateChanges.get(stateChange.getClass());
-                    if (persistentStateChange == null) {
-                        if (!stateChange.isTheDefaultInstance()) { // yep, new (convenience) method, just for readability
-                            // defensive programming here: the check is probably unnecessary as for every default
-                            // instance of a state change subType there should be a non-default one already in the
-                            // persistentStateChangeS map, falling within cases handled below.
-                            taskList.add(stateChange.generateTask());
-                            persistentStateChanges.put(stateChange.getClass(), stateChange);
+                // generating tasks for the desired state changes
+                for (StateChange currentStateChange : node.getDesiredStateChanges()) {
 
-                        } // else {
-                        // do nothing: we do not want a back-to-default state change if there was no known
-                        // non-default state change already taking place.
-                        // }
-                    } else {
-                        if (stateChange.isTheDefaultInstance()) { // I know, I'm a sucker for almost plain-english code
-                            // non redundant default state change, eliminates subType entry in the map, to keep map small
-                            taskList.add(stateChange.generateTask());
-                            persistentStateChanges.remove(stateChange.getClass());
+                    // State changes persist beyond the node that request them if following nodes
+                    // require the exact same change.
+                    persistentStateChange = (StateChange) persistentStateChanges.get(currentStateChange.getClass());
 
-                        } else if (!stateChange.equals(persistentStateChange)) {
-                            // non-redundant state change of the same subType but different value, becomes new map entry
-                            taskList.add(stateChange.generateTask());
-                            persistentStateChanges.put(stateChange.getClass(), stateChange);
+                    // for a state change to be necessary there can't be an identical one already persisting
+                    if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
+                        // no persistent state change of this subType found: the state change is necessary (not redundant)
+                        taskList.add(currentStateChange.generateTask());
+                        persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
 
-                        } // else {
-                        // the non-redundant state change being examined is not a default one and is identical
-                        // in value to the one stored in the persistentStateChange map: it is redundant after all
-                        // and we ignore it
-                        // }
+                    } // else: the state change is redundant - we don't generate a task for it
+                }
+
+                // task executing the node.process() method
+                taskList.add(node.generateTask());
+
+                // generating tasks for the desired state resets
+                nextEnabledNode = findNextEnabledNode(orderedNodes, currentIndex + 1);
+                if (nextEnabledNode != null) {
+
+                    // if there is one enabled node after this one we must check its desired state changes,
+                    // to make sure we don't reset to default something it would set again.
+                    // For example: no point binding the display (the default FBO) if the next enabled node
+                    // will bind another FBO.
+                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
+                        if (sameClassStateChangeNotFoundInThe(nextEnabledNode, currentStateReset)) {
+                            taskList.add(currentStateReset.generateTask());
+                            persistentStateChanges.remove(currentStateReset.getClass());
+                        }
                     }
 
-                }
-
-                intranodesStateChanges.clear();
-                taskList.add(((Node) object).generateTask());
-            }
-        }
-        logList("-- Task List --", taskList); // TODO: remove in the future or turn it into debug
-    }
-
-    private void generateIntermediateList(List<Node> orderedNodes) {
-        intermediateList.clear();
-        for (Node node : orderedNodes) {
-            node.setTaskListGenerator(this);
-            if (node.isEnabled()) {
-                intermediateList.addAll(node.getDesiredStateChanges());
-                intermediateList.add(node);
-                // Add state changes to reset all desired state changes back to default.
-                for (StateChange stateChange : node.getDesiredStateChanges()) {
-                    intermediateList.add(stateChange.getDefaultInstance());
+                } else {
+                    // there are no enabled nodes after this one: we must generate all the tasks necessary
+                    // to reset the effects of any persisting state change.
+                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
+                        taskList.add(currentStateReset.generateTask());
+                        persistentStateChanges.remove(currentStateReset.getClass());
+                    }
                 }
             }
+
+            currentIndex++;
         }
-        logList("-- Intermediate List --", intermediateList); // TODO: remove in the future or turn it into debug
+
+        long endTimeInNanoSeconds = System.nanoTime();
+
+        if (logger.isInfoEnabled()) {
+            logIntermediateRendererListForDebugging(orderedNodes);
+            logList("----- RENDERER TASK LIST --------------------------------", taskList);
+            logger.info(String.format("Task list generated in %.3f ms.", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
+        }
+
+        return taskList;
     }
 
+    private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
+
+        for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {
+            if (stateChange.getClass() == stateChangeReset.getClass()) {
+                return false; // we did find it! And yes, returning false is correct, see method name.
+
+                // note: we don't worry about the details of the two state changes (i.e. if they are value-identical)
+                // as this is something that will be checked while iterating over next node's desired state changes,
+                // in the first part of method generateTaskList.
+            }
+        }
+
+        return true; // we didn't find a state change of the same class
+
+    }
+
+    private Node findNextEnabledNode(List<Node> orderedNodeList, int startIndex) {
+
+        for (int index = startIndex; index < orderedNodeList.size(); index++) {
+            Node currentNode = orderedNodeList.get(index);
+            if (currentNode.isEnabled()) {
+                return currentNode;
+            }
+        }
+
+        return null;
+    }
+
+    private void logList(String title, List<?> list) {
+        logger.info(title);
+        for (Object object : list) {
+            logger.info(object.toString());
+        }
+    }
+
+    /**
+     * Forces a refresh of the task list using the latest node list provided to the generateFrom method.
+     *
+     * A refresh is useful when one of the nodes has been enabled or disabled, as the tasks associated
+     * with it need to be added to the task list or removed from it. Tasks "downstream" of the change
+     * need to be re-evaluated then, as they might have become redundant.
+     *
+     * At this stage the refresh uses a brute-force approach: the whole task list is cleared and regenerated.
+     * Eventually it will be useful to make sure that only tasks affected by a change are regenerated.
+     */
     public void refresh() {
-        generateIntermediateList(nodeList);
-        generateTaskList();
+        generateFrom(nodeList);
     }
 
 }
