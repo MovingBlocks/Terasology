@@ -69,10 +69,7 @@ public final class SetFacesToCull implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetFacesToCull) {
-            return mode == ((SetFacesToCull) obj).getMode();
-        }
-        return false;
+        return (obj instanceof SetFacesToCull) && mode == ((SetFacesToCull) obj).getMode();
     }
 
     @Override
@@ -86,6 +83,6 @@ public final class SetFacesToCull implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), getModeName(mode));
+        return String.format("%30s: %s", this.getClass().getSimpleName(), getModeName(mode));
     }
 }

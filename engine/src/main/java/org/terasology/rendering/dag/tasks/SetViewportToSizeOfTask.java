@@ -43,6 +43,6 @@ public final class SetViewportToSizeOfTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
+        return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
     }
 }

@@ -61,8 +61,4 @@ public final class EnableFaceCulling extends SetStateParameter {
         return this == defaultInstance;
     }
 
-    @Override
-    public String toString() {
-        return String.format("%s%s", this.getClass().getSimpleName(), super.toString());
-    }
 }

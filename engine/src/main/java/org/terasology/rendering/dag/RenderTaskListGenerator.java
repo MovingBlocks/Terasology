@@ -53,13 +53,12 @@ public final class RenderTaskListGenerator {
     }
 
     private void logIntermediateRendererListForDebugging(List<Node> orderedNodes) {
-        logger.info("----- INTERMEDIATE RENDERER LIST --------------------------------");
 
         for (Node node : orderedNodes) {
             if (node.isEnabled()) {
 
                 // printing out node name
-                logger.info(String.format(("## Node: %s"), node.getClass().getSimpleName()));
+                logger.info(String.format(("----- %s"), node.getClass().getSimpleName()));
 
                 // printing out individual desired state changes
                 for (StateChange desiredStateChange : node.getDesiredStateChanges()) {
@@ -67,7 +66,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s.process()", node.toString()));
+                logger.info(String.format("%s: process()", node.toString()));
 
                 // printing out individual state resets
                 for (StateChange desiredStateReset : node.getDesiredStateResets()) {
@@ -100,6 +99,8 @@ public final class RenderTaskListGenerator {
         StateChange persistentStateChange;
         Map persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
 
+        int enabledNodes = 0;
+        int potentialTasks = 0;
         int currentIndex = 0;
 
         for (Node node : orderedNodes) {
@@ -110,6 +111,8 @@ public final class RenderTaskListGenerator {
                 if (logger.isInfoEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
                     taskList.add(new MarkerTask(node.getClass().getSimpleName()));
+                    enabledNodes++; // we count them only for statistical purposes
+                    potentialTasks += node.getDesiredStateChanges().size() + 1 + node.getDesiredStateResets().size();
                 }
 
                 // generating tasks for the desired state changes
@@ -162,9 +165,15 @@ public final class RenderTaskListGenerator {
         long endTimeInNanoSeconds = System.nanoTime();
 
         if (logger.isInfoEnabled()) {
+            logger.info("===== INTERMEDIATE RENDERER LIST =========================");
             logIntermediateRendererListForDebugging(orderedNodes);
-            logList("----- RENDERER TASK LIST --------------------------------", taskList);
-            logger.info(String.format("Task list generated in %.3f ms.", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
+            logger.info("===== RENDERER TASK LIST =================================");
+            logList(taskList);
+            logger.info("----------------------------------------------------------");
+            logger.info(String.format("Task list generated in %.3f ms", endTimeInNanoSeconds - startTimeInNanoSeconds / 1000000f));
+            logger.info(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
+                    nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
+            logger.info("----------------------------------------------------------");
         }
 
         return taskList;
@@ -198,8 +207,7 @@ public final class RenderTaskListGenerator {
         return null;
     }
 
-    private void logList(String title, List<?> list) {
-        logger.info(title);
+    private void logList(List<?> list) {
         for (Object object : list) {
             logger.info(object.toString());
         }

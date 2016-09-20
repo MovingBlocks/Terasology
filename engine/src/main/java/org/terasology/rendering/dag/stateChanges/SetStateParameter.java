@@ -37,10 +37,7 @@ abstract class SetStateParameter implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetStateParameter) {
-            return this.enabled == ((SetStateParameter) obj).isEnabled();
-        }
-        return false;
+        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).isEnabled();
     }
 
     public boolean isEnabled() {
@@ -60,13 +57,17 @@ abstract class SetStateParameter implements StateChange {
 
     protected abstract RenderPipelineTask getEnablingTask();
 
-    @Override
-    public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
+    public String getStatus() {
         String status = "disabled";
         if (enabled) {
             status = "enabled";
         }
 
-        return String.format(": capability %s", status);
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
     }
 }

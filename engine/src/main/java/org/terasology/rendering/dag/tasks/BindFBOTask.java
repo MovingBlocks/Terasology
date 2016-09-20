@@ -44,6 +44,6 @@ public final class BindFBOTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: %s(%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 }
