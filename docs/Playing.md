@@ -8,7 +8,6 @@ You can run the game with `-homedir` to instead store all game data in the direc
 
 Report issues in the [support forum](http://forum.terasology.org/forum/support.20) or ask on [IRC](https://github.com/MovingBlocks/Terasology/wiki/Using-IRC) (`#terasology` on Freenode)
 
-
 ## Multiplayer
 
 To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar, name in chat, and floating name tag.
@@ -33,6 +32,8 @@ After you have rights to manage *user* permissions you can grant other players s
 
 With *server* rights you can terminate the server gracefully via `shutdownServer` in the console. Otherwise you can kill a headless server with `CTRL-C` in a terminal / command prompt. Running headless with the .exe on Windows is not recommended as it "detaches" from its command prompt so you get no handy logging there or any way to issue a break to the process. If you cannot connect or get "op" you may have to terminate the process manually via Task Manager or comparable.
 
+### Configuring a server
+
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
 It is also possible to provide a configuration file which overrides the default configuration on startup. This file can be passed using the `-overrideDefaultConfig=<pathToFile>`. Settings from this file will be copied to the generated `config.cfg`. After that changes in the `config.cfg` have priority, so further modifications in the override file will not modify the server values. It not required to pass an entire configuration file. A typical example would be:
@@ -41,7 +42,8 @@ It is also possible to provide a configuration file which overrides the default 
 {
   "defaultModSelection": {
     "modules": [
-      "MyModule"
+      "MyModule",
+      "MyModule2"
     ],
     "defaultGameplayModuleName": "MyModule"
   },
@@ -51,19 +53,6 @@ It is also possible to provide a configuration file which overrides the default 
     "defaultGenerator": "MyModule:MyWorldgen"
   },
   "moduleConfigs": {},
-  "network": {
-    "servers": [
-      {
-        "name": "localhost",
-        "address": "localhost",
-        "port": 25777,
-        "active": true
-      }
-    ],
-    "upstreamBandwidth": 1024,
-    "serverPort": 25777,
-    "masterServer": "meta.terasology.org"
-  }
 }
 ```
 
@@ -77,6 +66,17 @@ Alternatively you can run from source and supply parameters for game configurati
 
 This will all become easier as the project and especially the launcher mature further :-)
 
+### Server via Docker
+
+If you're into Docker you can launch a container with a Terasology server already hooked up. 
+
+@qwc maintains the related setup and info at https://github.com/qwc/docker-terasology (related: #1749)
+
+See all available images at https://hub.docker.com/r/qwick/terasology/tags/
+
+Example: `docker pull qwick/terasology:latest`
+
+The Docker server starts with no extra modules configured, you would have to go update the game server's config accordingly if desired.
 
 ## Controls
 
