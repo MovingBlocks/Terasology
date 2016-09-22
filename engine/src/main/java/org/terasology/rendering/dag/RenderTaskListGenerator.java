@@ -170,7 +170,7 @@ public final class RenderTaskListGenerator {
             logger.info("===== RENDERER TASK LIST =================================");
             logList(taskList);
             logger.info("----------------------------------------------------------");
-            logger.info(String.format("Task list generated in %.3f ms", endTimeInNanoSeconds - startTimeInNanoSeconds / 1000000f));
+            logger.info(String.format("Task list generated in %.3f ms", (endTimeInNanoSeconds - startTimeInNanoSeconds) / 1000000f));
             logger.info(String.format("%s nodes, %s enabled - %s tasks (excluding marker tasks) out of %s potential tasks.",
                     nodeList.size(), enabledNodes, taskList.size() - enabledNodes, potentialTasks));
             logger.info("----------------------------------------------------------");
