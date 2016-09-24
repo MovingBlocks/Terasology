@@ -124,19 +124,6 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
     }
 
     @Override
-    public Vector3f getQuantizedSunDirection(float stepSize) {
-        float sunAngle = (float) Math.floor(getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
-        Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
-
-        // Moonlight flip
-        if (sunDirection.y < 0.0f) {
-            sunDirection.scale(-1.0f);
-        }
-
-        return sunDirection;
-    }
-
-    @Override
     public Vector3f getSunDirection(boolean moonlightFlip) {
         float sunAngle = getSunPositionAngle() + 0.0001f;
         Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
