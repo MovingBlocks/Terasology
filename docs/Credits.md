@@ -29,11 +29,49 @@ Soundtrack and Sound Effects
 * Camera Click Noise from Snapper4298, from FreeSound.org
 * Other sound effects created by Exile.
 
+Icons
+--------
+
+Some NUI editor icons belong to ["Fugue Icons" by Yusuke Kamiyamane](http://p.yusukekamiyamane.com/), licensed under the [Creative Commons Attribution 3.0 License](https://creativecommons.org/licenses/by/3.0/):
+* editor_array.png
+* editor_attribute.png
+* editor_object.png
+* editor_uibox.png
+* editor_uibutton.png
+* editor_uicheckbox.png
+* editor_uidoubleslider.png
+* editor_uidropdown.png
+* editor_uidropdownscrollable.png
+* editor_uiimage.png
+* editor_uilabel.png
+* editor_uilist.png
+* editor_uiloadbar.png
+* editor_uiscrollbar.png
+* editor_uislider.png
+* editor_uitext.png
+* editor_uitextentry.png
+* editor_uitooltip.png
+* editor_uitreeview.png
+* editor_zoomablelayout.png
+
+
+Some icons have been made by Florian Köberle and are licensed under the [Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/):
+* editor_cardLayout.png
+* editor_columnlayout.png
+* editor_flowlayout.png
+* editor_miglayout.png
+* editor_relativelayout.png
+* editor_rowlayout.png
+* editor_uispace.png
+* contract.png
+* contractOver.png
+* expand.png
+* expandOver.png
+
+
 Additional Notes
 --------
 
 A few of Terasology's base textures use the awesome [Good Morning Craft](http://www.minecraftforum.net/forums/mapping-and-modding/resource-packs/1227051-16x-good-morning-craft) texture pack by Louis Durrant. Make sure to visit his <a href="http://www.carrotcakestudios.co.uk/">homepage</a> and support his work.
 
 Our default font is ["Noto" by Google](http://www.google.com/get/noto), which is released under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) just like Terasology. More on the [font in the wiki](https://github.com/MovingBlocks/Terasology/wiki/Text-and-Font).
-
-Some NUI editor icons belong to ["Fugue Icons" by Yusuke Kamiyamane](http://p.yusukekamiyamane.com/), licensed under the [Creative Commons Attribution 3.0 License](https://creativecommons.org/licenses/by/3.0/).
