@@ -44,6 +44,7 @@ import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
 import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
@@ -65,6 +66,8 @@ import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
@@ -81,7 +84,10 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -208,9 +214,21 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
         NodeFactory nodeFactory = new NodeFactory(context);
+
+        // TODO: change FBOConfig to also hold the fbo manager
+        BufferClearingNode.RequiredData shadowMapClearingData = new BufferClearingNode.RequiredData(
+                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(),
+                shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
+        Node shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, shadowMapClearingData);
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+
+        BufferClearingNode.RequiredData reflectedBufferClearingData = new BufferClearingNode.RequiredData(
+                new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(),
+                displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Node reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectedBufferClearingData);
         Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
+
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
         Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
         Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
@@ -235,7 +253,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
         RenderGraph renderGraph = new RenderGraph();
+        renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
+
+        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
         renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
         renderGraph.addNode(backdropNode, "backdropNode");

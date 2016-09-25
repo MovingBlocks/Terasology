@@ -24,6 +24,7 @@ import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
@@ -84,6 +85,7 @@ public class BackdropReflectionNode extends AbstractNode {
         addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new DisableDepthMask());
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
     }
 
@@ -101,19 +103,7 @@ public class BackdropReflectionNode extends AbstractNode {
         playerCamera.setReflected(true);
         playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Ideally we'd set a DisableDepthMask state change to avoid the glDepthMask calls, below.
-        // However, the glClear call above must be executed while writing to the depth buffer is enabled.
-        // Having a state change that clears the buffer before the depth mask is disabled is problematic
-        // as a glClear operation is effectively a render rather than a state change and does not have a
-        // "default" to reset to.
-        // I therefore opted for keeping the glDepthMask statements in process(), until glClear statements
-        // will go in their own ClearingNode class
-
-        glDepthMask(false);
         glCallList(skySphere); // Draws the skysphere
-        glDepthMask(true); // this re-establish the default: writing to the depth buffer is enabled.
 
         // TODO: initially avoid the next line by having a LookThroughNormalized state change
         // TODO: eventually, when cameras are components, this node would simply use a different camera.

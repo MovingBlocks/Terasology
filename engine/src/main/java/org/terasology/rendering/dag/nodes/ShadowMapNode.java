@@ -40,10 +40,6 @@ import org.terasology.rendering.world.WorldRendererImpl;
 
 import java.beans.PropertyChangeEvent;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-
-
 /**
  * This node class generates a shadow map used by the lighting step to determine what's in sight of
  * the main light (sun, moon) and what isn't, allowing the display of shadows cast from said light.
@@ -129,20 +125,30 @@ public class ShadowMapNode extends ConditionDependentNode {
         }
     }
 
+    /**
+     * Re-positions the shadow map camera to loosely match the position of the main light (sun, moon), then
+     * writes depth information from that camera into a depth buffer, to be used later to create shadows.
+     *
+     * The loose match is to avoid flickering: the shadowmap only moves in steps while the main light actually
+     * moves continuously.
+     *
+     * This method is executed within a NodeTask in the Render Tasklist, but its calculations are executed
+     * only once per frame. I.e. in VR mode they are executed only when the left eye is processed. This is
+     * done in the assumption that we do not need to generate and use a shadow map for each eye as it wouldn't
+     * be noticeable.
+     */
     @Override
     public void process() {
-        positionShadowMapCamera();
-
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
+            positionShadowMapCamera();
 
             shadowMapCamera.lookThrough();
 
-            glClear(GL_DEPTH_BUFFER_BIT); // the shadowmap is a depth-only FBO
-
             // FIXME: storing chunksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
             worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
+
             playerCamera.lookThrough(); //TODO: camera setting need to go into a state change: enable camera, back to default camera
 
             PerformanceMonitor.endActivity();
@@ -150,7 +156,7 @@ public class ShadowMapNode extends ConditionDependentNode {
     }
 
     private void positionShadowMapCamera() {
-        // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude altitude
+        // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude
         Vector3f mainLightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z); // world-space coordinates
 
         // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
