@@ -26,6 +26,8 @@ public interface Node {
 
     void initialise();
 
+    void initialise(Object initialData);
+
     void process();
 
     // TODO: invoked when Node is removed from RenderGraph
