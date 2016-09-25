@@ -58,6 +58,7 @@ import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
 import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
+import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
@@ -208,6 +209,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // FIXME: init pipeline without specifying them as a field in this class
         NodeFactory nodeFactory = new NodeFactory(context);
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
         Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
@@ -234,6 +236,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         RenderGraph renderGraph = new RenderGraph();
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
+        renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
         renderGraph.addNode(backdropNode, "backdropNode");
         renderGraph.addNode(skybandsNode, "skybandsNode");
@@ -434,6 +437,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         return isFirstRenderingStageForCurrentFrame;
     }
 
+    // TODO: review - break this method and move it into the individual nodes using it?
     @Override
     public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         final Vector3f cameraPosition = camera.getPosition();
@@ -475,17 +479,12 @@ public final class WorldRendererImpl implements WorldRenderer {
                     chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
                 }
 
-
-                /**
-                 * Sets the state prior to the rendering of a chunk.
-                 *
-                 * In practice this just positions the chunk appropriately, relative to the camera.
-                 *
-                 * @param chunkPositionRelativeToCamera Effectively: chunkCoordinates * chunkDimensions - cameraCoordinate
-                 */
+                // Effectively this just positions the chunk appropriately, relative to the camera.
+                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
                 GL11.glPushMatrix();
                 GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
+                // TODO: review - if this is enabled it probably happens multiple times per frame, overdrawing objects.
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
                     AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
                     aabbRenderer.renderLocally(1f);
@@ -495,11 +494,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 chunk.getMesh().render(phase);
                 statRenderedTriangles += chunk.getMesh().triangleCount();
 
-                /**
-                 * Resets the state after the rendering of a chunk.
-                 *
-                 */
-                GL11.glPopMatrix();
+                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
 
             } else {
                 statChunkNotReady++;
@@ -585,18 +580,18 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public String getMetrics() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(renderableWorld.getMetrics());
-        builder.append("Empty Mesh Chunks: ");
-        builder.append(statChunkMeshEmpty);
-        builder.append("\n");
-        builder.append("Unready Chunks: ");
-        builder.append(statChunkNotReady);
-        builder.append("\n");
-        builder.append("Rendered Triangles: ");
-        builder.append(statRenderedTriangles);
-        builder.append("\n");
-        return builder.toString();
+        String stringToReturn = "";
+        stringToReturn += renderableWorld.getMetrics();
+        stringToReturn += "Empty Mesh Chunks: ";
+        stringToReturn += statChunkMeshEmpty;
+        stringToReturn += "\n";
+        stringToReturn += "Unready Chunks: ";
+        stringToReturn += statChunkNotReady;
+        stringToReturn += "\n";
+        stringToReturn += "Rendered Triangles: ";
+        stringToReturn += statRenderedTriangles;
+        stringToReturn += "\n";
+        return stringToReturn;
     }
 
     @Override
