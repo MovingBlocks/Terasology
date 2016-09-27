@@ -30,6 +30,6 @@ public final class DisableMaterialTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s(0)", this.getClass().getSimpleName());
+        return String.format("%30s: program 0", this.getClass().getSimpleName());
     }
 }

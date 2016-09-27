@@ -39,6 +39,6 @@ public final class SetFacesToCullTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
+        return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
     }
 }

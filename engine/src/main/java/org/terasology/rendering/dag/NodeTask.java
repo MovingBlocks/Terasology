@@ -32,6 +32,6 @@ public class NodeTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", this.getClass().getSimpleName(), node.getClass().getSimpleName());
+        return String.format("%30s: process()", node.getClass().getSimpleName());
     }
 }

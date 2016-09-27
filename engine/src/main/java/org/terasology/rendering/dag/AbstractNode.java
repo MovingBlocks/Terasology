@@ -17,6 +17,7 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
+    private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
@@ -62,12 +64,17 @@ public abstract class AbstractNode implements Node {
         fboUsages.clear();
     }
 
-    protected boolean addDesiredStateChange(StateChange stateChange) {
-        return desiredStateChanges.add(stateChange);
+    protected void addDesiredStateChange(StateChange stateChange) {
+        if (stateChange.isTheDefaultInstance()) {
+            logger.error("Attempted to add default state change %s to the set of desired state changes", stateChange.getClass().getSimpleName());
+        }
+        desiredStateChanges.add(stateChange);
+        desiredStateResets.add(stateChange.getDefaultInstance());
     }
 
-    protected boolean removeDesiredStateChange(StateChange stateChange) {
-        return desiredStateChanges.remove(stateChange);
+    protected void removeDesiredStateChange(StateChange stateChange) {
+        desiredStateChanges.remove(stateChange);
+        desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
     protected void refreshTaskList() {
@@ -76,6 +83,9 @@ public abstract class AbstractNode implements Node {
 
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
+    }
+    public Set<StateChange> getDesiredStateResets() {
+        return desiredStateResets;
     }
 
     public RenderPipelineTask generateTask() {
@@ -87,7 +97,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName();
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {

@@ -61,11 +61,7 @@ public final class SetWireframe implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetWireframe) {
-            return this.enabled == ((SetWireframe) obj).isEnabled();
-        }
-
-        return false;
+        return (obj instanceof SetWireframe) && this.enabled == ((SetWireframe) obj).isEnabled();
     }
 
     public boolean isEnabled() {
@@ -84,6 +80,6 @@ public final class SetWireframe implements StateChange {
             status = "enabled";
         }
 
-        return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), status);
     }
 }

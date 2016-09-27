@@ -37,6 +37,6 @@ public final class DisableStateParameterTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s: disabled", parameterName);
+        return String.format("%30s: %s disabled", this.getClass().getSimpleName(), parameterName);
     }
 }

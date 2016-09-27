@@ -35,6 +35,10 @@ public final class SetDepthMaskTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", this.getClass().getSimpleName(), enabled);
+        String status = "disabled";
+        if (enabled) {
+            status = "enabled";
+        }
+        return String.format("%30s: %s", this.getClass().getSimpleName(), status);
     }
 }

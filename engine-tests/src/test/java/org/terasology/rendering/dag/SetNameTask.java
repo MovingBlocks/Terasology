@@ -32,6 +32,6 @@ public class SetNameTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", this.getClass().getSimpleName(), name);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), name);
     }
 }

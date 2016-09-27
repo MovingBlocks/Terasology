@@ -66,10 +66,7 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof EnableMaterial) {
-            return materialName.equals(((EnableMaterial) obj).getMaterialName());
-        }
-        return false;
+        return (obj instanceof EnableMaterial) && materialName.equals(((EnableMaterial) obj).getMaterialName());
     }
 
     @Override
@@ -84,6 +81,6 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), materialName);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
     }
 }

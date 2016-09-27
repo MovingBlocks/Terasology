@@ -48,6 +48,6 @@ public final class SetWireframeTask implements RenderPipelineTask {
         if (mode == ENABLED) {
             status = "enabled";
         }
-        return String.format("%s: wireframe %s", this.getClass().getSimpleName(), status);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), status);
     }
 }
