@@ -70,7 +70,7 @@ This will all become easier as the project and especially the launcher mature fu
 
 If you're into Docker you can launch a container with a Terasology server already hooked up. 
 
-@qwc maintains the related setup and info at https://github.com/qwc/docker-terasology (related: #1749)
+[qwc](https://github.com/qwc) maintains the related setup and info at https://github.com/qwc/docker-terasology (related: #1749)
 
 See all available images at https://hub.docker.com/r/qwick/terasology/tags/
 
