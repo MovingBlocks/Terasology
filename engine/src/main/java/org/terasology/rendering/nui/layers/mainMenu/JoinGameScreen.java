@@ -19,6 +19,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
@@ -26,6 +28,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
@@ -41,6 +44,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layouts.CardLayout;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -62,6 +66,8 @@ import java.util.concurrent.Future;
 /**
  */
 public class JoinGameScreen extends CoreScreenLayer {
+
+    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
@@ -386,5 +392,14 @@ public class JoinGameScreen extends CoreScreenLayer {
             return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
         }
     }
+
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.R) {
+            logger.info("Refresh");
+            visibleList.setSelection(null);
+            extInfo.clear();
+            }
+            return false;
+        }
 
 }
