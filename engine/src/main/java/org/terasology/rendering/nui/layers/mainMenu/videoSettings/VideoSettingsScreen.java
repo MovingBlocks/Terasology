@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -32,6 +33,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.widgets.UIDropdown;
@@ -268,6 +270,18 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             CoreRegistry.get(ShaderManager.class).recompileAllShaders();
             triggerBackAnimation();
         });
+    }
+
+
+    @Override
+    public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+            // TODO: add a dirty flag that checks if recompiling is needed
+            CoreRegistry.get(ShaderManager.class).recompileAllShaders();
+            triggerBackAnimation();
+        }
+        return false;
     }
 
     @Override
