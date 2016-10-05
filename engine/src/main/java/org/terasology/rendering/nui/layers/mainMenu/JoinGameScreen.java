@@ -208,7 +208,8 @@ public class JoinGameScreen extends CoreScreenLayer {
         serverList.subscribe((widget, item) -> join(item.getAddress(), item.getPort()));
 
         serverList.subscribeSelection((widget, item) -> {
-            if (item != null && !extInfo.containsKey(item)) {
+            extInfo.remove(item);
+            if (item != null) {
                 extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
             }
         });
