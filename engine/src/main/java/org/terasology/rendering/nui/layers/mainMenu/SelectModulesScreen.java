@@ -329,12 +329,20 @@ public class SelectModulesScreen extends CoreScreenLayer {
             if (downloadButton != null) {
                 downloadButton.subscribe(button -> {
                     if (moduleList.getSelection() != null) {
-
                         ModuleSelectionInfo info = moduleList.getSelection();
                         startDownloadingNewestModulesRequiredFor(info);
                     }
                 });
-
+                downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        try {
+                        return moduleList.getSelection().getOnlineVersion() != null;
+                        } catch (NullPointerException e) {
+                            return false;
+                        }
+                    }
+                });
                 downloadButton.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
