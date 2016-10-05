@@ -284,6 +284,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         CoreRegistry.get(ShaderManager.class).recompileAllShaders();
         triggerBackAnimation();
     }
+
     @Override
     public boolean isLowerLayerVisible() {
         return false;
