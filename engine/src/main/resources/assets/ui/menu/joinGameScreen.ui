@@ -310,18 +310,6 @@
                 }
               },
               {
-                "type": "UIButton",
-                "id": "join",
-                "text": "${engine:menu#join-server-action}",
-                "family": "highlight",
-                "layoutInfo": {
-                  "height": 40,
-                  "position-bottom": {
-                    "target": "BOTTOM"
-                  }
-                }
-              },
-              {
                 "type": "RowLayout",
                 "id": "buttonRow",
                 "horizontalSpacing": 4,

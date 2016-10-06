@@ -415,7 +415,6 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
 
     public void refresh() {
-        logger.info("Refresh");
         ServerInfo i = visibleList.getSelection();
         visibleList.setSelection(null);
         extInfo.clear();
