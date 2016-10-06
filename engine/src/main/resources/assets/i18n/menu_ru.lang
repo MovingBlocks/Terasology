@@ -96,6 +96,7 @@
     "invert-y": "Инвертировать ось Y",
     "invert-z": "Инвертировать ось Z",
     "join-game-online": "Присоединиться к игре",
+    "join-server-refresh": "Refresh",
     "join-server-action": "Присоединиться",
     "join-server-requested": "Запрос соединения",
     "join-server-title": "Присоединиться к серверу",

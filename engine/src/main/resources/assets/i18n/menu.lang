@@ -97,6 +97,7 @@
     "invert-z": "invert-z",
     "join-game-online": "join-game-online",
     "join-server-action": "join-server-action",
+    "join-server-refresh": "join-server-refresh",
     "join-server-requested": "join-server-requested",
     "join-server-title": "join-server-title",
     "light-shafts": "light-shafts",

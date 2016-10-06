@@ -96,6 +96,7 @@
     "invert-y": "Invert Y Axis",
     "invert-z": "Invert Z Axis",
     "join-game-online": "Join Game",
+    "join-server-refresh": "Refresh",
     "join-server-action": "Join",
     "join-server-requested": "Requested",
     "join-server-title": "Join Server",

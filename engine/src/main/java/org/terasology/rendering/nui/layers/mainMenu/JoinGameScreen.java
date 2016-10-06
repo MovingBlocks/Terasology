@@ -302,6 +302,19 @@ public class JoinGameScreen extends CoreScreenLayer {
             });
         }
 
+        UIButton refreshButton = find("refresh", UIButton.class);
+        if (refreshButton != null) {
+            refreshButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    return visibleList.getSelection() != null;
+                }
+            });
+            refreshButton.subscribe(button -> {
+               refresh();
+            });
+        }
     }
 
     private void bindCustomButtons() {
@@ -396,13 +409,17 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown() && event.getKey() == Keyboard.Key.R) {
-            logger.info("Refresh");
-            ServerInfo i = visibleList.getSelection();
-            visibleList.setSelection(null);
-            extInfo.clear();
-            visibleList.setSelection(i);
+            refresh();
             }
             return false;
         }
+
+    public void refresh() {
+        logger.info("Refresh");
+        ServerInfo i = visibleList.getSelection();
+        visibleList.setSelection(null);
+        extInfo.clear();
+        visibleList.setSelection(i);
+    }
 
 }
