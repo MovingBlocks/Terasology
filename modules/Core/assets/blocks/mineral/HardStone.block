@@ -2,5 +2,5 @@
  * Harder than normal stone
  */
 {
-    "basedOn" : "core:rock2"
+    "basedOn": "core:rock2"
 }

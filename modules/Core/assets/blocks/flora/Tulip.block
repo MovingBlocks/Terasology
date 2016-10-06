@@ -20,6 +20,6 @@
  * 109 species and belongs to the family Liliaceae.
  */
 {
-    "basedOn" : "core:plant",
-    "waving" : true
+    "basedOn": "core:plant",
+    "waving": true
 }

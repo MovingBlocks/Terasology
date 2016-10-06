@@ -38,8 +38,8 @@
                     }
                 ],
                 "layoutInfo": {
-                    "height" : 300, 
-                    "width" : 500,
+                    "height": 300,
+                    "width": 500,
                     "position-bottom": {
                         "target": "BOTTOM"
                     }

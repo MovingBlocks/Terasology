@@ -21,7 +21,7 @@
  * Entirely separate trees would have their own tree + leaf block definitions (rename the plain "Tree" then)
  */
 {
-    "basedOn" : "core:wood",
+    "basedOn": "core:wood",
     "displayName": "Oak Log",
     // Graphics
     "tiles": {

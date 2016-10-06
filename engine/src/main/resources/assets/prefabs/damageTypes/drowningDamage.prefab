@@ -1,5 +1,5 @@
 {
-    "damageSound" : {
-        "sounds" : ["engine:Slime3"]
+    "damageSound": {
+        "sounds": ["engine:Slime3"]
     }
 }

@@ -1,6 +1,8 @@
 {
-    "params" : [
-        { "name" : "diffuse",
-          "type" : "sampler2D" }
+    "params": [
+        {
+            "name": "diffuse",
+            "type": "sampler2D"
+        }
     ]
 }

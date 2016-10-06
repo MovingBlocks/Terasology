@@ -18,6 +18,6 @@
  * MantleStone is our bedrock of sorts - the bottom layer of the world. It is indestructible
 */
 {
-    "hardness" : 0,
-    "mass" : 256
+    "hardness": 0,
+    "mass": 256
 }

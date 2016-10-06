@@ -19,10 +19,10 @@
  * Unlike Grass, it might be possible to have a SnowBlock as well
  */
 {
-    "basedOn" : "core:soil",
-    "tiles" : {
-        "sides" : "SnowSide",
-        "bottom" : "dirt"
+    "basedOn": "core:soil",
+    "tiles": {
+        "sides": "SnowSide",
+        "bottom": "dirt"
     },
     "sounds": "Core:snow"
 }

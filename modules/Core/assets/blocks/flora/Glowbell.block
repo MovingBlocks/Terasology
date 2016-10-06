@@ -19,7 +19,7 @@
  * @author (art) eleazzaar
  */
 {
-    "author" : "eleazzaar",
-    "basedOn" : "core:plant",
-    "waving" : true
+    "author": "eleazzaar",
+    "basedOn": "core:plant",
+    "waving": true
 }

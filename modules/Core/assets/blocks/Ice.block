@@ -18,7 +18,7 @@
  * Ice is pretty similar to Glass (for now)
  */
 {
-    "ice" : true,
-    "translucent" : true,
-    "hardness" : 1
+    "ice": true,
+    "translucent": true,
+    "hardness": 1
 }

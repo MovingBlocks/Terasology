@@ -1,4 +1,4 @@
 {
-    "filterMode" : "Linear",
-    "type" : "Texture3D"
+    "filterMode": "Linear",
+    "type": "Texture3D"
 }

@@ -18,6 +18,6 @@
  * Sand is fairly sandy.
  */
 {
-    "basedOn" : "core:soil",
+    "basedOn": "core:soil",
     "sounds": "Core:sand"
 }

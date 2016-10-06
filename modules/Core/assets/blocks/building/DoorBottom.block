@@ -15,8 +15,8 @@
  */
 
 {
-    "shape" : "door",
-    "rotation" : "horizontal",
-    "attachmentAllowed" : false,
-    "mass" : 40
+    "shape": "door",
+    "rotation": "horizontal",
+    "attachmentAllowed": false,
+    "mass": 40
 }

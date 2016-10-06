@@ -18,7 +18,6 @@
  * Brick is Brick
  */
 {
-
-    "basedOn" : "core:rock",
+    "basedOn": "core:rock",
     "displayName": "Brick"
 }

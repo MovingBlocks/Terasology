@@ -1,8 +1,8 @@
 {
     "inherit": "default",
     "elements": {
-        "UIBox" : {
-            "background" : "engine:box"
+        "UIBox": {
+            "background": "engine:box"
         }
     }
 }

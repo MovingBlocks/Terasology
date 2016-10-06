@@ -18,12 +18,12 @@
  * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
  */
 {
-    "tiles" : {
-        "sides" : "FurnaceSides",
-        "front" : "FurnaceFront",
-        "topBottom" : "FurnaceTopBottom"
+    "tiles": {
+        "sides": "FurnaceSides",
+        "front": "FurnaceFront",
+        "topBottom": "FurnaceTopBottom"
     },
-    "entity" : {
-        "prefab" : "chest"
+    "entity": {
+        "prefab": "chest"
     }
 }

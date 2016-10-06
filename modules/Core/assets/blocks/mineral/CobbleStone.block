@@ -19,6 +19,6 @@
  * But maybe we'll do something else since ideally we'll have mini-blocks drop from Stone...
  */
 {
-    "basedOn" : "core:rock",
+    "basedOn": "core:rock",
     "displayName": "Cobble Stone"
 }

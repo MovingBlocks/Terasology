@@ -21,17 +21,17 @@
  * That might be an example of a meta-block - need more info than the byte ID
  */
 {
-    "liquid" : true,
-    "lava" : true,
-    "shape" : "engine:trimmedLoweredCube",
+    "liquid": true,
+    "lava": true,
+    "shape": "engine:trimmedLoweredCube",
     // Let the lava shine!
-    "luminance" : 15,
-    "hardness" : 0,
-    "attachmentAllowed" : false,
-    "translucent" : true,
-    "targetable" : false,
-    "penetrable" : true,
-    "shadowCasting" : false,
-    "replacementAllowed" : true,
-    "tint" : [0.3, 0.2, 0.2]
+    "luminance": 15,
+    "hardness": 0,
+    "attachmentAllowed": false,
+    "translucent": true,
+    "targetable": false,
+    "penetrable": true,
+    "shadowCasting": false,
+    "replacementAllowed": true,
+    "tint": [0.3, 0.2, 0.2]
 }

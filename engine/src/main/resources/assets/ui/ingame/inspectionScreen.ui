@@ -1,6 +1,6 @@
 {
-    "type" : "InspectionScreen",
-    "contents" : {
+    "type": "InspectionScreen",
+    "contents": {
         "type": "RelativeLayout",
         "contents": [
             {
@@ -13,20 +13,20 @@
                     "id": "fullDescriptionLabel"
                 },
                 "layoutInfo": {
-                    "height" : 300,
-                    "width" : 500,
-                    "position-horizontal-center" : {},
+                    "height": 300,
+                    "width": 500,
+                    "position-horizontal-center": {},
                     "position-vertical-center": {}
                 }
             },
-             {
-                "type" : "RowLayout",
-                "contents" : [
+            {
+                "type": "RowLayout",
+                "contents": [
                     {
-                        "type" : "UILabel",
-                        "text" : "Entity Id: ",
-                        "layoutInfo" : {
-                            "useContentWidth":true
+                        "type": "UILabel",
+                        "text": "Entity Id: ",
+                        "layoutInfo": {
+                            "useContentWidth": true
                         }
                     },
                     {
@@ -35,26 +35,25 @@
                         "id": "entityIdField"
                     },
                     {
-                        "type" : "UIButton",
-                        "text" : "Set",
-                        "id" : "setEntityIdButton",
-                        "layoutInfo" : {
-                            "relativeWidth":0.1
+                        "type": "UIButton",
+                        "text": "Set",
+                        "id": "setEntityIdButton",
+                        "layoutInfo": {
+                            "relativeWidth": 0.1
                         }
                     }
                 ],
-                "layoutInfo" : {
-                    "use-content-height" : true,
-                    "width" : 500,
-                    "position-horizontal-center" : {},
-                    "position-vertical-top" : {},
+                "layoutInfo": {
+                    "use-content-height": true,
+                    "width": 500,
+                    "position-horizontal-center": {},
+                    "position-vertical-top": {},
                     "position-bottom": {
-                            "widget": "scrollArea",
-                            "target": "TOP"
+                        "widget": "scrollArea",
+                        "target": "TOP"
                     }
                 }
             }
-
         ]
     }
 }

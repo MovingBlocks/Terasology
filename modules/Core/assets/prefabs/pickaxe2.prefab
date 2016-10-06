@@ -6,6 +6,6 @@
     "Item": {
         "icon": "engine:items#pick",
         "damageType": "pickaxeDamage",
-        "baseDamage" : 2
+        "baseDamage": 2
     }
 }

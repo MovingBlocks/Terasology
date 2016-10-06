@@ -19,6 +19,6 @@
  * @author (art) eleazzaar
  */
 {
-    "author" : "eleazzaar",
-    "basedOn" : "core:plant"
+    "author": "eleazzaar",
+    "basedOn": "core:plant"
 }

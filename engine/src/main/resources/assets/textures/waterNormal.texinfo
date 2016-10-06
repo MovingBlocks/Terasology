@@ -1,4 +1,4 @@
 {
-    "wrapMode" : "Repeat",
-    "filterMode" : "Linear"
+    "wrapMode": "Repeat",
+    "filterMode": "Linear"
 }

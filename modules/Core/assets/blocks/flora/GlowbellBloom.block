@@ -19,8 +19,8 @@
  * @author (art) eleazzaar
  */
 {
-    "author" : "eleazzaar",
-    "basedOn" : "core:plant",
-    "luminance" : 6,
-    "waving" : true
+    "author": "eleazzaar",
+    "basedOn": "core:plant",
+    "luminance": 6,
+    "waving": true
 }
