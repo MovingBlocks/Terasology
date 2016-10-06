@@ -397,8 +397,10 @@ public class JoinGameScreen extends CoreScreenLayer {
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown() && event.getKey() == Keyboard.Key.R) {
             logger.info("Refresh");
+            ServerInfo i = visibleList.getSelection();
             visibleList.setSelection(null);
             extInfo.clear();
+            visibleList.setSelection(i);
             }
             return false;
         }
