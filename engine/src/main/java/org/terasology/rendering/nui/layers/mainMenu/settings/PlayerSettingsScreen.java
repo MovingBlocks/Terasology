@@ -61,7 +61,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private final List<Color> colors = CieCamColors.L65C65;
 
     private UIText nametext;
-    private UISlider slider;
+    private UISlider slider, heightSlider, eyeHeightSlider;
     private UIImage img;
     private UIDropdownScrollable<Locale> language;
 
@@ -106,6 +106,23 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             slider.setIncrement(0.01f);
             Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
             slider.setLabelFunction(constant);
+        }
+
+        heightSlider = find("height", UISlider.class);
+        if (heightSlider != null) {
+            heightSlider.setMinimum(0.1f);
+            heightSlider.setIncrement(0.1f);
+            heightSlider.setRange(49.9f);
+            heightSlider.setPrecision(1);
+        }
+
+        eyeHeightSlider = find("eye-height", UISlider.class);
+        if (eyeHeightSlider != null) {
+            eyeHeightSlider.setMinimum(0.1f);
+            eyeHeightSlider.setIncrement(0.1f);
+            eyeHeightSlider.setRange(49.9f);
+            eyeHeightSlider.setPrecision(1);
+            eyeHeightSlider.setIncrement(0.01f);
         }
 
         language = find("language", UIDropdownScrollable.class);

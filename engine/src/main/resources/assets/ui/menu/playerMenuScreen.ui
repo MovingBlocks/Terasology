@@ -1,75 +1,105 @@
 {
-    "type" : "PlayerSettingsScreen",
-    "skin" : "mainmenu",
-    "contents" : {
-        "type" : "relativeLayout",
-        "contents" : [
+    "type": "PlayerSettingsScreen",
+    "skin": "mainmenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
             {
-                "type" : "UIImage",
-                "image" : "engine:terasology",
-                "id" : "title",
-                "layoutInfo" : {
-                    "width" : 512,
-                    "height" : 128,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "TOP",
-                        "offset" : 48
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
                     }
                 }
             },
             {
-                "type" : "UILabel",
+                "type": "UILabel",
                 "text": "${engine:menu#player-settings-title}",
-                "family" : "title",
-                "id" : "subtitle",
-                "layoutInfo" : {
-                    "height" : 48,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "widget" : "title"
+                "family": "title",
+                "id": "subtitle",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
                     }
                 }
             },
             {
-                "type" : "UIBox",
-                "content" : {
-                    "type" : "ColumnLayout",
-                    "family" : "option-grid",
-                    "columns" : 2,
-                    "column-widths" : [0.35, 0.65],
-                    "verticalSpacing" : 8,
-                    "horizontalSpacing" : 8,
-
-                    "contents" : [
+                "type": "UIBox",
+                "content": {
+                    "type": "ColumnLayout",
+                    "family": "option-grid",
+                    "columns": 2,
+                    "column-widths": [
+                        0.35,
+                        0.65
+                    ],
+                    "verticalSpacing": 8,
+                    "horizontalSpacing": 8,
+                    "contents": [
                         {
-                            "type" : "UILabel",
-                            "text" : "${engine:menu#player-name}:"
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-name}:"
                         },
                         {
-                            "type" : "UIText",
-                            "id"   : "playername"
+                            "type": "UIText",
+                            "id": "playername"
                         },
                         {
-                            "type" : "UILabel",
-                            "text" : "${engine:menu#player-color}:"
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-color}:"
                         },
                         {
-                            "type" : "RowLayout",
-                            "horizontalSpacing" : 10,
-                            "contents" : [
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
                                 {
-                                    "type" : "UISlider",
-                                    "id" : "tone",
-                                    "layoutInfo" : {
-                                        "relativeWidth" : 0.88
+                                    "type": "UISlider",
+                                    "id": "tone",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.88
                                     }
                                 },
                                 {
-                                    "type" : "UIImage",
-                                    "skin" : "framed_image",
-                                    "id" : "image"
+                                    "type": "UIImage",
+                                    "skin": "framed_image",
+                                    "id": "image"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-height}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UISlider",
+                                    "id": "height"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-eye-height}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UISlider",
+                                    "id": "eye-height"
                                 }
                             ]
                         },
@@ -83,18 +113,18 @@
                         }
                     ]
                 },
-                "layoutInfo" : {
-                    "width" : 450,
-                    "use-content-height" : true,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "offset" : 16,
-                        "widget" : "subtitle"
+                "layoutInfo": {
+                    "width": 450,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "subtitle"
                     },
-                    "position-bottom" : {
-                        "target" : "TOP",
-                        "offset" : 32,
+                    "position-bottom": {
+                        "target": "TOP",
+                        "offset": 32,
                         "widget": "actionsRow"
                     }
                 }
@@ -115,13 +145,13 @@
                         "id": "close"
                     }
                 ],
-                "layoutInfo" : {
+                "layoutInfo": {
                     "width": 400,
-                    "height" : 32,
-                    "position-horizontal-center" : {},
-                    "position-bottom" : {
-                        "target" : "BOTTOM",
-                        "offset" : 48
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
                     }
                 }
             }
