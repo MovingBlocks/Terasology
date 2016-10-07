@@ -547,9 +547,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        // moduleConfig passes the module collection to the Create Game Screen.
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
-        sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
+        // Fetch all the selected/activated modules using allSortedModules
+        // instead of fetching only selected/activated modules from filtered collection of modules using sortedModules
+        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
                 moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
