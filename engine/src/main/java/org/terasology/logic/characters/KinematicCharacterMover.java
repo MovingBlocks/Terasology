@@ -238,7 +238,7 @@ public class KinematicCharacterMover implements CharacterMover {
             } else {
                 state.setMode(MovementMode.DIVING);
             }
-            if (state.getVelocity().y < -5f) {
+            if (state.getVelocity().y < 0) {
                 state.getVelocity().y += 1f;
             }
         } else if (newSwimming) {
