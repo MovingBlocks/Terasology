@@ -75,6 +75,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             Color color = config.getPlayer().getColor();
             slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
         }
+        if (heightSlider != null) {
+            heightSlider.bindValue(new NotifyingBinding(config.getPlayer().getHeight()));
+        }
+        if (eyeHeightSlider != null) {
+            eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
+        }
         if (language != null) {
             language.setSelection(config.getSystem().getLocale());
         }
@@ -211,9 +217,31 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
     }
 
+    private Float getHeight() {
+        if (heightSlider != null) {
+            float index = heightSlider.getValue();
+            return index;
+        } else {
+            return config.getPlayer().getHeight();
+        }
+    }
+
+    private Float getEyeHeight() {
+        if (eyeHeightSlider != null) {
+            float index = eyeHeightSlider.getValue();
+            return index;
+        } else {
+            return config.getPlayer().getEyeHeight();
+        }
+    }
+
     private void savePlayerSettings() {
         Color color = getColor();
         config.getPlayer().setColor(color);
+        Float height = getHeight();
+        config.getPlayer().setHeight(height);
+        Float eyeHeight = getEyeHeight();
+        config.getPlayer().setEyeHeight(eyeHeight);
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText());
         }

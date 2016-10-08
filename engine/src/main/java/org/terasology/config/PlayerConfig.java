@@ -30,6 +30,10 @@ public class PlayerConfig {
 
     private Color color = defaultPlayerColor();
 
+    private Float height = defaultPlayerHeight();
+
+    private Float eyeHeight = defaultPlayerEyeHeight();
+
     public String getName() {
         return name;
     }
@@ -44,6 +48,18 @@ public class PlayerConfig {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Float getHeight() { return height; }
+
+    public void setHeight(Float height) {
+        this.height = height;
+    }
+
+    public Float getEyeHeight() { return eyeHeight; }
+
+    public void setEyeHeight(Float eyeHeight) {
+        this.eyeHeight = eyeHeight;
     }
 
     private static String defaultPlayerName() {
@@ -63,5 +79,13 @@ public class PlayerConfig {
         Random rng = new FastRandom();
         List<Color> colors = CieCamColors.L65C65;
         return colors.get(rng.nextInt(colors.size()));
+    }
+
+    private Float defaultPlayerHeight() {
+        return 1.8f;
+    }
+
+    private Float defaultPlayerEyeHeight() {
+        return 1.6f;
     }
 }
