@@ -121,6 +121,8 @@
     "parallax-mapping": "Parallax Mapping",
     "player-color": "Spelarens Färg",
     "player-name": "Spelarnamn",
+    "player-height": "Player Height",
+    "player-eye-height": "Player Eye Height",
     "player-settings": "Spelare",
     "player-settings-title": "Spelarens Inställningar",
     "preview-world-title": "Förhandsgranska Värld...",

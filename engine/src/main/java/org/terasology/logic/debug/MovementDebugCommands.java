@@ -203,4 +203,20 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         return "";
     }
+
+    @Command(shortDescription = "Sets the height of the player", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String playerHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+        if (move != null) {
+            float prevHeight = move.height;
+            move.height = amount;
+            clientComp.character.saveComponent(move);
+
+            return "Height of player set to " + amount + " (was " + prevHeight + ")";
+        }
+
+        return "";
+    }
 }

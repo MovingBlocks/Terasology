@@ -38,8 +38,6 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerStartingInventorySystem.class);
 
-//    @In
-//    private Config config;
     @In
     BlockManager blockManager;
     @In
@@ -98,13 +96,5 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
 
-        if (player.hasComponent(CharacterMovementComponent.class)) {
-            CharacterMovementComponent charMoveComp = player.getComponent(CharacterMovementComponent.class);
-            logger.info("Height: " + charMoveComp.height);
-            charMoveComp.height = 3.8f;
-//            logger.info("ConfigHeight: " + config.getPlayer().getHeight());
-            player.saveComponent(charMoveComp);
-            logger.info("Height: " + charMoveComp.height);
-        }
     }
 }

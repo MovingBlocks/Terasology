@@ -144,6 +144,8 @@
     "particle-effect-limit": "Предел воздействия частиц",
     "player-color": "Цвет игрока",
     "player-name": "Имя игрока",
+    "player-height": "Player Height",
+    "player-eye-height": "Player Eye Height",
     "player-settings": "Игрок",
     "player-settings-title": "Настройки игрока",
     "please-wait": "Пожалуйста, подождите...",
