@@ -177,8 +177,8 @@ public class CreateGameScreen extends CoreScreenLayer {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
+                    // This grabs modules from `config.getDefaultModSelection()` which is updated in SelectModulesScreen
                     Set<Name> enabledModuleNames = getAllEnabledModuleNames().stream().collect(Collectors.toSet());
-
                     List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
                         if (enabledModuleNames.contains(option.getUri().getModuleName())) {

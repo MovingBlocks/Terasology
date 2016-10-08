@@ -82,20 +82,20 @@
                             "family": "option-grid",
                             "contents": [
                                 {
-                                    "type" : "UILabel",
-                                    "text" : "${engine:menu#screenshot-size}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#screenshot-size}: "
                                 },
                                 {
                                     "type": "UIDropdown",
-                                    "id" : "screenshotSize"
+                                    "id": "screenshotSize"
                                 },
                                 {
-                                    "type" : "UILabel",
-                                    "text" : "${engine:menu#screenshot-format}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#screenshot-format}: "
                                 },
                                 {
-                                    "type" : "UIDropdown",
-                                    "id" : "screenshotFormat"
+                                    "type": "UIDropdown",
+                                    "id": "screenshotFormat"
                                 },
                                 {
                                     "type": "UILabel",
@@ -114,12 +114,12 @@
                                     "id": "vsync"
                                 },
                                 {
-                                    "type" : "UILabel",
-                                    "text" : "${engine:menu#menu-animations}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#menu-animations}: "
                                 },
                                 {
                                     "type": "UICheckbox",
-                                    "id" : "menu-animations"
+                                    "id": "menu-animations"
                                 }
                             ]
                         },
@@ -269,12 +269,12 @@
                                     "id": "particleEffectLimit"
                                 },
                                 {
-                                 "type": "UILabel",
-                                 "text": "${engine:menu#fog}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#fog}: "
                                 },
                                 {
-                                 "type": "UICheckbox",
-                                 "id": "inscattering"
+                                    "type": "UICheckbox",
+                                    "id": "inscattering"
                                 }
                             ]
                         },
@@ -369,30 +369,30 @@
                                     "id": "lightShafts"
                                 },
                                 {
-                                   "type": "UILabel",
-                                   "text": "${engine:menu#vignette}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#vignette}: "
                                 },
                                 {
-                                   "type": "UICheckbox",
-                                   "id": "vignette"
+                                    "type": "UICheckbox",
+                                    "id": "vignette"
                                 },
                                 {
-                                  "type": "UILabel",
-                                  "text": "${engine:menu#flickering-lights}: "
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#flickering-lights}: "
                                 },
                                 {
-                                  "type": "UICheckbox",
-                                  "id": "flickeringLight"
+                                    "type": "UICheckbox",
+                                    "id": "flickeringLight"
                                 },
                                 {
-                                 "type": "UILabel",
-                                 "text": "${engine:menu#volumetric-fog}: ",
-                                 "enabled": false
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#volumetric-fog}: ",
+                                    "enabled": false
                                 },
                                 {
-                                 "type": "UICheckbox",
-                                 "id": "volumetricFog",
-                                 "enabled": false
+                                    "type": "UICheckbox",
+                                    "id": "volumetricFog",
+                                    "enabled": false
                                 }
                             ]
                         },

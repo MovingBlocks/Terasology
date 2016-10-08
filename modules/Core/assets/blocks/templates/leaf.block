@@ -2,12 +2,12 @@
  * General template for tree leaf blocks
  */
 {
-    "template" : true,
-    "categories" : ["wood", "leaf"],
-    "attachmentAllowed" : false,
-    "hardness" : 1,
-    "colorSource" : "foliage_lut",
-    "debrisOnDestroy" : false,
-    "waving" : true,
-    "mass" : 8
+    "template": true,
+    "categories": ["wood", "leaf"],
+    "attachmentAllowed": false,
+    "hardness": 1,
+    "colorSource": "foliage_lut",
+    "debrisOnDestroy": false,
+    "waving": true,
+    "mass": 8
 }

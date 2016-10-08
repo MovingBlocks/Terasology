@@ -1,5 +1,5 @@
 {
-    "shader" : "engine:UILitMesh",
-    "params" : {
+    "shader": "engine:UILitMesh",
+    "params": {
     }
 }

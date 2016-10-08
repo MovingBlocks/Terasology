@@ -1,14 +1,14 @@
 {
-    "parent" : "engine:iconItem",
-    "DisplayName" : {
-        "name" : "Railgun"
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Railgun"
     },
-    "Item" : {
-        "icon" : "engine:items#dynamite",
-        "usage" : "IN_DIRECTION"
+    "Item": {
+        "icon": "engine:items#dynamite",
+        "usage": "IN_DIRECTION"
     },
-    "TunnelAction" : {},
-    "PlaySoundAction" : {
-        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    "TunnelAction": {},
+    "PlaySoundAction": {
+        "sounds": ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
     }
 }

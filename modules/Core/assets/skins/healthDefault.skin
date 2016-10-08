@@ -1,22 +1,22 @@
 {
-    "inherit" : "default",
-    "elements" : {
-        "UIIconBar" : {
-            "parts" : {
-                "icon" : {
-                    "fixed-width" : 16,
-                    "fixed-height" : 16
+    "inherit": "default",
+    "elements": {
+        "UIIconBar": {
+            "parts": {
+                "icon": {
+                    "fixed-width": 16,
+                    "fixed-height": 16
                 }
             }
         }
     },
-    "families" : {
-        "healthBar" : {
-            "elements" : {
-                "UIIconBar" : {
-                    "parts" : {
-                        "icon" : {
-                            "background" : "engine:icons#darkHeartOutline"
+    "families": {
+        "healthBar": {
+            "elements": {
+                "UIIconBar": {
+                    "parts": {
+                        "icon": {
+                            "background": "engine:icons#darkHeartOutline"
                         }
                     }
                 }

@@ -1,16 +1,16 @@
 {
-    "parent" : "engine:iconItem",
-    "DisplayName" : {
-        "name" : "Explode Tool"
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Explode Tool"
     },
-    "Item" : {
-        "icon" : "engine:items#dynamiteStick",
-        "usage" : "ON_BLOCK"
+    "Item": {
+        "icon": "engine:items#dynamiteStick",
+        "usage": "ON_BLOCK"
     },
-    "ExplosionAction" : {
-        "relativeTo" : "Target"
+    "ExplosionAction": {
+        "relativeTo": "Target"
     },
-    "PlaySoundAction" : {
-        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
+    "PlaySoundAction": {
+        "sounds": ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
     }
 }

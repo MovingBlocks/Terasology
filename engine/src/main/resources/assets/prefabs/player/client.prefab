@@ -1,9 +1,7 @@
 {
-    "persisted" : false,
-    "Location" : {
-    },
-    "Client" : {},
-    "Network" : {
-    },
+    "persisted": false,
+    "Location": {},
+    "Client": {},
+    "Network": {},
     "AutoMountCamera": {}
 }

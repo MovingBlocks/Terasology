@@ -1,9 +1,9 @@
 {
-    "attachmentAllowed" : false,
-    "rotation" : "horizontal",
-    "climbable" : true,
-    "penetrable" : false,
-    "shape" : "engine:verticalOffsetPlane",
-    "translucent" : true,
-    "doubleSided" : true
+    "attachmentAllowed": false,
+    "rotation": "horizontal",
+    "climbable": true,
+    "penetrable": false,
+    "shape": "engine:verticalOffsetPlane",
+    "translucent": true,
+    "doubleSided": true
 }
