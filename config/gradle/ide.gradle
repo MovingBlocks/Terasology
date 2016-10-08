@@ -157,7 +157,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -220,7 +220,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir=terasology-2ndclient -noCrashReport"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -252,7 +252,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -284,7 +284,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -noSplash"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -316,7 +316,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -loadlastgame"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -348,7 +348,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -noSaveGames"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -380,7 +380,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir -noCrashReport -noSound"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -412,7 +412,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-headless -homedir=terasology-server"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
@@ -444,7 +444,7 @@ ext {
                 </pattern>
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.editor.TeraEd"/>
-              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1024m"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
               <option name="PROGRAM_PARAMETERS" value="-homedir"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
