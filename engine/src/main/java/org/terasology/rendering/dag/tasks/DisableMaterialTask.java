@@ -15,7 +15,8 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import static org.lwjgl.opengl.GL20.glUseProgram;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
@@ -23,9 +24,11 @@ import org.terasology.rendering.dag.RenderPipelineTask;
  */
 public final class DisableMaterialTask implements RenderPipelineTask {
 
+    private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
+
     @Override
     public void execute() {
-        glUseProgram(0);
+        shaderManager.disableShader();
     }
 
     @Override

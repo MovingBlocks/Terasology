@@ -16,11 +16,13 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -86,7 +88,12 @@ import java.util.PriorityQueue;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 
 /**
@@ -97,9 +104,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  * This implementation works closely with a number of support objects, in particular:
  *
- * - a FrameBuffersManager instance, holding handles to GPU buffers used as input and output of rendering steps<br/>
- * - a GraphicState instance, providing a number of methods to affect the OpenGL state<br/>
- * - a PostProcessor instance, taking care of (mostly) 2D processing on the content of the GPU buffers<br/>
+ * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  *
  */
@@ -214,22 +219,52 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
         NodeFactory nodeFactory = new NodeFactory(context);
+        RenderGraph renderGraph = new RenderGraph();
 
-        // TODO: change FBOConfig to also hold the fbo manager
-        BufferClearingNode.RequiredData shadowMapClearingData = new BufferClearingNode.RequiredData(
-                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(),
-                shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
+        // ShadowMap generation
+        FBOConfig shadowMapConfig =
+                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
+        BufferClearingNode.RequiredData shadowMapClearingData = // TODO: turn node into condition-dependent one
+                new BufferClearingNode.RequiredData(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         Node shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, shadowMapClearingData);
-        shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
 
-        BufferClearingNode.RequiredData reflectedBufferClearingData = new BufferClearingNode.RequiredData(
-                new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(),
-                displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        renderGraph.addNode(shadowMapNode, "shadowMapNode");
+
+        // (i.e. water) reflection generation
+        FBOConfig reflectedBufferConfig =
+                new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
+        BufferClearingNode.RequiredData reflectedBufferClearingData =
+                new BufferClearingNode.RequiredData(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Node reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectedBufferClearingData);
+        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode"); // TODO: verify this is necessary
+
         Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
+        renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
+
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
+        renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
+
+        // TODO: write snippets and shaders to inspect content of a color/depth buffer
+
+        // sky generation
+        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"),
+                        FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
+        BufferClearingNode.RequiredData reflectiveRefractiveBufferClearingData =
+                new BufferClearingNode.RequiredData(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Node reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectiveRefractiveBufferClearingData);
+        renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
+
+        BufferClearingNode.RequiredData readBufferClearingData = new BufferClearingNode.RequiredData(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs,
+                        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        Node readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, readBufferClearingData);
+        renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
 
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
+        renderGraph.addNode(backdropNode, "backdropNode");
+
+        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
         Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
         Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
         Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
@@ -252,15 +287,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
-        RenderGraph renderGraph = new RenderGraph();
-        renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
-        renderGraph.addNode(shadowMapNode, "shadowMapNode");
-
-        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
-        renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
-        renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-        renderGraph.addNode(backdropNode, "backdropNode");
         renderGraph.addNode(skybandsNode, "skybandsNode");
+
         renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
         renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
         renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
@@ -381,7 +409,19 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
 
+        // The following line re-establish OpenGL defaults, so that the nodes/tasks can rely on them.
+        // A place where Terasology overrides the defaults is LwjglGraphics.initOpenGLParams(), but
+        // there could be potentially other places, i.e. in the UI code. In the rendering engine we'd like
+        // to eventually rely on a default OpenGL state.
+        glDisable(GL_CULL_FACE);
+        //glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
+        //glDepthFunc(GL_LESS);
+
         renderPipelineTaskList.forEach(RenderPipelineTask::execute);
+
+        // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
+        LwjglGraphics.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
