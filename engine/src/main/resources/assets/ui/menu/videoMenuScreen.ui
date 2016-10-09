@@ -99,11 +99,11 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#video-fullscreen}: "
+                                    "text": "${engine:menu#video-display-mode}: "
                                 },
                                 {
-                                    "type": "UICheckbox",
-                                    "id": "fullscreen"
+                                    "type": "UIDropdown",
+                                    "id": "displayModeSetting"
                                 },
                                 {
                                     "type": "UILabel",

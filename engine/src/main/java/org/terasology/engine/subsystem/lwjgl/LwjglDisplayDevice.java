@@ -21,6 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -53,24 +54,56 @@ public class LwjglDisplayDevice implements DisplayDevice {
 
     @Override
     public void setFullscreen(boolean state) {
-        setFullscreen(state, true);
+        if (state) {
+            setDisplayModeSetting(DisplayModeSetting.FULLSCREEN, true);
+        } else {
+            setDisplayModeSetting(DisplayModeSetting.WINDOWED, true);
+        }
     }
 
-    void setFullscreen(boolean state, boolean resize) {
+    @Override
+    public DisplayModeSetting getDisplayModeSetting() {
+        return config.getDisplayModeSetting();
+    }
+
+    @Override
+    public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
+        setDisplayModeSetting(displayModeSetting, true);
+    }
+
+    public void setDisplayModeSetting(DisplayModeSetting displayModeSetting, boolean resize) {
         try {
-            if (state) {
-                Display.setDisplayMode(Display.getDesktopDisplayMode());
-                Display.setFullscreen(true);
-            } else {
-                Display.setDisplayMode(config.getDisplayMode());
-                Display.setResizable(true);
+            switch (displayModeSetting) {
+                case FULLSCREEN:
+                    Display.setDisplayMode(Display.getDesktopDisplayMode());
+                    Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
+                    Display.setFullscreen(true);
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setFullscreen(true);
+                    break;
+                case WINDOWED_FULLSCREEN:
+                    System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
+                    Display.setDisplayMode(Display.getDesktopDisplayMode());
+                    Display.setLocation(0, 0);
+                    Display.setFullscreen(false);
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setWindowedFullscreen(true);
+                    break;
+                case WINDOWED:
+                    System.setProperty("org.lwjgl.opengl.Window.undecorated", "false");
+                    Display.setDisplayMode(config.getDisplayMode());
+                    Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
+                    Display.setFullscreen(false);
+                    Display.setResizable(true);
+                    config.setDisplayModeSetting(displayModeSetting);
+                    config.setFullscreen(false);
+                    break;
             }
-            config.setFullscreen(state);
+            if (resize) {
+                glViewport(0, 0, Display.getWidth(), Display.getHeight());
+            }
         } catch (LWJGLException e) {
             throw new RuntimeException("Can not initialize graphics device.", e);
-        }
-        if (resize) {
-            glViewport(0, 0, Display.getWidth(), Display.getHeight());
         }
     }
 

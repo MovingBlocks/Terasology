@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless.device;
 
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 
 public class HeadlessDisplayDevice implements DisplayDevice {
 
@@ -40,6 +41,15 @@ public class HeadlessDisplayDevice implements DisplayDevice {
 
     @Override
     public void setFullscreen(boolean state) {
+    }
+
+    @Override
+    public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
+    }
+
+    @Override
+    public DisplayModeSetting getDisplayModeSetting() {
+        return DisplayModeSetting.WINDOWED;
     }
 
     @Override

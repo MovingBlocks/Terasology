@@ -64,6 +64,7 @@ import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
@@ -215,9 +216,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     private void initDisplay() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
         try {
-            lwjglDisplay.setFullscreen(config.isFullscreen(), false);
 
-            Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
+            if (config.isWindowedFullscreen()) {
+                lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED_FULLSCREEN, false);
+            } else {
+                lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.FULLSCREEN, false);
+            }
+
             Display.setTitle("Terasology" + " | " + "Alpha");
             try {
 

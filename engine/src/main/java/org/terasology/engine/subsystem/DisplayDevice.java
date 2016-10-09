@@ -15,6 +15,8 @@
  */
 package org.terasology.engine.subsystem;
 
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+
 public interface DisplayDevice {
 
     boolean hasFocus();
@@ -24,6 +26,10 @@ public interface DisplayDevice {
     void setFullscreen(boolean state);
 
     boolean isFullscreen();
+
+    void setDisplayModeSetting(DisplayModeSetting displayModeSetting);
+
+    DisplayModeSetting getDisplayModeSetting();
 
     // TODO: this breaks the nice API we have so far.
     // From the lwjgl docs:

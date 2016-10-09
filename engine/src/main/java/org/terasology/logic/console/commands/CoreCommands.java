@@ -284,7 +284,6 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
         displayDevice.setFullscreen(!displayDevice.isFullscreen());
-
         if (displayDevice.isFullscreen()) {
             return "Switched to fullscreen mode";
         } else {

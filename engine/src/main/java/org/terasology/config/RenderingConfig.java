@@ -19,6 +19,7 @@ package org.terasology.config;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.subscribables.AbstractSubscribable;
@@ -34,7 +35,7 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String WINDOW_POS_Y = "WindowPosY";
     public static final String WINDOW_WIDTH = "WindowWidth";
     public static final String WINDOW_HEIGHT = "WindowHeight";
-    public static final String FULLSCREEN = "FullScreen";
+    public static final String DISPLAY_MODE_SETTING = "DisplayModeSetting";
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
     public static final String FLICKERING_LIGHT = "FlickeringLight";
@@ -82,6 +83,8 @@ public class RenderingConfig extends AbstractSubscribable {
     private int windowWidth;
     private int windowHeight;
     private boolean fullscreen;
+    private boolean windowedFullscreen;
+    private DisplayModeSetting displayModeSetting;
     private boolean animatedMenu;
     private ViewDistance viewDistance;
     private boolean flickeringLight;
@@ -188,14 +191,60 @@ public class RenderingConfig extends AbstractSubscribable {
         return new DisplayMode(windowWidth, windowHeight);
     }
 
+    public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
+        switch (displayModeSetting) {
+            case FULLSCREEN:
+                this.windowedFullscreen = false;
+                setFullscreen(true);
+                break;
+            case WINDOWED_FULLSCREEN:
+                this.windowedFullscreen = true;
+                setWindowedFullscreen(true);
+                break;
+            case WINDOWED:
+                this.windowedFullscreen = false;
+                setFullscreen(false);
+                break;
+        }
+    }
+
+    public DisplayModeSetting getDisplayModeSetting() {
+        return this.displayModeSetting;
+    }
+
     public boolean isFullscreen() {
         return fullscreen;
     }
 
     public void setFullscreen(boolean fullscreen) {
-        boolean oldValue = this.fullscreen;
+        DisplayModeSetting oldValue = this.displayModeSetting;
         this.fullscreen = fullscreen;
-        propertyChangeSupport.firePropertyChange(FULLSCREEN, oldValue, this.fullscreen);
+        if (fullscreen) {
+            this.displayModeSetting = DisplayModeSetting.FULLSCREEN;
+        } else {
+            if (windowedFullscreen) {
+                this.displayModeSetting = DisplayModeSetting.WINDOWED_FULLSCREEN;
+            } else {
+                this.displayModeSetting = DisplayModeSetting.WINDOWED;
+            }
+        }
+        propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, this.displayModeSetting);
+    }
+
+    public boolean isWindowedFullscreen() {
+        return windowedFullscreen;
+    }
+
+    public void setWindowedFullscreen(boolean fullscreenWindowed) {
+        DisplayModeSetting oldValue = this.displayModeSetting;
+        this.windowedFullscreen = fullscreenWindowed;
+        if (fullscreenWindowed) {
+            this.displayModeSetting = DisplayModeSetting.WINDOWED_FULLSCREEN;
+            this.fullscreen = false;
+        } else {
+            setFullscreen(true);
+        }
+        propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, this.displayModeSetting);
     }
 
     public boolean isAnimatedMenu() {
