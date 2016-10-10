@@ -60,7 +60,7 @@ public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitio
         assetManager.resolve(resourceName.toString(), BlockTile.class).stream()
                 .map(urn -> assetManager.getAsset(urn, BlockTile.class).get())
                 .filter(BlockTile::isAutoBlock)
-                .forEach(tile -> result.add(tile.getUrn().getResourceName()));
+                .forEach(tile -> result.add(tile.getUrn().getModuleName()));
         return result;
     }
 
