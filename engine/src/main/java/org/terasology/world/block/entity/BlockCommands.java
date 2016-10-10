@@ -17,6 +17,7 @@
 package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -60,7 +61,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 
 @RegisterSystem
 @Share(BlockCommands.class)
@@ -233,6 +234,37 @@ public class BlockCommands extends BaseComponentSystem {
 
     }
 
+    @Command(shortDescription = "Gives multiple stacks of blocks matching a search",
+            helpText = "Adds all blocks that match the search parameter into your inventory",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bulkGiveBlock(
+            @Sender EntityRef sender,
+            @CommandParam("searched") String searched) {
+        String searchLowercase = searched.toLowerCase();
+        List<String> blocks = findBlockMatches(searchLowercase);
+        String result = "Found " + blocks.size() + " block matches when searching for '" + searched + "'.";
+        if (blocks.size() > 0) {
+            result += "\nBlocks:";
+            for (String block : blocks) {
+                result += "\n" + block;
+                giveBlock(sender, block, null, null);
+            }
+        }
+        return result;
+    }
+
+    private List<String> findBlockMatches(String searchLowercase) {
+        return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
+                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+    }
+
+    private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
+        return def.getUrn().toString().toLowerCase().contains(searchLowercase);
+    }
+
+
     @Command(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -275,7 +307,7 @@ public class BlockCommands extends BaseComponentSystem {
                 throw new IllegalArgumentException("No block found for '" + uri + "'");
             }
         } else if (matchingUris.isEmpty()) {
-        	return suggestItemIfAvailable(uri);
+            return suggestItemIfAvailable(uri);
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -283,10 +315,10 @@ public class BlockCommands extends BaseComponentSystem {
             return builder.toString();
         }
     }
-    
+
     /**
      * Tells players that their request matched no blocks, and directs them to giveItem if an item matches.
-     * 
+     *
      * @param uri the URI to use to look for an item
      */
     private String suggestItemIfAvailable(String uri) {
