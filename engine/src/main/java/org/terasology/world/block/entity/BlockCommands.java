@@ -234,7 +234,7 @@ public class BlockCommands extends BaseComponentSystem {
 
     }
 
-    @Command(shortDescription = "Add multiple blocks to inventory",
+    @Command(shortDescription = "Gives multiple stacks of blocks matching a search",
             helpText = "Adds all blocks that match the search parameter into your inventory",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bulkGiveBlock(
