@@ -16,11 +16,13 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
@@ -44,6 +46,7 @@ import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
 import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
 import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
@@ -58,12 +61,15 @@ import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
 import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
+import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.SkyBandsNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
@@ -80,7 +86,15 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -90,9 +104,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  *
  * This implementation works closely with a number of support objects, in particular:
  *
- * - a FrameBuffersManager instance, holding handles to GPU buffers used as input and output of rendering steps<br/>
- * - a GraphicState instance, providing a number of methods to affect the OpenGL state<br/>
- * - a PostProcessor instance, taking care of (mostly) 2D processing on the content of the GPU buffers<br/>
+ * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  *
  */
@@ -207,9 +219,52 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
         NodeFactory nodeFactory = new NodeFactory(context);
+        RenderGraph renderGraph = new RenderGraph();
+
+        // ShadowMap generation
+        FBOConfig shadowMapConfig =
+                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
+        BufferClearingNode.RequiredData shadowMapClearingData = // TODO: turn node into condition-dependent one
+                new BufferClearingNode.RequiredData(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
+        Node shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, shadowMapClearingData);
+        renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
+
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        renderGraph.addNode(shadowMapNode, "shadowMapNode");
+
+        // (i.e. water) reflection generation
+        FBOConfig reflectedBufferConfig =
+                new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
+        BufferClearingNode.RequiredData reflectedBufferClearingData =
+                new BufferClearingNode.RequiredData(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Node reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectedBufferClearingData);
+        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode"); // TODO: verify this is necessary
+
+        Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
+        renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
+
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
+        renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
+
+        // TODO: write snippets and shaders to inspect content of a color/depth buffer
+
+        // sky generation
+        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"),
+                        FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
+        BufferClearingNode.RequiredData reflectiveRefractiveBufferClearingData =
+                new BufferClearingNode.RequiredData(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Node reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectiveRefractiveBufferClearingData);
+        renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
+
+        BufferClearingNode.RequiredData readBufferClearingData = new BufferClearingNode.RequiredData(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs,
+                        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        Node readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, readBufferClearingData);
+        renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
+
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
+        renderGraph.addNode(backdropNode, "backdropNode");
+
+        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
         Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
         Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
         Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
@@ -232,11 +287,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
-        RenderGraph renderGraph = new RenderGraph();
-        renderGraph.addNode(shadowMapNode, "shadowMapNode");
-        renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-        renderGraph.addNode(backdropNode, "backdropNode");
         renderGraph.addNode(skybandsNode, "skybandsNode");
+
         renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
         renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
         renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
@@ -357,7 +409,19 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // TODO: Add a method here to check wireframe configuration and regenerate "renderPipelineTask" accordingly.
 
+        // The following line re-establish OpenGL defaults, so that the nodes/tasks can rely on them.
+        // A place where Terasology overrides the defaults is LwjglGraphics.initOpenGLParams(), but
+        // there could be potentially other places, i.e. in the UI code. In the rendering engine we'd like
+        // to eventually rely on a default OpenGL state.
+        glDisable(GL_CULL_FACE);
+        //glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
+        //glDepthFunc(GL_LESS);
+
         renderPipelineTaskList.forEach(RenderPipelineTask::execute);
+
+        // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
+        LwjglGraphics.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
     }
@@ -434,6 +498,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         return isFirstRenderingStageForCurrentFrame;
     }
 
+    // TODO: review - break this method and move it into the individual nodes using it?
     @Override
     public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         final Vector3f cameraPosition = camera.getPosition();
@@ -475,17 +540,12 @@ public final class WorldRendererImpl implements WorldRenderer {
                     chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
                 }
 
-
-                /**
-                 * Sets the state prior to the rendering of a chunk.
-                 *
-                 * In practice this just positions the chunk appropriately, relative to the camera.
-                 *
-                 * @param chunkPositionRelativeToCamera Effectively: chunkCoordinates * chunkDimensions - cameraCoordinate
-                 */
+                // Effectively this just positions the chunk appropriately, relative to the camera.
+                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
                 GL11.glPushMatrix();
                 GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
+                // TODO: review - if this is enabled it probably happens multiple times per frame, overdrawing objects.
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
                     AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
                     aabbRenderer.renderLocally(1f);
@@ -495,11 +555,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 chunk.getMesh().render(phase);
                 statRenderedTriangles += chunk.getMesh().triangleCount();
 
-                /**
-                 * Resets the state after the rendering of a chunk.
-                 *
-                 */
-                GL11.glPopMatrix();
+                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
 
             } else {
                 statChunkNotReady++;
@@ -585,18 +641,18 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public String getMetrics() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(renderableWorld.getMetrics());
-        builder.append("Empty Mesh Chunks: ");
-        builder.append(statChunkMeshEmpty);
-        builder.append("\n");
-        builder.append("Unready Chunks: ");
-        builder.append(statChunkNotReady);
-        builder.append("\n");
-        builder.append("Rendered Triangles: ");
-        builder.append(statRenderedTriangles);
-        builder.append("\n");
-        return builder.toString();
+        String stringToReturn = "";
+        stringToReturn += renderableWorld.getMetrics();
+        stringToReturn += "Empty Mesh Chunks: ";
+        stringToReturn += statChunkMeshEmpty;
+        stringToReturn += "\n";
+        stringToReturn += "Unready Chunks: ";
+        stringToReturn += statChunkNotReady;
+        stringToReturn += "\n";
+        stringToReturn += "Rendered Triangles: ";
+        stringToReturn += statRenderedTriangles;
+        stringToReturn += "\n";
+        return stringToReturn;
     }
 
     @Override

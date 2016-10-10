@@ -22,11 +22,11 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -37,17 +37,23 @@ import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 
 /**
+ * An instance of this class is responsible for rendering a reflected landscape into the
+ * "engine:sceneReflected". This buffer is then used to produce the reflection
+ * of the landscape on the water surface.
+ *
+ * It could potentially be used also for other reflecting surfaces, i.e. metal, but it only works
+ * for horizontal surfaces.
+ *
+ * An instance of this class is enabled or disabled depending on the reflections setting in the rendering config.
+ *
  * Diagram of this node can be viewed from:
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
-public class WorldReflectionNode extends AbstractNode {
+public class WorldReflectionNode extends ConditionDependentNode {
     public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
 
     @In
@@ -60,47 +66,61 @@ public class WorldReflectionNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     @In
-    private BackdropRenderer backdropRenderer;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
 
-
+    /**
+     * Node initialization.
+     *
+     * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
+     * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
+     * on possible FBO configurations.
+     *
+     * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
+     */
     @Override
     public void initialise() {
-        this.renderingConfig = config.getRendering();
-        this.chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
-        this.playerCamera = worldRenderer.getActiveCamera();
+        playerCamera = worldRenderer.getActiveCamera();
+
+        renderingConfig = config.getRendering();
+        requiresCondition(() -> renderingConfig.isReflectiveWater());
+        renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
 
         requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+        addDesiredStateChange(new EnableMaterial("engine:prog.chunk"));
+
+        // we must get this here because in process we activate/deactivate a specific shader feature.
+        // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
+        chunkShader = worldRenderer.getMaterial("engine:prog.chunk");
     }
 
+    /**
+     * Renders the landscape, reflected, into the buffers attached to the "engine:sceneReflected" FBO. It is used later,
+     * to render horizontal reflective surfaces, i.e. water.
+     *
+     * Notice that this method -does not- clear the FBO. The rendering takes advantage of the depth buffer to decide
+     * which pixel is in front of the one already stored in the buffer.
+     *
+     * See: https://en.wikipedia.org/wiki/Deep_image_compositing
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/worldReflection");
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify if necessary
         playerCamera.setReflected(true);
-        playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
-        // TODO: convert backdropRenderer into a BackdropNode.
-        backdropRenderer.render(playerCamera);
-        playerCamera.lookThrough();
+        playerCamera.lookThrough(); // TODO: handle this trough a state change
 
-        if (renderingConfig.isReflectiveWater()) {
-            // TODO: the isReflectiveWater() block should include content of the whole process() method.
-            // TODO: Eventually the check will be removed, when node insertion will signify that the feature is enabled.
-            chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-            worldRenderer.renderChunks(renderQueues.chunksOpaqueReflection, ChunkMesh.RenderPhase.OPAQUE, playerCamera, WorldRendererImpl.ChunkRenderMode.REFLECTION);
-            chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        }
+        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        worldRenderer.renderChunks(renderQueues.chunksOpaqueReflection, ChunkMesh.RenderPhase.OPAQUE, playerCamera, WorldRendererImpl.ChunkRenderMode.REFLECTION);
+        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+
         playerCamera.setReflected(false);
 
         PerformanceMonitor.endActivity();

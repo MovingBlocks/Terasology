@@ -22,12 +22,12 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
-import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -37,21 +37,26 @@ import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
-import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 
+import java.beans.PropertyChangeEvent;
 
 /**
+ * This node class generates a shadow map used by the lighting step to determine what's in sight of
+ * the main light (sun, moon) and what isn't, allowing the display of shadows cast from said light.
+ * TODO: generalize to handle more than one light.
+ *
+ * Instances of this class:
+ * - are enabled and disabled depending on the shadow setting in the rendering config.
+ * - in VR mode regenerate the shadow map only once per frame rather than once per-eye.
+ *
  * Diagram of this node can be viewed from:
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
-public class ShadowMapNode extends AbstractNode {
+public class ShadowMapNode extends ConditionDependentNode {
     public static final ResourceUrn SHADOW_MAP = new ResourceUrn("engine:sceneShadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
+    private static final float STEP_SIZE = 50f;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     @In
@@ -72,86 +77,123 @@ public class ShadowMapNode extends AbstractNode {
     @In
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
 
-    private Material shadowMapShader;
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
     private float texelSize;
-    private float stepSize;
-
 
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
-        this.shadowMapShader = worldRenderer.getMaterial("engine:prog.shadowMap");
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
 
         requiresFBO(new FBOConfig(SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
 
-        // TODO: fix them
+        texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
+        renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
+
+        requiresCondition(() -> renderingConfig.isDynamicShadows());
+        renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
+
         addDesiredStateChange(new BindFBO(SHADOW_MAP, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial("engine:prog.shadowMap"));
     }
 
+    private float calculateTexelSize(int shadowMapResolution) {
+        return 1.0f / shadowMapResolution * 2.0f; // the 2.0 multiplier is currently a mystery.
+    }
+
+    /**
+     * Handle changes to the following rendering config properties:
+     *
+     * - DYNAMIC_SHADOWS
+     * - SHADOW_MAP_RESOLUTION
+     *
+     * It assumes the event gets fired only if one of the property has actually changed.
+     *
+     * @param event a PropertyChangeEvent instance, carrying information regarding
+     *              what property changed, its old value and its new value.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals(RenderingConfig.DYNAMIC_SHADOWS)) {
+            super.propertyChange(event);
+        } else if (event.getPropertyName().equals(RenderingConfig.SHADOW_MAP_RESOLUTION)) {
+            int shadowMapResolution = (int) event.getNewValue();
+            texelSize = calculateTexelSize(shadowMapResolution);
+        }
+    }
+
+    /**
+     * Re-positions the shadow map camera to loosely match the position of the main light (sun, moon), then
+     * writes depth information from that camera into a depth buffer, to be used later to create shadows.
+     *
+     * The loose match is to avoid flickering: the shadowmap only moves in steps while the main light actually
+     * moves continuously.
+     *
+     * This method is executed within a NodeTask in the Render Tasklist, but its calculations are executed
+     * only once per frame. I.e. in VR mode they are executed only when the left eye is processed. This is
+     * done in the assumption that we do not need to generate and use a shadow map for each eye as it wouldn't
+     * be noticeable.
+     */
     @Override
     public void process() {
-        positionShadowMapCamera();
-
-        // TODO: find an elegant way to fetch isFirstRenderingStageForCurrentFrame
-        // TODO: check these conditions before adding this node inside the DAG, removing this condition completely from process()
-        if (renderingConfig.isDynamicShadows() && worldRenderer.isFirstRenderingStageForCurrentFrame()) {
+        // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
+        if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
+            positionShadowMapCamera();
 
-            // preRenderSetupSceneShadowMap
-            // TODO: verify the need to clear color buffer
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            GL11.glDisable(GL_CULL_FACE);
-
-            // render
             shadowMapCamera.lookThrough();
 
-            shadowMapShader.enable();
             // FIXME: storing chunksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
             worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
-            playerCamera.lookThrough(); //FIXME: not strictly needed: just defensive programming here.
 
-            // postRenderCleanupSceneShadowMap
-            GL11.glEnable(GL_CULL_FACE);
-
+            playerCamera.lookThrough(); //TODO: camera setting need to go into a state change: enable camera, back to default camera
 
             PerformanceMonitor.endActivity();
         }
     }
 
     private void positionShadowMapCamera() {
-        // Shadows are rendered around the player so...
-        Vector3f lightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z);
+        // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude
+        Vector3f mainLightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z); // world-space coordinates
 
-        // Project the shadowMapCamera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the shadowMapCamera)
-        texelSize = 1.0f / renderingConfig.getShadowMapResolution();
-        texelSize *= 2.0f;
+        // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
+        // That's why we first convert it to the previous frame's light-space coordinates and then back to world-space.
+        shadowMapCamera.getViewProjectionMatrix().transformPoint(mainLightPosition); // to light-space
+        mainLightPosition.set(TeraMath.fastFloor(mainLightPosition.x / texelSize) * texelSize, 0.0f,
+                              TeraMath.fastFloor(mainLightPosition.z / texelSize) * texelSize);
+        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(mainLightPosition); // back to world-space
 
-        shadowMapCamera.getViewProjectionMatrix().transformPoint(lightPosition);
-        lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
-        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(lightPosition);
+        // This is what causes the shadow map to change infrequently, to prevent flickering.
+        // Notice that this is different from what is done above, which is about spatial steps
+        // and is related to the player's position and texels.
+        Vector3f quantizedMainLightDirection = getQuantizedMainLightDirection(STEP_SIZE);
 
-        // ... we position our new shadowMapCamera at the position of the player and move it
-        // quite a bit into the direction of the sun (our main light).
+        // The shadow map camera is placed away from the player, in the direction of the main light.
+        Vector3f offsetFromPlayer = new Vector3f(quantizedMainLightDirection);
+        offsetFromPlayer.scale(256.0f + 64.0f); // these hardcoded numbers are another mystery.
+        mainLightPosition.add(offsetFromPlayer);
+        shadowMapCamera.getPosition().set(mainLightPosition);
 
-        // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
-        stepSize = 50f;
-        Vector3f sunDirection = backdropProvider.getQuantizedSunDirection(stepSize);
+        // Finally, we adjust the shadow map camera to look toward the player
+        Vector3f fromLightToPlayerDirection = new Vector3f(quantizedMainLightDirection);
+        fromLightToPlayerDirection.scale(-1.0f);
+        shadowMapCamera.getViewingDirection().set(fromLightToPlayerDirection);
 
-        Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(256.0f + 64.0f);
-        lightPosition.add(sunPosition);
-        shadowMapCamera.getPosition().set(lightPosition);
-
-        // and adjust it to look from the sun direction into the direction of our player
-        Vector3f negSunDirection = new Vector3f(sunDirection);
-        negSunDirection.scale(-1.0f);
-
-        shadowMapCamera.getViewingDirection().set(negSunDirection);
         shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
+    }
+
+    private Vector3f getQuantizedMainLightDirection(float stepSize) {
+        float mainLightAngle = (float) Math.floor(backdropProvider.getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
+        Vector3f mainLightDirection = new Vector3f(0.0f, (float) Math.cos(mainLightAngle), (float) Math.sin(mainLightAngle));
+
+        // When the sun goes under the horizon we flip the vector, to provide the moon direction, and viceversa.
+        if (mainLightDirection.y < 0.0f) {
+            mainLightDirection.scale(-1.0f);
+        }
+
+        return mainLightDirection;
     }
 }

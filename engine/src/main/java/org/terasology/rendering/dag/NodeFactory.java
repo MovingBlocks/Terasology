@@ -37,4 +37,13 @@ public class NodeFactory {
         node.initialise();
         return type.cast(node);
     }
+
+    public <T extends Node> T createInstance(Class<T> type, Object initializationData) {
+        // Attempt constructor-based injection first
+        T node = InjectionHelper.createWithConstructorInjection(type, context);
+        // Then fill @In fields
+        InjectionHelper.inject(node, context);
+        node.initialise(initializationData);
+        return type.cast(node);
+    }
 }

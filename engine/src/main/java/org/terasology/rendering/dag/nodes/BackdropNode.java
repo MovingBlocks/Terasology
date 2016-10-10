@@ -15,30 +15,33 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.assets.ResourceUrn;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.Sphere;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+
+import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
+
 
 /**
  * TODO: Diagram of this node
  */
 public class BackdropNode extends WireframeCapableNode {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
+    public static final int RADIUS = 1024;
+    public static final int SLICES = 16;
+    public static final int STACKS = 128;
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -50,49 +53,52 @@ public class BackdropNode extends WireframeCapableNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
-    private FBO sceneReflectiveRefractive;
+    private int skySphere = -1;
 
     @Override
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        initSkysphere();
+
+        // We do not call requireFBO as we can count this default buffer is there.
+        //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
+        addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
+
+        // By disabling the writing to the depth buffer the sky will always have a depth value
+        // set by the latest glClear statement.
+        addDesiredStateChange(new DisableDepthMask());
+
+        // Note: culling GL_FRONT polygons is necessary as we are inside the sphere and
+        //       due to vertex ordering the polygons we do see are the GL_BACK ones.
+        addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-
-        initialClearing();
-
-        READ_ONLY_GBUFFER.bind();
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
+        READ_ONLY_GBUFFER.bind(); // remove this when default FBOs become standard FBOs.
 
         playerCamera.lookThroughNormalized();
-        /**
-         * Sets the state to render the Backdrop. At this stage the backdrop is the SkySphere
-         * plus the SkyBands passes.
-         *
-         * The backdrop is the only rendering that has three state-changing methods.
-         * This is due to the SkySphere requiring a state and the SkyBands requiring a slightly
-         * different one.
-         */
         READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);
-        backdropRenderer.render(playerCamera);
+
+        glCallList(skySphere); // Draws the skysphere
+
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
+        playerCamera.lookThrough();
 
         PerformanceMonitor.endActivity();
     }
 
-    /**
-     * Initial clearing of a couple of important Frame Buffers. Then binds back the Display.
-     */
-    // It's unclear why these buffers need to be cleared while all the others don't...
-    private void initialClearing() {
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
-        READ_ONLY_GBUFFER.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        sceneReflectiveRefractive.bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        bindDisplay();
+    private void initSkysphere() {
+        Sphere sphere = new Sphere();
+        sphere.setTextureFlag(true);
+
+        skySphere = glGenLists(1);
+
+        glNewList(skySphere, GL11.GL_COMPILE);
+        sphere.draw(RADIUS, SLICES, STACKS);
+        glEndList();
     }
 }

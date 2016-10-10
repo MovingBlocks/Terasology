@@ -38,8 +38,6 @@ public interface BackdropProvider {
 
     float getSunPositionAngle();
 
-    Vector3f getQuantizedSunDirection(float stepSize);
-
     Vector3f getSunDirection(boolean moonlightFlip);
 
 }
