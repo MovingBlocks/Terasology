@@ -59,6 +59,10 @@ public class SkyBandsNode extends ConditionDependentNode {
     @Override
     public void initialise() {
 
+        // TODO: transform this node into a BlurNode taking input and output FBOs
+        // TODO: obtain FBOs on initialization, via config and actual READ_ONLY_GBUFFER instance
+        // TODO: create RequiredData folder - Base class just encapsulates an FBO config, other classes to add to it
+
         requiresFBO(new FBOConfig(SKY_BAND_0, ONE_16TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(SKY_BAND_1, ONE_32TH_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
 

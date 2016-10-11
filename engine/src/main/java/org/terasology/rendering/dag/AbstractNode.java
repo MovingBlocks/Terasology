@@ -40,8 +40,6 @@ public abstract class AbstractNode implements Node {
     private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
     private boolean enabled = true;
 
-    public void initialise(Object initialData) { } // added here to avoid adding it to all other nodes.
-
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
 
