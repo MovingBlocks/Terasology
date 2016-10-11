@@ -42,11 +42,7 @@ import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.*;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
@@ -163,8 +159,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
 
+            // Change height as per PlayerSettings
             Float height = config.getPlayer().getHeight();
-            String val = movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
+            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
+            // Change eyeHeight as per PlayerSettings
+            Float eyeHeight = config.getPlayer().getEyeHeight();
+            GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
+            gazeMountPointComponent.translate = new Vector3f(0, eyeHeight, 0);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
             // This is not done while the game is still loading, since systems are not updated.
