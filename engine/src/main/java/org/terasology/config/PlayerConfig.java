@@ -26,6 +26,11 @@ import org.terasology.utilities.random.Random;
 /**
  */
 public class PlayerConfig {
+
+    private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
+
+    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 1.6f;
+
     private String name = defaultPlayerName();
 
     private Color color = defaultPlayerColor();
@@ -59,7 +64,8 @@ public class PlayerConfig {
     public Float getEyeHeight() { return eyeHeight; }
 
     public void setEyeHeight(Float eyeHeight) {
-        this.eyeHeight = eyeHeight;
+        if (eyeHeight< this.height)
+            this.eyeHeight = eyeHeight;
     }
 
     private static String defaultPlayerName() {
@@ -81,11 +87,9 @@ public class PlayerConfig {
         return colors.get(rng.nextInt(colors.size()));
     }
 
-    private Float defaultPlayerHeight() {
-        return 1.8f;
-    }
+    private Float defaultPlayerHeight() { return DEFAULT_PLAYER_HEIGHT; }
 
     private Float defaultPlayerEyeHeight() {
-        return 1.6f;
+        return DEFAULT_PLAYER_EYE_HEIGHT;
     }
 }

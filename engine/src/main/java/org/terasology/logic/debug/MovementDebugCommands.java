@@ -41,9 +41,10 @@ import java.util.Optional;
 @RegisterSystem
 public class MovementDebugCommands extends BaseComponentSystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
+
     @In
     private PhysicsEngine physics;
-    private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -229,7 +230,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             clientComp.character.saveComponent(move);
             LocationComponent loc = client.getComponent(LocationComponent.class);
             Vector3f currentPosition = loc.getWorldPosition();
-            teleportCommand(client, currentPosition.getX(), currentPosition.getY() + (amount - prevHeight)/2, currentPosition.getZ());
+            clientComp.character.send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight)/2, currentPosition.getZ())));
             physics.removeCharacterCollider(clientComp.character);
             physics.getCharacterCollider(clientComp.character);
             return "Height of player set to " + amount + " (was " + prevHeight + ")";
