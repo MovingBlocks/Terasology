@@ -22,6 +22,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -39,6 +40,7 @@ import org.terasology.network.ClientComponent;
 import java.util.Optional;
 
 @RegisterSystem
+@Share(MovementDebugCommands.class)
 public class MovementDebugCommands extends BaseComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
@@ -222,19 +224,27 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Sets the height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String playerHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-        if (move != null) {
-            float prevHeight = move.height;
-            move.height = amount;
-            clientComp.character.saveComponent(move);
-            LocationComponent loc = client.getComponent(LocationComponent.class);
-            Vector3f currentPosition = loc.getWorldPosition();
-            clientComp.character.send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight)/2, currentPosition.getZ())));
-            physics.removeCharacterCollider(clientComp.character);
-            physics.getCharacterCollider(clientComp.character);
-            return "Height of player set to " + amount + " (was " + prevHeight + ")";
+        try {
+            ClientComponent clientComp = client.getComponent(ClientComponent.class);
+            CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+            if (move != null) {
+                float prevHeight = move.height;
+                logger.info("prevHeight: " + prevHeight);
+                move.height = amount;
+                clientComp.character.saveComponent(move);
+                LocationComponent loc = client.getComponent(LocationComponent.class);
+                Vector3f currentPosition = loc.getWorldPosition();
+                clientComp.character
+                        .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
+                physics.removeCharacterCollider(clientComp.character);
+                physics.getCharacterCollider(clientComp.character);
+                logger.info("newHeight: " + amount);
+                return "Height of player set to " + amount + " (was " + prevHeight + ")";
+            }
+            return "";
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+            return "";
         }
-        return "";
     }
 }
