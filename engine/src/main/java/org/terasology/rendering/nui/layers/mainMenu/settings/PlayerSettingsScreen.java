@@ -116,19 +116,18 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         heightSlider = find("height", UISlider.class);
         if (heightSlider != null) {
-            heightSlider.setMinimum(0.1f);
+            heightSlider.setMinimum(1.5f);
             heightSlider.setIncrement(0.1f);
-            heightSlider.setRange(49.9f);
+            heightSlider.setRange(0.5f);
             heightSlider.setPrecision(1);
         }
 
         eyeHeightSlider = find("eye-height", UISlider.class);
         if (eyeHeightSlider != null) {
-            eyeHeightSlider.setMinimum(0.1f);
+            eyeHeightSlider.setMinimum(0.5f);
             eyeHeightSlider.setIncrement(0.1f);
-            eyeHeightSlider.setRange(49.9f);
+            eyeHeightSlider.setRange(1f);
             eyeHeightSlider.setPrecision(1);
-            eyeHeightSlider.setIncrement(0.01f);
         }
 
         language = find("language", UIDropdownScrollable.class);
