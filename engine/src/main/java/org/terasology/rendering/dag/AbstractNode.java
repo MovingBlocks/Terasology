@@ -116,6 +116,14 @@ public abstract class AbstractNode implements Node {
         this.enabled = enabled;
     }
 
+    /**
+     * Utility method to conveniently retrieve materials from the Assets system,
+     * hiding the relative complexity of the exception handling.
+     *
+     * @param materialUrn a ResourceUrn instance providing the name of the material to be obtained.
+     * @return a Material instance
+     * @throws RuntimeException if the material couldn't be resolved through the asset system.
+     */
     public static Material getMaterial(ResourceUrn materialUrn) {
         String materialName = materialUrn.toString();
         return Assets.getMaterial(materialName).orElseThrow(() ->

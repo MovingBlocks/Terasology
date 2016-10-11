@@ -26,7 +26,7 @@ import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
-import org.terasology.rendering.dag.nodes.SkyBandNode;
+import org.terasology.rendering.dag.nodes.HazeNode;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
@@ -123,7 +123,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case SKY_BAND:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(SkyBandNode.FINAL_HAZE);
+                displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE);
                 program.setInt("texDebug", texId++, true);
                 break;
             case LIGHT_SHAFTS:

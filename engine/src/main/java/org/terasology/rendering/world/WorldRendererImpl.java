@@ -65,7 +65,7 @@ import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
 import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
-import org.terasology.rendering.dag.nodes.SkyBandNode;
+import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -267,14 +267,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(backdropNode, "backdropNode");
 
         String aLabel = "hazeIntermediateNode";
-        FBOConfig hazeIntermediateConfig = new FBOConfig(SkyBandNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        SkyBandNode hazeIntermediateNode = nodeFactory.createInstance(SkyBandNode.class, DELAY_INIT);
+        FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
+        HazeNode hazeIntermediateNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
         hazeIntermediateNode.initialise(READ_ONLY_GBUFFER.getConfig(), hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
-        FBOConfig hazeFinalConfig = new FBOConfig(SkyBandNode.FINAL_HAZE, ONE_32TH_SCALE, FBO.Type.DEFAULT);
-        SkyBandNode hazeFinalNode = nodeFactory.createInstance(SkyBandNode.class, DELAY_INIT);
+        FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE, ONE_32TH_SCALE, FBO.Type.DEFAULT);
+        HazeNode hazeFinalNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
         hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
         renderGraph.addNode(hazeFinalNode, aLabel);
 
