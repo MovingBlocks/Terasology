@@ -15,16 +15,19 @@
  */
 package org.terasology.logic.debug;
 
-import org.terasology.logic.characters.CharacterImpulseEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.logic.characters.*;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.physics.Physics;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.In;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterTeleportEvent;
-import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
@@ -37,6 +40,10 @@ import java.util.Optional;
 
 @RegisterSystem
 public class MovementDebugCommands extends BaseComponentSystem {
+
+    @In
+    private PhysicsEngine physics;
+    private static final Logger logger = LoggerFactory.getLogger(MovementDebugCommands.class);
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -116,6 +123,13 @@ public class MovementDebugCommands extends BaseComponentSystem {
                     + move.slopeFactor + " RunFactor:" + move.runFactor;
         }
         return "You're dead I guess.";
+    }
+
+    @Command(shortDescription = "Show your Position/Location",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String showPosition(@Sender EntityRef client) {
+        LocationComponent loc = client.getComponent(LocationComponent.class);
+        return "Your Position: " + loc.getWorldPosition();
     }
 
     @Command(shortDescription = "Go really fast", runOnServer = true,
@@ -213,10 +227,13 @@ public class MovementDebugCommands extends BaseComponentSystem {
             float prevHeight = move.height;
             move.height = amount;
             clientComp.character.saveComponent(move);
-
+            LocationComponent loc = client.getComponent(LocationComponent.class);
+            Vector3f currentPosition = loc.getWorldPosition();
+            teleportCommand(client, currentPosition.getX(), currentPosition.getY() + (amount - prevHeight)/2, currentPosition.getZ());
+            physics.removeCharacterCollider(clientComp.character);
+            physics.getCharacterCollider(clientComp.character);
             return "Height of player set to " + amount + " (was " + prevHeight + ")";
         }
-
         return "";
     }
 }
