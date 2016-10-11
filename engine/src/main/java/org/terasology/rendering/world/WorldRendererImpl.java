@@ -44,6 +44,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
+import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
@@ -64,7 +65,7 @@ import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
 import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
-import org.terasology.rendering.dag.nodes.SkyBandsNode;
+import org.terasology.rendering.dag.nodes.SkyBandNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -95,6 +96,8 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -263,8 +266,23 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
         renderGraph.addNode(backdropNode, "backdropNode");
 
+        String aLabel = "hazeIntermediateNode";
+        FBOConfig hazeIntermediateConfig = new FBOConfig(SkyBandNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
+        SkyBandNode hazeIntermediateNode = nodeFactory.createInstance(SkyBandNode.class, DELAY_INIT);
+        hazeIntermediateNode.initialise(READ_ONLY_GBUFFER.getConfig(), hazeIntermediateConfig, aLabel);
+        renderGraph.addNode(hazeIntermediateNode, aLabel);
+
+        aLabel = "hazeFinalNode";
+        FBOConfig hazeFinalConfig = new FBOConfig(SkyBandNode.FINAL_HAZE, ONE_32TH_SCALE, FBO.Type.DEFAULT);
+        SkyBandNode hazeFinalNode = nodeFactory.createInstance(SkyBandNode.class, DELAY_INIT);
+        hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
+        renderGraph.addNode(hazeFinalNode, aLabel);
+
+        // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
+        Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
+        renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
+
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
         Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
         Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
         Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
@@ -285,8 +303,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-
-        renderGraph.addNode(skybandsNode, "skybandsNode");
 
         renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
         renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");

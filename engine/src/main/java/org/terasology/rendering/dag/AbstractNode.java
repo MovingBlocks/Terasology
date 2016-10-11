@@ -23,9 +23,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.utilities.Assets;
 
 /**
  * TODO: Add javadocs
@@ -112,5 +114,11 @@ public abstract class AbstractNode implements Node {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public static Material getMaterial(ResourceUrn materialUrn) {
+        String materialName = materialUrn.toString();
+        return Assets.getMaterial(materialName).orElseThrow(() ->
+                new RuntimeException("Failed to resolve required asset: '" + materialName + "'"));
     }
 }
