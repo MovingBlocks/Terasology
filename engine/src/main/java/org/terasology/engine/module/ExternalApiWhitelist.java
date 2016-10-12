@@ -90,6 +90,25 @@ public final class ExternalApiWhitelist {
             .add(java.awt.datatransfer.UnsupportedFlavorException.class)
             .add(java.nio.ByteBuffer.class)
             .add(java.nio.IntBuffer.class)
+            .add(java.io.DataInput.class)
+            .add(java.io.DataOutput.class)
+            .add(java.io.EOFException.class)
+            .add(java.io.UTFDataFormatException.class)
+            /* All sorts of input streams */
+            .add(java.io.InputStream.class)
+            .add(java.io.ByteArrayInputStream.class)
+            .add(java.io.FilterInputStream.class)
+            .add(java.io.PipedInputStream.class)
+            .add(java.io.BufferedInputStream.class)
+            .add(java.io.DataInputStream.class)
+            .add(java.io.PushbackInputStream.class)
+            /* All sorts of output streams */
+            .add(java.io.OutputStream.class)
+            .add(java.io.ByteArrayOutputStream.class)
+            .add(java.io.FilterOutputStream.class)
+            .add(java.io.PipedOutputStream.class)
+            .add(java.io.BufferedOutputStream.class)
+            .add(java.io.DataOutputStream.class)
             .build();
 
     private ExternalApiWhitelist() {
