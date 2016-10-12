@@ -18,7 +18,9 @@ package org.terasology.logic.debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.characters.*;
+import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
@@ -135,6 +137,17 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Your Position: " + loc.getWorldPosition();
     }
 
+    @Command(shortDescription = "Show your Height",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String showHeight(@Sender EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+        float height = move.height;
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        float eyeHeight = gazeMountPointComponent.translate.y;
+        return "Your height: " + height + " Eye-height: " + eyeHeight;
+    }
+
     @Command(shortDescription = "Go really fast", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String hspeed(@Sender EntityRef client) {
@@ -229,7 +242,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
             CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
             if (move != null) {
                 float prevHeight = move.height;
-                logger.info("prevHeight: " + prevHeight);
                 move.height = amount;
                 clientComp.character.saveComponent(move);
                 LocationComponent loc = client.getComponent(LocationComponent.class);
@@ -238,8 +250,27 @@ public class MovementDebugCommands extends BaseComponentSystem {
                         .send(new CharacterTeleportEvent(new Vector3f(currentPosition.getX(), currentPosition.getY() + (amount - prevHeight) / 2, currentPosition.getZ())));
                 physics.removeCharacterCollider(clientComp.character);
                 physics.getCharacterCollider(clientComp.character);
-                logger.info("newHeight: " + amount);
                 return "Height of player set to " + amount + " (was " + prevHeight + ")";
+            }
+            return "";
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @Command(shortDescription = "Sets the eye-height of the player", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String playerEyeHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        try {
+            GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+            if (gazeMountPointComponent != null) {
+                float prevHeight = gazeMountPointComponent.translate.y;
+                Location.removeChild(client, gazeMountPointComponent.gazeEntity);
+                gazeMountPointComponent.translate.y = amount;
+                Location.attachChild(client, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
             return "";
         } catch(NullPointerException e) {
