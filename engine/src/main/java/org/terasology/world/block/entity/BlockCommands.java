@@ -239,7 +239,10 @@ public class BlockCommands extends BaseComponentSystem {
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bulkGiveBlock(
             @Sender EntityRef sender,
-            @CommandParam("searched") String searched) {
+            @CommandParam("searched") String searched,
+            @CommandParam(value = "quantity", required = false) Integer quantityParam,
+            @CommandParam(value = "shapeName", required = false) String shapeUriParam){
+        int quantity = quantityParam != null ? quantityParam : 16;
         String searchLowercase = searched.toLowerCase();
         List<String> blocks = findBlockMatches(searchLowercase);
         String result = "Found " + blocks.size() + " block matches when searching for '" + searched + "'.";
@@ -247,7 +250,7 @@ public class BlockCommands extends BaseComponentSystem {
             result += "\nBlocks:";
             for (String block : blocks) {
                 result += "\n" + block;
-                giveBlock(sender, block, null, null);
+                giveBlock(sender, block, quantityParam, shapeUriParam);
             }
         }
         return result;
