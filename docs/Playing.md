@@ -135,8 +135,8 @@ Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to sh
 * `hjump` - jump really high. Almost like flying - but it isn't. Just jump good.
 * `restoreSpeed` - normalizes speed (both horizontal and vertical)
 * `help giveBlock` - Shows detailed help on the "giveBlock" command
-* `giveBlock Water` - Gives 16 water blocks
-* `giveBlock Stone Stair 99` - Gives you 99 stone stair blocks
+* `giveBlock Water` - Gives 16 water blocks (default quantity when not specified)
+* `giveBlock Stone 99 Stair` - Gives you 99 stone stair blocks
 * `giveBlock Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
 * `giveBlock TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * `bulkGiveBlock cake` - Gives you a stack of blocks for every block with the name "cake" in it! Find good block series with `search`
