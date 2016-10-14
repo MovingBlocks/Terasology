@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.modes;
 
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -64,6 +65,13 @@ public class StateMainMenu implements GameState {
     public StateMainMenu(String showMessageOnLoad) {
         messageOnLoad = showMessageOnLoad;
     }
+
+    AudioEndListener endListener = new AudioEndListener() {
+        @Override
+        public void onAudioEnd() {
+            playBackgroundMusic();
+        }
+    };
 
 
     @Override
@@ -136,7 +144,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get());
+        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get(), endListener);
     }
 
     private void stopBackgroundMusic() {
