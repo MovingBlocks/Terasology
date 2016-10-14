@@ -68,10 +68,10 @@ public class UIText extends CoreWidget {
     private TextureRegion cursorTexture;
 
     @LayoutConfig
-    private Binding<String> text = new DefaultBinding<>("");
+    protected Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
-    private boolean multiline;
+    protected boolean multiline;
 
     @LayoutConfig
     private boolean readOnly;
@@ -79,16 +79,16 @@ public class UIText extends CoreWidget {
     private int cursorPosition;
     private int selectionStart;
 
-    private int lastWidth;
-    private Font lastFont;
+    protected int lastWidth;
+    protected Font lastFont;
 
     private List<ActivateEventListener> activationListeners = Lists.newArrayList();
     private List<CursorUpdateEventListener> cursorUpdateListeners = Lists.newArrayList();
     private List<TextChangeEventListener> textChangeListeners = Lists.newArrayList();
 
-    private int offset;
+    protected int offset;
 
-    private InteractionListener interactionListener = new BaseInteractionListener() {
+    protected InteractionListener interactionListener = new BaseInteractionListener() {
         boolean dragging;
 
         @Override
@@ -152,7 +152,7 @@ public class UIText extends CoreWidget {
         }
     }
 
-    private void drawSelection(Canvas canvas) {
+    protected void drawSelection(Canvas canvas) {
         Font font = canvas.getCurrentStyle().getFont();
         String currentText = getText();
 
@@ -199,7 +199,7 @@ public class UIText extends CoreWidget {
         }
     }
 
-    private void drawCursor(Canvas canvas) {
+    protected void drawCursor(Canvas canvas) {
         if (blinkCounter < BLINK_RATE) {
             Font font = canvas.getCurrentStyle().getFont();
             String beforeCursor = text.get();
@@ -372,7 +372,7 @@ public class UIText extends CoreWidget {
         return keyboard.isKeyDown(KeyId.LEFT_SHIFT) || keyboard.isKeyDown(KeyId.RIGHT_SHIFT);
     }
 
-    private boolean hasSelection() {
+    protected boolean hasSelection() {
         return getCursorPosition() != selectionStart;
     }
 
@@ -482,8 +482,8 @@ public class UIText extends CoreWidget {
 
         if (callEvent) {
             for (TextChangeEventListener listener : textChangeListeners) {
-                    listener.onTextChange(prevText, val);
-                }
+                listener.onTextChange(prevText, val);
+            }
         }
     }
 
@@ -600,7 +600,7 @@ public class UIText extends CoreWidget {
         setCursorPosition(position, moveSelectionStart, true);
     }
 
-    private void correctCursor() {
+    protected void correctCursor() {
         cursorPosition = TeraMath.clamp(cursorPosition, 0, getText().length());
         selectionStart = TeraMath.clamp(selectionStart, 0, getText().length());
     }
