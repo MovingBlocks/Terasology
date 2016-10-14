@@ -249,8 +249,8 @@ public class BlockCommands extends BaseComponentSystem {
         if (blocks.size() > 0) {
             result += "\nBlocks:";
             for (String block : blocks) {
-                result += "\n" + block;
-                giveBlock(sender, block, quantityParam, shapeUriParam);
+                result += "\n" + block + "\n";
+                result += giveBlock(sender, block, quantityParam, shapeUriParam);
             }
         }
         return result;
@@ -287,7 +287,7 @@ public class BlockCommands extends BaseComponentSystem {
                     } else {
                         Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
                         if (resolvedShapeUris.isEmpty()) {
-                            throw new IllegalArgumentException("No shape found for '" + shapeUriParam + "'");
+                            return  "No shape found for '" + shapeUriParam + "'";
                         } else if (resolvedShapeUris.size() > 1) {
                             StringBuilder builder = new StringBuilder();
                             builder.append("Non-unique shape name, possible matches: ");
@@ -307,7 +307,7 @@ public class BlockCommands extends BaseComponentSystem {
                     return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn())), quantity, sender);
                 }
             } else {
-                throw new IllegalArgumentException("No block found for '" + uri + "'");
+                return "No block found for '" + uri + "'";
             }
         } else if (matchingUris.isEmpty()) {
             return suggestItemIfAvailable(uri);
