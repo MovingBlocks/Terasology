@@ -15,39 +15,50 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Rect2i;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
+/**
+ * A text widget with a button to clear the text.
+ */
 public class ResettableUIText extends UIText {
-    private UIButton clearButton = new UIButton("clearButton", "X");
+
+    private InteractionListener clearInteractionListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(NUIMouseClickEvent event) {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                setText("");
+                return true;
+            }
+            return false;
+        }
+    };
 
     @Override
     public void onDraw(Canvas canvas) {
-        //super.onDraw(canvas);
-        if (super.text.get() == null) {
-            super.text.set("");
+        Rect2i clearButtonRegion = Rect2i.createFromMinAndSize(0, 0, 30, canvas.size().y);
+
+        if (text.get() == null) {
+            text.set("");
         }
-        super.lastFont = canvas.getCurrentStyle().getFont();
-        super.lastWidth = (int) (canvas.size().x * 0.8f);
+        lastFont = canvas.getCurrentStyle().getFont();
+        lastWidth = canvas.size().x - clearButtonRegion.size().x;
         if (isEnabled()) {
-            canvas.addInteractionRegion(super.interactionListener, Rect2i.createFromMinAndMax(0, 0, (int) (canvas.size().x * 0.8f), canvas.size().y));
-            clearButton.subscribe(new ActivateEventListener() {
-                @Override
-                public void onActivated(UIWidget widget) {
-                    setText("");
-                }
-            });
+            canvas.addInteractionRegion(interactionListener, Rect2i.createFromMinAndMax(0, 0, canvas.size().x, canvas.size().y));
+            canvas.addInteractionRegion(clearInteractionListener, Rect2i.createFromMinAndMax(canvas.size().x, 0, canvas.size().x + clearButtonRegion.size().x, canvas.size().y));
         }
-        clearButton.setEnabled(isEnabled());
         correctCursor();
 
-        int widthForDraw = (super.multiline) ? (int) (canvas.size().x * 0.8f) : super.lastFont.getWidth(getText());
+        int widthForDraw = (multiline) ? canvas.size().x - clearButtonRegion.size().x : lastFont.getWidth(getText());
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
-             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-super.offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
-            canvas.drawText(super.text.get(), canvas.getRegion());
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
+            canvas.drawText(text.get(), canvas.getRegion());
             if (isFocused()) {
                 if (hasSelection()) {
                     drawSelection(canvas);
@@ -56,7 +67,5 @@ public class ResettableUIText extends UIText {
                 }
             }
         }
-        Rect2i buttonRegion = Rect2i.createFromMinAndMax((int) (canvas.size().x * 0.8f), 0, canvas.size().x, canvas.size().y);
-        canvas.drawWidget(clearButton, buttonRegion);
     }
 }

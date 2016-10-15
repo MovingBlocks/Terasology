@@ -45,7 +45,11 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.ResettableUIText;
+import org.terasology.rendering.nui.widgets.TextChangeEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
