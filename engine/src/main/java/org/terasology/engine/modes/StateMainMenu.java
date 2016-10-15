@@ -71,15 +71,14 @@ public class StateMainMenu implements GameState {
         context = gameEngine.createChildContext();
         CoreRegistry.setContext(context);
 
-        // let's get the entity event system running
+        //let's get the entity event system running
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl(context));
 
-        nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class),
-                context);
+        nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
         eventSystem.registerEventHandler(nuiManager);
@@ -92,10 +91,8 @@ public class StateMainMenu implements GameState {
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         context.put(CameraTargetSystem.class, cameraTargetSystem);
 
-        componentSystemManager.register(cameraTargetSystem,
-                "engine:CameraTargetSystem");
-        componentSystemManager.register(new ConsoleSystem(),
-                "engine:ConsoleSystem");
+        componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
+        componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
@@ -104,13 +101,11 @@ public class StateMainMenu implements GameState {
 
         NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
         context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
-        componentSystemManager.register(nuiSkinEditorSystem,
-                "engine:NUISkinEditorSystem");
+        componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
 
         inputSystem = context.get(InputSystem.class);
 
-        // TODO: REMOVE this and handle refreshing of core game state at the engine
-        // level - see Issue #1127
+        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
         new RegisterInputSystem(context).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
@@ -122,11 +117,10 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        // guiManager.openWindow("main");
+        //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                    .setMessage("Error", messageOnLoad);
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
     }
 
