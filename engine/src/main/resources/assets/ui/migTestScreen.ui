@@ -246,6 +246,45 @@
             {
                 "type": "UILabel",
                 "id": "",
+                "text": "ResettableUIText",
+                "layoutInfo": {
+                    "cc": "newline"
+                }
+            },
+            {
+                "type": "ResettableUIText",
+                "id": "rtext1",
+                "text": "text1",
+                "layoutInfo": {
+                    "cc": ""
+                },
+                "readOnly": true,
+                "enabled": false
+            },
+            {
+                "type": "ResettableUIText",
+                "id": "rtext2",
+                "layoutInfo": {
+                    "cc": "w min, h min"
+                }
+            },
+            {
+                "type": "ResettableUIText",
+                "id": "rtext3",
+                "layoutInfo": {
+                    "cc": ""
+                }
+            },
+            {
+                "type": "ResettableUIText",
+                "id": "rtext4",
+                "layoutInfo": {
+                    "cc": "grow"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "",
                 "text": "UIDropdown",
                 "layoutInfo": {
                     "cc": "newline"

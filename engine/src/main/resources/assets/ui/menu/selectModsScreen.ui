@@ -101,7 +101,7 @@
                                         }
                                     },
                                     {
-                                        "type": "UIText",
+                                        "type": "ResettableUIText",
                                         "id": "moduleSearch",
                                         "layoutInfo": {
                                             "relativeWidth": 0.75,
