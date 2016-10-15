@@ -42,7 +42,12 @@ import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.logic.characters.*;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
+import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
@@ -300,14 +305,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
-        aabbRenderer = newAABBRender;
-    }
-
     public BlockOverlayRenderer getAABBRenderer() {
         return aabbRenderer;
     }
 
+    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
+        aabbRenderer = newAABBRender;
+    }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         playerCamera.getPosition().set(position);
@@ -338,7 +342,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onFrobButton(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
@@ -355,7 +358,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             event.consume();
         }
     }
-
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {

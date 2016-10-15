@@ -17,7 +17,11 @@ package org.terasology.logic.debug;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.characters.*;
+import org.terasology.logic.characters.CharacterImpulseEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterTeleportEvent;
+import org.terasology.logic.characters.GazeMountPointComponent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
@@ -68,7 +72,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Flight mode toggled";
     }
 
-
     @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setSpeedMultiplier(@Sender EntityRef client, @CommandParam("amount") float amount) {
@@ -93,9 +96,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Teleporting  to " + x + " " + y + " " + z;
     }
 
-    @Command(value  = "pushCharacter", shortDescription = "Pushes you in the direction (x, y, z)", runOnServer = true)
+    @Command(value = "pushCharacter", shortDescription = "Pushes you in the direction (x, y, z)", runOnServer = true)
     public String pushCharacterCommand(@Sender EntityRef sender,
-                              @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+                                       @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         clientComponent.character.send(new CharacterImpulseEvent(new Vector3f(x, y, z)));
         return "Pushing character with " + x + " " + y + " " + z;
@@ -124,8 +127,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
             return "Your SpeedMultiplier:" + move.speedMultiplier + " JumpSpeed:"
-                    + move.jumpSpeed + " SlopeFactor:"
-                    + move.slopeFactor + " RunFactor:" + move.runFactor;
+                   + move.jumpSpeed + " SlopeFactor:"
+                   + move.slopeFactor + " RunFactor:" + move.runFactor;
         }
         return "You're dead I guess.";
     }
@@ -253,7 +256,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 return "Height of player set to " + amount + " (was " + prevHeight + ")";
             }
             return "";
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
             return "";
         }
@@ -273,7 +276,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
             return "";
-        } catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
             return "";
         }
