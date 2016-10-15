@@ -23,6 +23,8 @@ import org.terasology.registry.InjectionHelper;
  */
 public class NodeFactory {
 
+    public static final boolean DELAY_INIT = true;
+
     private Context context;
 
     public NodeFactory(Context context) {
