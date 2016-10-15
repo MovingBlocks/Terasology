@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.registry.In;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.GazeMountPointComponent;
@@ -29,7 +27,6 @@ import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -408,6 +405,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         Vector3f vPlayerLocation = Vector3f.zero();
         boolean bPlayerLocationWasFound = false;
+        EntityRef playerEntity = null;
 
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
@@ -418,6 +416,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 if (locationComponent != null) {
                     vPlayerLocation = locationComponent.getWorldPosition();
                     bPlayerLocationWasFound = true;
+                    playerEntity = clientEntity;
                 }
                 break;
             }
@@ -427,13 +426,27 @@ public class MovementDebugCommands extends BaseComponentSystem {
             throw new IllegalArgumentException("No such user '" + username + "'");
         }
 
+        MovementMode playerMovementMode = MovementMode.NONE;
+        ClientComponent clientInfo = playerEntity.getComponent(ClientComponent.class);
+        if ( clientInfo != null ) {
+            CharacterMovementComponent playerMovementComponent = clientInfo.character.getComponent(CharacterMovementComponent.class);
+            if (playerMovementComponent != null) {
+                playerMovementMode = playerMovementComponent.mode;
+            }
+        }
+
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
             if (clientComp != null) {
                 clientComp.character.send(new CharacterTeleportEvent(vPlayerLocation));
+
+                CharacterMovementComponent characterMovementComponent = clientComp.character.getComponent(CharacterMovementComponent.class);
+                if (characterMovementComponent != null && playerMovementMode != MovementMode.NONE && playerMovementMode != characterMovementComponent.mode) {
+                    clientComp.character.send(new SetMovementModeEvent(playerMovementMode));
+                }
             }
         }
 
-        return "All possible players teleported";
+        return "All possible players teleported to " + username + " and set to " + playerMovementMode;
     }
 }
