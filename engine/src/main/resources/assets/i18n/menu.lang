@@ -144,6 +144,8 @@
     "parallax-mapping": "parallax-mapping",
     "player-color": "player-color",
     "player-name": "player-name",
+    "player-height": "player-height",
+    "player-eye-height": "player-eye-height",
     "player-settings": "player-settings",
     "player-settings-title": "player-settings-title",
     "please-wait": "please-wait",

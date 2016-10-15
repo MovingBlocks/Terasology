@@ -138,6 +138,8 @@
     "particle-effect-limit": "Limita effetti particellari",
     "player-color": "Colore giocatore",
     "player-name": "Nome giocatore",
+    "player-height": "Player Height",
+    "player-eye-height": "Player Eye Height",
     "player-settings": "Giocatore",
     "player-settings-title": "Impostazioni giocatore",
     "preview-world-title": "Anteprima del mondo...",

@@ -121,6 +121,8 @@
     "parallax-mapping": "Parallax Mapping",
     "player-color": "Couleur du joueur",
     "player-name": "Nom du joueur",
+    "player-height": "Player Height",
+    "player-eye-height": "Player Eye Height",
     "player-settings": "Joueur",
     "player-settings-title": "Paramètres du joueur",
     "preview-world-title": "Prévisualisation du monde...",

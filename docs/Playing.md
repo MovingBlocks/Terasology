@@ -127,21 +127,22 @@ Only works when the F3 debug mode is enabled (and may come and go)
 
 Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to show the in-game console. Mostly everything is case insensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
 
-* help - Show in-game help (more thorough)
-* search [something] - searches for any command, prefab, or asset with "something" in its name, help text, etc
-* flight - just what it sounds like :)
-* ghost - no-clip mode (fly through anything)
-* hspeed - greatly increase your movement speed
-* hjump - jump really high. Almost like flying - but it isn't. Just jump good.
-* restoreSpeed - normalizes speed (both horizontal and vertical)
-* help giveBlock - Shows detailed help on the "giveBlock" command
-* giveBlock Water - Gives 16 water blocks
-* giveBlock Stone Stair 99 - Gives you 99 stone stair blocks
-* giveBlock Chest - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
-* giveBlock TNT - Gives you 16 TNT blocks you can place and activate ('E') to blow up
-* listBlocks - Lists all actively used blocks (have been loaded for the world)
-* listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
-* listShapes - Lists the available shapes
-* healthMax - Fully restores the player's health
-* showHealth - Shows the player's health
-* teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42
+* `help` - Show in-game help (more thorough)
+* `search [something]` - searches for any command, prefab, or asset with "something" in its name, help text, etc
+* `flight` - just what it sounds like :)
+* `ghost` - no-clip mode (fly through anything)
+* `hspeed` - greatly increase your movement speed
+* `hjump` - jump really high. Almost like flying - but it isn't. Just jump good.
+* `restoreSpeed` - normalizes speed (both horizontal and vertical)
+* `help giveBlock` - Shows detailed help on the "giveBlock" command
+* `giveBlock Water` - Gives 16 water blocks (default quantity when not specified)
+* `giveBlock Stone 99 Stair` - Gives you 99 stone stair blocks
+* `giveBlock Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
+* `giveBlock TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* `bulkGiveBlock cake` - Gives you a stack of blocks for every block with the name "cake" in it! Find good block series with `search`
+* `listBlocks` - Lists all actively used blocks (have been loaded for the world)
+* `listFreeShapeBlocks` - Lists all blocks that can be requested in any known shape
+* `listShapes` - Lists the available shapes
+* `healthMax` - Fully restores the player's health
+* `showHealth` - Shows the player's health
+* `teleport 42 42 42` - Warps the player to x = 42, y = 42, z = 42
