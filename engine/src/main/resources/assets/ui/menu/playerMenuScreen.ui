@@ -38,7 +38,10 @@
                     "type": "ColumnLayout",
                     "family": "option-grid",
                     "columns": 2,
-                    "column-widths": [0.35, 0.65],
+                    "column-widths": [
+                        0.35,
+                        0.65
+                    ],
                     "verticalSpacing": 8,
                     "horizontalSpacing": 8,
                     "contents": [
@@ -79,6 +82,42 @@
                         {
                             "type": "UIDropdownScrollable",
                             "id": "language"
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": ""
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "Expeimental:                                                                        "
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-height}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UISlider",
+                                    "id": "height"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#player-eye-height}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UISlider",
+                                    "id": "eye-height"
+                                }
+                            ]
                         }
                     ]
                 },

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
@@ -41,12 +43,14 @@ import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
+import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
+import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -73,11 +77,16 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalPlayerSystem.class);
+
     @In
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
     private Camera playerCamera;
+    @In
+    private MovementDebugCommands movementDebugCommands;
 
     @In
     private Config config;
@@ -154,6 +163,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
+
+            // Change height as per PlayerSettings
+            Float height = config.getPlayer().getHeight();
+            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height);
+            // Change eyeHeight as per PlayerSettings
+            Float eyeHeight = config.getPlayer().getEyeHeight();
+            GazeMountPointComponent gazeMountPointComponent = character.getComponent(GazeMountPointComponent.class);
+            gazeMountPointComponent.translate = new Vector3f(0, eyeHeight, 0);
 
             // Trigger updating the player camera position as soon as the local player is spawned.
             // This is not done while the game is still loading, since systems are not updated.
@@ -288,14 +305,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
-        aabbRenderer = newAABBRender;
-    }
-
     public BlockOverlayRenderer getAABBRenderer() {
         return aabbRenderer;
     }
 
+    public void setAABBRenderer(BlockOverlayRenderer newAABBRender) {
+        aabbRenderer = newAABBRender;
+    }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         playerCamera.getPosition().set(position);
@@ -326,7 +342,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
     }
 
-
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onFrobButton(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
@@ -343,7 +358,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             event.consume();
         }
     }
-
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {

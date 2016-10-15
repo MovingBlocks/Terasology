@@ -123,6 +123,8 @@
     "parallax-mapping": "Mapování Parallaxy",
     "player-color": "Barva Hráče",
     "player-name": "Jméno Hráče",
+    "player-height": "Player Height",
+    "player-eye-height": "Player Eye Height",
     "player-settings": "Hráč",
     "player-settings-title": "Nastavení Hráče",
     "preview-world-title": "Náhled světa...",
