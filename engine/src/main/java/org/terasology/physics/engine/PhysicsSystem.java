@@ -29,7 +29,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
 import org.terasology.math.geom.Quat4f;
@@ -41,14 +40,18 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.events.*;
+import org.terasology.physics.events.ChangeVelocityEvent;
+import org.terasology.physics.events.CollideEvent;
+import org.terasology.physics.events.ForceEvent;
+import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.physics.events.PhysicsResynchEvent;
+import org.terasology.physics.events.ImpactEvent;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * The PhysicsSystem is a bridging class between the event system and the
@@ -167,7 +170,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 float fDistance = vDirection.length();
                 vDirection.normalize();
 
-                HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistance * delta, StandardCollisionGroup.WORLD);
+                HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistance * delta, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER );
                 if (hitInfo.isHit()) {
                     entity.send(new ImpactEvent());
                 }
