@@ -29,7 +29,7 @@ public class PlayerConfig {
 
     private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
 
-    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 1.6f;
+    private static final float DEFAULT_PLAYER_EYE_HEIGHT = 0.7f;
 
     private String name = defaultPlayerName();
 
