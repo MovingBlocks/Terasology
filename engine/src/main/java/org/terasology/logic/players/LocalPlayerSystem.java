@@ -29,17 +29,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.ForwardsMovementAxis;
-import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
-import org.terasology.input.binds.movement.JumpButton;
-import org.terasology.input.binds.movement.RotationPitchAxis;
-import org.terasology.input.binds.movement.RotationYawAxis;
-import org.terasology.input.binds.movement.StrafeMovementAxis;
-import org.terasology.input.binds.movement.StrafeRealMovementAxis;
-import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
-import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
-import org.terasology.input.binds.movement.VerticalMovementAxis;
-import org.terasology.input.binds.movement.VerticalRealMovementAxis;
+import org.terasology.input.binds.movement.*;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
@@ -255,8 +245,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
         boolean toggle = event.isDown();
+        logger.info("shift");
         run = runPerDefault ^ toggle;
+        event.consume();
+    }
 
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
+        float eyeHeight = gazeMountPointComponent.translate.getY();
+        if (event.isDown()) {
+            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
+            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+        } else {
+            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
+            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
+        }
         event.consume();
     }
 
