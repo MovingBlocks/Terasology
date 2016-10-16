@@ -45,15 +45,11 @@ public class OpenVRProvider {
     //keyboard
     private static boolean keyboardShowing;
     private static boolean headIsTracking;
-
-
     // TextureIDs of framebuffers for each eye
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
-
     public static Texture_t texType[] = new Texture_t[2];
-
     public OpenVRState vrState = new OpenVRState();
 
     public OpenVRProvider() {
@@ -123,9 +119,6 @@ public class OpenVRProvider {
     }
 
     public void updateState() {
-        if (!initialized) {
-            init();
-        }
         updatePose();
         pollControllers();
         pollInputEvents();
@@ -170,7 +163,6 @@ public class OpenVRProvider {
             logger.info("vrSystem initialization failed:" + errorString);
             return false;
         } else {
-
             vrSystem.setAutoSynch(false);
             vrSystem.read();
 
@@ -257,11 +249,9 @@ public class OpenVRProvider {
             texType[0].setAutoWrite(false);
             texType[0].handle = -1;
             texType[0].write();
-
         }
         logger.info("OpenVR Compositor initialized OK.");
         return true;
-
     }
 
     public static boolean setKeyboardOverlayShowing(boolean showingState) {
@@ -271,16 +261,11 @@ public class OpenVRProvider {
             pointer.setString(0, "mc");
             Pointer empty = new Memory(1);
             empty.setString(0, "");
-
             ret = vrOverlay.ShowKeyboard.apply(0, 0, pointer, 256, empty, (byte) 1, 0);
-
             keyboardShowing = 0 == ret; //0 = no error, > 0 see EVROverlayError
-
-
             if (ret != 0) {
                 logger.error("VR Overlay Error: " + vrOverlay.GetOverlayErrorNameFromEnum.apply(ret).getString(0));
             }
-
         } else {
             try {
                 vrOverlay.HideKeyboard.apply();
@@ -291,13 +276,6 @@ public class OpenVRProvider {
         }
 
         return keyboardShowing;
-    }
-
-    public void destroy() {
-        if (initialized) {
-            JOpenVRLibrary.VR_ShutdownInternal();
-            initialized = false;
-        }
     }
 
     private static void findControllerDevices() {
@@ -313,10 +291,6 @@ public class OpenVRProvider {
     }
 
     private static void pollInputEvents() {
-        if (vrSystem == null) {
-            return;
-        }
-
         jopenvr.VREvent_t event = new jopenvr.VREvent_t();
 
         while (vrSystem.PollNextEvent.apply(event, event.size()) > 0) {
@@ -327,16 +301,6 @@ public class OpenVRProvider {
                     keyboardShowing = false;
                     break;
                 case EVREventType.EVREventType_VREvent_KeyboardCharInput:
-                    // Might want to use this at some point
-                    /*
-                    byte[] inbytes = event.data.getPointer().getByteArray(0, 8);
-                    int len = 0;
-                    for (byte b : inbytes) {
-                        if (b > 0) {
-                            len++;
-                        }
-                    }
-                    */
                     break;
                 default:
                     break;
@@ -345,10 +309,6 @@ public class OpenVRProvider {
     }
 
     private void updatePose() {
-        if (vrSystem == null || vrCompositor == null) {
-            return;
-        }
-
         vrCompositor.WaitGetPoses.apply(hmdTrackedDevicePoseReference, JOpenVRLibrary.k_unMaxTrackedDeviceCount, null, 0);
         for (int nDevice = 0; nDevice < JOpenVRLibrary.k_unMaxTrackedDeviceCount; ++nDevice) {
             hmdTrackedDevicePoses[nDevice].read();
@@ -391,12 +351,6 @@ public class OpenVRProvider {
     }
 
     public void submitFrame() {
-        if (vrCompositor == null) {
-            return;
-        }
-        if (vrCompositor.Submit == null) {
-            return;
-        }
         for (int nEye = 0; nEye < 2; nEye++) {
             vrCompositor.Submit.apply(
                     nEye,
@@ -415,5 +369,4 @@ public class OpenVRProvider {
     public void setFarClip(float farClipIn) {
         farClip = farClipIn;
     }
-
 }
