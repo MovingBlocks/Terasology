@@ -26,23 +26,21 @@ public class OpenVRState {
     // In the tracking system intertial frame
     private Matrix4f headPose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
-
     public void addControllerListener(ControllerListener toAdd) {
         controllerListeners.add(toAdd);
     }
 
     public OpenVRState() {
-        for (int c = 0; c < 2; c++) {
-            lastControllerState[c] = new VRControllerState_t();
-            controllerPose[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-            eyePoses[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-            projectionMatrices[c] = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        for (int handIndex = 0; handIndex < 2; handIndex++) {
+            lastControllerState[handIndex] = new VRControllerState_t();
+            controllerPose[handIndex] = OpenVRUtil.createIdentityMatrix4f();
+            eyePoses[handIndex] = OpenVRUtil.createIdentityMatrix4f();
+            projectionMatrices[handIndex] = OpenVRUtil.createIdentityMatrix4f();
 
             for (int i = 0; i < 5; i++) {
-                lastControllerState[c].rAxis[i] = new VRControllerAxis_t();
+                lastControllerState[handIndex].rAxis[i] = new VRControllerAxis_t();
             }
         }
-
     }
 
     public void setHeadPose(HmdMatrix34_t inputPose) {

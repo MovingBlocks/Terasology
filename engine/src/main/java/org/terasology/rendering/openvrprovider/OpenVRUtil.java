@@ -74,4 +74,8 @@ public class OpenVRUtil {
     public static boolean switchedUp(long nButton, long stateBefore, long stateAfter) {
         return (isPressed(nButton, stateBefore) && !isPressed(nButton, stateAfter));
     }
+
+    public static Matrix4f createIdentityMatrix4f() {
+        return new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
 }

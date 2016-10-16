@@ -57,25 +57,28 @@ public class OpenVRProvider {
     public OpenVRState vrState = new OpenVRState();
 
     public OpenVRProvider() {
-        for (int c = 0; c < 2; c++) {
-            controllerDeviceIndex[c] = -1;
-            controllerStateReference[c] = new VRControllerState_t();
-            inputStateRefernceArray[c] = new VRControllerState_t.ByReference();
-            inputStateRefernceArray[c].setAutoRead(false);
-            inputStateRefernceArray[c].setAutoWrite(false);
-            inputStateRefernceArray[c].setAutoSynch(false);
-            texType[c] = new Texture_t();
+        for (int handIndex = 0; handIndex < 2; handIndex++) {
+            controllerDeviceIndex[handIndex] = -1;
+            controllerStateReference[handIndex] = new VRControllerState_t();
+            inputStateRefernceArray[handIndex] = new VRControllerState_t.ByReference();
+            inputStateRefernceArray[handIndex].setAutoRead(false);
+            inputStateRefernceArray[handIndex].setAutoWrite(false);
+            inputStateRefernceArray[handIndex].setAutoSynch(false);
+            texType[handIndex] = new Texture_t();
         }
     }
 
     public boolean init() {
         if (!initializeOpenVRLibrary()) {
+            logger.warn("JOpenVR library loading failed.");
             return false;
         }
-        if (!initializeJOpenVR())
+        if (!initializeJOpenVR()) {
+            logger.warn("JOpenVR initialization failed.");
             return false;
-        int nAttempts = 0;
-        boolean bSuccess = false;
+        }
+        int initAttempts = 0;
+        boolean initSuccess = false;
 
         // OpenVR has a race condition here - it is necessary
         // to initialize the overlay, but certain operations
@@ -84,19 +87,23 @@ public class OpenVRProvider {
         // soon after OpenVR is initialized. This loop waits a
         // reasonable amount of time and makes several attempts.
         // In my testing, it works all of the time.
-        while (!bSuccess && nAttempts < 10) {
+        while (!initSuccess && initAttempts < 10) {
             try {
                 Thread.sleep(300);
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-            bSuccess = initOpenVRCompositor(true);
-            nAttempts++;
+            initSuccess = initOpenVRCompositor(true);
+            initAttempts++;
         }
-        if (!initOpenVROverlay())
+        if (!initOpenVROverlay()) {
+            logger.warn("VROverlay initialization failed.");
             return false;
-        if (!initOpenVROSettings())
+        }
+        if (!initOpenVROSettings()) {
+            logger.warn("OpenVR settings initialization failed.");
             return false;
+        }
         initialized = true;
         return true;
     }
@@ -106,6 +113,12 @@ public class OpenVRProvider {
     }
 
     public void shutdown() {
+        JOpenVRLibrary.VR_ShutdownInternal();
+        vrSystem = null;
+        vrCompositor = null;
+        vrOverlay = null;
+        vrSettings = null;
+        vrState = null;
         initialized = false;
     }
 
@@ -119,11 +132,11 @@ public class OpenVRProvider {
     }
 
     private void pollControllers() {
-        for (int c = 0; c < 2; c++) {
-            if (controllerDeviceIndex[c] != -1) {
-                vrSystem.GetControllerState.apply(controllerDeviceIndex[c], inputStateRefernceArray[c]);
-                inputStateRefernceArray[c].read();
-                controllerStateReference[c] = inputStateRefernceArray[c];
+        for (int handIndex = 0; handIndex < 2; handIndex++) {
+            if (controllerDeviceIndex[handIndex] != -1) {
+                vrSystem.GetControllerState.apply(controllerDeviceIndex[handIndex], inputStateRefernceArray[handIndex]);
+                inputStateRefernceArray[handIndex].read();
+                controllerStateReference[handIndex] = inputStateRefernceArray[handIndex];
                 vrState.updateControllerButtonState(controllerStateReference);
             }
         }
@@ -299,7 +312,6 @@ public class OpenVRProvider {
                         JOpenVRLibrary.ETrackedControllerRole.ETrackedControllerRole_TrackedControllerRole_RightHand);
     }
 
-    //jrbuda:: oh hello there you are.
     private static void pollInputEvents() {
         if (vrSystem == null) {
             return;
@@ -361,12 +373,12 @@ public class OpenVRProvider {
 
         findControllerDevices();
 
-        for (int c = 0; c < 2; c++) {
-            if (controllerDeviceIndex[c] != -1) {
-                controllerTracking[c] = true;
-                vrState.setControllerPose(hmdTrackedDevicePoses[controllerDeviceIndex[c]].mDeviceToAbsoluteTracking, c);
+        for (int handIndex = 0; handIndex < 2; handIndex++) {
+            if (controllerDeviceIndex[handIndex] != -1) {
+                controllerTracking[handIndex] = true;
+                vrState.setControllerPose(hmdTrackedDevicePoses[controllerDeviceIndex[handIndex]].mDeviceToAbsoluteTracking, handIndex);
             } else {
-                controllerTracking[c] = false;
+                controllerTracking[handIndex] = false;
             }
         }
     }

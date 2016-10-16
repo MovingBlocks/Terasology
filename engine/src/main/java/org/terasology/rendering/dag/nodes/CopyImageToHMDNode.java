@@ -65,7 +65,6 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     public void initialise() {
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
-                && vrProvider != null
                 && vrProvider.isInitialized() ));
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
@@ -91,11 +90,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
         FINAL.bindTexture();
-        if (!renderingConfig.isVrSupport()) {
-            logger.warn("CopyToVRFrameBufferNode processed in non-VR mode.");
-        } else {
-            renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
-        }
+        renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();
     }
 

@@ -55,7 +55,6 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
         FINAL.bindTexture();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }
