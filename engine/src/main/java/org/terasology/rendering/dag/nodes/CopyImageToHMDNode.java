@@ -70,19 +70,17 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
         rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO,FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
-        if (this.vrProvider != null) {
-            logger.info("Left eye FBOID:" + Integer.toString(leftEye.fboId));
-            logger.info("Right eye FBOID:" + Integer.toString(rightEye.fboId));
-            logger.info("OpenVR init done.");
-            vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
-            vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
-            vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
-            vrProvider.texType[0].write();
-            vrProvider.texType[1].handle = rightEye.colorBufferTextureId;
-            vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
-            vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
-            vrProvider.texType[1].write();
-        }
+        logger.info("Left eye FBOID:" + Integer.toString(leftEye.fboId));
+        logger.info("Right eye FBOID:" + Integer.toString(rightEye.fboId));
+        logger.info("OpenVR init done.");
+        vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
+        vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
+        vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
+        vrProvider.texType[0].write();
+        vrProvider.texType[1].handle = rightEye.colorBufferTextureId;
+        vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
+        vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
+        vrProvider.texType[1].write();
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
