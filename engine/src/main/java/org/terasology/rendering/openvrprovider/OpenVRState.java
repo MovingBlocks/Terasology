@@ -24,7 +24,7 @@ public class OpenVRState {
     private Matrix4f[] projectionMatrices = new Matrix4f[2];
 
     // In the tracking system intertial frame
-    private Matrix4f headPose = new Matrix4f(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
 
     public void addControllerListener(ControllerListener toAdd) {
         controllerListeners.add(toAdd);
