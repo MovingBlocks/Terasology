@@ -72,7 +72,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
                 FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
         if (this.vrProvider != null) {
             logger.info("Left eye FBOID:" + Integer.toString(leftEye.fboId));
-            logger.info("Right eye FBOID:" + Integer.toString(leftEye.fboId));
+            logger.info("Right eye FBOID:" + Integer.toString(rightEye.fboId));
             logger.info("OpenVR init done.");
             vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
