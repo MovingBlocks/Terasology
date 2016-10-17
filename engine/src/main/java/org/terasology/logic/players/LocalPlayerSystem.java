@@ -32,12 +32,7 @@ import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.*;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.GazeMountPointComponent;
-import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.*;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
@@ -50,6 +45,9 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.engine.CharacterCollider;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.SweepCallback;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -60,6 +58,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
+
+import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
 /**
  */
@@ -77,6 +77,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Camera playerCamera;
     @In
     private MovementDebugCommands movementDebugCommands;
+    @In
+    private PhysicsEngine physics;
 
     @In
     private Config config;
@@ -254,14 +256,33 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        CharacterMovementComponent charMoveComp= clientComp.character.getComponent(CharacterMovementComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
         if (event.isDown()) {
-            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
-            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+            if (charMoveComp.mode == MovementMode.WALKING) {
+                movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
+                movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+                charMoveComp.mode = MovementMode.CROUCHING;
+                logger.info(charMoveComp.mode.toString());
+            }
         } else {
+            Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
+            float head_while_crouching = pos.y + height/2 + 0.1f;
+            float head_while_standing = pos.y + 3* height/2 + 0.1f;
+            // Check for collision when rising
+            CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
+            Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
+            SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+            if (callback.hasHit()) {
+                logger.info("Cannot stand up here!" + charMoveComp.mode.toString());
+                event.consume();
+                return;
+            }
             movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
             movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
+            charMoveComp.mode = MovementMode.WALKING;
+            logger.info(charMoveComp.mode.toString());
         }
         event.consume();
     }

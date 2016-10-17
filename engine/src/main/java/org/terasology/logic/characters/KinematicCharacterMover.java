@@ -73,12 +73,12 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * The amount of extra distance added to horizontal movement to allow for penetration.
      */
-    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
+    public static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
 
     /**
      * The amount of extra distance added to vertical movement to allow for penetration.
      */
-    private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
+    public static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
     private static final Logger logger = LoggerFactory.getLogger(KinematicCharacterMover.class);
