@@ -23,6 +23,8 @@ import org.terasology.registry.InjectionHelper;
  */
 public class NodeFactory {
 
+    public static final boolean DELAY_INIT = true;
+
     private Context context;
 
     public NodeFactory(Context context) {
@@ -30,20 +32,18 @@ public class NodeFactory {
     }
 
     public <T extends Node> T createInstance(Class<T> type) {
-        // Attempt constructor-based injection first
-        T node = InjectionHelper.createWithConstructorInjection(type, context);
-        // Then fill @In fields
-        InjectionHelper.inject(node, context);
-        node.initialise();
-        return type.cast(node);
+        return createInstance(type, false);
     }
 
-    public <T extends Node> T createInstance(Class<T> type, Object initializationData) {
+    public <T extends Node> T createInstance(Class<T> type, boolean delayInitialization) {
         // Attempt constructor-based injection first
         T node = InjectionHelper.createWithConstructorInjection(type, context);
         // Then fill @In fields
         InjectionHelper.inject(node, context);
-        node.initialise(initializationData);
+        if (!delayInitialization) {
+            node.initialise();
+        }
         return type.cast(node);
+        // node.initialise() -must- be called externally, to have parameters as necessary
     }
 }

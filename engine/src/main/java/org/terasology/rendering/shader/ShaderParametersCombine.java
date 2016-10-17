@@ -25,7 +25,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
-import org.terasology.rendering.dag.nodes.SkyBandsNode;
+import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.nui.properties.Range;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
@@ -131,7 +131,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.bindFboColorTexture(SkyBandsNode.SKY_BAND_1);
+            displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE);
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

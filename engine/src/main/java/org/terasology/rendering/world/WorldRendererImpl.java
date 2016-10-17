@@ -44,6 +44,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
+import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
@@ -64,7 +65,7 @@ import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
 import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
-import org.terasology.rendering.dag.nodes.SkyBandsNode;
+import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
 import org.terasology.rendering.logic.LightComponent;
@@ -91,10 +92,13 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
+import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -109,6 +113,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public final class WorldRendererImpl implements WorldRenderer {
+
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -224,9 +229,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         // ShadowMap generation
         FBOConfig shadowMapConfig =
                 new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
-        BufferClearingNode.RequiredData shadowMapClearingData = // TODO: turn node into condition-dependent one
-                new BufferClearingNode.RequiredData(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
-        Node shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, shadowMapClearingData);
+        BufferClearingNode shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
+        shadowMapClearingNode.initialise(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
 
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
@@ -235,9 +239,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         // (i.e. water) reflection generation
         FBOConfig reflectedBufferConfig =
                 new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
-        BufferClearingNode.RequiredData reflectedBufferClearingData =
-                new BufferClearingNode.RequiredData(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Node reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectedBufferClearingData);
+        BufferClearingNode reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
+        reflectedBufferClearingNode.initialise(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode"); // TODO: verify this is necessary
 
         Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
@@ -249,23 +252,36 @@ public final class WorldRendererImpl implements WorldRenderer {
         // TODO: write snippets and shaders to inspect content of a color/depth buffer
 
         // sky generation
-        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"),
-                        FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
-        BufferClearingNode.RequiredData reflectiveRefractiveBufferClearingData =
-                new BufferClearingNode.RequiredData(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Node reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, reflectiveRefractiveBufferClearingData);
+        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
+        BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
+        reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        BufferClearingNode.RequiredData readBufferClearingData = new BufferClearingNode.RequiredData(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs,
-                        GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        Node readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, readBufferClearingData);
+        BufferClearingNode readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
+        readBufferClearingNode.initialise(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs,
+                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
 
         Node backdropNode = nodeFactory.createInstance(BackdropNode.class);
         renderGraph.addNode(backdropNode, "backdropNode");
 
+        String aLabel = "hazeIntermediateNode";
+        FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
+        HazeNode hazeIntermediateNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
+        hazeIntermediateNode.initialise(READ_ONLY_GBUFFER.getConfig(), hazeIntermediateConfig, aLabel);
+        renderGraph.addNode(hazeIntermediateNode, aLabel);
+
+        aLabel = "hazeFinalNode";
+        FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE, ONE_32TH_SCALE, FBO.Type.DEFAULT);
+        HazeNode hazeFinalNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
+        hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
+        renderGraph.addNode(hazeFinalNode, aLabel);
+
+        // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
+        Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
+        renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
+
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node skybandsNode = nodeFactory.createInstance(SkyBandsNode.class);
         Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
         Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
         Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
@@ -286,8 +302,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-
-        renderGraph.addNode(skybandsNode, "skybandsNode");
 
         renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
         renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
@@ -358,6 +372,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         resetStats();
 
         currentRenderingStage = renderingStage;
+
         if ((currentRenderingStage == RenderingStage.MONO) || (currentRenderingStage == RenderingStage.LEFT_EYE)) {
             isFirstRenderingStageForCurrentFrame = true;
         } else {
@@ -370,7 +385,6 @@ public final class WorldRendererImpl implements WorldRenderer {
             timeSmoothedMainLightIntensity = TeraMath.lerp(timeSmoothedMainLightIntensity, getMainLightIntensityAt(playerCamera.getPosition()), secondsSinceLastFrame);
 
             playerCamera.update(secondsSinceLastFrame);
-
 
             renderableWorld.update();
             renderableWorld.generateVBOs();
