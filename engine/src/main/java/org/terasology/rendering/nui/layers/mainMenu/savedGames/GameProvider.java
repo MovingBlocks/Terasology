@@ -66,9 +66,13 @@ public final class GameProvider {
             }
             try {
                 GameManifest info = GameManifest.load(gameManifest);
-                if (!info.getTitle().isEmpty()) {
-                    Date date = new Date(world.getKey().toMillis());
-                    result.add(new GameInfo(info, date));
+                try {
+                    if (!info.getTitle().isEmpty()) {
+                        Date date = new Date(world.getKey().toMillis());
+                        result.add(new GameInfo(info, date));
+                    }
+                } catch (NullPointerException npe) {
+                    logger.error("The save file was corrupted for: " + world.toString() + ". The manifest can be found and restored at: " + gameManifest.toString(), npe);
                 }
             } catch (IOException e) {
                 logger.error("Failed reading world data object.", e);
