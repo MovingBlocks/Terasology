@@ -256,15 +256,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
-        CharacterMovementComponent charMoveComp= clientComp.character.getComponent(CharacterMovementComponent.class);
+        CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
         if (event.isDown()) {
-            if (charMoveComp.mode == MovementMode.WALKING) {
+            if (move.mode == MovementMode.WALKING) {
                 movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
                 movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
-                charMoveComp.mode = MovementMode.CROUCHING;
-                logger.info(charMoveComp.mode.toString());
+                move.mode = MovementMode.CROUCHING;
+                clientComp.character.saveComponent(move);
+                logger.info(move.mode.toString());
             }
         } else {
             Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
@@ -275,14 +276,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
             SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
-                logger.info("Cannot stand up here!" + charMoveComp.mode.toString());
+                logger.info("Cannot stand up here!" + move.mode.toString());
                 event.consume();
                 return;
             }
             movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
             movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
-            charMoveComp.mode = MovementMode.WALKING;
-            logger.info(charMoveComp.mode.toString());
+            move.mode = MovementMode.WALKING;
+            clientComp.character.saveComponent(move);
+            logger.info(move.mode.toString());
         }
         event.consume();
     }
@@ -292,6 +294,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (event.isDown()) {
             runPerDefault = !runPerDefault;
             run = !run;
+            ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+            CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
+            logger.info(move.mode.toString());
         }
         event.consume();
     }
