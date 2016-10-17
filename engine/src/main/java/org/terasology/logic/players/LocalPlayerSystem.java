@@ -257,22 +257,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
+        logger.info(move.mode.toString());
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
-        if (event.isDown()) {
-            if (move.mode == MovementMode.WALKING) {
-                movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
-                movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
-                move.mode = MovementMode.CROUCHING;
-                clientComp.character.saveComponent(move);
-                logger.info(move.mode.toString());
-            }
-        } else {
+        if (event.isDown() && move.mode == MovementMode.WALKING) {
+            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
+            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+            move.mode = MovementMode.CROUCHING;
+            clientComp.character.saveComponent(move);
+            logger.info(move.mode.toString());
+        } else if (!event.isDown() && move.mode == MovementMode.CROUCHING) {
             Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
-            float head_while_crouching = pos.y + height/2 + 0.1f;
-            float head_while_standing = pos.y + 3* height/2 + 0.1f;
             // Check for collision when rising
             CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
+            // height used below is half of standing height.
             Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
             SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
