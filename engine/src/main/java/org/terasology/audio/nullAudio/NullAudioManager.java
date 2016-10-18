@@ -73,11 +73,26 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
+    public void playMusic(StreamingSound music, boolean loop) {
+
+    }
+
+    @Override
     public void playMusic(StreamingSound sound, float volume) {
     }
 
     @Override
+    public void playMusic(StreamingSound music, float volume, boolean loop) {
+
+    }
+
+    @Override
     public void playMusic(StreamingSound sound, AudioEndListener endListener) {
+    }
+
+    @Override
+    public void playMusic(StreamingSound music, boolean loop, AudioEndListener endListener) {
+
     }
 
     @Override
@@ -109,4 +124,11 @@ public class NullAudioManager implements AudioManager {
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
         return NullStreamingSound::new;
     }
+
+		@Override
+		public void playMusic(StreamingSound music, float volume, boolean loop,
+				AudioEndListener endListener) {
+			// TODO Auto-generated method stub
+			
+		}
 }
