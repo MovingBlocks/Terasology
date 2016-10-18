@@ -25,6 +25,7 @@
                 "engine:right",
                 "engine:toggleSpeedPermanently",
                 "engine:toggleSpeedTemporarily",
+                "engine:toggleStance",
                 "engine:jump",
                 "engine:crouch"
         }) package org.terasology.input.binds.movement;

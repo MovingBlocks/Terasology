@@ -153,6 +153,38 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         jump = false;
     }
 
+    public void crouchPlayer(EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
+        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
+        float eyeHeight = gazeMountPointComponent.translate.getY();
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
+    }
+
+    public void standPlayer (EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
+        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
+        float eyeHeight = gazeMountPointComponent.translate.getY();
+        Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
+        // Check for collision when rising
+        CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
+        // height used below is half of standing height.
+        Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
+        SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+        if (callback.hasHit()) {
+            logger.info("Cannot stand up here!" + move.mode.toString());
+            return;
+        }
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
+    }
+
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
@@ -248,7 +280,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
         boolean toggle = event.isDown();
-        logger.info("shift");
         run = runPerDefault ^ toggle;
         event.consume();
     }
@@ -256,29 +287,25 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
-        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
-        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
-        float eyeHeight = gazeMountPointComponent.translate.getY();
         if (event.isDown() && move.mode == MovementMode.WALKING) {
-            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
-            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
-            clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
+           crouchPlayer(entity);
         } else if (!event.isDown() && move.mode == MovementMode.CROUCHING) {
-            Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
-            // Check for collision when rising
-            CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
-            // height used below is half of standing height.
-            Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
-            SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
-            if (callback.hasHit()) {
-                logger.info("Cannot stand up here!" + move.mode.toString());
-                event.consume();
-                return;
+            standPlayer(entity);
+        }
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onToggleStance(ToggleStanceButton event, EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
+        if (event.isDown()) {
+            if (move.mode == MovementMode.WALKING) {
+                crouchPlayer(entity);
+            } else if (move.mode == MovementMode.CROUCHING) {
+                standPlayer(entity);
             }
-            movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
-            movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
-            clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
         }
         event.consume();
     }
