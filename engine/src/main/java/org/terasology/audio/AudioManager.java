@@ -50,11 +50,19 @@ public interface AudioManager {
 
     void playMusic(StreamingSound music);
 
+    void playMusic(StreamingSound music, boolean loop);
+
     void playMusic(StreamingSound music, float volume);
+
+    void playMusic(StreamingSound music, float volume, boolean loop);
 
     void playMusic(StreamingSound music, AudioEndListener endListener);
 
+    void playMusic(StreamingSound music, boolean loop, AudioEndListener endListener);
+
     void playMusic(StreamingSound music, float volume, AudioEndListener endListener);
+
+    void playMusic(StreamingSound music, float volume, boolean loop, AudioEndListener endListener);
 
     /**
      * Update AudioManager sound sources
