@@ -34,6 +34,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.*;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.inventory.ItemComponent;
@@ -257,15 +258,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
-        logger.info(move.mode.toString());
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
         if (event.isDown() && move.mode == MovementMode.WALKING) {
             movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
             movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
-            move.mode = MovementMode.CROUCHING;
-            clientComp.character.saveComponent(move);
-            logger.info(move.mode.toString());
+            clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
         } else if (!event.isDown() && move.mode == MovementMode.CROUCHING) {
             Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
             // Check for collision when rising
@@ -280,9 +278,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             }
             movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
             movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
-            move.mode = MovementMode.WALKING;
-            clientComp.character.saveComponent(move);
-            logger.info(move.mode.toString());
+            clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
         }
         event.consume();
     }
@@ -292,9 +288,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         if (event.isDown()) {
             runPerDefault = !runPerDefault;
             run = !run;
-            ClientComponent clientComp = entity.getComponent(ClientComponent.class);
-            CharacterMovementComponent move= clientComp.character.getComponent(CharacterMovementComponent.class);
-            logger.info(move.mode.toString());
         }
         event.consume();
     }
