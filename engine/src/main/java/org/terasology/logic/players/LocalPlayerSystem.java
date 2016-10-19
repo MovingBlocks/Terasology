@@ -36,9 +36,11 @@ import org.terasology.logic.characters.*;
 import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
+import org.terasology.logic.console.ErrorMessageEvent;
 import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
@@ -178,6 +180,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
             logger.info("Cannot stand up here!" + move.mode.toString());
+            entity.send(new NotificationMessageEvent("Cannot stand here!", entity));
             return;
         }
         movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
