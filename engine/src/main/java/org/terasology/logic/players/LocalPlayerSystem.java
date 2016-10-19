@@ -170,6 +170,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         jump = false;
     }
 
+    // Reduces height and eyeHeight by crouch_fraction and changes MovementMode.
+    // TODO: Add animation while crouching
+    // TODO: Shift crouch_fraction = 0.5f outside
     private void crouchPlayer(EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
@@ -180,20 +183,22 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
     }
 
+    // Checks if there is an impenetrable block above,
+    // Raises a Notification "Cannot stand here!" if present
+    // If not present, increases height and eyeHeight by crouch_fraction and changes MovementMode.
+    // TODO: Add animation while standing
     private void standPlayer(EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
-        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
         Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
         // Check for collision when rising
         CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
-        // height used below is half of standing height.
-        Vector3f to = new Vector3f(pos.x, pos.y + height + VERTICAL_PENETRATION_LEEWAY, pos.z);
+        // height used below = standing_height - crouch_fraction * standing_height
+        Vector3f to = new Vector3f(pos.x, pos.y + height, pos.z);
         SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
-            logger.info("Cannot stand up here!" + move.mode.toString());
             entity.send(new NotificationMessageEvent("Cannot stand here!", entity));
             return;
         }
@@ -301,6 +306,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         event.consume();
     }
 
+    // Crouches if button is pressed. Stands if button is released.
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
