@@ -36,6 +36,8 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.events.ChangeVelocityEvent;
@@ -43,6 +45,7 @@ import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.events.ForceEvent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.physics.events.PhysicsResynchEvent;
+import org.terasology.physics.events.ImpactEvent;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
@@ -135,6 +138,14 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         physics.awakenArea(event.getBlockPosition().toVector3f(), 0.6f);
     }
 
+    @ReceiveEvent()
+    public void onItemImpact(ImpactEvent event, EntityRef entity) {
+        RigidBody rigidBody = physics.getRigidBody(entity);
+        if (rigidBody != null) {
+            rigidBody.setLinearVelocity(new Vector3f(0.0f, 4.0f, 0.0f));
+        }
+    }
+
     @Override
     public void update(float delta) {
 
@@ -152,6 +163,17 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             if (body.isActive()) {
                 body.getLinearVelocity(comp.velocity);
                 body.getAngularVelocity(comp.angularVelocity);
+
+                Vector3f vLocation = Vector3f.zero();
+                body.getLocation(vLocation);
+                Vector3f vDirection = comp.velocity;
+                float fDistance = vDirection.length();
+                vDirection.normalize();
+
+                HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistance * delta, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER );
+                if (hitInfo.isHit()) {
+                    entity.send(new ImpactEvent());
+                }
             }
         }
 
