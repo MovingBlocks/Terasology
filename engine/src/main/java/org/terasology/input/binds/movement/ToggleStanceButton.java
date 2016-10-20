@@ -24,6 +24,6 @@ import org.terasology.input.RegisterBindButton;
 /**
  */
 @RegisterBindButton(id = "toggleStance", description = "${engine:menu#binding-toggle-stance}")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.C)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.X)
 public class ToggleStanceButton extends BindButtonEvent {
 }

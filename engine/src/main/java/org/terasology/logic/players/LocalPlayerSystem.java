@@ -112,6 +112,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private float lookPitchDelta;
     private float lookYaw;
     private float lookYawDelta;
+    private float crouchFraction = 0.5f;
 
     @In
     private Time time;
@@ -170,23 +171,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         jump = false;
     }
 
-    // Reduces height and eyeHeight by crouch_fraction and changes MovementMode.
-    // TODO: Add animation while crouching
-    // TODO: Shift crouch_fraction = 0.5f outside
+    /**
+     * Reduces height and eyeHeight by crouchFraction and changes MovementMode.
+     */
     private void crouchPlayer(EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
         float eyeHeight = gazeMountPointComponent.translate.getY();
-        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * 0.5f);
-        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * 0.5f);
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * crouchFraction);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * crouchFraction);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
     }
 
-    // Checks if there is an impenetrable block above,
-    // Raises a Notification "Cannot stand here!" if present
-    // If not present, increases height and eyeHeight by crouch_fraction and changes MovementMode.
-    // TODO: Add animation while standing
+    /**
+     * Checks if there is an impenetrable block above,
+     * Raises a Notification "Cannot stand up here!" if present
+     * If not present, increases height and eyeHeight by crouchFraction and changes MovementMode.
+     */
     private void standPlayer(EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
@@ -195,15 +197,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
         // Check for collision when rising
         CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
-        // height used below = standing_height - crouch_fraction * standing_height
-        Vector3f to = new Vector3f(pos.x, pos.y + height, pos.z);
+        // height used below = (1 - crouch_fraction) * standing_height
+        Vector3f to = new Vector3f(pos.x, pos.y + (1 - crouchFraction) * height / crouchFraction, pos.z);
         SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
-            entity.send(new NotificationMessageEvent("Cannot stand here!", entity));
+            entity.send(new NotificationMessageEvent("Cannot stand up here!", entity));
             return;
         }
-        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / 0.5f);
-        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / 0.5f);
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / crouchFraction);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / crouchFraction);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
     }
 
