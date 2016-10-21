@@ -28,6 +28,7 @@
     "binding-show-online-players": "binding-show-online-players",
     "binding-toggle-speed-permanently": "binding-toggle-speed-permanently",
     "binding-toggle-speed-temporarily": "binding-toggle-speed-temporarily",
+    "binding-toggle-stance": "binding-toggle-stance",
     "binding-use-item": "binding-use-item",
     "bloom-effect": "bloom-effect",
     "bobbing": "bobbing",

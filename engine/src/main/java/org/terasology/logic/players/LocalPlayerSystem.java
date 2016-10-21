@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
+import org.terasology.input.binds.movement.CrouchButton;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
@@ -38,21 +39,23 @@ import org.terasology.input.binds.movement.StrafeMovementAxis;
 import org.terasology.input.binds.movement.StrafeRealMovementAxis;
 import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
+import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.GazeMountPointComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
@@ -60,6 +63,9 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.engine.CharacterCollider;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.SweepCallback;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -70,6 +76,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
+
+import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
 /**
  */
@@ -87,6 +95,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Camera playerCamera;
     @In
     private MovementDebugCommands movementDebugCommands;
+    @In
+    private PhysicsEngine physics;
 
     @In
     private Config config;
@@ -102,6 +112,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private float lookPitchDelta;
     private float lookYaw;
     private float lookYawDelta;
+    private float crouchFraction = 0.5f;
 
     @In
     private Time time;
@@ -158,6 +169,44 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
         entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
         jump = false;
+    }
+
+    /**
+     * Reduces height and eyeHeight by crouchFraction and changes MovementMode.
+     */
+    private void crouchPlayer(EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
+        float eyeHeight = gazeMountPointComponent.translate.getY();
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height * crouchFraction);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight * crouchFraction);
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.CROUCHING));
+    }
+
+    /**
+     * Checks if there is an impenetrable block above,
+     * Raises a Notification "Cannot stand up here!" if present
+     * If not present, increases height and eyeHeight by crouchFraction and changes MovementMode.
+     */
+    private void standPlayer(EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+        float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
+        float eyeHeight = gazeMountPointComponent.translate.getY();
+        Vector3f pos = entity.getComponent(LocationComponent.class).getWorldPosition();
+        // Check for collision when rising
+        CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
+        // height used below = (1 - crouch_fraction) * standing_height
+        Vector3f to = new Vector3f(pos.x, pos.y + (1 - crouchFraction) * height / crouchFraction, pos.z);
+        SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+        if (callback.hasHit()) {
+            entity.send(new NotificationMessageEvent("Cannot stand up here!", entity));
+            return;
+        }
+        movementDebugCommands.playerHeight(localPlayer.getClientEntity(), height / crouchFraction);
+        movementDebugCommands.playerEyeHeight(localPlayer.getClientEntity(), eyeHeight / crouchFraction);
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
     }
 
     @ReceiveEvent
@@ -256,7 +305,33 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
         boolean toggle = event.isDown();
         run = runPerDefault ^ toggle;
+        event.consume();
+    }
 
+    // Crouches if button is pressed. Stands if button is released.
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onCrouchTemporarily(CrouchButton event, EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+        if (event.isDown() && move.mode == MovementMode.WALKING) {
+            crouchPlayer(entity);
+        } else if (!event.isDown() && move.mode == MovementMode.CROUCHING) {
+            standPlayer(entity);
+        }
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onCrouchMode(CrouchModeButton event, EntityRef entity) {
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
+        if (event.isDown()) {
+            if (move.mode == MovementMode.WALKING) {
+                crouchPlayer(entity);
+            } else if (move.mode == MovementMode.CROUCHING) {
+                standPlayer(entity);
+            }
+        }
         event.consume();
     }
 
