@@ -277,15 +277,23 @@ public final class WorldRendererImpl implements WorldRenderer {
         hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
         renderGraph.addNode(hazeFinalNode, aLabel);
 
+        Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
+        renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
+
+        Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
+        renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
+
+        Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
+        renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
+
+        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
         Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
         renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
 
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
-        Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
-        Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
-        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
         Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
@@ -303,10 +311,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
-        renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
-        renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
-        renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
-        renderGraph.addNode(overlaysNode, "overlaysNode");
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
         renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
         renderGraph.addNode(directionalLightsNode, "directionalLightsNode");

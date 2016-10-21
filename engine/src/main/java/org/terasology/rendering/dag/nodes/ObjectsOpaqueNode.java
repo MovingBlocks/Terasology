@@ -20,6 +20,9 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
  * TODO: Diagram of this node
@@ -32,14 +35,19 @@ public class ObjectsOpaqueNode extends WireframeCapableNode {
     @Override
     public void initialise() {
         super.initialise();
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/objectsOpaque");
+
+        READ_ONLY_GBUFFER.bind();
+
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
+
         PerformanceMonitor.endActivity();
     }
 }

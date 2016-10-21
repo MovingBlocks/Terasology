@@ -20,10 +20,13 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRendererImpl;
+
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
  * TODO: Diagram of this node
@@ -42,15 +45,20 @@ public class ChunksOpaqueNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/chunksOpaque");
+
+        READ_ONLY_GBUFFER.bind();
+
         worldRenderer.renderChunks(renderQueues.chunksOpaque,
                 ChunkMesh.RenderPhase.OPAQUE,
                 playerCamera,
                 WorldRendererImpl.ChunkRenderMode.DEFAULT);
+
         PerformanceMonitor.endActivity();
     }
 }
