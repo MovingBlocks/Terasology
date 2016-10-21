@@ -23,7 +23,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "toggleStance", description = "${engine:menu#binding-toggle-stance}")
+@RegisterBindButton(id = "crouchMode", description = "${engine:menu#binding-crouch-mode}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.X)
-public class ToggleStanceButton extends BindButtonEvent {
+public class CrouchModeButton extends BindButtonEvent {
 }

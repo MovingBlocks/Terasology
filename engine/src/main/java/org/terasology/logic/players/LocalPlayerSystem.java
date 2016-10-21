@@ -39,7 +39,7 @@ import org.terasology.input.binds.movement.StrafeMovementAxis;
 import org.terasology.input.binds.movement.StrafeRealMovementAxis;
 import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
-import org.terasology.input.binds.movement.ToggleStanceButton;
+import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
@@ -322,7 +322,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onToggleStance(ToggleStanceButton event, EntityRef entity) {
+    public void onCrouchMode(CrouchModeButton event, EntityRef entity) {
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (event.isDown()) {
