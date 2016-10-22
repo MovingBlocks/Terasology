@@ -92,14 +92,6 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "";
     }
 
-    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
-        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
-        clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
-        return "Teleporting  to " + x + " " + y + " " + z;
-    }
-
     @Command(value = "pushCharacter", shortDescription = "Pushes you in the direction (x, y, z)", runOnServer = true)
     public String pushCharacterCommand(@Sender EntityRef sender,
                                        @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
@@ -286,6 +278,14 @@ public class MovementDebugCommands extends BaseComponentSystem {
         }
     }
 
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
+        clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
+        return "Teleporting  to " + x + " " + y + " " + z;
+    }
+
     @Command(shortDescription = "Teleport to player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String teleportMeToPlayer(@Sender EntityRef sender, @CommandParam("username") String username) {
@@ -354,8 +354,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             if (!foundEntityFrom && usernameFrom.equals(name.name)) {
                 entityFrom = clientEntity;
                 foundEntityFrom = true;
-            }
-            else if (!foundEntityTo && usernameTo.equals(name.name)) {
+            } else if (!foundEntityTo && usernameTo.equals(name.name)) {
                 entityTo = clientEntity;
                 foundEntityTo = true;
             }
@@ -428,7 +427,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         MovementMode playerMovementMode = MovementMode.NONE;
         ClientComponent clientInfo = playerEntity.getComponent(ClientComponent.class);
-        if ( clientInfo != null ) {
+        if (clientInfo != null) {
             CharacterMovementComponent playerMovementComponent = clientInfo.character.getComponent(CharacterMovementComponent.class);
             if (playerMovementComponent != null) {
                 playerMovementMode = playerMovementComponent.mode;
