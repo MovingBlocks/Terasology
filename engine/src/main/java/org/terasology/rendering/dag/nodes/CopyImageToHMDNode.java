@@ -93,6 +93,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     }
 
     private void renderFinalStereoImage(RenderingStage renderingStage) {
+        // TODO: verify if we can use glCopyTexSubImage2D instead of pass-through shaders,
+        // TODO: in terms of code simplicity and performance.
         switch (renderingStage) {
             case LEFT_EYE:
                 vrProvider.updateState();
