@@ -50,134 +50,134 @@ import org.terasology.utilities.Assets;
  * @version 0.3
  */
 public class StateMainMenu implements GameState {
-	private Context									context;
-	private EngineEntityManager			entityManager;
-	private EventSystem							eventSystem;
-	private ComponentSystemManager	componentSystemManager;
-	private NUIManager							nuiManager;
-	private InputSystem							inputSystem;
+    private Context context;
+    private EngineEntityManager entityManager;
+    private EventSystem eventSystem;
+    private ComponentSystemManager componentSystemManager;
+    private NUIManager nuiManager;
+    private InputSystem inputSystem;
 
-	private String									messageOnLoad	= "";
+    private String messageOnLoad = "";
 
-	public StateMainMenu() {
-	}
+    public StateMainMenu() {
+    }
 
-	public StateMainMenu(String showMessageOnLoad) {
-		messageOnLoad = showMessageOnLoad;
-	}
+    public StateMainMenu(String showMessageOnLoad) {
+        messageOnLoad = showMessageOnLoad;
+    }
 
-	@Override
-	public void init(GameEngine gameEngine) {
-		context = gameEngine.createChildContext();
-		CoreRegistry.setContext(context);
+    @Override
+    public void init(GameEngine gameEngine) {
+        context = gameEngine.createChildContext();
+        CoreRegistry.setContext(context);
 
-		// let's get the entity event system running
-		EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
-		entityManager = context.get(EngineEntityManager.class);
+        // let's get the entity event system running
+        EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
+        entityManager = context.get(EngineEntityManager.class);
 
-		eventSystem = context.get(EventSystem.class);
-		context.put(Console.class, new ConsoleImpl(context));
+        eventSystem = context.get(EventSystem.class);
+        context.put(Console.class, new ConsoleImpl(context));
 
-		nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class),
-				context);
-		context.put(NUIManager.class, nuiManager);
+        nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class),
+                context);
+        context.put(NUIManager.class, nuiManager);
 
-		eventSystem.registerEventHandler(nuiManager);
+        eventSystem.registerEventHandler(nuiManager);
 
-		componentSystemManager = new ComponentSystemManager(context);
-		context.put(ComponentSystemManager.class, componentSystemManager);
+        componentSystemManager = new ComponentSystemManager(context);
+        context.put(ComponentSystemManager.class, componentSystemManager);
 
-		// TODO: Reduce coupling between Input system and CameraTargetSystem,
-		// TODO: potentially eliminating the following lines. See Issue #1126
-		CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-		context.put(CameraTargetSystem.class, cameraTargetSystem);
+        // TODO: Reduce coupling between Input system and CameraTargetSystem,
+        // TODO: potentially eliminating the following lines. See Issue #1126
+        CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
+        context.put(CameraTargetSystem.class, cameraTargetSystem);
 
-		componentSystemManager.register(cameraTargetSystem,
-				"engine:CameraTargetSystem");
-		componentSystemManager.register(new ConsoleSystem(),
-				"engine:ConsoleSystem");
-		componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
+        componentSystemManager.register(cameraTargetSystem,
+                "engine:CameraTargetSystem");
+        componentSystemManager.register(new ConsoleSystem(),
+                "engine:ConsoleSystem");
+        componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
-		NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
-		context.put(NUIEditorSystem.class, nuiEditorSystem);
-		componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
+        NUIEditorSystem nuiEditorSystem = new NUIEditorSystem();
+        context.put(NUIEditorSystem.class, nuiEditorSystem);
+        componentSystemManager.register(nuiEditorSystem, "engine:NUIEditorSystem");
 
-		NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
-		context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
-		componentSystemManager.register(nuiSkinEditorSystem,
-				"engine:NUISkinEditorSystem");
+        NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
+        context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
+        componentSystemManager.register(nuiSkinEditorSystem,
+                "engine:NUISkinEditorSystem");
 
-		inputSystem = context.get(InputSystem.class);
+        inputSystem = context.get(InputSystem.class);
 
-		// TODO: REMOVE this and handle refreshing of core game state at the engine
-		// level - see Issue #1127
-		new RegisterInputSystem(context).step();
+        // TODO: REMOVE this and handle refreshing of core game state at the engine
+        // level - see Issue #1127
+        new RegisterInputSystem(context).step();
 
-		EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-		LocalPlayer localPlayer = new LocalPlayer();
-		context.put(LocalPlayer.class, localPlayer);
-		localPlayer.setClientEntity(localPlayerEntity);
+        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
+        LocalPlayer localPlayer = new LocalPlayer();
+        context.put(LocalPlayer.class, localPlayer);
+        localPlayer.setClientEntity(localPlayerEntity);
 
-		componentSystemManager.initialise();
+        componentSystemManager.initialise();
 
-		playBackgroundMusic();
+        playBackgroundMusic();
 
-		// guiManager.openWindow("main");
-		context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
-		if (!messageOnLoad.isEmpty()) {
-			nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-					.setMessage("Error", messageOnLoad);
-		}
-	}
+        // guiManager.openWindow("main");
+        context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+        if (!messageOnLoad.isEmpty()) {
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                    .setMessage("Error", messageOnLoad);
+        }
+    }
 
-	@Override
-	public void dispose() {
-		eventSystem.process();
+    @Override
+    public void dispose() {
+        eventSystem.process();
 
-		componentSystemManager.shutdown();
-		stopBackgroundMusic();
-		nuiManager.clear();
+        componentSystemManager.shutdown();
+        stopBackgroundMusic();
+        nuiManager.clear();
 
-		entityManager.clear();
-	}
+        entityManager.clear();
+    }
 
-	private void playBackgroundMusic() {
-		context.get(AudioManager.class)
-				.playMusic(Assets.getMusic("engine:MenuTheme").get(), 1.0f, true, null);
-	}
+    private void playBackgroundMusic() {
+        context.get(AudioManager.class)
+                .playMusic(Assets.getMusic("engine:MenuTheme").get(), 1.0f, true, null);
+    }
 
-	private void stopBackgroundMusic() {
-		context.get(AudioManager.class).stopAllSounds();
-	}
+    private void stopBackgroundMusic() {
+        context.get(AudioManager.class).stopAllSounds();
+    }
 
-	@Override
-	public void handleInput(float delta) {
-		inputSystem.update(delta);
-	}
+    @Override
+    public void handleInput(float delta) {
+        inputSystem.update(delta);
+    }
 
-	@Override
-	public void update(float delta) {
-		updateUserInterface(delta);
+    @Override
+    public void update(float delta) {
+        updateUserInterface(delta);
 
-		eventSystem.process();
-	}
+        eventSystem.process();
+    }
 
-	@Override
-	public void render() {
-		nuiManager.render();
-	}
+    @Override
+    public void render() {
+        nuiManager.render();
+    }
 
-	@Override
-	public String getLoggingPhase() {
-		return LoggingContext.MENU;
-	}
+    @Override
+    public String getLoggingPhase() {
+        return LoggingContext.MENU;
+    }
 
-	@Override
-	public boolean isHibernationAllowed() {
-		return true;
-	}
+    @Override
+    public boolean isHibernationAllowed() {
+        return true;
+    }
 
-	private void updateUserInterface(float delta) {
-		nuiManager.update(delta);
-	}
+    private void updateUserInterface(float delta) {
+        nuiManager.update(delta);
+    }
 }
