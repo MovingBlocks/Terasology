@@ -74,7 +74,6 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void playMusic(StreamingSound music, boolean loop) {
-
     }
 
     @Override
@@ -83,7 +82,6 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void playMusic(StreamingSound music, float volume, boolean loop) {
-
     }
 
     @Override
@@ -92,7 +90,6 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void playMusic(StreamingSound music, boolean loop, AudioEndListener endListener) {
-
     }
 
     @Override
@@ -128,7 +125,5 @@ public class NullAudioManager implements AudioManager {
 		@Override
 		public void playMusic(StreamingSound music, float volume, boolean loop,
 				AudioEndListener endListener) {
-			// TODO Auto-generated method stub
-			
 		}
 }

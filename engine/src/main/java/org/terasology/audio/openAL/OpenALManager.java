@@ -246,7 +246,7 @@ public class OpenALManager implements AudioManager {
         SoundSource<?> source = pool.getSource(music);
         if (source != null) {
             source.setGain(volume).play();
-            if(loop) {
+            if (loop) {
                 source.setLooping(true);
             }
 
