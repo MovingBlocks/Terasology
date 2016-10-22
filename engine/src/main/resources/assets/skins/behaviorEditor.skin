@@ -1,10 +1,10 @@
 {
-    "inherit" : "mainMenu",
-    "text-shadowed" : true,
-    "font" : "default",
-    "elements" : {
-        "UITooltip" : {
-            "text-align-horizontal" : "left"
+    "inherit": "mainMenu",
+    "text-shadowed": true,
+    "font": "default",
+    "elements": {
+        "UITooltip": {
+            "text-align-horizontal": "left"
         }
     }
 }

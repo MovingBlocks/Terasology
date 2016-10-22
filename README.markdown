@@ -4,7 +4,8 @@
 [![Release](https://img.shields.io/github/release/MovingBlocks/Terasology.svg)](../../releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/MovingBlocks/Terasology/latest/total.svg "Downloads")](../../releases/latest)
 [![Bounties](https://img.shields.io/bountysource/team/MovingBlocks/activity.svg)](https://www.bountysource.com/teams/MovingBlocks)
-![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+[![License(code)](https://img.shields.io/badge/license(code)-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![License(art)](https://img.shields.io/badge/license(art)-CC%20BY%204.0-blue.svg)](http://creativecommons.org/licenses/by/4.0/)
 [![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
 
 Welcome!
@@ -13,7 +14,7 @@ The Terasology project was born from a Minecraft-inspired tech demo and is becom
 
 The [creators and maintainers](https://github.com/MovingBlocks/Terasology/blob/develop/docs/Credits.md) are a diverse mix of software developers, designers, game testers, graphic artists, and musicians. We encourage others to join!
 
-Terasology is fully open source and licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology) 
+Terasology is fully [open source](https://github.com/MovingBlocks/Terasology) and licensed [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) for code and [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/) for artwork (unless indicated otherwise - see [credits](docs/Credits.md) for minor exceptions)
 
 We encourage contributions from anybody and try to keep a warm and friendly community. See [our published code of conduct](https://github.com/MovingBlocks/Terasology/blob/develop/docs/Conduct.md) adopted from the [template by the TODOGroup](https://github.com/todogroup/opencodeofconduct).
 

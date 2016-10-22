@@ -45,11 +45,11 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
@@ -95,7 +95,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
             o1.getMetadata().getDisplayName().toString().compareTo(
-            o2.getMetadata().getDisplayName().toString());
+                    o2.getMetadata().getDisplayName().toString());
 
     @Override
     public void onOpened() {
@@ -172,20 +172,20 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 }
             });
 
-            UIText moduleSearch = find("moduleSearch", UIText.class);
+            ResettableUIText moduleSearch = find("moduleSearch", ResettableUIText.class);
             if (moduleSearch != null) {
-                    moduleSearch.subscribe(new TextChangeEventListener() {
-                            @Override
-                            public void onTextChange(String oldText, String newText) {
-                                    sortedModules.clear();
-                                    for (ModuleSelectionInfo m : allSortedModules) {
-                                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                                                    sortedModules.add(m);
-                                                }
-                                        }
-                                }
-                        });
-                }
+                moduleSearch.subscribe(new TextChangeEventListener() {
+                    @Override
+                    public void onTextChange(String oldText, String newText) {
+                        sortedModules.clear();
+                        for (ModuleSelectionInfo m : allSortedModules) {
+                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                                sortedModules.add(m);
+                            }
+                        }
+                    }
+                });
+            }
 
             final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
                 @Override
@@ -234,7 +234,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             return "";
                         }
                         return (sel.getOnlineVersion() != null)
-                              ? sel.getOnlineVersion().getVersion().toString() : "none";
+                                ? sel.getOnlineVersion().getVersion().toString() : "none";
                     }
                 });
             }
@@ -329,12 +329,20 @@ public class SelectModulesScreen extends CoreScreenLayer {
             if (downloadButton != null) {
                 downloadButton.subscribe(button -> {
                     if (moduleList.getSelection() != null) {
-
                         ModuleSelectionInfo info = moduleList.getSelection();
                         startDownloadingNewestModulesRequiredFor(info);
                     }
                 });
-
+                downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
+                    @Override
+                    public Boolean get() {
+                        try {
+                            return moduleList.getSelection().getOnlineVersion() != null;
+                        } catch (NullPointerException e) {
+                            return false;
+                        }
+                    }
+                });
                 downloadButton.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
@@ -371,7 +379,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         Map<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
 
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-        confirmPopup.setMessage("Confirm Download", modulesToDownload.size()  + " modules will be downloaded");
+        confirmPopup.setMessage("Confirm Download", modulesToDownload.size() + " modules will be downloaded");
         confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
     }
 
@@ -380,18 +388,18 @@ public class SelectModulesScreen extends CoreScreenLayer {
         ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
         loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         popup.onSuccess(paths -> {
-                for (Path filePath: paths) {
-                    try {
-                        Module module = loader.load(filePath);
-                        modulesLookup.get(module.getId()).setLocalVersion(module);
-                        moduleManager.getRegistry().add(module);
-                    } catch (IOException e) {
-                        logger.warn("Could not load module {}", filePath.getFileName(), e);
-                        return;
-                    }
-                    updateValidToSelect();
+            for (Path filePath : paths) {
+                try {
+                    Module module = loader.load(filePath);
+                    modulesLookup.get(module.getId()).setLocalVersion(module);
+                    moduleManager.getRegistry().add(module);
+                } catch (IOException e) {
+                    logger.warn("Could not load module {}", filePath.getFileName(), e);
+                    return;
                 }
-            });
+                updateValidToSelect();
+            }
+        });
         ProgressListener progressListener = progress ->
                 popup.setMessage("Downloading required modules", String.format("Please wait ... %d%%", (int) (progress * 100f)));
         // to ensure that the initial message gets set:
@@ -402,7 +410,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private Map<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
         Map<URL, Path> urlToTargetMap = Maps.newLinkedHashMap();
-        for (ModuleSelectionInfo moduleSelectionInfo: modulesToDownload) {
+        for (ModuleSelectionInfo moduleSelectionInfo : modulesToDownload) {
             ModuleMetadata metaData = moduleSelectionInfo.getOnlineVersion().getMetadata();
             String version = metaData.getVersion().toString();
             String id = metaData.getId().toString();
@@ -468,7 +476,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     /**
-     *
      * @return all modules that need to be downloaded to use the newest version of the specified module and all its
      * dependencies.
      */
@@ -539,9 +546,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        // moduleConfig passes the module collection to the Create Game Screen.
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
-        sortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
+        // Fetch all the selected/activated modules using allSortedModules
+        // instead of fetching only selected/activated modules from filtered collection of modules using sortedModules
+        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
                 moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
@@ -619,7 +629,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             List<Path> downloadedFiles = new ArrayList<>();
             float fractionPerFile = (float) 1 / urlToTargetMap.size();
             int index = 0;
-            for (Map.Entry<URL, Path> entry: urlToTargetMap.entrySet()) {
+            for (Map.Entry<URL, Path> entry : urlToTargetMap.entrySet()) {
                 float progressWithFiles = fractionPerFile * index;
                 ProgressListener singleDownloadListener = fraction -> {
                     float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());

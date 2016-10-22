@@ -46,7 +46,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
         FBO fbo;
         ResourceUrn fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
-            if (!config.equals(fboConfigs.get(fboName))) {
+            if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
             }
             fbo = fboLookup.get(fboConfig.getName());

@@ -19,7 +19,6 @@
                 "UIButton": {
                     "min-width": 192,
                     "min-height": 32
-
                 }
             }
         },
@@ -35,7 +34,7 @@
             "font": "NotoSans-Regular-Large",
             "text-color": "F0F0F0FF"
         },
-         "subtitle": {
+        "subtitle": {
             "font": "NotoSans-Regular-Medium",
             "text-color": "F0F0F0FF"
         },
@@ -47,14 +46,14 @@
         },
         "highlight": {
             "text-color": "FFFF00FF",
-            "font" : "NotoSans-Bold"
+            "font": "NotoSans-Bold"
         },
         "subheading": {
             "font": "NotoSans-Regular-Medium",
             "text-align-horizontal": "left",
-            "margin" : {
-                "bottom" : 4,
-                "left" : 4
+            "margin": {
+                "bottom": 4,
+                "left": 4
             }
         },
         "left-label": {

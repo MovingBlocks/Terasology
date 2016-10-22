@@ -1,5 +1,4 @@
 {
-    "shader" : "engine:testShader",
-    "params" : {
-    }
+    "shader": "engine:testShader",
+    "params": {}
 }

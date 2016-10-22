@@ -61,7 +61,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private final List<Color> colors = CieCamColors.L65C65;
 
     private UIText nametext;
-    private UISlider slider;
+    private UISlider slider, heightSlider, eyeHeightSlider;
     private UIImage img;
     private UIDropdownScrollable<Locale> language;
 
@@ -74,6 +74,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         if (slider != null) {
             Color color = config.getPlayer().getColor();
             slider.bindValue(new NotifyingBinding(findClosestIndex(color)));
+        }
+        if (heightSlider != null) {
+            heightSlider.bindValue(new NotifyingBinding(config.getPlayer().getHeight()));
+        }
+        if (eyeHeightSlider != null) {
+            eyeHeightSlider.bindValue(new NotifyingBinding(config.getPlayer().getEyeHeight()));
         }
         if (language != null) {
             language.setSelection(config.getSystem().getLocale());
@@ -106,6 +112,22 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             slider.setIncrement(0.01f);
             Function<Object, String> constant = Functions.constant("  ");   // ensure a certain width
             slider.setLabelFunction(constant);
+        }
+
+        heightSlider = find("height", UISlider.class);
+        if (heightSlider != null) {
+            heightSlider.setMinimum(1.5f);
+            heightSlider.setIncrement(0.1f);
+            heightSlider.setRange(0.5f);
+            heightSlider.setPrecision(1);
+        }
+
+        eyeHeightSlider = find("eye-height", UISlider.class);
+        if (eyeHeightSlider != null) {
+            eyeHeightSlider.setMinimum(0.5f);
+            eyeHeightSlider.setIncrement(0.1f);
+            eyeHeightSlider.setRange(1f);
+            eyeHeightSlider.setPrecision(1);
         }
 
         language = find("language", UIDropdownScrollable.class);
@@ -194,9 +216,31 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
     }
 
+    private Float getHeight() {
+        if (heightSlider != null) {
+            float index = heightSlider.getValue();
+            return index;
+        } else {
+            return config.getPlayer().getHeight();
+        }
+    }
+
+    private Float getEyeHeight() {
+        if (eyeHeightSlider != null) {
+            float index = eyeHeightSlider.getValue();
+            return index;
+        } else {
+            return config.getPlayer().getEyeHeight();
+        }
+    }
+
     private void savePlayerSettings() {
         Color color = getColor();
         config.getPlayer().setColor(color);
+        Float height = getHeight();
+        config.getPlayer().setHeight(height);
+        Float eyeHeight = getEyeHeight();
+        config.getPlayer().setEyeHeight(eyeHeight);
         if (nametext != null) {
             config.getPlayer().setName(nametext.getText());
         }

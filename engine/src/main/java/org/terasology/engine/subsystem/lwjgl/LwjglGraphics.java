@@ -327,7 +327,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
                 "If that fails you might need to use a different GPU (graphics card). Sorry!\n";
     }
 
-    public void initOpenGLParams() {
+    public static void initOpenGLParams() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_NORMALIZE);

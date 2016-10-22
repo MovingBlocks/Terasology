@@ -16,8 +16,18 @@
 package org.terasology.rendering.opengl;
 
 /**
- * TODO: add javadocs
+ * Interface to connect an object to an FBO manager so that the manager can inform it about changes.
+ *
+ * This is useful when the FBOs are not static and need to be regenerated at runtime.
  */
 public interface FBOManagerSubscriber {
+
+    /**
+     * Triggered by an FBO manager, for example when the FBOs have been regenerated.
+     *
+     * This way the subscriber might react to the event obtaining the new FBOs,
+     * for example when the FBO's dimensions have changed.
+     */
     void update();
+
 }

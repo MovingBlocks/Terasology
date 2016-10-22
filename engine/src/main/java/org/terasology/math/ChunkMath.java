@@ -61,6 +61,16 @@ public final class ChunkMath {
         return (z >> chunkPowerZ);
     }
 
+    public static int calcChunkPosX(int x) {
+        return calcChunkPosX(x, ChunkConstants.CHUNK_POWER.x);
+    }
+    public static int calcChunkPosY(int y) {
+        return calcChunkPosY(y, ChunkConstants.CHUNK_POWER.y);
+    }
+    public static int calcChunkPosZ(int z) {
+        return calcChunkPosZ(z, ChunkConstants.CHUNK_POWER.z);
+    }
+
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
     }
@@ -130,6 +140,18 @@ public final class ChunkMath {
      */
     public static int calcBlockPosZ(int blockZ, int chunkPosFilterZ) {
         return blockZ & chunkPosFilterZ;
+    }
+
+    public static int calcBlockPosX(int blockX) {
+        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER.x);
+    }
+
+    public static int calcBlockPosY(int blockY) {
+        return calcBlockPosY(blockY, ChunkConstants.INNER_CHUNK_POS_FILTER.y);
+    }
+
+    public static int calcBlockPosZ(int blockZ) {
+        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER.z);
     }
 
     public static Vector3i calcBlockPos(Vector3i worldPos) {

@@ -37,6 +37,6 @@ public final class EnableMaterialTask implements RenderPipelineTask {
 
     @Override
     public String toString() {
-        return String.format("%21s(%s)", this.getClass().getSimpleName(), materialName);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
     }
 }

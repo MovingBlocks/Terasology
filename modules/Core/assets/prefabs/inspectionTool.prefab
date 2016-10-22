@@ -1,12 +1,12 @@
 {
-    "parent" : "engine:iconItem",
-    "DisplayName" : {
-        "name" : "Inspection Tool"
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Inspection Tool"
     },
-    "Item" : {
-        "icon" : "engine:items#whiteRecipe"
+    "Item": {
+        "icon": "engine:items#whiteRecipe"
     },
-    "InspectionTool" : {},
+    "InspectionTool": {},
     "InteractionTarget": {},
     "InteractionScreen": {
         "screen": "engine:inspectionScreen"

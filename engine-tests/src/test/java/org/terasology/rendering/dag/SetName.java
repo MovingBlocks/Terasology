@@ -48,10 +48,7 @@ public class SetName implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetName) {
-            return name.equals(((SetName) obj).getName());
-        }
-        return false;
+        return (obj instanceof SetName) && name.equals(((SetName) obj).getName());
     }
 
     @Override
@@ -61,7 +58,7 @@ public class SetName implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%s: %s", this.getClass().getSimpleName(), name);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), name);
     }
 
     public String getName() {

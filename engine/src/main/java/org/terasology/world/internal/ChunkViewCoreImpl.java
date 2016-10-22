@@ -81,7 +81,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getBlock(ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize));
+        return chunks[chunkIndex].getBlock(ChunkMath.calcBlockPosX(blockX, chunkFilterSize.x), ChunkMath.calcBlockPosY(blockY, chunkFilterSize.y), ChunkMath.calcBlockPosZ(blockZ, chunkFilterSize.z));
     }
 
     @Override

@@ -91,10 +91,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof BindFBO) {
-            return fboName.equals(((BindFBO) obj).getFboName());
-        }
-        return false;
+        return (obj instanceof BindFBO) && fboName.equals(((BindFBO) obj).getFboName());
     }
 
     @Override
@@ -104,6 +101,6 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
     }
 }

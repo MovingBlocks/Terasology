@@ -112,21 +112,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
 
         final UIText worldName = find("worldName", UIText.class);
-        if (worldName != null) {
-            int gameNum = 1;
-            for (GameInfo info : GameProvider.getSavedGames()) {
-                if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
-                    String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
-                    try {
-                        gameNum = Math.max(gameNum, Integer.parseInt(remainder) + 1);
-                    } catch (NumberFormatException e) {
-                        logger.trace("Could not parse {} as integer (not an error)", remainder, e);
-                    }
-                }
-            }
-
-            worldName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
-        }
+        setGameName(worldName);
 
         final UIText seed = find("seed", UIText.class);
         if (seed != null) {
@@ -177,8 +163,8 @@ public class CreateGameScreen extends CoreScreenLayer {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
+                    // This grabs modules from `config.getDefaultModSelection()` which is updated in SelectModulesScreen
                     Set<Name> enabledModuleNames = getAllEnabledModuleNames().stream().collect(Collectors.toSet());
-
                     List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
                         if (enabledModuleNames.contains(option.getUri().getModuleName())) {
@@ -293,6 +279,8 @@ public class CreateGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
+        final UIText worldName = find("worldName", UIText.class);
+        setGameName(worldName);
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
 
@@ -325,6 +313,24 @@ public class CreateGameScreen extends CoreScreenLayer {
                     break;
                 }
             }
+        }
+    }
+
+    private void setGameName(UIText worldName) {
+        if (worldName != null) {
+            int gameNum = 1;
+            for (GameInfo info : GameProvider.getSavedGames()) {
+                if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
+                    String remainder = info.getManifest().getTitle().substring(DEFAULT_GAME_NAME_PREFIX.length());
+                    try {
+                        gameNum = Math.max(gameNum, Integer.parseInt(remainder) + 1);
+                    } catch (NumberFormatException e) {
+                        logger.trace("Could not parse {} as integer (not an error)", remainder, e);
+                    }
+                }
+            }
+
+            worldName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
         }
     }
 

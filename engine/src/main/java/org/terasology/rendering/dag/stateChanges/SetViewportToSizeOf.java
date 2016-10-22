@@ -70,10 +70,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SetViewportToSizeOf) {
-            return this.fboName.equals(((SetViewportToSizeOf) obj).getFboName());
-        }
-        return false;
+        return (obj instanceof SetViewportToSizeOf) && this.fboName.equals(((SetViewportToSizeOf) obj).getFboName());
     }
 
     @Override
@@ -93,7 +90,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%21s: %s", this.getClass().getSimpleName(), fboName);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
     }
 
     public ResourceUrn getFboName() {

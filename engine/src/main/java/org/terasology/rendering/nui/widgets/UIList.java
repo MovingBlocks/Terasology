@@ -61,11 +61,11 @@ public class UIList<T> extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         updateItemListeners();
+        canvas.setPart("item");
 
         boolean enabled = isEnabled();
         Border margin = canvas.getCurrentStyle().getMargin();
 
-        canvas.setPart("item");
         int yOffset = 0;
         for (int i = 0; i < list.get().size(); ++i) {
             T item = list.get().get(i);

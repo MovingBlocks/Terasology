@@ -1,6 +1,6 @@
 {
     "parent": "engine:iconItem",
-    "DisplayName" : {
+    "DisplayName": {
         "name": "Door"
     },
     "Item": {
@@ -20,12 +20,12 @@
         "maxHealth": 5,
         "regenRate": 1,
         "waitBeforeRegen": 2,
-        "destroyEntityOnNoHealth" : true
+        "destroyEntityOnNoHealth": true
     },
     "BlockDropGrammar": {
         "itemDrops": ["Core:door"]
     },
-    "ActAsBlock" : {
-        "block" : "core:DoorTop"
+    "ActAsBlock": {
+        "block": "core:DoorTop"
     }
 }

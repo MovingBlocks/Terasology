@@ -2,9 +2,9 @@
  * Soils are just easily broken, dirt-like blocks.
  */
 {
-    "template" : true,
-    "categories" : ["soil"],
-    "hardness" : 9,
-    "mass" : 32,
+    "template": true,
+    "categories": ["soil"],
+    "hardness": 9,
+    "mass": 32,
     "sounds": "Core:soil"
 }

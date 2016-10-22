@@ -32,17 +32,28 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
         checkConditions(); // TODO: better to remove this in near feature
     }
 
-    private void checkConditions() {
-        boolean areSatisfied = true;
+    private boolean checkConditions() {
+        boolean conditionsAreSatisfied = true;
         for (Supplier<Boolean> condition : conditions) {
-            areSatisfied = areSatisfied && condition.get();
+            conditionsAreSatisfied = conditionsAreSatisfied && condition.get();
         }
-        setEnabled(areSatisfied);
+
+        if (conditionsAreSatisfied != isEnabled()) {
+            setEnabled(conditionsAreSatisfied);
+            // enabling/disabling here means we cannot enable/disable nodes directly:
+            // we must always go through the settings.
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        checkConditions();
-        refreshTaskList(); // TODO: Think about `pending` mode for the nodes, for not refreshing task list more than once
+        boolean conditionsChanged = checkConditions();
+        if (conditionsChanged) {
+            refreshTaskList(); // TODO: Think about `pending` mode for the nodes, for not refreshing task list more than once
+        }
     }
 }

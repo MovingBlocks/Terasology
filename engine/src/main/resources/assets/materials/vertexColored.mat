@@ -1,5 +1,4 @@
 {
-    "shader" : "engine:vertexColoredMesh",
-    "params" : {
-    }
+    "shader": "engine:vertexColoredMesh",
+    "params": {}
 }

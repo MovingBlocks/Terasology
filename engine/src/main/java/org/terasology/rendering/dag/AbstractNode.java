@@ -17,14 +17,17 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.utilities.Assets;
 
 /**
  * TODO: Add javadocs
@@ -33,6 +36,7 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
+    private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
     private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
@@ -62,12 +66,17 @@ public abstract class AbstractNode implements Node {
         fboUsages.clear();
     }
 
-    protected boolean addDesiredStateChange(StateChange stateChange) {
-        return desiredStateChanges.add(stateChange);
+    protected void addDesiredStateChange(StateChange stateChange) {
+        if (stateChange.isTheDefaultInstance()) {
+            logger.error("Attempted to add default state change %s to the set of desired state changes", stateChange.getClass().getSimpleName());
+        }
+        desiredStateChanges.add(stateChange);
+        desiredStateResets.add(stateChange.getDefaultInstance());
     }
 
-    protected boolean removeDesiredStateChange(StateChange stateChange) {
-        return desiredStateChanges.remove(stateChange);
+    protected void removeDesiredStateChange(StateChange stateChange) {
+        desiredStateChanges.remove(stateChange);
+        desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
     protected void refreshTaskList() {
@@ -76,6 +85,9 @@ public abstract class AbstractNode implements Node {
 
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
+    }
+    public Set<StateChange> getDesiredStateResets() {
+        return desiredStateResets;
     }
 
     public RenderPipelineTask generateTask() {
@@ -87,7 +99,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName();
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {
@@ -102,5 +114,19 @@ public abstract class AbstractNode implements Node {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * Utility method to conveniently retrieve materials from the Assets system,
+     * hiding the relative complexity of the exception handling.
+     *
+     * @param materialUrn a ResourceUrn instance providing the name of the material to be obtained.
+     * @return a Material instance
+     * @throws RuntimeException if the material couldn't be resolved through the asset system.
+     */
+    public static Material getMaterial(ResourceUrn materialUrn) {
+        String materialName = materialUrn.toString();
+        return Assets.getMaterial(materialName).orElseThrow(() ->
+                new RuntimeException("Failed to resolve required asset: '" + materialName + "'"));
     }
 }

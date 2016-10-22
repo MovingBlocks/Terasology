@@ -1,5 +1,5 @@
 {
-  "stepSounds": [],
-  "destroySounds": ["engine:RemoveBlock"],
-  "digSounds": ["engine:Dig"]
+    "stepSounds": [],
+    "destroySounds": ["engine:RemoveBlock"],
+    "digSounds": ["engine:Dig"]
 }

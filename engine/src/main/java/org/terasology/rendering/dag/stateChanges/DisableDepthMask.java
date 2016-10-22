@@ -61,10 +61,7 @@ public final class DisableDepthMask implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof DisableDepthMask) {
-            return this.enabled == ((DisableDepthMask) obj).isEnabled();
-        }
-        return false;
+        return (obj instanceof DisableDepthMask) && this.enabled == ((DisableDepthMask) obj).isEnabled();
     }
 
     @Override
@@ -76,8 +73,18 @@ public final class DisableDepthMask implements StateChange {
         return enabled;
     }
 
+    public String getStatus() {
+        String status = "disabled";
+        if (enabled) {
+            status = "enabled";
+        }
+
+        return status;
+    }
+
     @Override
     public String toString() {
-        return String.format("%21s", this.getClass().getSimpleName());
+        return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
     }
+
 }
