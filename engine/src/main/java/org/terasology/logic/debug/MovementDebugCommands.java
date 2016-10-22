@@ -15,9 +15,11 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.entitySystem.entity.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.characters.CharacterImpulseEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.characters.GazeMountPointComponent;
@@ -25,7 +27,6 @@ import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
-import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -53,6 +54,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @In
     private PhysicsEngine physics;
+
+    @In
+    private EntityManager entityManager;
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -280,5 +284,169 @@ public class MovementDebugCommands extends BaseComponentSystem {
             e.printStackTrace();
             return "";
         }
+    }
+
+    @Command(shortDescription = "Teleport to player", runOnServer = true,
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String teleportMeToPlayer(@Sender EntityRef sender, @CommandParam("username") String username) {
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+
+            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
+            if (username.equals(name.name)) {
+                LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
+                if (locationComponent != null) {
+                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    ClientComponent clientComp = sender.getComponent(ClientComponent.class);
+                    if (clientComp != null) {
+                        clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                        return "Teleporting you to " + username + " at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("No such user '" + username + "'");
+    }
+
+    @Command(shortDescription = "Teleport player to you", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String teleportPlayerToMe(@Sender EntityRef sender, @CommandParam("username") String username) {
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+
+            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
+            if (username.equals(name.name)) {
+                LocationComponent locationComponent = sender.getComponent(LocationComponent.class);
+                if (locationComponent != null) {
+                    Vector3f vLocation = locationComponent.getWorldPosition();
+                    ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+                    if (clientComp != null) {
+                        clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                        return "Teleporting " + username + " to you at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("No such user '" + username + "'");
+    }
+
+    @Command(shortDescription = "Teleport User1 to User2", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String teleportPlayerToPlayer(@CommandParam("usernameFrom") String usernameFrom, @CommandParam("usernameTo") String usernameTo) {
+
+        if (usernameFrom.equals(usernameTo)) {
+            throw new IllegalArgumentException("Why teleport to yourself...");
+        }
+
+        EntityRef entityFrom = null;
+        EntityRef entityTo = null;
+        boolean foundEntityFrom = false;
+        boolean foundEntityTo = false;
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+
+            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
+            if (!foundEntityFrom && usernameFrom.equals(name.name)) {
+                entityFrom = clientEntity;
+                foundEntityFrom = true;
+            }
+            else if (!foundEntityTo && usernameTo.equals(name.name)) {
+                entityTo = clientEntity;
+                foundEntityTo = true;
+            }
+
+            if (foundEntityFrom && foundEntityTo) {
+                break;
+            }
+        }
+
+        if (!foundEntityFrom) {
+            throw new IllegalArgumentException("No such user '" + usernameFrom + "'");
+        }
+        if (!foundEntityTo) {
+            throw new IllegalArgumentException("No such user '" + usernameTo + "'");
+        }
+
+        LocationComponent locationComponent = entityTo.getComponent(LocationComponent.class);
+        if (locationComponent != null) {
+            Vector3f vLocation = locationComponent.getWorldPosition();
+            ClientComponent clientComp = entityFrom.getComponent(ClientComponent.class);
+            if (clientComp != null) {
+                clientComp.character.send(new CharacterTeleportEvent(vLocation));
+                return "Teleporting " + usernameFrom + " to " + usernameTo + " at " + vLocation.x + " " + vLocation.y + " " + vLocation.z;
+            }
+        }
+
+        throw new IllegalArgumentException("User " + usernameTo + " has an invalid location.");
+    }
+
+    @Command(shortDescription = "Teleport all users to location", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String teleportAllPlayersToLocation(@CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+            if (clientComp != null) {
+                clientComp.character.send(new CharacterTeleportEvent(new Vector3f(x, y, z)));
+            }
+        }
+
+        return "All possible players teleported";
+    }
+
+    @Command(shortDescription = "Teleport all users to specified user", runOnServer = true,
+            requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
+    public String teleportAllPlayersToPlayer(@CommandParam("username") String username) {
+
+        Vector3f vPlayerLocation = Vector3f.zero();
+        boolean bPlayerLocationWasFound = false;
+        EntityRef playerEntity = null;
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+
+            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
+            if (username.equals(name.name)) {
+                LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
+                if (locationComponent != null) {
+                    vPlayerLocation = locationComponent.getWorldPosition();
+                    bPlayerLocationWasFound = true;
+                    playerEntity = clientEntity;
+                }
+                break;
+            }
+        }
+
+        if (!bPlayerLocationWasFound) {
+            throw new IllegalArgumentException("No such user '" + username + "'");
+        }
+
+        MovementMode playerMovementMode = MovementMode.NONE;
+        ClientComponent clientInfo = playerEntity.getComponent(ClientComponent.class);
+        if ( clientInfo != null ) {
+            CharacterMovementComponent playerMovementComponent = clientInfo.character.getComponent(CharacterMovementComponent.class);
+            if (playerMovementComponent != null) {
+                playerMovementMode = playerMovementComponent.mode;
+            }
+        }
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+            if (clientComp != null) {
+                clientComp.character.send(new CharacterTeleportEvent(vPlayerLocation));
+
+                CharacterMovementComponent characterMovementComponent = clientComp.character.getComponent(CharacterMovementComponent.class);
+                if (characterMovementComponent != null && playerMovementMode != MovementMode.NONE && playerMovementMode != characterMovementComponent.mode) {
+                    clientComp.character.send(new SetMovementModeEvent(playerMovementMode));
+                }
+            }
+        }
+
+        return "All possible players teleported to " + username + " and set to " + playerMovementMode;
     }
 }
