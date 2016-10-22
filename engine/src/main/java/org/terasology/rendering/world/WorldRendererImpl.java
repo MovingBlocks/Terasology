@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -28,7 +27,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
@@ -75,17 +73,13 @@ import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
-import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.List;
-import java.util.PriorityQueue;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -125,7 +119,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
-    private Material chunkShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
@@ -217,7 +210,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initMaterials() {
-        chunkShader = getMaterial("engine:prog.chunk");
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
@@ -372,6 +364,16 @@ public final class WorldRendererImpl implements WorldRenderer {
         statRenderedTriangles = 0;
     }
 
+    @Override
+    public void increaseTrianglesCount(int increase) {
+        statRenderedTriangles += increase;
+    }
+
+    @Override
+    public void increaseNotReadyChunkCount(int increase) {
+        statChunkNotReady += increase;
+    }
+
     private void preRenderUpdate(RenderingStage renderingStage) {
         resetStats();
 
@@ -514,79 +516,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
         return isFirstRenderingStageForCurrentFrame;
-    }
-
-    // TODO: review - break this method and move it into the individual nodes using it?
-    @Override
-    public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
-        final Vector3f cameraPosition = camera.getPosition();
-        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-            }
-
-            if (mode == ChunkRenderMode.REFLECTION) {
-                chunkShader.setFloat("clip", camera.getClipHeight(), true);
-            } else {
-                chunkShader.setFloat("clip", 0.0f, true);
-            }
-
-            chunkShader.enable();
-
-        } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
-            shaderManager.disableShader();
-        }
-
-        // render all the chunks in the queue
-        while (chunks.size() > 0) {
-            RenderableChunk chunk = chunks.poll();
-            if (chunk.hasMesh()) {
-                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-                final Vector3f chunkPositionRelativeToCamera =
-                        new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
-
-                if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                    chunkShader.setFloat3("chunkPositionWorld",
-                            chunkPosition.x * ChunkConstants.SIZE_X,
-                            chunkPosition.y * ChunkConstants.SIZE_Y,
-                            chunkPosition.z * ChunkConstants.SIZE_Z,
-                            true);
-                    chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
-                }
-
-                // Effectively this just positions the chunk appropriately, relative to the camera.
-                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-                GL11.glPushMatrix();
-                GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-                // TODO: review - if this is enabled it probably happens multiple times per frame, overdrawing objects.
-                if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
-                    AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
-                    aabbRenderer.renderLocally(1f);
-                    statRenderedTriangles += 12;
-                }
-
-                chunk.getMesh().render(phase);
-                statRenderedTriangles += chunk.getMesh().triangleCount();
-
-                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
-
-            } else {
-                statChunkNotReady++;
-            }
-        }
-
-        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-            }
-        }
     }
 
     /**

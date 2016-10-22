@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -22,6 +23,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
@@ -36,7 +38,8 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.rendering.world.WorldRendererImpl;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
 
@@ -73,6 +76,9 @@ public class ShadowMapNode extends ConditionDependentNode {
 
     @In
     private BackdropProvider backdropProvider;
+
+    @In
+    private ShaderManager shaderManager;
 
     @In
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
@@ -144,12 +150,43 @@ public class ShadowMapNode extends ConditionDependentNode {
             PerformanceMonitor.startActivity("rendering/shadowMap");
             positionShadowMapCamera();
 
+            int numberOfRenderedTriangles = 0;
+            int numberOfChunksThatAreNotReadyYet = 0;
+
+            final Vector3f cameraPosition = shadowMapCamera.getPosition();
+
             shadowMapCamera.lookThrough();
 
             // FIXME: storing chunksOpaqueShadow or a mechanism for requesting a chunk queue for nodes which calls renderChunks method?
-            worldRenderer.renderChunks(renderQueues.chunksOpaqueShadow, ChunkMesh.RenderPhase.OPAQUE, shadowMapCamera, WorldRendererImpl.ChunkRenderMode.SHADOW_MAP);
+            while (renderQueues.chunksOpaqueShadow.size() > 0) {
+                RenderableChunk chunk = renderQueues.chunksOpaqueShadow.poll();
+
+                if (chunk.hasMesh()) {
+                    final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                    final Vector3f chunkPositionRelativeToCamera =
+                            new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
+                                    chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
+                                    chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
+
+                    // Effectively this just positions the chunk appropriately, relative to the camera.
+                    // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
+                    GL11.glPushMatrix();
+                    GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
+
+                    chunk.getMesh().render(ChunkMesh.RenderPhase.OPAQUE);
+                    numberOfRenderedTriangles += chunk.getMesh().triangleCount();
+
+                    GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+
+                } else {
+                    numberOfChunksThatAreNotReadyYet++;
+                }
+            }
 
             playerCamera.lookThrough(); //TODO: camera setting need to go into a state change: enable camera, back to default camera
+
+            worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
+            worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 
             PerformanceMonitor.endActivity();
         }

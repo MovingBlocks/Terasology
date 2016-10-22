@@ -20,11 +20,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.chunks.RenderableChunk;
-
-import java.util.PriorityQueue;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -52,7 +48,6 @@ public interface WorldRenderer {
 
     boolean isFirstRenderingStageForCurrentFrame();
 
-    void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, WorldRendererImpl.ChunkRenderMode mode);
     /**
      * This method is triggered when a chunk has been loaded.
      *
@@ -117,6 +112,20 @@ public interface WorldRenderer {
      * @param delta The elapsed time, in seconds, since the previous update.
      */
     void update(float delta);
+
+    /**
+     * Increase the triangles count, eventually retrieved through the getMetrics() method.
+     *
+     * @param increase An integer representing the triangle count increase.
+     */
+    void increaseTrianglesCount(int increase);
+
+    /**
+     * Increases the count of chunks that are not ready yet. The count is eventually retrieved through the getMetrics() method.
+     *
+     * @param increase An integer representing the not-ready chunk count increase.
+     */
+    void increaseNotReadyChunkCount(int increase);
 
     /**
      * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
