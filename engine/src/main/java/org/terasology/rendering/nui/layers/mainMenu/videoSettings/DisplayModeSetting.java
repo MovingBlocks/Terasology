@@ -23,8 +23,21 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
  * <li>{@link #WINDOWED} - Sets the screen to windowed with borders allowing the player to resize the window.</li>
  */
 public enum DisplayModeSetting {
+
+    /**
+     * Sets the screen to fullscreen and prevents the mouse from moving out of the game.
+     */
     FULLSCREEN("${engine:menu#video-fullscreen}", true),
+
+    /**
+     * Sets the screen to borderless windowed fullscreen allowing the player to move the
+     * mouse out of the game without minimizing.
+     */
     WINDOWED_FULLSCREEN("${engine:menu#video-windowed-fullscreen}", false),
+
+    /**
+     * Sets the screen to windowed with borders allowing the player to resize the window.
+     */
     WINDOWED("${engine:menu#video-windowed}", false);
 
     private String displayName;
