@@ -355,13 +355,17 @@ public class KinematicCharacterMover implements CharacterMover {
         if (moveDelta.y < 0 || steppedUpDist > 0) {
             float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
             dist -= steppedUpDist;
+            // Returns true if bottom is hit at current position.
             hitBottom = moveDown(dist, slopeFactor, collider, position);
         }
+
         if (!hitBottom && stepHeight > 0) {
             Vector3f tempPos = new Vector3f(position);
             hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
+            logger.info("hitBottom" + hitBottom);
             // Don't apply step down if nothing to step onto
             if (hitBottom) {
+                logger.info(tempPos.toString());
                 position.set(tempPos);
             }
         }
@@ -620,9 +624,14 @@ public class KinematicCharacterMover implements CharacterMover {
         } else {
             endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - (GRAVITY * movementComp.mode.scaleGravity) * input.getDelta());
         }
-        Vector3f moveDelta = new Vector3f(endVelocity);
+            Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
+
+        if (movementComp.mode == MovementMode.CROUCHING) {
+            logger.info("start position: " + state.getPosition() + " moveDelta: " + moveDelta);
+        }
+
         MoveResult moveResult = move(state.getPosition(), moveDelta,
                 (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
                 movementComp.slopeFactor, collider);
