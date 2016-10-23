@@ -39,9 +39,9 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class BackdropNode extends WireframeCapableNode {
 
-    public static final int RADIUS = 1024;
     public static final int SLICES = 16;
     public static final int STACKS = 128;
+    public static final int RADIUS = 1024;
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -59,7 +59,7 @@ public class BackdropNode extends WireframeCapableNode {
     public void initialise() {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
-        initSkysphere();
+        initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         // We do not call requireFBO as we can count this default buffer is there.
         //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
@@ -91,14 +91,14 @@ public class BackdropNode extends WireframeCapableNode {
         PerformanceMonitor.endActivity();
     }
 
-    private void initSkysphere() {
+    private void initSkysphere(float sphereRadius) {
         Sphere sphere = new Sphere();
         sphere.setTextureFlag(true);
 
         skySphere = glGenLists(1);
 
         glNewList(skySphere, GL11.GL_COMPILE);
-        sphere.draw(RADIUS, SLICES, STACKS);
+        sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
     }
 }
