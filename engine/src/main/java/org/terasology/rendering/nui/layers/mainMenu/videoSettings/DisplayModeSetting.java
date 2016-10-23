@@ -15,17 +15,42 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
+import static java.lang.System.in;
+
 /**
  */
 public enum DisplayModeSetting {
-    FULLSCREEN("${engine:menu#video-fullscreen}"),
-    WINDOWED_FULLSCREEN("${engine:menu#video-windowed-fullscreen}"),
-    WINDOWED("${engine:menu#video-windowed}");
+    FULLSCREEN("${engine:menu#video-fullscreen}", true),
+    WINDOWED_FULLSCREEN("${engine:menu#video-windowed-fullscreen}", false),
+    WINDOWED("${engine:menu#video-windowed}", false);
 
     private String displayName;
 
-    DisplayModeSetting(String displayName) {
+    private boolean current;
+
+    DisplayModeSetting(String displayName, boolean current) {
         this.displayName = displayName;
+        this.current = current;
+    }
+
+    public DisplayModeSetting getCurrent() {
+        for(DisplayModeSetting setting : values()) {
+            if (setting.current) {
+                return setting;
+            }
+        }
+        return DisplayModeSetting.FULLSCREEN;
+    }
+
+    public boolean isCurrent() {
+       return this.current;
+    }
+
+    public void setCurrent(boolean current) {
+        for(DisplayModeSetting setting : values()) {
+            setting.current = false;
+        }
+        this.current = current;
     }
 
     @Override

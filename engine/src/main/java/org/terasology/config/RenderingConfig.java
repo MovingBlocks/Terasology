@@ -82,8 +82,6 @@ public class RenderingConfig extends AbstractSubscribable {
     private int windowPosY;
     private int windowWidth;
     private int windowHeight;
-    private boolean fullscreen;
-    private boolean windowedFullscreen;
     private DisplayModeSetting displayModeSetting;
     private boolean animatedMenu;
     private ViewDistance viewDistance;
@@ -194,57 +192,49 @@ public class RenderingConfig extends AbstractSubscribable {
     public void setDisplayModeSetting(DisplayModeSetting displayModeSetting) {
         switch (displayModeSetting) {
             case FULLSCREEN:
-                this.windowedFullscreen = false;
                 setFullscreen(true);
                 break;
             case WINDOWED_FULLSCREEN:
-                this.windowedFullscreen = true;
                 setWindowedFullscreen(true);
                 break;
             case WINDOWED:
-                this.windowedFullscreen = false;
                 setFullscreen(false);
                 break;
         }
     }
 
     public DisplayModeSetting getDisplayModeSetting() {
-        return this.displayModeSetting;
+        return displayModeSetting;
     }
 
     public boolean isFullscreen() {
-        return fullscreen;
+        return displayModeSetting.getCurrent() == DisplayModeSetting.FULLSCREEN;
     }
 
     public void setFullscreen(boolean fullscreen) {
-        DisplayModeSetting oldValue = this.displayModeSetting;
-        this.fullscreen = fullscreen;
+        DisplayModeSetting oldValue = displayModeSetting;
         if (fullscreen) {
-            this.displayModeSetting = DisplayModeSetting.FULLSCREEN;
+            displayModeSetting = DisplayModeSetting.FULLSCREEN;
         } else {
-            if (windowedFullscreen) {
-                this.displayModeSetting = DisplayModeSetting.WINDOWED_FULLSCREEN;
-            } else {
-                this.displayModeSetting = DisplayModeSetting.WINDOWED;
-            }
+            displayModeSetting = DisplayModeSetting.WINDOWED;
         }
-        propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, this.displayModeSetting);
+        displayModeSetting.setCurrent(true);
+        propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, displayModeSetting);
     }
 
     public boolean isWindowedFullscreen() {
-        return windowedFullscreen;
+        return displayModeSetting.getCurrent() == DisplayModeSetting.WINDOWED_FULLSCREEN;
     }
 
     public void setWindowedFullscreen(boolean fullscreenWindowed) {
-        DisplayModeSetting oldValue = this.displayModeSetting;
-        this.windowedFullscreen = fullscreenWindowed;
+        DisplayModeSetting oldValue = displayModeSetting;
         if (fullscreenWindowed) {
-            this.displayModeSetting = DisplayModeSetting.WINDOWED_FULLSCREEN;
-            this.fullscreen = false;
+            displayModeSetting = DisplayModeSetting.WINDOWED_FULLSCREEN;
+            displayModeSetting.setCurrent(true);
+            propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, displayModeSetting);
         } else {
             setFullscreen(true);
         }
-        propertyChangeSupport.firePropertyChange(DISPLAY_MODE_SETTING, oldValue, this.displayModeSetting);
     }
 
     public boolean isAnimatedMenu() {

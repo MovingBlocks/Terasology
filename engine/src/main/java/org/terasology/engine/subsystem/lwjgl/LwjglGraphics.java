@@ -215,12 +215,19 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private void initDisplay() {
         logger.info("Initializing display (if last line in log then likely the game crashed from an issue with your video card)");
+
         try {
 
-            if (config.isWindowedFullscreen()) {
-                lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED_FULLSCREEN, false);
-            } else {
-                lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.FULLSCREEN, false);
+            switch (config.getDisplayModeSetting()) {
+                case FULLSCREEN:
+                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.FULLSCREEN, false);
+                    break;
+                case WINDOWED_FULLSCREEN:
+                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED_FULLSCREEN, false);
+                    break;
+                case WINDOWED:
+                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED, false);
+                    break;
             }
 
             Display.setTitle("Terasology" + " | " + "Alpha");
