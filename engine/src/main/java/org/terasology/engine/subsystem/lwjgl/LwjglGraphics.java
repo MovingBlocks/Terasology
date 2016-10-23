@@ -218,17 +218,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
         try {
 
-            switch (config.getDisplayModeSetting()) {
-                case FULLSCREEN:
-                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.FULLSCREEN, false);
-                    break;
-                case WINDOWED_FULLSCREEN:
-                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED_FULLSCREEN, false);
-                    break;
-                case WINDOWED:
-                    lwjglDisplay.setDisplayModeSetting(DisplayModeSetting.WINDOWED, false);
-                    break;
-            }
+            lwjglDisplay.setDisplayModeSetting(config.getDisplayModeSetting(), false);
 
             Display.setTitle("Terasology" + " | " + "Alpha");
             try {
