@@ -362,10 +362,8 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!hitBottom && stepHeight > 0) {
             Vector3f tempPos = new Vector3f(position);
             hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
-            logger.info("hitBottom" + hitBottom);
             // Don't apply step down if nothing to step onto
             if (hitBottom) {
-                logger.info(tempPos.toString());
                 position.set(tempPos);
             }
         }
@@ -628,16 +626,30 @@ public class KinematicCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
 
-        if (movementComp.mode == MovementMode.CROUCHING) {
-            logger.info("start position: " + state.getPosition() + " moveDelta: " + moveDelta);
-        }
+
 
         MoveResult moveResult = move(state.getPosition(), moveDelta,
                 (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
                 movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
-        state.getPosition().set(moveResult.getFinalPosition());
+        if (movementComp.mode == MovementMode.CROUCHING) {
+            if (moveResult.isBottomHit()) {
+                if (state.isGrounded()) {
+                    Vector3f pos = moveResult.getFinalPosition();
+                    Vector3f to = new Vector3f(pos.x, pos.y - 0.35f, pos.z);
+                    SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+                    if (callback.hasHit()) {
+                        state.getPosition().set(moveResult.getFinalPosition());
+                        logger.info("moved");
+                    }
+                } else {
+                    logger.info("not grounded");
+                }
+            }
+        } else {
+            state.getPosition().set(moveResult.getFinalPosition());
+        }
         if (input.isFirstRun() && distanceMoved.length() > 0) {
             entity.send(new MovedEvent(distanceMoved, state.getPosition()));
         }

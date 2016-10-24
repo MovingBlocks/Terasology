@@ -20,7 +20,7 @@ package org.terasology.logic.characters;
  */
 public enum MovementMode {
     WALKING(1f, 8f, true, true, true, 3f, false),
-    CROUCHING(1f, 8f, true, true, true, 0.3f, false),
+    CROUCHING(1f, 8f, true, true, true, 1.5f, false),
     PRONING(1f, 8f, true, true, true, 3f, false),
     CLIMBING(0f, 8f, true, true, true, 3f, false),
     SWIMMING(0.05f, 1.5f, true, false, true, 2f, true),
