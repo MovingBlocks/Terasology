@@ -98,6 +98,8 @@ public class AlphaRejectBlocksNode extends WireframeCapableNode {
         chunkShader.setFloat("clip", 0.0f, true);
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
+        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
+
         while (renderQueues.chunksAlphaReject.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaReject.poll();
 

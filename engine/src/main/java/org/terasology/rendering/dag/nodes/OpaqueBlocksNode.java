@@ -92,6 +92,8 @@ public class OpaqueBlocksNode extends WireframeCapableNode {
         READ_ONLY_GBUFFER.bind();
         chunkShader.setFloat("clip", 0.0f, true);
 
+        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
+
         while (renderQueues.chunksOpaque.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaque.poll();
 
