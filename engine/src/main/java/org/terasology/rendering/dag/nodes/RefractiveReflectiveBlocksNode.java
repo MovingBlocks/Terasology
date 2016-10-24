@@ -41,9 +41,21 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
 /**
- * TODO: Diagram of this node
+ * This node renders refractive/reflective blocks, i.e. water blocks.
+ *
+ * Reflections always include the sky but may or may not include the landscape,
+ * depending on the "Reflections" video setting. Any other object currently
+ * reflected is an artifact.
+ *
+ * Refractions distort the blocks behind the refracting surface, i.e. the bottom
+ * of a lake seen from above water or the landscape above water when the player is underwater.
+ * Refractions are currently always enabled.
+ *
+ * Note: a third "Reflections" video setting enables Screen-space Reflections (SSR),
+ * an experimental feature. It produces initially appealing reflections but rotating the
+ * camera partially spoils the effect showing its limits.
  */
-public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOManagerSubscriber {
+public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber {
     public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
@@ -59,6 +71,9 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
     private Camera playerCamera;
     private Material chunkShader;
 
+    /**
+     * Initialises the node. -Must- be called once after instantiation.
+     */
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
@@ -69,9 +84,19 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
         chunkShader = getMaterial(CHUNK_SHADER);
     }
 
+    /**
+     * This method is where the actual rendering of refractive/reflective blocks takes place.
+     *
+     * Also takes advantage of the two methods
+     *
+     * - WorldRenderer.increaseTrianglesCount(int)
+     * - WorldRenderer.increaseNotReadyChunkCount(int)
+     *
+     * to publish some statistics over its own activity.
+     */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksrefractivereflective");
+        PerformanceMonitor.startActivity("rendering/RefractiveReflectiveBlocks");
 
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
@@ -125,29 +150,11 @@ public class ChunksRefractiveReflectiveNode extends AbstractNode implements FBOM
             GL11.glEnable(GL11.GL_CULL_FACE);
         }
 
-
-
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 
         PerformanceMonitor.endActivity();
     }
-
-    /**
-     * Sets the state for the rendering of the reflective/refractive features of the scene.
-     * <p>
-     * At this stage this is the surface of water bodies, reflecting the sky and (if enabled)
-     * the surrounding landscape, and refracting the underwater scenery.
-     * <p>
-     * If the isHeadUnderWater argument is set to True, the state is further modified to
-     * accommodate the rendering of the water surface from an underwater point of view.
-     */
-
-    /**
-     * Resets the state after the rendering of the reflective/refractive features of the scene.
-     * <p>
-     * See preRenderSetupSceneReflectiveRefractive() for additional information.
-     */
 
     @Override
     public void update() {

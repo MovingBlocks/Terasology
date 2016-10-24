@@ -36,10 +36,17 @@ import org.terasology.world.chunks.RenderableChunk;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
- * TODO: Diagram of this node
- * Alpha reject is used for semi-transparent billboards, which in turn are used for ground plants.
+ * This node uses alpha-rejection to render semi-transparent blocks (i.e. tree foliage) and
+ * semi-transparent billboards (i.e. plants on the ground).
+ *
+ * Alpha-rejection is the idea that if a fragment has an alpha value lower than some threshold
+ * it gets discarded, leaving the color already stored in the frame buffer untouched.
+ *
+ * This is a less expensive way to render semi-transparent objects compared to alpha-blending.
+ * In alpha-blending the color of a semi-transparent fragment is combined with
+ * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class ChunksAlphaRejectNode extends WireframeCapableNode {
+public class AlphaRejectBlocksNode extends WireframeCapableNode {
 
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
@@ -55,6 +62,9 @@ public class ChunksAlphaRejectNode extends WireframeCapableNode {
     private Camera playerCamera;
     private Material chunkShader;
 
+    /**
+     * Initialises the node. -Must- be called once after instantiation.
+     */
     @Override
     public void initialise() {
         super.initialise();
@@ -64,6 +74,17 @@ public class ChunksAlphaRejectNode extends WireframeCapableNode {
         chunkShader = getMaterial(CHUNK_SHADER);
     }
 
+    /**
+     * Renders the world's semi-transparent blocks, i.e. tree foliage and terrain plants.
+     * Does not render fully opaque blocks, i.e. the typical landscape blocks.
+     *
+     * Takes advantage of the two methods
+     *
+     * - WorldRenderer.increaseTrianglesCount(int)
+     * - WorldRenderer.increaseNotReadyChunkCount(int)
+     *
+     * to publish some statistics over its own activity.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/chunksAlphaReject");
@@ -99,7 +120,7 @@ public class ChunksAlphaRejectNode extends WireframeCapableNode {
                 GL11.glPushMatrix();
                 GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
 
-                chunk.getMesh().render(ChunkMesh.RenderPhase.ALPHA_REJECT);
+                chunk.getMesh().render(ChunkMesh.RenderPhase.ALPHA_REJECT); // TODO: remove face culling from this method
                 numberOfRenderedTriangles += chunk.getMesh().triangleCount();
 
                 GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.

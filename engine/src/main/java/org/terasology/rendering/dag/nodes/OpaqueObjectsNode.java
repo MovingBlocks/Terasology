@@ -25,22 +25,32 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
- * TODO: Diagram of this node
+ * This node renders the opaque (as opposed to semi-transparent)
+ * objects present in the world. This node -does not- render the landscape.
+ *
+ * Objects to be rendered must be registered as implementing the interface RenderSystem and
+ * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
-public class ObjectsOpaqueNode extends WireframeCapableNode {
+public class OpaqueObjectsNode extends WireframeCapableNode {
 
     @In
     private ComponentSystemManager componentSystemManager;
 
+    /**
+     * Initialises this node. -Must- be called once after instantiation.
+     */
     @Override
     public void initialise() {
         super.initialise();
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
     }
 
+    /**
+     * Iterates over any registered RenderSystem instance and calls its renderOpaque() method.
+     */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/objectsOpaque");
+        PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
         READ_ONLY_GBUFFER.bind();
 

@@ -36,9 +36,11 @@ import org.terasology.world.chunks.RenderableChunk;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
- * TODO: Diagram of this node
+ * This node renders the opaque blocks in the world.
+ *
+ * In a typical world this is the majority of the world's landscape.
  */
-public class ChunksOpaqueNode extends WireframeCapableNode {
+public class OpaqueBlocksNode extends WireframeCapableNode {
 
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
@@ -51,6 +53,9 @@ public class ChunksOpaqueNode extends WireframeCapableNode {
     private Camera playerCamera;
     private Material chunkShader;
 
+    /**
+     * Initialises this node. -Must- be called once after instantiation.
+     */
     @Override
     public void initialise() {
         super.initialise();
@@ -60,9 +65,24 @@ public class ChunksOpaqueNode extends WireframeCapableNode {
         chunkShader = getMaterial(CHUNK_SHADER);
     }
 
+    /**
+     * Renders the world's opaque blocks, effectively, the world's landscape.
+     * Does not render semi-transparent blocks, i.e. semi-transparent vegetation.
+     *
+     * If RenderingDebugConfig.isRenderChunkBoundingBoxes() returns true
+     * this method also draws wireframe boxes around chunks, displaying
+     * their boundaries.
+     *
+     * Finally, takes advantage of the two methods
+     *
+     * - WorldRenderer.increaseTrianglesCount(int)
+     * - WorldRenderer.increaseNotReadyChunkCount(int)
+     *
+     * to publish some statistics over its own activity.
+     */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksOpaque");
+        PerformanceMonitor.startActivity("rendering/opaqueChunks");
 
         final Vector3f cameraPosition = playerCamera.getPosition();
 

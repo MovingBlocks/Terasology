@@ -46,9 +46,9 @@ import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
-import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
-import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
-import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
+import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
 import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
@@ -56,7 +56,7 @@ import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.dag.nodes.LightGeometryNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
-import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.nodes.OpaqueObjectsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
 import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
@@ -241,9 +241,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
 
-        // TODO: write snippets and shaders to inspect content of a color/depth buffer
+        // TODO: write snippets and shaders to inspect content of a color/depth buffer - debug mode
 
-        // sky generation
+        // sky rendering
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -269,17 +269,20 @@ public final class WorldRendererImpl implements WorldRenderer {
         hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
         renderGraph.addNode(hazeFinalNode, aLabel);
 
-        Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
-        renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
+        // world rendering
+        Node opaqueObjectsNode = nodeFactory.createInstance(OpaqueObjectsNode.class);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
 
-        Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
-        renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
+        Node opaqueBlocksNode = nodeFactory.createInstance(OpaqueBlocksNode.class);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
 
-        Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
-        renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
+        Node alphaRejectBlocksNode = nodeFactory.createInstance(AlphaRejectBlocksNode.class);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
 
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
+
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
 
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
         Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
@@ -290,7 +293,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
         Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
-        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(ChunksRefractiveReflectiveNode.class);
+        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);

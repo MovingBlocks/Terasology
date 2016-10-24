@@ -25,19 +25,28 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
- * TODO: Diagram of this node
+ * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
+ *
+ * Objects to be rendered as overlays must be registered as implementing the interface RenderSystem and
+ * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
 public class OverlaysNode extends WireframeCapableNode {
 
     @In
     private ComponentSystemManager componentSystemManager;
 
+    /**
+     * Initialises the node. -Must- be called once after instantiation.
+     */
     @Override
     public void initialise() {
         super.initialise();
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
     }
 
+    /**
+     * Iterates over any registered RenderSystem instance and calls its renderOverlay() method.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/overlays");
