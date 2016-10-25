@@ -77,7 +77,7 @@ public class SelectGameScreen extends CoreScreenLayer {
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if(saveGamePath != null)
         {
-            saveGamePath.setText(PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
+            saveGamePath.setText(translationSystem.translate("${engine:menu#save-game-path} ")+PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
