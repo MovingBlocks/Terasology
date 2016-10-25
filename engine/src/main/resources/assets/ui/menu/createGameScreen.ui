@@ -138,7 +138,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Save Game Path:"
+                            "text": "${engine:menu#save-game-path}"
                         },
                         {
                              "type": "UILabel",
