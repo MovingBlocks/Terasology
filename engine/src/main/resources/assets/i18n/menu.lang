@@ -161,6 +161,7 @@
     "restore-defaults": "restore-defaults",
     "return-main-menu": "return-main-menu",
     "rotation-dead-zone": "rotation-dead-zone",
+    "save-game-path": "save-game-path",
     "screenshot-format": "screenshot-format",
     "screenshot-size": "screenshot-size",
     "screenshot-size-double": "screenshot-size-double",
