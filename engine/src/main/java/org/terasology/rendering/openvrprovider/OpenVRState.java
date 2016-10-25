@@ -68,22 +68,22 @@ public class OpenVRState {
     public void updateControllerButtonState(
             VRControllerState_t[] controllerStateReference) {
         // each controller{
-        for (int c = 0; c < 2; c++) {
+        for (int handIndex = 0; handIndex < 2; handIndex++) {
             // store previous state
-            if (lastControllerState[c].ulButtonPressed != controllerStateReference[c].ulButtonPressed) {
+            if (lastControllerState[handIndex].ulButtonPressed != controllerStateReference[handIndex].ulButtonPressed) {
                 for (ControllerListener listener : controllerListeners) {
-                    listener.buttonStateChanged(lastControllerState[c], controllerStateReference[c], c);
+                    listener.buttonStateChanged(lastControllerState[handIndex], controllerStateReference[handIndex], handIndex);
                 }
             }
-            lastControllerState[c].unPacketNum = controllerStateReference[c].unPacketNum;
-            lastControllerState[c].ulButtonPressed = controllerStateReference[c].ulButtonPressed;
-            lastControllerState[c].ulButtonTouched = controllerStateReference[c].ulButtonTouched;
+            lastControllerState[handIndex].unPacketNum = controllerStateReference[handIndex].unPacketNum;
+            lastControllerState[handIndex].ulButtonPressed = controllerStateReference[handIndex].ulButtonPressed;
+            lastControllerState[handIndex].ulButtonTouched = controllerStateReference[handIndex].ulButtonTouched;
 
             // 5 axes but only [0] and [1] is anything, trigger and touchpad
             for (int i = 0; i < 5; i++) {
-                if (controllerStateReference[c].rAxis[i] != null) {
-                    lastControllerState[c].rAxis[i].x = controllerStateReference[c].rAxis[i].x;
-                    lastControllerState[c].rAxis[i].y = controllerStateReference[c].rAxis[i].y;
+                if (controllerStateReference[handIndex].rAxis[i] != null) {
+                    lastControllerState[handIndex].rAxis[i].x = controllerStateReference[handIndex].rAxis[i].x;
+                    lastControllerState[handIndex].rAxis[i].y = controllerStateReference[handIndex].rAxis[i].y;
                 }
             }
         }

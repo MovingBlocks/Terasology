@@ -86,7 +86,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/copyToVRFrameBuffers");
+        PerformanceMonitor.startActivity("rendering/copyImageToHMD");
         FINAL.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();

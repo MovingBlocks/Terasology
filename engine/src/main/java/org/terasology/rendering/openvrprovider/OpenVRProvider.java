@@ -270,7 +270,7 @@ public class OpenVRProvider {
             try {
                 vrOverlay.HideKeyboard.apply();
             } catch (Error e) {
-                logger.error("Error bringing up keyboard over.ay.");
+                logger.error("Error bringing up keyboard overlay.");
             }
             keyboardShowing = false;
         }
