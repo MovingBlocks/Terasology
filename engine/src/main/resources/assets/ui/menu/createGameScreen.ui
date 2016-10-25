@@ -134,7 +134,19 @@
                         },
                         {
                             "type": "UISpace",
-                            "size": [1, 16]
+                             "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "Save Game Path:"
+                        },
+                        {
+                             "type": "UILabel",
+                             "id": "saveGamePath"
+                        },
+                        {
+                             "type": "UISpace",
+                             "size": [1, 16]
                         },
                         {
                             "type": "UILabel",
