@@ -15,9 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
+import org.lwjgl.Sys;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.config.InputConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -55,7 +57,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     private UIInputBind bindButton;
 
-    private BindsConfig defaultBinds;
+    private BindsConfig defaultBinds, currBinds;
 
     @Override
     public void initialise() {
@@ -64,8 +66,16 @@ public class ChangeBindingPopup extends CoreScreenLayer {
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));
         WidgetUtil.trySubscribe(this, "ok", button -> {
-            bindButton.saveInput();
-            getManager().popScreen();
+            Input newInput = bindButton.getNewInput();
+            currBinds = config.getInput().getBinds();
+            if(currBinds.isBound(newInput) && !newInput.equals(bindButton.getInput())) {
+                ConfirmChangePopup popup = getManager().pushScreen(ConfirmChangePopup.ASSET_URI, ConfirmChangePopup.class);
+                popup.setButtonData(bindButton);
+            }
+            else {
+                bindButton.saveInput();
+                getManager().popScreen();
+            }
         });
         WidgetUtil.trySubscribe(this, "cancel", button -> getManager().popScreen());
     }

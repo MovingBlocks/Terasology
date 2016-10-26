@@ -30,6 +30,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -52,15 +53,11 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
+import org.terasology.registry.In;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
@@ -72,6 +69,18 @@ public final class BindsConfig {
     private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
 
     public BindsConfig() {
+    }
+
+    /**
+     * Returns true if an input has already been bound to another key
+     *
+     * @param newInput The input to check if it has been bound already
+     * @return True if newInput has been bound. False otherwise.
+     */
+    public boolean isBound(Input newInput) {
+        if(data.containsValue(newInput))
+            return true;
+        return false;
     }
 
     /**
@@ -105,6 +114,7 @@ public final class BindsConfig {
      * @param bindUri
      * @param inputs
      */
+
     public void setBinds(SimpleUri bindUri, Input... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
