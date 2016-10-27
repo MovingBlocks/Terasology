@@ -436,7 +436,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
-        if (!event.isDown() || time.getGameTimeInMs() < characterHeldItemComponent.nextItemUseTime) {
+        if (!event.isDown()) {
             return;
         }
 
@@ -445,13 +445,14 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             return;
         }
 
-        localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
-        entity.send(new OnItemUseEvent());
 
-        // TODO: send this data back to the server so that other players can visualize this item use
-
-        entity.saveComponent(characterHeldItemComponent);
-        event.consume();
+        OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
+        entity.send(onItemUseEvent);
+        if (!onItemUseEvent.isConsumed()) {
+            localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
+            entity.saveComponent(characterHeldItemComponent);
+            event.consume();
+        }
     }
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
