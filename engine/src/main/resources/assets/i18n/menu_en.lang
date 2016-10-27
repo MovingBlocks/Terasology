@@ -50,6 +50,8 @@
     "category-mouse": "Mouse",
     "category-movement": "Movement",
     "category-nui": "NUI",
+    "change-keybind-popup-message": "is already bound to an action. Rebind anyway?",
+    "change-keybind-popup-title": "Key already bound",
     "clamp-lighting": "Clamp Lighting",
     "cloud-shadows": "Cloud Shadows",
     "connecting-to": "Connecting to",

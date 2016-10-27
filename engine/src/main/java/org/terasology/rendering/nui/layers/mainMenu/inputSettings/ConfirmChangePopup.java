@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -23,6 +25,9 @@ import org.terasology.rendering.nui.widgets.UILabel;
 public class ConfirmChangePopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:confirmChangePopup");
+
+    @In
+    private TranslationSystem translationSystem;
 
     private UIInputBind bindButton;
 
@@ -36,9 +41,9 @@ public class ConfirmChangePopup extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "cancel", button -> getManager().popScreen());
     }
 
-    public void setButtonData(UIInputBind bindButton) {
-        this.bindButton = bindButton;
-        String messageText = "Key " +  bindButton.getNewInput().getDisplayName() + " has already been assigned an action. Press ok to change anyway.";
+    public void setButtonData(UIInputBind button) {
+        this.bindButton = button;
+        String messageText = button.getNewInput().getDisplayName() + " " + translationSystem.translate("${engine:menu#change-keybind-popup-message}");
         find("message", UILabel.class).setText(messageText);
     }
 

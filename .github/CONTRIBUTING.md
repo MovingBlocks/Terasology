@@ -56,6 +56,7 @@ Pull requests are highly appreciated! Please follow the simple guidelines below.
 1. Fork the repository to your personal GitHub account.
 1. Create a topic branch for every separate change you make. The branch should have a short but explanatory name, such as "MakesGrassGrow".
 1. Apply your changes, committing at logical breaks. Make sure your changes are well-tested. 
+1. If your code includes any strings shown to the user, make sure they're accessed through the translation system as opposed to hardcoded values.
 1. Check any unit tests that cover the affected code and if at all possible include new ones for new code.
 1. Push your branch to your personal account and [create a pull request](https://help.github.com/articles/using-pull-requests/).
 1. Watch for comments or acceptance on your PR. The PR can be updated by just pushing to the original branch.
