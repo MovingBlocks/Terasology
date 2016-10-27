@@ -209,6 +209,9 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public HitResult rayTrace(org.terasology.math.geom.Vector3f from1, org.terasology.math.geom.Vector3f direction, float distance, Set<EntityRef> excludedEntities,
             CollisionGroup... collisionGroups) {
+        if (excludedEntities == null) {
+            return rayTrace(from1, direction,distance,collisionGroups);
+        }
         Vector3f to = new Vector3f(VecMath.to(direction));
         Vector3f from = VecMath.to(from1);
         to.scale(distance);
