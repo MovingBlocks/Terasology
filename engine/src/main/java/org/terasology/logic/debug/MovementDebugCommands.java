@@ -294,7 +294,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
 
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (username.equals(name.name)) {
+            if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
                     Vector3f vLocation = locationComponent.getWorldPosition();
@@ -318,7 +318,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
 
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (username.equals(name.name)) {
+            if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = sender.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
                     Vector3f vLocation = locationComponent.getWorldPosition();
@@ -338,7 +338,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.USER_MANAGEMENT_PERMISSION)
     public String teleportPlayerToPlayer(@CommandParam("usernameFrom") String usernameFrom, @CommandParam("usernameTo") String usernameTo) {
 
-        if (usernameFrom.equals(usernameTo)) {
+        if (usernameFrom.equalsIgnoreCase(usernameTo)) {
             throw new IllegalArgumentException("Why teleport to yourself...");
         }
 
@@ -351,10 +351,10 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
 
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (!foundEntityFrom && usernameFrom.equals(name.name)) {
+            if (!foundEntityFrom && usernameFrom.equalsIgnoreCase(name.name)) {
                 entityFrom = clientEntity;
                 foundEntityFrom = true;
-            } else if (!foundEntityTo && usernameTo.equals(name.name)) {
+            } else if (!foundEntityTo && usernameTo.equalsIgnoreCase(name.name)) {
                 entityTo = clientEntity;
                 foundEntityTo = true;
             }
@@ -410,7 +410,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
 
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (username.equals(name.name)) {
+            if (username.equalsIgnoreCase(name.name)) {
                 LocationComponent locationComponent = clientEntity.getComponent(LocationComponent.class);
                 if (locationComponent != null) {
                     vPlayerLocation = locationComponent.getWorldPosition();

@@ -92,7 +92,7 @@ public class ServerCommands extends BaseComponentSystem {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
 
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-            if (username.equals(name.name)) {
+            if (username.equalsIgnoreCase(name.name)) {
 
                 return kick(clientEntity);
             }
@@ -109,7 +109,7 @@ public class ServerCommands extends BaseComponentSystem {
         Iterable<EntityRef> clientInfoEntities = entityManager.getEntitiesWith(ClientInfoComponent.class);
         for (EntityRef clientInfo : clientInfoEntities) {
             DisplayNameComponent nameComp = clientInfo.getComponent(DisplayNameComponent.class);
-            if (newUserName.equals(nameComp.name)) {
+            if (newUserName.equalsIgnoreCase(nameComp.name)) {
                 throw new IllegalArgumentException("New user name is already in use");
             }
         }
@@ -117,7 +117,7 @@ public class ServerCommands extends BaseComponentSystem {
 
         for (EntityRef clientInfo : clientInfoEntities) {
             DisplayNameComponent nameComp = clientInfo.getComponent(DisplayNameComponent.class);
-            if (userName.equals(nameComp.name)) {
+            if (userName.equalsIgnoreCase(nameComp.name)) {
                 nameComp.name = newUserName;
                 clientInfo.saveComponent(nameComp);
                 return "User " + userName + " has been renamed to " + newUserName;

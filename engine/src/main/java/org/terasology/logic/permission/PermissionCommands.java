@@ -167,7 +167,7 @@ public class PermissionCommands extends BaseComponentSystem {
         EntityRef clientInfo = client.clientInfo;
         if (clientInfo != null) {
             String name = clientInfo.getComponent(DisplayNameComponent.class).name;
-            return playerName.equals(name);
+            return playerName.equalsIgnoreCase(name);
         }
         return false;
     }
