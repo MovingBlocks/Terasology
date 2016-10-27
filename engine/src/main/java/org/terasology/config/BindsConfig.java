@@ -30,7 +30,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
@@ -53,11 +52,16 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
-import org.terasology.registry.In;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.Collections;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.

@@ -39,7 +39,6 @@ public class ConfirmChangePopup extends CoreScreenLayer {
     public void setButtonData(UIInputBind bindButton) {
         this.bindButton = bindButton;
         String messageText = "Key " +  bindButton.getNewInput().getDisplayName() + " has already been assigned an action. Press ok to change anyway.";
-        find("title", UILabel.class).setText("Rebinding");
         find("message", UILabel.class).setText(messageText);
     }
 

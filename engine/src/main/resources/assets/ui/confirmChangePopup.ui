@@ -19,8 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Title",
-                            "id": "title",
+                            "text": "Rebinding",
                             "family": "title"
                         },
                         {
