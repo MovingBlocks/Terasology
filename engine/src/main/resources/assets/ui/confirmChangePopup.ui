@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Rebinding",
+                            "text": "${engine:menu#change-popup-title}",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Message",
+                            "text": "${engine:menu#change-popup-message}",
                             "id": "message"
                         },
                         {
