@@ -43,7 +43,7 @@ public class ConfirmChangePopup extends CoreScreenLayer {
 
     public void setButtonData(UIInputBind button) {
         this.bindButton = button;
-        String messageText = button.getNewInput().getDisplayName() + " " + translationSystem.translate("${engine:menu#change-popup-message}");
+        String messageText = button.getNewInput().getDisplayName() + " " + translationSystem.translate("${engine:menu#change-keybind-popup-message}");
         find("message", UILabel.class).setText(messageText);
     }
 

@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#change-popup-title}",
+                            "text": "${engine:menu#change-keybind-popup-title}",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#change-popup-message}",
+                            "text": "${engine:menu#change-keybind-popup-message}",
                             "id": "message"
                         },
                         {
