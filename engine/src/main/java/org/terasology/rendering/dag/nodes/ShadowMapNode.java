@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -38,10 +37,11 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
+
+import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
 /**
  * This node class generates a shadow map used by the lighting step to determine what's in sight of
@@ -162,21 +162,10 @@ public class ShadowMapNode extends ConditionDependentNode {
                 RenderableChunk chunk = renderQueues.chunksOpaqueShadow.poll();
 
                 if (chunk.hasMesh()) {
+                    final ChunkMesh chunkMesh = chunk.getMesh();
                     final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-                    final Vector3f chunkPositionRelativeToCamera =
-                            new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                    chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                    chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
-                    // Effectively this just positions the chunk appropriately, relative to the camera.
-                    // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-                    GL11.glPushMatrix();
-                    GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-                    chunk.getMesh().render(ChunkMesh.RenderPhase.OPAQUE);
-                    numberOfRenderedTriangles += chunk.getMesh().triangleCount();
-
-                    GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+                    numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
                 } else {
                     numberOfChunksThatAreNotReadyYet++;

@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.math.geom.Vector3f;
@@ -30,10 +29,10 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_REJECT;
 
 /**
  * This node uses alpha-rejection to render semi-transparent blocks (i.e. tree foliage) and
@@ -104,28 +103,11 @@ public class AlphaRejectBlocksNode extends WireframeCapableNode {
             RenderableChunk chunk = renderQueues.chunksAlphaReject.poll();
 
             if (chunk.hasMesh()) {
+                final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-                final Vector3f chunkPositionRelativeToCamera =
-                        new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
-                chunkShader.setFloat3("chunkPositionWorld",
-                        chunkPosition.x * ChunkConstants.SIZE_X,
-                        chunkPosition.y * ChunkConstants.SIZE_Y,
-                        chunkPosition.z * ChunkConstants.SIZE_Z,
-                        true);
-                chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
-
-                // Effectively this just positions the chunk appropriately, relative to the camera.
-                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-                GL11.glPushMatrix();
-                GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-                chunk.getMesh().render(ChunkMesh.RenderPhase.ALPHA_REJECT); // TODO: remove face culling from this method
-                numberOfRenderedTriangles += chunk.getMesh().triangleCount();
-
-                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                numberOfRenderedTriangles += chunkMesh.render(ALPHA_REJECT, chunkPosition, cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++; // TODO: verify - should we count them only in ChunksOpaqueNode?

@@ -33,11 +33,12 @@ import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
+
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
 /**
@@ -118,28 +119,11 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
 
             if (chunk.hasMesh()) {
+                final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-                final Vector3f chunkPositionRelativeToCamera =
-                        new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
-                chunkShader.setFloat3("chunkPositionWorld",
-                        chunkPosition.x * ChunkConstants.SIZE_X,
-                        chunkPosition.y * ChunkConstants.SIZE_Y,
-                        chunkPosition.z * ChunkConstants.SIZE_Z,
-                        true);
-                chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
-
-                // Effectively this just positions the chunk appropriately, relative to the camera.
-                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-                GL11.glPushMatrix();
-                GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-                chunk.getMesh().render(ChunkMesh.RenderPhase.REFRACTIVE);
-                numberOfRenderedTriangles += chunk.getMesh().triangleCount();
-
-                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, chunkPosition, cameraPosition);
 
             } else {
                 numberOfChunksThatAreNotReadyYet++;
