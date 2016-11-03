@@ -26,8 +26,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -39,7 +37,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
@@ -86,11 +83,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, WorldRendererImpl.ChunkRenderMode mode) {
-
-    }
-
-    @Override
     public void onChunkLoaded(Vector3i pos) {
 
     }
@@ -127,9 +119,18 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
+    public void increaseTrianglesCount(int increase) {
+        // we are not going to count triangles in headless
+    }
+
+    @Override
+    public void increaseNotReadyChunkCount(int increase) {
+        // we are not going to count not ready chunks in headless
+    }
+
+    @Override
     public void render(RenderingStage mono) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
