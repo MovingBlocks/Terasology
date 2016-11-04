@@ -16,9 +16,11 @@
 
 package org.terasology.physics.events;
 
-import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.BroadcastEvent;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.math.Side;
 
 /**
  */
@@ -28,15 +30,17 @@ public class ImpactEvent implements Event {
     private Vector3f impactNormal;
     private Vector3f impactSpeed;
     private float travelDistance;
+    private EntityRef impactEntity;
 
     protected ImpactEvent() {
     }
 
-    public ImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance) {
+    public ImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance, EntityRef impactEntity) {
         this.impactPoint = impactPoint;
         this.impactNormal = impactNormal;
         this.impactSpeed = impactSpeed;
         this.travelDistance = travelDistance;
+        this.impactEntity = impactEntity;
     }
 
     public Vector3f getImpactPoint() {
@@ -53,5 +57,11 @@ public class ImpactEvent implements Event {
 
     public float getTravelDistance(){
         return travelDistance;
+    }
+
+    public EntityRef getImpactEntity() {return impactEntity; }
+
+    public Side getSide() {
+        return Side.inDirection(impactNormal);
     }
 }

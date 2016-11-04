@@ -220,7 +220,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                                 continue;
                             }
                             else {
-                                entity.send(new ImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame));
+                                entity.send(new ImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity()));
                                 break;
                             }
                         }
