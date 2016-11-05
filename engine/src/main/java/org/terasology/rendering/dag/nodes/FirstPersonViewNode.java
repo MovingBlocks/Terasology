@@ -16,33 +16,64 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.WireframeCapable;
+import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
+
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
  * TODO: Diagram of this node
  */
-public class FirstPersonViewNode extends WireframeCapableNode {
+public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
 
     @In
     private WorldRenderer worldRenderer;
 
     @In
+    private Config config;
+
+    @In
     private ComponentSystemManager componentSystemManager;
 
     private Camera playerCamera;
+    private RenderingDebugConfig renderingDebugConfig;
+    private SetWireframe wireframeStateChange;
 
     @Override
     public void initialise() {
-        super.initialise();
-        renderingDebugConfig = config.getRendering().getDebug();
         playerCamera = worldRenderer.getActiveCamera();
+
+        wireframeStateChange = new SetWireframe(true);
+        renderingDebugConfig = config.getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
+
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+    }
+
+    public void enableWireframe() {
+        if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
+    }
+
+    public void disableWireframe() {
+        if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
     }
 
     @Override
@@ -50,7 +81,9 @@ public class FirstPersonViewNode extends WireframeCapableNode {
         if (!renderingDebugConfig.isFirstPersonElementsHidden()) {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
 
-            /**
+            READ_ONLY_GBUFFER.bind(); // TODO: to be removed - will eventually be bound with a state change
+
+            /*
              * Sets the state to render the First Person View.
              *
              * This generally comprises the objects held in hand, i.e. a pick, an axe, a torch and so on.
@@ -69,7 +102,7 @@ public class FirstPersonViewNode extends WireframeCapableNode {
             playerCamera.updateMatrices();
             playerCamera.loadProjectionMatrix();
 
-            /**
+            /*
              * Resets the state after the render of the First Person View.
              */
             GL11.glDepthFunc(GL_LEQUAL);

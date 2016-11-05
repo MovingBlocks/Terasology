@@ -282,6 +282,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
+        // TODO: this is a work in progress
+        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
+        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
 
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
@@ -289,7 +293,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
 
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
         Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
@@ -306,7 +309,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
 
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
         renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
         renderGraph.addNode(directionalLightsNode, "directionalLightsNode");
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");

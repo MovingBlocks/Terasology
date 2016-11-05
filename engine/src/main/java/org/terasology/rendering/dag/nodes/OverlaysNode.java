@@ -15,13 +15,18 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.WireframeCapable;
+import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
@@ -32,24 +37,47 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
  * Objects to be rendered as overlays must be registered as implementing the interface RenderSystem and
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
-public class OverlaysNode extends WireframeCapableNode {
+public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
     @In
     private ComponentSystemManager componentSystemManager;
 
     @In
+    private Config config;
+
+    @In
     private WorldRenderer worldRenderer;
 
     private Camera playerCamera;
+    private SetWireframe wireframeStateChange;
+    private RenderingDebugConfig renderingDebugConfig;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
-        super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
+
+        wireframeStateChange = new SetWireframe(true);
+        renderingDebugConfig = config.getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
+
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+    }
+
+    public void enableWireframe() {
+        if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
+    }
+
+    public void disableWireframe() {
+        if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
     }
 
     /**
@@ -61,7 +89,7 @@ public class OverlaysNode extends WireframeCapableNode {
 
         playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
-        READ_ONLY_GBUFFER.bind();
+        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();

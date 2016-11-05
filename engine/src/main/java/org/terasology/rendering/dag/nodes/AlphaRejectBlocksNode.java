@@ -16,6 +16,8 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -23,9 +25,12 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.WireframeCapable;
+import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -45,12 +50,15 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * In alpha-blending the color of a semi-transparent fragment is combined with
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class AlphaRejectBlocksNode extends WireframeCapableNode {
+public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
 
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
     private ComponentSystemManager componentSystemManager;
+
+    @In
+    private Config config;
 
     @In
     private WorldRenderer worldRenderer;
@@ -60,17 +68,37 @@ public class AlphaRejectBlocksNode extends WireframeCapableNode {
 
     private Camera playerCamera;
     private Material chunkShader;
+    private SetWireframe wireframeStateChange;
+    private RenderingDebugConfig renderingDebugConfig;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
-        super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
+
+        wireframeStateChange = new SetWireframe(true);
+        renderingDebugConfig = config.getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
+
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
+    }
+
+    public void enableWireframe() {
+        if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
+    }
+
+    public void disableWireframe() {
+        if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
     }
 
     /**
@@ -93,7 +121,7 @@ public class AlphaRejectBlocksNode extends WireframeCapableNode {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        READ_ONLY_GBUFFER.bind();
+        READ_ONLY_GBUFFER.bind();   // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
