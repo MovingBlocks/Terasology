@@ -137,13 +137,17 @@ public class UIList<T> extends CoreWidget {
         selectable = binding;
     }
 
-    public boolean isInteractive() { return interactive.get(); }
+    public boolean isInteractive() {
+        return interactive.get();
+    }
 
     public boolean isSelectable() {
         return selectable.get();
     }
 
-    public void setInteractive(boolean value) { interactive.set(value); }
+    public void setInteractive(boolean value) {
+        interactive.set(value);
+    }
 
     public void setSelectable(boolean value) {
         selectable.set(value);
