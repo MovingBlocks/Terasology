@@ -58,6 +58,7 @@ public class ItemIcon extends CoreWidget {
 
     public ItemIcon() {
         tooltip = new UIList<>();
+        tooltip.setInteractive(false);
         tooltip.setSelectable(false);
         final UISkin defaultSkin = Assets.getSkin("core:itemTooltip").get();
         tooltip.setSkin(defaultSkin);
