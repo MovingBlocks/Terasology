@@ -30,6 +30,7 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.CrouchButton;
+import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
@@ -39,7 +40,6 @@ import org.terasology.input.binds.movement.StrafeMovementAxis;
 import org.terasology.input.binds.movement.StrafeRealMovementAxis;
 import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
-import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
@@ -63,6 +63,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -97,6 +98,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private MovementDebugCommands movementDebugCommands;
     @In
     private PhysicsEngine physics;
+    @In
+    NetworkSystem networkSystem;
 
     @In
     private Config config;
@@ -445,10 +448,17 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             return;
         }
 
+        boolean requestIsValid;
+        if (networkSystem.getMode().isAuthority()) {
+            // Let the ActivationRequest handler trigger the OnItemUseEvent if this is a local client
+            requestIsValid = true;
+        } else {
+            OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
+            entity.send(onItemUseEvent);
+            requestIsValid = !onItemUseEvent.isConsumed();
+        }
 
-        OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
-        entity.send(onItemUseEvent);
-        if (!onItemUseEvent.isConsumed()) {
+        if (requestIsValid) {
             localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
             entity.saveComponent(characterHeldItemComponent);
             event.consume();

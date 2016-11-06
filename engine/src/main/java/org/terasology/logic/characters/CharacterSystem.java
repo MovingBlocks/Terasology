@@ -89,9 +89,17 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return;
         }
 
-        OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
-        entity.send(onItemUseEvent);
-        if (!onItemUseEvent.isConsumed()) {
+        boolean attackRequestIsValid;
+        if (networkSystem.getMode().isAuthority()) {
+            // Let the AttackRequest handler trigger the OnItemUseEvent if this is a local client
+            attackRequestIsValid = true;
+        } else {
+            OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
+            entity.send(onItemUseEvent);
+            attackRequestIsValid = !onItemUseEvent.isConsumed();
+        }
+
+        if (attackRequestIsValid) {
             EntityRef selectedItemEntity = characterHeldItemComponent.selectedItem;
             entity.send(new AttackRequest(selectedItemEntity));
             event.consume();
@@ -99,7 +107,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     @ReceiveEvent(components = LocationComponent.class, netFilter = RegisterMode.AUTHORITY)
-    public void onAttackRequest(AttackRequest event, EntityRef character) {
+    public void onAttackRequest(AttackRequest event, EntityRef character, CharacterComponent characterComponent) {
         // if an item is used,  make sure this entity is allowed to attack with it
         if (event.getItem().exists()) {
             if (!character.equals(event.getItem().getOwner())) {
@@ -108,9 +116,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
 
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
-        event.getInstigator().send(onItemUseEvent);
+        character.send(onItemUseEvent);
         if (!onItemUseEvent.isConsumed()) {
-            CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
             EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
             LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
             Vector3f direction = gazeLocation.getWorldDirection();
