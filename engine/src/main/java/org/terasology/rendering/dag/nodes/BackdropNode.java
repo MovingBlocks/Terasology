@@ -30,6 +30,7 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -60,6 +61,8 @@ public class BackdropNode extends WireframeCapableNode {
         super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
         initSkysphere();
+
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
 
         // We do not call requireFBO as we can count this default buffer is there.
         //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
