@@ -282,7 +282,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
-        // TODO: this is a work in progress
+        // TODO: clarify if this is actually needed - held-in-hand items seem to be rendered in OpaqueObjectsNode, above
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
 
