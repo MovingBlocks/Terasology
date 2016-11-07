@@ -16,9 +16,11 @@
 package org.terasology.logic.characters.events;
 
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
-public class OnItemUseEvent implements Event {
+/**
+ * Consuming this event means that the subsequent actions should cancel
+ */
+public class OnItemUseEvent extends AbstractConsumableEvent {
 
 }
