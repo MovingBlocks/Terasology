@@ -25,7 +25,7 @@ import org.terasology.math.Side;
 /**
  */
 @BroadcastEvent
-public class ImpactEvent implements Event {
+public class ImpactEvent extends AbstractConsumableEvent {
     private Vector3f impactPoint;
     private Vector3f impactNormal;
     private Vector3f impactSpeed;
