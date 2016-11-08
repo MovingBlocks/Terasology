@@ -13,12 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.physics.events;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.network.BroadcastEvent;
 
 /**
  */
+@BroadcastEvent
 public class ImpactEvent implements Event {
+    private Vector3f impactPoint;
+    private Vector3f impactNormal;
+    private Vector3f impactSpeed;
+    private float travelDistance;
+
+    protected ImpactEvent() {
+    }
+
+    public ImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance) {
+        this.impactPoint = impactPoint;
+        this.impactNormal = impactNormal;
+        this.impactSpeed = impactSpeed;
+        this.travelDistance = travelDistance;
+    }
+
+    public Vector3f getImpactPoint() {
+        return impactPoint;
+    }
+
+    public Vector3f getImpactNormal() {
+        return impactNormal;
+    }
+
+    public Vector3f getImpactSpeed() {
+        return impactSpeed;
+    }
+
+    public float getTravelDistance(){
+        return travelDistance;
+    }
 }

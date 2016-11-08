@@ -17,6 +17,9 @@
 package org.terasology.logic.inventory;
 
 import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.engine.Time;
@@ -68,6 +71,9 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
+
+    @In
+    private Physics physics;
 
     private long lastInteraction;
     private long lastTimeThrowInteraction;
@@ -179,10 +185,16 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             Vector3f position = localPlayer.getViewPosition();
             Vector3f direction = localPlayer.getViewDirection();
 
-            Vector3f newPosition = new Vector3f(position.x + direction.x * 1.5f,
-                    position.y + direction.y * 1.5f,
-                    position.z + direction.z * 1.5f
-            );
+            Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
+            HitResult hitResult = physics.rayTrace(position,direction,1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
+            if (hitResult.isHit())
+            {
+                Vector3f possibleNewPosition = hitResult.getHitPoint();
+                maxAllowedDistanceInDirection = possibleNewPosition.sub(position);
+            }
+
+            Vector3f newPosition = position;
+            newPosition.add(maxAllowedDistanceInDirection.mul(0.9f));
 
             //send DropItemRequest
             Vector3f impulseVector = new Vector3f(direction);
