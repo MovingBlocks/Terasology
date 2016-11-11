@@ -57,14 +57,15 @@ public class HealthCommands extends BaseComponentSystem {
     public String healthMax(@Sender EntityRef clientEntity) {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(100000, clientComp.character));
-        return "Health restored";
+        return "Health fully restored";
     }
 
     @Command(shortDescription = "Restores your health by an amount", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public void heal(@Sender EntityRef client, @CommandParam("amount") int amount) {
+    public String heal(@Sender EntityRef client, @CommandParam("amount") int amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(amount, clientComp.character));
+        return "Health restored for " + amount;
     }
 
     @Command(shortDescription = "Set max health", runOnServer = true,
@@ -116,7 +117,6 @@ public class HealthCommands extends BaseComponentSystem {
 
             return "Soft landing mode activated";
         }
-
         return "";
     }
 
@@ -134,7 +134,6 @@ public class HealthCommands extends BaseComponentSystem {
             health.excessSpeedDamageMultiplier = healthDefault.excessSpeedDamageMultiplier;
             clientComp.character.saveComponent(health);
         }
-
         return "Normal collision damage values restored";
     }
 }

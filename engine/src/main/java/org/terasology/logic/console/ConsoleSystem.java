@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
-import java.util.List;
-
-/**
- */
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
     @In
@@ -60,7 +56,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     public void onCommand(CommandEvent event, EntityRef entity) {
         ConsoleCommand cmd = console.getCommand(event.getCommandName());
 
-        if (cmd.getCommandParameters().size() >= cmd.getRequiredParameterCount() && cmd.isRunOnServer()){
+        if (cmd.getCommandParameters().size() >= cmd.getRequiredParameterCount() && cmd.isRunOnServer()) {
         console.execute(cmd.getName(), event.getParameters(), entity);
         }
     }

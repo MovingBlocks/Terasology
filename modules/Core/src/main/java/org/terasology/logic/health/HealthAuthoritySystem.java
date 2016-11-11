@@ -21,8 +21,6 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.utilities.Assets;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
@@ -39,19 +37,12 @@ import org.terasology.logic.characters.CharacterSoundSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
-
-import java.util.Optional;
 
 /**
  * This system reacts to OnDamageEvent events and lowers health on the HealthComponent.
