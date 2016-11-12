@@ -21,9 +21,9 @@ import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.SoundPool;
 import org.terasology.audio.openAL.SoundSource;
 
-import static org.lwjgl.openal.AL10.*;
-
 import java.nio.IntBuffer;
+
+import static org.lwjgl.openal.AL10.*;
 
 public class OpenALStreamingSoundSource
         extends BaseSoundSource<OpenALStreamingSound> {
@@ -89,7 +89,7 @@ public class OpenALStreamingSoundSource
     protected void updateState() {
         // Start playing if playback for stopped by end of buffers
         if (isPlaying()
-                && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
+            && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
             alSourcePlay(this.getSourceId());
         } else if (isLooping()) {
             play();
