@@ -80,6 +80,21 @@
                         "text": "${engine:menu#exit-game}"
                     }
                 ]
+            },
+            {
+                "type": "UIButton",
+                "id": "crashReporter",
+                "text": "${engine:menu#crash-reporter}",
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-bottom": {
+                        "offset": 8
+                    },
+                    "position-right": {
+                        "offset": 8
+                    }
+                }
             }
         ]
     }
