@@ -131,8 +131,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class)
-                .playMusic(Assets.getMusic("engine:MenuTheme").get(), 1.0f, true, null);
+        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get(), 1.0f, true, null);
     }
 
     private void stopBackgroundMusic() {
