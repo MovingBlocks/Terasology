@@ -25,14 +25,12 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.openal.AL10.*;
 
-public class OpenALStreamingSoundSource
-        extends BaseSoundSource<OpenALStreamingSound> {
+public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingSound> {
 
     private OpenALStreamingSound audio;
     private boolean loop;
 
-    public OpenALStreamingSoundSource(
-            SoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> owningPool) {
+    public OpenALStreamingSoundSource(SoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> owningPool) {
         super(owningPool);
     }
 
@@ -88,8 +86,7 @@ public class OpenALStreamingSoundSource
     @Override
     protected void updateState() {
         // Start playing if playback for stopped by end of buffers
-        if (isPlaying()
-            && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
+        if (isPlaying() && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
             alSourcePlay(this.getSourceId());
         } else if (isLooping()) {
             play();
@@ -116,8 +113,7 @@ public class OpenALStreamingSoundSource
             sound.updateBuffer(buffer);
         }
 
-        alSourceQueueBuffers(this.getSourceId(), (IntBuffer) BufferUtils
-                .createIntBuffer(buffers.length).put(buffers).flip());
+        alSourceQueueBuffers(this.getSourceId(), (IntBuffer) BufferUtils.createIntBuffer(buffers.length).put(buffers).flip());
 
         if (isPlaying) {
             this.play();
