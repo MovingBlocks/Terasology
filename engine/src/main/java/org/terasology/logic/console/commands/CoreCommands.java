@@ -55,7 +55,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.Server;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
@@ -77,8 +76,6 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -403,75 +400,6 @@ public class CoreCommands extends BaseComponentSystem {
         blockItem.send(new DropItemEvent(spawnPos));
         return "Spawned block.";
     }
-
-
-
-	//Works on windows only , i don't know if you can even play the game on other platforms
-    @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-    "to reach the server and back" , runOnServer = false, requiredPermission = PermissionManager.NO_PERMISSION)
-    public String ping(@Sender EntityRef sender ) {
-        //The class is just to tidy up the code , and not having random methods in this file
-        class InnerClass{
-            //Runs commands in the command prompt and return the output
-            public String runSystemCommand(String command) {
-                String ret = "";
-                try {
-                    Process p = Runtime.getRuntime().exec(command);
-                    BufferedReader inputStream = new BufferedReader(
-                            new InputStreamReader(p.getInputStream()));
-
-                    String s = "";
-                    // reading output stream of the command
-                    while ((s = inputStream.readLine()) != null) {
-                      ret += s;
-                    }
-
-                } catch (Exception e) {
-                    ret += e.toString();
-                }
-
-                return ret;
-            }
-
-            //It's ugly because it splits the cmd output instead of a regular pretty api
-            public String uglyPing(String address){
-                return runSystemCommand("ping -n 1 " + address);
-            }
-        }
-        Server server = networkSystem.getServer();
-        if(server == null){
-            return "You need to be in a server to ping \r\n and no , single player doesn't count";
-        } else {
-            //Used just to tidy up some code
-            InnerClass TempObject = new InnerClass();
-
-            //Get the server address
-            String temp = server.getRemoteAddress();
-            String[] arr = temp.split("-");
-
-            //Get command prompt ping output
-            temp = TempObject.uglyPing(arr[1]);
-
-            //Find the actual part where the response time is
-            arr = temp.split(" ");
-            String ret = "";
-            for(String s : arr){
-              if(s.contains("time=")){
-                String[] secondArr = s.split("=");
-                if(secondArr.length == 2){
-                  ret = secondArr[1];
-                } else {
-                  //incase the string "time=<value>" split by '=' isn't split into 2 strings
-                  return "An error occured";
-                }
-              }
-            }
-
-            return ret;
-        }
-    }
-    //P.S Sorry for my english :D
-
 
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
             requiredPermission = PermissionManager.NO_PERMISSION)
