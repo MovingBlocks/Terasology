@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.modes;
 
-import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -44,10 +43,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.utilities.Assets;
 
 /**
- * The class implements the main game menu. <br>
- * <br>
- *
- * @version 0.3
+ * The class implements the main game menu.
  */
 public class StateMainMenu implements GameState {
     private Context context;
@@ -117,7 +113,6 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
