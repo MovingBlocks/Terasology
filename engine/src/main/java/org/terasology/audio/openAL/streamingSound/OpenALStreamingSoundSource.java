@@ -61,8 +61,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
     @Override
     public void update(float delta) {
-        int buffersProcessed = alGetSourcei(this.getSourceId(),
-                AL_BUFFERS_PROCESSED);
+        int buffersProcessed = alGetSourcei(this.getSourceId(), AL_BUFFERS_PROCESSED);
 
         while (buffersProcessed-- > 0) {
             int buffer = alSourceUnqueueBuffers(this.getSourceId());
