@@ -77,6 +77,9 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
+import java.net.Socket;
+import java.time.Duration;
+import java.time.Instant;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -405,72 +408,47 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
 
-
 	//Works on windows only , i don't know if you can even play the game on other platforms
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-    "to reach the server and back" , runOnServer = false, requiredPermission = PermissionManager.NO_PERMISSION)
+        "to reach the server and back" , runOnServer = false, requiredPermission = PermissionManager.NO_PERMISSION)
     public String ping(@Sender EntityRef sender ) {
-        //The class is just to tidy up the code , and not having random methods in this file
-        class InnerClass{
-            //Runs commands in the command prompt and return the output
-            public String runSystemCommand(String command) {
-                String ret = "";
-                try {
-                    Process p = Runtime.getRuntime().exec(command);
-                    BufferedReader inputStream = new BufferedReader(
-                            new InputStreamReader(p.getInputStream()));
-
-                    String s = "";
-                    // reading output stream of the command
-                    while ((s = inputStream.readLine()) != null) {
-                      ret += s;
-                    }
-
-                } catch (Exception e) {
-                    ret += e.toString();
-                }
-
-                return ret;
+        try{
+            Server server = networkSystem.getServer();
+            if(server == null){
+                return "Please make sure you are connected to an online server (SinglePlayer doesn't count)";
             }
-
-            //It's ugly because it splits the cmd output instead of a regular pretty api
-            public String uglyPing(String address){
-                return runSystemCommand("ping -n 1 " + address);
-            }
-        }
-        Server server = networkSystem.getServer();
-        if(server == null){
-            return "You need to be in a server to ping \r\n and no , single player doesn't count";
-        } else {
-            //Used just to tidy up some code
-            InnerClass TempObject = new InnerClass();
-
-            //Get the server address
             String temp = server.getRemoteAddress();
             String[] arr = temp.split("-");
-
-            //Get command prompt ping output
-            temp = TempObject.uglyPing(arr[1]);
-
-            //Find the actual part where the response time is
-            arr = temp.split(" ");
-            String ret = "";
-            for(String s : arr){
-              if(s.contains("time=")){
-                String[] secondArr = s.split("=");
-                if(secondArr.length == 2){
-                  ret = secondArr[1];
-                } else {
-                  //incase the string "time=<value>" split by '=' isn't split into 2 strings
-                  return "An error occured";
-                }
-              }
+            String address = arr[1];
+            int port = -1;
+            try{
+                port = Integer.valueOf(arr[2]);
+            } catch(Exception ex){
+                return "An error occured" + ex.toString();
             }
-
-            return ret;
+            Instant starts = Instant.now();
+            Socket sock = new Socket(address, port);
+            Instant ends = Instant.now();
+            sock.close();
+            String response = String.valueOf(Duration.between(starts, ends));
+            String millis = "";
+            char[] AllowedValues = {'0' , '1' ,'2' ,'3' ,'4' ,'5' ,'6' ,'7' ,'8' ,'9' ,'.'};
+            //Removes all unneccesery characters and keeps only the digits and numbers
+            for (char c : response.toCharArray()){
+                for(char a : AllowedValues){
+                    if(a == c){
+                        millis += c;
+                    }
+                }
+            }
+            float intMillis = Float.valueOf(millis);
+            //I want to know how many milliseconds and not seconds
+            intMillis = intMillis * 1000;
+            return String.valueOf(intMillis).substring(0 , String.valueOf(intMillis).length() - 2) + "ms";
+        } catch(Exception e){
+            return e.toString();
         }
     }
-    //P.S Sorry for my english :D
 
 
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
