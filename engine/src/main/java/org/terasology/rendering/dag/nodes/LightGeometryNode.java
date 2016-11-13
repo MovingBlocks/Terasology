@@ -66,6 +66,8 @@ public class LightGeometryNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/lightGeometry");
+
+        // TODO: fetch preRenderSetupLightGeometryStencil() and postRenderCleanupLightGeometryStencil()
         // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
         /*
         graphicState.preRenderSetupLightGeometryStencil();
@@ -85,31 +87,9 @@ public class LightGeometryNode extends AbstractNode {
         */
 
         // LightGeometry requires a cleanup
-        cleanupSceneOpaque();
-        preRenderSetupLightGeometry();
-
-        for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
-            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-            LightComponent lightComponent = entity.getComponent(LightComponent.class);
-
-            final Vector3f worldPosition = locationComponent.getWorldPosition();
-            // TODO: find a more elegant way
-            worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
-        }
-        postRenderCleanupLightGeometry();
-        PerformanceMonitor.endActivity();
-    }
-
-    // TODO: figure how lighting works and what this does
-    private void postRenderCleanupLightGeometry() {
-        glDisable(GL_STENCIL_TEST);
-        glCullFace(GL_BACK);
-
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: probably redundant - verify
         bindDisplay();
-    }
 
-    // TODO: figure how lighting works and what this does
-    private void preRenderSetupLightGeometry() {
         READ_ONLY_GBUFFER.bind();
 
         // Only write to the light buffer
@@ -126,13 +106,23 @@ public class LightGeometryNode extends AbstractNode {
         // TODO: use a state change for enabling face culling - also review ChunksRefractiveReflectiveNode.process() when this is done.
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
+
+
+        for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
+            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+            LightComponent lightComponent = entity.getComponent(LightComponent.class);
+
+            final Vector3f worldPosition = locationComponent.getWorldPosition();
+            // TODO: find a more elegant way
+            worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
+        }
+
+        glDisable(GL_STENCIL_TEST);
+        glCullFace(GL_BACK);
+
+        bindDisplay();
+
+        PerformanceMonitor.endActivity();
     }
 
-    /**
-     * Resets the state after the rendering of the Opaque scene.
-     */
-    private void cleanupSceneOpaque() {
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: probably redundant - verify
-        bindDisplay();
-    }
 }
