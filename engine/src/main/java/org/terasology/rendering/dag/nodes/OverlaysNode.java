@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
@@ -25,6 +26,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
@@ -39,6 +41,8 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
  */
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+
     @In
     private ComponentSystemManager componentSystemManager;
 
@@ -50,7 +54,6 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -60,12 +63,20 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
     }
 
+    /**
+     * Enables wireframe.
+     *
+     * Notice that this is just a request and wireframe gets enabled only after the
+     * rendering task list has been refreshed. This occurs before the beginning
+     * of next frame or earlier.
+     */
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
@@ -73,6 +84,13 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         }
     }
 
+    /**
+     * Disables wireframe.
+     *
+     * Notice that this is just a request and wireframe gets disabled only after the
+     * rendering task list has been refreshed. This occurs before the beginning
+     * of next frame or earlier.
+     */
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
