@@ -144,15 +144,15 @@ public class CoreCommands extends BaseComponentSystem {
     private Config config;
 
     @Command(shortDescription = "Search commands/prefabs/assets",
-            helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                    + "help text, usage or required permission")
+             helpText = "Displays commands, prefabs, and assets with matching name, description, "
+                 + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
         List<String> commands = findCommandMatches(searchLowercase);
         List<String> prefabs = findPrefabMatches(searchLowercase);
         List<String> blocks = findBlockMatches(searchLowercase);
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
-                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+            " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         if (commands.size() > 0) {
             result += "\nCommands:";
@@ -174,33 +174,33 @@ public class CoreCommands extends BaseComponentSystem {
 
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
-                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
+            .map(ConsoleCommand::getUsage).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
-                || command.getDescription().toLowerCase().contains(searchLowercase)
-                || command.getHelpText().toLowerCase().contains(searchLowercase)
-                || command.getUsage().toLowerCase().contains(searchLowercase)
-                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+            || command.getDescription().toLowerCase().contains(searchLowercase)
+            || command.getHelpText().toLowerCase().contains(searchLowercase)
+            || command.getUsage().toLowerCase().contains(searchLowercase)
+            || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
-                .filter(prefab -> matchesSearch(searchLowercase, prefab))
-                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
+            .filter(prefab -> matchesSearch(searchLowercase, prefab))
+            .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
         return prefab.getName().toLowerCase().contains(searchLowercase)
-                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+            || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+            .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+            .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+            .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
@@ -335,7 +335,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Leaves the current game and returns to main menu",
-            requiredPermission = PermissionManager.NO_PERMISSION)
+             requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
         if (networkSystem.getMode() != NetworkMode.NONE) {
             gameEngine.changeState(new StateMainMenu());
@@ -346,7 +346,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
+             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
@@ -385,7 +385,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+        "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -407,24 +407,22 @@ public class CoreCommands extends BaseComponentSystem {
         return "Spawned block.";
     }
 
-
-	//Works on windows only , i don't know if you can even play the game on other platforms
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-        "to reach the server and back" , runOnServer = false, requiredPermission = PermissionManager.NO_PERMISSION)
-    public String ping(@Sender EntityRef sender ) {
-        try{
+        "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
+    public String ping(@Sender EntityRef sender) {
+        try {
             Server server = networkSystem.getServer();
-            if(server == null){
-                return "Please make sure you are connected to an online server (SinglePlayer doesn't count)";
+            if (server == null) {
+                return "Please make sure you are connected to an online server (singleplayer doesn't count)";
             }
             String temp = server.getRemoteAddress();
             String[] arr = temp.split("-");
             String address = arr[1];
             int port = -1;
-            try{
+            try {
                 port = Integer.valueOf(arr[2]);
-            } catch(Exception ex){
-                return "An error occured" + ex.toString();
+            } catch (Exception ex) {
+                return ex.toString();
             }
             Instant starts = Instant.now();
             Socket sock = new Socket(address, port);
@@ -432,27 +430,29 @@ public class CoreCommands extends BaseComponentSystem {
             sock.close();
             String response = String.valueOf(Duration.between(starts, ends));
             String millis = "";
-            char[] AllowedValues = {'0' , '1' ,'2' ,'3' ,'4' ,'5' ,'6' ,'7' ,'8' ,'9' ,'.'};
-            //Removes all unneccesery characters and keeps only the digits and numbers
-            for (char c : response.toCharArray()){
-                for(char a : AllowedValues){
-                    if(a == c){
+            char[] allowedValues = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
+
+            //Remove all unnecessary characters, only keeping the digits and numbers
+            for (char c : response.toCharArray()) {
+                for (char a : allowedValues) {
+                    if (a == c) {
                         millis += c;
                     }
                 }
             }
+
             float intMillis = Float.valueOf(millis);
-            //I want to know how many milliseconds and not seconds
+            // Convert seconds to ms
             intMillis = intMillis * 1000;
-            return String.valueOf(intMillis).substring(0 , String.valueOf(intMillis).length() - 2) + "ms";
-        } catch(Exception e){
+            return String.valueOf(intMillis).substring(0, String.valueOf(intMillis).length() - 2) + " ms";
+        } catch (Exception e) {
             return e.toString();
         }
     }
 
 
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
-            requiredPermission = PermissionManager.NO_PERMISSION)
+             requiredPermission = PermissionManager.NO_PERMISSION)
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();
