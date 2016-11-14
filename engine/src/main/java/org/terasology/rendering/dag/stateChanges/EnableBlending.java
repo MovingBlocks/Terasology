@@ -36,7 +36,7 @@ public final class EnableBlending extends SetStateParameter {
     }
 
     private EnableBlending(boolean enabled) {
-        super(enabled);
+        super(GL_BLEND, enabled);
         disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
         enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }

@@ -36,7 +36,7 @@ public final class EnableStencilTest extends SetStateParameter {
     }
 
     private EnableStencilTest(boolean enabled) {
-        super(enabled);
+        super(GL_STENCIL_TEST, enabled);
         disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
         enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }

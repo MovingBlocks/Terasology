@@ -24,7 +24,11 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.logic.LightComponent;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
@@ -35,23 +39,13 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 
 /**
  * TODO: Break this node into several nodes
  * TODO: For doing that worldRenderer.renderLightComponent must be eliminated somehow
  */
 public class DirectionalLightsNode extends AbstractNode {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
+    private static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
     private BackdropProvider backdropProvider;
@@ -79,6 +73,8 @@ public class DirectionalLightsNode extends AbstractNode {
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
 
+        addDesiredStateChange(new DisableDepthTest());
+
         initMainDirectionalLight();
     }
 
@@ -92,8 +88,14 @@ public class DirectionalLightsNode extends AbstractNode {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/directionallights");
+        PerformanceMonitor.startActivity("rendering/mainlight");
         READ_ONLY_GBUFFER.bind();
+        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
+
+        glDisable(GL_DEPTH_TEST);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
@@ -140,8 +142,6 @@ public class DirectionalLightsNode extends AbstractNode {
         READ_ONLY_GBUFFER.bindLightBufferTexture();
         lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
 
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
-
         WRITE_ONLY_GBUFFER.bind();
         WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
@@ -153,6 +153,7 @@ public class DirectionalLightsNode extends AbstractNode {
         bindDisplay();     // TODO: verify this is necessary
         setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
 
+        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
         displayResolutionDependentFBOs.swapReadWriteBuffers();
         READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }

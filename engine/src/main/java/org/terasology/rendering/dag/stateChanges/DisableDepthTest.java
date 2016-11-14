@@ -28,15 +28,15 @@ public final class DisableDepthTest extends SetStateParameter {
     private static final int PARAMETER = GL_DEPTH_TEST;
     private static final String PARAMETER_NAME = "GL_DEPTH_TEST";
     private static StateChange defaultInstance = new DisableDepthTest(true);
-    private static RenderPipelineTask enablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
-    private static RenderPipelineTask disablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
+    private static RenderPipelineTask enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
+    private static RenderPipelineTask disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
 
     public DisableDepthTest() {
         this(false);
     }
 
     private DisableDepthTest(boolean enabled) {
-        super(enabled);
+        super(GL_DEPTH_TEST, enabled);
     }
 
     @Override

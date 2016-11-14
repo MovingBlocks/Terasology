@@ -36,7 +36,7 @@ public final class EnableFaceCulling extends SetStateParameter {
     }
 
     private EnableFaceCulling(boolean enabled) {
-        super(enabled);
+        super(GL_CULL_FACE, enabled);
         disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
         enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }

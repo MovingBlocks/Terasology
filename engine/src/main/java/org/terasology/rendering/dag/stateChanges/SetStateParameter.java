@@ -15,29 +15,32 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
+
+import java.util.Objects;
 
 /**
  * TODO: Add javadocs
  * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
  */
 abstract class SetStateParameter implements StateChange {
+    private int glParameter;
     private boolean enabled;
 
-    SetStateParameter(boolean enabled) {
+    SetStateParameter(int glParameter, boolean enabled) {
+        this.glParameter = glParameter;
         this.enabled = enabled;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(enabled);
+        return Objects.hash(enabled, glParameter);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).isEnabled();
+        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).isEnabled() && this.glParameter == ((SetStateParameter) obj).glParameter;
     }
 
     public boolean isEnabled() {

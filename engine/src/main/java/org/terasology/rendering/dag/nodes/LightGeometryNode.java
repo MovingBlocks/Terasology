@@ -15,15 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -32,22 +24,26 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
+import org.terasology.rendering.dag.stateChanges.EnableBlending;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
+
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glStencilFunc;
 
 /**
  * TODO: Add desired state changes
  */
 public class LightGeometryNode extends AbstractNode {
+
+    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
+
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
@@ -56,57 +52,32 @@ public class LightGeometryNode extends AbstractNode {
 
     @In
     private EntityManager entityManager;
+
     private Material lightGeometryShader;
 
     @Override
     public void initialise() {
-        lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
+
+        lightGeometryShader = getMaterial(LIGHT_GEOMETRY_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
+
+        addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+
+        addDesiredStateChange(new EnableBlending());
+        addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
+
+        addDesiredStateChange(new DisableDepthTest());
+
+
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/lightGeometry");
 
-        // TODO: fetch preRenderSetupLightGeometryStencil() and postRenderCleanupLightGeometryStencil()
-        // DISABLED UNTIL WE CAN FIND WHY IT's BROKEN. SEE ISSUE #1486
-        /*
-        graphicState.preRenderSetupLightGeometryStencil();
-
-        simple.enable();
-        simple.setCamera(playerCamera);
-        EntityManager entityManager = context.get(EntityManager.class);
-        for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
-            LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-            LightComponent lightComponent = entity.getComponent(LightComponent.class);
-
-            final Vector3f worldPosition = locationComponent.getWorldPosition();
-            renderLightComponent(lightComponent, worldPosition, simple, true);
-        }
-
-        graphicState.postRenderCleanupLightGeometryStencil();
-        */
-
-        // LightGeometry requires a cleanup
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: probably redundant - verify
-        bindDisplay();
-
         READ_ONLY_GBUFFER.bind();
-
-        // Only write to the light buffer
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true);
-
-        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-
-        glDepthMask(true);
-        glDisable(GL_DEPTH_TEST);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
-
-        // TODO: use a state change for enabling face culling - also review ChunksRefractiveReflectiveNode.process() when this is done.
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-
+        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
@@ -117,10 +88,7 @@ public class LightGeometryNode extends AbstractNode {
             worldRenderer.renderLightComponent(lightComponent, worldPosition, lightGeometryShader, false);
         }
 
-        glDisable(GL_STENCIL_TEST);
-        glCullFace(GL_BACK);
-
-        bindDisplay();
+        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
 
         PerformanceMonitor.endActivity();
     }
