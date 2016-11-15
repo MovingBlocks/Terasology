@@ -63,8 +63,8 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
-import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
+import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
@@ -77,12 +77,11 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -410,43 +409,25 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
         "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
     public String ping(@Sender EntityRef sender) {
+        Server server = networkSystem.getServer();
+        if (server == null) {
+            //TODO: i18n
+            return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+        }
+        String[] remoteAddress = server.getRemoteAddress().split("-");
+        String address = remoteAddress[1];
+        int port = Integer.valueOf(remoteAddress[2]);
         try {
-            Server server = networkSystem.getServer();
-            if (server == null) {
-                return "Please make sure you are connected to an online server (singleplayer doesn't count)";
-            }
-            String temp = server.getRemoteAddress();
-            String[] arr = temp.split("-");
-            String address = arr[1];
-            int port = -1;
-            try {
-                port = Integer.valueOf(arr[2]);
-            } catch (Exception ex) {
-                return ex.toString();
-            }
             Instant starts = Instant.now();
             Socket sock = new Socket(address, port);
             Instant ends = Instant.now();
             sock.close();
-            String response = String.valueOf(Duration.between(starts, ends));
-            String millis = "";
-            char[] allowedValues = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'};
-
-            //Remove all unnecessary characters, only keeping the digits and numbers
-            for (char c : response.toCharArray()) {
-                for (char a : allowedValues) {
-                    if (a == c) {
-                        millis += c;
-                    }
-                }
-            }
-
-            float intMillis = Float.valueOf(millis);
-            // Convert seconds to ms
-            intMillis = intMillis * 1000;
-            return String.valueOf(intMillis).substring(0, String.valueOf(intMillis).length() - 2) + " ms";
-        } catch (Exception e) {
-            return e.toString();
+            long delay = Duration.between(starts, ends).toMillis();
+            return String.format("%d ms", delay);
+        } catch (UnknownHostException e) {
+            return String.format("Error: Unknown host \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
+        } catch (IOException e) {
+            return String.format("Error: Failed to ping server \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
         }
     }
 
