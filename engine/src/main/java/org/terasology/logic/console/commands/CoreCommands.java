@@ -55,6 +55,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.Server;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.In;
@@ -62,8 +63,8 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.editor.layers.NUIEditorScreen;
-import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.layers.NUISkinEditorScreen;
+import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
@@ -77,6 +78,10 @@ import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -138,15 +143,15 @@ public class CoreCommands extends BaseComponentSystem {
     private Config config;
 
     @Command(shortDescription = "Search commands/prefabs/assets",
-            helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                    + "help text, usage or required permission")
+             helpText = "Displays commands, prefabs, and assets with matching name, description, "
+                 + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
         List<String> commands = findCommandMatches(searchLowercase);
         List<String> prefabs = findPrefabMatches(searchLowercase);
         List<String> blocks = findBlockMatches(searchLowercase);
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
-                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+            " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         if (commands.size() > 0) {
             result += "\nCommands:";
@@ -168,33 +173,33 @@ public class CoreCommands extends BaseComponentSystem {
 
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
-                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
+            .map(ConsoleCommand::getUsage).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
-                || command.getDescription().toLowerCase().contains(searchLowercase)
-                || command.getHelpText().toLowerCase().contains(searchLowercase)
-                || command.getUsage().toLowerCase().contains(searchLowercase)
-                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+            || command.getDescription().toLowerCase().contains(searchLowercase)
+            || command.getHelpText().toLowerCase().contains(searchLowercase)
+            || command.getUsage().toLowerCase().contains(searchLowercase)
+            || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
-                .filter(prefab -> matchesSearch(searchLowercase, prefab))
-                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
+            .filter(prefab -> matchesSearch(searchLowercase, prefab))
+            .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
         return prefab.getName().toLowerCase().contains(searchLowercase)
-                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+            || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+            .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+            .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+            .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
     }
 
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
@@ -284,7 +289,6 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
         displayDevice.setFullscreen(!displayDevice.isFullscreen());
-
         if (displayDevice.isFullscreen()) {
             return "Switched to fullscreen mode";
         } else {
@@ -330,7 +334,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Leaves the current game and returns to main menu",
-            requiredPermission = PermissionManager.NO_PERMISSION)
+             requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
         if (networkSystem.getMode() != NetworkMode.NONE) {
             gameEngine.changeState(new StateMainMenu());
@@ -341,7 +345,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
+             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
@@ -380,7 +384,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+        "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -402,8 +406,34 @@ public class CoreCommands extends BaseComponentSystem {
         return "Spawned block.";
     }
 
+    @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
+        "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
+    public String ping(@Sender EntityRef sender) {
+        Server server = networkSystem.getServer();
+        if (server == null) {
+            //TODO: i18n
+            return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+        }
+        String[] remoteAddress = server.getRemoteAddress().split("-");
+        String address = remoteAddress[1];
+        int port = Integer.valueOf(remoteAddress[2]);
+        try {
+            Instant starts = Instant.now();
+            Socket sock = new Socket(address, port);
+            Instant ends = Instant.now();
+            sock.close();
+            long delay = Duration.between(starts, ends).toMillis();
+            return String.format("%d ms", delay);
+        } catch (UnknownHostException e) {
+            return String.format("Error: Unknown host \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
+        } catch (IOException e) {
+            return String.format("Error: Failed to ping server \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
+        }
+    }
+
+
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
-            requiredPermission = PermissionManager.NO_PERMISSION)
+             requiredPermission = PermissionManager.NO_PERMISSION)
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();

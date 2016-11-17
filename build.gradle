@@ -187,8 +187,21 @@ task protobufCompileLinux(type:Exec) {
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+task copyInMissingTemplates {
+    description = "Copies in placeholders from the /templates dir to project root if not present yet"
+    File gradlePropsFile = new File(rootDir, 'gradle.properties')
+    File OverrideCfgFile = new File(rootDir, 'override.cfg')
+    if (!gradlePropsFile.exists()) {
+        new File(rootDir, 'gradle.properties') << new File(templatesDir, 'gradle.properties').text
+    }
+    if (!OverrideCfgFile.exists()) {
+        new File(rootDir, 'override.cfg') << new File(templatesDir, 'override.cfg').text
+    }
+}
+
 // Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
+ideaModule.dependsOn copyInMissingTemplates
 
 // For IntelliJ add a bunch of excluded directories
 idea {

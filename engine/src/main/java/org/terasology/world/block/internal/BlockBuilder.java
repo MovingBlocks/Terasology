@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ import org.terasology.world.block.tiles.WorldAtlas;
 
 import java.util.Map;
 
-/**
- */
 public class BlockBuilder implements BlockBuilderHelper {
 
     private WorldAtlas worldAtlas;
@@ -146,9 +144,6 @@ public class BlockBuilder implements BlockBuilderHelper {
         block.setPenetrable(def.isPenetrable());
         block.setTargetable(def.isTargetable());
         block.setClimbable(def.isClimbable());
-        if (def.isInvisible()) {
-            block.setMeshGenerator(null);
-        }
         block.setTranslucent(def.isTranslucent());
         block.setDoubleSided(def.isDoubleSided());
         block.setShadowCasting(def.isShadowCasting());

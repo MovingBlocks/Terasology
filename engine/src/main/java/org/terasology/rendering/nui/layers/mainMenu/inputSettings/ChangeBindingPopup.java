@@ -56,6 +56,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
     private UIInputBind bindButton;
 
     private BindsConfig defaultBinds;
+    private BindsConfig currBinds;
 
     @Override
     public void initialise() {
@@ -64,8 +65,15 @@ public class ChangeBindingPopup extends CoreScreenLayer {
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));
         WidgetUtil.trySubscribe(this, "ok", button -> {
-            bindButton.saveInput();
-            getManager().popScreen();
+            Input newInput = bindButton.getNewInput();
+            currBinds = config.getInput().getBinds();
+            if (currBinds.isBound(newInput) && !newInput.equals(bindButton.getInput())) {
+                ConfirmChangePopup popup = getManager().pushScreen(ConfirmChangePopup.ASSET_URI, ConfirmChangePopup.class);
+                popup.setButtonData(bindButton);
+            } else {
+                bindButton.saveInput();
+                getManager().popScreen();
+            }
         });
         WidgetUtil.trySubscribe(this, "cancel", button -> getManager().popScreen());
     }

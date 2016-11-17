@@ -24,7 +24,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.world.chunks.ChunkConstants;
 
 import java.nio.IntBuffer;
 import java.util.Map;
@@ -45,7 +48,7 @@ import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
 
 /**
- * Chunk meshes are used to store the vertex data of tessellated chunks.
+ * Chunk meshes store, manipulate and render the vertex data of tessellated chunks.
  */
 @SuppressWarnings("PointlessArithmeticExpression")
 public class ChunkMesh {
@@ -61,7 +64,7 @@ public class ChunkMesh {
 
         private int meshIndex;
 
-        private RenderType(int index) {
+        RenderType(int index) {
             meshIndex = index;
         }
 
@@ -77,19 +80,21 @@ public class ChunkMesh {
         Z_PRE_PASS
     }
 
-    /* CONST */
-    public static final int SIZE_VERTEX = 3;
-    public static final int SIZE_TEX0 = 3;
-    public static final int SIZE_TEX1 = 3;
-    public static final int SIZE_COLOR = 1;
-    public static final int SIZE_NORMAL = 3;
+    // some constants
+    private static final int SIZE_VERTEX = 3;   // vertices have 3 positional components, x,y,z
+    private static final int SIZE_TEX0 = 3;     // the first texture has 3 color components, r,g,b
+    private static final int SIZE_TEX1 = 3;     // the second texture is the same
+    private static final int SIZE_COLOR = 1;    // the color field has 4 components, r,g,b,a
+    private static final int SIZE_NORMAL = 3;   // normals are 3-dimensional vectors with u,v,t components
 
+    // offset to the beginning of each data field, from the start of the data regarding an individual vertex
     private static final int OFFSET_VERTEX = 0;
     private static final int OFFSET_TEX_0 = OFFSET_VERTEX + SIZE_VERTEX * 4;
     private static final int OFFSET_TEX_1 = OFFSET_TEX_0 + SIZE_TEX0 * 4;
     private static final int OFFSET_COLOR = OFFSET_TEX_1 + SIZE_TEX1 * 4;
     private static final int OFFSET_NORMAL = OFFSET_COLOR + SIZE_COLOR * 4;
     private static final int STRIDE = OFFSET_NORMAL + SIZE_NORMAL * 4;
+    // the STRIDE, above, is the gap between the beginnings of the data regarding two consecutive vertices
 
     /* VERTEX DATA */
     private final int[] vertexBuffers = new int[4];
@@ -221,7 +226,49 @@ public class ChunkMesh {
         }
     }
 
-    public void render(RenderPhase type) {
+    /**
+     * Updates a given material with information such as the World position of a chunk and whether it is animated.
+     *
+     * @param chunkMaterial a Material instance to be updated
+     * @param chunkPosition a Vector3f instance holding the world coordinates of a chunk
+     * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
+     */
+    public void updateMaterial(Material chunkMaterial, Vector3f chunkPosition, boolean chunkIsAnimated) {
+        chunkMaterial.setFloat3("chunkPositionWorld",
+                chunkPosition.x * ChunkConstants.SIZE_X,
+                chunkPosition.y * ChunkConstants.SIZE_Y,
+                chunkPosition.z * ChunkConstants.SIZE_Z,
+                true);
+        chunkMaterial.setFloat("animated", chunkIsAnimated ? 1.0f : 0.0f, true);
+    }
+
+    /**
+     * Renders the phase-appropriate mesh of the chunk. I.e. if the RenderPhase is OPAQUE only the opaque mesh
+     * is rendered: other meshes stored in an instance of this class are rendered in separate rendering steps.
+     *
+     * @param phase a RenderPhase value
+     * @param chunkPosition a Vector3f storing the world position of the chunk.
+     * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
+     * @return Returns an integer representing the number of triangles rendered.
+     */
+    public int render(ChunkMesh.RenderPhase phase, Vector3f chunkPosition, Vector3f cameraPosition) {
+        GL11.glPushMatrix();
+
+        // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
+        final Vector3f chunkPositionRelativeToCamera =
+                new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
+                        chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
+                        chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
+        GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
+
+        render(phase);  // this is where the chunk is actually rendered
+
+        GL11.glPopMatrix();
+
+        return triangleCount();
+    }
+
+    private void render(RenderPhase type) {
         switch (type) {
             case OPAQUE:
                 renderVbo(0);
@@ -240,6 +287,12 @@ public class ChunkMesh {
         }
     }
 
+    /**
+     * Disposes of all the data stored in an instance of this class and
+     * the associated data stored in the GLBufferPool instance provided on construction.
+     *
+     * ChunkMesh instances cannot be un-disposed.
+     */
     public void dispose() {
         lock.lock();
         try {
@@ -280,15 +333,20 @@ public class ChunkMesh {
         }
     }
 
-    public int triangleCount() {
+    private int triangleCount() {
         return triangleCount;
     }
 
+    /**
+     * Returns true if an instance of this class stores no triangles.
+     *
+     * @return True if no triangles are stored in the instance, false otherwise.
+     */
     public boolean isEmpty() {
         return triangleCount == 0;
     }
 
-    public void setTimeToGenerateBlockVertices(int timeToGenerateBlockVertices) {
+    void setTimeToGenerateBlockVertices(int timeToGenerateBlockVertices) {
         this.timeToGenerateBlockVertices = timeToGenerateBlockVertices;
     }
 
@@ -296,7 +354,7 @@ public class ChunkMesh {
         return timeToGenerateBlockVertices;
     }
 
-    public void setTimeToGenerateOptimizedBuffers(int timeToGenerateOptimizedBuffers) {
+    void setTimeToGenerateOptimizedBuffers(int timeToGenerateOptimizedBuffers) {
         this.timeToGenerateOptimizedBuffers = timeToGenerateOptimizedBuffers;
     }
 
@@ -320,7 +378,7 @@ public class ChunkMesh {
         public IntBuffer finalVertices;
         public IntBuffer finalIndices;
 
-        public VertexElements() {
+        VertexElements() {
             vertexCount = 0;
             normals = new TFloatArrayList();
             vertices = new TFloatArrayList();

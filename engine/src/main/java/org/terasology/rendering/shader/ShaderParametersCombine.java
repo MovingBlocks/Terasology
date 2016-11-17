@@ -23,7 +23,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
-import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.nui.properties.Range;
@@ -76,7 +76,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO sceneReflectiveRefractive = displayResolutionDependentFBOs.get(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE);
+        FBO sceneReflectiveRefractive = displayResolutionDependentFBOs.get(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE);
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

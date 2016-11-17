@@ -44,6 +44,7 @@ public class UIList<T> extends CoreWidget {
     private final List<ItemInteractionListener> itemListeners = Lists.newArrayList();
     private final List<ItemActivateEventListener<T>> activateListeners = Lists.newArrayList();
     private final List<ItemSelectEventListener<T>> selectionListeners = Lists.newArrayList();
+    private Binding<Boolean> interactive = new DefaultBinding<>(true);
     private Binding<Boolean> selectable = new DefaultBinding<>(true);
     private Binding<T> selection = new DefaultBinding<>();
     private Binding<List<T>> list = new DefaultBinding<>(new ArrayList<>());
@@ -80,7 +81,9 @@ public class UIList<T> extends CoreWidget {
                 } else {
                     canvas.setMode(DEFAULT_MODE);
                 }
-                canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item), itemRegion);
+                if (isInteractive()) {
+                    canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item), itemRegion);
+                }
             } else {
                 canvas.setMode(DISABLED_MODE);
             }
@@ -134,8 +137,16 @@ public class UIList<T> extends CoreWidget {
         selectable = binding;
     }
 
+    public boolean isInteractive() {
+        return interactive.get();
+    }
+
     public boolean isSelectable() {
         return selectable.get();
+    }
+
+    public void setInteractive(boolean value) {
+        interactive.set(value);
     }
 
     public void setSelectable(boolean value) {

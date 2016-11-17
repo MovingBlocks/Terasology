@@ -17,7 +17,6 @@ package org.terasology.rendering.world;
 
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -30,7 +29,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
@@ -50,9 +48,9 @@ import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
-import org.terasology.rendering.dag.nodes.ChunksAlphaRejectNode;
-import org.terasology.rendering.dag.nodes.ChunksOpaqueNode;
-import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
+import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
 import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
@@ -61,7 +59,7 @@ import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.dag.nodes.LightGeometryNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
-import org.terasology.rendering.dag.nodes.ObjectsOpaqueNode;
+import org.terasology.rendering.dag.nodes.OpaqueObjectsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
 import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
@@ -78,17 +76,13 @@ import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
-import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.List;
-import java.util.PriorityQueue;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -127,7 +121,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
-    private Material chunkShader;
     // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
@@ -225,7 +218,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initMaterials() {
-        chunkShader = getMaterial("engine:prog.chunk");
         //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
@@ -257,9 +249,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
 
-        // TODO: write snippets and shaders to inspect content of a color/depth buffer
+        // TODO: write snippets and shaders to inspect content of a color/depth buffer - debug mode
 
-        // sky generation
+        // sky rendering
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -285,20 +277,34 @@ public final class WorldRendererImpl implements WorldRenderer {
         hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
         renderGraph.addNode(hazeFinalNode, aLabel);
 
+        // world rendering
+        Node opaqueObjectsNode = nodeFactory.createInstance(OpaqueObjectsNode.class);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
+
+        Node opaqueBlocksNode = nodeFactory.createInstance(OpaqueBlocksNode.class);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
+
+        Node alphaRejectBlocksNode = nodeFactory.createInstance(AlphaRejectBlocksNode.class);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
+
+        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+
+        // TODO: clarify if this is actually needed - held-in-hand items seem to be rendered in OpaqueObjectsNode, above
+        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
+        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
+
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
         Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
         renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
 
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node objectOpaqueNode = nodeFactory.createInstance(ObjectsOpaqueNode.class);
-        Node chunksOpaqueNode = nodeFactory.createInstance(ChunksOpaqueNode.class);
-        Node chunksAlphaRejectNode = nodeFactory.createInstance(ChunksAlphaRejectNode.class);
-        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
-        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
         Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
-        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(ChunksRefractiveReflectiveNode.class);
+        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
@@ -313,11 +319,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
 
-        renderGraph.addNode(objectOpaqueNode, "objectOpaqueNode");
-        renderGraph.addNode(chunksOpaqueNode, "chunksOpaqueNode");
-        renderGraph.addNode(chunksAlphaRejectNode, "chunksAlphaRejectNode");
-        renderGraph.addNode(overlaysNode, "overlaysNode");
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
         renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
         renderGraph.addNode(directionalLightsNode, "directionalLightsNode");
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
@@ -378,6 +380,16 @@ public final class WorldRendererImpl implements WorldRenderer {
         statChunkMeshEmpty = 0;
         statChunkNotReady = 0;
         statRenderedTriangles = 0;
+    }
+
+    @Override
+    public void increaseTrianglesCount(int increase) {
+        statRenderedTriangles += increase;
+    }
+
+    @Override
+    public void increaseNotReadyChunkCount(int increase) {
+        statChunkNotReady += increase;
     }
 
     private void preRenderUpdate(RenderingStage renderingStage) {
@@ -522,79 +534,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
         return isFirstRenderingStageForCurrentFrame;
-    }
-
-    // TODO: review - break this method and move it into the individual nodes using it?
-    @Override
-    public void renderChunks(PriorityQueue<RenderableChunk> chunks, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
-        final Vector3f cameraPosition = camera.getPosition();
-        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-            }
-
-            if (mode == ChunkRenderMode.REFLECTION) {
-                chunkShader.setFloat("clip", camera.getClipHeight(), true);
-            } else {
-                chunkShader.setFloat("clip", 0.0f, true);
-            }
-
-            chunkShader.enable();
-
-        } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
-            shaderManager.disableShader();
-        }
-
-        // render all the chunks in the queue
-        while (chunks.size() > 0) {
-            RenderableChunk chunk = chunks.poll();
-            if (chunk.hasMesh()) {
-                final Vector3f chunkPosition = chunk.getPosition().toVector3f();
-                final Vector3f chunkPositionRelativeToCamera =
-                        new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
-                                chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
-                                chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
-
-                if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                    chunkShader.setFloat3("chunkPositionWorld",
-                            chunkPosition.x * ChunkConstants.SIZE_X,
-                            chunkPosition.y * ChunkConstants.SIZE_Y,
-                            chunkPosition.z * ChunkConstants.SIZE_Z,
-                            true);
-                    chunkShader.setFloat("animated", chunk.isAnimated() ? 1.0f : 0.0f, true);
-                }
-
-                // Effectively this just positions the chunk appropriately, relative to the camera.
-                // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-                GL11.glPushMatrix();
-                GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);
-
-                // TODO: review - if this is enabled it probably happens multiple times per frame, overdrawing objects.
-                if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {
-                    AABBRenderer aabbRenderer = new AABBRenderer(chunk.getAABB());
-                    aabbRenderer.renderLocally(1f);
-                    statRenderedTriangles += 12;
-                }
-
-                chunk.getMesh().render(phase);
-                statRenderedTriangles += chunk.getMesh().triangleCount();
-
-                GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
-
-            } else {
-                statChunkNotReady++;
-            }
-        }
-
-        if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-            if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-            } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-            }
-        }
     }
 
     /**

@@ -22,7 +22,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
-import org.terasology.rendering.dag.nodes.ChunksRefractiveReflectiveNode;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
@@ -83,7 +83,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(ChunksRefractiveReflectiveNode.REFRACTIVE_REFLECTIVE);
+                displayResolutionDependentFBOs.bindFboColorTexture(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:

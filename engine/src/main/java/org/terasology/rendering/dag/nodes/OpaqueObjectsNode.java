@@ -32,12 +32,13 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
- * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
+ * This node renders the opaque (as opposed to semi-transparent)
+ * objects present in the world. This node -does not- render the landscape.
  *
- * Objects to be rendered as overlays must be registered as implementing the interface RenderSystem and
- * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
+ * Objects to be rendered must be registered as implementing the interface RenderSystem and
+ * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
-public class OverlaysNode extends AbstractNode implements WireframeCapable {
+public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
 
     @In
     private ComponentSystemManager componentSystemManager;
@@ -53,7 +54,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     private RenderingDebugConfig renderingDebugConfig;
 
     /**
-     * Initialises the node. -Must- be called once after instantiation.
+     * Initialises this node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
@@ -81,18 +82,18 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     }
 
     /**
-     * Iterates over any registered RenderSystem instance and calls its renderOverlay() method.
+     * Iterates over any registered RenderSystem instance and calls its renderOpaque() method.
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/overlays");
-
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
+        PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
         READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
 
+        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
+
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
-            renderer.renderOverlay();
+            renderer.renderOpaque();
         }
 
         PerformanceMonitor.endActivity();

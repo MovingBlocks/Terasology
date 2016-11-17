@@ -25,9 +25,10 @@ extensions
 /libs/*
 !/libs/subprojects.gradle
 
-# Ignore Gradle, including local override properties (template file available under /templates)
+# Ignore Gradle and some transient project config files (template versions available under /templates)
 build/
-gradle.properties
+/gradle.properties
+/override.cfg
 
 # Ignore IntelliJ - could use "/**/*.iml" to catch all .iml files, but that requires a somewhat recent Git version
 /out/
@@ -77,6 +78,7 @@ Thumbs.db
 /logs/
 /terasology-server/
 /terasology-2ndclient/
+/terasology-3rdclient/
 config.cfg
 entityDump.txt
 

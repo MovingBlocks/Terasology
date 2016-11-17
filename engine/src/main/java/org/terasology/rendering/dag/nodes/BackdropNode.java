@@ -17,27 +17,32 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.WireframeCapableNode;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.WireframeCapable;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
+import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-
 
 /**
  * TODO: Diagram of this node
  */
-public class BackdropNode extends WireframeCapableNode {
+public class BackdropNode extends AbstractNode implements WireframeCapable {
 
     public static final int SLICES = 16;
     public static final int STACKS = 128;
@@ -47,6 +52,9 @@ public class BackdropNode extends WireframeCapableNode {
     private BackdropRenderer backdropRenderer;
 
     @In
+    private Config config;
+
+    @In
     private WorldRenderer worldRenderer;
 
     @In
@@ -54,12 +62,19 @@ public class BackdropNode extends WireframeCapableNode {
 
     private Camera playerCamera;
     private int skySphere = -1;
+    private SetWireframe wireframeStateChange;
+    private RenderingDebugConfig renderingDebugConfig;
 
     @Override
     public void initialise() {
-        super.initialise();
         playerCamera = worldRenderer.getActiveCamera();
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
+
+        wireframeStateChange = new SetWireframe(true);
+        renderingDebugConfig = config.getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
+
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
 
         // We do not call requireFBO as we can count this default buffer is there.
         //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
@@ -75,10 +90,24 @@ public class BackdropNode extends WireframeCapableNode {
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
     }
 
+    public void enableWireframe() {
+        if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
+    }
+
+    public void disableWireframe() {
+        if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList();
+        }
+    }
+
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        READ_ONLY_GBUFFER.bind(); // remove this when default FBOs become standard FBOs.
+        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
 
         playerCamera.lookThroughNormalized();
         READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);

@@ -58,7 +58,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
-* [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key 'J'
+* [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key `J`
 * [Lakes](https://github.com/Terasology/Lakes) - add lakes to any enabled world generator, both surface lakes and subterranean ones (water and lava both!)
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
@@ -69,7 +69,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ManualLaborEventualSkills](https://github.com/Terasology/ManualLaborEventualSkills) - bridge module for adding EventualSkills to ManualLabor
 * [MarcinScIncubator](https://github.com/Terasology/MarcinScIncubator) - parking lot for tools used in @MarcinSc's many modules without a more explicit home yet
 * [MarkovChains](https://github.com/Terasology/MarkovChains) - Library module with some pseudo random math stuff
-* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
+* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key `O`
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
@@ -91,7 +91,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
 * [Potions](https://github.com/Terasology/Potions) - contains a set of assorted potions the player can consume to gain various effects
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
-* [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts
+* [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press `E` to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Seasons](https://github.com/Terasology/Seasons) - adds seasons to the game
 * [ShatteredPlanes](https://github.com/Terasology/ShatteredPlanes) - a world generator focused on canyons, sky islands, and other somewhat radical terrain features

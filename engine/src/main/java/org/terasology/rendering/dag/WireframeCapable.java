@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
-
-
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
+package org.terasology.rendering.dag;
 
 /**
- * Consuming this event means that the subsequent actions should cancel
+ * Classes implementing this interface are capable of producing
+ * a wireframe rendering that can be triggered on or off.
  */
-public class OnItemUseEvent extends AbstractConsumableEvent {
+public interface WireframeCapable {
 
+    /**
+     * Enables the wireframe rendering mode.
+     */
+    void enableWireframe();
+
+    /**
+     * Disables the wireframe rendering mode.
+     */
+    void disableWireframe();
 }

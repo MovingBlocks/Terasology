@@ -36,6 +36,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
@@ -48,6 +49,8 @@ import org.terasology.physics.events.PhysicsResynchEvent;
 import org.terasology.physics.events.ImpactEvent;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 
 import java.util.Iterator;
@@ -65,6 +68,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 500;
+    private static final CollisionGroup[] DEFAULT_COLLISION_GROUP = {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
     @In
     private Time time;
     @In
@@ -73,6 +77,8 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     private EntityManager entityManager;
     @In
     private PhysicsEngine physics;
+    @In
+    private WorldProvider worldProvider;
 
     private long lastNetsync;
 
@@ -142,7 +148,32 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     public void onItemImpact(ImpactEvent event, EntityRef entity) {
         RigidBody rigidBody = physics.getRigidBody(entity);
         if (rigidBody != null) {
-            rigidBody.setLinearVelocity(new Vector3f(0.0f, 4.0f, 0.0f));
+            Vector3f vImpactNormal = event.getImpactNormal();
+            Vector3f vImpactPoint = event.getImpactPoint();
+            Vector3f vImpactSpeed = event.getImpactSpeed();
+
+            float speedFactor = vImpactSpeed.length();
+            vImpactNormal.normalize();
+            vImpactSpeed.normalize();
+
+            Vector3f vSpeed = vImpactSpeed;
+            float dotImpactNormal = vSpeed.dot(vImpactNormal);
+
+            Vector3f impactResult = vImpactNormal.mul(dotImpactNormal);
+            impactResult = vImpactSpeed.sub(impactResult.mul(2.0f));
+            impactResult.normalize();
+
+            Vector3f vNewLocationVector = impactResult;
+            vNewLocationVector.mul(event.getTravelDistance());
+
+            Vector3f vNewPosition = vImpactPoint;
+            vNewPosition.add(vNewLocationVector);
+
+            Vector3f vNewVelocity = impactResult;
+            vNewVelocity.mul(speedFactor * 10);
+
+            rigidBody.setLocation(vNewPosition);
+            rigidBody.setLinearVelocity(vNewVelocity);
         }
     }
 
@@ -166,13 +197,41 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
                 Vector3f vLocation = Vector3f.zero();
                 body.getLocation(vLocation);
+
                 Vector3f vDirection = comp.velocity;
-                float fDistance = vDirection.length();
+                float fDistanceThisFrame = vDirection.length();
                 vDirection.normalize();
 
-                HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistance * delta, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER );
-                if (hitInfo.isHit()) {
-                    entity.send(new ImpactEvent());
+                fDistanceThisFrame = fDistanceThisFrame * delta;
+
+                while(true) {
+                    HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
+                    if (hitInfo.isHit()) {
+                        Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
+                        if (hitBlock != null) {
+                            Vector3f vTravelledDistance = vLocation.sub(hitInfo.getHitPoint());
+                            if (vTravelledDistance.lengthSquared() > fDistanceThisFrame * fDistanceThisFrame)
+                            {
+                                break;
+                            }
+                            if (hitBlock.isPenetrable()) {
+                                fDistanceThisFrame = fDistanceThisFrame - vTravelledDistance.length(); // decrease the remaining distance to check if we hit a block
+                                vLocation = hitInfo.getHitPoint();
+                                continue;
+                            }
+                            else {
+                                entity.send(new ImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame));
+                                break;
+                            }
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }

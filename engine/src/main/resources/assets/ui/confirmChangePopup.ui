@@ -1,0 +1,69 @@
+{
+    "type": "confirmChangePopup",
+    "skin": "messageBox",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#change-keybind-popup-title}",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#change-keybind-popup-message}",
+                            "id": "message"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 4,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-ok}",
+                                    "id": "ok"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-cancel}",
+                                    "id": "cancel"
+                                }
+                            ],
+                            "layoutInfo": {
+                                "width": 200,
+                                "position-right": {}
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

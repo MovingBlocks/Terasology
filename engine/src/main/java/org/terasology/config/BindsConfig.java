@@ -55,12 +55,13 @@ import org.terasology.naming.Name;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.Map;
+import java.util.Collections;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
@@ -72,6 +73,16 @@ public final class BindsConfig {
     private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
 
     public BindsConfig() {
+    }
+
+    /**
+     * Returns true if an input has already been bound to another key
+     *
+     * @param newInput The input to check if it has been bound already
+     * @return True if newInput has been bound. False otherwise.
+     */
+    public boolean isBound(Input newInput) {
+        return data.containsValue(newInput);
     }
 
     /**
@@ -105,6 +116,7 @@ public final class BindsConfig {
      * @param bindUri
      * @param inputs
      */
+
     public void setBinds(SimpleUri bindUri, Input... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }

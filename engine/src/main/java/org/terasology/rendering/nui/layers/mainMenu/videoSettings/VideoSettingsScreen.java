@@ -237,6 +237,13 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
 
+        UIDropdown<DisplayModeSetting> displaySetting = find("displayModeSetting", UIDropdown.class);
+        if (displaySetting != null) {
+            displaySetting.setOptionRenderer(new ToStringTextRenderer<>(translationSystem));
+            displaySetting.setOptions(Arrays.asList(DisplayModeSetting.values()));
+            displaySetting.bindSelection(BindHelper.bindBeanProperty("displayModeSetting", displayDevice, DisplayModeSetting.class));
+        }
+
         WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateGrass", BindHelper.bindBeanProperty("animateGrass", config.getRendering(), Boolean.TYPE));
@@ -252,7 +259,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "eyeAdaptation", BindHelper.bindBeanProperty("eyeAdaptation", config.getRendering(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", displayDevice, Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "ssao", BindHelper.bindBeanProperty("ssao", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "clampLighting", BindHelper.bindBeanProperty("clampLighting", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "bloom", BindHelper.bindBeanProperty("bloom", config.getRendering(), Boolean.TYPE));

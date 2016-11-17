@@ -62,8 +62,21 @@
                     },
                     "position-bottom": {
                         "target": "TOP",
+                        "widget": "saveGamePath",
+                        "offset": 8
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "saveGamePath",
+                "layoutInfo": {
+                    "height": 16,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "TOP",
                         "widget": "actionButtons",
-                        "offset": 16
+                        "offset": 8
                     }
                 }
             },
