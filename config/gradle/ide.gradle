@@ -242,6 +242,38 @@ ext {
             </configuration>
         '''))
 
+        // Run config for a *third* client in its own data dir (for more extensive multiplayer testing)
+        runManager.append(new XmlParser().parseText('''
+            <configuration default="false" name="TerasologyPC (3rd client)" type="Application" factoryName="Application">
+              <extension name="coverage" enabled="false" merge="false" runner="idea">
+                <pattern>
+                  <option name="PATTERN" value="org.terasology.engine.*"/>
+                  <option name="ENABLED" value="true"/>
+                </pattern>
+              </extension>
+              <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
+              <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
+              <option name="PROGRAM_PARAMETERS" value="-homedir=terasology-3rdclient -noCrashReport"/>
+              <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
+              <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+              <option name="ALTERNATIVE_JRE_PATH" value=""/>
+              <option name="ENABLE_SWING_INSPECTOR" value="false"/>
+              <option name="ENV_VARIABLES"/>
+              <option name="PASS_PARENT_ENVS" value="true"/>
+              <module name="PC"/>
+              <envs/>
+              <RunnerSettings RunnerId="Debug">
+                <option name="DEBUG_PORT" value=""/>
+                <option name="TRANSPORT" value="0"/>
+                <option name="LOCAL" value="true"/>
+              </RunnerSettings>
+              <RunnerSettings RunnerId="Run"/>
+              <ConfigurationWrapper RunnerId="Debug"/>
+              <ConfigurationWrapper RunnerId="Run"/>
+              <method/>
+            </configuration>
+        '''))
+
         // Run config that includes the Crash Reporter
         runManager.append(new XmlParser().parseText('''
             <configuration default="false" name="TerasologyPC (CR enabled)" type="Application" factoryName="Application">
@@ -413,7 +445,7 @@ ext {
               </extension>
               <option name="MAIN_CLASS_NAME" value="org.terasology.engine.Terasology"/>
               <option name="VM_PARAMETERS" value="-Xms256m -Xmx1536m"/>
-              <option name="PROGRAM_PARAMETERS" value="-headless -homedir=terasology-server"/>
+              <option name="PROGRAM_PARAMETERS" value="-headless -homedir=terasology-server -overrideDefaultConfig=override.cfg"/>
               <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$"/>
               <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
               <option name="ALTERNATIVE_JRE_PATH" value=""/>
