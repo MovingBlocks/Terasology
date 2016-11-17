@@ -47,6 +47,8 @@ import org.terasology.physics.events.ForceEvent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.physics.events.PhysicsResynchEvent;
 import org.terasology.physics.events.ImpactEvent;
+import org.terasology.physics.events.EntityImpactEvent;
+import org.terasology.physics.events.BlockImpactEvent;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
@@ -69,6 +71,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 500;
     private static final CollisionGroup[] DEFAULT_COLLISION_GROUP = {StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.DEFAULT};
+    private static final float COLLISION_DAMPENING_MULTIPLIER = 0.5f;
     @In
     private Time time;
     @In
@@ -148,32 +151,27 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     public void onItemImpact(ImpactEvent event, EntityRef entity) {
         RigidBody rigidBody = physics.getRigidBody(entity);
         if (rigidBody != null) {
-            Vector3f vImpactNormal = event.getImpactNormal();
-            Vector3f vImpactPoint = event.getImpactPoint();
-            Vector3f vImpactSpeed = event.getImpactSpeed();
+            Vector3f vImpactNormal = new Vector3f(event.getImpactNormal());
+            Vector3f vImpactPoint = new Vector3f(event.getImpactPoint());
+            Vector3f vImpactSpeed = new Vector3f(event.getImpactSpeed());
 
             float speedFactor = vImpactSpeed.length();
             vImpactNormal.normalize();
             vImpactSpeed.normalize();
 
-            Vector3f vSpeed = vImpactSpeed;
-            float dotImpactNormal = vSpeed.dot(vImpactNormal);
+            float dotImpactNormal = vImpactSpeed.dot(vImpactNormal);
 
             Vector3f impactResult = vImpactNormal.mul(dotImpactNormal);
             impactResult = vImpactSpeed.sub(impactResult.mul(2.0f));
             impactResult.normalize();
 
-            Vector3f vNewLocationVector = impactResult;
-            vNewLocationVector.mul(event.getTravelDistance());
-
-            Vector3f vNewPosition = vImpactPoint;
-            vNewPosition.add(vNewLocationVector);
-
-            Vector3f vNewVelocity = impactResult;
-            vNewVelocity.mul(speedFactor * 10);
+            Vector3f vNewLocationVector = (new Vector3f(impactResult)).mul(event.getTravelDistance());
+            Vector3f vNewPosition = (new Vector3f(vImpactPoint)).add(vNewLocationVector);
+            Vector3f vNewVelocity = (new Vector3f(impactResult)).mul(speedFactor * COLLISION_DAMPENING_MULTIPLIER);
 
             rigidBody.setLocation(vNewPosition);
             rigidBody.setLinearVelocity(vNewVelocity);
+            rigidBody.setAngularVelocity(vNewVelocity);
         }
     }
 
@@ -198,7 +196,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 Vector3f vLocation = Vector3f.zero();
                 body.getLocation(vLocation);
 
-                Vector3f vDirection = comp.velocity;
+                Vector3f vDirection = new Vector3f(comp.velocity);
                 float fDistanceThisFrame = vDirection.length();
                 vDirection.normalize();
 
@@ -210,17 +208,22 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                         Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
                         if (hitBlock != null) {
                             Vector3f vTravelledDistance = vLocation.sub(hitInfo.getHitPoint());
-                            if (vTravelledDistance.lengthSquared() > fDistanceThisFrame * fDistanceThisFrame)
+                            float fTravelledDistance  = vTravelledDistance.length();
+                            if (fTravelledDistance > fDistanceThisFrame)
                             {
                                 break;
                             }
                             if (hitBlock.isPenetrable()) {
-                                fDistanceThisFrame = fDistanceThisFrame - vTravelledDistance.length(); // decrease the remaining distance to check if we hit a block
+                                if (!hitInfo.getEntity().hasComponent(BlockComponent.class))
+                                {
+                                    entity.send( new EntityImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
+                                    break;
+                                }
+                                fDistanceThisFrame = fDistanceThisFrame - fTravelledDistance; // decrease the remaining distance to check if we hit a block
                                 vLocation = hitInfo.getHitPoint();
-                                continue;
                             }
                             else {
-                                entity.send(new ImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame));
+                                entity.send( new BlockImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
                                 break;
                             }
                         }
