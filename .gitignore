@@ -78,6 +78,7 @@ Thumbs.db
 /logs/
 /terasology-server/
 /terasology-2ndclient/
+/terasology-3rdclient/
 config.cfg
 entityDump.txt
 
