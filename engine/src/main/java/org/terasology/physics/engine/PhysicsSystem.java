@@ -41,12 +41,7 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.events.ChangeVelocityEvent;
-import org.terasology.physics.events.CollideEvent;
-import org.terasology.physics.events.ForceEvent;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.physics.events.PhysicsResynchEvent;
-import org.terasology.physics.events.ImpactEvent;
+import org.terasology.physics.events.*;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
@@ -212,11 +207,16 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                                 break;
                             }
                             if (hitBlock.isPenetrable()) {
+                                if (!hitInfo.getEntity().hasComponent(BlockComponent.class))
+                                {
+                                    entity.send( new EntityImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
+                                    break;
+                                }
                                 fDistanceThisFrame = fDistanceThisFrame - fTravelledDistance; // decrease the remaining distance to check if we hit a block
                                 vLocation = hitInfo.getHitPoint();
                             }
                             else {
-                                entity.send( new ImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
+                                entity.send( new BlockImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
                                 break;
                             }
                         }

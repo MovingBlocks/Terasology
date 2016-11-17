@@ -23,6 +23,9 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.math.Side;
 
 /**
+ * Impact event is called whenever an item has enough speed to detect
+ * penetration of a block or entity in the next frame. It computes the
+ * reflection angle, speed and the next position the item should be in.
  */
 @BroadcastEvent
 public class ImpactEvent extends AbstractConsumableEvent {
