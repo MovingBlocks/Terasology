@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         physics.awakenArea(event.getBlockPosition().toVector3f(), 0.6f);
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onItemImpact(ImpactEvent event, EntityRef entity) {
         RigidBody rigidBody = physics.getRigidBody(entity);
         if (rigidBody != null) {
@@ -202,37 +202,31 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
                 fDistanceThisFrame = fDistanceThisFrame * delta;
 
-                while(true) {
+                while (true) {
                     HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
                     if (hitInfo.isHit()) {
                         Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
                         if (hitBlock != null) {
                             Vector3f vTravelledDistance = vLocation.sub(hitInfo.getHitPoint());
                             float fTravelledDistance  = vTravelledDistance.length();
-                            if (fTravelledDistance > fDistanceThisFrame)
-                            {
+                            if (fTravelledDistance > fDistanceThisFrame) {
                                 break;
                             }
                             if (hitBlock.isPenetrable()) {
-                                if (!hitInfo.getEntity().hasComponent(BlockComponent.class))
-                                {
-                                    entity.send( new EntityImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
+                                if (!hitInfo.getEntity().hasComponent(BlockComponent.class)) {
+                                    entity.send(new EntityImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity()));
                                     break;
                                 }
                                 fDistanceThisFrame = fDistanceThisFrame - fTravelledDistance; // decrease the remaining distance to check if we hit a block
                                 vLocation = hitInfo.getHitPoint();
-                            }
-                            else {
-                                entity.send( new BlockImpactEvent( hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity() ) );
+                            } else {
+                                entity.send(new BlockImpactEvent(hitInfo.getHitPoint(), hitInfo.getHitNormal(), comp.velocity, fDistanceThisFrame, hitInfo.getEntity()));
                                 break;
                             }
-                        }
-                        else {
+                        } else {
                             break;
                         }
-                    }
-                    else
-                    {
+                    } else  {
                         break;
                     }
                 }

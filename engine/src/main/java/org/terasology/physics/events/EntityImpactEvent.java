@@ -18,9 +18,8 @@ package org.terasology.physics.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 
-/**
- *
- */
 public class EntityImpactEvent extends ImpactEvent {
-    public EntityImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance, EntityRef impactEntity) { super(impactPoint,impactNormal,impactSpeed,travelDistance,impactEntity); }
+    public EntityImpactEvent(Vector3f impactPoint, Vector3f impactNormal, Vector3f impactSpeed, float travelDistance, EntityRef impactEntity) {
+        super(impactPoint, impactNormal, impactSpeed, travelDistance, impactEntity);
+    }
 }

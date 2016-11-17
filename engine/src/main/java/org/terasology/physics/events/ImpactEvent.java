@@ -58,11 +58,13 @@ public class ImpactEvent extends AbstractConsumableEvent {
         return impactSpeed;
     }
 
-    public float getTravelDistance(){
+    public float getTravelDistance() {
         return travelDistance;
     }
 
-    public EntityRef getImpactEntity() {return impactEntity; }
+    public EntityRef getImpactEntity() {
+        return impactEntity;
+    }
 
     public Side getSide() {
         return Side.inDirection(impactNormal);
