@@ -22,7 +22,11 @@ import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
 import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
- * TODO: Add javadocs
+ * Instances of this class enable OpenGL's blending, i.e. to render transparent objects or to make
+ * a composite of different images.
+ *
+ * See also StateChange implementation SetBlendFunction to set the source and destination factors
+ * used by the blending process.
  */
 public final class EnableBlending extends SetStateParameter {
     private static final int PARAMETER = GL_BLEND;
@@ -31,6 +35,20 @@ public final class EnableBlending extends SetStateParameter {
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
+    /**
+     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
+     * the form:
+     *
+     * addDesiredStateChange(new EnableBlending());
+     *
+     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
+     * in the rendering task list, each instance enabling/disabling respectively the GL_BLEND mode. The
+     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
+     * i.e. because the upstream or downstream node also enables blending.
+     *
+     * See also StateChange implementation SetBlendFunction to set the source and destination factors
+     * used by the blending process.
+     */
     public EnableBlending() {
         this(true);
     }

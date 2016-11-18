@@ -26,6 +26,8 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * This StateChange generates the tasks that change and reset the blend function factors.
+ *
+ * The OpenGL defaults are: source factor GL_ONE, destination factor GL_ZERO.
  */
 public class SetBlendFunction implements StateChange {
 

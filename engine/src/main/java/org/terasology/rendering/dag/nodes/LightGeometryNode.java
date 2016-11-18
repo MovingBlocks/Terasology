@@ -43,8 +43,15 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+
+// TODO: rename class to PointLightsGeometryNode
+
 /**
- * TODO: Add desired state changes
+ * Instances of this class are integral to the deferred rendering process.
+ * They render point lights as spheres, into the light accumulation buffer
+ * (the spheres have a radius proportional to each light's attenuation radius).
+ * Data from the light accumulation buffer is eventually combined with the
+ * content of other buffers to correctly light up the scene.
  */
 public class LightGeometryNode extends AbstractNode {
 
@@ -63,6 +70,11 @@ public class LightGeometryNode extends AbstractNode {
     private Material lightGeometryMaterial;
     private Camera playerCamera;
 
+    /**
+     * Initializes an instance of this node.
+     *
+     * This method -must- be called once for this node to be fully operational.
+     */
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
@@ -104,9 +116,16 @@ public class LightGeometryNode extends AbstractNode {
         return lightIsRenderable;
     }
 
+    /**
+     * Iterates over all available point lights and renders them as spheres into the light accumulation buffer.
+     *
+     * Furthermore, lights that are further from the camera than their set rendering distance are ignored,
+     * while lights with a rendering distance set to 0.0 are always considered. However, only lights within
+     * the camera's field of view (frustrum) are rendered.
+     */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/lightGeometry");
+        PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
 
         playerCamera.lookThrough(); // TODO: remove and replace with a state change
 
@@ -128,6 +147,7 @@ public class LightGeometryNode extends AbstractNode {
 
                     lightGeometryMaterial.setCamera(playerCamera);
 
+                    // setting shader parameters regarding the light's properties
                     lightGeometryMaterial.setFloat3("lightColorDiffuse",
                             lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
                     lightGeometryMaterial.setFloat3("lightColorAmbient",
@@ -137,10 +157,12 @@ public class LightGeometryNode extends AbstractNode {
                     lightGeometryMaterial.setFloat4("lightExtendedProperties",
                             lightComponent.lightAttenuationRange, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
 
+                    // setting shader parameters for the light position in camera space
                     Vector3f lightPositionInViewSpace = new Vector3f(lightPositionRelativeToCamera);
                     playerCamera.getViewMatrix().transformPoint(lightPositionInViewSpace);
                     lightGeometryMaterial.setFloat3("lightViewPos", lightPositionInViewSpace.x, lightPositionInViewSpace.y, lightPositionInViewSpace.z, true);
 
+                    // set the size and location of the sphere to be rendered via shader parameters
                     Matrix4f modelMatrix = new Matrix4f();
                     modelMatrix.set(lightComponent.lightAttenuationRange); // scales the modelview matrix, effectively scales the light sphere
                     modelMatrix.setTranslation(lightPositionRelativeToCamera); // effectively moves the light sphere in the right position relative to camera

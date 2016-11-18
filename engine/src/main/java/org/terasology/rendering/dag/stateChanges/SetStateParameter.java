@@ -21,13 +21,21 @@ import org.terasology.rendering.dag.StateChange;
 import java.util.Objects;
 
 /**
- * TODO: Add javadocs
- * Indented for capabilities that are enabled/disabled via glEnable and glDisable.
+ * Base for classes wanting to affect the OpenGL state via glEnable/glDisable directives.
+ *
+ * See classes EnableBlending and EnableFaceCulling as working implementations.
  */
 abstract class SetStateParameter implements StateChange {
     private int glParameter;
     private boolean enabled;
 
+    /**
+     * Construct an instance of this class, provided an OpenGL constant and a boolean to enable or disable
+     * the indicated mode.
+     *
+     * @param glParameter An integer representing one of the many OpenGL constants, i.e. GL_DEPTH_TEST
+     * @param enabled A boolean indicating if the mode given by the parameter above must be enabled (true) or disabled (false).
+     */
     SetStateParameter(int glParameter, boolean enabled) {
         this.glParameter = glParameter;
         this.enabled = enabled;

@@ -22,7 +22,12 @@ import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
 import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
- * TODO: Add javadocs
+ * Instances of this class enable OpenGL's Face Culling, i.e. to render only the inside faces of the skysphere.
+ *
+ * Notice that Terasology's by default enables face culling. However, the rendering engine disables it again
+ * every frame to be consistent with OpenGL's defaults. This is debatable and might change in the future.
+ *
+ * Also see SetFacesToCull, which allows deviation from OpenGL's default of culling only the GL_BACK faces.
  */
 public final class EnableFaceCulling extends SetStateParameter {
     private static final int PARAMETER = GL_CULL_FACE;
@@ -31,6 +36,19 @@ public final class EnableFaceCulling extends SetStateParameter {
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
+    /**
+     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
+     * the form:
+     *
+     * addDesiredStateChange(new EnableFaceCulling());
+     *
+     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
+     * in the rendering task list, each instance enabling/disabling respectively the GL_CULL_FACE mode. The
+     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
+     * i.e. because the upstream or downstream node also enables face culling.
+     *
+     * See StateChange implementation SetFacesToCull to change from OpenGL's default of culling only the GL_BACK faces.
+     */
     public EnableFaceCulling() {
         this(true);
     }
