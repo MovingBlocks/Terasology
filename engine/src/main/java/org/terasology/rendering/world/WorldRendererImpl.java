@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -33,7 +35,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.OculusStereoCamera;
+import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
@@ -52,6 +54,7 @@ import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
 import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
+import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
 import org.terasology.rendering.dag.nodes.LightGeometryNode;
@@ -97,8 +100,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
  *
- * This implementation includes support for Oculus VR, a head mounted display. No other stereoscopic displays are
- * supported at this stage: see https://github.com/MovingBlocks/Terasology/issues/2111 for updates.
+ * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
  *
  * This implementation works closely with a number of support objects, in particular:
  *
@@ -144,6 +146,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
+    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -168,11 +171,16 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.renderingDebugConfig = renderingConfig.getDebug();
         this.shaderManager = context.get(ShaderManager.class);
-
-        if (renderingConfig.isOculusVrSupport()) {
-            playerCamera = new OculusStereoCamera();
-            currentRenderingStage = RenderingStage.LEFT_EYE;
-
+        if (renderingConfig.isVrSupport()) {
+            this.vrProvider = new OpenVRProvider();
+            context.put(OpenVRProvider.class, vrProvider);
+            if (this.vrProvider.init()) {
+                playerCamera = new OpenVRStereoCamera(this.vrProvider);
+                currentRenderingStage = RenderingStage.LEFT_EYE;
+            } else {
+                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                currentRenderingStage = RenderingStage.MONO;
+            }
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = RenderingStage.MONO;
@@ -308,6 +316,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
 
 
         renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
@@ -325,6 +335,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -421,7 +433,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * or to a file, when grabbing a screenshot.
      *
      * In this particular implementation this method can be called once per frame, when rendering to a standard display,
-     * or twice, each time with a different rendering stage, when rendering to the OculusVR head mounted display.
+     * or twice, each time with a different rendering stage, when rendering to the head mounted display.
      *
      * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,

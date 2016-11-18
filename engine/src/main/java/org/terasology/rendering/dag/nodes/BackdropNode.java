@@ -44,9 +44,9 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
 
-    public static final int RADIUS = 1024;
     public static final int SLICES = 16;
     public static final int STACKS = 128;
+    public static final int RADIUS = 1024;
 
     @In
     private BackdropRenderer backdropRenderer;
@@ -68,7 +68,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        initSkysphere();
+        initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = config.getRendering().getDebug();
@@ -120,14 +120,14 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         PerformanceMonitor.endActivity();
     }
 
-    private void initSkysphere() {
+    private void initSkysphere(float sphereRadius) {
         Sphere sphere = new Sphere();
         sphere.setTextureFlag(true);
 
         skySphere = glGenLists(1);
 
         glNewList(skySphere, GL11.GL_COMPILE);
-        sphere.draw(RADIUS, SLICES, STACKS);
+        sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
     }
 }
