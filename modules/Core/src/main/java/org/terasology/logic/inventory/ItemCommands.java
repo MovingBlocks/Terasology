@@ -49,37 +49,56 @@ public class ItemCommands extends BaseComponentSystem {
     @In
     private AssetManager assetManager;
 
-    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true,
+
+    @Command(shortDescription = "Adds an item or block to your inventory",
+            helpText = "Puts the desired number of the given item or block with the given shape into your inventory",
+            runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String giveItem(
+    public String give(
             @Sender EntityRef client,
             @CommandParam("prefabId or blockName") String itemPrefabName,
-            @CommandParam(value = "amount", required = false) Integer amount) {
-        Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
-        switch(matches.size()) {
-            case 0:
-                return "Could not find any item matching \"" + itemPrefabName + "\"";
-            case 1:
-                Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
-                if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
-                    EntityRef item = entityManager.create(prefab);
-                    EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-                    if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
-                        item.destroy();
-                    }
-                    return "You received an item of " + prefab.getName();
-                } else {
-                    return blockCommands.giveBlock(client, itemPrefabName, amount, null);
-                }
-            default:
-                StringBuilder builder = new StringBuilder();
-                builder.append("Requested item \"");
-                builder.append(itemPrefabName);
-                builder.append("\": matches ");
-                Joiner.on(" and ").appendTo(builder, matches);
-                builder.append(". Please fully specify one.");
-                return builder.toString();
+            @CommandParam(value = "amount", required = false) Integer amount,
+            @CommandParam(value = "blockShapeName", required = false) String shapeUriParam) {
+
+        int itemAmount = amount != null ? amount : 1;
+        if (itemAmount < 1) {
+            return "Requested zero (0) items / blocks!";
         }
+
+        Set<ResourceUrn> matches = assetManager.resolve(itemPrefabName, Prefab.class);
+
+        if (matches.size() == 1) {
+            Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
+            if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
+                EntityRef item = entityManager.create(prefab);
+                EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+                if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) { //TODO Give specified quantity of item (int itemAmount)
+                    item.destroy();
+                }
+
+                return "You received "
+                        + (itemAmount > 1 ? itemAmount + " items of " : "an item of ")
+                        + prefab.getName() //TODO Use item display name
+                        + (shapeUriParam != null ? " (Item can not have a shape)" : "");
+            }
+
+        } else if (matches.size() > 1) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Requested item \"");
+            builder.append(itemPrefabName);
+            builder.append("\": matches ");
+            Joiner.on(" and ").appendTo(builder, matches);
+            builder.append(". Please fully specify one.");
+            return builder.toString();
+        }
+
+        // If no no matches are found for items, try blocks
+        String message = blockCommands.giveBlock(client, itemPrefabName, amount, shapeUriParam);
+        if (message != null) {
+            return message;
+        }
+
+        return "Could not find an item or block matching \"" + itemPrefabName + "\"";
     }
 
 }
