@@ -53,7 +53,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Data from the light accumulation buffer is eventually combined with the
  * content of other buffers to correctly light up the scene.
  */
-public class LightGeometryNode extends AbstractNode {
+public class DeferredPointLightsNode extends AbstractNode {
 
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;

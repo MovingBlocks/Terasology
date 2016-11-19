@@ -57,7 +57,7 @@ import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
 import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
-import org.terasology.rendering.dag.nodes.LightGeometryNode;
+import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OpaqueObjectsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
@@ -290,19 +290,23 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
-        // TODO: clarify if this is actually needed - held-in-hand items seem to be rendered in OpaqueObjectsNode, above
+        // TODO: remove this, including associated method in the RenderSystem interface
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
 
+        Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
+        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
+
+        // TODO next!
+        Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
+        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
 
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
         Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
         renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
 
-        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
-        Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
         Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
@@ -318,9 +322,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
-
-
-        renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
+        
         renderGraph.addNode(directionalLightsNode, "directionalLightsNode");
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         renderGraph.addNode(outlineNode, "outlineNode");
