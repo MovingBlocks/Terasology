@@ -109,6 +109,14 @@ public final class ExternalApiWhitelist {
             .add(java.io.PipedOutputStream.class)
             .add(java.io.BufferedOutputStream.class)
             .add(java.io.DataOutputStream.class)
+            /* Some writers */
+            .add(java.io.Writer.class)
+            .add(java.io.BufferedWriter.class)
+            .add(java.io.OutputStreamWriter.class)
+            /* Some readers */
+            .add(java.io.Reader.class)
+            .add(java.io.BufferedReader.class)
+            .add(java.io.InputStreamReader.class)
             .build();
 
     private ExternalApiWhitelist() {
