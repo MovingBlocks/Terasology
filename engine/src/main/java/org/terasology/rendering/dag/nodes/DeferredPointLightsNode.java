@@ -98,7 +98,7 @@ public class DeferredPointLightsNode extends AbstractNode {
         Sphere sphere = new Sphere();
 
         glNewList(lightSphereDisplayList, GL11.GL_COMPILE);
-            sphere.draw(1, 8, 8);
+        sphere.draw(1, 8, 8);
         glEndList();
     }
 
