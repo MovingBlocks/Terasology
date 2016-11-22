@@ -20,6 +20,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
@@ -32,6 +33,8 @@ import org.terasology.rendering.logic.LightComponent;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -48,18 +51,18 @@ public class DeferredMainLightNode extends AbstractNode {
     private WorldRenderer worldRenderer;
 
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
-    private LightComponent mainDirectionalLight = new LightComponent();
+    private LightComponent mainLightComponent = new LightComponent();
 
     private Camera playerCamera;
 
-    private Material lightGeometryShader;
+    private Material lightGeometryMaterial;
 
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
-        lightGeometryShader = getMaterial(LIGHT_GEOMETRY_MATERIAL);
+        lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
 
         addDesiredStateChange(new DisableDepthTest());
 
@@ -71,27 +74,38 @@ public class DeferredMainLightNode extends AbstractNode {
 
     // TODO: one day the main light (sun/moon) should be just another light in the scene.
     private void initMainDirectionalLight() {
-        mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
-        mainDirectionalLight.lightAmbientIntensity = 0.75f;
-        mainDirectionalLight.lightDiffuseIntensity = 0.75f;
-        mainDirectionalLight.lightSpecularPower = 100f;
+        mainLightComponent.lightType = LightComponent.LightType.DIRECTIONAL;
+        mainLightComponent.lightAmbientIntensity = 0.75f;
+        mainLightComponent.lightDiffuseIntensity = 0.75f;
+        mainLightComponent.lightSpecularPower = 100f;
     }
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/mainlight");
+        PerformanceMonitor.startActivity("rendering/mainLightGeometry");
 
-        playerCamera.lookThrough(); // TODO: remove and replace with a state change
+        // Note: no need to set a camera here: the render takes place
+        // with a default opengl camera and the quad is in front of it - I think.
 
         READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
         READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
 
-        Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
-        sunlightWorldPosition.scale(50000f);
-        sunlightWorldPosition.add(playerCamera.getPosition());
-        // TODO: find a more elegant way
-        // TODO: iterating over RenderSystems for rendering multiple lights
-        worldRenderer.renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
+        lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
+
+        lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
+                mainLightComponent.lightColorDiffuse.y, mainLightComponent.lightColorDiffuse.z, true);
+        lightGeometryMaterial.setFloat3("lightColorAmbient", mainLightComponent.lightColorAmbient.x,
+                mainLightComponent.lightColorAmbient.y, mainLightComponent.lightColorAmbient.z, true);
+        lightGeometryMaterial.setFloat3("lightProperties", mainLightComponent.lightAmbientIntensity,
+                mainLightComponent.lightDiffuseIntensity, mainLightComponent.lightSpecularPower, true);
+
+        Vector3f mainLightInViewSpace = new Vector3f(backdropProvider.getSunDirection(true));
+        playerCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
+        lightGeometryMaterial.setFloat3("lightViewPos", mainLightInViewSpace.x, mainLightInViewSpace.y, mainLightInViewSpace.z, true);
+
+        renderFullscreenQuad(); // renders the light.
+
+        lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
