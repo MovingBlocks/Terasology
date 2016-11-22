@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL13;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -25,27 +24,22 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
+import org.terasology.rendering.dag.stateChanges.EnableBlending;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 /**
  * TODO: Break this node into several nodes
  * TODO: For doing that worldRenderer.renderLightComponent must be eliminated somehow
  */
 public class DeferredMainLightNode extends AbstractNode {
-    private static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
+    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
 
     @In
     private BackdropProvider backdropProvider;
@@ -53,27 +47,24 @@ public class DeferredMainLightNode extends AbstractNode {
     @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainDirectionalLight = new LightComponent();
 
     private Camera playerCamera;
 
     private Material lightGeometryShader;
-    private Material lightBufferPass;
-
-    private FBO sceneReflectiveRefractive;
 
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        lightGeometryShader = worldRenderer.getMaterial("engine:prog.lightGeometryPass");
-        lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
+        lightGeometryShader = getMaterial(LIGHT_GEOMETRY_MATERIAL);
 
         addDesiredStateChange(new DisableDepthTest());
+
+        addDesiredStateChange(new EnableBlending());
+        addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         initMainDirectionalLight();
     }
@@ -89,13 +80,11 @@ public class DeferredMainLightNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/mainlight");
-        READ_ONLY_GBUFFER.bind();
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
-        glDisable(GL_DEPTH_TEST);
+        playerCamera.lookThrough(); // TODO: remove and replace with a state change
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+        READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
+        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
 
         Vector3f sunlightWorldPosition = new Vector3f(backdropProvider.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
@@ -104,57 +93,8 @@ public class DeferredMainLightNode extends AbstractNode {
         // TODO: iterating over RenderSystems for rendering multiple lights
         worldRenderer.renderLightComponent(mainDirectionalLight, sunlightWorldPosition, lightGeometryShader, false);
 
-        // TODO: Investigate these might be redundant
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glEnable(GL_DEPTH_TEST);
-
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
-        bindDisplay();
 
-        //applyLightBufferPass();
         PerformanceMonitor.endActivity();
-    }
-
-    /**
-     * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering stored in the primary FBO.   // TODO: rename sceneOpaque* FBOs to primaryA/B
-     * <p>
-     * See http://en.wikipedia.org/wiki/Deferred_shading as a starting point.
-     */
-    private void applyLightBufferPass() {
-        int texId = 0;
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindTexture();
-        lightBufferPass.setInt("texSceneOpaque", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindDepthTexture();
-        lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindNormalsTexture();
-        lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindLightBufferTexture();
-        lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
-
-        WRITE_ONLY_GBUFFER.bind();
-        WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
-
-        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
-
-        renderFullscreenQuad();
-
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
-
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
-        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
     }
 }

@@ -25,9 +25,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
@@ -55,6 +53,13 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
     }
 
+
+    /**
+     * Part of the deferred lighting technique, this method applies lighting through screen-space
+     * calculations to the previously flat-lit world rendering stored in the primary FBO.   // TODO: rename sceneOpaque* FBOs to primaryA/B
+     * <p>
+     * See http://en.wikipedia.org/wiki/Deferred_shading as a starting point.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
