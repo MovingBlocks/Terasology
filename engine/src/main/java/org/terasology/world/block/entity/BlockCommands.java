@@ -17,7 +17,6 @@
 package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -267,10 +266,11 @@ public class BlockCommands extends BaseComponentSystem {
         return def.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
-
-    @Command(shortDescription = "Adds a block to your inventory",
-            helpText = "Puts a desired number of the given block with the give shape into your inventory",
-            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    /**
+     * Called by 'give' command in ItemCommands.java to attempt to put a block in the player's inventory when no item is found.
+     * Called by 'giveBulkBlock' command in BlockCommands.java to put a block in the player's inventory.
+     * @return Null if not found, otherwise success or warning message
+     */
     public String giveBlock(
             @Sender EntityRef sender,
             @CommandParam("blockName") String uri,
@@ -287,10 +287,10 @@ public class BlockCommands extends BaseComponentSystem {
                     } else {
                         Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
                         if (resolvedShapeUris.isEmpty()) {
-                            return  "No shape found for '" + shapeUriParam + "'";
+                            return  "Found block. No shape found for '" + shapeUriParam + "'";
                         } else if (resolvedShapeUris.size() > 1) {
                             StringBuilder builder = new StringBuilder();
-                            builder.append("Non-unique shape name, possible matches: ");
+                            builder.append("Found block. Non-unique shape name, possible matches: ");
                             Iterator<ResourceUrn> shapeUris = sortItems(resolvedShapeUris).iterator();
                             while (shapeUris.hasNext()) {
                                 builder.append(shapeUris.next().toString());
@@ -306,34 +306,15 @@ public class BlockCommands extends BaseComponentSystem {
                 } else {
                     return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn())), quantity, sender);
                 }
-            } else {
-                return "No block found for '" + uri + "'";
             }
-        } else if (matchingUris.isEmpty()) {
-            return suggestItemIfAvailable(uri);
-        } else {
+        } else if (matchingUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             return builder.toString();
         }
-    }
 
-    /**
-     * Tells players that their request matched no blocks, and directs them to giveItem if an item matches.
-     *
-     * @param uri the URI to use to look for an item
-     */
-    private String suggestItemIfAvailable(String uri) {
-        Set<ResourceUrn> matchingItems = assetManager.resolve(uri, Prefab.class);
-        StringBuilder result = new StringBuilder();
-        result.append("No block found for " + uri);
-        if (matchingItems.size() != 0) {
-            result.append(". ");
-            result.append("Item matches found, use 'giveItem' to request one: ");
-            Joiner.on(", ").appendTo(result, matchingItems);
-        }
-        return result.toString();
+        return null;
     }
 
     /**
@@ -344,7 +325,7 @@ public class BlockCommands extends BaseComponentSystem {
      */
     private String giveBlock(BlockFamily blockFamily, int quantity, EntityRef client) {
         if (quantity < 1) {
-            return "Here, have these zero (0) items just like you wanted";
+            return "Here, have these zero (0) blocks just like you wanted";
         }
 
         EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
