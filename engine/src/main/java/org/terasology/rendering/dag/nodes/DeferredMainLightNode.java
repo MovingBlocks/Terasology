@@ -44,7 +44,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
  * TODO: Break this node into several nodes
  * TODO: For doing that worldRenderer.renderLightComponent must be eliminated somehow
  */
-public class DirectionalLightsNode extends AbstractNode {
+public class DeferredMainLightNode extends AbstractNode {
     private static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
 
     @In
@@ -113,7 +113,7 @@ public class DirectionalLightsNode extends AbstractNode {
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         bindDisplay();
 
-        applyLightBufferPass();
+        //applyLightBufferPass();
         PerformanceMonitor.endActivity();
     }
 
