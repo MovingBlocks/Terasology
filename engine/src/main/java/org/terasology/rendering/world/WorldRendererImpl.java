@@ -22,19 +22,16 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
@@ -70,14 +67,12 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
-import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
@@ -92,7 +87,6 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
@@ -122,7 +116,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
-    // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
@@ -130,16 +123,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statChunkNotReady;
     private int statRenderedTriangles;
 
-    // TODO: to be documented (when understood in more detail)
-    public enum ChunkRenderMode {
-        DEFAULT,
-        REFLECTION,
-        SHADOW_MAP,
-        Z_PRE_PASS
-    }
-
     private final RenderingConfig renderingConfig;
-    private final RenderingDebugConfig renderingDebugConfig;
     private ScreenGrabber screenGrabber;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -170,7 +154,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        this.renderingDebugConfig = renderingConfig.getDebug();
         this.shaderManager = context.get(ShaderManager.class);
         if (renderingConfig.isVrSupport()) {
             this.vrProvider = new OpenVRProvider();
@@ -473,73 +456,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
-        Vector3f positionViewSpace = new Vector3f();
-        positionViewSpace.sub(lightWorldPosition, playerCamera.getPosition());
-
-        boolean doRenderLight = lightComponent.lightType == LightComponent.LightType.DIRECTIONAL
-                || lightComponent.lightRenderingDistance == 0.0f
-                || positionViewSpace.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
-
-        doRenderLight &= isLightVisible(positionViewSpace, lightComponent);
-
-        if (!doRenderLight) {
-            return false;
-        }
-
-        if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
-            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-            }
-        }
-        program.enable();
-        program.setCamera(playerCamera);
-
-        Vector3f worldPosition = new Vector3f();
-        worldPosition.sub(lightWorldPosition, playerCamera.getPosition());
-
-        Vector3f lightViewPosition = new Vector3f(worldPosition);
-        playerCamera.getViewMatrix().transformPoint(lightViewPosition);
-
-        program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z, true);
-
-        Matrix4f modelMatrix = new Matrix4f();
-        modelMatrix.set(lightComponent.lightAttenuationRange);
-
-        modelMatrix.setTranslation(worldPosition);
-        program.setMatrix4("modelMatrix", modelMatrix, true);
-
-        if (!geometryOnly) {
-            program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
-            program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
-            program.setFloat3("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity, lightComponent.lightSpecularPower, true);
-        }
-
-        if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            if (!geometryOnly) {
-                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
-            }
-
-            LightGeometryHelper.renderSphereGeometry();
-        } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-            // Directional lights cover all pixels on the screen
-            renderFullscreenQuad();
-        }
-
-        if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
-            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-            }
-        }
-
-        return true;
-    }
-
-    @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
         return isFirstRenderingStageForCurrentFrame;
     }
@@ -556,12 +472,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public void setViewDistance(ViewDistance viewDistance) {
         renderableWorld.updateChunksInProximity(viewDistance);
-    }
-
-    private boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
-        return component.lightType == LightComponent.LightType.DIRECTIONAL
-                || playerCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
-
     }
 
     @Override
