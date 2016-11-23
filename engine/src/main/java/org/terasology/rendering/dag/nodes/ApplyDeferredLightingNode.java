@@ -21,38 +21,37 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.bindDisplay;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
 
 /**
  * TODO
  */
 public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
-
-    @In
-    private WorldRenderer worldRenderer;
+    private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private Material lightBufferPass;
-    private FBO sceneReflectiveRefractive;
-
+    private Material deferredLightingMaterial;
 
     @Override
     public void initialise() {
-        lightBufferPass = worldRenderer.getMaterial("engine:prog.lightBufferPass");
-    }
 
+        addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
+
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+        deferredLightingMaterial = getMaterial(DEFERRED_LIGHTING_MATERIAL);
+    }
 
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
@@ -64,39 +63,38 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        int texId = 0;
+        setInputTextures();
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindTexture();
-        lightBufferPass.setInt("texSceneOpaque", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindDepthTexture();
-        lightBufferPass.setInt("texSceneOpaqueDepth", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindNormalsTexture();
-        lightBufferPass.setInt("texSceneOpaqueNormals", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindLightBufferTexture();
-        lightBufferPass.setInt("texSceneOpaqueLightBuffer", texId, true);
-
-        WRITE_ONLY_GBUFFER.bind();
+        WRITE_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
         WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
-
-        setViewportToSizeOf(WRITE_ONLY_GBUFFER);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
 
-        bindDisplay();     // TODO: verify this is necessary
-        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
-
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
         displayResolutionDependentFBOs.swapReadWriteBuffers();
-        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
+        READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
 
         PerformanceMonitor.endActivity();
+    }
+
+    private void setInputTextures() {
+        int texId = 0;
+
+        // TODO: turn into state changes
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        READ_ONLY_GBUFFER.bindTexture();
+        deferredLightingMaterial.setInt("texSceneOpaque", texId++, true);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        READ_ONLY_GBUFFER.bindDepthTexture();
+        deferredLightingMaterial.setInt("texSceneOpaqueDepth", texId++, true);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        READ_ONLY_GBUFFER.bindNormalsTexture();
+        deferredLightingMaterial.setInt("texSceneOpaqueNormals", texId++, true);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        READ_ONLY_GBUFFER.bindLightBufferTexture();
+        deferredLightingMaterial.setInt("texSceneOpaqueLightBuffer", texId, true);
     }
 }
