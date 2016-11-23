@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL13;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
@@ -30,7 +30,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
  * TODO
@@ -51,6 +51,16 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
         deferredLightingMaterial = getMaterial(DEFERRED_LIGHTING_MATERIAL);
+
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTexture(
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().colorBufferTextureId,   deferredLightingMaterial, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTexture(
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().depthStencilTextureId,  deferredLightingMaterial, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTexture(
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().normalsBufferTextureId, deferredLightingMaterial, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTexture(
+                textureSlot,   READ_ONLY_GBUFFER.getFbo().lightBufferTextureId,   deferredLightingMaterial, "texSceneOpaqueLightBuffer"));
     }
 
     /**
@@ -63,8 +73,6 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        setInputTextures();
-
         WRITE_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
         WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
@@ -75,26 +83,5 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
 
         PerformanceMonitor.endActivity();
-    }
-
-    private void setInputTextures() {
-        int texId = 0;
-
-        // TODO: turn into state changes
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindTexture();
-        deferredLightingMaterial.setInt("texSceneOpaque", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindDepthTexture();
-        deferredLightingMaterial.setInt("texSceneOpaqueDepth", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindNormalsTexture();
-        deferredLightingMaterial.setInt("texSceneOpaqueNormals", texId++, true);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        READ_ONLY_GBUFFER.bindLightBufferTexture();
-        deferredLightingMaterial.setInt("texSceneOpaqueLightBuffer", texId, true);
     }
 }

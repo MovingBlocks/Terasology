@@ -50,6 +50,7 @@ public final class FBO {
     private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
+    // TODO: make accessors for these
     public int fboId;
     public int colorBufferTextureId;
     public int depthStencilTextureId;
