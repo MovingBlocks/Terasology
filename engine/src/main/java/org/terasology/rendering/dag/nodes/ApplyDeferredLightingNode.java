@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
@@ -33,7 +32,11 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUF
 import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
- * TODO
+ * The ApplyDeferredLightingNode takes advantage of the information stored by previous nodes
+ * in various buffers, especially the light accumulation buffer and lights up the otherwise
+ * flatly-lit 3d scene.
+ *
+ * This node is integral to the deferred lighting technique.
  */
 public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
@@ -42,32 +45,32 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private Material deferredLightingMaterial;
-
+    /**
+     * Initializes an instance of this node.
+     *
+     * This method -must- be called once for this node to be fully operational.
+     */
     @Override
     public void initialise() {
 
         addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
-
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
-        deferredLightingMaterial = getMaterial(DEFERRED_LIGHTING_MATERIAL);
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().colorBufferTextureId,   deferredLightingMaterial, "texSceneOpaque"));
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().colorBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().depthStencilTextureId,  deferredLightingMaterial, "texSceneOpaqueDepth"));
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().depthStencilTextureId,  DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().normalsBufferTextureId, deferredLightingMaterial, "texSceneOpaqueNormals"));
+                textureSlot++, READ_ONLY_GBUFFER.getFbo().normalsBufferTextureId, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot,   READ_ONLY_GBUFFER.getFbo().lightBufferTextureId,   deferredLightingMaterial, "texSceneOpaqueLightBuffer"));
+                textureSlot,   READ_ONLY_GBUFFER.getFbo().lightBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
     }
-
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering stored in the primary FBO.   // TODO: rename sceneOpaque* FBOs to primaryA/B
+     * calculations to the previously flat-lit world rendering, stored in the READ_ONLY_GBUFFER.
      * <p>
-     * See http://en.wikipedia.org/wiki/Deferred_shading as a starting point.
+     * See http://en.wikipedia.org/wiki/Deferred_shading for more information on the general subject.
      */
     @Override
     public void process() {

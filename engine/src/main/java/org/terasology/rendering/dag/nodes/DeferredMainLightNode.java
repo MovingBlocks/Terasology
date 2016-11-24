@@ -37,9 +37,18 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 import org.terasology.rendering.world.WorldRenderer;
 
+// TODO: have this node and the shadowmap node handle multiple directional lights
+
 /**
- * TODO: Break this node into several nodes
- * TODO: For doing that worldRenderer.renderLightComponent must be eliminated somehow
+ * This class is integral to the deferred rendering process.
+ * It renders the main light (sun/moon) as a directional light, a type of light emitting parallel rays as is
+ * appropriate for astronomical light sources.
+ *
+ * This achieved by blending a single color into each pixel of the light accumulation buffer, the single
+ * color being dependent only on the angle between the camera and the light direction.
+ *
+ * Eventually the content of the light accumulation buffer is combined with other buffers to correctly
+ * light up the 3d scene.
  */
 public class DeferredMainLightNode extends AbstractNode {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
@@ -50,13 +59,15 @@ public class DeferredMainLightNode extends AbstractNode {
     @In
     private WorldRenderer worldRenderer;
 
-    // TODO: Review this? (What are we doing with a component not attached to an entity?)
     private LightComponent mainLightComponent = new LightComponent();
-
     private Camera playerCamera;
-
     private Material lightGeometryMaterial;
 
+    /**
+     * Initializes an instance of this node.
+     *
+     * This method -must- be called once for this node to be fully operational.
+     */
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
@@ -80,6 +91,10 @@ public class DeferredMainLightNode extends AbstractNode {
         mainLightComponent.lightSpecularPower = 100f;
     }
 
+    /**
+     * Renders the main light (sun/moon) as a uniformly colored full-screen quad.
+     * This gets blended into the existing data stored in the light accumulation buffer.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/mainLightGeometry");

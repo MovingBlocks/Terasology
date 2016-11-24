@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.tasks;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
@@ -22,9 +23,17 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 
 /**
- * TODO
+ * Instances of this class bind a texture to a texture unit. The integer identifying
+ * the texture unit is then passed to a shader program using the material/parameter
+ * pair provided on construction. See the source of the execute() method for the
+ * nitty gritty details.
+ *
+ * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+ * Modules or other parts of the engine should take advantage of them through classes
+ * inheriting from StateChange.
  */
 public class SetInputTextureTask implements RenderPipelineTask {
 
@@ -33,10 +42,10 @@ public class SetInputTextureTask implements RenderPipelineTask {
     private final Material material;
     private final String materialParameter;
 
-    public SetInputTextureTask(int textureSlot, int textureId, Material material, String materialParameter) {
+    public SetInputTextureTask(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
         this.textureSlot = textureSlot;
         this.textureId = textureId;
-        this.material = material;
+        this.material = getMaterial(materialURN);
         this.materialParameter = materialParameter;
     }
 
