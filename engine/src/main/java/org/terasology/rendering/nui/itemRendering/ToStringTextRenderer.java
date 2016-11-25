@@ -36,8 +36,7 @@ public class ToStringTextRenderer<T> extends StringTextRenderer<T> {
     public String getString(T value) {
         if (translationSystem == null) {
             return Objects.toString(value);
-        }
-        else {
+        } else {
             return translationSystem.translate(Objects.toString(value));
         }
     }

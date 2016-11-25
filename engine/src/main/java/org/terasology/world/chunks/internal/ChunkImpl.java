@@ -446,6 +446,21 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof ChunkImpl)) {
+            return false;
+        }
+
+        ChunkImpl that = (ChunkImpl) obj;
+
+        return Objects.equal(this.chunkPos, that.chunkPos);
+    }
+
+    @Override
     public void setMesh(ChunkMesh mesh) {
         this.activeMesh = mesh;
     }

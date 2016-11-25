@@ -55,17 +55,22 @@ public class PlayerConfig {
         this.color = color;
     }
 
-    public Float getHeight() { return height; }
+    public Float getHeight() {
+        return height;
+    }
 
     public void setHeight(Float height) {
         this.height = height;
     }
 
-    public Float getEyeHeight() { return eyeHeight; }
+    public Float getEyeHeight() {
+        return eyeHeight;
+    }
 
     public void setEyeHeight(Float eyeHeight) {
-        if (eyeHeight< this.height)
+        if (eyeHeight < this.height) {
             this.eyeHeight = eyeHeight;
+        }
     }
 
     private static String defaultPlayerName() {
