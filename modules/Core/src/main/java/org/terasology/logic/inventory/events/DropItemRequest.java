@@ -45,8 +45,7 @@ public class DropItemRequest implements Event {
         this.count = count;
     }
 
-    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition)
-    {
+    public DropItemRequest(EntityRef usedItem, EntityRef inventoryEntity, Vector3f impulse, Vector3f newPosition) {
         this(usedItem, inventoryEntity, impulse, newPosition, 1);
     }
 

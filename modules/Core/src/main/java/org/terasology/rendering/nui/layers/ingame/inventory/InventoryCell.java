@@ -64,12 +64,11 @@ public class InventoryCell extends ItemCell {
                 int stackSize = InventoryUtils.getStackCount(getTargetItem());
                 if (stackSize > 0 && getTransferItem().getClass() != getTargetItem().getClass()) {
                     giveAmount((stackSize + 1) / 2);
-                }
-                else {
-					int transferStackSize = InventoryUtils.getStackCount(getTransferItem());
-					if (transferStackSize > 0) {
-						takeAmount(1);
-					}
+                } else {
+                    int transferStackSize = InventoryUtils.getStackCount(getTransferItem());
+                    if (transferStackSize > 0) {
+                        takeAmount(1);
+                    }
                 }
             }
             return true;

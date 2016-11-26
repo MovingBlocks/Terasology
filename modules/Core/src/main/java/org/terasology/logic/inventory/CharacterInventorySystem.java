@@ -124,8 +124,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
         pickupItem.send(new DropItemEvent(event.getNewPosition()));
 
-        if (pickupItem.hasComponent(PickupComponent.class))
-        {
+        if (pickupItem.hasComponent(PickupComponent.class)) {
             PickupComponent pickupComponent = pickupItem.getComponent(PickupComponent.class);
             pickupComponent.timeDropped = time.getGameTimeInMs();
             pickupItem.saveComponent(pickupComponent);
@@ -187,8 +186,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
 
             Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
             HitResult hitResult = physics.rayTrace(position,direction,1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
-            if (hitResult.isHit())
-            {
+            if (hitResult.isHit()) {
                 Vector3f possibleNewPosition = hitResult.getHitPoint();
                 maxAllowedDistanceInDirection = possibleNewPosition.sub(position);
             }
@@ -240,8 +238,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(netFilter = RegisterMode.CLIENT)
-    public void onPlayerDeath(DeathEvent event, EntityRef entity)
-    {
+    public void onPlayerDeath(DeathEvent event, EntityRef entity) {
         resetDropMark();
     }
 
