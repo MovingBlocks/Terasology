@@ -90,8 +90,7 @@ public class SetInputTexture implements StateChange {
                 && this.materialURN.equals(((SetInputTexture) other).materialURN)
                 && this.materialParameter.equals(((SetInputTexture) other).materialParameter);
     }
-
-
+    
     /**
      * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot.
      * Also disconnects the texture from the shader program.

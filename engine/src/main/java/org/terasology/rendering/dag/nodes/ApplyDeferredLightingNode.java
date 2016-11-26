@@ -66,6 +66,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         addDesiredStateChange(new SetInputTexture(
                 textureSlot,   READ_ONLY_GBUFFER.getFbo().lightBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
     }
+
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
      * calculations to the previously flat-lit world rendering, stored in the READ_ONLY_GBUFFER.
