@@ -88,7 +88,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
-            float skyBoxDistance = (zFar > 1024 ? 1024.0f : zFar*0.95f);
+            float skyBoxDistance = (zFar > 1024 ? 1024.0f : zFar * 0.95f);
             sphere.draw(skyBoxDistance, 16, 128);
 
             glEndList();

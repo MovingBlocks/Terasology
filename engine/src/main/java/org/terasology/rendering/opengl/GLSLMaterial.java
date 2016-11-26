@@ -66,7 +66,7 @@ public class GLSLMaterial extends BaseMaterial {
     private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
 
-    private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
+    private EnumSet<ShaderProgramFeature> activeFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
     private int activeFeaturesMask;
 
     private final ShaderManager shaderManager;
@@ -622,7 +622,8 @@ public class GLSLMaterial extends BaseMaterial {
         private int shaderProgramId;
         private String name;
 
-        public UniformId(int shaderProgramId, String name) {
+        // made package-private after Jenkins' suggestion
+        UniformId(int shaderProgramId, String name) {
             this.shaderProgramId = shaderProgramId;
             this.name = name;
         }
@@ -651,7 +652,8 @@ public class GLSLMaterial extends BaseMaterial {
 
         private TIntIntMap shaderPrograms = new TIntIntHashMap();
 
-        public DisposalAction(ResourceUrn urn) {
+        // made package-private after Jenkins' suggestion
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
         }
 

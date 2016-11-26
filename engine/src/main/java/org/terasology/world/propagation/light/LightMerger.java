@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class LightMerger<T> {
     private static final int CENTER_INDEX = 13;
 
-    private static Logger logger = LoggerFactory.getLogger(LightMerger.class);
+    private static final Logger logger = LoggerFactory.getLogger(LightMerger.class);
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Future<T> resultFuture;

@@ -44,7 +44,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class RenderableWorldImpl implements RenderableWorld {
+/**
+ * TODO: write javadoc unless this class gets slated for removal, which might be.
+ */
+class RenderableWorldImpl implements RenderableWorld {
 
     private static final int MAX_ANIMATED_CHUNKS = 64;
     private static final int MAX_BILLBOARD_CHUNKS = 64;
@@ -76,7 +79,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     private int statIgnoredPhases;
 
 
-    public RenderableWorldImpl(WorldProvider worldProvider,
+    RenderableWorldImpl(WorldProvider worldProvider,
                                ChunkProvider chunkProvider,
                                GLBufferPool bufferPool,
                                Camera playerCamera) {
@@ -294,12 +297,9 @@ public class RenderableWorldImpl implements RenderableWorld {
         int processedChunks = 0;
         int chunkCounter = 0;
         ChunkMesh mesh;
-        RenderableChunk chunk;
         boolean isDynamicShadows = renderingConfig.isDynamicShadows();
-        Iterator<RenderableChunk> nearbyChunks = chunksInProximityOfCamera.iterator();
-        while (nearbyChunks.hasNext()) {
-            chunk = nearbyChunks.next();
 
+        for (RenderableChunk chunk : chunksInProximityOfCamera) {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
@@ -344,12 +344,10 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
 
                 // Process all chunks in the area, not only the visible ones
-                if (isFirstRenderingStageForCurrentFrame) {
-                    if ((chunk.isDirty() || !chunk.hasMesh())) {
-                        statDirtyChunks++;
-                        chunkMeshUpdateManager.queueChunkUpdate(chunk);
-                        processedChunks++;
-                    }
+                if (isFirstRenderingStageForCurrentFrame && (chunk.isDirty() || !chunk.hasMesh())) {
+                    statDirtyChunks++;
+                    chunkMeshUpdateManager.queueChunkUpdate(chunk);
+                    processedChunks++;
                 }
             }
             chunkCounter++;
@@ -372,23 +370,23 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkMeshUpdateManager.shutdown();
     }
 
-    public boolean isChunkValidForRender(RenderableChunk chunk) {
+    private boolean isChunkValidForRender(RenderableChunk chunk) {
         return chunk.isReady() && chunk.areAdjacentChunksReady();
     }
 
-    public boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
+    private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {
         return isChunkVisible(shadowMapCamera, chunk); //TODO: find an elegant way
     }
 
-    public boolean isChunkVisible(RenderableChunk chunk) {
+    private boolean isChunkVisible(RenderableChunk chunk) {
         return isChunkVisible(playerCamera, chunk);
     }
 
-    public boolean isChunkVisible(Camera camera, RenderableChunk chunk) {
+    private boolean isChunkVisible(Camera camera, RenderableChunk chunk) {
         return camera.hasInSight(chunk.getAABB());
     }
 
-    public boolean isChunkVisibleReflection(RenderableChunk chunk) {
+    private boolean isChunkVisibleReflection(RenderableChunk chunk) {
         return playerCamera.getViewFrustumReflected().intersects(chunk.getAABB());
     }
 
@@ -409,17 +407,17 @@ public class RenderableWorldImpl implements RenderableWorld {
 
     @Override
     public String getMetrics() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Dirty Chunks: ");
-        builder.append(statDirtyChunks);
-        builder.append("\n");
-        builder.append("Ignored Phases: ");
-        builder.append(statIgnoredPhases);
-        builder.append("\n");
-        builder.append("Visible Chunks: ");
-        builder.append(statVisibleChunks);
-        builder.append("\n");
-        return builder.toString();
+        String stringToReturn = "";
+        stringToReturn += "Dirty Chunks: ";
+        stringToReturn += statDirtyChunks;
+        stringToReturn += "\n";
+        stringToReturn += "Ignored Phases: ";
+        stringToReturn += statIgnoredPhases;
+        stringToReturn += "\n";
+        stringToReturn += "Visible Chunks: ";
+        stringToReturn += statVisibleChunks;
+        stringToReturn += "\n";
+        return stringToReturn;
     }
 
     private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
@@ -450,9 +448,11 @@ public class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            if (distance1 == distance2) {
+            // using Double.compare as simple d1 < d2 comparison is flagged as problematic by Jenkins
+            double comparisonResult = Double.compare(distance1, distance2);
+            if (comparisonResult == 0.0) {
                 return 0;
-            } else if (distance1 > distance2) {
+            } else if (comparisonResult > 0.0) {
                 return 1;
             } else {
                 return -1;

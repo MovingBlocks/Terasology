@@ -134,10 +134,8 @@ public final class FBO {
             }
             attachmentId++;
         }
-        if (lightBufferTextureId != 0) {
-            if (this.writeToLightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
+        if (lightBufferTextureId != 0 && this.writeToLightBuffer) { // compacted if block because Jenkins was complaining about it.
+            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
         }
 
         bufferIds.flip();
@@ -549,7 +547,9 @@ public final class FBO {
         }
 
         /**
-         * @param dimensions
+         * Copy constructor: construct a Dimensions instance with the dimensions of another.
+         *
+         * @param dimensions a Dimensions instance
          */
         public Dimensions(Dimensions dimensions) {
             this(dimensions.width(), dimensions.height());

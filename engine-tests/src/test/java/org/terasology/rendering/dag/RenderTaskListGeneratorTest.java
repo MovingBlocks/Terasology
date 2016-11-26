@@ -17,13 +17,10 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class RenderTaskListGeneratorTest {
 
@@ -106,6 +103,7 @@ public class RenderTaskListGeneratorTest {
         return node;
     }
 
+    @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class AlphaNode extends AbstractNode {
         @Override
         public void initialise() {
@@ -117,6 +115,7 @@ public class RenderTaskListGeneratorTest {
         }
     }
 
+    @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class BravoNode extends AbstractNode {
         @Override
         public void initialise() {
@@ -128,6 +127,7 @@ public class RenderTaskListGeneratorTest {
         }
     }
 
+    @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class CharlieNode extends AbstractNode {
         @Override
         public void initialise() {
@@ -139,6 +139,7 @@ public class RenderTaskListGeneratorTest {
         }
     }
 
+    @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class DeltaNode extends AbstractNode {
         @Override
         public void initialise() {
@@ -150,6 +151,7 @@ public class RenderTaskListGeneratorTest {
         }
     }
 
+    @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class EchoNode extends AbstractNode {
         @Override
         public void initialise() {
