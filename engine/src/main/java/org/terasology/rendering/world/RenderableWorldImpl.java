@@ -448,15 +448,10 @@ class RenderableWorldImpl implements RenderableWorld {
             double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
             double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
-            // using Double.compare as simple d1 < d2 comparison is flagged as problematic by Jenkins
-            double comparisonResult = Double.compare(distance1, distance2);
-            if (comparisonResult == 0.0) {
-                return 0;
-            } else if (comparisonResult > 0.0) {
-                return 1;
-            } else {
-                return -1;
-            }
+            // Using Double.compare as simple d1 < d2 comparison is flagged as problematic by Jenkins
+            // On the other hand Double.compare can return any positive/negative value apparently,
+            // hence the need for Math.signum().
+            return (int) Math.signum(Double.compare(distance1, distance2));
         }
     }
 
