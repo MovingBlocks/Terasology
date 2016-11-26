@@ -43,8 +43,6 @@ import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.liquid.LiquidData;
 
 import java.text.DecimalFormat;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -80,8 +78,6 @@ public class ChunkImpl implements Chunk {
 
     private AABB aabb;
     private Region3i region;
-
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     private boolean disposed;
     private boolean ready;
@@ -447,17 +443,10 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof ChunkImpl)) {
-            return false;
-        }
-
-        ChunkImpl that = (ChunkImpl) obj;
-
-        return Objects.equal(this.chunkPos, that.chunkPos);
+        // According to hashCode() two ChunkImpls are not equal when their
+        // position differs. The default equals() compares object instances.
+        // The same instance has the same chunkPos, so this is valid.
+        return super.equals(obj);
     }
 
     @Override
