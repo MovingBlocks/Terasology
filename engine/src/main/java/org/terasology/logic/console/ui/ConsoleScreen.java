@@ -108,7 +108,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                     "You can use auto-completion by typing a partial command then hitting [tab] - examples:" + Console.NEW_LINE + Console.NEW_LINE +
                     "gh + [tab] => 'ghost'" + Console.NEW_LINE +
                     "help gh + [tab] => 'help ghost' (can auto complete commands fed to help)" + Console.NEW_LINE +
-                    "giv + [tab] => 'giveBlock giveItem givePermission' (use [tab] again to cycle between choices)" + Console.NEW_LINE +
+                    "giv + [tab] => 'give givePermission' (use [tab] again to cycle between choices)" + Console.NEW_LINE +
                     "lS + [tab] => 'listShapes' (camel casing abbreviated commands)" + Console.NEW_LINE);
             welcomePrinted = true;
         }
