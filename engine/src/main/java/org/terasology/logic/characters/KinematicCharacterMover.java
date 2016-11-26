@@ -94,6 +94,40 @@ public class KinematicCharacterMover implements CharacterMover {
         physics = physicsEngine;
     }
 
+    /**
+     * Updates a character's movement mode and changes his vertical velocity accordingly.
+     * @param state The current state of the character.
+     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
+     * @param newDiving True if the character's body is fully inside liquid blocks.
+     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
+     */
+    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
+        if (newDiving) {
+            if (state.getMode() != MovementMode.DIVING) {
+                state.setMode(MovementMode.DIVING);
+            }
+        } else if (newSwimming) {
+            if (state.getMode() != MovementMode.SWIMMING) {
+                state.setMode(MovementMode.SWIMMING);
+            }
+            state.getVelocity().y += 0.02;
+        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
+            if (newClimbing) {
+                state.setMode(MovementMode.CLIMBING);
+                state.getVelocity().y = 0;
+            } else {
+                if (state.getVelocity().y > 0) {
+                    state.getVelocity().y += 4;
+                }
+                state.setMode(MovementMode.WALKING);
+            }
+        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
+            //We need to toggle the climbing mode
+            state.getVelocity().y = 0;
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        }
+    }
+
     @Override
     public CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity) {
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -196,40 +230,6 @@ public class KinematicCharacterMover implements CharacterMover {
         }
 
         updateMode(state, newSwimming, newDiving, newClimbing);
-    }
-
-    /**
-     * Updates a character's movement mode and changes his vertical velocity accordingly.
-     * @param state The current state of the character.
-     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
-     * @param newDiving True if the character's body is fully inside liquid blocks.
-     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
-     */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
-        if (newDiving) {
-            if (state.getMode() != MovementMode.DIVING) {
-                state.setMode(MovementMode.DIVING);
-            }
-        } else if (newSwimming) {
-            if (state.getMode() != MovementMode.SWIMMING) {
-                state.setMode(MovementMode.SWIMMING);
-            }
-            state.getVelocity().y += 0.02;
-        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
-            if (newClimbing) {
-                state.setMode(MovementMode.CLIMBING);
-                state.getVelocity().y = 0;
-            } else {
-                if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 4;
-                }
-                state.setMode(MovementMode.WALKING);
-            }
-        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
-            //We need to toggle the climbing mode
-            state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
-        }
     }
 
     private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos, boolean swimming, boolean diving) {
@@ -355,8 +355,10 @@ public class KinematicCharacterMover implements CharacterMover {
         if (moveDelta.y < 0 || steppedUpDist > 0) {
             float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
             dist -= steppedUpDist;
+            // Returns true if bottom is hit at current position.
             hitBottom = moveDown(dist, slopeFactor, collider, position);
         }
+
         if (!hitBottom && stepHeight > 0) {
             Vector3f tempPos = new Vector3f(position);
             hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
@@ -623,105 +625,126 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
+
         MoveResult moveResult = move(state.getPosition(), moveDelta,
                 (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
                 movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
-        state.getPosition().set(moveResult.getFinalPosition());
-        if (input.isFirstRun() && distanceMoved.length() > 0) {
-            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
-        }
-
-        // Upon hitting solid ground, reset the number of jumps back to the maximum value.
-        if (state.isGrounded()) {
-            movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
-        }
-
-        if (moveResult.isBottomHit()) {
-            if (!state.isGrounded() && movementComp.mode.canBeGrounded) {
-                if (input.isFirstRun()) {
-                    Vector3f landVelocity = new Vector3f(state.getVelocity());
-                    landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
-                    logger.debug("Landed at " + landVelocity);
-                    entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
+        if (movementComp.mode == MovementMode.CROUCHING) {
+            if (moveResult.isBottomHit()) {
+                if (state.isGrounded()) {
+                    Vector3f pos = moveResult.getFinalPosition();
+                    Vector3f to = new Vector3f(pos.x, pos.y - 0.35f, pos.z);
+                    SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+                    if (callback.hasHit()) {
+                        state.getPosition().set(moveResult.getFinalPosition());
+                        state.getVelocity().set(endVelocity);
+                        logger.info("moved");
+                    } else {
+                        logger.info("could not move");
+                        state.getVelocity().set(Vector3f.zero());
+                    }
+                } else {
+                    logger.info("not grounded");
                 }
-                state.setGrounded(true);
+            }
+        } else {
+            state.getPosition().set(moveResult.getFinalPosition());
+            if (input.isFirstRun() && distanceMoved.length() > 0) {
+                entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+            }
+
+            // Upon hitting solid ground, reset the number of jumps back to the maximum value.
+            if (state.isGrounded()) {
                 movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
             }
-            endVelocity.y = 0;
 
-            // Jumping is only possible, if the entity is standing on ground
-            if (input.isJumpRequested()) {
+            if (moveResult.isBottomHit()) {
+                if (!state.isGrounded() && movementComp.mode.canBeGrounded) {
+                    if (input.isFirstRun()) {
+                        Vector3f landVelocity = new Vector3f(state.getVelocity());
+                        landVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                        logger.debug("Landed at " + landVelocity);
+                        entity.send(new VerticalCollisionEvent(state.getPosition(), landVelocity));
+                    }
+                    state.setGrounded(true);
+                    movementComp.numberOfJumpsLeft = movementComp.numberOfJumpsMax;
+                }
+                endVelocity.y = 0;
 
-                state.setGrounded(false);
+                // Jumping is only possible, if the entity is standing on ground
+                if (input.isJumpRequested()) {
 
-                // Send event to allow for other systems to modify the jump force.
-                AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
-                entity.send(affectJumpForceEvent);
-                endVelocity.y += affectJumpForceEvent.getResultValue();
-                if (input.isFirstRun()) {
-                    entity.send(new JumpEvent());
+                    state.setGrounded(false);
+
+                    // Send event to allow for other systems to modify the jump force.
+                    AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
+                    entity.send(affectJumpForceEvent);
+                    endVelocity.y += affectJumpForceEvent.getResultValue();
+                    if (input.isFirstRun()) {
+                        entity.send(new JumpEvent());
+                    }
+
+                    // Send event to allow for other systems to modify the max number of jumps.
+                    AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
+                    entity.send(affectMultiJumpEvent);
+                    movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
+
+                    movementComp.numberOfJumpsLeft--;
+                }
+            } else {
+                if (moveResult.isTopHit() && endVelocity.y > 0) {
+                    endVelocity.y = -0.5f * endVelocity.y;
                 }
 
-                // Send event to allow for other systems to modify the max number of jumps.
-                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
-                entity.send(affectMultiJumpEvent);
-                movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
+                // Jump again in mid-air only if a jump was requested and there are jumps remaining.
+                if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
+                    state.setGrounded(false);
 
-                movementComp.numberOfJumpsLeft--;
-            }
-        }
-        else {
-            if (moveResult.isTopHit() && endVelocity.y > 0) {
-                endVelocity.y = -0.5f * endVelocity.y;
-            }
+                    // Send event to allow for other systems to modify the jump force.
+                    AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
+                    entity.send(affectJumpForceEvent);
+                    endVelocity.y += affectJumpForceEvent.getResultValue();
+                    if (input.isFirstRun()) {
+                        entity.send(new JumpEvent());
+                    }
 
-            // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
-                state.setGrounded(false);
+                    // Send event to allow for other systems to modify the max number of jumps.
+                    AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
+                    entity.send(affectMultiJumpEvent);
+                    movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
 
-                // Send event to allow for other systems to modify the jump force.
-                AffectJumpForceEvent affectJumpForceEvent = new AffectJumpForceEvent(movementComp.jumpSpeed);
-                entity.send(affectJumpForceEvent);
-                endVelocity.y += affectJumpForceEvent.getResultValue();
-                if (input.isFirstRun()) {
-                    entity.send(new JumpEvent());
+                    movementComp.numberOfJumpsLeft--;
                 }
 
-                // Send event to allow for other systems to modify the max number of jumps.
-                AffectMultiJumpEvent affectMultiJumpEvent = new AffectMultiJumpEvent(movementComp.baseNumberOfJumpsMax);
-                entity.send(affectMultiJumpEvent);
-                movementComp.numberOfJumpsMax = (int) affectMultiJumpEvent.getResultValue();
-
-                movementComp.numberOfJumpsLeft--;
+                logger.info("Setting grounded to false");
+                state.setGrounded(false);
             }
-
-            state.setGrounded(false);
-        }
-        state.getVelocity().set(endVelocity);
-        if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-            entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
-        }
-        if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
-            state.setFootstepDelta(
-                    state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
-            if (state.getFootstepDelta() > 1) {
-                state.setFootstepDelta(state.getFootstepDelta() - 1);
-                if (input.isFirstRun()) {
-                    switch (movementComp.mode) {
-                        case WALKING:
-                            entity.send(new FootstepEvent());
-                            break;
-                        case DIVING:
-                        case SWIMMING:
-                            entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
-                            break;
-                        case CLIMBING:
-                        case FLYING:
-                        case GHOSTING:
-                        case NONE:
-                            break;
+            state.getVelocity().set(endVelocity);
+            if (input.isFirstRun() && moveResult.isHorizontalHit()) {
+                entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
+            }
+            if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
+                state.setFootstepDelta(
+                        state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
+                if (state.getFootstepDelta() > 1) {
+                    state.setFootstepDelta(state.getFootstepDelta() - 1);
+                    if (input.isFirstRun()) {
+                        switch (movementComp.mode) {
+                            case WALKING:
+                                entity.send(new FootstepEvent());
+                                break;
+                            case DIVING:
+                            case SWIMMING:
+                                entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
+                                break;
+                            case CLIMBING:
+                            case FLYING:
+                            case GHOSTING:
+                            case NONE:
+                                break;
+                        }
                     }
                 }
             }
