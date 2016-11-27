@@ -166,6 +166,7 @@ Contributors
  [ron-popov](https://github.com/ron-popov),
  [MaxBorsch](https://github.com/MaxBorsch),
  [freyley](https://github.com/freyley)
+ [Tropid](https://github.com/Tropid),
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
