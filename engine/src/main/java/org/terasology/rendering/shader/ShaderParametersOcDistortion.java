@@ -23,7 +23,6 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
  * Shader parameters for the Combine shader program.
- *
  */
 public class ShaderParametersOcDistortion extends ShaderParametersBase {
 

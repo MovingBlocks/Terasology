@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,6 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class GLSLMaterial extends BaseMaterial {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);

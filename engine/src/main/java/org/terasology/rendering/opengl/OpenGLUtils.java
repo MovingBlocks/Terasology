@@ -30,9 +30,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 
-/**
-
- */
 public final class OpenGLUtils {
     private static int displayListQuad = -1;
 

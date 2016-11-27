@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package org.terasology.rendering.assets.shader;
 
 import java.util.Collection;
 
-/**
- */
 public enum ShaderProgramFeature {
     FEATURE_REFRACTIVE_PASS(0b00000001),
     FEATURE_ALPHA_REJECT(0b00000010),
