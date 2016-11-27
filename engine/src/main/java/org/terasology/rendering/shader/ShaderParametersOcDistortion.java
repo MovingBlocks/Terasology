@@ -37,7 +37,7 @@ public class ShaderParametersOcDistortion extends ShaderParametersBase {
         // TODO: In the BaseMaterial class perhaps? Or an even more generic utility class?
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         CoreRegistry.get(DisplayResolutionDependentFBOs.class).bindFboColorTexture(DefaultDynamicFBOs.FINAL.getName()); // TODO: switch from CoreRegistry to Context.
-        program.setInt("texSceneFinal", texId++, true);
+        program.setInt("texSceneFinal", texId, true);
     }
 
 }

@@ -87,7 +87,7 @@ public class GLSLShader extends Shader {
         }
     }
 
-    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.<ShaderProgramFeature>emptyList(), ShaderProgramFeature.class);
+    private EnumSet<ShaderProgramFeature> availableFeatures = Sets.newEnumSet(Collections.emptyList(), ShaderProgramFeature.class);
 
     private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
@@ -103,11 +103,13 @@ public class GLSLShader extends Shader {
         reload(data);
     }
 
-    public Set<ShaderProgramFeature> getAvailableFeatures() {
+    // made package-private after CheckStyle suggestion
+    Set<ShaderProgramFeature> getAvailableFeatures() {
         return availableFeatures;
     }
 
-    public int linkShaderProgram(int featureHash) {
+    // made package-private after CheckStyle suggestion
+    int linkShaderProgram(int featureHash) {
         int shaderProgram = GL20.glCreateProgram();
 
         GL20.glAttachShader(shaderProgram, disposalAction.fragmentPrograms.get(featureHash));
@@ -262,9 +264,9 @@ public class GLSLShader extends Shader {
                 disposalAction.fragmentPrograms.put(featureHash, fragShaderId);
                 disposalAction.vertexPrograms.put(featureHash, vertShaderId);
             } else {
-                throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.\n\n"
-                                + "Vertex Shader Info: \n%s\n"
-                                + "Fragment Shader Info: \n%s",
+                throw new RuntimeException(String.format("Shader '%s' failed to compile for features '%s'.%n%n"
+                                + "Vertex Shader Info: %n%s%n"
+                                + "Fragment Shader Info: %n%s",
                         getUrn(), permutation,
                         getLogInfo(vertShaderId), getLogInfo(fragShaderId)));
             }
@@ -387,7 +389,8 @@ public class GLSLShader extends Shader {
         private TIntIntMap fragmentPrograms = new TIntIntHashMap();
         private TIntIntMap vertexPrograms = new TIntIntHashMap();
 
-        public DisposalAction(ResourceUrn urn) {
+        // made package-private after CheckStyle's suggestion
+        DisposalAction(ResourceUrn urn) {
             this.urn = urn;
         }
 

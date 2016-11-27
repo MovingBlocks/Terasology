@@ -17,6 +17,7 @@
 package org.terasology.rendering.assets.shader;
 
 /**
+ * TODO: write javadoc
  */
 public enum ParamType {
     sampler2D(true),
@@ -24,7 +25,7 @@ public enum ParamType {
 
     private boolean texture;
 
-    private ParamType(boolean texture) {
+    ParamType(boolean texture) {
         this.texture = texture;
     }
 

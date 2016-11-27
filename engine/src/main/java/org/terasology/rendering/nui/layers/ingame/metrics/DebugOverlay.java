@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import org.terasology.config.Config;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -47,9 +46,6 @@ public class DebugOverlay extends CoreScreenLayer {
 
     @In
     private Config config;
-
-    @In
-    private GameEngine engine;
 
     @In
     private CameraTargetSystem cameraTarget;

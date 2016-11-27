@@ -21,7 +21,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
@@ -36,7 +35,6 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -44,12 +42,9 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
 
-    public static final int SLICES = 16;
-    public static final int STACKS = 128;
-    public static final int RADIUS = 1024;
-
-    @In
-    private BackdropRenderer backdropRenderer;
+    private static final int SLICES = 16;
+    private static final int STACKS = 128;
+    private static final int RADIUS = 1024;
 
     @In
     private Config config;
@@ -57,13 +52,10 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
     @Override
     public void initialise() {
@@ -71,7 +63,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));

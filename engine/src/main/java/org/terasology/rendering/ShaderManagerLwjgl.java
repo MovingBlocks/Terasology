@@ -168,6 +168,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         activeMaterial = null;
     }
 
+    @SuppressWarnings("unused")  // this is actually used, I'm not sure why the Jenkins Static Analyses says it's unused.
     private GLSLMaterial prepareAndStoreShaderProgramInstance(String title, ShaderParameters params) {
         String uri = "engine:" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);
