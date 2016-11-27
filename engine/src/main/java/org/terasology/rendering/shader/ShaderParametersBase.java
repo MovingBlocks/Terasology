@@ -17,6 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.terasology.config.Config;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -28,6 +29,7 @@ import org.terasology.world.WorldProvider;
  * Basic shader parameters for all shader program.
  *
  */
+@API
 public class ShaderParametersBase implements ShaderParameters {
 
     public ShaderParametersBase() {

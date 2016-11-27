@@ -15,9 +15,11 @@
  */
 package org.terasology.engine.subsystem.headless.renderer;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.shader.ShaderParameters;
 
 public class ShaderManagerHeadless implements ShaderManager {
 
@@ -25,6 +27,11 @@ public class ShaderManagerHeadless implements ShaderManager {
 
     @Override
     public void initShaders() {
+    }
+
+    @Override
+    public void loadShader(ResourceUrn shaderName, ShaderParameters shaderParameters) {
+
     }
 
     @Override

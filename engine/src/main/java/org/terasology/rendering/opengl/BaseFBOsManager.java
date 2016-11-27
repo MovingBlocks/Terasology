@@ -16,10 +16,12 @@
 package org.terasology.rendering.opengl;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.module.sandbox.API;
 
 /**
  * TODO: Add javadocs
  */
+@API
 public interface BaseFBOsManager {
 
     boolean subscribe(FBOManagerSubscriber subscriber);
@@ -31,6 +33,8 @@ public interface BaseFBOsManager {
     FBO request(FBOConfig fboConfig);
 
     FBO get(ResourceUrn fboName);
+
+    void clear();
 
     boolean bindFboColorTexture(ResourceUrn fboName);
 

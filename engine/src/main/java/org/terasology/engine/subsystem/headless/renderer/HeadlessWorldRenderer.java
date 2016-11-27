@@ -25,6 +25,8 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.nodes.ShadowMapNode;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,6 +67,21 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     @Override
     public boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
         return false;
+    }
+
+    @Override
+    public void setRenderGraph(RenderGraph renderGraph) {
+
+    }
+
+    @Override
+    public void setShadowMapNode(ShadowMapNode shadowNode) {
+
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     @Override

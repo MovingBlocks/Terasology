@@ -180,6 +180,17 @@ public class ShaderManagerLwjgl implements ShaderManager {
         return material;
     }
 
+    @Override
+    public void loadShader(ResourceUrn shaderName, ShaderParameters shaderParameters) {
+        Optional<? extends Shader> shader = Assets.getShader(shaderName.toString());
+        checkState(shader.isPresent(), "Failed to resolve %s", shaderName.toString());
+        shader.get().recompile();
+        GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn(shaderName.getModuleName()
+                + ":prog." + shaderName.getResourceName()), new MaterialData(shader.get()), Material.class);
+        material.setShaderParameters(shaderParameters);
+        progamaticShaders.add(material);
+    }
+
     /**
      * Enables the default shader program.
      */

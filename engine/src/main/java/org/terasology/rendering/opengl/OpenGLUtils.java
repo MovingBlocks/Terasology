@@ -17,7 +17,10 @@
 package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
@@ -29,10 +32,12 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
+import org.terasology.module.sandbox.API;
 
 /**
 
  */
+@API
 public final class OpenGLUtils {
     private static int displayListQuad = -1;
 
@@ -85,6 +90,10 @@ public final class OpenGLUtils {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
+
+    public static void selectActiveTexture(int texture) {
+        glActiveTexture(GL13.GL_TEXTURE0 + texture);
+    }
 
     /**
      * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
@@ -162,6 +171,10 @@ public final class OpenGLUtils {
     public static void renderFullscreenQuad(int x, int y, int viewportWidth, int viewportHeight) {
         glViewport(x, y, viewportWidth, viewportHeight);
         renderFullscreenQuad();
+    }
+
+    public static void renderFullScreenQuad() {
+        renderFullscreenQuad(0, 0, Display.getWidth(), Display.getHeight());
     }
 
 

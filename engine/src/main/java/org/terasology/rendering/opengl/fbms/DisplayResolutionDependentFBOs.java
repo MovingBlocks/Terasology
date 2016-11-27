@@ -74,6 +74,12 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         return fbo;
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+        generateDefaultFBOs();
+    }
+
     /**
      * Invoked before real-rendering starts
      * TODO: how about completely removing this, and make Display observable and this FBM as an observer

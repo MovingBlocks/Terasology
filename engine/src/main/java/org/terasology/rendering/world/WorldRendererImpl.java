@@ -142,6 +142,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private ScreenGrabber screenGrabber;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
+    private RenderTaskListGenerator renderTaskListGenerator;
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
@@ -340,10 +341,27 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
-        RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
+        renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
+    }
+
+    @Override
+    public void setShadowMapNode(ShadowMapNode shadowMapNode) {
+        this.shadowMapNode = shadowMapNode;
+    }
+
+    @Override
+    public void setRenderGraph(RenderGraph renderGraph) {
+        List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+        renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
+    }
+
+    @Override
+    public void clear() {
+        displayResolutionDependentFBOs.clear();
+        immutableFBOs.clear();
+        shadowMapResolutionDependentFBOs.clear();
     }
 
     @Override
