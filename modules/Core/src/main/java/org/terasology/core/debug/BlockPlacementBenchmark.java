@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.core.debug;
 
 import java.util.HashMap;
@@ -23,7 +38,7 @@ class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
     private final boolean useSetBlocksInsteadOfSetBlock;
     private Block blockToPlace;
 
-    public BlockPlacementBenchmark(Context context, boolean useSetBlocksInsteadOfSetBlock) {
+    BlockPlacementBenchmark(Context context, boolean useSetBlocksInsteadOfSetBlock) {
         this.worldProvider = context.get(org.terasology.world.WorldProvider.class);
         LocalPlayer localPlayer = context.get(LocalPlayer.class);
         this.region3i = BenchmarkScreen.getChunkRegionAbove(localPlayer.getPosition());
@@ -37,7 +52,7 @@ class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
     @Override
     public void runStep() {
         if (useSetBlocksInsteadOfSetBlock) {
-            Map<Vector3i,Block> blocksToPlace = new HashMap<>();
+            Map<Vector3i, Block> blocksToPlace = new HashMap<>();
             for (Vector3i v : region3i) {
                 blocksToPlace.put(v, blockToPlace);
             }

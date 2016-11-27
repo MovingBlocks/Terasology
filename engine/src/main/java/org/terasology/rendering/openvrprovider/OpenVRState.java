@@ -1,12 +1,31 @@
+/*
+ * Copyright 2016 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.openvrprovider;
 
-import jopenvr.*;
+import jopenvr.HmdMatrix34_t;
+import jopenvr.HmdMatrix44_t;
+import jopenvr.JOpenVRLibrary;
+import jopenvr.VRControllerAxis_t;
+import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/* Contains all of the information that the user will need from OpenVR without using any OpenVR data structures. The
+/** Contains all of the information that the user will need from OpenVR without using any OpenVR data structures. The
 OpenVRProvider automatically updates this.
  */
 public class OpenVRState {
@@ -26,10 +45,6 @@ public class OpenVRState {
     // In the tracking system intertial frame
     private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
 
-    public void addControllerListener(ControllerListener toAdd) {
-        controllerListeners.add(toAdd);
-    }
-
     public OpenVRState() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
             lastControllerState[handIndex] = new VRControllerState_t();
@@ -41,6 +56,10 @@ public class OpenVRState {
                 lastControllerState[handIndex].rAxis[i] = new VRControllerAxis_t();
             }
         }
+    }
+
+    public void addControllerListener(ControllerListener toAdd) {
+        controllerListeners.add(toAdd);
     }
 
     public void setHeadPose(HmdMatrix34_t inputPose) {

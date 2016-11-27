@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.openvrprovider;
 
 import com.sun.jna.Memory;
@@ -24,11 +39,13 @@ import java.nio.IntBuffer;
 import static org.terasology.rendering.openvrprovider.ControllerListener.LEFT_CONTROLLER;
 import static org.terasology.rendering.openvrprovider.ControllerListener.RIGHT_CONTROLLER;
 
-/* This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
+/** This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
  * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
  * or OpenVRState
-  * */
+ */
 public class OpenVRProvider {
+    public static Texture_t[] texType = new Texture_t[2];
+
     private static boolean initialized;
     private static final Logger logger = LoggerFactory.getLogger(OpenVRProvider.class);
     private static VR_IVRSystem_FnTable vrSystem;
@@ -42,15 +59,17 @@ public class OpenVRProvider {
     private static TrackedDevicePose_t.ByReference hmdTrackedDevicePoseReference;
     private static TrackedDevicePose_t[] hmdTrackedDevicePoses;
     private static boolean[] controllerTracking = new boolean[2];
+
     //keyboard
     private static boolean keyboardShowing;
     private static boolean headIsTracking;
+
+    public OpenVRState vrState = new OpenVRState();
+
     // TextureIDs of framebuffers for each eye
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
-    public static Texture_t texType[] = new Texture_t[2];
-    public OpenVRState vrState = new OpenVRState();
 
     public OpenVRProvider() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
@@ -86,7 +105,7 @@ public class OpenVRProvider {
         while (!initSuccess && initAttempts < 10) {
             try {
                 Thread.sleep(300);
-            } catch(InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
             initSuccess = initOpenVRCompositor(true);

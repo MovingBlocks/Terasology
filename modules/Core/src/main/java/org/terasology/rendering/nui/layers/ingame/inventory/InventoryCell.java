@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adds interaction between an inventory slot and the player
+ * Adds interaction between an inventory slot and the player.
  */
 public class InventoryCell extends ItemCell {
     private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);

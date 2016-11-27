@@ -31,7 +31,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 /**
  * A region/layer around the inventory grid to allow players to get rid of extra items
  * and have free inventory slots by dropping them onto this layer.
- *
  */
 public class DropItemRegion extends CoreHudWidget {
 

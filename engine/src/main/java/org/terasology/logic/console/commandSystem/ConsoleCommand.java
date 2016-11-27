@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Interface of commands used in a {@link org.terasology.logic.console.Console}
- *
+ * Interface of commands used in a {@link org.terasology.logic.console.Console}.
  */
 @API
 public interface ConsoleCommand extends Comparable<ConsoleCommand> {
