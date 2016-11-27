@@ -17,7 +17,6 @@ package org.terasology.core.debug;
 
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.Vector3f;
@@ -29,25 +28,18 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;
 import org.terasology.rendering.nui.widgets.UIText;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This screen can be shown with the showScreen command in order to measure the performance of the block placement.
  */
 public class BenchmarkScreen extends BaseInteractionScreen {
-    private static final int BLOCKS_PER_CHUNK = ChunkConstants.CHUNK_SIZE.x * ChunkConstants.CHUNK_SIZE.y
-            * ChunkConstants.CHUNK_SIZE.z;
-    private static final int DEFAULT_ITERATION_COUNT = 200;
+    static final int DEFAULT_ITERATION_COUNT = 200;
 
     private UIText textArea;
     private UIButton closeButton;
@@ -106,125 +98,6 @@ public class BenchmarkScreen extends BaseInteractionScreen {
 
     }
 
-    /**
-     * Benchmark types the user can select and start.
-     */
-    private enum BenchmarkType {
-        WORLD_PROVIDER_SET_BLOCK("WorldProvider.setBlock", DEFAULT_ITERATION_COUNT) {
-            @Override
-            public AbstractBenchmarkInstance createInstance(Context context) {
-                return new BlockPlacementBenchmark(context, false);
-            }
-
-            @Override
-            public String getDescription() {
-                return "Uses setBlock of WorldProvder to replace the chunk (" + BLOCKS_PER_CHUNK + " blocks) above" +
-                        " the player one iteration with stone the other iteration with air";
-
-            }
-        },
-
-        WORLD_PROVIDER_SET_BLOCKs("WorldProvider.setBlocks", DEFAULT_ITERATION_COUNT) {
-            @Override
-            public AbstractBenchmarkInstance createInstance(Context context) {
-                return new BlockPlacementBenchmark(context, true);
-            }
-
-            @Override
-            public String getDescription() {
-                return "Uses setBlocks of WorldProvder to replace the chunk (" + BLOCKS_PER_CHUNK + " blocks) above" +
-                        " the player one iteration with stone the other iteration with air";
-
-            }
-        };
-
-        private String title;
-        private int maxIterations;
-
-        private BenchmarkType(String title, int maxIterations) {
-            this.title = title;
-            this.maxIterations = maxIterations;
-        }
-
-        @Override
-        public String toString() {
-            return title;
-        }
-
-        /**
-         * @return a runnable that will be invoked each iteration, and duration of the invokation will be recorded.
-         */
-        public abstract AbstractBenchmarkInstance createInstance(Context context);
-
-        /**
-         *
-         * @return a description of the benchmark type.
-         */
-        public abstract String getDescription();
-
-        public String getTitle() {
-            return title;
-        }
-
-        public int getMaxIterations() {
-            return maxIterations;
-        }
-    }
-
-    /**
-     * Can banchmark either {@link WorldProvider#setBlock(Vector3i, Block)} or {@link WorldProvider#setBlocks(Map)}
-     * depending on a constructor argument.
-     */
-    private static class BlockPlacementBenchmark extends AbstractBenchmarkInstance {
-        private final WorldProvider worldProvider;
-        private final Region3i region3i;
-        private final Block air;
-        private final Block stone;
-        private final boolean useSetBlocksInsteadOfSetBlock;
-        private Block blockToPlace;
-
-        public BlockPlacementBenchmark(Context context, boolean useSetBlocksInsteadOfSetBlock) {
-            this.worldProvider = context.get(org.terasology.world.WorldProvider.class);
-            LocalPlayer localPlayer = context.get(LocalPlayer.class);
-            this.region3i = getChunkRegionAbove(localPlayer.getPosition());
-            BlockManager blockManager = context.get(BlockManager.class);
-            this.stone = blockManager.getBlock("Core:Stone");
-            this.useSetBlocksInsteadOfSetBlock = useSetBlocksInsteadOfSetBlock;
-            this.air = blockManager.getBlock("engine:air");
-            blockToPlace = stone;
-        }
-
-        @Override
-        public void runStep() {
-            if (useSetBlocksInsteadOfSetBlock) {
-                Map<Vector3i,Block> blocksToPlace = new HashMap<>();
-                for (Vector3i v : region3i) {
-                    blocksToPlace.put(v, blockToPlace);
-                }
-                worldProvider.setBlocks(blocksToPlace);
-            } else {
-                for (Vector3i v : region3i) {
-                    worldProvider.setBlock(v, blockToPlace);
-                }
-            }
-            if (blockToPlace == stone) {
-                blockToPlace = air;
-            } else {
-                blockToPlace = stone;
-            }
-        }
-    }
-
-
-    /**
-     * The interface runnable does not get used to have the possiblity in future to introduce a prepareStep and
-     * cleanupStep method. Those methods could be used in future to do stuff that mustnot be measured.
-     */
-    private static abstract class AbstractBenchmarkInstance {
-
-        public abstract void runStep();
-    }
-
     private void onStartStopButton(UIWidget uiWidget) {
         if (runningBenchmark == null) {
             handleBenchmarkStart();
@@ -239,7 +112,7 @@ public class BenchmarkScreen extends BaseInteractionScreen {
         sum = 0;
         min = Double.MAX_VALUE;
         max = Double.MIN_VALUE;
-        sortedDurations.clear();;
+        sortedDurations.clear();
         updateStartStopButton();
     }
 
@@ -269,7 +142,7 @@ public class BenchmarkScreen extends BaseInteractionScreen {
         getManager().popScreen();
     }
 
-    private static Region3i getChunkRegionAbove(Vector3f location) {
+    static Region3i getChunkRegionAbove(Vector3f location) {
         Vector3i charecterPos = new Vector3i(location);
         Vector3i chunkAboveCharacter = ChunkMath.calcChunkPos(charecterPos);
         chunkAboveCharacter.addY(1);

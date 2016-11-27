@@ -162,8 +162,9 @@ public class UISlider extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (!isEnabled())
+        if (!isEnabled()) {
             return DISABLED_MODE;
+        }
 
         if (active) {
             return ACTIVE_MODE;

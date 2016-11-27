@@ -61,7 +61,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private final List<Color> colors = CieCamColors.L65C65;
 
     private UIText nametext;
-    private UISlider slider, heightSlider, eyeHeightSlider;
+    private UISlider slider;
+    private UISlider heightSlider;
+    private UISlider eyeHeightSlider;
     private UIImage img;
     private UIDropdownScrollable<Locale> language;
 

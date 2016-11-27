@@ -671,8 +671,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
                 movementComp.numberOfJumpsLeft--;
             }
-        }
-        else {
+        } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
                 endVelocity.y = -0.5f * endVelocity.y;
             }
