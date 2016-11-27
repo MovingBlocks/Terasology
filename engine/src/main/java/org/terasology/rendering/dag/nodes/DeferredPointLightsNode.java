@@ -43,9 +43,6 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-
-// TODO: rename class to PointLightsGeometryNode
-
 /**
  * Instances of this class are integral to the deferred rendering process.
  * They render point lights as spheres, into the light accumulation buffer
