@@ -165,8 +165,11 @@ Contributors
  [nahh](https://github.com/nahh),
  [ron-popov](https://github.com/ron-popov),
  [MaxBorsch](https://github.com/MaxBorsch),
- [freyley](https://github.com/freyley)
+ [freyley](https://github.com/freyley),
  [Tropid](https://github.com/Tropid),
+ [HolixSF](https://github.com/HolixSF),
+ [agsmith](https://github.com/agsmith),
+ [Stefan-Mitic](https://github.com/Stefan-Mitic)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
