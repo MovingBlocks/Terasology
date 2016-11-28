@@ -16,8 +16,8 @@
 package org.terasology.rendering.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.math.Vector2i;
 import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.LinkedList;

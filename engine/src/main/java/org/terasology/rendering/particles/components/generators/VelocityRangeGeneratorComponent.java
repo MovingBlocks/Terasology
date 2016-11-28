@@ -17,8 +17,6 @@ package org.terasology.rendering.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 7-3-2015.

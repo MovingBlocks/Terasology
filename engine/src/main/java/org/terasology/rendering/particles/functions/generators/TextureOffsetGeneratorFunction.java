@@ -16,9 +16,9 @@
 package org.terasology.rendering.particles.functions.generators;
 
 import org.terasology.math.geom.Vector2f;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.components.generators.TextureOffsetGeneratorComponent;
-import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**

@@ -18,6 +18,7 @@ package org.terasology.rendering.particles.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.rendering.particles.events.ParticleSystemUpdateEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ import java.util.List;
 public class ParticleEmitterComponent implements Component {
     public static final int INFINITE_PARTICLE_SPAWNS = -1;
 
+    // Reference to owner entity
+    public EntityRef entityRef;
+
     public float spawnRateMax = 11.0f;
     public float spawnRateMin = 9.0f;
 
@@ -37,5 +41,40 @@ public class ParticleEmitterComponent implements Component {
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 
     @Owns
-    public List<EntityRef> generators = new ArrayList<>();
+    private List<EntityRef> generators = new ArrayList<>();
+
+    /*
+    * Notify ParticleSystemManager that this system needs an updated ParticleSystemStateData
+    * */
+    private void requestUpdate () {
+        if (entityRef != null) {
+            entityRef.send(new ParticleSystemUpdateEvent());
+        }
+    }
+
+    // GENERATOR LIST ACCESS
+    public void addGenerator (final EntityRef generator) {
+        generators.add(generator);
+        requestUpdate();
+    }
+
+    public boolean removeGenerator (final EntityRef generator) {
+        boolean removed = generators.remove(generator);
+        requestUpdate();
+        return removed;
+    }
+
+    public EntityRef removeGenerator (final int generatorIndex) {
+        EntityRef generator = generators.remove(generatorIndex);
+        requestUpdate();
+        return generator;
+    }
+
+    public EntityRef getGenerator (int index) {
+        return generators.get(index);
+    }
+
+    public List<EntityRef> getGenerators () {
+        return generators;
+    }
 }

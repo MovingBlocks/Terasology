@@ -34,13 +34,15 @@ public interface ParticleUpdater {
     void register(EntityRef entity);
     void dispose(EntityRef entity);
 
-    void update(final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions,
-                float delta);
+    void updateStateData(final EntityRef entityRef,
+                         final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
+                         final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
+
+    void update(float delta);
 
     Collection<ParticleSystemStateData> getStateData();
 
-    public static ParticleUpdater create(Physics physics, Logger logger) {
+    static ParticleUpdater create(Physics physics, Logger logger) {
         return new ParticleUpdaterImplementation(physics);
     }
 }

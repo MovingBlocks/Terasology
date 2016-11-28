@@ -18,9 +18,9 @@ package org.terasology.rendering.particles.functions.affectors;
 import com.google.common.collect.Maps;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.components.affectors.EnergyColorAffectorComponent;
-import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 import java.util.Map;

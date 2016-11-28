@@ -16,8 +16,6 @@
 package org.terasology.rendering.particles.components.affectors;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 10-3-2015.

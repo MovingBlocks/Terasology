@@ -17,11 +17,11 @@ package org.terasology.rendering.particles.internal.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
-import org.terasology.asset.Assets;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.particles.internal.data.ParticleSystemStateData;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 
 /**
  * Created by Linus on 7-4-2015.
@@ -51,7 +51,7 @@ public abstract class ParticleRenderer {
     public abstract void dispose();
 
     public void render(WorldRenderer worldRenderer, Iterable<ParticleSystemStateData> particleSystems) {
-        Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI);
+        Material material = Assets.getMaterial(PARTICLE_MATERIAL_URI).get();
         material.enable();
         Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 

@@ -16,15 +16,13 @@
 package org.terasology.rendering.particles.components.affectors;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.reflection.MappedContainer;
-import org.terasology.rendering.particles.ParticleData;
-import org.terasology.utilities.random.Random;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Linus on 8-3-2015.

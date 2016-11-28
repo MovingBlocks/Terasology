@@ -17,9 +17,9 @@ package org.terasology.rendering.particles.functions.affectors;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.functions.ParticleSystemFunction;
-import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**

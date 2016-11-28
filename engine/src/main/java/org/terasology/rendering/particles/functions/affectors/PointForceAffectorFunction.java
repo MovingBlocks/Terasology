@@ -17,9 +17,9 @@ package org.terasology.rendering.particles.functions.affectors;
 
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.rendering.particles.DataMask;
 import org.terasology.rendering.particles.ParticleData;
 import org.terasology.rendering.particles.components.affectors.PointForceAffectorComponent;
-import org.terasology.rendering.particles.DataMask;
 import org.terasology.utilities.random.Random;
 
 /**
