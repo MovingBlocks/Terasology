@@ -87,7 +87,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [PhysicalStats](https://github.com/Terasology/PhysicalStats) - introduces a basic attributes system akin to traditional RPGs
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Throughout the Ages gameplay
 * [PolyWorld](https://github.com/Terasology/PolyWorld) - creates very neat island worlds based on the [map generating algorithm by Amit Patel of Red Blob Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
-* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock portal`
+* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `give portal`
 * [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
 * [Potions](https://github.com/Terasology/Potions) - contains a set of assorted potions the player can consume to gain various effects
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
