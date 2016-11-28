@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public enum ViewDistance {
         }
     }
 
-    private ViewDistance(String displayName, int index, Vector3i chunkDistance) {
+    ViewDistance(String displayName, int index, Vector3i chunkDistance) {
         this.displayName = displayName;
         this.index = index;
         this.chunkDistance = chunkDistance;

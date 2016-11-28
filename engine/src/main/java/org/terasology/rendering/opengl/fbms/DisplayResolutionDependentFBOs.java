@@ -20,7 +20,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
@@ -111,9 +110,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     private void updateFullScale() {
         if (screenGrabber.isNotTakingScreenshot()) {
             fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
-            if (renderingConfig.isOculusVrSupport()) {
-                fullScale.multiplySelfBy(OculusVrHelper.getScaleFactor());
-            }
         } else {
             fullScale = new FBO.Dimensions(
                     renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),

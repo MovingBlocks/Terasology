@@ -50,6 +50,7 @@ public final class FBO {
     private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
+    // TODO: make accessors for these
     public int fboId;
     public int colorBufferTextureId;
     public int depthStencilTextureId;
@@ -134,10 +135,8 @@ public final class FBO {
             }
             attachmentId++;
         }
-        if (lightBufferTextureId != 0) {
-            if (this.writeToLightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
+        if (lightBufferTextureId != 0 && this.writeToLightBuffer) { // compacted if block because Jenkins was complaining about it.
+            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
         }
 
         bufferIds.flip();
@@ -549,7 +548,9 @@ public final class FBO {
         }
 
         /**
-         * @param dimensions
+         * Copy constructor: construct a Dimensions instance with the dimensions of another.
+         *
+         * @param dimensions a Dimensions instance
          */
         public Dimensions(Dimensions dimensions) {
             this(dimensions.width(), dimensions.height());

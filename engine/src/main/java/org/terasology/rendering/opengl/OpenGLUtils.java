@@ -30,9 +30,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 
-/**
-
- */
 public final class OpenGLUtils {
     private static int displayListQuad = -1;
 
@@ -118,10 +115,8 @@ public final class OpenGLUtils {
             }
             attachmentId++;
         }
-        if (fbo.lightBufferTextureId != 0) {
-            if (lightBuffer) {
+        if (fbo.lightBufferTextureId != 0 && lightBuffer) {
                 bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
         }
 
         bufferIds.flip();
@@ -166,7 +161,7 @@ public final class OpenGLUtils {
 
 
     // TODO: replace with a proper resident buffer with interleaved vertex and uv coordinates
-    public static void renderQuad() {
+    private static void renderQuad() {
         if (displayListQuad == -1) {
             displayListQuad = glGenLists(1);
 

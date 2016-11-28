@@ -58,7 +58,7 @@ It is also possible to provide a configuration file which overrides the default 
 
 To set the gameplay module, the world generator and some basic server settings.
 
-If you include the "CheatsForAll" module in config for a server then you can bypass a lot of the admin setup as every player will be able to use `cheat` commands, like `giveBlock` - however, keep in mind then everybody can cheat, this is really more for testing :-)
+If you include the "CheatsForAll" module in config for a server then you can bypass a lot of the admin setup as every player will be able to use `cheat` commands, like `give` - however, keep in mind then everybody can cheat, this is really more for testing :-)
 
 Alternatively you can run from source and supply parameters for game configuration. For instance here is how you would launch with ThroughoutTheAges active, our most complete setting. Keep in mind the module list may change any day, check in the game client what modules highlight with TTA selected to confirm.
 
@@ -134,11 +134,11 @@ Press the `F1` or `grave` key (usually the \` key immediately above `tab`) to sh
 * `hspeed` - greatly increase your movement speed
 * `hjump` - jump really high. Almost like flying - but it isn't. Just jump good.
 * `restoreSpeed` - normalizes speed (both horizontal and vertical)
-* `help giveBlock` - Shows detailed help on the "giveBlock" command
-* `giveBlock Water` - Gives 16 water blocks (default quantity when not specified)
-* `giveBlock Stone 99 Stair` - Gives you 99 stone stair blocks
-* `giveBlock Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
-* `giveBlock TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* `help give` - Shows detailed help on the "give" command
+* `give Water` - Gives 16 water blocks (default quantity when not specified)
+* `give Stone 99 Stair` - Gives you 99 stone stair blocks
+* `give Chest` - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
+* `give TNT` - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * `bulkGiveBlock cake` - Gives you a stack of blocks for every block with the name "cake" in it! Find good block series with `search`
 * `listBlocks` - Lists all actively used blocks (have been loaded for the world)
 * `listFreeShapeBlocks` - Lists all blocks that can be requested in any known shape

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -671,8 +671,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
                 movementComp.numberOfJumpsLeft--;
             }
-        }
-        else {
+        } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
                 endVelocity.y = -0.5f * endVelocity.y;
             }

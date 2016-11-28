@@ -16,11 +16,13 @@
 package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 
 /**
  * Entities with this component will show an UI during interactions.
  *
  */
+@API
 public class InteractionScreenComponent implements Component {
     public String screen;
 

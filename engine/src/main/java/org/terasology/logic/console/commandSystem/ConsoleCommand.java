@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,25 +27,28 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Interface of commands used in a {@link org.terasology.logic.console.Console}
- *
+ * Interface of commands used in a {@link org.terasology.logic.console.Console}.
  */
 @API
 public interface ConsoleCommand extends Comparable<ConsoleCommand> {
-    Comparator<ConsoleCommand> COMPARATOR = (o1, o2) -> {
-        int nameComparison = o1.getName().compareTo(o2.getName());
+    Comparator<ConsoleCommand> COMPARATOR = new Comparator<ConsoleCommand>() {
 
-        if (nameComparison != 0) {
-            return nameComparison;
-        }
+        @Override
+        public int compare(ConsoleCommand o1, ConsoleCommand o2) {
+            int nameComparison = o1.getName().compareTo(o2.getName());
 
-        if (!o1.endsWithVarargs() && o2.endsWithVarargs()) {
-            return -1;
-        } else if (o1.endsWithVarargs() && !o2.endsWithVarargs()) {
-            return 1;
-        }
+            if (nameComparison != 0) {
+                return nameComparison;
+            }
 
-        return o2.getRequiredParameterCount() - o1.getRequiredParameterCount();
+            if (!o1.endsWithVarargs() && o2.endsWithVarargs()) {
+                return -1;
+            } else if (o1.endsWithVarargs() && !o2.endsWithVarargs()) {
+                return 1;
+            }
+
+            return o2.getRequiredParameterCount() - o1.getRequiredParameterCount();
+        };
     };
 
     /**

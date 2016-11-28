@@ -20,7 +20,6 @@ import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -51,15 +50,12 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 public class BackdropReflectionNode extends AbstractNode {
 
     public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
-    public static final int RADIUS = 1024;
-    public static final int SLICES = 16;
-    public static final int STACKS = 128;
+    private static final int RADIUS = 1024;
+    private static final int SLICES = 16;
+    private static final int STACKS = 128;
 
     @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private BackdropRenderer backdropRenderer;
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;

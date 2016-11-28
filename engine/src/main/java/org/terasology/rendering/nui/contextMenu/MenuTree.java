@@ -41,8 +41,8 @@ public final class MenuTree implements AbstractContextMenuItem {
         return this.options;
     }
 
-    public <E> void addOption(String name, Consumer<E> consumer, E item) {
-        options.add(new ContextMenuOption<E>(name, consumer, item, true));
+    public <E> void addOption(String optionName, Consumer<E> consumer, E item) {
+        options.add(new ContextMenuOption<E>(optionName, consumer, item, true));
     }
 
     public void addSubmenu(MenuTree tree) {

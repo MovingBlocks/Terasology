@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ import org.terasology.rendering.nui.layers.mainMenu.settings.CieCamColors;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
-/**
- */
 public class PlayerConfig {
 
     private static final float DEFAULT_PLAYER_HEIGHT = 1.8f;
@@ -55,17 +53,22 @@ public class PlayerConfig {
         this.color = color;
     }
 
-    public Float getHeight() { return height; }
+    public Float getHeight() {
+        return height;
+    }
 
     public void setHeight(Float height) {
         this.height = height;
     }
 
-    public Float getEyeHeight() { return eyeHeight; }
+    public Float getEyeHeight() {
+        return eyeHeight;
+    }
 
     public void setEyeHeight(Float eyeHeight) {
-        if (eyeHeight< this.height)
+        if (eyeHeight < this.height) {
             this.eyeHeight = eyeHeight;
+        }
     }
 
     private static String defaultPlayerName() {

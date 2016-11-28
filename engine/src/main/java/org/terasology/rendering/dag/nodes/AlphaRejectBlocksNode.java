@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -53,9 +52,6 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
 public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
 
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
-
-    @In
-    private ComponentSystemManager componentSystemManager;
 
     @In
     private Config config;

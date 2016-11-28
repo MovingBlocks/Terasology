@@ -15,25 +15,26 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
+import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
+import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.OculusStereoCamera;
+import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
@@ -49,12 +50,12 @@ import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
-import org.terasology.rendering.dag.nodes.DirectionalLightsNode;
 import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
+import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
-import org.terasology.rendering.dag.nodes.LightGeometryNode;
+import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OpaqueObjectsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
@@ -66,14 +67,12 @@ import org.terasology.rendering.dag.nodes.SimpleBlendMaterialsNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
-import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
@@ -88,7 +87,6 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
@@ -97,8 +95,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
  *
- * This implementation includes support for Oculus VR, a head mounted display. No other stereoscopic displays are
- * supported at this stage: see https://github.com/MovingBlocks/Terasology/issues/2111 for updates.
+ * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
  *
  * This implementation works closely with a number of support objects, in particular:
  *
@@ -119,7 +116,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
-    // private Material simpleShader; // in use by the currently commented out light stencil pass
 
     private float millisecondsSinceRenderingStart;
     private float secondsSinceLastFrame;
@@ -127,16 +123,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statChunkNotReady;
     private int statRenderedTriangles;
 
-    // TODO: to be documented (when understood in more detail)
-    public enum ChunkRenderMode {
-        DEFAULT,
-        REFLECTION,
-        SHADOW_MAP,
-        Z_PRE_PASS
-    }
-
     private final RenderingConfig renderingConfig;
-    private final RenderingDebugConfig renderingDebugConfig;
     private ScreenGrabber screenGrabber;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
@@ -144,6 +131,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
+    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -166,13 +154,17 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.worldProvider = context.get(WorldProvider.class);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        this.renderingDebugConfig = renderingConfig.getDebug();
         this.shaderManager = context.get(ShaderManager.class);
-
-        if (renderingConfig.isOculusVrSupport()) {
-            playerCamera = new OculusStereoCamera();
-            currentRenderingStage = RenderingStage.LEFT_EYE;
-
+        if (renderingConfig.isVrSupport()) {
+            this.vrProvider = new OpenVRProvider();
+            context.put(OpenVRProvider.class, vrProvider);
+            if (this.vrProvider.init()) {
+                playerCamera = new OpenVRStereoCamera(this.vrProvider);
+                currentRenderingStage = RenderingStage.LEFT_EYE;
+            } else {
+                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                currentRenderingStage = RenderingStage.MONO;
+            }
         } else {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = RenderingStage.MONO;
@@ -282,19 +274,28 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
-        // TODO: clarify if this is actually needed - held-in-hand items seem to be rendered in OpaqueObjectsNode, above
+        // TODO: remove this, including associated method in the RenderSystem interface
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
 
+        // lighting
+        Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
+        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
+
+        // TODO next!
+        Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
+        renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
+
+        Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
+        renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
+        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
 
         // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
         Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
         renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
 
-        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node lightGeometryNode = nodeFactory.createInstance(LightGeometryNode.class);
-        Node directionalLightsNode = nodeFactory.createInstance(DirectionalLightsNode.class);
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
         Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
@@ -308,10 +309,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
         Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
+        
 
-
-        renderGraph.addNode(lightGeometryNode, "lightGeometryNode");
-        renderGraph.addNode(directionalLightsNode, "directionalLightsNode");
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         renderGraph.addNode(outlineNode, "outlineNode");
         renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
@@ -325,6 +326,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
         renderGraph.addNode(blurPassesNode, "blurPassesNode");
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -421,7 +424,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * or to a file, when grabbing a screenshot.
      *
      * In this particular implementation this method can be called once per frame, when rendering to a standard display,
-     * or twice, each time with a different rendering stage, when rendering to the OculusVR head mounted display.
+     * or twice, each time with a different rendering stage, when rendering to the head mounted display.
      *
      * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
@@ -453,73 +456,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public boolean renderLightComponent(LightComponent lightComponent, Vector3f lightWorldPosition, Material program, boolean geometryOnly) {
-        Vector3f positionViewSpace = new Vector3f();
-        positionViewSpace.sub(lightWorldPosition, playerCamera.getPosition());
-
-        boolean doRenderLight = lightComponent.lightType == LightComponent.LightType.DIRECTIONAL
-                || lightComponent.lightRenderingDistance == 0.0f
-                || positionViewSpace.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
-
-        doRenderLight &= isLightVisible(positionViewSpace, lightComponent);
-
-        if (!doRenderLight) {
-            return false;
-        }
-
-        if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
-            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-            }
-        }
-        program.enable();
-        program.setCamera(playerCamera);
-
-        Vector3f worldPosition = new Vector3f();
-        worldPosition.sub(lightWorldPosition, playerCamera.getPosition());
-
-        Vector3f lightViewPosition = new Vector3f(worldPosition);
-        playerCamera.getViewMatrix().transformPoint(lightViewPosition);
-
-        program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z, true);
-
-        Matrix4f modelMatrix = new Matrix4f();
-        modelMatrix.set(lightComponent.lightAttenuationRange);
-
-        modelMatrix.setTranslation(worldPosition);
-        program.setMatrix4("modelMatrix", modelMatrix, true);
-
-        if (!geometryOnly) {
-            program.setFloat3("lightColorDiffuse", lightComponent.lightColorDiffuse.x, lightComponent.lightColorDiffuse.y, lightComponent.lightColorDiffuse.z, true);
-            program.setFloat3("lightColorAmbient", lightComponent.lightColorAmbient.x, lightComponent.lightColorAmbient.y, lightComponent.lightColorAmbient.z, true);
-            program.setFloat3("lightProperties", lightComponent.lightAmbientIntensity, lightComponent.lightDiffuseIntensity, lightComponent.lightSpecularPower, true);
-        }
-
-        if (lightComponent.lightType == LightComponent.LightType.POINT) {
-            if (!geometryOnly) {
-                program.setFloat4("lightExtendedProperties", lightComponent.lightAttenuationRange, lightComponent.lightAttenuationFalloff, 0.0f, 0.0f, true);
-            }
-
-            LightGeometryHelper.renderSphereGeometry();
-        } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-            // Directional lights cover all pixels on the screen
-            renderFullscreenQuad();
-        }
-
-        if (!geometryOnly) {
-            if (lightComponent.lightType == LightComponent.LightType.POINT) {
-                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
-            } else if (lightComponent.lightType == LightComponent.LightType.DIRECTIONAL) {
-                program.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-            }
-        }
-
-        return true;
-    }
-
-    @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
         return isFirstRenderingStageForCurrentFrame;
     }
@@ -536,12 +472,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public void setViewDistance(ViewDistance viewDistance) {
         renderableWorld.updateChunksInProximity(viewDistance);
-    }
-
-    private boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
-        return component.lightType == LightComponent.LightType.DIRECTIONAL
-                || playerCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
-
     }
 
     @Override

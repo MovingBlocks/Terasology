@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Provides support for loading and applying shaders.
- *
  */
 public class ShaderManagerLwjgl implements ShaderManager {
 
@@ -170,6 +169,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         activeMaterial = null;
     }
 
+    @SuppressWarnings("unused")  // this is actually used, I'm not sure why the Jenkins Static Analyses says it's unused.
     private GLSLMaterial prepareAndStoreShaderProgramInstance(String title, ShaderParameters params) {
         String uri = "engine:" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);

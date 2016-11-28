@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Collections;
 
-/**
- */
 public class PlayerSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:PlayerMenuScreen");
@@ -61,7 +59,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private final List<Color> colors = CieCamColors.L65C65;
 
     private UIText nametext;
-    private UISlider slider, heightSlider, eyeHeightSlider;
+    private UISlider slider;
+    private UISlider heightSlider;
+    private UISlider eyeHeightSlider;
     private UIImage img;
     private UIDropdownScrollable<Locale> language;
 

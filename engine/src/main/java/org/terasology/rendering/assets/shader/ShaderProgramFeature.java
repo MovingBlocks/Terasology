@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,18 @@
 package org.terasology.rendering.assets.shader;
 
 import java.util.Collection;
-import java.util.EnumSet;
 
-/**
- */
 public enum ShaderProgramFeature {
-    FEATURE_REFRACTIVE_PASS (0b00000001),
-    FEATURE_ALPHA_REJECT (0b00000010),
-    FEATURE_LIGHT_POINT (0b00000100),
-    FEATURE_LIGHT_DIRECTIONAL (0b00001000),
-    FEATURE_USE_MATRIX_STACK (0b00100000),
-    FEATURE_USE_FORWARD_LIGHTING (0b01000000);
+    FEATURE_REFRACTIVE_PASS(0b00000001),
+    FEATURE_ALPHA_REJECT(0b00000010),
+    FEATURE_LIGHT_POINT(0b00000100),
+    FEATURE_LIGHT_DIRECTIONAL(0b00001000),
+    FEATURE_USE_MATRIX_STACK(0b00100000),
+    FEATURE_USE_FORWARD_LIGHTING(0b01000000);
 
-    static {
-        allBitset = getBitset(EnumSet.allOf(ShaderProgramFeature.class));
-    }
-
-    private static int allBitset;
     private int value;
 
-    private ShaderProgramFeature(int value) {
+    ShaderProgramFeature(int value) {
         this.value = value;
     }
 
@@ -49,14 +41,5 @@ public enum ShaderProgramFeature {
             result |= feature.getValue();
         }
         return result;
-    }
-
-    public static int getAllBitset() {
-        return allBitset;
-    }
-
-    public static Iterable<EnumSet<ShaderProgramFeature>> iteratePermutations(EnumSet<ShaderProgramFeature> features) {
-
-        return null;  //To change body of created methods use File | Settings | File Templates.
     }
 }

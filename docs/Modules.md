@@ -16,6 +16,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 
 *Note about "Tutorial" modules:* These are more likely for some time to be for developers/modders to learn about different kinds of content and systems, not for players to actually learn stuff in-game. That's usually handled by actual content modules including their own in-game help system.
 
+* [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
@@ -35,6 +36,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ClimateConditions](https://github.com/Terasology/ClimateConditions) - A library module for managing temperature, humidity, and other climate factors 
 * [CommonWorld](https://github.com/Terasology/CommonWorld) - general world generation utility module
 * [ComputerMonitors](https://github.com/Terasology/ComputerMonitors) - allows for the creation of functional multi-block monitors in-game - ModularComputers puts them to work!
+* [Cooking](https://github.com/Terasology/Cooking) - cook stuff!
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
 * Core - mandatory content needed for normal game launch
 * CoreSampleGameplay - gameplay front for Core - allows modules to depend on Core without the default starting inventory
@@ -87,7 +89,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [PhysicalStats](https://github.com/Terasology/PhysicalStats) - introduces a basic attributes system akin to traditional RPGs
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Throughout the Ages gameplay
 * [PolyWorld](https://github.com/Terasology/PolyWorld) - creates very neat island worlds based on the [map generating algorithm by Amit Patel of Red Blob Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
-* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock portal`
+* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `give portal`
 * [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
 * [Potions](https://github.com/Terasology/Potions) - contains a set of assorted potions the player can consume to gain various effects
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
@@ -98,6 +100,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [SimpleFarming](https://github.com/Terasology/SimpleFarming) - easy to understand growing of foods
 * [SimpleLiquids](https://github.com/Terasology/SimpleLiquids) - lets water propagate in the world - beware of floods!
+* [Smithing](https://github.com/Terasology/Smithing) - crafting for metal-based recipes
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StaticCities](https://github.com/Terasology/StaticCities) - variant of Cities that places all cities during world generation without later dynamic growth
@@ -116,6 +119,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
+* [WorkstationCrafting](https://github.com/Terasology/WorkstationCrafting) - an extension to Workstation focused on crafting more advanced recipe-based stuff
 * [WorkstationInGameHelp](https://github.com/Terasology/WorkstationInGameHelp) - bridging module to bring in-game help to workstation screens
 * [WorldlyTooltip](https://github.com/Terasology/WorldlyTooltip) - a little tooltip that shows you what you're looking at (hold `alt` for debug details)
 

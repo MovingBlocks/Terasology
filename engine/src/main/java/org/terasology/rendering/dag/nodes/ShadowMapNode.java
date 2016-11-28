@@ -22,7 +22,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
@@ -76,9 +75,6 @@ public class ShadowMapNode extends ConditionDependentNode {
 
     @In
     private BackdropProvider backdropProvider;
-
-    @In
-    private ShaderManager shaderManager;
 
     @In
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;

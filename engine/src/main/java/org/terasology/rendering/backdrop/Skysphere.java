@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import static org.lwjgl.opengl.GL11.glNewList;
 
 /**
  * Skysphere based on the Perez all weather luminance model.
- *
  */
 public class Skysphere implements BackdropProvider, BackdropRenderer {
 
@@ -68,7 +67,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         shader.enable();
 
         // Draw the skysphere
-        drawSkysphere();
+        drawSkysphere(camera.getzFar());
 
         if (camera.isReflected()) {
             glCullFace(GL_FRONT);
@@ -79,7 +78,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         glDepthMask(true);
     }
 
-    private void drawSkysphere() {
+    private void drawSkysphere(float zFar) {
         if (displayListSphere == -1) {
             displayListSphere = glGenLists(1);
 
@@ -88,7 +87,8 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
             glNewList(displayListSphere, GL11.GL_COMPILE);
 
-            sphere.draw(1024, 16, 128);
+            float skyBoxDistance = (zFar > 1024 ? 1024.0f : zFar * 0.95f);
+            sphere.draw(skyBoxDistance, 16, 128);
 
             glEndList();
         }

@@ -22,7 +22,8 @@ import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
 import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
- * TODO: Add javadocs
+ * Instances of this class enable OpenGL's stencil testing, potentially used in a variety
+ * of advanced computer graphics tricks such as stenciled shadows.
  */
 public final class EnableStencilTest extends SetStateParameter {
     private static final int PARAMETER = GL_STENCIL_TEST;
@@ -31,12 +32,23 @@ public final class EnableStencilTest extends SetStateParameter {
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
+    /**
+     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
+     * the form:
+     *
+     * addDesiredStateChange(new EnableStencilTest());
+     *
+     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
+     * in the rendering task list, each instance enabling/disabling respectively the GL_CULL_FACE mode. The
+     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
+     * i.e. because the upstream or downstream node also enables face culling.
+     */
     public EnableStencilTest() {
         this(true);
     }
 
     private EnableStencilTest(boolean enabled) {
-        super(enabled);
+        super(GL_STENCIL_TEST, enabled);
         disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
         enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }
