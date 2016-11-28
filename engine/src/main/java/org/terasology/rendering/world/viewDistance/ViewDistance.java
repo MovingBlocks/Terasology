@@ -45,7 +45,7 @@ public enum ViewDistance {
     }
 
     ViewDistance(String displayName, int index, Vector3i chunkDistance) {
-        this.displayName = displayName;
+        this.displayName = String.format(displayName + " (%1$dx%2$dx%3$d)", chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
         this.index = index;
         this.chunkDistance = chunkDistance;
     }
