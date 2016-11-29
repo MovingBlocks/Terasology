@@ -248,7 +248,7 @@ public class RenderingConfig extends AbstractSubscribable {
     }
 
     public ViewDistance getViewDistance() {
-        return (viewDistance == null) ? ViewDistance.FAR : viewDistance;
+        return (viewDistance == null) ? ViewDistance.MODERATE : viewDistance;
     }
 
     /**

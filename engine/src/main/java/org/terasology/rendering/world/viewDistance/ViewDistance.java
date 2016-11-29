@@ -45,7 +45,7 @@ public enum ViewDistance {
     }
 
     ViewDistance(String displayName, int index, Vector3i chunkDistance) {
-        this.displayName = String.format(displayName + " (%1$dx%2$dx%3$d)", chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
+        this.displayName = displayName;
         this.index = index;
         this.chunkDistance = chunkDistance;
     }
@@ -68,6 +68,6 @@ public enum ViewDistance {
 
     @Override
     public String toString() {
-        return displayName;
+        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
     }
 }
