@@ -68,6 +68,6 @@ public enum ViewDistance {
 
     @Override
     public String toString() {
-        return displayName;
+        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
     }
 }
