@@ -127,6 +127,14 @@ public class OpenVRProvider {
         return initialized;
     }
 
+    public boolean isHeadTracking() {
+        return headIsTracking;
+    }
+
+    public boolean isControllerTrackint(int controllerIndex) {
+        return controllerTracking[controllerIndex];
+    }
+
     public void shutdown() {
         JOpenVRLibrary.VR_ShutdownInternal();
         vrSystem = null;
