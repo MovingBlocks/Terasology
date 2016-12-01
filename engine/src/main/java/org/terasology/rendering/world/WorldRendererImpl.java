@@ -291,9 +291,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
 
+        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
+        renderGraph.addNode(outlineNode, "outlineNode");
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
+
         Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
@@ -309,7 +312,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         
 
 
-        renderGraph.addNode(outlineNode, "outlineNode");
+
         renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
