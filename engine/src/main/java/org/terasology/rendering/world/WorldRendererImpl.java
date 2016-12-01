@@ -43,7 +43,6 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
-import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
@@ -282,22 +281,18 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
         renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
 
-        // TODO next!
         Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
         renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
 
         Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
 
+        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
+        renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-
-        // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
-        Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
-        renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
-
-        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
-        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
@@ -313,7 +308,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
         
 
-        renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+
         renderGraph.addNode(outlineNode, "outlineNode");
         renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
