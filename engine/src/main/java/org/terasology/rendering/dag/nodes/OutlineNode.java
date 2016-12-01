@@ -31,7 +31,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
- * This nodes (or rather the shader used by it) takes advantage of the Sobel operator
+ * This nodes (or rather the shader used by it) takes advantage of the Sobel operator [1]
  * to trace outlines (silhouette edges) of objects at some distance from the player.
  *
  * The resulting outlines are stored in a separate buffer the content of which is

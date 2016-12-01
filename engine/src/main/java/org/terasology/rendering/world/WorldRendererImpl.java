@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
+import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
@@ -41,7 +43,6 @@ import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.BlurPassesNode;
@@ -291,13 +292,20 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
 
+        // 3d-based decorations (versus purely 2d, post-production effects)
         Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         renderGraph.addNode(outlineNode, "outlineNode");
+
+        Node ambientOcclusionNode = nodeFactory.createInstance(AmbientOcclusionNode.class);
+        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
+
+        Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
+        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
 
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
 
-        Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
+
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
         Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
@@ -309,11 +317,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
-        
 
-
-
-        renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
