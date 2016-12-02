@@ -24,14 +24,17 @@ public class ArrowActionComponent implements Component{
     /**
      * The max distance the arrow will fly.
      */
-    public int maxDistance = 64;
+    public int maxDistance = 24;
 
     /**
-     * The max number of rays to cast at each chosen spot in the path of the tunnel to hit target blocks
+     * The damage the arrow does
      */
-    public int maxRaysCast = 512;
+    public int damageAmount = 3;
 
-    public int damageAmount = 20;
+    /**
+     * How many arrows can be fired per second
+     */
+    public float arrowsPerSecond = 1.0f;
 
     public Prefab damageType = EngineDamageTypes.PHYSICAL.get();
 

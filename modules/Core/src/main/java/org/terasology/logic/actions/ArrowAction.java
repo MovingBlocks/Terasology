@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.actions;
 
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,9 +33,6 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.asset.UIFormat;
-import org.terasology.utilities.random.FastRandom;
-import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -53,7 +51,11 @@ public class ArrowAction extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    private CollisionGroup[] filter = {StandardCollisionGroup.ALL};
+    @In
+    private Time time;
+
+    private CollisionGroup filter = StandardCollisionGroup.ALL;
+    private float lastTime = 0.0f;
 
     @Override
     public void initialise() {
@@ -66,23 +68,26 @@ public class ArrowAction extends BaseComponentSystem {
     @ReceiveEvent
     public void onActivate(ActivateEvent event, EntityRef entity, ArrowActionComponent arrowActionComponent) {
 
-        Vector3f target = event.getHitNormal();
-        Vector3i blockPos = new Vector3i(target);
+        if (time.getGameTime() > lastTime + 1.0f/arrowActionComponent.arrowsPerSecond) {
+            Vector3f target = event.getHitNormal();
+            Vector3i blockPos = new Vector3i(target);
 
-        Vector3f position = new Vector3f(event.getOrigin());
-        Vector3f dir = new Vector3f(event.getDirection());
+            Vector3f position = new Vector3f(event.getOrigin());
+            Vector3f dir = new Vector3f(event.getDirection());
 
-        HitResult result;
-        result = physicsRenderer.rayTrace(position, dir, arrowActionComponent.maxDistance, filter);
+            HitResult result;
+            result = physicsRenderer.rayTrace(position, dir, arrowActionComponent.maxDistance, filter);
 
-        Block currentBlock = worldProvider.getBlock(blockPos);
+            Block currentBlock = worldProvider.getBlock(blockPos);
 
-        if (currentBlock.isDestructible()) {
-            EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
-            builder.getComponent(LocationComponent.class).setWorldPosition(target);
-            builder.build();
+            if (currentBlock.isDestructible()) {
+                EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
+                builder.getComponent(LocationComponent.class).setWorldPosition(target);
+                builder.build();
+            }
+            EntityRef blockEntity = result.getEntity();
+            blockEntity.send(new DoDamageEvent(arrowActionComponent.damageAmount, arrowActionComponent.damageType));
+            lastTime = time.getGameTime();
         }
-        EntityRef blockEntity = result.getEntity();
-        blockEntity.send(new DoDamageEvent(arrowActionComponent.damageAmount, arrowActionComponent.damageType));
     }
 }
