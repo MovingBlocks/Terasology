@@ -29,19 +29,19 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
  * TODO: Add diagram of this node
  */
-public class AmbientOcclusionNode extends ConditionDependentNode {
+public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
     public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
     private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
+    private static final float NOISE_TEXEL_SIZE = 0.25f;
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -53,6 +53,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
     private Config config;
 
     private Material ssaoMaterial;
+    private float outputFboWidth;
+    private float outputFboHeight;
 
     @Override
     public void initialise() {
@@ -66,6 +68,9 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
+
+        displayResolutionDependentFBOs.subscribe(this);
+        update(); // initializing ssaoBufferWidth/ssaoBufferHeight
 
         // TODO: check for input textures brought in by the material
     }
@@ -81,14 +86,18 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/ambientOcclusion");
 
-        FBO ssaoFBO = displayResolutionDependentFBOs.get(SSAO_FBO); // TODO: make this class a subscriber and handle changes
-        ssaoMaterial.setFloat2("texelSize", 1.0f / ssaoFBO.width(), 1.0f / ssaoFBO.height(), true);
-        ssaoMaterial.setFloat2("noiseTexelSize", 1.0f / 4.0f, 1.0f / 4.0f, true);
+        ssaoMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
+        ssaoMaterial.setFloat2("noiseTexelSize", NOISE_TEXEL_SIZE, NOISE_TEXEL_SIZE, true);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
     }
 
+    @Override
+    public void update() {
+        FBO ssaoFBO = displayResolutionDependentFBOs.get(SSAO_FBO);
+        outputFboWidth = ssaoFBO.width();
+        outputFboHeight = ssaoFBO.height();
+    }
 }
