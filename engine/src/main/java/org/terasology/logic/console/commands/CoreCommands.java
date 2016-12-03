@@ -479,4 +479,9 @@ public class CoreCommands extends BaseComponentSystem {
             }
         }
     }
+
+    @Command(shortDescription = "Clears the console window of previous messages.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void clear() {
+        console.clear();
+    }
 }
