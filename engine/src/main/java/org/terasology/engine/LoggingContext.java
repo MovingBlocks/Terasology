@@ -74,10 +74,10 @@ public final class LoggingContext {
     public static void initialize(Path logFileFolder) {
         TerasologyVersion terasologyVersion = TerasologyVersion.getInstance();
         String logFileDir = TIMESTAMP_FORMAT.format(new Date());
-        if (!terasologyVersion.getengineVersion().trim().equals("")) {
+        if (!terasologyVersion.getengineVersion().equals("")) {
             logFileDir += "_" + terasologyVersion.getengineVersion();
         }
-        if (!terasologyVersion.getBuildNumber().trim().equals("")) {
+        if (!terasologyVersion.getBuildNumber().equals("")) {
             logFileDir += "_" + terasologyVersion.getBuildNumber();
         }
         loggingPath = logFileFolder.resolve(logFileDir).normalize();
