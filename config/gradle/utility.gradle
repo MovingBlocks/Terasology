@@ -22,6 +22,15 @@ ext {
     templatesDir = 'templates'
 }
 
+// Prompts the user to enter a line of text
+def getUserString (String prompt) {
+    println ('\n' + (char)27 + '[1m*** ' + prompt + '\n') // Bold terminal text
+
+    def reader = new BufferedReader(new InputStreamReader(System.in)) // Note: Do not close reader, it will close System.in (Big no-no)
+
+    return reader.readLine()
+}
+
 // Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)
 // Sample command: gradlew fetchModulePortals
 tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
@@ -77,17 +86,30 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
     }
 }
 
-// Dynamic task definition for creating a new module (from scratch, rather than cloning from GitHub)
+// Interactive Dynamic task definition for creating a new module (from scratch, rather than cloning from GitHub)
 // Sample command: gradlew createModuleMyStuff
-tasks.addRule("Pattern: createModule<ID>") { String taskName ->
+tasks.addRule("Pattern: createModule<ID>,<VERSION>,<AUTHOR>,<DESCRIPTION>") { String taskName ->
     if (taskName.startsWith("createModule")) {
+
+        // Split arguments by comma
+        def args = (taskName - 'createModule').tokenize (',')
+
+        // Use provided argument or request from the user
+        def createModule_repo = args[0] ?: getUserString ('Enter module name:')
+        def createModule_version = args[1] ?: getUserString ('Enter initial module version:')
+        def createModule_author = args[2] ?: getUserString ('Enter author name:')
+        def createModule_description = args[3] ?: getUserString ('Enter module description:')
 
         // Here's the actual task definition for each dynamically created task of name taskName
         task (taskName, type: GitInit) {
             description = 'Creates template source for a given module to the local project and preps a local Git repo'
 
+            if (!createModule_repo){
+                throw new GradleException ("Aborted createModule! No module name.")
+            }
+
             // Repo name is the dynamic part of the task name
-            def repo = (taskName - 'createModule')
+            def repo = createModule_repo
             def parentDir = 'modules'
 
             // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
@@ -123,7 +145,13 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
                     // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
                     def moduleManifest = new File (destination, 'module.txt')
                     def moduleText = new File(templatesDir, 'module.txt').text
-                    moduleManifest << moduleText.replaceAll('MODULENAME', repo)
+                    moduleText = moduleText
+                    .replaceAll('MODULENAME', createModule_repo)
+                    .replaceAll('VERSION', createModule_version)
+                    .replaceAll('AUTHOR', createModule_author)
+                    .replaceAll('DESCRIPTION', createModule_description)
+
+                    moduleManifest << moduleText
                     new File(destination, '.gitignore') << new File(templatesDir, '.gitignore').text
                 }
             }
