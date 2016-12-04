@@ -19,7 +19,6 @@ import org.terasology.context.Context;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfill.
- *
  */
 public final class CoreRegistry {
     private static Context context;
@@ -27,12 +26,56 @@ public final class CoreRegistry {
     private CoreRegistry() {
     }
 
+    private static class CoreRegistryContext implements Context {
+        private static CoreRegistryContext INSTANCE = new CoreRegistryContext();
+
+        private CoreRegistryContext() {
+        }
+
+        @Override
+        public <T> T get(Class<? extends T> type) {
+            return CoreRegistry.get(type);
+        }
+
+        @Override
+        public <T, U extends T> void put(Class<T> type, U object) {
+            CoreRegistry.put(type, object);
+        }
+
+        @Override
+        public <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider) {
+            if (context == null) {
+                return;
+            }
+            context.putInstanceProvider(type, provider);
+        }
+
+        @Override
+        public <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type) {
+            // SANDBOXED ELSEWHERE
+            if (context == null) {
+                return null;
+            }
+            return context.getInstanceProvider(type);
+        }
+    }
+
     /**
-     * Registers an object. These objects will be removed when CoreRegistry.clear() is called (typically when game state changes)
+     * Returns this class as a Context object.
      *
-     * @param type   The interface which the system fulfils
-     * @param object The system itself
-     * @param <T>
+     * @return A Context object representing this class.
+     */
+    public static Context asContext() {
+        return CoreRegistryContext.INSTANCE;
+    }
+
+    /**
+     * Registers an object.
+     *
+     * @param type   The interface which the system fulfils.
+     * @param object The system itself.
+     * @param <T>    The type.
+     * @return The object itself.
      */
     public static <T, U extends T> U put(Class<T> type, U object) {
         if (context == null) {
@@ -44,7 +87,8 @@ public final class CoreRegistry {
 
     /**
      * Sets the context that powers this class.
-     * @param context
+     *
+     * @param context The context.
      */
     public static void setContext(Context context) {
         if (System.getSecurityManager() != null) {
@@ -54,10 +98,11 @@ public final class CoreRegistry {
     }
 
     /**
+     * Retrieves the object associated with the given type.
      *
-     * @param type
-     * @param <T>
-     * @return The system fulfilling the given interface
+     * @param type The type.
+     * @param <T>  The type.
+     * @return The system fulfilling the given interface.
      */
     public static <T> T get(Class<T> type) {
         if (context == null) {
@@ -68,5 +113,4 @@ public final class CoreRegistry {
         }
         return context.get(type);
     }
-
 }

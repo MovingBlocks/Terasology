@@ -15,22 +15,27 @@
  */
 package org.terasology.internet.internal;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
+import com.google.common.collect.Maps;
 import org.terasology.internet.InternetManager;
+import org.terasology.naming.Name;
+import org.terasology.registry.DynamicInstanceProvider;
+
+import java.util.Map;
 
 /**
  * @author soniex2
  */
-public class InternetSubsystem implements EngineSubsystem {
-    @Override
-    public String getName() {
-        return "Internet";
-    }
+public class InternetManagerProvider implements DynamicInstanceProvider<InternetManager> {
+    /**
+     * The semi-permanent instance cache.
+     */
+    private final Map<Name, InternetManager> permCache = Maps.newConcurrentMap();
 
     @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        rootContext.putInstanceProvider(InternetManager.class, new InternetManagerProvider());
+    public InternetManager getInstanceForModule(Name moduleId) {
+        if (moduleId == null) {
+            return null;
+        }
+        return permCache.computeIfAbsent(moduleId, InternetManagerImpl::new);
     }
 }

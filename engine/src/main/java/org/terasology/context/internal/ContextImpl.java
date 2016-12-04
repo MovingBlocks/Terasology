@@ -17,7 +17,10 @@ package org.terasology.context.internal;
 
 import com.google.common.collect.Maps;
 import org.terasology.context.Context;
+import org.terasology.registry.DynamicInstanceProvider;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -26,11 +29,9 @@ import java.util.Map;
 public class ContextImpl implements Context {
     private final Context parent;
 
-    private final Map<Class<? extends Object>, Object> map = Maps.newConcurrentMap();
-
+    private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
 
     /**
-     *
      * @param parent can be null. If not null it will be used as a fallback if this context does not contain a
      *               requested object.
      */
@@ -54,12 +55,50 @@ public class ContextImpl implements Context {
         if (parent != null) {
             return parent.get(type);
         }
-        return result;
+        return null;
     }
 
     @Override
-    public <T, U extends T> void put(Class<T> type, U object)  {
+    public <T, U extends T> void put(Class<T> type, U object) {
         map.put(type, object);
     }
 
+    // DynamicInstanceProvider stuff, kinda messy but it works
+
+    private static final class DynamicInstanceProviderHolder<T> {
+        private final Class<? extends DynamicInstanceProvider> providerClass;
+        private final DynamicInstanceProvider<T> provider;
+
+        private DynamicInstanceProviderHolder(Class<? extends DynamicInstanceProvider> providerClass, DynamicInstanceProvider<T> provider) {
+            this.providerClass = providerClass;
+            this.provider = provider;
+        }
+
+        private <U> DynamicInstanceProvider<U> get() {
+            return providerClass.cast(provider);
+        }
+    }
+    private final Map<Class<?>, DynamicInstanceProviderHolder<?>> providers = Maps.newConcurrentMap();
+
+    @Override
+    public <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider) {
+        providers.put(type, new DynamicInstanceProviderHolder<>(provider.getClass(), provider));
+    }
+
+    @Override
+    public <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(new RuntimePermission("permGetInstanceProvider"));
+        }
+
+        DynamicInstanceProviderHolder<?> holder = providers.get(type);
+        DynamicInstanceProvider<T> result = holder != null ? holder.get() : null;
+        if (result != null) {
+            return result;
+        }
+        if (parent != null) {
+            return parent.getInstanceProvider(type);
+        }
+        return null;
+    }
 }

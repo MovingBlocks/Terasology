@@ -15,31 +15,23 @@
  */
 package org.terasology.internet.internal;
 
-import com.google.common.collect.Maps;
 import org.terasology.internet.InternetManager;
 import org.terasology.internet.TCPSocket;
 import org.terasology.naming.Name;
-import org.terasology.registry.DynamicInstanceProvider;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Map;
 import java.util.TreeSet;
 
 /**
  * @author soniex2
  */
-public class InternetManagerImpl implements InternetManager, DynamicInstanceProvider<InternetManager> {
-    /**
-     * The semi-permanent instance cache.
-     */
-    private final Map<Name, InternetManager> permCache;
-    private final InternetManager rootManager;
+public class InternetManagerImpl implements InternetManager {
     private final Name moduleId;
 
     private static final TreeSet<String> allowedHosts; // TODO make this dynamic.
@@ -50,32 +42,12 @@ public class InternetManagerImpl implements InternetManager, DynamicInstanceProv
     }
 
     /**
-     * Construct a new InternetManagerImpl with a fresh "permanent" cache.
-     */
-    public InternetManagerImpl() {
-        permCache = Maps.newConcurrentMap();
-        moduleId = null;
-        rootManager = this;
-    }
-
-    /**
      * Construct a new InternetManagerImpl with a shared "permanent" cache.
      *
-     * @param moduleId  The module ID.
-     * @param permCache The "permanent" cache to share.
+     * @param moduleId The module ID.
      */
-    public InternetManagerImpl(Name moduleId, Map<Name, InternetManager> permCache, InternetManager rootManager) {
-        this.permCache = permCache;
+    public InternetManagerImpl(Name moduleId) {
         this.moduleId = moduleId;
-        this.rootManager = rootManager;
-    }
-
-    @Override
-    public InternetManager getInstanceForModule(Name moduleId) {
-        if (moduleId == null) {
-            return this;
-        }
-        return permCache.computeIfAbsent(moduleId, x -> new InternetManagerImpl(x, permCache, rootManager));
     }
 
     @Override

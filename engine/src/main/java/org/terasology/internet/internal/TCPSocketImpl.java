@@ -29,6 +29,7 @@ public class TCPSocketImpl implements TCPSocket {
 
     /**
      * Creates a new TCPSocketImpl.
+     *
      * @param socket The socket.
      * @throws IOException If an I/O error occurs.
      */

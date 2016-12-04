@@ -93,6 +93,7 @@ public class CoreRegistryTest {
 
     private static class ContextImplementation implements Context {
         private final Map<Class<?>, Object> map = Maps.newConcurrentMap();
+        private final Map<Class<?>, DynamicInstanceProvider<?>> providers = Maps.newConcurrentMap();
 
         @Override
         public <T> T get(Class<? extends T> type) {
@@ -106,6 +107,16 @@ public class CoreRegistryTest {
         @Override
         public <T, U extends T> void put(Class<T> type, U object) {
             map.put(type, object);
+        }
+
+        @Override
+        public <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider) {
+            providers.put(type, provider);
+        }
+
+        @Override
+        public <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type) {
+            return (DynamicInstanceProvider<T>) providers.get(type);
         }
     }
 }

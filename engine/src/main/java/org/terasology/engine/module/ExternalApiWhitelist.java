@@ -20,10 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
@@ -81,6 +78,7 @@ public final class ExternalApiWhitelist {
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
             .add(com.esotericsoftware.reflectasm.MethodAccess.class)
             .add(IOException.class)
+            .add(InterruptedIOException.class)
             .add(InvocationTargetException.class)
             .add(LoggerFactory.class)
             .add(Logger.class)

@@ -24,12 +24,14 @@ import java.io.OutputStream;
 public interface TCPSocket {
     /**
      * Returns the InputStream. Closing the InputStream closes the socket.
+     *
      * @return The InputStream.
      */
     InputStream getInputStream();
 
     /**
      * Returns the OutputStream. Closing the OutputStream closes this socket.
+     *
      * @return The OutputStream.
      */
     OutputStream getOutputStream();
