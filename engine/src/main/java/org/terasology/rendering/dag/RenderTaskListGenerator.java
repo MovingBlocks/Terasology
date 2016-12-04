@@ -228,6 +228,9 @@ public final class RenderTaskListGenerator {
         generateFrom(nodeList);
     }
 
+    /**
+     * Refreshes the task list if a refresh has been requested.
+     */
     public void refreshIfNeeded() {
         if (refreshRequested) {
             refresh();
@@ -237,6 +240,12 @@ public final class RenderTaskListGenerator {
         }
     }
 
+    /**
+     * Requests a refresh of the task list.
+     *
+     * Refreshes do not take place as soon as they are requested; instead they take place before the next frame is
+     * rendered. This prevents the task list unnecessarily refreshing when quite a few nodes are changed or disabled.
+     */
     public void requestRefresh() {
         refreshRequested = true;
     }
