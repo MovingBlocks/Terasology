@@ -79,10 +79,9 @@ public abstract class AbstractNode implements Node {
         desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
-    // TODO: to be refactored - nodes should request a refresh but this should be pending until the end of the frame
     protected void refreshTaskList() {
         if (taskListGenerator != null) {
-            taskListGenerator.refresh();
+            taskListGenerator.requestRefresh();
         }
     }
 

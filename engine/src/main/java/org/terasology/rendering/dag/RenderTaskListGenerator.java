@@ -47,6 +47,7 @@ public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<RenderPipelineTask> taskList;
     private List<Node> nodeList;
+    private boolean refreshRequested;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
@@ -227,4 +228,16 @@ public final class RenderTaskListGenerator {
         generateFrom(nodeList);
     }
 
+    public void refreshIfNeeded() {
+        if (refreshRequested) {
+            refresh();
+
+            // Clear refresh requests to prevent refreshing unless needed
+            refreshRequested = false;
+        }
+    }
+
+    public void requestRefresh() {
+        refreshRequested = true;
+    }
 }

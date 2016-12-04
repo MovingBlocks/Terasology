@@ -125,6 +125,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private final RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
+
+    private RenderTaskListGenerator renderTaskListGenerator;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
@@ -329,7 +331,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
-        RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
+        renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
 
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
@@ -416,6 +418,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
+
+        renderTaskListGenerator.refreshIfNeeded();
     }
 
     /**
