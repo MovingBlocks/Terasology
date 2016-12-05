@@ -47,7 +47,6 @@ public final class RenderTaskListGenerator {
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<RenderPipelineTask> taskList;
     private List<Node> nodeList;
-    private boolean refreshRequested;
 
     public RenderTaskListGenerator() {
         taskList = Lists.newArrayList();
