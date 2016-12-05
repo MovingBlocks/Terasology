@@ -43,6 +43,9 @@ public class ToneMappingNode extends AbstractNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private Config config;
 
     @Override

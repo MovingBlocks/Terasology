@@ -43,6 +43,8 @@ public class PrePostCompositeNode extends AbstractNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    @In
+    private WorldRenderer worldRenderer;
 
     private FBO sceneReflectiveRefractive;
 

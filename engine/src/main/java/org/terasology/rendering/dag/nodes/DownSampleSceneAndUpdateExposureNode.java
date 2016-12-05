@@ -80,10 +80,14 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private float currentSceneLuminance = 1.0f;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private ImmutableFBOs immutableFBOs;
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
 
     @In
     private Config config;

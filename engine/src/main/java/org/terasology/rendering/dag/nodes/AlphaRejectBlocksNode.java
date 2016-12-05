@@ -57,6 +57,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private Config config;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
@@ -83,14 +86,14 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

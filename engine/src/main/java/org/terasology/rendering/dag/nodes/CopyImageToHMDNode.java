@@ -46,6 +46,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private OpenVRProvider vrProvider;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private Config config;
 
     @In

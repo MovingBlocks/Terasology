@@ -67,6 +67,9 @@ public class WorldReflectionNode extends ConditionDependentNode {
     private Config config;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;

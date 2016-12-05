@@ -127,7 +127,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private ScreenGrabber screenGrabber;
 
     private RenderTaskListGenerator renderTaskListGenerator;
-    private boolean requestedRenderTaskListRefresh;
+    private boolean requestedTaskListRefresh;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
@@ -360,11 +360,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public void requestRenderTaskListRefresh() {
-        requestedRenderTaskListRefresh = true;
-    }
-
-    @Override
     public boolean pregenerateChunks() {
         return renderableWorld.pregenerateChunks();
     }
@@ -425,9 +420,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
 
-        if (requestedRenderTaskListRefresh) {
+        if (requestedTaskListRefresh) {
             renderTaskListGenerator.refresh();
-            requestedRenderTaskListRefresh = false;
+            requestedTaskListRefresh = false;
         }
     }
 
@@ -466,6 +461,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         LwjglGraphics.initOpenGLParams();
 
         playerCamera.updatePrevViewProjectionMatrix();
+    }
+
+    @Override
+    public void requestTaskListRefresh() {
+        requestedTaskListRefresh = true;
     }
 
     @Override

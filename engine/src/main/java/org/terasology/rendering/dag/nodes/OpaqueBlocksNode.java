@@ -51,6 +51,9 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private Config config;
 
     @In
@@ -80,14 +83,14 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

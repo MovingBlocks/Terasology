@@ -59,6 +59,9 @@ public class DeferredPointLightsNode extends AbstractNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private EntityManager entityManager;
 
     private Material lightGeometryMaterial;

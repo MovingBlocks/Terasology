@@ -58,11 +58,6 @@ public interface WorldRenderer {
     void onChunkUnloaded(Vector3i chunkPos);
 
     /**
-     * Request a refresh of the render task list. The refresh takes place before the next frame.
-     */
-    void requestRenderTaskListRefresh();
-
-    /**
      * Lists the stages the rendering engine may go through on a given frame.
      *
      * At the time of the writing the rendering engine works in two conceptual modes: mono or stereo.
@@ -134,6 +129,11 @@ public interface WorldRenderer {
      * @param renderingStage "MONO" for standard rendering and "LEFT_EYE" or "RIGHT_EYE" for stereoscopic displays.
      */
     void render(RenderingStage renderingStage);
+
+    /**
+     * Request a refresh of the render task list. The refresh takes place before the next frame.
+     */
+    void requestTaskListRefresh();
 
     /**
      * Gives the chance to an implementation to deal with anything that might need a more careful disposal

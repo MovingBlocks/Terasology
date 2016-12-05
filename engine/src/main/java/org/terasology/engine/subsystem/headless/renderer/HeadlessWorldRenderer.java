@@ -87,11 +87,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public void requestRenderTaskListRefresh() {
-
-    }
-
-    @Override
     public Camera getActiveCamera() {
         return noCamera;
     }
@@ -130,6 +125,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     @Override
     public void render(RenderingStage mono) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void requestTaskListRefresh() {
+
     }
 
     @Override

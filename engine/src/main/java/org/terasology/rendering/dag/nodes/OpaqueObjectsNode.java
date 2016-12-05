@@ -46,6 +46,8 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     @In
     private Config config;
 
+    @In
+    private WorldRenderer worldRenderer;
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
@@ -68,14 +70,14 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

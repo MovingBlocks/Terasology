@@ -40,6 +40,9 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
 public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private Config config;
 
     @In
@@ -69,14 +72,14 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            requestTaskListRefresh();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

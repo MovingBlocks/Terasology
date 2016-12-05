@@ -52,6 +52,9 @@ public class BlurPassesNode extends ConditionDependentNode {
     private Config config;
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;

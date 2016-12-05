@@ -45,6 +45,8 @@ public class InitialPostProcessingNode extends AbstractNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    @In
+    private WorldRenderer worldRenderer;
 
     @Override
     public void initialise() {
