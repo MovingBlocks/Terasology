@@ -19,8 +19,6 @@ import org.terasology.naming.Name;
 
 /**
  * A DynamicInstanceProvider provides an instance dynamically.
- *
- * @author soniex2
  */
 public interface DynamicInstanceProvider<T> {
     /**

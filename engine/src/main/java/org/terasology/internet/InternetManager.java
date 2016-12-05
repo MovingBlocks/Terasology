@@ -17,9 +17,6 @@ package org.terasology.internet;
 
 import java.io.IOException;
 
-/**
- * @author soniex2
- */
 public interface InternetManager {
 
     /**

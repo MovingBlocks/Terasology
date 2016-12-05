@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * @author soniex2
- */
-
 @API
 package org.terasology.internet;
 

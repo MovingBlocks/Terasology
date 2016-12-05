@@ -26,20 +26,16 @@ import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * @author soniex2
+ * Implements InternetManager.
  */
 public class InternetManagerImpl implements InternetManager {
     private final Name moduleId;
 
-    private static final TreeSet<String> allowedHosts; // TODO make this dynamic.
-
-    static {
-        allowedHosts = new TreeSet<>();
-        allowedHosts.add("irc.freenode.net");
-    }
+    private final Set<String> allowedHosts;
 
     /**
      * Construct a new InternetManagerImpl with a shared "permanent" cache.
@@ -48,12 +44,13 @@ public class InternetManagerImpl implements InternetManager {
      */
     public InternetManagerImpl(Name moduleId) {
         this.moduleId = moduleId;
+        allowedHosts = new TreeSet<>();
+        allowedHosts.add("irc.freenode.net");
     }
 
     @Override
     public TCPSocket openTCPConnection(String hostname, int port) throws IOException {
         if (!allowedHosts.contains(hostname)) {
-            // TODO actual permission checking rather than just checking for the root manager.
             throw new IllegalArgumentException();
         }
         try {

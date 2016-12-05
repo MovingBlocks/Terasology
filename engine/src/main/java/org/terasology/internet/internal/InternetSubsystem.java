@@ -21,7 +21,7 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.internet.InternetManager;
 
 /**
- * @author soniex2
+ *
  */
 public class InternetSubsystem implements EngineSubsystem {
     @Override

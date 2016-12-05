@@ -26,49 +26,6 @@ public final class CoreRegistry {
     private CoreRegistry() {
     }
 
-    private static class CoreRegistryContext implements Context {
-        private static CoreRegistryContext INSTANCE = new CoreRegistryContext();
-
-        private CoreRegistryContext() {
-        }
-
-        @Override
-        public <T> T get(Class<? extends T> type) {
-            return CoreRegistry.get(type);
-        }
-
-        @Override
-        public <T, U extends T> void put(Class<T> type, U object) {
-            CoreRegistry.put(type, object);
-        }
-
-        @Override
-        public <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider) {
-            if (context == null) {
-                return;
-            }
-            context.putInstanceProvider(type, provider);
-        }
-
-        @Override
-        public <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type) {
-            // SANDBOXED ELSEWHERE
-            if (context == null) {
-                return null;
-            }
-            return context.getInstanceProvider(type);
-        }
-    }
-
-    /**
-     * Returns this class as a Context object.
-     *
-     * @return A Context object representing this class.
-     */
-    public static Context asContext() {
-        return CoreRegistryContext.INSTANCE;
-    }
-
     /**
      * Registers an object.
      *
@@ -112,5 +69,48 @@ public final class CoreRegistry {
             return type.cast(context);
         }
         return context.get(type);
+    }
+
+    /**
+     * Returns this class as a Context object.
+     *
+     * @return A Context object representing this class.
+     */
+    public static Context asContext() {
+        return CoreRegistryContext.INSTANCE;
+    }
+
+    private static final class CoreRegistryContext implements Context {
+        private static final CoreRegistryContext INSTANCE = new CoreRegistryContext();
+
+        private CoreRegistryContext() {
+        }
+
+        @Override
+        public <T> T get(Class<? extends T> type) {
+            return CoreRegistry.get(type);
+        }
+
+        @Override
+        public <T, U extends T> void put(Class<T> type, U object) {
+            CoreRegistry.put(type, object);
+        }
+
+        @Override
+        public <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider) {
+            if (context == null) {
+                return;
+            }
+            context.putInstanceProvider(type, provider);
+        }
+
+        @Override
+        public <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type) {
+            // SANDBOXED ELSEWHERE
+            if (context == null) {
+                return null;
+            }
+            return context.getInstanceProvider(type);
+        }
     }
 }

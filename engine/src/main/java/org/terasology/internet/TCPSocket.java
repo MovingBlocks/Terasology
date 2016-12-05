@@ -18,9 +18,6 @@ package org.terasology.internet;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * @author soniex2
- */
 public interface TCPSocket {
     /**
      * Returns the InputStream. Closing the InputStream closes the socket.

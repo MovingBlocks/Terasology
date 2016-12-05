@@ -23,7 +23,7 @@ import org.terasology.registry.DynamicInstanceProvider;
 import java.util.Map;
 
 /**
- * @author soniex2
+ * Instance provider for InternetManager.
  */
 public class InternetManagerProvider implements DynamicInstanceProvider<InternetManager> {
     /**

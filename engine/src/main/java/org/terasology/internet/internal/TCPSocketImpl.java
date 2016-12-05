@@ -17,11 +17,15 @@ package org.terasology.internet.internal;
 
 import org.terasology.internet.TCPSocket;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * @author soniex2
+ * Implements TCPSocket.
  */
 public class TCPSocketImpl implements TCPSocket {
     private final InputStream is;

@@ -19,8 +19,6 @@ import com.google.common.collect.Maps;
 import org.terasology.context.Context;
 import org.terasology.registry.DynamicInstanceProvider;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -78,6 +76,7 @@ public class ContextImpl implements Context {
             return providerClass.cast(provider);
         }
     }
+
     private final Map<Class<?>, DynamicInstanceProviderHolder<?>> providers = Maps.newConcurrentMap();
 
     @Override
