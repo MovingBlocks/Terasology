@@ -86,14 +86,14 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

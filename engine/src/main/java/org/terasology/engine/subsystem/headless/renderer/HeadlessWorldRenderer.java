@@ -128,6 +128,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
+    public void requestTaskListRefresh() {
+
+    }
+
+    @Override
     public void dispose() {
         worldProvider.dispose();
 

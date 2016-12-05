@@ -36,8 +36,6 @@ public interface Node {
 
     RenderPipelineTask generateTask();
 
-    void setTaskListGenerator(RenderTaskListGenerator taskListGenerator);
-
     boolean isEnabled();
 
     void setEnabled(boolean enabled);

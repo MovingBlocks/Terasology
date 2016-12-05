@@ -16,6 +16,9 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
+import org.terasology.registry.In;
+import org.terasology.rendering.world.WorldRenderer;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -26,6 +29,9 @@ import java.util.function.Supplier;
  */
 public abstract class ConditionDependentNode extends AbstractNode implements PropertyChangeListener {
     private List<Supplier<Boolean>> conditions = Lists.newArrayList();
+
+    @In
+    private WorldRenderer worldRenderer;
 
     protected void requiresCondition(Supplier<Boolean> condition) {
         conditions.add(condition);
@@ -53,7 +59,7 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
     public void propertyChange(PropertyChangeEvent evt) {
         boolean conditionsChanged = checkConditions();
         if (conditionsChanged) {
-            refreshTaskList(); // TODO: Think about `pending` mode for the nodes, for not refreshing task list more than once
+            worldRenderer.requestTaskListRefresh();
         }
     }
 }

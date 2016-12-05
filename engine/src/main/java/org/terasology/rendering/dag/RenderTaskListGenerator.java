@@ -104,8 +104,6 @@ public final class RenderTaskListGenerator {
         int currentIndex = 0;
 
         for (Node node : orderedNodes) {
-            node.setTaskListGenerator(this); // currently required as nodes trigger a refresh of the tasklist
-
             if (node.isEnabled()) {
 
                 if (logger.isInfoEnabled()) {
@@ -226,5 +224,4 @@ public final class RenderTaskListGenerator {
     public void refresh() {
         generateFrom(nodeList);
     }
-
 }
