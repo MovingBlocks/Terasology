@@ -38,10 +38,17 @@ public class UIScrollingText extends CoreWidget {
     private static final int OFFSET_BOTTOM = 32;
     private static final int LINE_SPACING = 3;
 
+    /**
+     * The text to be shown by the widget
+     */
     @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
+    /**
+     * Specifies the change in the Y values of the text every frame
+     */
+    @LayoutConfig
+    private int step;
 
-    private boolean isScrolling;
     /**
      * Maps text to their Y coordinates
      */
@@ -50,10 +57,7 @@ public class UIScrollingText extends CoreWidget {
      * Specifies whether scrolling will restart from the beginning when all text has been scrolled through
      */
     private boolean autoReset;
-    /**
-     * Specifies the change in the Y values of the text every frame
-     */
-    private int step = 1;
+    private boolean isScrolling;
 
     public UIScrollingText() {
     }
