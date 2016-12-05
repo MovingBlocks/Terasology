@@ -49,8 +49,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @In
     private Config config;
 
-    @In
-    private WorldRenderer worldRenderer;
 
 
     private Camera playerCamera;
@@ -85,14 +83,14 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            requestTaskListRefresh();
         }
     }
 

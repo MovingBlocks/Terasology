@@ -64,9 +64,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     private RenderQueuesHelper renderQueues;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;

@@ -55,9 +55,6 @@ public class BackdropReflectionNode extends AbstractNode {
     private static final int STACKS = 128;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;

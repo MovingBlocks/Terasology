@@ -71,9 +71,6 @@ public class ShadowMapNode extends ConditionDependentNode {
     private Config config;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private BackdropProvider backdropProvider;
 
     @In

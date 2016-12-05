@@ -105,8 +105,6 @@ public final class RenderTaskListGenerator {
         int currentIndex = 0;
 
         for (Node node : orderedNodes) {
-            node.setTaskListGenerator(this); // currently required as nodes trigger a refresh of the tasklist
-
             if (node.isEnabled()) {
 
                 if (logger.isInfoEnabled()) {
@@ -226,27 +224,5 @@ public final class RenderTaskListGenerator {
      */
     public void refresh() {
         generateFrom(nodeList);
-    }
-
-    /**
-     * Refreshes the task list if a refresh has been requested.
-     */
-    public void refreshIfNeeded() {
-        if (refreshRequested) {
-            refresh();
-
-            // Clear refresh requests to prevent refreshing unless needed
-            refreshRequested = false;
-        }
-    }
-
-    /**
-     * Requests a refresh of the task list.
-     *
-     * Refreshes do not take place as soon as they are requested; instead they take place before the next frame is
-     * rendered. This prevents the task list unnecessarily refreshing when quite a few nodes are changed or disabled.
-     */
-    public void requestRefresh() {
-        refreshRequested = true;
     }
 }

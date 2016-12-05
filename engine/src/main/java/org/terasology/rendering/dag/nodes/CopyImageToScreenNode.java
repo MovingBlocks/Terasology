@@ -34,9 +34,6 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 public class CopyImageToScreenNode extends ConditionDependentNode {
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Config config;
 
     @In

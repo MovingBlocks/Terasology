@@ -23,10 +23,12 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 
 /**
@@ -39,8 +41,10 @@ public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
-    private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
     private boolean enabled = true;
+
+    @In
+    protected WorldRenderer worldRenderer;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
         ResourceUrn fboName = fboConfig.getName();
@@ -79,10 +83,8 @@ public abstract class AbstractNode implements Node {
         desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
-    protected void refreshTaskList() {
-        if (taskListGenerator != null) {
-            taskListGenerator.requestRefresh();
-        }
+    protected void requestTaskListRefresh() {
+        worldRenderer.requestRenderTaskListRefresh();
     }
 
     public Set<StateChange> getDesiredStateChanges() {
@@ -105,7 +107,6 @@ public abstract class AbstractNode implements Node {
     }
 
     public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {
-        this.taskListGenerator = taskListGenerator;
     }
 
     @Override

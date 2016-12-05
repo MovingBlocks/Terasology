@@ -46,8 +46,6 @@ public class LightShaftsNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
 
     private RenderingConfig renderingConfig;
 

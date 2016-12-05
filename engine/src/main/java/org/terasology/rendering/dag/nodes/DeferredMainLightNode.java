@@ -56,8 +56,6 @@ public class DeferredMainLightNode extends AbstractNode {
     @In
     private BackdropProvider backdropProvider;
 
-    @In
-    private WorldRenderer worldRenderer;
 
     private LightComponent mainLightComponent = new LightComponent();
     private Camera playerCamera;

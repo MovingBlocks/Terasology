@@ -46,9 +46,6 @@ public class AmbientOcclusionPassesNode extends ConditionDependentNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Config config;
 
     private RenderingConfig renderingConfig;

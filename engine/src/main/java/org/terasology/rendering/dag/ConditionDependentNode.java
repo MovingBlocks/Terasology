@@ -53,7 +53,7 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
     public void propertyChange(PropertyChangeEvent evt) {
         boolean conditionsChanged = checkConditions();
         if (conditionsChanged) {
-            refreshTaskList(); // TODO: Think about `pending` mode for the nodes, for not refreshing task list more than once
+            requestTaskListRefresh(); // TODO: Think about `pending` mode for the nodes, for not refreshing task list more than once
         }
     }
 }

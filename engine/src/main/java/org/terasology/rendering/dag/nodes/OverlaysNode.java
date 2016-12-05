@@ -49,8 +49,6 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     @In
     private Config config;
 
-    @In
-    private WorldRenderer worldRenderer;
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
@@ -80,7 +78,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            requestTaskListRefresh();
         }
     }
 
@@ -94,7 +92,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            requestTaskListRefresh();
         }
     }
 

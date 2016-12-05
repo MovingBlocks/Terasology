@@ -43,9 +43,6 @@ public class OutlineNode extends ConditionDependentNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Config config;
 
     private RenderingConfig renderingConfig;

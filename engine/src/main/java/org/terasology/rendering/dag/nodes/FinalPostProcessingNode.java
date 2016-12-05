@@ -41,9 +41,6 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 public class FinalPostProcessingNode extends AbstractNode {
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private Config config;
 
     @In

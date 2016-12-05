@@ -87,6 +87,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
+    public void requestRenderTaskListRefresh() {
+
+    }
+
+    @Override
     public Camera getActiveCamera() {
         return noCamera;
     }

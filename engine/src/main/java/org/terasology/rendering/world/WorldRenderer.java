@@ -58,6 +58,11 @@ public interface WorldRenderer {
     void onChunkUnloaded(Vector3i chunkPos);
 
     /**
+     * Request a refresh of the render task list. The refresh takes place before the next frame.
+     */
+    void requestRenderTaskListRefresh();
+
+    /**
      * Lists the stages the rendering engine may go through on a given frame.
      *
      * At the time of the writing the rendering engine works in two conceptual modes: mono or stereo.
