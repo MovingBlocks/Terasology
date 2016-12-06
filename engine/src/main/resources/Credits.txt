@@ -1,5 +1,5 @@
-Architects
- 
+## Architects
+
 Benjamin 'begla' Glatzel
 Immortius
 Kai Kratz
@@ -13,7 +13,7 @@ Gimpanse / shartte
 Flo_K
 emanuele3d
 
-Art Team
+## Art Team
 
 Glasz
 Abraham "A'nW" Feldick
@@ -30,7 +30,7 @@ Christoph "Chrisk" Köbke
 Maternal
 Trekmarvel
 
-Design Team
+## Design Team
 
 Rasmus 'Cervator' Praestholm
 Overdhose
@@ -40,7 +40,7 @@ Dei
 UberWaffe
 Christian 'chridal' Dalsvaag
 
-General
+## General
 
 Janred
 Josh
@@ -167,14 +167,14 @@ agsmith
 Stefan-Mitic
 cribsb
 
-GUI Team
+## GUI Team
 
 Anton "small-jeeper" Kireev
 miniME89
 Lucas 'x3ro' Jenß
 Piotr 'Halamix2' Halama
 
-Logistics Team
+## Logistics Team
 
 AlbireoX
 Mathias Kalb
@@ -187,7 +187,7 @@ Dennis 'Philaxx' Urban
 MiJyn
 Pavel 'neoascetic' Puchkin
 
-World Team
+## World Team
 
 bi0hax
 ddr2
@@ -199,7 +199,7 @@ MatthewPratt
 Martin 'msteiger' Steiger
 Josh 'Josharias' Zacharias
 
-Soundtrack and Sound Effects
+## Soundtrack and Sound Effects
 
 Primary soundtrack by Chris Köbke - https://soundcloud.com/chriskoebke
 Sunrise, Afternoon and Sunset composed by Karina Kireev
@@ -208,6 +208,8 @@ Door Open sound by Pagancow, from FreeSound.org
 Door Close sound by Fresco, from FreeSound.org
 Camera Click Noise from Snapper4298, from FreeSound.org
 Other sound effects created by Exile.
+
+## Icons
 
 Icons from "Fugue Icons" by Yusuke Kamiyamane (CC BY 3.0)
 

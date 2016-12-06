@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -24,16 +26,24 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.skin.UIStyle;
+import org.terasology.utilities.Assets;
+import org.w3c.dom.css.Rect;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * A widget that scrolls through long strings of text
  */
 public class UIScrollingText extends CoreWidget {
+    private static final String UNDERLINE = "__ ";
+    private static final String BOLD = "** ";
+    private static final String HEADER1 = "# ";
+    private static final String HEADER2 = "## ";
     /**
      * The text to be shown by the widget
      */
@@ -59,7 +69,16 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
-    
+    /**
+     * Enables fancy text formatting based on the symbols at the start of each line
+     * ** for bold
+     * # for header 1
+     * ## for header 2
+     * __ for underline
+     */
+    @LayoutConfig
+    private boolean fancyFormatting;
+
     /**
      * Maps text to their Y coordinates
      */
@@ -68,6 +87,7 @@ public class UIScrollingText extends CoreWidget {
      * Specifies whether scrolling will restart from the beginning when all text has been scrolled through
      */
     private boolean autoReset;
+    private Map<String, Font> fancyFonts = new HashMap<String, Font>();
     private boolean isScrolling = true;
 
     public UIScrollingText() {
@@ -140,8 +160,12 @@ public class UIScrollingText extends CoreWidget {
             //ignores offsets
             if (y >= -offsetTop && y <= canvas.size().y - offsetBottom + font.getHeight(entry.getKey())) {
                 String line = entry.getKey();
-                Rect2i coords = Rect2i.createFromMinAndSize(w - font.getWidth(line) / 2, y, font.getWidth(line), font.getHeight(line));
-                canvas.drawText(entry.getKey(), coords);
+                if (fancyFormatting) {
+                    drawFancyText(canvas, entry.getKey(), y);
+                } else {
+                    Rect2i coords = Rect2i.createFromMinAndSize(w - font.getWidth(line) / 2, y, font.getWidth(line), font.getHeight(line));
+                    canvas.drawText(entry.getKey(), coords);
+                }
             }
             if (y >= -offsetTop) {
                 finished = false;
@@ -165,13 +189,56 @@ public class UIScrollingText extends CoreWidget {
                 textY.put(entry.getKey(), entry.getValue() - step);
             }
         } else {
+            //on initialise or scrolling reset
             String[] parsed = getText().split("\\r?\\n", -1);
             Font font = canvas.getCurrentStyle().getFont();
             int y = canvas.size().y + lineSpacing;
             for (String line : parsed) {
+                if (fancyFonts.isEmpty()) {
+                    fancyFonts.put(HEADER1, Assets.getFont("engine:NotoSans-Regular-Large").get());
+                    fancyFonts.put(HEADER2, Assets.getFont("engine:NotoSans-Regular-Medium").get());
+                    fancyFonts.put(BOLD, Assets.getFont("engine:NotoSans-Bold").get());
+                }
                 textY.put(line, y);
-                y += font.getHeight(line) + lineSpacing;
+                if (fancyFormatting && getFancyFont(line) != null) {
+                    y += getFancyFont(line).getHeight(line) + lineSpacing;
+                } else {
+                    y += font.getHeight(line) + lineSpacing;
+                }
             }
         }
+    }
+
+    private void drawFancyText(Canvas canvas, String s, int y) {
+        UIStyle currentStyle = canvas.getCurrentStyle();
+        Font font = currentStyle.getFont();
+        boolean underline = false;
+        for (Entry<String, Font> entry : fancyFonts.entrySet()) {
+            if (s.startsWith(entry.getKey())) {
+                font = entry.getValue();
+                s = s.substring(entry.getKey().length());
+                if (s.startsWith(UNDERLINE)) {
+                    underline = true;
+                    s = s.substring(3);
+                }
+            } else if (s.startsWith("\\" + entry.getKey())) {
+                s = s.substring(entry.getKey().length() + 1);
+            }
+        }
+        if (s.startsWith(UNDERLINE)) {
+            underline = true;
+            s = s.substring(3);
+        }
+        Rect2i coords = Rect2i.createFromMinAndSize(canvas.size().x / 2 - font.getWidth(s) / 2, y, font.getWidth(s), font.getHeight(s));
+        canvas.drawTextRawShadowed(s, font, currentStyle.getTextColor(), currentStyle.getTextShadowColor(), underline, coords, currentStyle.getHorizontalAlignment(), currentStyle.getVerticalAlignment());
+    }
+
+    private Font getFancyFont(String s) {
+        for (Entry<String, Font> entry : fancyFonts.entrySet()) {
+            if (s.startsWith(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }
