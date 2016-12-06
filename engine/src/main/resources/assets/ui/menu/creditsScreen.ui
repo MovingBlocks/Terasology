@@ -53,8 +53,7 @@
                     "type": "UIScrollingText",
                     "id": "creditsScroll",
                     "offsetTop": 16,
-                    "offsetBottom": 32,
-                    "fancyFormatting": true
+                    "offsetBottom": 32
                 }
             },
             {
