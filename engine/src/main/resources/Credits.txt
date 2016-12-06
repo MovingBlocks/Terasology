@@ -166,6 +166,8 @@ HolixSF
 agsmith
 Stefan-Mitic
 cribsb
+eviltak
+iojw
 
 GUI Team
 
