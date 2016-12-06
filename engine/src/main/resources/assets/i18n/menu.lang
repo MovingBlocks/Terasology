@@ -57,6 +57,7 @@
     "connecting-to": "connecting-to",
     "connection-failed": "connection-failed",
     "could-not-connect-to-server": "could-not-connect-to-server",
+    "credits": "credits",
     "create-game": "create-game",
     "create-game-title": "create-game-title",
     "create-preview": "create-preview",
