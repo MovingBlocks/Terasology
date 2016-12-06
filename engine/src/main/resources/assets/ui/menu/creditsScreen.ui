@@ -51,7 +51,9 @@
                 },
                 "content": {
                     "type": "UIScrollingText",
-                    "id": "creditsScroll"
+                    "id": "creditsScroll",
+                    "offsetTop": 16,
+                    "offsetBottom": 32
                 }
             },
             {

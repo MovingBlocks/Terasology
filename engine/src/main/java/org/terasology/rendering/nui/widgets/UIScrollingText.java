@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,6 @@ import java.util.Map.Entry;
  * A widget that scrolls through long strings of text
  */
 public class UIScrollingText extends CoreWidget {
-    private static final int OFFSET_TOP = 16;
-    private static final int OFFSET_BOTTOM = 32;
-    private static final int LINE_SPACING = 3;
-
     /**
      * The text to be shown by the widget
      */
@@ -47,8 +43,23 @@ public class UIScrollingText extends CoreWidget {
      * Specifies the change in the Y values of the text every frame
      */
     @LayoutConfig
-    private int step;
-
+    private int step = 1;
+    /**
+     * Text offset from the top of the canvas, in pixels
+     */
+    @LayoutConfig
+    private int offsetTop;
+    /**
+     * Text offset from the bottom of the canvas, in pixels
+     */
+    @LayoutConfig
+    private int offsetBottom;
+    /**
+     * Spacing between the lines of text, in pixels
+     */
+    @LayoutConfig
+    private int lineSpacing = 3;
+    
     /**
      * Maps text to their Y coordinates
      */
@@ -57,7 +68,7 @@ public class UIScrollingText extends CoreWidget {
      * Specifies whether scrolling will restart from the beginning when all text has been scrolled through
      */
     private boolean autoReset;
-    private boolean isScrolling;
+    private boolean isScrolling = true;
 
     public UIScrollingText() {
     }
@@ -127,12 +138,12 @@ public class UIScrollingText extends CoreWidget {
         for (Entry<String, Integer> entry : textY.entrySet()) {
             int y = entry.getValue();
             //ignores offsets
-            if (y >= -OFFSET_TOP && y <= canvas.size().y - OFFSET_BOTTOM + font.getHeight(entry.getKey())) {
+            if (y >= -offsetTop && y <= canvas.size().y - offsetBottom + font.getHeight(entry.getKey())) {
                 String line = entry.getKey();
                 Rect2i coords = Rect2i.createFromMinAndSize(w - font.getWidth(line) / 2, y, font.getWidth(line), font.getHeight(line));
                 canvas.drawText(entry.getKey(), coords);
             }
-            if (y >= -OFFSET_TOP) {
+            if (y >= -offsetTop) {
                 finished = false;
             }
         }
@@ -156,10 +167,10 @@ public class UIScrollingText extends CoreWidget {
         } else {
             String[] parsed = getText().split("\\r?\\n", -1);
             Font font = canvas.getCurrentStyle().getFont();
-            int y = canvas.size().y + LINE_SPACING;
+            int y = canvas.size().y + lineSpacing;
             for (String line : parsed) {
                 textY.put(line, y);
-                y += font.getHeight(line) + LINE_SPACING;
+                y += font.getHeight(line) + lineSpacing;
             }
         }
     }
