@@ -24,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  */
 
-@RegisterBindButton(id = "dropItem", description = "Drop Item", repeating = true, category = "inventory")
+@RegisterBindButton(id = "dropItem", description = "${engine:menu#drop-item}", repeating = true, category = "inventory")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.Q)
 public class DropItemButton extends BindButtonEvent {
 }
