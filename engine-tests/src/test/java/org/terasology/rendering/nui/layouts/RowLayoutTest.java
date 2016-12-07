@@ -25,11 +25,11 @@ import org.terasology.rendering.nui.UIWidget;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class RowLayoutTest {
+    private static final int CANVAS_HEIGHT = 200;
+    private static final int CANVAS_WIDTH = 200;
 
     private RowLayout rowLayout;
 
@@ -61,7 +61,7 @@ public class RowLayoutTest {
         when(canvas.calculateRestrictedSize(eq(itemAt1x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
         when(canvas.calculateRestrictedSize(eq(itemAt1x3), any(Vector2i.class))).thenReturn(new Vector2i(10, 15));
 
-        Vector2i availableSize = new Vector2i(200, 200);
+        Vector2i availableSize = new Vector2i(CANVAS_WIDTH, CANVAS_HEIGHT);
         when(canvas.size()).thenReturn(availableSize);
 
         rowLayout.addWidget(itemAt1x1, null);
@@ -79,7 +79,7 @@ public class RowLayoutTest {
         Vector2i result = rowLayout.getPreferredContentSize(canvas, canvas.size());
 
         //Preferred width should be width of canvas
-        assertEquals(200, result.x);
+        assertEquals(CANVAS_WIDTH, result.x);
         //Preferred height should be the height of the tallest widget
         assertEquals(15, result.y);
 
@@ -87,11 +87,15 @@ public class RowLayoutTest {
 
         //Width split according to the relative widths of the widgets
         // Gets 4/10 of the entire area
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, 80, 200));
+        final int WIDTH_1 = CANVAS_WIDTH * 4 / 10;
         // Gets 1/2 of the entire area
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(80, 0, 100, 200));
+        final int WIDTH_2 = CANVAS_WIDTH / 2;
         // Gets 1/10 of the entire area
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(80 + 100, 0, 20, 200));
+        final int WIDTH_3 = CANVAS_WIDTH / 10;
+
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, WIDTH_1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(WIDTH_1, 0, WIDTH_2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(WIDTH_1 + WIDTH_2, 0, WIDTH_3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -102,16 +106,16 @@ public class RowLayoutTest {
         Vector2i result = rowLayout.getPreferredContentSize(canvas, canvas.size());
 
         //Preferred width should be width of canvas
-        assertEquals(200, result.x);
+        assertEquals(CANVAS_WIDTH, result.x);
         //Preferred height should be the height of the tallest widget
         assertEquals(15, result.y);
 
         rowLayout.onDraw(canvas);
 
         //Width split equally among 3 widgets as they have no relative widths
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, 200 / 3, 200));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(200 / 3, 0, 200 / 3, 200));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(200 / 3 + 200 / 3, 0, 200 / 3, 200));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 3 + CANVAS_WIDTH / 3, 0, CANVAS_WIDTH / 3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -124,15 +128,19 @@ public class RowLayoutTest {
         Vector2i result = rowLayout.getPreferredContentSize(canvas, canvas.size());
 
         //Preferred width should be width of canvas
-        assertEquals(200, result.x);
+        assertEquals(CANVAS_WIDTH, result.x);
         //Preferred height should be the height of the tallest widget
         assertEquals(15, result.y);
 
         rowLayout.onDraw(canvas);
 
         //Width first determined for widget with relative width, then split equally among remaining widgets
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, 200 / 2, 200));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(200 / 2, 0, (200 - 100) / 2, 200));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(200 / 2 + (200 - 100) / 2, 0, (200 - 100) / 2, 200));
+        final int WIDTH_1 = CANVAS_WIDTH / 2;
+        final int WIDTH_2 = (CANVAS_WIDTH - WIDTH_1) / 2;
+        final int WIDTH_3 = (CANVAS_WIDTH - WIDTH_1) / 2;
+
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, WIDTH_1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(WIDTH_1, 0, WIDTH_2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(WIDTH_1 + WIDTH_2, 0, WIDTH_3, CANVAS_HEIGHT));
     }
 }
