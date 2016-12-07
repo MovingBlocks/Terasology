@@ -30,6 +30,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ColumnLayoutTest {
+    private static final int CANVAS_HEIGHT = 200;
+    private static final int CANVAS_WIDTH = 200;
 
     private ColumnLayout columnLayout;
 
@@ -75,7 +77,7 @@ public class ColumnLayoutTest {
         when(canvas.calculateRestrictedSize(eq(itemAt2x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
         when(canvas.calculateRestrictedSize(eq(itemAt3x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
 
-        Vector2i availableSize = new Vector2i(200, 200);
+        Vector2i availableSize = new Vector2i(CANVAS_WIDTH, CANVAS_HEIGHT);
         when(canvas.size()).thenReturn(availableSize);
 
         columnLayout.setColumns(3);
@@ -105,18 +107,18 @@ public class ColumnLayoutTest {
         columnLayout.onDraw(canvas);
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, ((200 - 20) / 2), 100, 10));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH / 2, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(100, ((200 - 20) / 2), 40, 10));
+        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(100 + 40, ((200 - 20) / 2), 60, 10));
+        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2), CANVAS_WIDTH * 3 / 10, 10));
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(0, ((200 - 20) / 2) + 10, 100, 10));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(0, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH / 2, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(100, ((200 - 20) / 2) + 10, 40, 10));
+        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 2 / 10, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(100 + 40, ((200 - 20) / 2) + 10, 60, 10));
+        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(CANVAS_WIDTH / 2 + CANVAS_WIDTH * 2 / 10, ((CANVAS_HEIGHT - 20) / 2) + 10, CANVAS_WIDTH * 3 / 10, 10));
     }
 
     @Test
@@ -131,13 +133,13 @@ public class ColumnLayoutTest {
 
         columnLayout.onDraw(canvas);
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((200 - 75) / 2), ((200 - 20) / 2), 50, 10));
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, ((200 - 20) / 2), 5, 10));
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, ((200 - 20) / 2), 20, 10));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2), 50, 10));
+        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2), 5, 10));
+        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2), 20, 10));
 
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((200 - 75) / 2), ((200 - 20) / 2) + 10, 50, 10));
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, ((200 - 20) / 2) + 10, 5, 10));
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, ((200 - 20) / 2) + 10, 20, 10));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2), ((CANVAS_HEIGHT - 20) / 2) + 10, 50, 10));
+        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50, ((CANVAS_HEIGHT - 20) / 2) + 10, 5, 10));
+        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((CANVAS_WIDTH - 75) / 2) + 50 + 5, ((CANVAS_HEIGHT - 20) / 2) + 10, 20, 10));
     }
 
 }
