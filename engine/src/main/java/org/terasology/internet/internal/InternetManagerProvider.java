@@ -16,6 +16,7 @@
 package org.terasology.internet.internal;
 
 import com.google.common.collect.Maps;
+import org.terasology.context.Context;
 import org.terasology.internet.InternetManager;
 import org.terasology.naming.Name;
 import org.terasology.registry.DynamicInstanceProvider;
@@ -32,10 +33,10 @@ public class InternetManagerProvider implements DynamicInstanceProvider<Internet
     private final Map<Name, InternetManager> permCache = Maps.newConcurrentMap();
 
     @Override
-    public InternetManager getInstanceForModule(Name moduleId) {
+    public InternetManager getInstanceForModule(Name moduleId, Context context) {
         if (moduleId == null) {
             return null;
         }
-        return permCache.computeIfAbsent(moduleId, InternetManagerImpl::new);
+        return permCache.computeIfAbsent(moduleId, x -> new InternetManagerImpl(x, context));
     }
 }

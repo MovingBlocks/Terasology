@@ -50,7 +50,7 @@ public final class InjectionHelper {
                     if (object.getClass().getClassLoader() instanceof ModuleClassLoader) {
                         moduleId = ((ModuleClassLoader) object.getClass().getClassLoader()).getModuleId();
                     }
-                    value = provider.getInstanceForModule(moduleId);
+                    value = provider.getInstanceForModule(moduleId, context);
                 } else {
                     value = context.get(field.getType());
                 }

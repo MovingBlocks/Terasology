@@ -39,6 +39,7 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
+    private InternetConfig internet = new InternetConfig();
 
     /**
      * Create a new, empty config
@@ -95,5 +96,14 @@ public final class RootConfig {
 
     public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {
         return moduleConfigs;
+    }
+
+    /**
+     * Retrieves the Internet config.
+     *
+     * @return The internet config.
+     */
+    public InternetConfig getInternet() {
+        return internet;
     }
 }

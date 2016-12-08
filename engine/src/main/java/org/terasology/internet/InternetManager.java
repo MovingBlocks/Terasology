@@ -17,6 +17,9 @@ package org.terasology.internet;
 
 import java.io.IOException;
 
+/**
+ * An interface for accessing the internet.
+ */
 public interface InternetManager {
 
     /**

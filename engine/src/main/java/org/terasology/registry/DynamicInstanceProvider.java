@@ -15,6 +15,7 @@
  */
 package org.terasology.registry;
 
+import org.terasology.context.Context;
 import org.terasology.naming.Name;
 
 /**
@@ -25,7 +26,8 @@ public interface DynamicInstanceProvider<T> {
      * Returns the instance for the given module.
      *
      * @param moduleId The module ID.
+     * @param context The current context.
      * @return An instance.
      */
-    T getInstanceForModule(Name moduleId);
+    T getInstanceForModule(Name moduleId, Context context);
 }
