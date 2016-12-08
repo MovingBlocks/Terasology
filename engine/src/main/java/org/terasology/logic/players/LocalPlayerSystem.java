@@ -56,6 +56,8 @@ import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
+import org.terasology.logic.delay.DelayManager;
+import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -101,6 +103,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private PhysicsEngine physics;
     @In
+    private DelayManager delayManager;
+    @In
     NetworkSystem networkSystem;
 
     @In
@@ -123,13 +127,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private long lastItemUse;
-
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
 
     private AABB aabb;
+
+    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -223,23 +227,24 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Start a thread that moves the entity in the camera direction at every period of 0.2 seconds.
-     * @param entity
+     * Start a periodic action that moves the entity in the camera direction at every period of 0.2 seconds.
      */
     private void startAutoMove(EntityRef entity) {
         isAutoMove = true;
-        ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
-        new Thread(() -> {
-            while(isAutoMove) {
-                try {
-                    Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
-                    clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    isAutoMove = false;
-                }
-            }
-        }).start();
+        delayManager.addPeriodicAction(entity, AUTO_MOVE_ID, 0, 200);
+    }
+
+    @ReceiveEvent
+    public void onAutoMove(PeriodicActionTriggeredEvent event, EntityRef entity) {
+        if (event.getActionId().equals(AUTO_MOVE_ID) && isAutoMove) {
+            ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+            Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
+            clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
+        } else if (!isAutoMove) {
+
+            // If isAutoMove turns false, cancel the action.
+            delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+        }
     }
 
     @ReceiveEvent
