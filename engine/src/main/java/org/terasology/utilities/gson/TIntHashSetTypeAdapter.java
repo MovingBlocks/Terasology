@@ -27,7 +27,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.lang.reflect.Type;
 
 /**
- * @author soniex2
  */
 public class TIntHashSetTypeAdapter implements JsonDeserializer<TIntHashSet>, JsonSerializer<TIntHashSet> {
     @Override
