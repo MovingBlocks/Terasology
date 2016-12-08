@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -54,6 +53,11 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,6 +91,8 @@ public class JoinGameScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
+
+    private Map<ServerInfo, Float> pingInfo = new HashMap<>();
 
     private ServerInfoService infoService;
 
@@ -211,6 +217,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             extInfo.remove(item);
             if (item != null) {
                 extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
+                refreshPing();
             }
         });
 
@@ -312,7 +319,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
             refreshButton.subscribe(button -> {
-               refresh();
+                refresh();
             });
         }
     }
@@ -343,12 +350,12 @@ public class JoinGameScreen extends CoreScreenLayer {
         if (edit != null) {
             edit.bindEnabled(localSelectedServerOnly);
             edit.subscribe(button -> {
-              AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-              ServerInfo info = visibleList.getSelection();
-              popup.setServerInfo(info);
+                AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                ServerInfo info = visibleList.getSelection();
+                popup.setServerInfo(info);
 
-              // editing invalidates the currently known info, so query it again
-              popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
+                // editing invalidates the currently known info, so query it again
+                popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
             });
         }
 
@@ -407,12 +414,42 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
     }
 
+    private void refreshPing() {
+        String address = visibleList.getSelection().getAddress();
+        int port = visibleList.getSelection().getPort();
+        UILabel ping = find("ping", UILabel.class);
+        ping.setText("Requested");
+
+        Thread getPing = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Instant starts = Instant.now();
+                    Socket sock = new Socket();
+                    sock.connect(new InetSocketAddress(address, port), 10000);
+                    Instant ends = Instant.now();
+                    sock.close();
+                    String response = String.valueOf(Duration.between(starts, ends));
+                    String millis = response.replaceAll("[^\\d.]", "");
+                    float intMillis = Float.valueOf(millis) * 1000;
+                    String pingText = String.valueOf(intMillis).substring(0, String.valueOf(intMillis).length() - 2) + " ms";
+                    if (visibleList.getSelection().getAddress().equals(address)) {
+                        ping.setText(pingText);
+                    }
+                } catch (IOException e) {
+                    ping.setText(FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED));
+                }
+            }
+        });
+        getPing.start();
+    }
+
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown() && event.getKey() == Keyboard.Key.R) {
             refresh();
-            }
-            return false;
         }
+        return false;
+    }
 
     public void refresh() {
         ServerInfo i = visibleList.getSelection();
