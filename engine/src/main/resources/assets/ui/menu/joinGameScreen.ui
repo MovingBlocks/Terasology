@@ -280,8 +280,7 @@
                                     },
                                     {
                                         "type": "UILabel",
-                                        "id": "ping",
-                                        "text": ""
+                                        "id": "ping"
                                     },
                                     {
                                         "type": "UILabel",

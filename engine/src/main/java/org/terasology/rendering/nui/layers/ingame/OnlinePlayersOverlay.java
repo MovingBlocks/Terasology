@@ -19,11 +19,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingComponent;
+import org.terasology.network.Server;
 import org.terasology.registry.In;
+import org.terasology.rendering.FontColor;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.layouts.RowLayout;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Overlay that lists all players that are currently online.
@@ -32,13 +46,27 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(OnlinePlayersOverlay.class);
 
     private UIText text;
+    private UIText pingText;
 
     @In
     private EntityManager entityManager;
 
+    @In
+    private NetworkSystem networkSystem;
+
     @Override
     public void initialise() {
         this.text = find("playerList", UIText.class);
+        RowLayout row = find("row", RowLayout.class);
+        if (networkSystem.getServer() != null) {
+            //if multiplayer, add column for ping
+            UIText ping = new UIText();
+            ping.setReadOnly(true);
+            ping.setMultiline(true);
+            ping.setFamily(text.getFamily());
+            this.pingText = ping;
+            row.addWidget(pingText, null);
+        }
     }
 
     private String determinePlayerListText() {
@@ -51,9 +79,28 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             }
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
             sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
+
             first = false;
         }
         return sb.toString();
+    }
+
+    private String determinePlayerPingText() {
+        Iterable<EntityRef> allClients = entityManager.getEntitiesWith(ClientComponent.class);
+        StringBuilder sbPing = new StringBuilder();
+        boolean first = true;
+        for (EntityRef clientEntity : allClients) {
+            if (!first) {
+                sbPing.append("\n");
+            }
+            PingComponent pingComponent = clientEntity.getComponent(PingComponent.class);
+            if (pingComponent != null && pingComponent.ping > 0) {
+                sbPing.append(String.valueOf(pingComponent.ping));
+                sbPing.append(" ms");
+            }
+            first = false;
+        }
+        return sbPing.toString();
     }
 
     @Override
@@ -65,6 +112,9 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
         } else {
             logger.error("no  playerList");
         }
+        if (pingText != null) {
+            pingText.setText(determinePlayerPingText());
+        }
     }
-
+    
 }

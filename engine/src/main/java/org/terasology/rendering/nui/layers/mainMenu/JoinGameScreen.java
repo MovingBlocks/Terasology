@@ -92,8 +92,6 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
-    private Map<ServerInfo, Float> pingInfo = new HashMap<>();
-
     private ServerInfoService infoService;
 
     private ServerListDownloader downloader;
@@ -457,5 +455,4 @@ public class JoinGameScreen extends CoreScreenLayer {
         extInfo.clear();
         visibleList.setSelection(i);
     }
-
 }
