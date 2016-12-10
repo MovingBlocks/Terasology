@@ -22,6 +22,12 @@ ext {
     templatesDir = 'templates'
 }
 
+def metaHandler (String prompt) {
+    println ('\n' + (char)27 + '[1m*** ' + prompt + '\n')
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in))
+    return br.readLine()
+ }
+
 // Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)
 // Sample command: gradlew fetchModulePortals
 tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
@@ -79,15 +85,32 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
 
 // Dynamic task definition for creating a new module (from scratch, rather than cloning from GitHub)
 // Sample command: gradlew createModuleMyStuff
-tasks.addRule("Pattern: createModule<ID>") { String taskName ->
+tasks.addRule("Pattern: createModule<ID>,<VERSION>,<AUTHOR>,<DESCRIPTION>,<SERVERSIDE>") { String taskName ->
     if (taskName.startsWith("createModule")) {
+
+        // Variables for metadata
+        def meta = (taskName - 'createModule').tokenize (',')
+
+        def meta_repo = meta[0] ?: metaHandler('Enter Module Name: ') ?: 'MyModule'
+        def meta_version = meta[1] ?: metaHandler('Enter Module Version: ') ?: '1.0.0-SNAPSHOT'
+        def meta_author = meta[2] ?: metaHandler('Enter Author: ') ?: 'John Smith'
+        def meta_desc = meta[3] ?: metaHandler('Enter Description: ') ?: 'A Terasology Module'
+        def meta_serverSide
+        if (meta[4] == 'true'){
+            meta_serverSide = meta[4]
+        } else if (meta[4] == 'false'){
+            meta_serverSide = meta[4]
+        } else {
+            meta_serverSide = metaHandler ('Is this module server side only? (true/false)') ?: 'false'             
+        }
+
 
         // Here's the actual task definition for each dynamically created task of name taskName
         task (taskName, type: GitInit) {
             description = 'Creates template source for a given module to the local project and preps a local Git repo'
 
             // Repo name is the dynamic part of the task name
-            def repo = (taskName - 'createModule')
+            def repo = meta_repo
             def parentDir = 'modules'
 
             // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
@@ -123,7 +146,12 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
                     // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
                     def moduleManifest = new File (destination, 'module.txt')
                     def moduleText = new File(templatesDir, 'module.txt').text
-                    moduleManifest << moduleText.replaceAll('MODULENAME', repo)
+                    moduleText = moduleText.replaceAll('MODULENAME', meta_repo)
+                    moduleText = moduleText.replaceAll('MODULEVERSION', meta_version)
+                    moduleText = moduleText.replaceAll('MODULEAUTHOR', meta_author)
+                    moduleText = moduleText.replaceAll('MODULEDESCRIPTION', meta_desc)
+                    moduleText = moduleText.replaceAll('MODULESERVERSIDE', meta_serverSide)
+                    moduleManifest << moduleText
                     new File(destination, '.gitignore') << new File(templatesDir, '.gitignore').text
                 }
             }
