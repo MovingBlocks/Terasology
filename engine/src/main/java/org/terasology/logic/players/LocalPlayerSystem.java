@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
+import org.terasology.input.binds.movement.AutoMoveButton;
 import org.terasology.input.binds.movement.CrouchButton;
 import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
@@ -46,6 +47,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
+import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.GazeMountPointComponent;
@@ -54,6 +56,8 @@ import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
+import org.terasology.logic.delay.DelayManager;
+import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -99,6 +103,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private PhysicsEngine physics;
     @In
+    private DelayManager delayManager;
+    @In
     NetworkSystem networkSystem;
 
     @In
@@ -108,6 +114,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
+    private boolean isAutoMove = false;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean jump;
@@ -120,13 +127,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private long lastItemUse;
-
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
 
     private AABB aabb;
+
+    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -212,6 +219,34 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
     }
 
+    /**
+     * Auto move is disabled every time any other movement event occurs.
+     */
+    private void stopAutoMove() {
+        isAutoMove = false;
+    }
+
+    /**
+     * Start a periodic action that moves the entity in the camera direction at every period of 0.2 seconds.
+     */
+    private void startAutoMove(EntityRef entity) {
+        isAutoMove = true;
+        delayManager.addPeriodicAction(entity, AUTO_MOVE_ID, 0, 200);
+    }
+
+    @ReceiveEvent
+    public void onAutoMove(PeriodicActionTriggeredEvent event, EntityRef entity) {
+        if (event.getActionId().equals(AUTO_MOVE_ID) && isAutoMove) {
+            ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+            Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
+            clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
+        } else if (!isAutoMove) {
+
+            // If isAutoMove turns false, cancel the action.
+            delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+        }
+    }
+
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
@@ -270,36 +305,42 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.z = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.x = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.y = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.z = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.x = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
+        stopAutoMove();
         relativeMovement.y = event.getValue();
         event.consume();
     }
@@ -333,6 +374,18 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 crouchPlayer(entity);
             } else if (move.mode == MovementMode.CROUCHING) {
                 standPlayer(entity);
+            }
+        }
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
+        if(event.isDown()) {
+            if(!isAutoMove) {
+                startAutoMove(entity);
+            } else {
+                stopAutoMove();
             }
         }
         event.consume();

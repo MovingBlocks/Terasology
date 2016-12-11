@@ -169,7 +169,10 @@ Contributors
  [Tropid](https://github.com/Tropid),
  [HolixSF](https://github.com/HolixSF),
  [agsmith](https://github.com/agsmith),
- [Stefan-Mitic](https://github.com/Stefan-Mitic)
+ [Stefan-Mitic](https://github.com/Stefan-Mitic),
+ [cribsb](https://github.com/cribsb),
+ [eviltak](https://github.com/eviltak),
+ [iojw](https://github.com/iojw)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

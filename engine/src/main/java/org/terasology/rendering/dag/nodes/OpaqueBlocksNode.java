@@ -83,14 +83,14 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 

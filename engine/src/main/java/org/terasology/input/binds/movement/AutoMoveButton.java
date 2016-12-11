@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.input.binds.inventory;
+package org.terasology.input.binds.movement;
 
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
@@ -23,8 +23,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-
-@RegisterBindButton(id = "dropItem", description = "${engine:menu#drop-item}", repeating = true, category = "inventory")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.Q)
-public class DropItemButton extends BindButtonEvent {
+@RegisterBindButton(id = "autoMoveMode", description = "${engine:menu#binding-autoMove-mode}")
+@DefaultBinding(id = Keyboard.KeyId.R, type = InputType.KEY)
+public class AutoMoveButton extends BindButtonEvent{
 }

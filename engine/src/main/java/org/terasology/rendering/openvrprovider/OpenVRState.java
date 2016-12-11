@@ -17,7 +17,6 @@ package org.terasology.rendering.openvrprovider;
 
 import jopenvr.HmdMatrix34_t;
 import jopenvr.HmdMatrix44_t;
-import jopenvr.JOpenVRLibrary;
 import jopenvr.VRControllerAxis_t;
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
@@ -29,8 +28,6 @@ import java.util.List;
 OpenVRProvider automatically updates this.
  */
 public class OpenVRState {
-    public static int leftEye = JOpenVRLibrary.EVREye.EVREye_Eye_Left;
-    public static int rightEye = JOpenVRLibrary.EVREye.EVREye_Eye_Right;
 
     // Controllers
     private static Matrix4f[] controllerPose = new Matrix4f[2];
@@ -45,7 +42,7 @@ public class OpenVRState {
     // In the tracking system intertial frame
     private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
 
-    public OpenVRState() {
+    OpenVRState() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
             lastControllerState[handIndex] = new VRControllerState_t();
             controllerPose[handIndex] = OpenVRUtil.createIdentityMatrix4f();
@@ -62,15 +59,15 @@ public class OpenVRState {
         controllerListeners.add(toAdd);
     }
 
-    public void setHeadPose(HmdMatrix34_t inputPose) {
+    void setHeadPose(HmdMatrix34_t inputPose) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, headPose);
     }
 
-    public void setEyePoseWRTHead(HmdMatrix34_t inputPose, int nIndex) {
+    void setEyePoseWRTHead(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, eyePoses[nIndex]);
     }
 
-    public void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
+    void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
     }
 
@@ -84,7 +81,7 @@ public class OpenVRState {
         return new Matrix4f(projectionMatrices[nEye]);
     }
 
-    public void updateControllerButtonState(
+    void updateControllerButtonState(
             VRControllerState_t[] controllerStateReference) {
         // each controller{
         for (int handIndex = 0; handIndex < 2; handIndex++) {
@@ -108,7 +105,7 @@ public class OpenVRState {
         }
     }
 
-    public void setProjectionMatrix(
+    void setProjectionMatrix(
             HmdMatrix44_t inputPose,
             int nEye) {
         OpenVRUtil.setSteamVRMatrix44ToMatrix4f(inputPose, projectionMatrices[nEye]);

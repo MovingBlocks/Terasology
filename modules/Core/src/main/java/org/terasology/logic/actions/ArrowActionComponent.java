@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.logic.actions;
 
-//TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.health.EngineDamageTypes;
 
-import java.util.Set;
+public class ArrowActionComponent implements Component{
 
-/**
- * TODO: Add javadocs
- */
-public interface Node {
+    /**
+     * The max distance the arrow will fly.
+     */
+    public int maxDistance = 24;
 
-    void initialise();
+    /**
+     * The damage the arrow does
+     */
+    public int damageAmount = 3;
 
-    void process();
+    /**
+     * How many arrows can be fired per second
+     */
+    public float arrowsPerSecond = 1.0f;
 
-    // TODO: invoked when Node is removed from RenderGraph
-    void dispose();
-
-    Set<StateChange> getDesiredStateChanges();
-    Set<StateChange> getDesiredStateResets();
-
-    RenderPipelineTask generateTask();
-
-    boolean isEnabled();
-
-    void setEnabled(boolean enabled);
+    public Prefab damageType = EngineDamageTypes.PHYSICAL.get();
 
 }

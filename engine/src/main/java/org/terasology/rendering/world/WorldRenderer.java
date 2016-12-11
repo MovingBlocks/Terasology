@@ -131,6 +131,11 @@ public interface WorldRenderer {
     void render(RenderingStage renderingStage);
 
     /**
+     * Request a refresh of the render task list. The refresh takes place before the next frame.
+     */
+    void requestTaskListRefresh();
+
+    /**
      * Gives the chance to an implementation to deal with anything that might need a more careful disposal
      * than standard garbage collection would afford.
      */

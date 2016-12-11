@@ -1,0 +1,255 @@
+Architects
+ 
+Benjamin 'begla' Glatzel
+Immortius
+Kai Kratz
+Andre Herber
+Manuel 'Panserbjoern' Brotz
+Marcin 'MarcinSc' Sciesinski
+Synopia
+Xanhou
+Mike 'mkienenb' Kienenberger
+Gimpanse / shartte
+Flo_K
+emanuele3d
+
+Art Team
+
+Glasz
+Abraham "A'nW" Feldick
+basilix
+Double_A
+eleazzaar
+metouto
+Jan-H. 'Perdemot' B.
+RampageMode
+SuperSnark
+Wolfghard
+Rez 'zproc' N.
+Christoph "Chrisk" Köbke
+Maternal
+Trekmarvel
+
+Design Team
+
+Rasmus 'Cervator' Praestholm
+Overdhose
+Cynthia 'woodspeople' Kurtz
+Mooncalf
+Dei
+UberWaffe
+Christian 'chridal' Dalsvaag
+
+General
+
+Janred
+Josh
+Stuthulhu
+Igor 't3hk0d3' Yamolov
+AbraCadaver
+Andreas 'ahoehma' Höhmann
+Brokenshakles
+DizzyDragon / LinusVanElswijk
+Esereja
+Julien 'NowNewStart' Gelmar
+Penn 'pencilcheck' Su
+sdab
+Sebastin 'hagish' Dorda
+Philius342
+temsa
+Alex 'nitrix' Belanger
+Austin H. 'R41D3NN' Richards
+Chris 'Aperion' Ritchey
+ilgarma
+Martijn 'mcourteaux' Courteaux
+philip-wernersbach
+Xeano
+Andrew "Jamoozy" C. Sabisch
+zriezenman
+Wesley 'NanjoW' Nanjo
+Nick 'SleekoNiko' Caplinger
+Patrick 'Eliwood' Hansberry
+Noah 'nh_99' Howard
+jobernolte
+Elijah C 'emenifee' Menifee
+Marcos 'socram8888' Del Sol Vives
+Marshall 'dataupload' Bradley
+UltimateBudgie
+Michael 'maym86' May
+Aldo 'aldoborrero' Borrero
+PrivateAlpha
+CruzBishop
+JoeClacks
+Nathan "Nate-Devv" Moore
+Member1221
+Joseph 'Jtsessions' Sessions
+porl
+Jack 'jacklin213' Lin
+meniku
+GeckoTheGeek42
+IWhoI
+Hugo 'Calinou' Locurcio
+Jakub 'Limeth' Hlusička
+KokPok
+Sebastian 'unpause'
+Quinton 'qreeves' Reeves
+Rui914
+OvermindDL1
+prestidigitator
+chessandgo
+Gustavo 'gtugablue' Silva
+Flávio 'sk0ut' Couto
+Netopya
+André 'andrelago13' Lago
+Sérgio 'sergiomieic' Domingues
+MaloJaffre
+AlexanderGrooff
+janzegers
+Bas 'BdeBock' de Böck
+Arkka 'arkka' Dhiratara
+Rostyslav 'rzats' Zatserkovnyi
+Taha Doğan 'tdgunes' Güneş
+Omer 'oijazsh' Sheikh
+Mehul 'HashCode55' Ahuja
+JeanCGF
+David 'dkambersky' Kamberský
+Mihalache 'Margretor' Octavian
+oniatus
+Skylar 'SkySom' Sommers
+Abhinav 'genuinelucifer' Tripathi
+TobyShaw
+ClintRajaniemi
+Leonardo Akira 'Leonardoas26' Shimabukuro
+Michael 'pollend' Pollind
+Arsenii 'kujiraOo' Kurilov
+Adam 'planetguy32' Price
+portokaliu / Anthodeus
+Jessica 'LadySerenaKitty' Hawkwell
+Milan 'CptCrispyCrunchy' Ender
+Martin 'Vessalix' van Kuik
+Viveret 'viveret' Amant
+tyuiwei / korp
+Ian 'Motta' Maltbey
+joseph-healy
+engiValk
+XTariq
+roshikouhai
+Arcnor
+naiffuR
+Axydlbaaxr
+Waterpicker
+indianajohn
+Kazimir3701
+Translator5
+XroMyla
+Koga Masato
+kaen
+Avalancs
+jchappelle
+qwc
+coty91 / NullThought
+kartikey0303
+nihal111
+segfault802
+rodrigorosa
+triebben
+arpan98
+nclsppr
+namanyadav12
+zeokav
+nahh
+ron-popov
+MaxBorsch
+freyley
+Tropid
+HolixSF
+agsmith
+Stefan-Mitic
+cribsb
+eviltak
+iojw
+
+GUI Team
+
+Anton "small-jeeper" Kireev
+miniME89
+Lucas 'x3ro' Jenß
+Piotr 'Halamix2' Halama
+
+Logistics Team
+
+AlbireoX
+Mathias Kalb
+Richard "rapodaca" Apodaca
+Stellarfirefly
+Mathias 'mkalb' Kalb
+MrBarsack
+Dennis 'Philaxx' Urban
+3000Lane
+MiJyn
+Pavel 'neoascetic' Puchkin
+
+World Team
+
+bi0hax
+ddr2
+Nym Traveel
+Tobias 'Skaldarnar' Nett
+Tenson
+Laurimann
+MatthewPratt
+Martin 'msteiger' Steiger
+Josh 'Josharias' Zacharias
+
+Soundtrack and Sound Effects
+
+Primary soundtrack by Chris Köbke - https://soundcloud.com/chriskoebke
+Sunrise, Afternoon and Sunset composed by Karina Kireev
+Dimlight, Resurface and Other Side composed and produced by Exile.
+Door Open sound by Pagancow, from FreeSound.org
+Door Close sound by Fresco, from FreeSound.org
+Camera Click Noise from Snapper4298, from FreeSound.org
+Other sound effects created by Exile.
+
+Icons from "Fugue Icons" by Yusuke Kamiyamane (CC BY 3.0)
+
+editor_array.png
+editor_attribute.png
+editor_object.png
+editor_uibox.png
+editor_uibutton.png
+editor_uicheckbox.png
+editor_uidoubleslider.png
+editor_uidropdown.png
+editor_uidropdownscrollable.png
+editor_uiimage.png
+editor_uilabel.png
+editor_uilist.png
+editor_uiloadbar.png
+editor_uiscrollbar.png
+editor_uislider.png
+editor_uitext.png
+editor_uitextentry.png
+editor_uitooltip.png
+editor_uitreeview.png
+editor_zoomablelayout.png
+
+Icons by Florian Köberle (CC BY 4.0)
+
+editor_cardLayout.png
+editor_columnlayout.png
+editor_flowlayout.png
+editor_miglayout.png
+editor_relativelayout.png
+editor_rowlayout.png
+editor_uispace.png
+contract.png
+contractOver.png
+expand.png
+expandOver.png
+
+Icons by kartikey0303 (CC BY 4.0)
+
+checkboxChecked.png
+checkboxCheckedDisabled.png
+checkboxCheckedHover.png

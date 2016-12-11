@@ -71,6 +71,11 @@
                         "text": "${engine:menu#game-settings}"
                     },
                     {
+                        "type": "UIButton",
+                        "id": "credits",
+                        "text": "${engine:menu#credits}"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [1, 64]
                     },

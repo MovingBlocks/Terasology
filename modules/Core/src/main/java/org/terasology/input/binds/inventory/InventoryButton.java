@@ -24,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "inventory", description = "Open Inventory", category = "inventory")
+@RegisterBindButton(id = "inventory", description = "${engine:menu#open-inventory}", category = "inventory")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.I)
 public class InventoryButton extends BindButtonEvent {
 }
