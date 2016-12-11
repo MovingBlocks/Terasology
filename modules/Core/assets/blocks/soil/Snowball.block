@@ -1,7 +1,6 @@
 {
     "displayName": "Snowball",
-    "categories": ["snowball"],
-    "hardness": 5,
+    "basedOn": "core:soil",
     "tiles": {
         "top": "Snow",
         "bottom": "Snow",
@@ -12,5 +11,6 @@
     },
     "entity": {
         "prefab": "Snowball"
-    }
+    },
+    "sounds": "Core:snow"
 }
