@@ -38,8 +38,12 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
             // TODO: This task description does not get listed under the "Rules" section on "gradlew tasks" :-(
             description = 'Fetches source for a given module to the local project, cloned from GitHub'
 
+            // Interactive Capability
+            def meta = (taskName - 'fetchModule').tokenize()
+            def meta_repo = meta[0] ?: metaHandler('Enter Module Name: ')
+
             // Repo name is the dynamic part of the task name
-            def repo = (taskName - 'fetchModule')
+            def repo = meta_repo
             def parentDir = 'modules'
 
             // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
@@ -91,10 +95,10 @@ tasks.addRule("Pattern: createModule<ID>,<VERSION>,<AUTHOR>,<DESCRIPTION>,<SERVE
         // Variables for metadata
         def meta = (taskName - 'createModule').tokenize (',')
 
-        def meta_repo = meta[0] ?: metaHandler('Enter Module Name: ') ?: 'MyModule'
-        def meta_version = meta[1] ?: metaHandler('Enter Module Version: ') ?: '1.0.0-SNAPSHOT'
-        def meta_author = meta[2] ?: metaHandler('Enter Author: ') ?: 'John Smith'
-        def meta_desc = meta[3] ?: metaHandler('Enter Description: ') ?: 'A Terasology Module'
+        def meta_repo = meta[0] ?: metaHandler('Enter Module Name: ')
+        def meta_version = meta[1] ?: metaHandler('Enter Module Version (Default: 1.0.0-SNAPSHOT): ') ?: '1.0.0-SNAPSHOT'
+        def meta_author = meta[2] ?: metaHandler('Enter Author (Default: Gooey): ') ?: 'Gooey'
+        def meta_desc = meta[3] ?: metaHandler('Enter Description (Default: A Terasology Module): ') ?: 'A Terasology Module'
         def meta_serverSide
         if (meta[4] == 'true'){
             meta_serverSide = meta[4]
