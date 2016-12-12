@@ -537,18 +537,18 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     @Override
     public String getMetrics() {
-        String stringToReturn = "";
-        stringToReturn += renderableWorld.getMetrics();
-        stringToReturn += "Empty Mesh Chunks: ";
-        stringToReturn += statChunkMeshEmpty;
-        stringToReturn += "\n";
-        stringToReturn += "Unready Chunks: ";
-        stringToReturn += statChunkNotReady;
-        stringToReturn += "\n";
-        stringToReturn += "Rendered Triangles: ";
-        stringToReturn += statRenderedTriangles;
-        stringToReturn += "\n";
-        return stringToReturn;
+        StringBuilder stringToReturn = new StringBuilder("");
+        stringToReturn.append(renderableWorld.getMetrics());
+        stringToReturn.append("Empty Mesh Chunks: ");
+        stringToReturn.append(statChunkMeshEmpty);
+        stringToReturn.append("\n");
+        stringToReturn.append("Unready Chunks: ");
+        stringToReturn.append(statChunkNotReady);
+        stringToReturn.append("\n");
+        stringToReturn.append("Rendered Triangles: ");
+        stringToReturn.append(statRenderedTriangles);
+        stringToReturn.append("\n");
+        return stringToReturn.toString();
     }
 
     @Override

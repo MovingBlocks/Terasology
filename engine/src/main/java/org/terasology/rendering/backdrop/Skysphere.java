@@ -101,16 +101,30 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
         return celSystem.getSunPosAngle();
     }
 
+    /**
+     * Get the strength of the light for the current day part, based on sun/moon visibility.
+     * @return the strength of the current light in [0;1] range.
+     */
     @Override
     public float getDaylight() {
-        float angle = (float) Math.toDegrees(TeraMath.clamp(Math.cos(getSunPositionAngle())));
-        float daylight = 1.0f;
+        float lightBasedOnTimeOfDay = 1.0f;
+        final float ambientLight = 0.2f; // not totally black when the sun goes down, but the moon is not yet up
+        double radSunAngle = getSunPositionAngle(); // expected [-PI;PI] for the day cycle to work correctly!
 
-        if (angle < 24.0f) {
-            daylight = 1.0f - (24.0f - angle) / 24.0f;
+        // if the degree of the sun/moon is less than "lessLightUnderAngle", then we gradually increase the light, instead of full intensity
+        final double lessLightUnderAngle = Math.sin(Math.toRadians(15.0));
+        double absSinSunAngle = Math.abs(Math.sin(radSunAngle));
+        if (absSinSunAngle < lessLightUnderAngle) {
+            lightBasedOnTimeOfDay = (float)(absSinSunAngle / lessLightUnderAngle);
+        }
+        // otherwise the light remains full intensity
+
+        // if the moon is out, we want to reduce the brightness
+        if(radSunAngle < 0.0) {
+            lightBasedOnTimeOfDay *= 0.2f;
         }
 
-        return daylight;
+        return ambientLight + (lightBasedOnTimeOfDay*(1.0f-ambientLight));
     }
 
     @Override
@@ -126,7 +140,7 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
     @Override
     public Vector3f getSunDirection(boolean moonlightFlip) {
         float sunAngle = getSunPositionAngle() + 0.0001f;
-        Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
+        Vector3f sunDirection = new Vector3f(0.0f, (float) Math.sin(sunAngle), (float) Math.cos(sunAngle));
 
         // Moonlight flip
         if (moonlightFlip && sunDirection.y < 0.0f) {
