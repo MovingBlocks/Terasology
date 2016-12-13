@@ -13,25 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.socket;
+package org.terasology.exception;
 
-import org.terasology.exception.SandboxException;
-
-import java.io.IOException;
+import org.terasology.module.sandbox.API;
 
 /**
- * An interface for accessing the internet.
+ * Used when a resource access has been blocked by the sandbox.
  */
-public interface SocketManager {
+@API
+public class SandboxException extends Exception {
+    /**
+     * Constructs a new SandboxException with the given message and cause.
+     *
+     * @param message The message.
+     * @param cause   The cause.
+     */
+    public SandboxException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
     /**
-     * Opens a TCP connection.
+     * Constructs a new SandboxException with the given cause.
      *
-     * @param hostname The target hostname.
-     * @param port     The target port.
-     * @return The socket.
-     * @throws IOException      If an I/O error occurs.
-     * @throws SandboxException If there is a sandbox and the sandbox disallows the connection.
+     * @param cause The cause.
      */
-    TCPSocket openTCPConnection(String hostname, int port) throws IOException, SandboxException;
+    public SandboxException(Throwable cause) {
+        super(cause);
+    }
 }

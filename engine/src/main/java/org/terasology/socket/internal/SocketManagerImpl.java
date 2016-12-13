@@ -21,6 +21,7 @@ import gnu.trove.set.TIntSet;
 import org.terasology.config.Config;
 import org.terasology.config.SocketConfig;
 import org.terasology.context.Context;
+import org.terasology.exception.SandboxException;
 import org.terasology.socket.SocketManager;
 import org.terasology.socket.TCPSocket;
 import org.terasology.naming.Name;
@@ -66,22 +67,24 @@ public class SocketManagerImpl implements SocketManager {
     }
 
     @Override
-    public TCPSocket openTCPConnection(String hostname, int port) throws IOException {
+    public TCPSocket openTCPConnection(String hostname, int port) throws IOException, SandboxException {
         if (!(this.allowedHosts.containsKey(hostname) || this.allowedHosts.containsKey("*"))) {
-            // neither hostname nor wildcard in allowedHosts
-            // TODO maybe use a different exception type? (SandboxException or something?)
-            throw new IllegalArgumentException("Blocked hostname");
+            throw new SandboxException(new IllegalArgumentException("Blocked hostname"));
         }
-        // TODO We have many options when both a wildcard entry and a specific entry exist. Which one should we pick?
-        // 1. Merge allowed ports.
-        // 2. Wildcard overrides specific hostname.
-        // 3. Specific hostname overrides wildcard. This option pleases me the most. (It also enables blacklists.)
-        TIntSet allowedPorts = this.allowedHosts.getOrDefault(hostname, this.allowedHosts.get("*"));
-        if (!(allowedPorts.contains(port) || allowedPorts.contains(-1))) {
-            // neither port nor wildcard in allowedPorts
-            // TODO maybe use a different exception type? (SandboxException or something?)
-            throw new IllegalArgumentException("Blocked port");
+
+        TIntSet portSet = this.allowedHosts.getOrDefault(hostname, this.allowedHosts.get("*"));
+        boolean isBlacklist = portSet.contains(-1);
+        boolean portInSet = portSet.contains(port);
+        if (isBlacklist) {
+            if (portInSet) {
+                throw new SandboxException(new IllegalArgumentException("Blocked port"));
+            }
+        } else {
+            if (!portInSet) {
+                throw new SandboxException(new IllegalArgumentException("Blocked port"));
+            }
         }
+
         try {
             return AccessController.doPrivileged((PrivilegedExceptionAction<TCPSocket>) () -> {
                 try {
