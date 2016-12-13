@@ -49,7 +49,7 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.i18n.I18nSubsystem;
 import org.terasology.input.InputSystem;
-import org.terasology.internet.internal.InternetSubsystem;
+import org.terasology.socket.internal.SocketSubsystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.Activity;
@@ -167,7 +167,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
-        this.allSubsystems.add(new InternetSubsystem()); // TODO maybe disallow this on the client?
+        this.allSubsystems.add(new SocketSubsystem()); // TODO maybe disallow this on the client?
     }
 
     private void initialize() {

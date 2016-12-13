@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet;
+package org.terasology.socket;
 
 import java.io.IOException;
 
 /**
  * An interface for accessing the internet.
  */
-public interface InternetManager {
+public interface SocketManager {
 
     /**
      * Opens a TCP connection.

@@ -63,20 +63,6 @@ public class ContextImpl implements Context {
 
     // DynamicInstanceProvider stuff, kinda messy but it works
 
-    private static final class DynamicInstanceProviderHolder<T> {
-        private final Class<? extends DynamicInstanceProvider> providerClass;
-        private final DynamicInstanceProvider<T> provider;
-
-        private DynamicInstanceProviderHolder(Class<? extends DynamicInstanceProvider> providerClass, DynamicInstanceProvider<T> provider) {
-            this.providerClass = providerClass;
-            this.provider = provider;
-        }
-
-        private <U> DynamicInstanceProvider<U> get() {
-            return providerClass.cast(provider);
-        }
-    }
-
     private final Map<Class<?>, DynamicInstanceProviderHolder<?>> providers = Maps.newConcurrentMap();
 
     @Override
@@ -99,5 +85,19 @@ public class ContextImpl implements Context {
             return parent.getInstanceProvider(type);
         }
         return null;
+    }
+
+    private static final class DynamicInstanceProviderHolder<T> {
+        private final Class<? extends DynamicInstanceProvider> providerClass;
+        private final DynamicInstanceProvider<T> provider;
+
+        private DynamicInstanceProviderHolder(Class<? extends DynamicInstanceProvider> providerClass, DynamicInstanceProvider<T> provider) {
+            this.providerClass = providerClass;
+            this.provider = provider;
+        }
+
+        private <U> DynamicInstanceProvider<U> get() {
+            return providerClass.cast(provider);
+        }
     }
 }

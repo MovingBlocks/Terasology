@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet.internal;
+package org.terasology.socket.internal;
 
-import org.terasology.internet.TCPSocket;
+import org.terasology.socket.TCPSocket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

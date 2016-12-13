@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet.internal;
+package org.terasology.socket.internal;
 
 import com.google.common.collect.Maps;
 import gnu.trove.TCollections;
 import gnu.trove.set.TIntSet;
 import org.terasology.config.Config;
-import org.terasology.config.InternetConfig;
+import org.terasology.config.SocketConfig;
 import org.terasology.context.Context;
-import org.terasology.internet.InternetManager;
-import org.terasology.internet.TCPSocket;
+import org.terasology.socket.SocketManager;
+import org.terasology.socket.TCPSocket;
 import org.terasology.naming.Name;
 
 import java.io.IOException;
@@ -36,9 +36,9 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Implements InternetManager.
+ * Implements SocketManager.
  */
-public class InternetManagerImpl implements InternetManager {
+public class SocketManagerImpl implements SocketManager {
     /**
      * The allowed hosts.
      */
@@ -46,18 +46,18 @@ public class InternetManagerImpl implements InternetManager {
     private final Map<String, TIntSet> allowedHosts;
 
     /**
-     * Construct a new InternetManagerImpl with a shared "permanent" cache.
+     * Construct a new SocketManagerImpl with a shared "permanent" cache.
      *
      * @param moduleId The module ID.
      * @param context  The current context.
      */
-    public InternetManagerImpl(Name moduleId, Context context) {
+    public SocketManagerImpl(Name moduleId, Context context) {
         Config theConfig = context.get(Config.class);
         if (theConfig == null) {
             throw new IllegalStateException();
         }
         // TODO check if this could miss config updates, and make thread safe.
-        InternetConfig.Hosts hosts = theConfig.getInternet().getTcpWhitelists().get(moduleId);
+        SocketConfig.Hosts hosts = theConfig.getSocket().getTcpWhitelists().get(moduleId);
         if (hosts == null) {
             allowedHosts = Collections.emptyMap();
             return;

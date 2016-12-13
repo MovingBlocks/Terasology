@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet.internal;
+package org.terasology.socket;
 
-import org.terasology.context.Context;
-import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.internet.InternetManager;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- *
- */
-public class InternetSubsystem implements EngineSubsystem {
-    @Override
-    public String getName() {
-        return "Internet";
-    }
+public interface TCPSocket {
+    /**
+     * Returns the InputStream. Closing the InputStream closes the socket.
+     *
+     * @return The InputStream.
+     */
+    InputStream getInputStream();
 
-    @Override
-    public void initialise(GameEngine engine, Context rootContext) {
-        rootContext.putInstanceProvider(InternetManager.class, new InternetManagerProvider());
-    }
+    /**
+     * Returns the OutputStream. Closing the OutputStream closes this socket.
+     *
+     * @return The OutputStream.
+     */
+    OutputStream getOutputStream();
 }

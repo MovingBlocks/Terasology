@@ -13,7 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@API
-package org.terasology.internet;
+package org.terasology.socket.internal;
 
-import org.terasology.module.sandbox.API;
+import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.socket.SocketManager;
+
+/**
+ *
+ */
+public class SocketSubsystem implements EngineSubsystem {
+    @Override
+    public String getName() {
+        return "Socket";
+    }
+
+    @Override
+    public void initialise(GameEngine engine, Context rootContext) {
+        rootContext.putInstanceProvider(SocketManager.class, new SocketManagerProvider());
+    }
+}

@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet.internal;
+package org.terasology.socket.internal;
 
 import com.google.common.collect.Maps;
 import org.terasology.context.Context;
-import org.terasology.internet.InternetManager;
+import org.terasology.socket.SocketManager;
 import org.terasology.naming.Name;
 import org.terasology.registry.DynamicInstanceProvider;
 
 import java.util.Map;
 
 /**
- * Instance provider for InternetManager.
+ * Instance provider for SocketManager.
  */
-public class InternetManagerProvider implements DynamicInstanceProvider<InternetManager> {
+public class SocketManagerProvider implements DynamicInstanceProvider<SocketManager> {
     /**
      * The semi-permanent instance cache.
      */
-    private final Map<Name, InternetManager> permCache = Maps.newConcurrentMap();
+    private final Map<Name, SocketManager> permCache = Maps.newConcurrentMap();
 
     @Override
-    public InternetManager getInstanceForModule(Name moduleId, Context context) {
+    public SocketManager getInstanceForModule(Name moduleId, Context context) {
         if (moduleId == null) {
             return null;
         }
-        return permCache.computeIfAbsent(moduleId, x -> new InternetManagerImpl(x, context));
+        return permCache.computeIfAbsent(moduleId, x -> new SocketManagerImpl(x, context));
     }
 }

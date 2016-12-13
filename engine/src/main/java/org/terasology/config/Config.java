@@ -120,12 +120,12 @@ public final class Config {
     }
 
     /**
-     * Retrieves the Internet config.
+     * Retrieves the socket config.
      *
-     * @return The internet config.
+     * @return The socket config.
      */
-    public InternetConfig getInternet() {
-        return config.getInternet();
+    public SocketConfig getSocket() {
+        return config.getSocket();
     }
 
     public String renderConfigAsJson(Object configObject) {
@@ -203,8 +203,8 @@ public final class Config {
                 .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
                 .registerTypeAdapter(TIntHashSet.class, new TIntHashSetTypeAdapter())
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
-                .registerTypeAdapter(InternetConfig.Hosts.class, new InternetConfig.Hosts.Handler())
-                .registerTypeAdapter(InternetConfig.Ports.class, new InternetConfig.Ports.Handler())
+                .registerTypeAdapter(SocketConfig.Hosts.class, new SocketConfig.Hosts.Handler())
+                .registerTypeAdapter(SocketConfig.Ports.class, new SocketConfig.Ports.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
 
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())

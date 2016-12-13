@@ -13,23 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.internet;
+@API
+package org.terasology.socket;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public interface TCPSocket {
-    /**
-     * Returns the InputStream. Closing the InputStream closes the socket.
-     *
-     * @return The InputStream.
-     */
-    InputStream getInputStream();
-
-    /**
-     * Returns the OutputStream. Closing the OutputStream closes this socket.
-     *
-     * @return The OutputStream.
-     */
-    OutputStream getOutputStream();
-}
+import org.terasology.module.sandbox.API;

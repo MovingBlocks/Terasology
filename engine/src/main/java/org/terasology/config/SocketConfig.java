@@ -32,10 +32,10 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * Configuration file for all the internet BS you can think of.
+ * Configuration file for all the socket BS you can think of.
  */
 // TODO make thread safe and stuff
-public class InternetConfig {
+public class SocketConfig {
     /**
      * All the TCP whitelists. Keyed by module ID.
      */

@@ -39,7 +39,7 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
-    private InternetConfig internet = new InternetConfig();
+    private SocketConfig socket = new SocketConfig();
 
     /**
      * Create a new, empty config
@@ -99,11 +99,11 @@ public final class RootConfig {
     }
 
     /**
-     * Retrieves the Internet config.
+     * Retrieves the socket config.
      *
-     * @return The internet config.
+     * @return The socket config.
      */
-    public InternetConfig getInternet() {
-        return internet;
+    public SocketConfig getSocket() {
+        return socket;
     }
 }
