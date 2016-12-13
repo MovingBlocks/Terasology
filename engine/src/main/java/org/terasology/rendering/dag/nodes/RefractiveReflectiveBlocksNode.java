@@ -104,9 +104,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         final Vector3f cameraPosition = playerCamera.getPosition();
         playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
-        READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
-
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
         chunkShader.setFloat("clip", 0.0f, true);
 
