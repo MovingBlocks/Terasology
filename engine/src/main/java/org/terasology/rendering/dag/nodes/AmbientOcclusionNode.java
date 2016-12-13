@@ -36,7 +36,21 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: Add diagram of this node
+ * Instances of this node work in tandem with instances of the BlurredAmbientOcclusionNode class.
+ * Together they constitute an ambient occlusion pass.
+ *
+ * This particular node generates a first, sharper ambient occlusion output. Subsequently that's
+ * used by the BlurredAmbientOcclusionNode to make it softer.
+ *
+ * At this stage only the output of BlurredAmbientOcclusionNode is used to enhance the image eventually
+ * shown on screen to the user. It is currently not possible to use the sharper output produced by
+ * this node alone, i.e. to have lower quality but faster ambient occlusions.
+ *
+ * Ambient occlusion is a subtle visual effect that makes the rendering of the world more pleasing
+ * at the cost of some additional milliseconds per frame. Disabling it may lead to increased frame
+ * rate while the gameplay remains unaffected.
+ *
+ * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
     public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
@@ -56,6 +70,10 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private float outputFboWidth;
     private float outputFboHeight;
 
+    /**
+     * This method must be called once shortly after instantiation to fully initialize the node
+     * and make it ready for rendering.
+     */
     @Override
     public void initialise() {
         RenderingConfig renderingConfig = config.getRendering();
