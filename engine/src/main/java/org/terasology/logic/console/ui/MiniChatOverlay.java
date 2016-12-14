@@ -24,9 +24,10 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 
+import java.util.ArrayList;
+
 /**
  * The miniaturized chat console widget
- *
  */
 public class MiniChatOverlay extends CoreScreenLayer {
 
@@ -35,9 +36,11 @@ public class MiniChatOverlay extends CoreScreenLayer {
      */
     private static final float TIME_VISIBLE_PER_CHAR = 0.08f;
 
-    private static final float TIME_VISIBLE_BASE = 1.0f;
+    private static final float TIME_VISIBLE_BASE = 5.0f;
 
     private static final float TIME_FADE = 0.3f;
+
+    private static final int MAX_LINES = 6;
 
     private enum State {
         FADE_IN,
@@ -62,13 +65,21 @@ public class MiniChatOverlay extends CoreScreenLayer {
             @Override
             public String get() {
                 Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
-                String last = "";
+                ArrayList<Message> msgsList = new ArrayList<>();
+                StringBuilder messageHistory = new StringBuilder();
 
                 for (Message msg : msgs) {
-                    last = msg.getMessage();
+                    msgsList.add(msg);
                 }
 
-                return last;
+                //checks if number of messages > MAX_LINES, else starts from 0
+                for (int i = msgsList.size() >= MAX_LINES ? msgsList.size() - MAX_LINES : 0; i < msgsList.size(); i++) {
+                    messageHistory.append(msgsList.get(i).getMessage());
+                    if (i < msgsList.size() - 1) {
+                        messageHistory.append(Console.NEW_LINE);
+                    }
+                }
+                return messageHistory.toString();
             }
         });
     }

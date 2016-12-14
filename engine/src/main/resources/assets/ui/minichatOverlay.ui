@@ -21,7 +21,8 @@
                 "layoutInfo": {
                     "width": 500,
                     "position-bottom": {
-                        "target": "BOTTOM"
+                        "target": "BOTTOM",
+                        "offset": 25
                     }
                 }
             }
