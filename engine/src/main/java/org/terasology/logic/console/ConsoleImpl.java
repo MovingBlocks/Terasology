@@ -138,6 +138,14 @@ public class ConsoleImpl implements Console {
         messageHistory.remove(message);
     }
 
+    /**
+     * Clears the console of all previous messages.
+     */
+    @Override
+    public void clear() {
+        messageHistory.clear();
+    }
+
     @Override
     public void replaceMessage(Message oldMsg, Message newMsg) {
         int idx = messageHistory.indexOf(oldMsg);

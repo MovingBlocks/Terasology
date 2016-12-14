@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.google.common.collect.Ordering;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -83,7 +84,6 @@ import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -437,7 +437,8 @@ public class CoreCommands extends BaseComponentSystem {
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();
-            Collection<ConsoleCommand> commands = console.getCommands();
+            // Get all commands, with appropriate sorting
+            List<ConsoleCommand> commands = Ordering.natural().immutableSortedCopy(console.getCommands());
 
             for (ConsoleCommand cmd : commands) {
                 if (!msg.toString().isEmpty()) {
@@ -478,5 +479,10 @@ public class CoreCommands extends BaseComponentSystem {
                 return msg.toString();
             }
         }
+    }
+
+    @Command(shortDescription = "Clears the console window of previous messages.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void clear() {
+        console.clear();
     }
 }
