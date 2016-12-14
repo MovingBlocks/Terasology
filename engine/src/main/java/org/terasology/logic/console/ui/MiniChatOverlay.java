@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.ui;
 
+import com.google.common.collect.Iterables;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -40,7 +41,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
 
     private static final float TIME_FADE = 0.3f;
 
-    private static final int MAX_LINES = 6;
+    private static final int MAX_MESSAGES = 6;
 
     private enum State {
         FADE_IN,
@@ -65,20 +66,20 @@ public class MiniChatOverlay extends CoreScreenLayer {
             @Override
             public String get() {
                 Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
-                ArrayList<Message> msgsList = new ArrayList<>();
                 StringBuilder messageHistory = new StringBuilder();
+                int count = 1;
+                int size = Iterables.size(msgs);
 
                 for (Message msg : msgs) {
-                    msgsList.add(msg);
+                    if (count > size - MAX_MESSAGES) {
+                        messageHistory.append(msg.getMessage());
+                        if (count < size) {
+                            messageHistory.append(Console.NEW_LINE);
+                        }
+                    }
+                    count++;
                 }
 
-                //checks if number of messages > MAX_LINES, else starts from 0
-                for (int i = msgsList.size() >= MAX_LINES ? msgsList.size() - MAX_LINES : 0; i < msgsList.size(); i++) {
-                    messageHistory.append(msgsList.get(i).getMessage());
-                    if (i < msgsList.size() - 1) {
-                        messageHistory.append(Console.NEW_LINE);
-                    }
-                }
                 return messageHistory.toString();
             }
         });
