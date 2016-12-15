@@ -25,6 +25,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -43,9 +44,12 @@ public class ChatScreen extends CoreScreenLayer {
 
     @In
     private Console console;
-    
+
     @In
     private LocalPlayer localPlayer;
+
+    @In
+    private NUIManager nuiManager;
 
     private InteractionListener screenListener = new BaseInteractionListener() {
         @Override
@@ -76,6 +80,9 @@ public class ChatScreen extends CoreScreenLayer {
                 console.execute(new Name(command), params, localPlayer.getClientEntity());
                 commandLine.setText("");
                 scrollArea.moveToBottom();
+                MiniChatOverlay overlay = nuiManager.addOverlay("engine:minichatOverlay", MiniChatOverlay.class);
+                overlay.setVisible(true);
+                nuiManager.closeScreen(this);
             }
         });
 
