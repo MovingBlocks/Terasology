@@ -35,7 +35,9 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
+import org.terasology.world.liquid.LiquidData;
 
 import java.math.RoundingMode;
 
@@ -175,64 +177,105 @@ public class KinematicCharacterMover implements CharacterMover {
 
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
+        Vector3f mid = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
+        Vector3f frontTop = new Vector3f(worldPos);
+        Vector3f frontMid = new Vector3f(worldPos);
+
         top.y += 0.5f * movementComp.height;
+        mid.y += 0.09f * movementComp.height;
         bottom.y -= 0.5f * movementComp.height;
+        frontTop.y = top.y;
+        frontMid.y = mid.y;
+        if(worldPos.z < 0) {
+            frontTop.z -= 1;
+            frontMid.z -= 1;
+        } else {
+            frontTop.z += 1;
+            frontMid.z += 1;
+        }
 
-        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
-        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        final Block topBlock = worldProvider.getBlock(top);
+        final Block midBlock = worldProvider.getBlock(mid);
+        final Block bottomBlock = worldProvider.getBlock(bottom);
+        final Block frontTopBlock = worldProvider.getBlock(frontTop);
+        final Block frontMidBlock = worldProvider.getBlock(frontMid);
 
-        final boolean newSwimming = !topUnderwater && bottomUnderwater;
-        final boolean newDiving = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
-        if (isClimbingAllowed(newSwimming, newDiving)) {
+        if (isClimbingAllowed(topBlock, bottomBlock)) {
             Vector3i finalDir;
-            finalDir = findClimbable(movementComp, worldPos, newSwimming, newDiving);
+            finalDir = findClimbable(movementComp, worldPos);
             if (finalDir != null) {
                 newClimbing = true;
                 state.setClimbDirection(finalDir);
             }
         }
 
-        updateMode(state, newSwimming, newDiving, newClimbing);
+        updateMode(state, topBlock, midBlock, bottomBlock, newClimbing);
     }
 
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
-     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
-     * @param newDiving True if the character's body is fully inside liquid blocks.
+     * @param top Top part of characters body.
+     * @param mid Middle part of characters body.
+     * @param bottom Bottom part of characters body.
      * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
      */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
-        if (newDiving) {
-            if (state.getMode() != MovementMode.DIVING) {
+    static void updateMode(CharacterStateEvent state, Block top, Block mid, Block bottom, boolean newClimbing) {
+        boolean newDiving = isNewDiving(top, bottom);
+        boolean newSwimming = isNewSwimming(top, bottom);
+
+        if ((newClimbing != (state.getMode() == MovementMode.CLIMBING)) ||
+                newClimbing && MovementMode.getSwimmingModes().contains(state.getMode())) {
+            //We need to toggle the climbing mode
+            state.getVelocity().y = 0;
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        } else if (newDiving) {
+            if (!MovementMode.getDivingModes().contains(state.getMode())) {
+                state.setMode(MovementMode.NEW_DIVING);
+            } else {
                 state.setMode(MovementMode.DIVING);
             }
-        } else if (newSwimming) {
-            if (state.getMode() != MovementMode.SWIMMING) {
-                state.setMode(MovementMode.SWIMMING);
+            if (state.getVelocity().y < 0) {
+                state.getVelocity().y += 1f;
             }
-            state.getVelocity().y += 0.02;
-        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
+        } else if (newSwimming) {
+            if (!MovementMode.getSwimmingModes().contains(state.getMode()) &&
+                !MovementMode.getDivingModes().contains(state.getMode())) {
+                state.setMode(MovementMode.NEW_SWIMMING);
+            } else if (mid.isLiquid() && !MovementMode.getSwimmingModes().contains(state.getMode())){
+                state.setMode(MovementMode.SURFACE_SWIMMING);
+                state.getMode().refreshVolatile();
+            } else {
+                if (mid.isLiquid()) {
+                    state.setMode(MovementMode.SWIMMING);
+                } else {
+                    state.setMode(MovementMode.SURFACE_SWIMMING);
+                }
+                if ((!mid.isLiquid() && bottom.isLiquid()) && !state.isGrounded()) {
+                    state.getMode().volatileScaleGravity += 0.1f;
+                } else {
+                    state.getMode().refreshVolatile();
+                }
+            }
+        } else if (MovementMode.getSwimmingModes().contains(state.getMode()) ||
+                   MovementMode.getDivingModes().contains(state.getMode())) {
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;
             } else {
-                if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 4;
-                }
+                state.getMode().refreshVolatile();
                 state.setMode(MovementMode.WALKING);
             }
-        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
-            //We need to toggle the climbing mode
-            state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        } else {
+            state.getMode().refreshVolatile();
+            state.setMode(MovementMode.WALKING);
         }
     }
 
-    private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos, boolean swimming, boolean diving) {
+    private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos) {
         Vector3i finalDir = null;
         Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                 worldPos), new Vector3f(worldPos)};
@@ -278,8 +321,16 @@ public class KinematicCharacterMover implements CharacterMover {
         return finalDir;
     }
 
-    private boolean isClimbingAllowed(boolean swimming, boolean diving) {
-        return !swimming && !diving;
+    private static boolean isNewDiving(Block top, Block bottom) {
+        return top.isLiquid() && bottom.isLiquid();
+    }
+
+    private static boolean isNewSwimming(Block top, Block bottom) {
+        return !top.isLiquid() && bottom.isLiquid();
+    }
+
+    private static boolean isClimbingAllowed(Block top, Block bottom) {
+        return !isNewDiving(top, bottom);
     }
 
     /**
@@ -612,13 +663,13 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f endVelocity = new Vector3f(state.getVelocity());
         endVelocity.x += velocityDiff.x;
         endVelocity.z += velocityDiff.z;
-        if (movementComp.mode.scaleGravity == 0) {
+        if (movementComp.mode.volatileScaleGravity == 0) {
             // apply the velocity without gravity
             endVelocity.y += velocityDiff.y;
         } else if (movementComp.mode.applyInertiaToVertical) {
-            endVelocity.y += Math.max(-TERMINAL_VELOCITY, velocityDiff.y - (GRAVITY * movementComp.mode.scaleGravity) * input.getDelta());
+            endVelocity.y += Math.max(-TERMINAL_VELOCITY, velocityDiff.y - (GRAVITY * movementComp.mode.volatileScaleGravity) * input.getDelta());
         } else {
-            endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - (GRAVITY * movementComp.mode.scaleGravity) * input.getDelta());
+            endVelocity.y = Math.max(-TERMINAL_VELOCITY, state.getVelocity().y - (GRAVITY * movementComp.mode.volatileScaleGravity) * input.getDelta());
         }
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
@@ -652,7 +703,7 @@ public class KinematicCharacterMover implements CharacterMover {
             endVelocity.y = 0;
 
             // Jumping is only possible, if the entity is standing on ground
-            if (input.isJumpRequested()) {
+            if (input.isJumpRequested() && movementComp.mode.canBeGrounded) {
 
                 state.setGrounded(false);
 
@@ -677,7 +728,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
+            if (input.isJumpRequested() && movementComp.mode.canBeGrounded && movementComp.numberOfJumpsLeft > 0) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.
@@ -702,7 +753,8 @@ public class KinematicCharacterMover implements CharacterMover {
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
             entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
         }
-        if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
+        if (state.isGrounded() || MovementMode.getSwimmingModes().contains(state.getMode()) ||
+                MovementMode.getDivingModes().contains(state.getMode())) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
             if (state.getFootstepDelta() > 1) {
@@ -713,7 +765,10 @@ public class KinematicCharacterMover implements CharacterMover {
                             entity.send(new FootstepEvent());
                             break;
                         case DIVING:
+                        case NEW_DIVING:
                         case SWIMMING:
+                        case NEW_SWIMMING:
+                        case SURFACE_SWIMMING:
                             entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
                             break;
                         case CLIMBING:
