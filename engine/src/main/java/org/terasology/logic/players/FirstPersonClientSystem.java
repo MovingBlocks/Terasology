@@ -191,7 +191,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 clientHeldItem = heldItem.copy();
 
                 // remove unneeded/unused components for display only
-                filterUnusedClientHeldComponents(clientHeldItem);
+                removeUnusedClientHeldComponents(clientHeldItem);
 
                 clientHeldItem.addOrSaveComponent(new LocationComponent());
 
@@ -218,7 +218,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
      * held item.
      * @param heldItem The item from which to remove the components
      */
-    private void filterUnusedClientHeldComponents(EntityRef heldItem) {
+    private void removeUnusedClientHeldComponents(EntityRef heldItem) {
         Collection<Class<? extends Component>> componentsToRemove = new ArrayList<>();
         for (Component component : heldItem.iterateComponents()) {
             if (!NEEDED_COMPONENTS_FOR_RENDERING.contains(component.getClass())) {
