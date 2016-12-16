@@ -185,7 +185,11 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
             this.fboURN = defaultFBO.getName();
         }
 
-        task.setTextureId(fetchTextureId());
+        // If a node taking advantage of this state change is disabled when a game is started, task is null.
+        // This is due to the task list generator not having yet called the generateTask() method.
+        if (task != null) {
+            task.setTextureId(fetchTextureId());
+        }
     }
 
     @Override
