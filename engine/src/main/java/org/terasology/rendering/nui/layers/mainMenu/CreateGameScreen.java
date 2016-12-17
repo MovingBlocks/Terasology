@@ -120,11 +120,6 @@ public class CreateGameScreen extends CoreScreenLayer {
             seed.setText(new FastRandom().nextString(32));
         }
 
-        final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if(saveGamePath != null) {
-            saveGamePath.setText(PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
-        }
-
         final UIDropdownScrollable<Module> gameplay = find("gameplay", UIDropdownScrollable.class);
         gameplay.setOptions(getGameplayModules());
         gameplay.setVisibleOptions(3);

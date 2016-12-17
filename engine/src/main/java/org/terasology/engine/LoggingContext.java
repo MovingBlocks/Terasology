@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import org.slf4j.MDC;
 import org.terasology.engine.modes.GameState;
+import org.terasology.version.TerasologyVersion;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -71,8 +72,15 @@ public final class LoggingContext {
     }
 
     public static void initialize(Path logFileFolder) {
-        String timestamp = TIMESTAMP_FORMAT.format(new Date());
-        loggingPath = logFileFolder.resolve(timestamp).normalize();
+        TerasologyVersion terasologyVersion = TerasologyVersion.getInstance();
+        String logFileDir = TIMESTAMP_FORMAT.format(new Date());
+        if (!terasologyVersion.getengineVersion().equals("")) {
+            logFileDir += "_" + terasologyVersion.getengineVersion();
+        }
+        if (!terasologyVersion.getBuildNumber().equals("")) {
+            logFileDir += "_" + terasologyVersion.getBuildNumber();
+        }
+        loggingPath = logFileFolder.resolve(logFileDir).normalize();
         String pathString = loggingPath.toString();
         System.setProperty(LOG_FILE_FOLDER, pathString);
 
