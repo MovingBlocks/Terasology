@@ -49,8 +49,8 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
     private final CelestialSystem celSystem;
 
-    public Skysphere() {
-        celSystem = CoreRegistry.get(CelestialSystem.class);
+    public Skysphere(CelestialSystem celestialSystem) {
+        celSystem = celestialSystem;
     }
 
     @Override
