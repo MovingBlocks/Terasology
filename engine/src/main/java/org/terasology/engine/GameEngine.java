@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,6 @@ public interface GameEngine {
      * Invalid for a disposed engine
      */
     void run(GameState initialState);
-
-    /**
-     * Request the engine to stop running
-     */
-    void shutdown();
 
     /**
      * @return Whether the engine is running - this is true from the point run() is called to the point shutdown is complete
