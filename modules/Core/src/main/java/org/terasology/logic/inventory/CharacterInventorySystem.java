@@ -185,7 +185,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
             Vector3f direction = localPlayer.getViewDirection();
 
             Vector3f maxAllowedDistanceInDirection = direction.mul(1.5f);
-            HitResult hitResult = physics.rayTrace(position,direction,1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
+            HitResult hitResult = physics.rayTrace(position, direction, 1.5f, StandardCollisionGroup.CHARACTER, StandardCollisionGroup.WORLD);
             if (hitResult.isHit()) {
                 Vector3f possibleNewPosition = hitResult.getHitPoint();
                 maxAllowedDistanceInDirection = possibleNewPosition.sub(position);

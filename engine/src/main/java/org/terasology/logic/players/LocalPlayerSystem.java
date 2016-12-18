@@ -381,8 +381,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
-        if(event.isDown()) {
-            if(!isAutoMove) {
+        if (event.isDown()) {
+            if (!isAutoMove) {
                 startAutoMove(entity);
             } else {
                 stopAutoMove();
