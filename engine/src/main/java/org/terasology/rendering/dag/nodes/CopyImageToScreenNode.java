@@ -20,7 +20,6 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import static org.lwjgl.opengl.GL11.*;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;

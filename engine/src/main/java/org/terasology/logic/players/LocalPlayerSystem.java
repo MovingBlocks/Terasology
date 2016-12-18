@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,8 +84,6 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 
 import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
-/**
- */
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally

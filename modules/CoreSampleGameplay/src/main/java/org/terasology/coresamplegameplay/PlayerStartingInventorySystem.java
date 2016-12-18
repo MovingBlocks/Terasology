@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.terasology.coresamplegameplay;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -33,9 +31,6 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerStartingInventorySystem extends BaseComponentSystem {
-
-    private static final Logger logger = LoggerFactory.getLogger(PlayerStartingInventorySystem.class);
-
     @In
     BlockManager blockManager;
     @In
@@ -93,6 +88,5 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:explodeTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
-
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import org.terasology.rendering.nui.widgets.UILabel;
 
 
 /**
- * The miniaturized chat console widget
+ * The miniaturized chat console widget.
  */
 public class MiniChatOverlay extends CoreScreenLayer {
 
     /**
-     * Extra display time per message char
+     * Extra display time per message char.
      */
     private static final float TIME_VISIBLE_PER_CHAR = 0.08f;
 
