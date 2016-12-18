@@ -28,7 +28,6 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyInfo;

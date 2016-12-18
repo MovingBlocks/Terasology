@@ -25,7 +25,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import java.util.ArrayList;
 
 /**
  * The miniaturized chat console widget

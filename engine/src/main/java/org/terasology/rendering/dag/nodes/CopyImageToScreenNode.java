@@ -47,7 +47,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @Override
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
-        addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN,displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 

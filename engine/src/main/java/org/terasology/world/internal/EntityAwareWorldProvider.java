@@ -190,7 +190,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public EntityRef getBlockEntityAt(Vector3i blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-            if ( (!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
+            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
                 Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
                 blockEntity = createBlockEntity(blockPosition, block);
             }
