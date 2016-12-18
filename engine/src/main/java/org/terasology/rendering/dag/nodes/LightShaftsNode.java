@@ -28,14 +28,18 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: Add diagram of this node
+ * An instance of this class takes advantage of the color and depth buffers attached to the read-only gbuffer
+ * and produces light shafts from the main light (sun/moon). It is therefore a relatively inexpensive
+ * 2D effect rendered on a full screen quad - no 3D geometry involved.
+ *
+ * Trivia: the more correct term would be Crepuscular Rays [1], an atmospheric effect. One day we might
+ * be able to provide indoor light shafts through other means and it might be appropriate to rename
+ * this node accordingly.
+ *
+ * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
     public static final ResourceUrn LIGHT_SHAFTS = new ResourceUrn("engine:lightShafts");
@@ -46,28 +50,37 @@ public class LightShaftsNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    private RenderingConfig renderingConfig;
-
+    /**
+     * This method must be called once shortly after instantiation to fully initialize the node
+     * and make it ready for rendering.
+     */
     @Override
     public void initialise() {
-        renderingConfig = config.getRendering();
+        RenderingConfig renderingConfig = config.getRendering();
 
-        renderingConfig.subscribe(renderingConfig.LIGHT_SHAFTS, this);
-        requiresCondition(() -> renderingConfig.isLightShafts());
+        renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
+        requiresCondition(renderingConfig::isLightShafts);
+
         requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new EnableMaterial("engine:prog.lightshaft")); // TODO: rename shader to lightShafts
         addDesiredStateChange(new BindFBO(LIGHT_SHAFTS, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS, displayResolutionDependentFBOs));
+
+        addDesiredStateChange(new EnableMaterial("engine:prog.lightShafts"));
+
+        // TODO: move content of ShaderParametersLightShafts to this class
     }
 
+    /**
+     * Renders light shafts, taking advantage of the information provided
+     * by the color buffer and especially the depth buffer attached to the FBO
+     * currently set as read-only.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/lightShafts");
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
+        // The source code for this method is quite short because everything happens in the shader and its setup.
+        // In particular see the class ShaderParametersLightShafts and resource lightShafts_frag.glsl
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();

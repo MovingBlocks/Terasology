@@ -29,10 +29,10 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * Shader parameters for the Light Shaft shader program.
+ * Shader parameters for the Light Shafts shader program.
  *
  */
-public class ShaderParametersLightShaft extends ShaderParametersBase {
+public class ShaderParametersLightShafts extends ShaderParametersBase {
 
     @Range(min = 0.0f, max = 10.0f)
     private float density = 1.0f;
