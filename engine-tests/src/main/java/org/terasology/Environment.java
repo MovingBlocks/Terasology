@@ -80,6 +80,10 @@ public class Environment {
 
         setupComponentManager();
 
+        setupWorldProvider();
+
+        setupCelestialSystem();
+
         loadPrefabs();
     }
 
@@ -138,6 +142,14 @@ public class Environment {
     }
 
     protected void setupStorageManager() throws IOException {
+        // empty
+    }
+
+    protected void setupWorldProvider() {
+        // empty
+    }
+
+    protected void setupCelestialSystem() {
         // empty
     }
 
