@@ -31,6 +31,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private MovementMode mode = MovementMode.WALKING;
     private boolean grounded;
     private Vector3f velocity = new Vector3f();
+    private float scaleGravity = 0f;
     private float yaw;
     private float pitch;
     private float footstepDelta;
@@ -46,6 +47,7 @@ public class CharacterStateEvent extends NetworkEvent {
         this.mode = previous.mode;
         this.grounded = previous.grounded;
         this.velocity.set(previous.velocity);
+        this.scaleGravity = previous.mode.scaleGravity;
         this.sequenceNumber = previous.sequenceNumber + 1;
         this.pitch = previous.pitch;
         this.yaw = previous.yaw;
@@ -68,6 +70,7 @@ public class CharacterStateEvent extends NetworkEvent {
         this.rotation.set(rotation);
         this.velocity.set(velocity);
         this.mode = mode;
+        this.scaleGravity = mode.scaleGravity;
         this.grounded = grounded;
         this.sequenceNumber = sequenceNumber;
         this.pitch = pitch;
@@ -97,6 +100,10 @@ public class CharacterStateEvent extends NetworkEvent {
     public Vector3f getVelocity() {
         return velocity;
     }
+
+    public float getScaleGravity() { return scaleGravity; }
+
+    public void setScaleGravity(float gravity) { this.scaleGravity = gravity; }
 
     public void setVelocity(Vector3f velocity) {
         this.velocity.set(velocity);
