@@ -20,7 +20,7 @@ package org.terasology.rendering.nui.widgets;
 @FunctionalInterface
 public interface CursorUpdateEventListener {
     /**
-     * onCursorUpdated() method is invoked when a cursor position is updated.
+     * Invoked when a cursor position is updated.
      *
      * @param oldPosition The old position of the cursor.
      * @param newPosition The new position of the cursor.

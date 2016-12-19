@@ -22,7 +22,7 @@ import org.terasology.rendering.nui.UIWidget;
 @FunctionalInterface
 public interface ItemActivateEventListener<U> {
     /**
-     * onItemActivated() method is invoked when an item is activated.
+     * Invoked when an item is activated.
      *
      * @param widget The widget corresponding to the item activate event.
      * @param item The item corresponding to the item activate event.

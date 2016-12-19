@@ -22,7 +22,7 @@ import org.terasology.rendering.nui.UIWidget;
 @FunctionalInterface
 public interface ActivateEventListener {
     /**
-     * onActivated() method is invoked when an NUI element is activated.
+     * Invoked when an NUI element is activated.
      *
      * @param widget The widget corresponding to the activation event.
      */

@@ -20,7 +20,7 @@ package org.terasology.rendering.nui.widgets;
 @FunctionalInterface
 public interface TextChangeEventListener {
     /**
-     * onTextChange() method is invoked when a text was changed.
+     * Invoked when a text was changed.
      *
      * @param oldText The old text of the element.
      * @param newText The new text of the element.

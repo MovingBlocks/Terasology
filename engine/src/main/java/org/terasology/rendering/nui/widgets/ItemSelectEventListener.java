@@ -22,7 +22,7 @@ import org.terasology.rendering.nui.UIWidget;
 @FunctionalInterface
 public interface ItemSelectEventListener<U> {
     /**
-     * onItemSelected() method is invoked when when an item is selected.
+     * Invoked when when an item is selected.
      *
      * @param widget The widget corresponding to the item select event.
      * @param item The item corresponding to the item select event.
