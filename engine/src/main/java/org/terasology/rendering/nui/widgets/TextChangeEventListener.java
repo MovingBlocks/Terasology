@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+/**
+ * The listener interface for text change event.
+ * onTextChange() method is invoked when a text was changed.
+ */
+
 @FunctionalInterface
 public interface TextChangeEventListener {
     void onTextChange(String oldText, String newText);

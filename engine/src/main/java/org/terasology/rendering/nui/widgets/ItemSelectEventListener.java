@@ -17,6 +17,11 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.rendering.nui.UIWidget;
 
+/**
+ * The listener interface for item select event.
+ * onItemSelected() method is invoked when when an item is selected.
+ */
+
 @FunctionalInterface
 public interface ItemSelectEventListener<U> {
 
