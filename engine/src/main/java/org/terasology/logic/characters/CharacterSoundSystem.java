@@ -48,9 +48,9 @@ import java.util.List;
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(CharacterSoundSystem.class);
-
     public static final long MIN_TIME = 10;
+
+    private static final Logger logger = LoggerFactory.getLogger(CharacterSoundSystem.class);
     private static final float LANDING_VOLUME_MODIFIER = 0.2f; //The sound volume is multiplied by this number
     private static final float LANDING_VELOCITY_THRESHOLD = 7; //How fast do you have to be falling for the sound to play
     private static final float LANDING_VOLUME_MAX = 2; //The maximum modifier value

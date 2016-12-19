@@ -37,7 +37,7 @@ public enum ActivateMode {
     private boolean activatedOnPress;
     private boolean activatedOnRelease;
 
-    private ActivateMode(boolean activatedOnPress, boolean activatedOnRelease) {
+    ActivateMode(boolean activatedOnPress, boolean activatedOnRelease) {
         this.activatedOnPress = activatedOnPress;
         this.activatedOnRelease = activatedOnRelease;
     }

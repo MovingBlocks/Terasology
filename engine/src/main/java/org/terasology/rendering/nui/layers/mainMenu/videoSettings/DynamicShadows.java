@@ -28,7 +28,7 @@ public enum DynamicShadows {
     private boolean shadow;
     private boolean pcf;
 
-    private DynamicShadows(String displayName, boolean shadow, boolean pcf) {
+    DynamicShadows(String displayName, boolean shadow, boolean pcf) {
         this.displayName = displayName;
         this.shadow = shadow;
         this.pcf = pcf;

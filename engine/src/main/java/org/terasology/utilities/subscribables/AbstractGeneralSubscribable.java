@@ -28,6 +28,7 @@ public class AbstractGeneralSubscribable implements GeneralSubscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(changeListener);
     }
@@ -35,6 +36,7 @@ public class AbstractGeneralSubscribable implements GeneralSubscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unsubscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }

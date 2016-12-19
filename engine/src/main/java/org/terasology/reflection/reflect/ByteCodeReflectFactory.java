@@ -112,7 +112,7 @@ public class ByteCodeReflectFactory implements ReflectFactory {
         private FieldAccess fieldAccess;
         private int fieldIndex;
 
-        public ReflectASMFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException {
+        ReflectASMFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException {
             methodAccess = MethodAccess.get(ownerType);
             Method getter = ReflectionUtil.findGetter(field);
             if (getter != null) {

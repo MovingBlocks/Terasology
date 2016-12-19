@@ -82,7 +82,7 @@ public interface DimensionalMap<T> {
      */
     Collection<Entry<T>> findNearest(float[] position, int count, float within);
 
-    public class Entry<T> {
+    class Entry<T> {
         public final float distance;
         public final T value;
 

@@ -40,7 +40,7 @@ final class EntityStorer {
     private final OwnershipHelper helper;
     private Set<EntityRef> storedEntities = Sets.newHashSet();
 
-    public EntityStorer(EngineEntityManager entityManager) {
+    EntityStorer(EngineEntityManager entityManager) {
         this.entityStoreBuilder = EntityData.EntityStore.newBuilder();
         this.serializer = new EntitySerializer(entityManager);
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());

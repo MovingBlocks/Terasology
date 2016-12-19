@@ -52,7 +52,7 @@ class EntitySetDeltaRecorder {
      *
      * @param specialComponentLibrary must be a component library that uses a special copy strategy for entity refs.
      */
-    public EntitySetDeltaRecorder(ComponentLibrary specialComponentLibrary) {
+    EntitySetDeltaRecorder(ComponentLibrary specialComponentLibrary) {
         this.componentLibrary = specialComponentLibrary;
     }
 

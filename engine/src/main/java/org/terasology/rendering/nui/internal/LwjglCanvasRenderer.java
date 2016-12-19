@@ -521,7 +521,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         private final Color shadowColor;
         private final boolean underlined;
 
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underlined) {
+        TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean underlined) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;
@@ -562,14 +562,14 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         private Border border;
         private boolean tiled;
 
-        public TextureCacheKey(Vector2i textureSize, Vector2i areaSize) {
+        TextureCacheKey(Vector2i textureSize, Vector2i areaSize) {
             this.textureSize = new Vector2i(textureSize);
             this.areaSize = new Vector2i(areaSize);
             this.border = Border.ZERO;
             this.tiled = true;
         }
 
-        public TextureCacheKey(Vector2i textureSize, Vector2i areaSize, Border border, boolean tiled) {
+        TextureCacheKey(Vector2i textureSize, Vector2i areaSize, Border border, boolean tiled) {
             this.textureSize = new Vector2i(textureSize);
             this.areaSize = new Vector2i(areaSize);
             this.border = border;

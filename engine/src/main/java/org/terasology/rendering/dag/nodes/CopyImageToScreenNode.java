@@ -32,6 +32,8 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode {
 
+    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+
     @In
     private WorldRenderer worldRenderer;
 
@@ -41,7 +43,6 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
     @Override
     public void initialise() {

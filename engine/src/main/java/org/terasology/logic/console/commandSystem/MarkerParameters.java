@@ -34,7 +34,7 @@ public enum MarkerParameters implements Parameter {
 
     private Optional<? extends Class<?>> providedType;
 
-    private MarkerParameters(Optional<? extends Class<?>> providedType) {
+    MarkerParameters(Optional<? extends Class<?>> providedType) {
         this.providedType = providedType;
     }
 
