@@ -17,8 +17,14 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.rendering.nui.UIWidget;
 
+/** The listener interface for activate events. */
+
 @FunctionalInterface
 public interface ActivateEventListener {
-
+    /**
+     * Invoked when an NUI element is activated.
+     *
+     * @param widget The widget corresponding to the activation event.
+     */
     void onActivated(UIWidget widget);
 }
