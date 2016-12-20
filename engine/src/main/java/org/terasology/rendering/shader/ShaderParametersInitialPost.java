@@ -40,7 +40,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * Shader parameters for the Post-processing shader program.
  *
  */
-public class ShaderParametersPrePost extends ShaderParametersBase {
+public class ShaderParametersInitialPost extends ShaderParametersBase {
 
     @Range(min = 0.0f, max = 0.1f)
     float aberrationOffsetX;
