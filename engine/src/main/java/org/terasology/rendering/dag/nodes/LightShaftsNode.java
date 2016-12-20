@@ -42,7 +42,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    public static final ResourceUrn LIGHT_SHAFTS = new ResourceUrn("engine:lightShafts");
+    public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
 
     @In
     private Config config;
@@ -61,9 +61,9 @@ public class LightShaftsNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 
-        requiresFBO(new FBOConfig(LIGHT_SHAFTS, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(LIGHT_SHAFTS, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial("engine:prog.lightShafts"));
 

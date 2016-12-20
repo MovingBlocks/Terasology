@@ -28,6 +28,7 @@ import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 /**
@@ -60,6 +61,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
     @Override
     public void initialise() {
         addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

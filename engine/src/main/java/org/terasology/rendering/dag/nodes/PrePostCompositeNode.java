@@ -43,7 +43,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * [2] Currently not working: the code is there but it is never enabled.
  */
 public class PrePostCompositeNode extends AbstractNode {
-    private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:sceneReflectiveRefractive");
+    private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:fbo.reflectiveRefractive");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -55,7 +55,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new EnableMaterial("engine:prog.combine"));
+        addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
         addDesiredStateChange(new BindFBO(WRITE_ONLY_GBUFFER));
         addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
 
