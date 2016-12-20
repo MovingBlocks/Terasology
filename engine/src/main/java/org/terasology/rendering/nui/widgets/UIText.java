@@ -63,11 +63,6 @@ public class UIText extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 
     private static final float BLINK_RATE = 0.25f;
-
-    private float blinkCounter;
-
-    private TextureRegion cursorTexture;
-
     /** The text contained by the text box. */
     @LayoutConfig
     protected Binding<String> text = new DefaultBinding<>("");
@@ -153,6 +148,10 @@ public class UIText extends CoreWidget {
             }
         }
     };
+
+    private float blinkCounter;
+
+    private TextureRegion cursorTexture;
 
     /**
      * Default constructor.
