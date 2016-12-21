@@ -150,7 +150,7 @@ public final class OpenALStreamingSound extends StreamingSound {
         private final ResourceUrn urn;
         private final WeakReference<OpenALStreamingSound> asset;
 
-        public InternalResources(ResourceUrn urn, OpenALStreamingSound asset) {
+        InternalResources(ResourceUrn urn, OpenALStreamingSound asset) {
             this.urn = urn;
             this.asset = new WeakReference<>(asset);
         }

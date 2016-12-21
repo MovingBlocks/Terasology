@@ -67,7 +67,7 @@ public class FontMeshBuilder {
         private Deque<Color> previousColors = new ArrayDeque<>();
         private Color currentColor;
 
-        public Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean baseUnderline) {
+        Builder(Font font, List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor, boolean baseUnderline) {
             this.font = font;
             this.lines = lines;
             this.width = width;

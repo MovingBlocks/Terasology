@@ -53,7 +53,7 @@ public enum ControllerInput implements Input {
     private String name;
     private InputType type;
 
-    private ControllerInput(InputType type, int id, String name, String displayName) {
+    ControllerInput(InputType type, int id, String name, String displayName) {
         this.type = type;
         this.id = id;
         this.name = name.toUpperCase(Locale.ENGLISH);

@@ -26,7 +26,7 @@ public enum FieldReplicateType {
 
     private boolean replicateFromOwner;
 
-    private FieldReplicateType(boolean fromOwner) {
+    FieldReplicateType(boolean fromOwner) {
         this.replicateFromOwner = fromOwner;
     }
 

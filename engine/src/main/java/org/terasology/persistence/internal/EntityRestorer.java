@@ -31,7 +31,7 @@ final class EntityRestorer {
 
     private EngineEntityManager entityManager;
 
-    public EntityRestorer(EngineEntityManager entityManager) {
+    EntityRestorer(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

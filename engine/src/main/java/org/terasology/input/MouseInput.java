@@ -51,7 +51,7 @@ public enum MouseInput implements Input {
         }
     }
 
-    private MouseInput(InputType type, int id, String name, String displayName, String... alternateStrings) {
+    MouseInput(InputType type, int id, String name, String displayName, String... alternateStrings) {
         this.type = type;
         this.id = id;
         this.name = name.toUpperCase(Locale.ENGLISH);

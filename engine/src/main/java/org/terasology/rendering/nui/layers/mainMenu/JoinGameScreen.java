@@ -66,10 +66,9 @@ import java.util.concurrent.Future;
 /**
  */
 public class JoinGameScreen extends CoreScreenLayer {
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
-
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:joinGameScreen");
 
     @In
     private Config config;
@@ -189,7 +188,13 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage(translationSystem.translate("${engine:menu#join-game-online}"),
-                translationSystem.translate("${engine:menu#connecting-to}") + " '" + address + ":" + port + "' - " + translationSystem.translate("${engine:menu#please-wait}"));
+                translationSystem.translate("${engine:menu#connecting-to}")
+                        + " '"
+                        + address
+                        + ":"
+                        + port
+                        + "' - "
+                        + translationSystem.translate("${engine:menu#please-wait}"));
         popup.onSuccess(result -> {
             if (result.getStatus() != JoinStatus.Status.FAILED) {
                 engine.changeState(new StateLoading(result));

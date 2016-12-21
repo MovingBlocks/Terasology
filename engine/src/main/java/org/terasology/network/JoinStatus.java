@@ -19,7 +19,7 @@ package org.terasology.network;
  */
 public interface JoinStatus {
 
-    public enum Status {
+    enum Status {
         IN_PROGRESS,
         COMPLETE,
         FAILED

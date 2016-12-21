@@ -243,7 +243,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             public Vector3f offset;
             public CollisionShape collisionShape;
 
-            public ColliderInfo(Vector3f offset, CollisionShape shape) {
+            ColliderInfo(Vector3f offset, CollisionShape shape) {
                 this.offset = offset;
                 this.collisionShape = shape;
             }

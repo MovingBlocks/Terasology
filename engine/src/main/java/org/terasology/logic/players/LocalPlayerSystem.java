@@ -90,7 +90,10 @@ import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_P
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalPlayerSystem.class);
+    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
+    @In
+    NetworkSystem networkSystem;
     @In
     private LocalPlayer localPlayer;
     @In
@@ -102,8 +105,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private PhysicsEngine physics;
     @In
     private DelayManager delayManager;
-    @In
-    NetworkSystem networkSystem;
 
     @In
     private Config config;
@@ -112,7 +113,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean isAutoMove = false;
+    private boolean isAutoMove;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean jump;
@@ -131,7 +132,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private AABB aabb;
 
-    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;

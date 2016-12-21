@@ -42,10 +42,10 @@ import java.util.Set;
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(value = DelayManager.class)
 public class DelayedActionSystem extends BaseComponentSystem implements UpdateSubscriberSystem, DelayManager {
+    private static final Logger logger = LoggerFactory.getLogger(DelayedActionSystem.class);
+
     @In
     private Time time;
-
-    private static final Logger logger = LoggerFactory.getLogger(DelayedActionSystem.class);
 
     private SortedSetMultimap<Long, EntityRef> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
     private SortedSetMultimap<Long, EntityRef> periodicOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());

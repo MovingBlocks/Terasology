@@ -114,7 +114,7 @@ public final class GameThread {
         private Runnable internalProcess;
         private Semaphore semaphore = new Semaphore(0);
 
-        public BlockingProcess(Runnable runnable) {
+        BlockingProcess(Runnable runnable) {
             this.internalProcess = runnable;
         }
 

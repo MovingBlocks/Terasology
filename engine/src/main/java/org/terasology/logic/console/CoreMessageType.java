@@ -28,7 +28,7 @@ public enum CoreMessageType implements MessageType {
 
     private Color color;
 
-    private CoreMessageType(Color color) {
+    CoreMessageType(Color color) {
         this.color = color;
     }
 
