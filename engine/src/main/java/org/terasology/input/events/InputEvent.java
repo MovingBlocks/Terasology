@@ -38,10 +38,18 @@ public abstract class InputEvent implements ConsumableEvent {
         return target;
     }
 
+    /**
+     *
+     * @return This event's target world position.
+     */
     public Vector3f getHitPosition() {
         return hitPosition;
     }
 
+    /**
+     *
+     * @return The hit normal/direction of this event (usually from player camera).
+     */
     public Vector3f getHitNormal() {
         return hitNormal;
     }
@@ -50,6 +58,10 @@ public abstract class InputEvent implements ConsumableEvent {
         return targetBlockPosition;
     }
 
+    /**
+     *
+     * @return The time since the event was fired (also the game update loop's delta time).
+     */
     public float getDelta() {
         return delta;
     }
@@ -64,6 +76,13 @@ public abstract class InputEvent implements ConsumableEvent {
         this.consumed = true;
     }
 
+    /**
+     * Sets this event's target information.
+     * @param newTarget This event's target entity.
+     * @param targetBlockPos This event's target block coordinates.
+     * @param targetHitPosition This event's target world position.
+     * @param targetHitNormal The hit normal/direction of this event (usually from player camera).
+     */
     public void setTargetInfo(EntityRef newTarget, Vector3i targetBlockPos, Vector3f targetHitPosition, Vector3f targetHitNormal) {
         this.target = newTarget;
         this.targetBlockPosition = targetBlockPos;

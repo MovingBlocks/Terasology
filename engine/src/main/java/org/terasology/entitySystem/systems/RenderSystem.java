@@ -16,16 +16,32 @@
 package org.terasology.entitySystem.systems;
 
 /**
+ * Interface for component systems that needs to be updated every time certain game elements are rendered (generally to render something).
  */
 public interface RenderSystem extends ComponentSystem {
 
+    /**
+     * Called when opaque objects should be rendered.
+     */
     void renderOpaque();
 
+    /**
+     * Called when alpha blended objects should be rendered.
+     */
     void renderAlphaBlend();
 
+    /**
+     * Called when overlay objects should be rendered.
+     */
     void renderOverlay();
 
+    /**
+     * Called when first person objects should be rendered.
+     */
     void renderFirstPerson();
 
+    /**
+     * TODO: Implement RenderSystem.renderShadows()
+     */
     void renderShadows();
 }

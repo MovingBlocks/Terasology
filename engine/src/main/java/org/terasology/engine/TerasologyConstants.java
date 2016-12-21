@@ -24,18 +24,52 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * This class contains various important file-related constants used by the Terasology engine.
  */
 public final class TerasologyConstants {
+    /**
+     * Name and extension of an entities data file.
+     */
     public static final String ENTITY_DATA_FILE = "entity.dat";
+    /**
+     * Terasology's default server port.
+     */
     public static final int DEFAULT_PORT = 25777;
+    /**
+     * Name and extension of a world data file.
+     */
     public static final String WORLD_DATA_FILE = "world.dat";
+    /**
+     * The name of the default world.
+     */
     public static final String MAIN_WORLD = "main";
+    /**
+     * Default charset used by Terasology.
+     */
     public static final Charset CHARSET = Charsets.UTF_8;
+    /**
+     * Name of the engine module.
+     */
     public static final Name ENGINE_MODULE = new Name("engine");
+    /**
+     * Name of the core gameplay module.
+     */
     public static final Name CORE_GAMEPLAY_MODULE = new Name("coresamplegameplay");
+    /**
+     * Name of a module's assets directory.
+     */
     public static final String ASSETS_SUBDIRECTORY = "assets";
+    /**
+     * Name of a module's overrides directory.
+     */
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
+    /**
+     * Name of a module's deltas directory.
+     */
     public static final String DELTAS_SUBDIRECTORY = "deltas";
+    /**
+     * Path to a module's info file.
+     */
     public static final Path MODULE_INFO_FILENAME = Paths.get("module.txt");
 
     private TerasologyConstants() {
