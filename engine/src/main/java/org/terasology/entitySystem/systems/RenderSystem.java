@@ -16,22 +16,25 @@
 package org.terasology.entitySystem.systems;
 
 /**
- * Interface for component systems that needs to be updated every time certain game elements are rendered (generally to render something).
+ * Instances implementing this interface see their methods called at specific stages during the rendering process,
+ * with an OpenGL state compatible with what needs to be rendered - i.e. opaque objects
+ * (a fairly standard opengl state) vs semi-transparent objects (opengl has blending enabled).
+ * This allows a RenderSystem to update its own entities or inject its own objects for rendering.
  */
 public interface RenderSystem extends ComponentSystem {
 
     /**
-     * Called when opaque objects should be rendered.
+     * Called with an OpenGL state useful to the rendering of opaque objects. See OpaqueObjectsNode for more information.
      */
     void renderOpaque();
 
     /**
-     * Called when alpha blended objects should be rendered.
+     * Called with an OpenGL state useful to the rendering of alpha blended objects. See SimpleBlendMaterialsNode for more information.
      */
     void renderAlphaBlend();
 
     /**
-     * Called when overlay objects should be rendered.
+     * Called with an OpenGL state useful to the rendering of overlays. See OverlaysNode for more information.
      */
     void renderOverlay();
 
@@ -41,7 +44,8 @@ public interface RenderSystem extends ComponentSystem {
     void renderFirstPerson();
 
     /**
-     * TODO: Implement RenderSystem.renderShadows()
+     * Currently not used.
      */
+    @Deprecated
     void renderShadows();
 }

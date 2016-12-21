@@ -72,7 +72,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-    private static final Name ENGINE_MODULE_NAME = new Name("engine");
 
     @In
     private ModuleManager moduleManager;
@@ -442,8 +441,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 Name depName = dependencyInfo.getId();
 
                 ModuleMetadata depMetaData;
-                if (depName.equals(ENGINE_MODULE_NAME)) {
-                    depMetaData = moduleManager.getRegistry().getLatestModuleVersion(ENGINE_MODULE_NAME).getMetadata();
+                if (depName.equals(TerasologyConstants.ENGINE_MODULE)) {
+                    depMetaData = moduleManager.getRegistry().getLatestModuleVersion(TerasologyConstants.ENGINE_MODULE).getMetadata();
                     if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
                         throw new DependencyResolutionFailed(String.format(
                                 "Module %s %s requires %s in version range %s, but you are using version %s",
@@ -513,7 +512,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
     private void updateModuleInformation() {
 
-        Set<Name> filtered = ImmutableSet.of(ENGINE_MODULE_NAME, new Name("engine-test"));
+        Set<Name> filtered = ImmutableSet.of(TerasologyConstants.ENGINE_MODULE, new Name("engine-test"));
         for (RemoteModule remote : metaDownloader.getModules()) {
             ModuleSelectionInfo info = modulesLookup.get(remote.getId());
             if (!filtered.contains(remote.getId())) {
