@@ -78,6 +78,7 @@
     "downloading-server-list": "downloading-server-list",
     "edit-server": "edit-server",
     "edit-server-title": "edit-server-title",
+    "enter-username-message": "enter-username-message",
     "enum-editor-prompt": "enum-editor-prompt",
     "enum-editor-title": "enum-editor-title",
     "error-downloading-server-list": "error-downloading-server-list",
