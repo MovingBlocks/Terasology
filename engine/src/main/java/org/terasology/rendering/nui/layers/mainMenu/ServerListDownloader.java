@@ -51,6 +51,8 @@ class ServerListDownloader {
     private final String serverAddress;
 
     /**
+     * The i18n key corresponding to the current status of the downloader
+     *
      * "volatile" ensures the visibility of updates across different threads
      */
     private volatile String status;
@@ -76,7 +78,7 @@ class ServerListDownloader {
     }
 
     /**
-     * @return the current status
+     * @return the i18n key corresponding to the current status of the downloader
      */
     public String getStatus() {
         return status;
