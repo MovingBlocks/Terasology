@@ -140,7 +140,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
                 @Override
                 public void draw(ModuleSelectionInfo value, Canvas canvas) {
-                    if (isSelectedGameplayModule(value)) {
+                    if (isSelectedGameplayModule(value) && value.isValidToSelect()) {
                         canvas.setMode("gameplay");
                     } else if (value.isSelected() && value.isExplicitSelection()) {
                         canvas.setMode("enabled");
