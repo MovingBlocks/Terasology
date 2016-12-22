@@ -26,20 +26,43 @@ import org.terasology.rendering.nui.UIWidget;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * A layout that allows for a single widget to be displayed among a list of stored widgets
+ */
 public class CardLayout extends CoreLayout<LayoutHint> {
+    /**
+     * The id of the currently displayed widget
+     */
     @LayoutConfig
     private String defaultCard;
 
+    /**
+     * Maps ids to their corresponding widgets
+     */
     private Map<String, UIWidget> widgets = Maps.newHashMap();
 
+    /**
+     * The default constructor
+     */
     public CardLayout() {
 
     }
 
+    /**
+     * The parameterized constructor
+     *
+     * @param id the id assigned to the {@code CardLayout}
+     */
     public CardLayout(String id) {
         super(id);
     }
 
+    /**
+     * Adds the widget to the list of widgets stored in the {@code CardLayout}
+     *
+     * @param widget The {@link UIWidget} to be added to the {@code CardLayout}
+     * @throws IllegalArgumentException if the widget does not have an id
+     */
     public void addWidget(UIWidget widget) {
         String id = widget.getId();
         if (id == null) {
@@ -48,6 +71,11 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         widgets.put(id, widget);
     }
 
+    /**
+     * Removes the widget from the list of widgets stored in the {@code CardLayout}
+     *
+     * @param widget The {@code UIWidget} to be removed from the {@code CardLayout}
+     */
     @Override
     public void removeWidget(UIWidget widget) {
         String id = widget.getId();
@@ -56,15 +84,31 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         }
     }
 
+    /**
+     * Sets the currently displayed widget
+     *
+     * @param id The id of the {@code UIWidget} to be displayed
+     */
     public void setDisplayedCard(String id) {
         defaultCard = id;
     }
 
+    /**
+     * Adds the widget to the list of widgets stored in the {@code CardLayout}
+     *
+     * @param element The {@code UIWidget} to add
+     * @param hint A hint as to how the widget should be laid out - may be null (and null values should be handled).
+     */
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
         addWidget(element);
     }
 
+    /**
+     * Handles how the {@code CardLayout} is drawn - called every frame
+     *
+     * @param canvas The {@link Canvas} on which the {@code CardLayout} is drawn
+     */
     @Override
     public void onDraw(Canvas canvas) {
         if (defaultCard != null) {
@@ -75,6 +119,13 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         }
     }
 
+    /**
+     * Retrieves the preferred content size of the {@code CardLayout}
+     *
+     * @param canvas The {@code Canvas} on which the {@code CardLayout} is drawn
+     * @param sizeHint A hint as to how the {@code CardLayout} should be laid out
+     * @return A {@link Vector2i} representing the preferred content size of the {@code CardLayout}
+     */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int maxX = 0;
@@ -88,6 +139,12 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         return new Vector2i(maxX, maxY);
     }
 
+    /**
+     * Retrieves the maximum content size of the {@code CardLayout}
+     *
+     * @param canvas The {@code Canvas} on which the {@code CardLayout} is drawn
+     * @return A {@code Vector2i} representing the maximum content size of the {@code CardLayout}
+     */
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
         int maxX = 0;
@@ -101,6 +158,11 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         return new Vector2i(maxX, maxY);
     }
 
+    /**
+     * Retrieves an {@link Iterator} containing the list of widgets stored in the {@code CardLayout}
+     *
+     * @return The {@code Iterator} containing the list of {@code UIWidgets}
+     */
     @Override
     public Iterator<UIWidget> iterator() {
         return widgets.values().iterator();
