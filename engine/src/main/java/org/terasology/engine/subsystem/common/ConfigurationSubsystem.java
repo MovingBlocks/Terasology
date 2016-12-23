@@ -37,24 +37,15 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     private Config config;
 
     @Override
-    /**
-     *Method getName Overrided
-     * Which returns
-     * @return "Configuration"
-     */
     public String getName() {
         return "Configuration";
     }
 
     @Override
     /**
-     * Method  preInitialise Overrided
      * @parameter set up Context rootContext
-     * 
      */
     public void preInitialise(Context rootContext) {
-    	
-    	 
         config = new Config();
         config.load();
         /**
@@ -121,7 +112,6 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         
     }
 /**
- *shutdown method Overrided
  * In the case of shutdown it will save the setting and exit.
  */
     @Override
