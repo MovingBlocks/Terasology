@@ -23,25 +23,13 @@ import org.terasology.game.Game;
 /**
  * Class made Subsystem for game. 
  */
-//
-/**
- * Method made to implement EngineSubsystem and get name.
- * @author ADMIN
- *
- */
 public class GameSubsystem implements EngineSubsystem {
     @Override
-    /**
-     * String set up to getName.
-	 * Which returns
-     * @return String "Game".
-     */
     public String getName() {
         return "Game";
     }
     /**
-     * initialise method Overrided
-     * with @parameters GameEngine engine, Context rootContext.
+     * @parameters GameEngine engine, Context rootContext.
      *rootContext will put new Game.
      */
 
