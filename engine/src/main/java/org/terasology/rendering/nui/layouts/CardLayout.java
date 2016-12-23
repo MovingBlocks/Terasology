@@ -49,16 +49,16 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Creates an empty {@code CardLayout} with the given id
+     * Creates an empty {@code CardLayout} with the given id.
      *
-     * @param id the id assigned to this {@code CardLayout}
+     * @param id The id assigned to this {@code CardLayout}
      */
     public CardLayout(String id) {
         super(id);
     }
 
     /**
-     * Adds the widget to this layout's widget list
+     * Adds the widget to this layout's widget list.
      *
      * @param widget The {@link UIWidget} to be added to this {@code CardLayout}
      * @throws IllegalArgumentException if the widget does not have an id
@@ -72,7 +72,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Adds the widget to this layout's widget list
+     * Adds the widget to this layout's widget list.
      *
      * @param element The {@code UIWidget} to add
      * @param hint A hint as to how the widget should be drawn in this layout
@@ -83,7 +83,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Removes the widget from this layout's widget list
+     * Removes the widget from this layout's widget list.
      *
      * @param widget The {@code UIWidget} to be removed from this {@code CardLayout}
      */
@@ -96,7 +96,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Sets the currently displayed widget
+     * Sets the currently displayed widget.
      *
      * @param id The id of the {@code UIWidget} to be displayed
      */
@@ -105,7 +105,8 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Draws the currently displayed widget, as defined in {@code currentDisplayedCard} - called every frame
+     * Draws the currently displayed widget, as defined in {@code currentDisplayedCard}.
+     * This is called every frame.
      *
      * @param canvas The {@link Canvas} on which this {@code CardLayout} is drawn
      */
@@ -120,8 +121,8 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Retrieves the preferred content size of this {@code CardLayout}
-     * This is the minimum size this layout will take, given no space restrictions
+     * Retrieves the preferred content size of this {@code CardLayout}.
+     * This is the minimum size this layout will take, given no space restrictions.
      *
      * @param canvas The {@code Canvas} on which this {@code CardLayout} is drawn
      * @param sizeHint A {@link Vector2i} representing the space available for widgets to be drawn in this layout
@@ -141,7 +142,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Retrieves the maximum content size of this {@code CardLayout}
+     * Retrieves the maximum content size of this {@code CardLayout}.
      *
      * @param canvas The {@code Canvas} on which this {@code CardLayout} is drawn
      * @return A {@code Vector2i} representing the maximum content size of this {@code CardLayout}
@@ -160,9 +161,9 @@ public class CardLayout extends CoreLayout<LayoutHint> {
     }
 
     /**
-     * Retrieves an {@link Iterator} containing this layout's widget list
+     * Retrieves an {@link Iterator} containing this layout's widget list.
      *
-     * @return A {@code Iterator} containing the list of {@code UIWidgets}
+     * @return An {@code Iterator} containing the list of {@code UIWidgets}
      */
     @Override
     public Iterator<UIWidget> iterator() {

@@ -56,14 +56,14 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     private int horizontalSpacing;
 
     /**
-     * Creates an empty {@code RowLayout}
+     * Creates an empty {@code RowLayout}.
      */
     public RowLayout() {
 
     }
 
     /**
-     * Creates an empty {@code RowLayout} with the given id
+     * Creates an empty {@code RowLayout} with the given id.
      *
      * @param id The id assigned to this {@code RowLayout}
      */
@@ -72,7 +72,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Creates a {@code RowLayout} containing the given widgets
+     * Creates a {@code RowLayout} containing the given widgets.
      *
      * @param widgets A variable number of {@link UIWidget}s to be added to this layout's widget list
      */
@@ -83,11 +83,11 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Adds the widget to this layout's widget list
+     * Adds the widget to this layout's widget list.
      *
      * @param widget The {@code UIWidget} to be added
-     * @param hint   An optional {@link RowLayoutHint} specifying how the widget should be drawn in this layout -
-     *               whether it has a relative width or whether it uses the content width
+     * @param hint   An optional {@link RowLayoutHint} specifying how the widget should be drawn in this layout =
+     *               such as whether it has a relative width or whether it uses the content width
      */
     @Override
     public void addWidget(UIWidget widget, RowLayoutHint hint) {
@@ -98,7 +98,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Removes the widget from this layout's widget list
+     * Removes the widget from this layout's widget list.
      *
      * @param widget The {@code UIWidget} to be removed
      */
@@ -110,8 +110,8 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
 
     /**
      * Draws the widgets contained in this layout's widget list,
-     * according to the widths calculated in {@link #calcWidths(Canvas)}
-     * - called every frame
+     * according to the widths calculated in {@link #calcWidths(Canvas)}.
+     * This is called every frame.
      *
      * @param canvas The {@link Canvas} on which this {@code RowLayout} is drawn
      */
@@ -132,7 +132,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Calculates the widths of each of the widgets in this layout's widget list
+     * Calculates the widths of each of the widgets in this layout's widget list.
      * Widths are first calculated for widgets with a relative width specified,
      * followed by widgets which follow their content width.
      * The remaining width is then split equally among the remaining widgets.
@@ -194,8 +194,8 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves the preferred content size of this {@code RowLayout}
-     * This is the minimum size this layout will take, given no space restrictions
+     * Retrieves the preferred content size of this {@code RowLayout}.
+     * This is the minimum size this layout will take, given no space restrictions.
      *
      * @param canvas The {@code Canvas} on which this {@code RowLayout} is drawn
      * @param areaHint A {@link Vector2i} representing the space available for widgets to be drawn in this layout
@@ -214,7 +214,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves the maximum content size of this {@code RowLayout}
+     * Retrieves the maximum content size of this {@code RowLayout}.
      *
      * @param canvas The {@code Canvas} on which this {@code RowLayout} is drawn
      * @return A {@code Vector2i} representing the maximum content size of this {@code RowLayout}
@@ -225,9 +225,9 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves an {@link Iterator} containing this layout's widget list
+     * Retrieves an {@link Iterator} containing this layout's widget list.
      *
-     * @return The {@code Iterator} containing the list of {@code UIWidgets}
+     * @return An {@code Iterator} containing the list of {@code UIWidgets}
      */
     @Override
     public Iterator<UIWidget> iterator() {
@@ -235,7 +235,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Sets the ratios of the widths of the widgets in this {@code RowLayout}
+     * Sets the ratios of the widths of the widgets in this {@code RowLayout}.
      *
      * @param ratios The ratios of the widths, each corresponding to a separate widget, with a maximum total of 1
      * @return This {@code RowLayout}
@@ -249,7 +249,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves the spacing between adjacent widgets in this {@code RowLayout}
+     * Retrieves the spacing between adjacent widgets in this {@code RowLayout}.
      *
      * @return The spacing, in pixels
      */
@@ -258,7 +258,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Sets the spacing betweeen adjacent widgets in this {@code RowLayout}
+     * Sets the spacing betweeen adjacent widgets in this {@code RowLayout}.
      *
      * @param spacing The spacing, in pixels
      * @return This {@code RowLayout}

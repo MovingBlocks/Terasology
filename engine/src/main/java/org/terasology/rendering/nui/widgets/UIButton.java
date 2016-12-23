@@ -76,7 +76,7 @@ public class UIButton extends CoreWidget {
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     /**
-     * An {@link InteractionListener} that listens for mouse interacction with this button
+     * An {@link InteractionListener} that listens for mouse interaction with this button
      */
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -104,13 +104,13 @@ public class UIButton extends CoreWidget {
     };
 
     /**
-     * Creates an empty {@code UIButton}
+     * Creates an empty {@code UIButton}.
      */
     public UIButton() {
     }
 
     /**
-     * Creates an empty {@code UIButton} with the given id
+     * Creates an empty {@code UIButton} with the given id.
      *
      * @param id The id assigned to this {@code UIButton}
      */
@@ -119,7 +119,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Creates a {@code UIButton} with the given id, containing the given text
+     * Creates a {@code UIButton} with the given id, containing the given text.
      *
      * @param id The id assigned to this {@code UIButton}
      * @param text The text shown on this {@code UIButton}
@@ -130,7 +130,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Creates a {@code UIButton} with the given id, containing the text in the given {@code Binding}
+     * Creates a {@code UIButton} with the given id, containing the text in the given {@code Binding}.
      *
      * @param id The id assigned to this {@code UIButton}
      * @param text The {@code Binding} containing the text shown on this {@code UIButton}
@@ -141,7 +141,8 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Handles how the {@code UIButton} is drawn - called every frame
+     * Handles how the {@code UIButton} is drawn.
+     * This is called every frame.
      *
      * @param canvas The {@link Canvas} on which this {@code UIButton} is drawn
      */
@@ -157,8 +158,8 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the preferred content size of the {@code UIButton}
-     * This is the minimum size this layout will take, given no space restrictions
+     * Retrieves the preferred content size of the {@code UIButton}.
+     * This is the minimum size this layout will take, given no space restrictions.
      *
      * @param canvas The {@code Canvas} on which the {@code UIButton} is drawn
      * @param areaHint A {@link Vector2i} representing the available space for this {@code UIButton}
@@ -172,15 +173,15 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the current mode of this {@code UIButton}
+     * Retrieves the current mode of this {@code UIButton}.
      * <p><ul>
      * <li> DISABLED_MODE - The {@code UIButton} is disabled
      * <li> DOWN_MODE - The {@code UIButton} is being pressed
      * <li> HOVER_MODE - The mouse is hovering over the {@code UIButton}
-     * <li> DEFAULT_MODE - Default mode if none of the other modes are applicable
+     * <li> DEFAULT_MODE - The default mode if no other modes are applicable
      * </ul></p>
      *
-     * @return The {@code String} representing the current mode of this {@code UIButton}
+     * @return A {@code String} representing the current mode of this {@code UIButton}
      */
     @Override
     public String getMode() {
@@ -195,7 +196,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Called when this {@code UIButton} is pressed to activate all listeners
+     * Called when this {@code UIButton} is pressed to activate all subscribed listeners.
      */
     private void activate() {
         for (ActivateEventListener listener : listeners) {
@@ -204,7 +205,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Binds the text to be shown on this {@code UIButton}
+     * Binds the text to be shown on this {@code UIButton}.
      *
      * @param binding The {@code Binding} containing the text
      */
@@ -213,7 +214,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the text shown on this {@code UIButton}
+     * Retrieves the text shown on this {@code UIButton}.
      *
      * @return The text shown on this {@code UIButton}
      */
@@ -222,7 +223,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Sets the text shown on this {@code UIButton}
+     * Sets the text shown on this {@code UIButton}.
      *
      * @param text The text to be shown on this {@code UIButton}
      */
@@ -231,7 +232,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Binds the image shown on this {@code UIButton}
+     * Binds the image shown on this {@code UIButton}.
      *
      * @param binding The {@code Binding} containing the {@code TextureRegion} corresponding to the image
      */
@@ -240,7 +241,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Sets the image shown on this {@code UIButton}
+     * Sets the image shown on this {@code UIButton}.
      *
      * @param image The {@code TextureRegion} corresponding to the image
      */
@@ -249,16 +250,16 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the the image shown on this {@code UIButton}
+     * Retrieves the the image shown on this {@code UIButton}.
      *
-     * @return The {@code TextureRegion} corresponding to the image
+     * @return A {@code TextureRegion} corresponding to the image
      */
     public TextureRegion getImage() {
         return image.get();
     }
 
     /**
-     * Binds the click sound played when this {@code UIButton} is clicked
+     * Binds the click sound played when this {@code UIButton} is clicked.
      *
      * @param binding The {@code Binding} containing the {@code StaticSound} corresponding to the click sound
      */
@@ -267,25 +268,25 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the click sound played when this {@code UIButton} is clicked
+     * Retrieves the click sound played when this {@code UIButton} is clicked.
      *
-     * @return The {@code StaticSound} corresponding to the click sound
+     * @return A {@code StaticSound} corresponding to the click sound
      */
     public StaticSound getClickSound() {
         return clickSound.get();
     }
 
     /**
-     * Sets the click sound played when this {@code UIButton} is clicked
+     * Sets the click sound played when this {@code UIButton} is clicked.
      *
-     * @param val The {@code StaticSound} corresponding to the click sound
+     * @param val A {@code StaticSound} corresponding to the click sound
      */
     public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
 
     /**
-     * Binds the volume of the click sound
+     * Binds the volume of the click sound.
      *
      * @param binding The {@code Binding} containing the float representing the volume the click sound
      */
@@ -294,16 +295,16 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the volume of the click sound
+     * Retrieves the volume of the click sound.
      *
-     * @return The float representing the volume of the click sound
+     * @return A float representing the volume of the click sound
      */
     public float getClickVolume() {
         return clickVolume.get();
     }
 
     /**
-     * Sets the volume of the click sound
+     * Sets the volume of the click sound.
      *
      * @param val The float representing the volume of the click sound
      */
@@ -312,7 +313,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Subscribes a listener that is called whenever this {@code UIButton} is activated
+     * Subscribes a listener that is called whenever this {@code UIButton} is activated.
      *
      * @param listener The {@link ActivateEventListener} to be subscribed
      */
@@ -321,7 +322,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Unsubscribes a listener from this {@code UIButton}
+     * Unsubscribes a listener from this {@code UIButton}.
      *
      * @param listener The {@code ActivateEventListener}to be unsubscribed
      */
