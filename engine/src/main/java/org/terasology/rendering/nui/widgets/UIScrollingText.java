@@ -35,7 +35,7 @@ import java.util.Map.Entry;
  */
 public class UIScrollingText extends CoreWidget {
     /**
-     * The text to be shown by the widget
+     * The text to be shown by this widget
      */
     @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
@@ -59,7 +59,7 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
-
+    
     /**
      * Maps text to their Y coordinates
      */
@@ -68,40 +68,37 @@ public class UIScrollingText extends CoreWidget {
      * Specifies whether scrolling will restart from the beginning when all text has been scrolled through
      */
     private boolean autoReset;
-    /**
-     * Specifies whether the {@code UIScrollingText} is currently scrolling
-     */
     private boolean isScrolling = true;
 
     /**
-     * The default constructor
+     * Creates an empty {@code UIScrollingText}
      */
     public UIScrollingText() {
     }
 
     /**
-     * The parameterized constructor
+     * Creates an empty {@code UIScrollingText} with the given id
      *
-     * @param text The text to be shown in the {@code UIScrollingText}
+     * @param text The text to be shown in this {@code UIScrollingText}
      */
     public UIScrollingText(String text) {
         this.text.set(text);
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code UIScrollingText} containing the text in the given {@link Binding}
      *
-     * @param text the {@link Binding<>} containing the text to be shown in the {@code UIScrollingText}
+     * @param text the {@code Binding} containing the text to be shown in this {@code UIScrollingText}
      */
     public UIScrollingText(Binding<String> text) {
         this.text = text;
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code UIScrollingText} with the given id, containing the given text
      *
-     * @param id The id assigned to the {@code UIScrollingText}
-     * @param text The text to be shown in the {@code UIScrollingText}
+     * @param id The id assigned to this {@code UIScrollingText}
+     * @param text The text to be shown in this {@code UIScrollingText}
      */
     public UIScrollingText(String id, String text) {
         super(id);
@@ -109,10 +106,10 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code UIScrollingText} with the given id, containing the text in the given {@code Binding}
      *
-     * @param id The id assigned to the {@code UIScrollingText}
-     * @param text The text to be shown in the {@code UIScrollingText}
+     * @param id The id assigned to this {@code UIScrollingText}
+     * @param text The text to be shown in this {@code UIScrollingText}
      */
     public UIScrollingText(String id, Binding<String> text) {
         super(id);
@@ -120,9 +117,9 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Retrieves the text shown in the {@code UIScrollingText}
+     * Retrieves the text shown in this {@code UIScrollingText}
      * }
-     * @return The text shown in the {@code UIScrollingText}
+     * @return The text shown in this {@code UIScrollingText}
      */
     public String getText() {
         if (text.get() == null) {
@@ -132,7 +129,7 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Sets the text shown in the {@code UIScrollingText}
+     * Sets the text shown in this {@code UIScrollingText}
      *
      * @param text The text to be shown in the {@code UIScrollingText}
      */
@@ -141,23 +138,23 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Binds the text to be shown to the {@code UIScrollingText}
+     * Binds the text to be shown in this {@code UIScrollingText}
      *
-     * @param binding The {@code Binding} containing the text to be shown in the {@code UIScrollingText}
+     * @param binding The {@code Binding} containing the text to be shown in this {@code UIScrollingText}
      */
     public void bindText(Binding<String> binding) {
         this.text = binding;
     }
 
     /**
-     * Starts the scrolling of the text shown in the {@code UIScrollingText}
+     * Starts the scrolling of the text shown in this {@code UIScrollingText}
      */
     public void startScrolling() {
         isScrolling = true;
     }
 
     /**
-     * Stops the scrolling of the text shown in the {@code UIScrollingText}
+     * Stops the scrolling of the text shown in this {@code UIScrollingText}
      */
     public void stopScrolling() {
         isScrolling = false;
@@ -189,9 +186,9 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Handles how the {@code UIScrollingText} is drawn - called every frame
+     * Handles how this {@code UIScrollingText} is drawn - called every frame
      *
-     * @param canvas The {@link Canvas} on which the {@code UIScrollingText} is drawn
+     * @param canvas The {@link Canvas} on which this {@code UIScrollingText} is drawn
      */
     @Override
     public void onDraw(Canvas canvas) {
@@ -220,11 +217,12 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Retrieves the preferred content size of the {@code UIScrollingText}
+     * Retrieves the preferred content size of this {@code UIScrollingText}
+     * This is the minimum size this layout will take, given no space restrictions
      *
-     * @param canvas The {@code Canvas} on which the {@code UIScrollingText} is drawn
-     * @param areaHint A hint as to how the {@code UIScrollingText} should be laid out
-     * @return A {@link Vector2i} representing the preferred content size of the {@code UIScrollingText}
+     * @param canvas The {@code Canvas} on which this {@code UIScrollingText} is drawn
+     * @param areaHint A {@link Vector2i} representing the available space for this {@code UIScrollingText}
+     * @return A {@code Vector2i} representing the preferred content size of this {@code UIScrollingText}
      */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
@@ -234,10 +232,10 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Updates the Y values of the text shown in the {@code UIScrollingText} each frame
+     * Updates the Y values of the text shown in this {@code UIScrollingText} each frame
      * or initialises them if they are empty
      *
-     * @param canvas The {@code Canvas} on which the {@code UIScrollingText} is drawn
+     * @param canvas The {@code Canvas} on which this {@code UIScrollingText} is drawn
      */
     private void updateYValues(Canvas canvas) {
         if (!textY.isEmpty()) {

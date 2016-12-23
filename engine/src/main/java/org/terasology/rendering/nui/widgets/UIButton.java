@@ -42,19 +42,19 @@ public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
 
     /**
-     * The {@link Binding} containing the {@link TextureRegion} corresponding to the image shown on the button
+     * The {@link Binding} containing the {@link TextureRegion} corresponding to the image shown on this button
      */
     @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
 
     /**
-     * The {@code Binding} containing the text to be shown on the button
+     * The {@code Binding} containing the text to be shown on this button
      */
     @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
 
     /**
-     * The {@code Binding} containing the {@link StaticSound} to be played when the button is clicked
+     * The {@code Binding} containing the {@link StaticSound} to be played when this button is clicked
      */
     @LayoutConfig
     private Binding<StaticSound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click").get());
@@ -76,7 +76,7 @@ public class UIButton extends CoreWidget {
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     /**
-     * An {@link InteractionListener} that listens for clicks on the button
+     * An {@link InteractionListener} that listens for mouse interacction with this button
      */
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -104,13 +104,13 @@ public class UIButton extends CoreWidget {
     };
 
     /**
-     * The default constructor
+     * Creates an empty {@code UIButton}
      */
     public UIButton() {
     }
 
     /**
-     * The parameterized constructor
+     * Creates an empty {@code UIButton} with the given id
      *
      * @param id The id assigned to this {@code UIButton}
      */
@@ -119,10 +119,10 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code UIButton} with the given id, containing the given text
      *
      * @param id The id assigned to this {@code UIButton}
-     * @param text The text shown on the {@code UIButton}
+     * @param text The text shown on this {@code UIButton}
      */
     public UIButton(String id, String text) {
         super(id);
@@ -130,10 +130,10 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code UIButton} with the given id, containing the text in the given {@code Binding}
      *
      * @param id The id assigned to this {@code UIButton}
-     * @param text The {@code Binding} containing the text shown on the {@code UIButton}
+     * @param text The {@code Binding} containing the text shown on this {@code UIButton}
      */
     public UIButton(String id, Binding<String> text) {
         super(id);
@@ -143,7 +143,7 @@ public class UIButton extends CoreWidget {
     /**
      * Handles how the {@code UIButton} is drawn - called every frame
      *
-     * @param canvas The {@link Canvas} on which the {@code UIButton} is drawn
+     * @param canvas The {@link Canvas} on which this {@code UIButton} is drawn
      */
     @Override
     public void onDraw(Canvas canvas) {
@@ -158,9 +158,10 @@ public class UIButton extends CoreWidget {
 
     /**
      * Retrieves the preferred content size of the {@code UIButton}
+     * This is the minimum size this layout will take, given no space restrictions
      *
      * @param canvas The {@code Canvas} on which the {@code UIButton} is drawn
-     * @param areaHint A hint as to how the {@code UIButton} should be laid out
+     * @param areaHint A {@link Vector2i} representing the available space for this {@code UIButton}
      * @return A {@link Vector2i} representing the preferred content size of the {@code UIButton}
      */
     @Override
@@ -171,15 +172,15 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the current mode of the {@code UIButton}
+     * Retrieves the current mode of this {@code UIButton}
      * <p><ul>
-     * <li> DISABLED_MODE - The [@code UIButton} is disabled
+     * <li> DISABLED_MODE - The {@code UIButton} is disabled
      * <li> DOWN_MODE - The {@code UIButton} is being pressed
      * <li> HOVER_MODE - The mouse is hovering over the {@code UIButton}
-     * <li> DEFAULT_MODE - Default mode if none of the others are applicable
+     * <li> DEFAULT_MODE - Default mode if none of the other modes are applicable
      * </ul></p>
      *
-     * @return The {@code String} representing the current mode of the {@code UIButton}
+     * @return The {@code String} representing the current mode of this {@code UIButton}
      */
     @Override
     public String getMode() {
@@ -194,7 +195,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Called when the {@code UIButton} is pressed to activate all the listeners
+     * Called when this {@code UIButton} is pressed to activate all listeners
      */
     private void activate() {
         for (ActivateEventListener listener : listeners) {
@@ -203,7 +204,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Binds the text to be shown on the {@code UIButton}
+     * Binds the text to be shown on this {@code UIButton}
      *
      * @param binding The {@code Binding} containing the text
      */
@@ -212,25 +213,25 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the text being shown on the {@code UIButton}
+     * Retrieves the text shown on this {@code UIButton}
      *
-     * @return The text shown on the {@code UIButton}
+     * @return The text shown on this {@code UIButton}
      */
     public String getText() {
         return text.get();
     }
 
     /**
-     * Sets the text to be shown on the {@code UIButton}
+     * Sets the text shown on this {@code UIButton}
      *
-     * @param text The text to be shown on the {@code UIButton}
+     * @param text The text to be shown on this {@code UIButton}
      */
     public void setText(String text) {
         this.text.set(text);
     }
 
     /**
-     * Binds the image to be shown on the {@code UIButton}
+     * Binds the image shown on this {@code UIButton}
      *
      * @param binding The {@code Binding} containing the {@code TextureRegion} corresponding to the image
      */
@@ -239,7 +240,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Sets the image to be shown on the {@code UIButton}
+     * Sets the image shown on this {@code UIButton}
      *
      * @param image The {@code TextureRegion} corresponding to the image
      */
@@ -248,7 +249,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the the image shown on the {@code UIButton}
+     * Retrieves the the image shown on this {@code UIButton}
      *
      * @return The {@code TextureRegion} corresponding to the image
      */
@@ -257,7 +258,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Binds the click sound to be played when the {@code UIButton} is clicked
+     * Binds the click sound played when this {@code UIButton} is clicked
      *
      * @param binding The {@code Binding} containing the {@code StaticSound} corresponding to the click sound
      */
@@ -266,7 +267,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Retrieves the click sound to be played when the {@code UIButton} is clicked
+     * Retrieves the click sound played when this {@code UIButton} is clicked
      *
      * @return The {@code StaticSound} corresponding to the click sound
      */
@@ -275,7 +276,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Sets the click sound to be played when the {@code UIButton} is clicked
+     * Sets the click sound played when this {@code UIButton} is clicked
      *
      * @param val The {@code StaticSound} corresponding to the click sound
      */
@@ -286,7 +287,7 @@ public class UIButton extends CoreWidget {
     /**
      * Binds the volume of the click sound
      *
-     * @param binding The {@code Binding} containing the float representing volume the click sound
+     * @param binding The {@code Binding} containing the float representing the volume the click sound
      */
     public void bindClickVolume(Binding<Float> binding) {
         clickVolume = binding;
@@ -311,7 +312,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Subscribes a listener that is called whenever the {@code UIButton} is activated
+     * Subscribes a listener that is called whenever this {@code UIButton} is activated
      *
      * @param listener The {@link ActivateEventListener} to be subscribed
      */
@@ -320,7 +321,7 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Unsubscribes a listener from the {@code UIButton}
+     * Unsubscribes a listener from this {@code UIButton}
      *
      * @param listener The {@code ActivateEventListener}to be unsubscribed
      */

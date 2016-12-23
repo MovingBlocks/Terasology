@@ -34,18 +34,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A layout that places widgets side-by-side, with support for relative widths
+ * A layout that places widgets in a row, with support for relative widths
  */
 public class RowLayout extends CoreLayout<RowLayoutHint> {
 
     private static final Logger logger = LoggerFactory.getLogger(RowLayout.class);
 
     /**
-     * A list of the widgets in the {@link RowLayout}
+     * A list of the widgets in this {@link RowLayout}
      */
     private List<UIWidget> contents = Lists.newArrayList();
     /**
-     * Maps widgets to their hints
+     * Maps widgets to their layout hints
      */
     private Map<UIWidget, RowLayoutHint> hints = Maps.newHashMap();
 
@@ -56,25 +56,25 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     private int horizontalSpacing;
 
     /**
-     * The default constructor
+     * Creates an empty {@code RowLayout}
      */
     public RowLayout() {
 
     }
 
     /**
-     * The parameterized constructor
+     * Creates an empty {@code RowLayout} with the given id
      *
-     * @param id The id assigned to the {@code RowLayout}
+     * @param id The id assigned to this {@code RowLayout}
      */
     public RowLayout(String id) {
         super(id);
     }
 
     /**
-     * The parameterized constructor
+     * Creates a {@code RowLayout} containing the given widgets
      *
-     * @param widgets A variable number of {@link UIWidget}s to be added to the {@code RowLayout}
+     * @param widgets A variable number of {@link UIWidget}s to be added to this layout's widget list
      */
     public RowLayout(UIWidget... widgets) {
         for (UIWidget widget : widgets) {
@@ -83,10 +83,11 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Adds to widget to the {@code RowLayout}
+     * Adds the widget to this layout's widget list
      *
      * @param widget The {@code UIWidget} to be added
-     * @param hint   A hint as to how the widget should be laid out - may be null (and null values should be handled).
+     * @param hint   An optional {@link RowLayoutHint} specifying how the widget should be drawn in this layout -
+     *               whether it has a relative width or whether it uses the content width
      */
     @Override
     public void addWidget(UIWidget widget, RowLayoutHint hint) {
@@ -97,7 +98,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Removes the widget from the {@code RowLayout}
+     * Removes the widget from this layout's widget list
      *
      * @param widget The {@code UIWidget} to be removed
      */
@@ -108,9 +109,11 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Handles how the {@code RowLayout} is drawn - called every frame
+     * Draws the widgets contained in this layout's widget list,
+     * according to the widths calculated in {@link #calcWidths(Canvas)}
+     * - called every frame
      *
-     * @param canvas The {@link Canvas} on which the {@code RowLayout} is drawn
+     * @param canvas The {@link Canvas} on which this {@code RowLayout} is drawn
      */
     @Override
     public void onDraw(Canvas canvas) {
@@ -129,10 +132,13 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Calculates the widths of each of the widgets in the {@code RowLayout}
+     * Calculates the widths of each of the widgets in this layout's widget list
+     * Widths are first calculated for widgets with a relative width specified,
+     * followed by widgets which follow their content width.
+     * The remaining width is then split equally among the remaining widgets.
      *
-     * @param canvas The {@link Canvas} on which the {@code RowLayout} is drawn
-     * @return A list of the widths of each of the widgets, in pixels
+     * @param canvas The {@link Canvas} on which this {@code RowLayout} is drawn
+     * @return A list of the widths of the widgets in this layout's widget list, in pixels
      */
     private TIntList calcWidths(Canvas canvas) {
         TIntList results = new TIntArrayList(contents.size());
@@ -188,11 +194,12 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves the preferred content size of the {@code RowLayout}
+     * Retrieves the preferred content size of this {@code RowLayout}
+     * This is the minimum size this layout will take, given no space restrictions
      *
-     * @param canvas The {@code Canvas} on which the {@code RowLayout} is drawn
-     * @param areaHint A hint as to how the {@code RowLayout} should b  e laid out
-     * @return A {@link Vector2i} representing the preferred content size of the {@code RowLayout}
+     * @param canvas The {@code Canvas} on which this {@code RowLayout} is drawn
+     * @param areaHint A {@link Vector2i} representing the space available for widgets to be drawn in this layout
+     * @return A {@link Vector2i} representing the preferred content size of this {@code RowLayout}
      */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
@@ -207,10 +214,10 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves the maximum content size of the {@code RowLayout}
+     * Retrieves the maximum content size of this {@code RowLayout}
      *
-     * @param canvas The {@code Canvas} on which the {@code RowLayout} is drawn
-     * @return A {@code Vector2i} representing the maximum content size of the {@code RowLayout}
+     * @param canvas The {@code Canvas} on which this {@code RowLayout} is drawn
+     * @return A {@code Vector2i} representing the maximum content size of this {@code RowLayout}
      */
     @Override
     public Vector2i getMaxContentSize(Canvas canvas) {
@@ -218,7 +225,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrieves an {@link Iterator} containing the list of widgets stored in the {@code CardLayout}
+     * Retrieves an {@link Iterator} containing this layout's widget list
      *
      * @return The {@code Iterator} containing the list of {@code UIWidgets}
      */
@@ -228,10 +235,10 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Sets the ratios of the widths of the widgets in the {@code RowLayout}
+     * Sets the ratios of the widths of the widgets in this {@code RowLayout}
      *
-     * @param ratios The ratios of the widths, each corresponding to a separate widget, with the maximum being 1
-     * @return The {@code RowLayout} object
+     * @param ratios The ratios of the widths, each corresponding to a separate widget, with a maximum total of 1
+     * @return This {@code RowLayout}
      */
     public RowLayout setColumnRatios(float... ratios) {
         hints.clear();
@@ -242,7 +249,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Retrives the spacing between adjacent widgets in the {@code RowLayout}
+     * Retrieves the spacing between adjacent widgets in this {@code RowLayout}
      *
      * @return The spacing, in pixels
      */
@@ -251,10 +258,10 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
-     * Sets the spacing betweeen adjacent widgets in the {@code RowLayout}
+     * Sets the spacing betweeen adjacent widgets in this {@code RowLayout}
      *
      * @param spacing The spacing, in pixels
-     * @return The {@code RowLayout} object
+     * @return This {@code RowLayout}
      */
     public RowLayout setHorizontalSpacing(int spacing) {
         this.horizontalSpacing = spacing;
