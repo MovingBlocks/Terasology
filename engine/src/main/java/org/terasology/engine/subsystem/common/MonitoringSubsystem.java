@@ -32,10 +32,8 @@ public class MonitoringSubsystem implements EngineSubsystem {
     private AdvancedMonitor advancedMonitor;
 
     @Override
-    /**
-     * Method getName Override.
-	 * Which returns String 
-	 * @return "Monitoring"
+    /** 
+     * @return "Monitoring"
      */
     public String getName() {
         return "Monitoring";
@@ -43,8 +41,7 @@ public class MonitoringSubsystem implements EngineSubsystem {
 
     @Override
     /**
-     * initialise Method Overrided 
-     * with @parameters of (GameEngine engine, Context rootContext)
+     * @parameters of (GameEngine engine, Context rootContext)
      */
     public void initialise(GameEngine engine, Context rootContext) {
     	/**
@@ -58,7 +55,6 @@ public class MonitoringSubsystem implements EngineSubsystem {
 
     @Override
     /**
-     * shutdown method Overrided 
      * if advanceMonitor is there then set advancedMonitor Visibilty false. 
      */
     public void shutdown() {
