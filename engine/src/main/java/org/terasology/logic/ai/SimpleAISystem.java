@@ -99,6 +99,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
     }
     /**
      * This method help player to Jump.
+     * @parameters HorizontalCollisionEvent event, EntityRef entity.
      */
 
     @ReceiveEvent(components = {SimpleAIComponent.class})
