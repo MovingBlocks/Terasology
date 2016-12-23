@@ -41,7 +41,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
  * Size of the world.
  * Player is near to another player or not.
  */
-	@In
+    @In
     private WorldProvider worldProvider;
     @In
     private EntityManager entityManager;
