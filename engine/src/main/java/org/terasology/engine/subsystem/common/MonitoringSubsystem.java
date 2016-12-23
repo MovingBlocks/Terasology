@@ -22,19 +22,34 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 
 /**
- *
+ *Class made MonitoringSubsystem.
  */
 public class MonitoringSubsystem implements EngineSubsystem {
+	/**
+	 * Private field made advanceMonitor
+	 */
 
     private AdvancedMonitor advancedMonitor;
 
     @Override
+    /**
+     * Method getName Override.
+	 * Which returns String 
+	 * @return "Monitoring"
+     */
     public String getName() {
         return "Monitoring";
     }
 
     @Override
+    /**
+     * initialise Method Overrided 
+     * with @parameters of (GameEngine engine, Context rootContext)
+     */
     public void initialise(GameEngine engine, Context rootContext) {
+    	/**
+    	 * If Condition is true then set advancedMonitor (Visible). 
+    	 */
         if (rootContext.get(Config.class).getSystem().isMonitoringEnabled()) {
             advancedMonitor = new AdvancedMonitor();
             advancedMonitor.setVisible(true);
@@ -42,6 +57,10 @@ public class MonitoringSubsystem implements EngineSubsystem {
     }
 
     @Override
+    /**
+     * shutdown method Overrided 
+     * if advanceMonitor is there then set advancedMonitor Visibilty false. 
+     */
     public void shutdown() {
         if (advancedMonitor != null) {
             advancedMonitor.setVisible(false);
