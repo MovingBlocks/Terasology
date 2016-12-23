@@ -21,17 +21,33 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.game.Game;
 
 /**
+ * Class made Subsystem for game. 
+ */
+//
+/**
+ * Method made to implement EngineSubsystem and get name.
+ * @author ADMIN
  *
  */
-// TODO: Get rid of this subsystem, it is kind of silly (remove Game class, convert to entity?)
 public class GameSubsystem implements EngineSubsystem {
     @Override
+    /**
+     * String set up to getName.
+	 * Which returns
+     * @return String "Game".
+     */
     public String getName() {
         return "Game";
     }
+    /**
+     * initialise method Overrided
+     * with @parameters GameEngine engine, Context rootContext.
+     *rootContext will put new Game.
+     */
 
     @Override
     public void initialise(GameEngine engine, Context rootContext) {
         rootContext.put(Game.class, new Game());
     }
 }
+
