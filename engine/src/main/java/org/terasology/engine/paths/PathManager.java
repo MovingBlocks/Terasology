@@ -34,6 +34,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 
 /**
+ * Manager class that keeps track of the game's various paths and save directories.
  */
 public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
@@ -118,6 +119,10 @@ public final class PathManager {
         return null;
     }
 
+    /**
+     *
+     * @return An instance of the path manager for this execution.
+     */
     public static PathManager getInstance() {
         if (instance == null) {
             instance = new PathManager();
@@ -125,11 +130,20 @@ public final class PathManager {
         return instance;
     }
 
+    /**
+     * Uses the given path as the home instead of the default home path.
+     * @param rootPath Path to use as the home path.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
     public void useOverrideHomePath(Path rootPath) throws IOException {
         this.homePath = rootPath;
         updateDirs();
     }
 
+    /**
+     * Uses a platform-specific default home path for this execution.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
     public void useDefaultHomePath() throws IOException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
@@ -158,38 +172,74 @@ public final class PathManager {
         updateDirs();
     }
 
+    /**
+     *
+     * @return This execution's home path.
+     */
     public Path getHomePath() {
         return homePath;
     }
 
+    /**
+     *
+     * @return The path of the running installation.
+     */
     public Path getInstallPath() {
         return installPath;
     }
 
+    /**
+     *
+     * @return Path in which world saves are saved.
+     */
     public Path getSavesPath() {
         return savesPath;
     }
 
+    /**
+     *
+     * @return Path in which this execution's logs are saved.
+     */
     public Path getLogPath() {
         return logPath;
     }
 
+    /**
+     *
+     * @return Path in which this execution's shader logs are saved.
+     */
     public Path getShaderLogPath() {
         return shaderLogPath;
     }
 
+    /**
+     *
+     * @return List of paths to all of the modules.
+     */
     public List<Path> getModulePaths() {
         return modPaths;
     }
 
+    /**
+     *
+     * @return Path in which this execution's screen-shots are saved.
+     */
     public Path getScreenshotPath() {
         return screenshotPath;
     }
 
+    /**
+     *
+     * @return Path in which the game's native libraries are saved.
+     */
     public Path getNativesPath() {
         return nativesPath;
     }
 
+    /**
+     * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
+     * @throws IOException Thrown when required directories cannot be accessed.
+     */
     private void updateDirs() throws IOException {
         Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
