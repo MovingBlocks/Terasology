@@ -31,22 +31,39 @@ import org.terasology.identity.PublicIdentityCertificate;
  * The configuration subsystem manages Terasology's configuration
  */
 public class ConfigurationSubsystem implements EngineSubsystem {
+	
     public static final String SERVER_PORT_PROPERTY = "org.terasology.serverPort";
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationSubsystem.class);
     private Config config;
 
     @Override
+    /**
+     *Method getName Overrided
+     * Which returns
+     * @return "Configuration"
+     */
     public String getName() {
         return "Configuration";
     }
 
     @Override
+    /**
+     * Method  preInitialise Overrided
+     * @parameter set up Context rootContext
+     * 
+     */
     public void preInitialise(Context rootContext) {
+    	
+    	 
         config = new Config();
         config.load();
+        /**
+         * Declaring of SERVER_PORT_PROPERTY  for its function.
+         */
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
         if (serverPortProperty != null) {
+  
             try {
                 config.getNetwork().setServerPort(Integer.parseInt(serverPortProperty));
             } catch (NumberFormatException e) {
@@ -64,7 +81,11 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
         rootContext.put(Config.class, config);
     }
-
+             
+    /**
+     * Checking if there is Certificate or not 
+     * if not generating new certificate. 
+     */
     private void checkServerIdentity() {
         if (!validateServerIdentity()) {
             CertificateGenerator generator = new CertificateGenerator();
@@ -73,15 +94,23 @@ public class ConfigurationSubsystem implements EngineSubsystem {
             config.save();
         }
     }
+    
+
 
     private boolean validateServerIdentity() {
         PrivateIdentityCertificate privateCert = config.getSecurity().getServerPrivateCertificate();
         PublicIdentityCertificate publicCert = config.getSecurity().getServerPublicCertificate();
-
+        /**
+         * Checking if  both condition are true or one condition is true
+         * @return false
+         */
         if (privateCert == null || publicCert == null) {
             return false;
         }
-
+        /**
+         * Generating new server identity 
+         * 
+         */
         // Validate the signature
         if (!publicCert.verifySelfSigned()) {
             logger.error("Server signature is not self signed! Generating new server identity.");
@@ -89,11 +118,14 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         }
 
         return true;
+        
     }
-
+/**
+ * In the case of shutdown it will save the setting and exit.
+ */
     @Override
     public void shutdown() {
         config.save();
     }
 
-}
+ }
