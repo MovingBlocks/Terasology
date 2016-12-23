@@ -26,19 +26,12 @@ import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManage
 public class CommandSubsystem implements EngineSubsystem {
 
     @Override
-	/**
-	 * public Method getName Overrided. 
-         * Which returns
-	 * @return command
-	 * 
-	 */
     public String getName() {
         return "Command";
     }
    
     @Override
     /**
-     * Method initialise Overrided.
      * @parameters set up GameEngine engine, Context rootContext.
      */
     public void initialise(GameEngine engine, Context rootContext) {
