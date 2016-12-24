@@ -61,7 +61,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPED);
+        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPED_FBO);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor property rather than check every frame
