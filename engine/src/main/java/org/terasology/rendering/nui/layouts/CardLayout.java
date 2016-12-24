@@ -75,7 +75,7 @@ public class CardLayout extends CoreLayout<LayoutHint> {
      * Adds the widget to this layout's widget list.
      *
      * @param element The {@code UIWidget} to add
-     * @param hint A hint as to how the widget should be drawn in this layout
+     * @param hint (unused)
      */
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
