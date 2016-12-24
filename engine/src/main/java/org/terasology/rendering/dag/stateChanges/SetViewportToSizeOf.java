@@ -19,12 +19,16 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
+
 import java.util.Objects;
+
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportToSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
+
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+
 /**
  * TODO: Add javadocs
  */
@@ -63,14 +67,23 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         return task;
     }
 
+    // TODO: change equals and hashCode to use dimensions instead.
     @Override
     public int hashCode() {
-        return Objects.hashCode(fboName);
+        // Generates a unique 32 bit signed integer from two integers.
+        // This will return unique values for the following reasonable ranges:
+        // width < (1 << 16) (65536) and height < (1 << 15) (32768)
+        return getWidth() << 15 | getHeight();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetViewportToSizeOf) && this.fboName.equals(((SetViewportToSizeOf) obj).getFboName());
+        if (!(obj instanceof SetViewportToSizeOf))
+            return false;
+
+        SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
+
+        return getWidth() == other.getWidth() && getHeight() == other.getHeight();
     }
 
     @Override
@@ -80,12 +93,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public void update() {
-        if (defaultDynamicFBO == null) {
-            FBO fbo = frameBuffersManager.get(fboName);
-            task.setDimensions(fbo.width(), fbo.height());
-        } else {
-            task.setDimensions(defaultDynamicFBO.width(), defaultDynamicFBO.height());
-        }
+        task.setDimensions(getWidth(), getHeight());
     }
 
     @Override
@@ -93,6 +101,24 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
     }
 
+    public int getWidth() {
+        FBO fbo = getFbo();
+        return fbo.width();
+    }
+
+    public int getHeight() {
+        FBO fbo = getFbo();
+        return fbo.height();
+    }
+
+    private FBO getFbo() {
+        if (defaultDynamicFBO == null)
+            return frameBuffersManager.get(fboName);
+
+        return defaultDynamicFBO.getFbo();
+    }
+
+    // TODO: Remove
     public ResourceUrn getFboName() {
         return fboName;
     }
