@@ -97,7 +97,7 @@ public final class RenderTaskListGenerator {
         taskList.clear();
         Node nextEnabledNode;
         StateChange persistentStateChange;
-        Map persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
+        Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
 
         int enabledNodes = 0;
         int potentialTasks = 0;
@@ -118,7 +118,7 @@ public final class RenderTaskListGenerator {
 
                     // State changes persist beyond the node that request them if following nodes
                     // require the exact same change.
-                    persistentStateChange = (StateChange) persistentStateChanges.get(currentStateChange.getClass());
+                    persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
 
                     // for a state change to be necessary there can't be an identical one already persisting
                     if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
@@ -142,8 +142,16 @@ public final class RenderTaskListGenerator {
                     // will bind another FBO.
                     for (StateChange currentStateReset : node.getDesiredStateResets()) {
                         if (sameClassStateChangeNotFoundInThe(nextEnabledNode, currentStateReset)) {
-                            taskList.add(currentStateReset.generateTask());
-                            persistentStateChanges.remove(currentStateReset.getClass());
+                            persistentStateChange = persistentStateChanges.get(currentStateReset.getClass());
+
+                            // A reset state change is necessary only if an identical state change isn't already persisting.
+                            if (persistentStateChange == null || !currentStateReset.equals(persistentStateChange)) {
+                                taskList.add(currentStateReset.generateTask());
+
+                                // This makes sure that the reset state change persists so that future state changes
+                                // which are identical to the reset state change are not added.
+                                persistentStateChanges.put(currentStateReset.getClass(), currentStateReset);
+                            }
                         }
                     }
 
@@ -177,10 +185,11 @@ public final class RenderTaskListGenerator {
         return taskList;
     }
 
+    // TODO: Rename method and remove comments
     private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
 
         for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {
-            if (stateChange.getClass() == stateChangeReset.getClass()) {
+            if (stateChange.getClass() == stateChangeReset.getClass() ) {
                 return false; // we did find it! And yes, returning false is correct, see method name.
 
                 // note: we don't worry about the details of the two state changes (i.e. if they are value-identical)

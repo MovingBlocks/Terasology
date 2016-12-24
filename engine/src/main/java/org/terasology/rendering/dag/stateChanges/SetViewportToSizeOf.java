@@ -67,7 +67,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         return task;
     }
 
-    // TODO: change equals and hashCode to use dimensions instead.
     @Override
     public int hashCode() {
         // Generates a unique 32 bit signed integer from two integers.
@@ -116,10 +115,5 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
             return frameBuffersManager.get(fboName);
 
         return defaultDynamicFBO.getFbo();
-    }
-
-    // TODO: Remove
-    public ResourceUrn getFboName() {
-        return fboName;
     }
 }
