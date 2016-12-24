@@ -31,6 +31,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
+ * Play sound nearby player
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {
@@ -43,6 +44,10 @@ public class PlaySoundAction extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    /**
+     * @param event
+     * @param entity
+     */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivationPredicted(ActivationPredicted event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
@@ -64,6 +69,10 @@ public class PlaySoundAction extends BaseComponentSystem {
         }
     }
 
+    /**
+     * @param event
+     * @param entity
+     */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         if (event.getInstigator().equals(localPlayer.getCharacterEntity())) {

@@ -25,12 +25,17 @@ import org.terasology.registry.In;
 import com.google.common.collect.Iterables;
 
 /**
+ * Artificial Intelligence command
  */
 @RegisterSystem
 public class AICommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
+    /**
+     * Lists all AIs in the world
+     * @return String string containing number of simple AIs and hierarchical AIs
+     */
     @Command(runOnServer = true, shortDescription = "Count all AIs in the world")
     public String countAI() {
         int simpleAIs = Iterables.size(entityManager.getEntitiesWith(SimpleAIComponent.class));
@@ -38,13 +43,20 @@ public class AICommands extends BaseComponentSystem {
         return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 
+    /**
+     * Destroys all AIs in the world
+     * @return String string containing number of simple AIs and hierarchical AIs
+     */
     @Command(runOnServer = true, shortDescription = "Destroys all AIs in the world")
     public String destroyAI() {
         int simpleAI = 0;
+        // go through all simple AIs and destroy reference
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             ref.destroy();
             simpleAI++;
         }
+
+        // go through all hierarchical AIs and destroy reference
         int hierarchicalAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
             ref.destroy();

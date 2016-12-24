@@ -49,6 +49,9 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
     @In
     private LocalPlayer localPlayer;
 
+    /**
+     * @param delta The time (in seconds) since the last engine update.
+     */
     @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
@@ -96,6 +99,10 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
         }
     }
 
+    /**
+     * @param event
+     * @param entity
+     */
     @ReceiveEvent(components = {SimpleAIComponent.class})
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);

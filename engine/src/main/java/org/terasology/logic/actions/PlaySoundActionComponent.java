@@ -34,6 +34,10 @@ public class PlaySoundActionComponent implements Component {
     public PlaySoundActionComponent() {
     }
 
+    /**
+     * Add sounds to list of sounds
+     * @param sounds
+     */
     public PlaySoundActionComponent(StaticSound... sounds) {
         this.sounds.addAll(Arrays.asList(sounds));
     }

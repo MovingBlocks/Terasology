@@ -59,6 +59,9 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
 
     // TODO add way to recognize if attacked
 
+    /**
+     * @param delta The time (in seconds) since the last engine update.
+     */
     @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(
