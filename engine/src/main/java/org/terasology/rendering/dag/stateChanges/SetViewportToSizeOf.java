@@ -69,10 +69,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public int hashCode() {
-        // Generates a unique 32 bit signed integer from two integers.
-        // This will return unique values for the following reasonable ranges:
-        // width < (1 << 16) (65536) and height < (1 << 15) (32768)
-        return getWidth() << 15 | getHeight();
+        return Objects.hash(getWidth(), getHeight());
     }
 
     @Override
@@ -101,19 +98,15 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     }
 
     public int getWidth() {
-        FBO fbo = getFbo();
-        return fbo.width();
+        return getFbo().width();
     }
 
     public int getHeight() {
-        FBO fbo = getFbo();
-        return fbo.height();
+        return getFbo().height();
     }
 
     private FBO getFbo() {
-        if (defaultDynamicFBO == null)
-            return frameBuffersManager.get(fboName);
+        return defaultDynamicFBO != null ? defaultDynamicFBO.getFbo() : frameBuffersManager.get(fboName);
 
-        return defaultDynamicFBO.getFbo();
     }
 }
