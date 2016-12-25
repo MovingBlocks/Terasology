@@ -346,10 +346,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         secondLateBlurNode.initialise(firstLateBlurConfig, secondLateBlurConfig, aLabel);
         renderGraph.addNode(secondLateBlurNode, aLabel);
 
-        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
-
-        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class); // TODO - this PR
+        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
 
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
