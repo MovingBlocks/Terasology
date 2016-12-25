@@ -26,7 +26,7 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 /**
- * Client command usable in F1 in-game console
+ *
  */
 @RegisterSystem
 public class ClientCommands extends BaseComponentSystem {
@@ -38,8 +38,8 @@ public class ClientCommands extends BaseComponentSystem {
 
 
     /**
-     * Displays debug information on the target entity
-     * @return String
+     * Displays debug information on the target entity for the target the camera is pointing at
+     * @return String containing debug information on the entity
      */
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
@@ -48,11 +48,11 @@ public class ClientCommands extends BaseComponentSystem {
     }
 
     /**
-     * Sets the current world time of the in days fr the local player
-     * @param day
-     * @return String
+     * Sets the current world time for the local player in days
+     * @param day Float containing day to be set
+     * @return String message containing message to notify user
      */
-    @Command(shortDescription = "Sets the current world time of the in days for the local player",
+    @Command(shortDescription = "Sets the current world time for the local player in days",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setWorldTime(@CommandParam("day") float day) {
         worldProvider.getTime().setDays(day);

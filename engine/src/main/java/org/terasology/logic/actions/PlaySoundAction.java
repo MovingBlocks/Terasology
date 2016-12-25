@@ -31,7 +31,8 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
- * Play sound nearby player
+ * This class is responsible for managing audio in-game
+ * when triggered by some event on client side and also on server side.
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {
@@ -45,8 +46,8 @@ public class PlaySoundAction extends BaseComponentSystem {
     private LocalPlayer localPlayer;
 
     /**
-     * @param event
-     * @param entity
+     * @param event contains the details for the predicted event, used here for location purposes
+     * @param entity is source of the playsound
      */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivationPredicted(ActivationPredicted event, EntityRef entity) {
@@ -70,8 +71,8 @@ public class PlaySoundAction extends BaseComponentSystem {
     }
 
     /**
-     * @param event
-     * @param entity
+     * @param event contains the details for the active event, used here for location purposes
+     * @param entity is source of the playsound
      */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {

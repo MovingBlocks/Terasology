@@ -144,8 +144,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Search commands/prefabs/assets with matching name, description, help text, usage or required permission
-     * @param searched String
-     * @return String
+     * @param searched String which is used to search for match
+     * @return String containing result of search
      */
     @Command(shortDescription = "Search commands/prefabs/assets",
              helpText = "Displays commands, prefabs, and assets with matching name, description, "
@@ -153,12 +153,12 @@ public class CoreCommands extends BaseComponentSystem {
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
-        // finds commands, prefabs, blocks that match searched
+        // Create List<String> of commands, prefabs, blocks that match searched string
         List<String> commands = findCommandMatches(searchLowercase);
         List<String> prefabs = findPrefabMatches(searchLowercase);
         List<String> blocks = findBlockMatches(searchLowercase);
 
-        // create string containing results
+        // String containing numbers of commands, prefabs and block that match searched string
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
             " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
@@ -168,13 +168,13 @@ public class CoreCommands extends BaseComponentSystem {
             result = commands.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
-        // the same as above but with prefabs
+        // iterate through prefabs adding them to result
         if (prefabs.size() > 0) {
             result += "\nPrefabs:";
             result = prefabs.stream().reduce(result, (t, u) -> t + "\n    " + u);
         }
 
-        // the same as above but with blocks
+        // iterate through blocks adding them to result
         if (blocks.size() > 0) {
             result += "\nBlocks:";
             result = blocks.stream().reduce(result, (t, u) -> t + "\n    " + u);
@@ -184,8 +184,9 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * @param searchLowercase String
-     * @return List of commands that match search string
+     * List commands that match searched string
+     * @param searchLowercase searched string lowercase
+     * @return List of commands that match searched string
      */
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
@@ -194,9 +195,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if command is matching one of criteria
-     * @param searchLowercase String
-     * @param command ConsoleCommand
-     * @return boolean
+     * @param searchLowercase searched string
+     * @param command ConsoleCommand to check if matches searched string
+     * @return boolean containing true if command matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
@@ -207,8 +208,9 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * @param searchLowercase String
-     * @return List of prefabs that match search string
+     * List prefabs that match searched string
+     * @param searchLowercase searched string
+     * @return List of prefabs that match searched string
      */
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
@@ -218,9 +220,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if prefab is matching one of criteria
-     * @param searchLowercase String
-     * @param prefab Prefab
-     * @return boolean
+     * @param searchLowercase searched String
+     * @param prefab Prefab to check if matches searched string
+     * @return boolean containing true if prefab matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
         return prefab.getName().toLowerCase().contains(searchLowercase)
@@ -228,8 +230,9 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * @param searchLowercase String
-     * @return List of blocks that match search string
+     * List blocks that match searched string
+     * @param searchLowercase searched string
+     * @return List of blocks that match searched string
      */
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
@@ -240,9 +243,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if block family matches one of criteria
-     * @param searchLowercase String
-     * @param def BlockFamilyDefinition
-     * @return boolean
+     * @param searchLowercase searched string
+     * @param def BlockFamilyDefinition to be checked
+     * @return boolean containing true if blockFamilyDefinition matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
         return def.getUrn().toString().toLowerCase().contains(searchLowercase);
@@ -250,7 +253,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Alter the rate of time
-     * @param rate float
+     * @param rate float time dilation
      */
     @Command(shortDescription = "Alter the rate of time")
     public void setTimeDilation(@CommandParam("dilation") float rate) {
@@ -260,7 +263,7 @@ public class CoreCommands extends BaseComponentSystem {
     /**
      * Change the UI language
      * @param langTag String
-     * @return String
+     * @return String containing language or if not recognized error message
      */
     @Command(shortDescription = "Changes the UI language")
     public String setLanguage(@CommandParam("language-tag") String langTag) {
@@ -281,8 +284,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Shows a ui screen
-     * @param uri String
-     * @return String
+     * @param uri String containing ui screen name
+     * @return String containing Success if UI was change or Not found if screen is missing
      */
     @Command(shortDescription = "Shows a ui screen", helpText = "Can be used for debugging/testing, example: \"showScreen migTestScreen\"")
     public String showScreen(@CommandParam(value = "uri", suggester = ScreenSuggester.class) String uri) {
@@ -291,8 +294,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Reloads ui screen
-     * @param ui String
-     * @return String
+     * @param ui String containing ui screen name
+     * @return String containing Success if UI was reloaded or No unique resource found if more screens were found
      */
     @Command(shortDescription = "Reloads a ui screen")
     public String reloadScreen(@CommandParam("ui") String ui) {
@@ -315,8 +318,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui screen
-     * @param uri String
-     * @return String
+     * @param uri String containing ui screen name
+     * @return String containing final message
      */
     @Command(shortDescription = "Opens the NUI editor for a ui screen", requiredPermission = PermissionManager.NO_PERMISSION)
     public String editScreen(@CommandParam(value = "uri", suggester = ScreenSuggester.class) String uri) {
@@ -338,8 +341,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui skin
-     * @param uri String
-     * @return String
+     * @param uri String containing name of ui skin
+     * @return String containing final message
      */
     @Command(shortDescription = "Opens the NUI editor for a ui skin", requiredPermission = PermissionManager.NO_PERMISSION)
     public String editSkin(@CommandParam(value = "uri", suggester = SkinSuggester.class) String uri) {
@@ -360,8 +363,8 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Toggles Fullscreen Mode
-     * @return String
+     * Switches to fullscreen or to windowed mode
+     * @return String containing final message
      */
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
     public String fullscreen() {
@@ -376,7 +379,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Removes all entities of the given prefab
-     * @param prefabName String
+     * @param prefabName String containing prefab name
      */
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
     public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
@@ -400,8 +403,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Join a game
-     * @param address String
-     * @param portParam Integer
+     * @param address String containing address of game server
+     * @param portParam Integer containing game server port
      */
     @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
     public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
@@ -424,7 +427,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Leaves the current game and returns to main menu
-     * @return String
+     * @return String containing final message
      */
     @Command(shortDescription = "Leaves the current game and returns to main menu",
              requiredPermission = PermissionManager.NO_PERMISSION)
@@ -439,7 +442,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Writes out information on all entities to a text file for debugging
-     * @throws IOException
+     * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
              helpText = "Writes entity information out into a file named \"entityDump.txt\".")
@@ -452,9 +455,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns an instance of a prefab in the world
-     * @param sender Sender
-     * @param prefabName String
-     * @return String
+     * @param sender Sender of command
+     * @param prefabName String containing prefab name
+     * @return String containing final message
      */
     @Command(shortDescription = "Spawns an instance of a prefab in the world", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnPrefab(@Sender EntityRef sender, @CommandParam("prefabId") String prefabName) {
@@ -488,9 +491,9 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns a block in front of the player
-     * @param sender Sender
-     * @param blockName String
-     * @return String
+     * @param sender Sender of command
+     * @param blockName String containing name of block to spawn
+     * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
         "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -517,8 +520,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Your ping to the server
-     * @param sender Sender
-     * @return String
+     * @param sender Sender of command
+     * @return String containing ping or error message
      */
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
         "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -548,8 +551,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Prints out short descriptions for all available commands, or a longer help text if a command is provided.
-     * @param commandName String
-     * @return String
+     * @param commandName String containing command for which will be displayed help
+     * @return String containing short description of all commands or longer help text if command is provided
      */
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
              requiredPermission = PermissionManager.NO_PERMISSION)

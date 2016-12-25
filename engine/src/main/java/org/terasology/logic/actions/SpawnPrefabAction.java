@@ -35,8 +35,8 @@ public class SpawnPrefabAction extends BaseComponentSystem {
     private EntityManager entityManager;
 
     /**
-     * @param event
-     * @param entity
+     * @param event contains the details for the active event, used here for spawn location
+     * @param entity is entity which will be spawned
      */
     @ReceiveEvent(components = SpawnPrefabActionComponent.class)
     public void onActivate(ActivateEvent event, EntityRef entity) {
