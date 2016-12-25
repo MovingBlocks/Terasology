@@ -73,10 +73,10 @@ public class SelectGameScreen extends CoreScreenLayer {
         }
 
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
-        if(saveGamePath != null) {
+        if (saveGamePath != null) {
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                    PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
+                            PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -118,6 +118,13 @@ public class SelectGameScreen extends CoreScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    @Override
+    public void onOpened() {
+        if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
+            getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
+        }
     }
 
     private void loadGame(GameInfo item) {

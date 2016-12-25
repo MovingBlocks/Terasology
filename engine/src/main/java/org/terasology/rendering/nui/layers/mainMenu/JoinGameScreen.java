@@ -152,6 +152,10 @@ public class JoinGameScreen extends CoreScreenLayer {
         super.onOpened();
 
         infoService = new ServerInfoService();
+
+        if (!config.getPlayer().hasEnteredUsername()) {
+            getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
+        }
     }
 
     @Override
@@ -317,7 +321,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
             refreshButton.subscribe(button -> {
-               refresh();
+                refresh();
             });
         }
     }
@@ -348,12 +352,12 @@ public class JoinGameScreen extends CoreScreenLayer {
         if (edit != null) {
             edit.bindEnabled(localSelectedServerOnly);
             edit.subscribe(button -> {
-              AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
-              ServerInfo info = visibleList.getSelection();
-              popup.setServerInfo(info);
+                AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                ServerInfo info = visibleList.getSelection();
+                popup.setServerInfo(info);
 
-              // editing invalidates the currently known info, so query it again
-              popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
+                // editing invalidates the currently known info, so query it again
+                popup.onSuccess(item -> extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort())));
             });
         }
 
@@ -375,7 +379,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             downloadLabel.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return downloader.getStatus();
+                    return translationSystem.translate(downloader.getStatus());
                 }
             });
         }
@@ -415,9 +419,9 @@ public class JoinGameScreen extends CoreScreenLayer {
     public boolean onKeyEvent(NUIKeyEvent event) {
         if (event.isDown() && event.getKey() == Keyboard.Key.R) {
             refresh();
-            }
-            return false;
         }
+        return false;
+    }
 
     public void refresh() {
         ServerInfo i = visibleList.getSelection();
