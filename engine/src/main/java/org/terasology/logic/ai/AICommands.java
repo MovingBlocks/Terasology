@@ -25,7 +25,7 @@ import org.terasology.registry.In;
 import com.google.common.collect.Iterables;
 
 /**
- * Artificial Intelligence commands for counting and destroying AIs
+ * Artificial Intelligence commands for counting and destroying AIs used by entities with AI related components attached
  */
 @RegisterSystem
 public class AICommands extends BaseComponentSystem {
@@ -44,7 +44,7 @@ public class AICommands extends BaseComponentSystem {
     }
 
     /**
-     * Destroys all entities with attached SimpleAIComponent in the world
+     * Destroys all entities with attached SimpleAIComponent or HierarchicalAIComponent in the world
      * @return String string containing number of simple AIs and hierarchical AIs destroyed
      */
     @Command(runOnServer = true, shortDescription = "Destroys all AIs in the world")

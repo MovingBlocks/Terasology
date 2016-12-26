@@ -153,7 +153,6 @@ public class CoreCommands extends BaseComponentSystem {
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
-        // Create List<String> of commands, prefabs, blocks that match searched string
         List<String> commands = findCommandMatches(searchLowercase);
         List<String> prefabs = findPrefabMatches(searchLowercase);
         List<String> blocks = findBlockMatches(searchLowercase);
@@ -252,7 +251,8 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Alter the rate of time
+     * Time dilation slows down the passage of time by affecting how the main game loop runs,
+     * with the goal being to handle high-latency situations by spreading out processing over a longer amount of time
      * @param rate float time dilation
      */
     @Command(shortDescription = "Alter the rate of time")
@@ -262,7 +262,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Change the UI language
-     * @param langTag String
+     * @param langTag String containing language code to change
      * @return String containing language or if not recognized error message
      */
     @Command(shortDescription = "Changes the UI language")
@@ -394,7 +394,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     /**
-     * Exits the game
+     * Triggers a graceful shutdown of the game after the current frame, attempting to dispose all game resources
      */
     @Command(shortDescription = "Exits the game", requiredPermission = PermissionManager.NO_PERMISSION)
     public void exit() {

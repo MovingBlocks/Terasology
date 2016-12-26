@@ -31,8 +31,8 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
- * This class is responsible for managing audio in-game
- * when triggered by some event on client side and also on server side.
+ * This systems handles the playing of sounds in response to events, on both server and client,
+ * allowing the prediction system a chance to play expected sounds on time even if the server is lagging
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {
