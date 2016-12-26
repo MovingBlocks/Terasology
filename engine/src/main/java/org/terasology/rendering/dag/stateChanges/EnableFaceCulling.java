@@ -76,7 +76,7 @@ public final class EnableFaceCulling extends SetStateParameter {
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
 }
