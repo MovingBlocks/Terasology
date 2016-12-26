@@ -46,6 +46,7 @@ public class PlaySoundAction extends BaseComponentSystem {
     private LocalPlayer localPlayer;
 
     /**
+     * This method plays sound in prediction for preventing not playing song because of server lags
      * @param event contains the details for the predicted event, used here for location purposes
      * @param entity is source of the playsound
      */
@@ -71,6 +72,7 @@ public class PlaySoundAction extends BaseComponentSystem {
     }
 
     /**
+     * This method plays sound if it wasn't played by prediction system
      * @param event contains the details for the active event, used here for location purposes
      * @param entity is source of the playsound
      */
