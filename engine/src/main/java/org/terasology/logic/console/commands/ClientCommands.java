@@ -26,7 +26,9 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 /**
- *
+ * This class contains basic client commands for debugging eg.
+ * for displaying debug information for the target at which is camera pointing at
+ * and for setting current world time for the local player in days
  */
 @RegisterSystem
 public class ClientCommands extends BaseComponentSystem {
