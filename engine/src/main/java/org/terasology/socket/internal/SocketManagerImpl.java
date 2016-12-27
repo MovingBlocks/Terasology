@@ -21,6 +21,7 @@ import gnu.trove.set.TIntSet;
 import org.terasology.config.Config;
 import org.terasology.config.SocketConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.GameThread;
 import org.terasology.exception.SandboxException;
 import org.terasology.socket.SocketManager;
 import org.terasology.socket.TCPSocket;
@@ -53,6 +54,9 @@ public class SocketManagerImpl implements SocketManager {
      * @param context  The current context.
      */
     public SocketManagerImpl(Name moduleId, Context context) {
+        if (!GameThread.isCurrentThread()) {
+            throw new IllegalStateException("Wrong thread");
+        }
         Config theConfig = context.get(Config.class);
         if (theConfig == null) {
             throw new IllegalStateException();
@@ -68,6 +72,9 @@ public class SocketManagerImpl implements SocketManager {
 
     @Override
     public TCPSocket openTCPConnection(String hostname, int port) throws IOException, SandboxException {
+        if (!GameThread.isCurrentThread()) {
+            throw new IllegalStateException("Wrong thread");
+        }
         if (!(this.allowedHosts.containsKey(hostname) || this.allowedHosts.containsKey("*"))) {
             throw new SandboxException(new IllegalArgumentException("Blocked hostname"));
         }
