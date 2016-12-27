@@ -138,10 +138,20 @@ public class UIButton extends CoreWidget {
         this.text = binding;
     }
 
+    /**
+     * Get the text, if any, displayed on the button.
+     *
+     * @return The String on the button. In the case of no text the String is empty.
+     */
     public String getText() {
         return text.get();
     }
 
+    /**
+     * Set the text on the button.
+     *
+     * @param text The String to display on the button.
+     */
     public void setText(String text) {
         this.text.set(text);
     }
@@ -150,10 +160,20 @@ public class UIButton extends CoreWidget {
         this.image = binding;
     }
 
+    /**
+     * Set an image to display on the button.
+     *
+     * @param image A TextureRegion to set as the button's image.
+     */
     public void setImage(TextureRegion image) {
         this.image.set(image);
     }
 
+    /**
+     * Get the image currently shown on the button.
+     *
+     * @return The image shown on the Button in a TextureRegion.
+     */
     public TextureRegion getImage() {
         return image.get();
     }
@@ -162,10 +182,20 @@ public class UIButton extends CoreWidget {
         clickSound = binding;
     }
 
+    /**
+     * Get the sound that is played when the button is clicked.
+     *
+     * @return The StaticSound that is played.
+     */
     public StaticSound getClickSound() {
         return clickSound.get();
     }
 
+    /**
+     * Set the sound to be played when the button is clicked.
+     *
+     * @param val The StaticSound that should be played.
+     */
     public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
@@ -174,18 +204,38 @@ public class UIButton extends CoreWidget {
         clickVolume = binding;
     }
 
+    /**
+     * Get the volume the click sound is played at.
+     *
+     * @return A float indicating how load the sound is.
+     */
     public float getClickVolume() {
         return clickVolume.get();
     }
 
+    /**
+     * Set how loud the click sound should be played.
+     *
+     * @param val A Float that indicates how load the sound should be.
+     */
     public void setClickVolume(float val) {
         clickVolume.set(val);
     }
 
+    /**
+     * Add a listener to be called when the button is clicked.
+     *
+     * @param listener The listener to be called.
+     */
     public void subscribe(ActivateEventListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Remove a listener from the button such that it will no longer be called on click.
+     *
+     * @param listener The listener to remove.
+     */
     public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
     }
