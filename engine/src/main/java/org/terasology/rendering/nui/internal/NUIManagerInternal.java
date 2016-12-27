@@ -60,6 +60,7 @@ import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
@@ -206,6 +207,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void closeScreen(UIElement element) {
         closeScreen(element.getUrn());
+    }
+
+    @Override
+    public void closeAllScreens() {
+        for (UIScreenLayer screen: screens) {
+            if (screen.isLowerLayerVisible()) {
+                closeScreen(screen);
+            }
+        }
     }
 
     @Override
