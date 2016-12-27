@@ -45,7 +45,9 @@ public class UIDoubleSlider extends CoreWidget {
     private Binding<Float> increment = new DefaultBinding<>(0.1f);
     @LayoutConfig
     private int precision = 1;
+    @LayoutConfig
     private Binding<Float> valueLeft = new DefaultBinding<>(0.3f);
+    @LayoutConfig
     private Binding<Float> valueRight = new DefaultBinding<>(0.7f);
     private int sliderWidth;
     private String formatString = "0.0";
@@ -213,10 +215,20 @@ public class UIDoubleSlider extends CoreWidget {
         this.minimum = binding;
     }
 
+    /**
+     * Get the minimum value settable.
+     *
+     * @return A Float indicating the minimum value.
+     */
     public float getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * Set the minimum value possible.
+     *
+     * @param min A Float indicating the minimum value settable.
+     */
     public void setMinimum(float min) {
         this.minimum.set(min);
         generateFormatString();
@@ -226,10 +238,20 @@ public class UIDoubleSlider extends CoreWidget {
         this.range = binding;
     }
 
+    /**
+     * The range of possible values (from the minimum value).
+     *
+     * @return A Float indicating the range of values.
+     */
     public float getRange() {
         return range.get();
     }
 
+    /**
+     * Set the range of possible values (from the minimum value).
+     *
+     * @param val A Float specifying the range of values.
+     */
     public void setRange(float val) {
         range.set(val);
         generateFormatString();
@@ -239,10 +261,20 @@ public class UIDoubleSlider extends CoreWidget {
         increment = binding;
     }
 
+    /**
+     * Get the smallest increment the value can be set to.
+     *
+     * @return A Float indicating the smallest increment.
+     */
     public float getIncrement() {
         return increment.get();
     }
 
+    /**
+     * Set the smallest increment the value can be set to.
+     *
+     * @param val A Float specifying the smallest increment.
+     */
     public void setIncrement(float val) {
         increment.set(val);
     }
@@ -255,10 +287,21 @@ public class UIDoubleSlider extends CoreWidget {
         valueRight = binding;
     }
 
+    /**
+     * Get the value of the left bar.
+     *
+     * @return A Float containing the value of the left bar.
+     */
     public float getValueLeft() {
         return valueLeft.get();
     }
 
+    /**
+     * Set the value of the left bar.
+     * The right bar will adjust as needed such that it is always higher or equal to the left bar.
+     *
+     * @param val The new value of the left bar
+     */
     public void setValueLeft(float val) {
         valueLeft.set(val);
 
@@ -267,10 +310,21 @@ public class UIDoubleSlider extends CoreWidget {
         }
     }
 
+    /**
+     * Get the value of the right bar.
+     *
+     * @return A Float containing the value of the right bar.
+     */
     public float getValueRight() {
         return valueRight.get();
     }
 
+    /**
+     * Set the value of the right bar.
+     * The left bar will adjust as needed such that it is always lower or equal to the right bar.
+     *
+     * @param val The new value of the right bar.
+     */
     public void setValueRight(float val) {
         valueRight.set(val);
 
@@ -279,10 +333,20 @@ public class UIDoubleSlider extends CoreWidget {
         }
     }
 
+    /**
+     * Get the number of decimal points displayed on either bar.
+     *
+     * @return The number of decimal points displayed.
+     */
     public int getPrecision() {
         return precision;
     }
 
+    /**
+     * Set the number of decimal points to display on each bar.
+     *
+     * @param precision The number of decimal points to display.
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
         generateFormatString();

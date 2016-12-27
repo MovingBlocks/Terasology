@@ -36,6 +36,7 @@ import java.util.List;
 
 /**
  * A scrollable dropdown widget.
+ *
  * @param <T> the list element type
  */
 public class UIDropdownScrollable<T> extends UIDropdown<T> {
@@ -126,7 +127,8 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
     /**
      * Located in the onDraw method, this draws the menu items when the scrollbar is unnecessary.
-     * @param canvas {@link Canvas} from the onDraw method.
+     *
+     * @param canvas     {@link Canvas} from the onDraw method.
      * @param itemMargin Margin around every menu item.
      * @param itemHeight Height per menu item.
      */
@@ -140,11 +142,12 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
     /**
      * Located in the onDraw method, this draws the menu items with a scrollbar.
-     * @param canvas {@link Canvas} from the onDraw method.
-     * @param frame Menu frame.
-     * @param font {@link Font} used in the menu.
+     *
+     * @param canvas     {@link Canvas} from the onDraw method.
+     * @param frame      Menu frame.
+     * @param font       {@link Font} used in the menu.
      * @param itemMargin Margin around every menu item.
-     * @param height Total menu height.
+     * @param height     Total menu height.
      * @param itemHeight Height per menu item.
      */
     private void createScrollbarItems(Canvas canvas, Rect2i frame, Font font, Border itemMargin, int height, int itemHeight) {
@@ -179,8 +182,9 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
     /**
      * Looks for MouseOver event for every item in the menu.
+     *
      * @param canvas {@link Canvas} from the onDraw method.
-     * @param i Item index.
+     * @param i      Item index.
      */
     private void readItemMouseOver(Canvas canvas, int i) {
         if (optionListeners.get(i).isMouseOver()) {
@@ -192,9 +196,10 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
 
     /**
      * Draws the item on the {@link Canvas}.
-     * @param canvas {@link Canvas} from the onDraw method.
+     *
+     * @param canvas     {@link Canvas} from the onDraw method.
      * @param itemMargin Margin around every menu item.
-     * @param i Item index.
+     * @param i          Item index.
      * @param itemRegion Region of the item in the menu.
      */
     private void drawItem(Canvas canvas, Border itemMargin, int i, Rect2i itemRegion) {
@@ -218,10 +223,20 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         options = binding;
     }
 
+    /**
+     * Get all the options from the dropdown.
+     *
+     * @return A List containing all the options.
+     */
     public List<T> getOptions() {
         return options.get();
     }
 
+    /**
+     * Set a new set of options for the dropdown.
+     *
+     * @param values A List containing the new options.
+     */
     public void setOptions(List<T> values) {
         this.options.set(values);
     }
@@ -230,22 +245,50 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
         this.selection = binding;
     }
 
+    /**
+     * Get the currently selected item.
+     *
+     * @return The currently selected item.
+     */
     public T getSelection() {
         return selection.get();
     }
+
+    /**
+     * Set the item from that should be selected.
+     * Note that this item does not actually have to be contained in the List of options.
+     *
+     * @param value The item to set as selected.
+     */
 
     public void setSelection(T value) {
         selection.set(value);
     }
 
+    /**
+     * Set the renderer to use for the options.
+     * This is used to display the options on the dropdown list and in the selection box.
+     *
+     * @param itemRenderer The new item renderer.
+     */
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
         optionRenderer = itemRenderer;
     }
 
+    /**
+     * Get the number of visible options.
+     *
+     * @return The number of options visible.
+     */
     public int getVisibleOptions() {
         return visibleOptionsNum;
     }
 
+    /**
+     * Set the number of visible options.
+     *
+     * @param num The number of visible options.
+     */
     public void setVisibleOptions(int num) {
         visibleOptionsNum = num;
     }

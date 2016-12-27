@@ -45,7 +45,10 @@ public class UIIconBar extends CoreWidget {
     @LayoutConfig
     private TextureRegion icon;
 
+    @LayoutConfig
     private Binding<Float> value = new DefaultBinding<>(0f);
+
+    @LayoutConfig
     private Binding<Float> maxValue = new DefaultBinding<>(10f);
 
     @Override
@@ -129,10 +132,20 @@ public class UIIconBar extends CoreWidget {
         return new Vector2i(width, height);
     }
 
+    /**
+     * Get the icon used for the bar.
+     *
+     * @return The icon used.
+     */
     public TextureRegion getIcon() {
         return icon;
     }
 
+    /**
+     * Set the icon used in the bar.
+     *
+     * @param icon The icon to use in the bar.
+     */
     public void setIcon(TextureRegion icon) {
         this.icon = icon;
     }
@@ -141,10 +154,20 @@ public class UIIconBar extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * Get the value of the bar.
+     *
+     * @return The current value.
+     */
     public float getValue() {
         return value.get();
     }
 
+    /**
+     * Set the value of the bar.
+     *
+     * @param val The value to set it to.
+     */
     public void setValue(float val) {
         value.set(val);
     }
@@ -153,18 +176,38 @@ public class UIIconBar extends CoreWidget {
         maxValue = binding;
     }
 
+    /**
+     * Get the maximum value of the bar.
+     *
+     * @return The maximum value the bar can be set to.
+     */
     public float getMaxValue() {
         return maxValue.get();
     }
 
+    /**
+     * Set the maximum value of the bar.
+     *
+     * @param val The new max value the bar can be set to.
+     */
     public void setMaxValue(float val) {
         maxValue.set(val);
     }
 
+    /**
+     * Get the current mode used to display decimal values.
+     *
+     * @return The current HalfIconMode used.
+     */
     public HalfIconMode getHalfIconMode() {
         return halfIconMode;
     }
 
+    /**
+     * Set the mode used to display decimal values.
+     *
+     * @param halfIconMode The new mode to use.
+     */
     public void setHalfIconMode(HalfIconMode halfIconMode) {
         this.halfIconMode = halfIconMode;
     }
