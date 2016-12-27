@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem, EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
@@ -190,7 +188,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public EntityRef getBlockEntityAt(Vector3i blockPosition) {
         if (GameThread.isCurrentThread()) {
             EntityRef blockEntity = getExistingBlockEntityAt(blockPosition);
-            if ( (!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
+            if ((!blockEntity.exists() || !blockEntity.hasComponent(NetworkComponent.class)) && isBlockRelevant(blockPosition.x, blockPosition.y, blockPosition.z)) {
                 Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
                 blockEntity = createBlockEntity(blockPosition, block);
             }

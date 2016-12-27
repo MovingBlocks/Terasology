@@ -37,6 +37,8 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.Game;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -121,6 +123,7 @@ public abstract class TerasologyTestingEnvironment {
             complete = prefabLoadStep.step();
         }
         context.get(ComponentSystemManager.class).initialise();
+        context.put(Console.class, new ConsoleImpl(context));
     }
 
     @AfterClass

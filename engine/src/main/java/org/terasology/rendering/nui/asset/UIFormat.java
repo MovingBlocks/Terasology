@@ -112,7 +112,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
         private final TranslationSystem translationSystem;
         private final Locale otherLocale;
 
-        public I18nStringTypeAdapter(TranslationSystem translationSystem, Locale otherLocale) {
+        I18nStringTypeAdapter(TranslationSystem translationSystem, Locale otherLocale) {
             this.translationSystem = translationSystem;
             this.otherLocale = otherLocale;
         }
@@ -149,7 +149,7 @@ public class UIFormat extends AbstractAssetFileFormat<UIData> {
 
         private NUIManager nuiManager;
 
-        public UIWidgetTypeAdapter(NUIManager nuiManager) {
+        UIWidgetTypeAdapter(NUIManager nuiManager) {
             this.nuiManager = nuiManager;
         }
 

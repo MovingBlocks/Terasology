@@ -29,7 +29,7 @@ public enum ChunkVertexFlag {
     private int value;
     private String defineName;
 
-    private ChunkVertexFlag(int value, String defineName) {
+    ChunkVertexFlag(int value, String defineName) {
         this.value = value;
         this.defineName = defineName;
     }

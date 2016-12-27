@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.ui;
 
+import com.google.common.collect.Iterables;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -24,20 +25,22 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 
+
 /**
- * The miniaturized chat console widget
- *
+ * The miniaturized chat console widget.
  */
 public class MiniChatOverlay extends CoreScreenLayer {
 
     /**
-     * Extra display time per message char
+     * Extra display time per message char.
      */
     private static final float TIME_VISIBLE_PER_CHAR = 0.08f;
 
-    private static final float TIME_VISIBLE_BASE = 1.0f;
+    private static final float TIME_VISIBLE_BASE = 5.0f;
 
     private static final float TIME_FADE = 0.3f;
+
+    private static final int MAX_MESSAGES = 6;
 
     private enum State {
         FADE_IN,
@@ -62,13 +65,21 @@ public class MiniChatOverlay extends CoreScreenLayer {
             @Override
             public String get() {
                 Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
-                String last = "";
+                StringBuilder messageHistory = new StringBuilder();
+                int count = 1;
+                int size = Iterables.size(msgs);
 
                 for (Message msg : msgs) {
-                    last = msg.getMessage();
+                    if (count > size - MAX_MESSAGES) {
+                        messageHistory.append(msg.getMessage());
+                        if (count < size) {
+                            messageHistory.append(Console.NEW_LINE);
+                        }
+                    }
+                    count++;
                 }
 
-                return last;
+                return messageHistory.toString();
             }
         });
     }

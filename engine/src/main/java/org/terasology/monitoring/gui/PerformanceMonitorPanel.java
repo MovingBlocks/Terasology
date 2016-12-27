@@ -59,7 +59,7 @@ public class PerformanceMonitorPanel extends JPanel {
         private final JLabel lMean = new JLabel("Running Means");
         private final JLabel lSpike = new JLabel("Decaying Spikes");
 
-        public HeaderPanel() {
+        HeaderPanel() {
             setLayout(new FlowLayout(FlowLayout.LEFT, 4, 2));
 
             add(lName);
@@ -80,7 +80,7 @@ public class PerformanceMonitorPanel extends JPanel {
         public double mean;
         public double spike;
 
-        public Entry(String name) {
+        Entry(String name) {
             this.name = (name == null) ? "" : name;
         }
 
@@ -110,7 +110,7 @@ public class PerformanceMonitorPanel extends JPanel {
 
         private final MyRenderer renderer;
 
-        public PerformanceListRenderer(HeaderPanel header) {
+        PerformanceListRenderer(HeaderPanel header) {
             renderer = new MyRenderer(header);
         }
 
@@ -134,7 +134,7 @@ public class PerformanceMonitorPanel extends JPanel {
 
             private Dimension dName = new Dimension(0, 0);
 
-            public MyRenderer(HeaderPanel header) {
+            MyRenderer(HeaderPanel header) {
                 this.header = Preconditions.checkNotNull(header, "The parameter 'header' must not be null");
 
                 setBackground(Color.white);

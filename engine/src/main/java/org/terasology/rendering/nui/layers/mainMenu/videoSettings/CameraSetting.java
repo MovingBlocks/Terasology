@@ -25,7 +25,7 @@ public enum CameraSetting {
     private String displayName;
     private int smoothingFrames;
 
-    private CameraSetting(String displayName, int smoothingFrames) {
+    CameraSetting(String displayName, int smoothingFrames) {
         this.displayName = displayName;
         this.smoothingFrames = smoothingFrames;
     }

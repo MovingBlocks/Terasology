@@ -34,7 +34,7 @@ final class CommandEvent implements Event {
     CommandEvent() {
     }
 
-    public CommandEvent(Name commandName, List<String> parameters) {
+    CommandEvent(Name commandName, List<String> parameters) {
         this.commandName = commandName;
         this.parameters = parameters;
     }

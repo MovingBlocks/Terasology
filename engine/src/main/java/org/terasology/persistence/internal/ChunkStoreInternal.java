@@ -34,7 +34,7 @@ final class ChunkStoreInternal implements ChunkStore {
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
 
-    public ChunkStoreInternal(EntityData.ChunkStore chunkData, EngineEntityManager entityManager,
+    ChunkStoreInternal(EntityData.ChunkStore chunkData, EngineEntityManager entityManager,
             BlockManager blockManager, BiomeManager biomeManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.entityManager = entityManager;

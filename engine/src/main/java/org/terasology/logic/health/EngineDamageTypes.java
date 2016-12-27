@@ -37,7 +37,7 @@ public enum EngineDamageTypes {
 
     private String prefabId;
 
-    private EngineDamageTypes(String prefabId) {
+    EngineDamageTypes(String prefabId) {
         this.prefabId = prefabId;
     }
 

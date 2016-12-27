@@ -311,7 +311,7 @@ public final class Keyboard {
             }
         }
 
-        private Key(int id, String name, String displayName) {
+        Key(int id, String name, String displayName) {
             this.id = id;
             this.name = name;
             this.displayName = displayName;

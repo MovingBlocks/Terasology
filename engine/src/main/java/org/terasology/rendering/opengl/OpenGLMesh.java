@@ -306,7 +306,7 @@ public class OpenGLMesh extends Mesh {
         private int vboVertexBuffer;
         private int vboIndexBuffer;
 
-        public DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+        DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
             this.urn = urn;
             this.bufferPool = bufferPool;
         }

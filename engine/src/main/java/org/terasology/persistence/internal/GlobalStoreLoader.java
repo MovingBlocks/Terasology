@@ -51,7 +51,7 @@ final class GlobalStoreLoader {
     private EntitySerializer entitySerializer;
     private PrefabSerializer prefabSerializer;
 
-    public GlobalStoreLoader(ModuleEnvironment environment, EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+    GlobalStoreLoader(ModuleEnvironment environment, EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.environment = environment;

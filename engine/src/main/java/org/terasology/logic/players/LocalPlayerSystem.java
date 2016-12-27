@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,15 +84,16 @@ import org.terasology.world.block.regions.BlockRegionComponent;
 
 import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
-/**
- */
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalPlayerSystem.class);
+    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
+    @In
+    NetworkSystem networkSystem;
     @In
     private LocalPlayer localPlayer;
     @In
@@ -104,8 +105,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private PhysicsEngine physics;
     @In
     private DelayManager delayManager;
-    @In
-    NetworkSystem networkSystem;
 
     @In
     private Config config;
@@ -114,7 +113,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean isAutoMove = false;
+    private boolean isAutoMove;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean jump;
@@ -133,7 +132,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private AABB aabb;
 
-    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -236,14 +234,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent
     public void onAutoMove(PeriodicActionTriggeredEvent event, EntityRef entity) {
-        if (event.getActionId().equals(AUTO_MOVE_ID) && isAutoMove) {
-            ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
-            Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
-            clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
-        } else if (!isAutoMove) {
-
-            // If isAutoMove turns false, cancel the action.
-            delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+        if (event.getActionId().equals(AUTO_MOVE_ID)) {
+            if (isAutoMove) {
+                ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+                Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
+                clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
+            } else {
+                // If isAutoMove turns false, cancel the action.
+                delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+            }
         }
     }
 
@@ -381,8 +380,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
-        if(event.isDown()) {
-            if(!isAutoMove) {
+        if (event.isDown()) {
+            if (!isAutoMove) {
                 startAutoMove(entity);
             } else {
                 stopAutoMove();

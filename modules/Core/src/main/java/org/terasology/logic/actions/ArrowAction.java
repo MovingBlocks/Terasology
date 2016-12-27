@@ -68,7 +68,7 @@ public class ArrowAction extends BaseComponentSystem {
     @ReceiveEvent
     public void onActivate(ActivateEvent event, EntityRef entity, ArrowActionComponent arrowActionComponent) {
 
-        if (time.getGameTime() > lastTime + 1.0f/arrowActionComponent.arrowsPerSecond) {
+        if (time.getGameTime() > lastTime + 1.0f / arrowActionComponent.arrowsPerSecond) {
             Vector3f target = event.getHitNormal();
             Vector3i blockPos = new Vector3i(target);
 

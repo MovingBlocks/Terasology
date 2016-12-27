@@ -240,7 +240,7 @@ public class BlockCommands extends BaseComponentSystem {
             @Sender EntityRef sender,
             @CommandParam("searched") String searched,
             @CommandParam(value = "quantity", required = false) Integer quantityParam,
-            @CommandParam(value = "shapeName", required = false) String shapeUriParam){
+            @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
         int quantity = quantityParam != null ? quantityParam : 16;
         String searchLowercase = searched.toLowerCase();
         List<String> blocks = findBlockMatches(searchLowercase);

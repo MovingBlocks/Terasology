@@ -28,6 +28,7 @@ public class AbstractSpecificSubscribable implements SpecificSubscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subscribe(String propertyName, PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(propertyName, changeListener);
     }
@@ -35,6 +36,7 @@ public class AbstractSpecificSubscribable implements SpecificSubscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unsubscribe(String propertyName, PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(propertyName, changeListener);
     }

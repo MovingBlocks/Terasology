@@ -25,7 +25,7 @@ public enum ButtonState {
 
     private boolean down;
 
-    private ButtonState(boolean down) {
+    ButtonState(boolean down) {
         this.down = down;
     }
 

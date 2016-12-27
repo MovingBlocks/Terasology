@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -103,17 +102,10 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         int numberOfChunksThatAreNotReadyYet = 0;
 
         final Vector3f cameraPosition = playerCamera.getPosition();
+        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
         chunkShader.setFloat("clip", 0.0f, true);
-
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
-
-        // TODO: This is done this way because LightGeometryNode enable but does not disable face culling.
-        // TODO: When LightGeometryNode is switched to the new architecture, this will have to change.
-        if (worldRenderer.isHeadUnderWater()) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
@@ -131,10 +123,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         }
 
         chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-
-        if (worldRenderer.isHeadUnderWater()) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-        }
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

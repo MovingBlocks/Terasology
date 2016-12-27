@@ -86,8 +86,10 @@ public class ContextMenuScreen extends CoreScreenLayer {
                 double percentageThreshold = 0.9;
                 if (region.maxY() > canvas.getRegion().height() * percentageThreshold) {
                     region = Rect2i.createFromMinAndMax(region.minX(),
-                        region.minY() - (region.maxY() - canvas.getRegion().height()) -
-                        (int) (canvas.getRegion().height() * (1 - percentageThreshold)),
+                        region.minY()
+                                - (region.maxY()
+                                - canvas.getRegion().height())
+                                - (int) (canvas.getRegion().height() * (1 - percentageThreshold)),
                         region.maxX(),
                         canvas.getRegion().height());
                 }

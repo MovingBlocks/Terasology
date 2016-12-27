@@ -327,7 +327,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
         private final BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
 
-        public BlockFamilyFactoryHandler(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
+        BlockFamilyFactoryHandler(BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
             this.blockFamilyFactoryRegistry = blockFamilyFactoryRegistry;
         }
 
@@ -341,7 +341,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
         private final AssetManager assetManager;
 
-        public AssetTypeAdapterFactory(AssetManager assetManager) {
+        AssetTypeAdapterFactory(AssetManager assetManager) {
             this.assetManager = assetManager;
         }
 

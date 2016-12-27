@@ -273,7 +273,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         private List<Input> binds;
         private int index;
 
-        public BindingText(List<Input> binds, int index) {
+        BindingText(List<Input> binds, int index) {
             this.binds = binds;
             this.index = index;
         }

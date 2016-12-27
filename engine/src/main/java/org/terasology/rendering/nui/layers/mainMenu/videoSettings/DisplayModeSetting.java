@@ -50,7 +50,7 @@ public enum DisplayModeSetting {
     }
 
     public DisplayModeSetting getCurrent() {
-        for(DisplayModeSetting setting : values()) {
+        for (DisplayModeSetting setting : values()) {
             if (setting.current) {
                 return setting;
             }
@@ -63,7 +63,7 @@ public enum DisplayModeSetting {
     }
 
     public void setCurrent(boolean current) {
-        for(DisplayModeSetting setting : values()) {
+        for (DisplayModeSetting setting : values()) {
             setting.current = false;
         }
         this.current = current;

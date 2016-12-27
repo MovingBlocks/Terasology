@@ -143,7 +143,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         context.put(CelestialSystem.class, celestialSystem);
         context.get(ComponentSystemManager.class).register(celestialSystem);
 
-        Skysphere skysphere = new Skysphere();
+        Skysphere skysphere = new Skysphere(context);
         BackdropProvider backdropProvider = skysphere;
         BackdropRenderer backdropRenderer = skysphere;
         context.put(BackdropProvider.class, backdropProvider);
