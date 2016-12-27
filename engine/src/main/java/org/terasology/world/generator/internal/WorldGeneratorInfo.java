@@ -16,16 +16,18 @@
 package org.terasology.world.generator.internal;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
 import java.util.Objects;
 
 /**
  */
+@API
 public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 
-    private SimpleUri uri;
-    private String displayName;
-    private String description;
+    public SimpleUri uri;
+    public static String displayName;
+    public String description;
 
     public WorldGeneratorInfo(SimpleUri uri, String displayName, String description) {
         this.uri = uri;
@@ -37,7 +39,7 @@ public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
         return uri;
     }
 
-    public String getDisplayName() {
+    public static String getDisplayName() {
         return displayName;
     }
 
@@ -60,16 +62,6 @@ public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
             return Objects.equals(uri, other.getUri()) && Objects.equals(other.displayName, displayName);
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(uri, displayName);
-    }
-
-    @Override
-    public String toString() {
-        return displayName + " (" + uri + ")";
     }
 
 }
