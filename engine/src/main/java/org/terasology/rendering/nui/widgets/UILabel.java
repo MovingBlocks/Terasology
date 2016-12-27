@@ -61,6 +61,11 @@ public class UILabel extends CoreWidget {
         this.text = text;
     }
 
+    /**
+     * Get the text displayed on the label.
+     *
+     * @return The text on the label.
+     */
     public String getText() {
         if (text.get() == null) {
             return "";
@@ -76,6 +81,11 @@ public class UILabel extends CoreWidget {
         return DISABLED_MODE;
     }
 
+    /**
+     * Set the text to show on the label.
+     *
+     * @param text The new text to show.
+     */
     public void setText(String text) {
         this.text.set(text);
     }

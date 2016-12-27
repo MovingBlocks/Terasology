@@ -125,10 +125,20 @@ public class UIList<T> extends CoreWidget {
         this.list = binding;
     }
 
+    /**
+     * Get the list of options.
+     *
+     * @return The list of options.
+     */
     public List<T> getList() {
         return list.get();
     }
 
+    /**
+     * Set the lis to of options to display on the buttons.
+     *
+     * @param list The list to display on the buttons.
+     */
     public void setList(List<T> list) {
         this.list.set(list);
     }
@@ -137,22 +147,49 @@ public class UIList<T> extends CoreWidget {
         selectable = binding;
     }
 
+    /**
+     * Check if the list is interactive.
+     *
+     * @return True if the list is interactive.
+     */
     public boolean isInteractive() {
         return interactive.get();
     }
 
+    /**
+     * Check if the list is selectable.
+     *
+     * @return True if the list is selectable.
+     */
     public boolean isSelectable() {
         return selectable.get();
     }
 
+    /**
+     * Set the interactivity of the list.
+     *
+     * @param value A Boolean indicating the interactivity to set.
+     */
     public void setInteractive(boolean value) {
         interactive.set(value);
     }
 
+
+    /**
+     * Set how selectable the list is.
+     *
+     * @param value A Boolean indicating how selectable the list should be.
+     */
     public void setSelectable(boolean value) {
         selectable.set(value);
     }
 
+
+    /**
+     * Set the list's ability to be focused.
+     *
+     * @param value A Boolean indicating if it should be focusable.
+     */
     public void setCanBeFocus(boolean value) {
         canBeFocus.set(value);
     }
@@ -161,6 +198,11 @@ public class UIList<T> extends CoreWidget {
         selection = binding;
     }
 
+    /**
+     * Get the selected item on the list.
+     *
+     * @return The value of the selected button.
+     */
     public T getSelection() {
         if (!isSelectable()) {
             return null;
@@ -168,6 +210,11 @@ public class UIList<T> extends CoreWidget {
         return selection.get();
     }
 
+    /**
+     * Set which item on the list should be selected.
+     *
+     * @param item The item to be selected
+     */
     public void setSelection(T item) {
         if (isSelectable()) {
             selection.set(item);
@@ -177,22 +224,47 @@ public class UIList<T> extends CoreWidget {
         }
     }
 
+    /**
+     * Subscribe an event listener to be called upon the list being activated.
+     *
+     * @param eventListener The event listener to call.
+     */
     public void subscribe(ItemActivateEventListener<T> eventListener) {
         activateListeners.add(eventListener);
     }
 
+    /**
+     * Remove an event listener from being called when the list being activated.
+     *
+     * @param eventListener The event listener to remove.
+     */
     public void unsubscribe(ItemActivateEventListener<T> eventListener) {
         activateListeners.remove(eventListener);
     }
 
+    /**
+     * Subscribe an event listener to be called then an item is selected.
+     *
+     * @param eventListener The event listener to add.
+     */
     public void subscribeSelection(ItemSelectEventListener<T> eventListener) {
         selectionListeners.add(eventListener);
     }
 
+    /**
+     * Remove an event listener from being called when a selection is made.
+     *
+     * @param eventListener The event listener to remove.
+     */
     public void unsubscribeSelection(ItemSelectEventListener<T> eventListener) {
         selectionListeners.remove(eventListener);
     }
 
+    /**
+     * Select an item from the list via index.
+     *
+     * @param index The index of the item to select.
+     */
     public void select(int index) {
         if (index >= 0 && index < list.get().size() && isSelectable()) {
             T item = list.get().get(index);
@@ -200,6 +272,11 @@ public class UIList<T> extends CoreWidget {
         }
     }
 
+    /**
+     * Activate an item from the list via index.
+     *
+     * @param index The index of the item to select.
+     */
     private void activate(int index) {
         if (index < list.get().size()) {
             T item = list.get().get(index);
@@ -209,10 +286,20 @@ public class UIList<T> extends CoreWidget {
         }
     }
 
+    /**
+     * Get the renderer for the items on the list.
+     *
+     * @return The item renderer used in the list.
+     */
     public ItemRenderer<T> getItemRenderer() {
         return itemRenderer;
     }
 
+    /**
+     * Set which item renderer to use on the list.
+     *
+     * @param itemRenderer The renderer to use.
+     */
     public void setItemRenderer(ItemRenderer<T> itemRenderer) {
         this.itemRenderer = itemRenderer;
     }
