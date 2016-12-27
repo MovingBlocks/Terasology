@@ -34,10 +34,20 @@ public class UISpace extends CoreWidget {
         this.size.set(size);
     }
 
+    /**
+     * Get the current size of the space.
+     *
+     * @return The width and height of the space in a vector..
+     */
     public Vector2i getSize() {
         return size;
     }
 
+    /**
+     * Set the size of the space.
+     *
+     * @param size The new width and height in a vector.
+     */
     public void setSize(Vector2i size) {
         this.size.set(size);
     }

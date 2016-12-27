@@ -81,6 +81,7 @@ public class UISlider extends CoreWidget {
     @LayoutConfig
     private int precision = 1;
 
+    @LayoutConfig
     private Binding<Float> value = new DefaultBinding<>(0.7f);
 
     private int sliderWidth;
@@ -176,10 +177,20 @@ public class UISlider extends CoreWidget {
         this.minimum = binding;
     }
 
+    /**
+     * Get the minimum value settable.
+     *
+     * @return The minimum value possible.
+     */
     public float getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * Set the minimum value possible.
+     *
+     * @param min The new minimum value
+     */
     public void setMinimum(float min) {
         this.minimum.set(min);
     }
@@ -188,10 +199,20 @@ public class UISlider extends CoreWidget {
         this.range = binding;
     }
 
+    /**
+     * Get the maximum value possible.
+     *
+     * @return The maxiumum value possible.
+     */
     public float getRange() {
         return range.get();
     }
 
+    /**
+     * Set the maximum possible value.
+     *
+     * @param val The new maximum value.
+     */
     public void setRange(float val) {
         range.set(val);
     }
@@ -200,10 +221,20 @@ public class UISlider extends CoreWidget {
         increment = binding;
     }
 
+    /**
+     * Get the smallest increment the value can be changed by.
+     *
+     * @return The smallest increment possible.
+     */
     public float getIncrement() {
         return increment.get();
     }
 
+    /**
+     * Set the smallest increment the value can be set to.
+     *
+     * @param val The new smallest increment to set to.
+     */
     public void setIncrement(float val) {
         increment.set(val);
     }
@@ -212,18 +243,38 @@ public class UISlider extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * Get the current value of the slider.
+     *
+     * @return The current value.
+     */
     public float getValue() {
         return value.get();
     }
 
+    /**
+     * Set the current value of the slider.
+     *
+     * @param val The new current value.
+     */
     public void setValue(float val) {
         value.set(val);
     }
 
+    /**
+     * Get the number of decimal points to display the value to.
+     *
+     * @return The number of decimal points used.
+     */
     public int getPrecision() {
         return precision;
     }
 
+    /**
+     * Set the number of decimal points do display the value to.
+     *
+     * @param precision The number of decimal points.
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
     }

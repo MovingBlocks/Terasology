@@ -67,6 +67,7 @@ public class UIScrollingText extends CoreWidget {
     /**
      * Specifies whether scrolling will restart from the beginning when all text has been scrolled through
      */
+    @LayoutConfig
     private boolean autoReset;
     private boolean isScrolling = true;
 
@@ -91,6 +92,12 @@ public class UIScrollingText extends CoreWidget {
         this.text = text;
     }
 
+    /**
+     * Get the string displayed on the widget.
+     * Due to the nature of the widget this may be very long.
+     *
+     * @return The string displayed in the widget.
+     */
     public String getText() {
         if (text.get() == null) {
             return "";
@@ -98,6 +105,11 @@ public class UIScrollingText extends CoreWidget {
         return text.get();
     }
 
+    /**
+     * Set the text to display in the widget.
+     *
+     * @param text
+     */
     public void setText(String text) {
         this.text.set(text);
     }
@@ -106,22 +118,40 @@ public class UIScrollingText extends CoreWidget {
         this.text = binding;
     }
 
+    /**
+     * Start the widget scrolling.
+     */
     public void startScrolling() {
         isScrolling = true;
     }
 
+    /**
+     * Stop the widget scrolling.
+     */
     public void stopScrolling() {
         isScrolling = false;
     }
 
+    /**
+     * Reset the widget at the start of the text.
+     */
     public void resetScrolling() {
         textY.clear();
     }
 
+    /**
+     * Set the speed of scrolling in y pixels per frame
+     *
+     * @param speed Number of y pixels to move per frame.
+     */
     public void setScrollingSpeed(int speed) {
         this.step = speed;
     }
 
+    /**
+     * Set whether the widget should auto restart once finished
+     * @param reset A boolean indicating if the widget should auto restart.
+     */
     public void setAutoReset(boolean reset) {
         this.autoReset = reset;
     }

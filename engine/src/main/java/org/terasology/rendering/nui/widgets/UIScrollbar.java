@@ -39,6 +39,7 @@ public class UIScrollbar extends CoreWidget {
     @LayoutConfig
     private Binding<Integer> range = new DefaultBinding<>(100);
 
+    @LayoutConfig
     private Binding<Integer> value = new DefaultBinding<>(0);
 
     @LayoutConfig
@@ -194,10 +195,20 @@ public class UIScrollbar extends CoreWidget {
         minimum = binding;
     }
 
+    /**
+     * Get the minimum value above zero that can be scrolled to.
+     *
+     * @return The minimum value scrollable to.
+     */
     public int getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * Set the minimum value above zero scrollable to.
+     *
+     * @param val The new minimum above zero.
+     */
     public void setMinimum(int val) {
         minimum.set(val);
     }
@@ -206,10 +217,20 @@ public class UIScrollbar extends CoreWidget {
         range = binding;
     }
 
+    /**
+     * Get the max value scrollable to.
+     *
+     * @return The max value scrollable to.
+     */
     public int getRange() {
         return range.get();
     }
 
+    /**
+     * Set the max value scrollable to.
+     *
+     * @param val The new maximum scrollable.
+     */
     public void setRange(int val) {
         range.set(val);
     }
@@ -218,10 +239,20 @@ public class UIScrollbar extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * Get the current scroll value.
+     *
+     * @return The current scroll value.
+     */
     public int getValue() {
         return TeraMath.clamp(value.get(), getMinimum(), getMinimum() + getRange());
     }
 
+    /**
+     * Set the level of scrolling.
+     *
+     * @param val The new level of scrolling to set.
+     */
     public void setValue(int val) {
         value.set(val);
     }
