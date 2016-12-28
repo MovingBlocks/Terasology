@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import java.util.Objects;
 
 /**
+ * A widget allowing for simple text entry
  */
 public class UITextEntry<T> extends UIText {
     private static final Logger logger = LoggerFactory.getLogger(UITextEntry.class);
@@ -73,18 +74,30 @@ public class UITextEntry<T> extends UIText {
         stringValue.set(formatter.toString(value.get()));
     }
 
+    /**
+     * @return The current value of the widget
+     */
     public T getValue() {
         return value.get();
     }
 
+    /**
+     * @param val The new text to display
+     */
     public void setValue(T val) {
         value.set(val);
     }
 
+    /**
+     * @param parser The parser to use on the input
+     */
     public void setParser(Parser<T> parser) {
         this.parser = parser;
     }
 
+    /**
+     * @param formatter The formatter to use
+     */
     public void setFormatter(Formatter<T> formatter) {
         this.formatter = formatter;
     }

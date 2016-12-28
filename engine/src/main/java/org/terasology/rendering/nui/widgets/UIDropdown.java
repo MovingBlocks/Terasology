@@ -142,10 +142,20 @@ public class UIDropdown<T> extends CoreWidget {
         options = binding;
     }
 
+    /**
+     * Get all the options from the dropdown.
+     *
+     * @return A List containing all the options.
+     */
     public List<T> getOptions() {
         return options.get();
     }
 
+    /**
+     * Set a new set of options for the dropdown.
+     *
+     * @param values A List containing the new options.
+     */
     public void setOptions(List<T> values) {
         this.options.set(values);
     }
@@ -154,14 +164,31 @@ public class UIDropdown<T> extends CoreWidget {
         this.selection = binding;
     }
 
+    /**
+     * Get the currently selected item.
+     *
+     * @return The currently selected item.
+     */
     public T getSelection() {
         return selection.get();
     }
 
+    /**
+     * Set the item from that should be selected.
+     * Note that this item does not actually have to be contained in the List of options.
+     *
+     * @param value The item to set as selected.
+     */
     public void setSelection(T value) {
         selection.set(value);
     }
 
+    /**
+     * Set the renderer to use for the options.
+     * This is used to display the options on the dropdown list and in the selection box.
+     *
+     * @param itemRenderer The new item renderer.
+     */
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
         optionRenderer = itemRenderer;
     }

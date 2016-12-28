@@ -22,6 +22,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -36,6 +37,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import java.util.List;
 
 /**
+ * A clickable button widget that can have a custom texture or text applied
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
@@ -138,10 +140,16 @@ public class UIButton extends CoreWidget {
         this.text = binding;
     }
 
+    /**
+     * @return The String on the button. In the case of no text the String is empty.
+     */
     public String getText() {
         return text.get();
     }
 
+    /**
+     * @param text The String to display on the button.
+     */
     public void setText(String text) {
         this.text.set(text);
     }
@@ -150,10 +158,16 @@ public class UIButton extends CoreWidget {
         this.image = binding;
     }
 
+    /**
+     * @param image A TextureRegion to set as the button's image.
+     */
     public void setImage(TextureRegion image) {
         this.image.set(image);
     }
 
+    /**
+     * @return The image shown on the Button in a TextureRegion.
+     */
     public TextureRegion getImage() {
         return image.get();
     }
@@ -162,10 +176,16 @@ public class UIButton extends CoreWidget {
         clickSound = binding;
     }
 
+    /**
+     * @return The StaticSound that is played.
+     */
     public StaticSound getClickSound() {
         return clickSound.get();
     }
 
+    /**
+     * @param val The StaticSound that should be played.
+     */
     public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
@@ -174,18 +194,34 @@ public class UIButton extends CoreWidget {
         clickVolume = binding;
     }
 
+    /**
+     * @return A float indicating how load the sound is.
+     */
     public float getClickVolume() {
         return clickVolume.get();
     }
 
+    /**
+     * @param val A Float that indicates how load the sound should be.
+     */
     public void setClickVolume(float val) {
         clickVolume.set(val);
     }
 
+    /**
+     * Add a listener to be called when the button is clicked.
+     *
+     * @param listener The listener to be called.
+     */
     public void subscribe(ActivateEventListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Remove a listener from the button such that it will no longer be called on click.
+     *
+     * @param listener The listener to remove.
+     */
     public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
     }

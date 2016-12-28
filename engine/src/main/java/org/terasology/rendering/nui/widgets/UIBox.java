@@ -57,19 +57,31 @@ public class UIBox extends CoreWidget {
         }
     }
 
+    /**
+     * @return The UIWidget inside the box.
+     */
     public UIWidget getContent() {
         return content;
     }
 
+    /**
+     * @param content The UIWidget to set as the contents of the box.
+     */
     public void setContent(UIWidget content) {
         this.content = content;
         content.setEnabled(isEnabled());
     }
 
+    /**
+     * @return A Boolean indicating if the content is updated or not.
+     */
     public boolean getUpdateContent() {
         return updateContent;
     }
 
+    /**
+     * @param value A Boolean to indicate if the contents should be updated
+     */
     public void setUpdateContent(Boolean value) {
         updateContent = value;
     }
