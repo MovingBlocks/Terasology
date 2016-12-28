@@ -95,6 +95,21 @@
                 "right": 12
             }
         },
+        "UITabBox": {
+            "background": "engine:area",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
+            },
+            "margin": {
+                "top": 12,
+                "bottom": 12,
+                "left": 12,
+                "right": 12
+            }
+        },
         "UILoadBar": {
             "background": "engine:area",
             "background-border": {
