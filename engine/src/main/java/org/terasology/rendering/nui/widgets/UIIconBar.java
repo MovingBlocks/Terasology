@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
+ * A value bar that uses Icons
  */
 public class UIIconBar extends CoreWidget {
 
@@ -133,8 +134,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Get the icon used for the bar.
-     *
      * @return The icon used.
      */
     public TextureRegion getIcon() {
@@ -142,8 +141,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Set the icon used in the bar.
-     *
      * @param icon The icon to use in the bar.
      */
     public void setIcon(TextureRegion icon) {
@@ -155,8 +152,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Get the value of the bar.
-     *
      * @return The current value.
      */
     public float getValue() {
@@ -164,8 +159,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Set the value of the bar.
-     *
      * @param val The value to set it to.
      */
     public void setValue(float val) {
@@ -177,8 +170,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Get the maximum value of the bar.
-     *
      * @return The maximum value the bar can be set to.
      */
     public float getMaxValue() {
@@ -186,8 +177,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Set the maximum value of the bar.
-     *
      * @param val The new max value the bar can be set to.
      */
     public void setMaxValue(float val) {
@@ -195,8 +184,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Get the current mode used to display decimal values.
-     *
      * @return The current HalfIconMode used.
      */
     public HalfIconMode getHalfIconMode() {
@@ -204,8 +191,6 @@ public class UIIconBar extends CoreWidget {
     }
 
     /**
-     * Set the mode used to display decimal values.
-     *
      * @param halfIconMode The new mode to use.
      */
     public void setHalfIconMode(HalfIconMode halfIconMode) {

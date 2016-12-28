@@ -32,6 +32,7 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
+ * A simple slider bar with two handles
  */
 public class UIDoubleSlider extends CoreWidget {
     public static final String SLIDER_PART = "slider";
@@ -216,8 +217,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Get the minimum value settable.
-     *
      * @return A Float indicating the minimum value.
      */
     public float getMinimum() {
@@ -225,8 +224,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Set the minimum value possible.
-     *
      * @param min A Float indicating the minimum value settable.
      */
     public void setMinimum(float min) {
@@ -239,8 +236,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * The range of possible values (from the minimum value).
-     *
      * @return A Float indicating the range of values.
      */
     public float getRange() {
@@ -248,8 +243,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Set the range of possible values (from the minimum value).
-     *
      * @param val A Float specifying the range of values.
      */
     public void setRange(float val) {
@@ -262,8 +255,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Get the smallest increment the value can be set to.
-     *
      * @return A Float indicating the smallest increment.
      */
     public float getIncrement() {
@@ -271,8 +262,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Set the smallest increment the value can be set to.
-     *
      * @param val A Float specifying the smallest increment.
      */
     public void setIncrement(float val) {
@@ -288,19 +277,14 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Get the value of the left bar.
-     *
-     * @return A Float containing the value of the left bar.
+     * @return A Float containing the value of the left handle.
      */
     public float getValueLeft() {
         return valueLeft.get();
     }
 
     /**
-     * Set the value of the left bar.
-     * The right bar will adjust as needed such that it is always higher or equal to the left bar.
-     *
-     * @param val The new value of the left bar
+     * @param val The new value of the left handle
      */
     public void setValueLeft(float val) {
         valueLeft.set(val);
@@ -311,19 +295,14 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Get the value of the right bar.
-     *
-     * @return A Float containing the value of the right bar.
+     * @return A Float containing the value of the right handle.
      */
     public float getValueRight() {
         return valueRight.get();
     }
 
     /**
-     * Set the value of the right bar.
-     * The left bar will adjust as needed such that it is always lower or equal to the right bar.
-     *
-     * @param val The new value of the right bar.
+     * @param val The new value of the right handle.
      */
     public void setValueRight(float val) {
         valueRight.set(val);
@@ -334,8 +313,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Get the number of decimal points displayed on either bar.
-     *
      * @return The number of decimal points displayed.
      */
     public int getPrecision() {
@@ -343,8 +320,6 @@ public class UIDoubleSlider extends CoreWidget {
     }
 
     /**
-     * Set the number of decimal points to display on each bar.
-     *
      * @param precision The number of decimal points to display.
      */
     public void setPrecision(int precision) {

@@ -62,8 +62,6 @@ public class UILabel extends CoreWidget {
     }
 
     /**
-     * Get the text displayed on the label.
-     *
      * @return The text on the label.
      */
     public String getText() {
@@ -82,8 +80,6 @@ public class UILabel extends CoreWidget {
     }
 
     /**
-     * Set the text to show on the label.
-     *
      * @param text The new text to show.
      */
     public void setText(String text) {

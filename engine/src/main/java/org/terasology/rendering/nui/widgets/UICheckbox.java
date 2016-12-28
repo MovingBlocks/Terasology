@@ -76,8 +76,6 @@ public class UICheckbox extends CoreWidget {
     }
 
     /**
-     * Gets if the checkbox is ticked.
-     *
      * @return A boolean indicating the status of the checkbox
      */
     public boolean isChecked() {
@@ -85,8 +83,6 @@ public class UICheckbox extends CoreWidget {
     }
 
     /**
-     * Sets the ticked state of the checkbox
-     *
      * @param checked A boolean setting the ticked state of the checkbox
      */
     public void setChecked(boolean checked) {

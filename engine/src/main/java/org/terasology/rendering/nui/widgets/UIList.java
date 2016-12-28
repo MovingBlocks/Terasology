@@ -126,8 +126,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Get the list of options.
-     *
      * @return The list of options.
      */
     public List<T> getList() {
@@ -135,8 +133,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Set the lis to of options to display on the buttons.
-     *
      * @param list The list to display on the buttons.
      */
     public void setList(List<T> list) {
@@ -148,8 +144,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Check if the list is interactive.
-     *
      * @return True if the list is interactive.
      */
     public boolean isInteractive() {
@@ -157,8 +151,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Check if the list is selectable.
-     *
      * @return True if the list is selectable.
      */
     public boolean isSelectable() {
@@ -166,8 +158,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Set the interactivity of the list.
-     *
      * @param value A Boolean indicating the interactivity to set.
      */
     public void setInteractive(boolean value) {
@@ -176,8 +166,6 @@ public class UIList<T> extends CoreWidget {
 
 
     /**
-     * Set how selectable the list is.
-     *
      * @param value A Boolean indicating how selectable the list should be.
      */
     public void setSelectable(boolean value) {
@@ -186,8 +174,6 @@ public class UIList<T> extends CoreWidget {
 
 
     /**
-     * Set the list's ability to be focused.
-     *
      * @param value A Boolean indicating if it should be focusable.
      */
     public void setCanBeFocus(boolean value) {
@@ -199,8 +185,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Get the selected item on the list.
-     *
      * @return The value of the selected button.
      */
     public T getSelection() {
@@ -211,8 +195,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Set which item on the list should be selected.
-     *
      * @param item The item to be selected
      */
     public void setSelection(T item) {
@@ -287,8 +269,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Get the renderer for the items on the list.
-     *
      * @return The item renderer used in the list.
      */
     public ItemRenderer<T> getItemRenderer() {
@@ -296,8 +276,6 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Set which item renderer to use on the list.
-     *
      * @param itemRenderer The renderer to use.
      */
     public void setItemRenderer(ItemRenderer<T> itemRenderer) {

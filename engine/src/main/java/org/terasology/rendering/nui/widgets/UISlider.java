@@ -32,6 +32,9 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
+/**
+ * A simple value slider bar with one handle
+ */
 public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
@@ -178,8 +181,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Get the minimum value settable.
-     *
      * @return The minimum value possible.
      */
     public float getMinimum() {
@@ -187,8 +188,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Set the minimum value possible.
-     *
      * @param min The new minimum value
      */
     public void setMinimum(float min) {
@@ -200,8 +199,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Get the maximum value possible.
-     *
      * @return The maxiumum value possible.
      */
     public float getRange() {
@@ -209,8 +206,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Set the maximum possible value.
-     *
      * @param val The new maximum value.
      */
     public void setRange(float val) {
@@ -222,8 +217,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Get the smallest increment the value can be changed by.
-     *
      * @return The smallest increment possible.
      */
     public float getIncrement() {
@@ -231,8 +224,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Set the smallest increment the value can be set to.
-     *
      * @param val The new smallest increment to set to.
      */
     public void setIncrement(float val) {
@@ -244,8 +235,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Get the current value of the slider.
-     *
      * @return The current value.
      */
     public float getValue() {
@@ -253,8 +242,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Set the current value of the slider.
-     *
      * @param val The new current value.
      */
     public void setValue(float val) {
@@ -262,8 +249,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Get the number of decimal points to display the value to.
-     *
      * @return The number of decimal points used.
      */
     public int getPrecision() {
@@ -271,8 +256,6 @@ public class UISlider extends CoreWidget {
     }
 
     /**
-     * Set the number of decimal points do display the value to.
-     *
      * @param precision The number of decimal points.
      */
     public void setPrecision(int precision) {

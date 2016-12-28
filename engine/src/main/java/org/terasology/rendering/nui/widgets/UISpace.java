@@ -21,6 +21,7 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 
 /**
+ * A simple spacing widget
  */
 public class UISpace extends CoreWidget {
 
@@ -35,8 +36,6 @@ public class UISpace extends CoreWidget {
     }
 
     /**
-     * Get the current size of the space.
-     *
      * @return The width and height of the space in a vector..
      */
     public Vector2i getSize() {
@@ -44,8 +43,6 @@ public class UISpace extends CoreWidget {
     }
 
     /**
-     * Set the size of the space.
-     *
      * @param size The new width and height in a vector.
      */
     public void setSize(Vector2i size) {

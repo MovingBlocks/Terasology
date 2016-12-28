@@ -58,8 +58,6 @@ public class UIBox extends CoreWidget {
     }
 
     /**
-     * Gets the widget/layout inside the box.
-     *
      * @return The UIWidget inside the box.
      */
     public UIWidget getContent() {
@@ -67,8 +65,6 @@ public class UIBox extends CoreWidget {
     }
 
     /**
-     * Sets a new widget/layout to render inside the box.
-     *
      * @param content The UIWidget to set as the contents of the box.
      */
     public void setContent(UIWidget content) {
@@ -77,8 +73,6 @@ public class UIBox extends CoreWidget {
     }
 
     /**
-     * Gets if the contents of the box are updated at the same time as the box.
-     *
      * @return A Boolean indicating if the content is updated or not.
      */
     public boolean getUpdateContent() {
@@ -86,8 +80,6 @@ public class UIBox extends CoreWidget {
     }
 
     /**
-     * Sets if the contents inside the box should be updated when the box itself is updated
-     *
      * @param value A Boolean to indicate if the contents should be updated
      */
     public void setUpdateContent(Boolean value) {

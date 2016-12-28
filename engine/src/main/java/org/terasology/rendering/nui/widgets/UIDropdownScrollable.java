@@ -224,8 +224,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Get all the options from the dropdown.
-     *
      * @return A List containing all the options.
      */
     public List<T> getOptions() {
@@ -233,8 +231,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Set a new set of options for the dropdown.
-     *
      * @param values A List containing the new options.
      */
     public void setOptions(List<T> values) {
@@ -246,8 +242,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Get the currently selected item.
-     *
      * @return The currently selected item.
      */
     public T getSelection() {
@@ -255,9 +249,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Set the item from that should be selected.
-     * Note that this item does not actually have to be contained in the List of options.
-     *
      * @param value The item to set as selected.
      */
 
@@ -266,9 +257,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Set the renderer to use for the options.
-     * This is used to display the options on the dropdown list and in the selection box.
-     *
      * @param itemRenderer The new item renderer.
      */
     public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
@@ -276,8 +264,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Get the number of visible options.
-     *
      * @return The number of options visible.
      */
     public int getVisibleOptions() {
@@ -285,8 +271,6 @@ public class UIDropdownScrollable<T> extends UIDropdown<T> {
     }
 
     /**
-     * Set the number of visible options.
-     *
      * @param num The number of visible options.
      */
     public void setVisibleOptions(int num) {

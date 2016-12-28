@@ -25,6 +25,9 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
+/**
+ *  A widget to display an image
+ */
 public class UIImage extends CoreWidget {
     @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
@@ -64,8 +67,6 @@ public class UIImage extends CoreWidget {
     }
 
     /**
-     * Get the current image being displayed.
-     *
      * @return The image being displayed
      */
     public TextureRegion getImage() {
@@ -73,8 +74,6 @@ public class UIImage extends CoreWidget {
     }
 
     /**
-     * Set the image being displayed.
-     *
      * @param image The new image to display.
      */
     public void setImage(TextureRegion image) {
@@ -86,8 +85,6 @@ public class UIImage extends CoreWidget {
     }
 
     /**
-     * Get the current tint of the image (if any).
-     *
      * @return The Color of the tint.
      */
     public Color getTint() {
@@ -95,8 +92,6 @@ public class UIImage extends CoreWidget {
     }
 
     /**
-     * Set the tint of the image.
-     *
      * @param color The new tint to apply.
      */
     public void setTint(Color color) {

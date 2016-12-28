@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
+ * An animated loading bar
  */
 public class UILoadBar extends CoreWidget {
 
@@ -80,8 +81,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Get the texture used to display the bar.
-     *
      * @return The texture used in the bar.
      */
     public TextureRegion getFillTexture() {
@@ -89,8 +88,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Set the texture to use in the bar.
-     *
      * @param fillTexture The new texture to use.
      */
     public void setFillTexture(TextureRegion fillTexture) {
@@ -98,8 +95,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Check the animated status of the bar.
-     *
      * @return A Boolean indicating whether. the bar is animated.
      */
     public boolean isAnimate() {
@@ -107,8 +102,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Set the animation status of the bar.
-     *
      * @param animate A Boolean indicating if the bar should be animated.
      */
     public void setAnimate(boolean animate) {
@@ -120,8 +113,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Get the current percentage of the bar.
-     *
      * @return A Float between 0 and 1 indicating the percentage of the bar.
      */
     public float getValue() {
@@ -129,8 +120,6 @@ public class UILoadBar extends CoreWidget {
     }
 
     /**
-     * Set the current percentage of the bar.
-     *
      * @param val A float from 0 to 1 indicating the percentage loaded.
      */
     public void setValue(float val) {

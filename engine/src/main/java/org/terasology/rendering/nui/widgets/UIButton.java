@@ -22,6 +22,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -36,6 +37,7 @@ import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import java.util.List;
 
 /**
+ * A clickable button widget that can have a custom texture or text applied
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
@@ -139,8 +141,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Get the text, if any, displayed on the button.
-     *
      * @return The String on the button. In the case of no text the String is empty.
      */
     public String getText() {
@@ -148,8 +148,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Set the text on the button.
-     *
      * @param text The String to display on the button.
      */
     public void setText(String text) {
@@ -161,8 +159,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Set an image to display on the button.
-     *
      * @param image A TextureRegion to set as the button's image.
      */
     public void setImage(TextureRegion image) {
@@ -170,8 +166,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Get the image currently shown on the button.
-     *
      * @return The image shown on the Button in a TextureRegion.
      */
     public TextureRegion getImage() {
@@ -183,8 +177,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Get the sound that is played when the button is clicked.
-     *
      * @return The StaticSound that is played.
      */
     public StaticSound getClickSound() {
@@ -192,8 +184,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Set the sound to be played when the button is clicked.
-     *
      * @param val The StaticSound that should be played.
      */
     public void setClickSound(StaticSound val) {
@@ -205,8 +195,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Get the volume the click sound is played at.
-     *
      * @return A float indicating how load the sound is.
      */
     public float getClickVolume() {
@@ -214,8 +202,6 @@ public class UIButton extends CoreWidget {
     }
 
     /**
-     * Set how loud the click sound should be played.
-     *
      * @param val A Float that indicates how load the sound should be.
      */
     public void setClickVolume(float val) {

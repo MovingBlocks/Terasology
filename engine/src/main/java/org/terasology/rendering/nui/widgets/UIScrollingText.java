@@ -93,9 +93,6 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Get the string displayed on the widget.
-     * Due to the nature of the widget this may be very long.
-     *
      * @return The string displayed in the widget.
      */
     public String getText() {
@@ -106,9 +103,7 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Set the text to display in the widget.
-     *
-     * @param text
+     * @param text The string to display on the widget
      */
     public void setText(String text) {
         this.text.set(text);
@@ -140,8 +135,6 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Set the speed of scrolling in y pixels per frame
-     *
      * @param speed Number of y pixels to move per frame.
      */
     public void setScrollingSpeed(int speed) {
@@ -149,7 +142,6 @@ public class UIScrollingText extends CoreWidget {
     }
 
     /**
-     * Set whether the widget should auto restart once finished
      * @param reset A boolean indicating if the widget should auto restart.
      */
     public void setAutoReset(boolean reset) {
