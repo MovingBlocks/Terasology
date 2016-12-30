@@ -32,23 +32,41 @@ public final class BlockComponent implements Component {
     public BlockComponent() {
     }
 
+    /**
+     * @param block The block of this component
+     * @param pos The position of this component
+     */
     public BlockComponent(Block block, Vector3i pos) {
         this.block = block;
         this.position.set(pos);
     }
 
+    /**
+     * @return The position of the component
+     */
     public Vector3i getPosition() {
         return position;
     }
 
+    /**
+     * Set the position of the component
+     * @param pos New position of the component
+     */
     public void setPosition(Vector3i pos) {
         position.set(pos);
     }
 
+    /**
+     * Set block of the component
+     * @param block The new block of the component
+     */
     public void setBlock(Block block) {
         this.block = block;
     }
 
+    /**
+     * @return The block of the component
+     */
     public Block getBlock() {
         return block;
     }

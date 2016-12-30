@@ -327,14 +327,26 @@ public final class Block {
         return targetable;
     }
 
+    /**
+     * Set can this block be targetted for interactions
+     * @param targetable True if this block be targetted for interactions
+     */
     public void setTargetable(boolean targetable) {
         this.targetable = targetable;
     }
 
+    /**
+     * Checks if the block can be climbed by player
+     * @return True if the block can be climbed by player
+     */
     public boolean isClimbable() {
         return climbable;
     }
 
+    /**
+     * Set is the block can be climbed by player
+     * @param value True to allow player climb on this block
+     */
     public void setClimbable(boolean value) {
         this.climbable = value;
     }
@@ -346,6 +358,10 @@ public final class Block {
         return waving;
     }
 
+    /**
+     * Set is this block waves in the wind
+     * @param waving True to waves in the wind
+     */
     public void setWaving(boolean waving) {
         this.waving = waving;
     }
@@ -357,6 +373,10 @@ public final class Block {
         return replacementAllowed;
     }
 
+    /**
+     * Set is this block can be replaced freely by other blocks
+     * @param replacementAllowed True to allow replace freely by other blocks
+     */
     public void setReplacementAllowed(boolean replacementAllowed) {
         this.replacementAllowed = replacementAllowed;
     }
@@ -368,10 +388,19 @@ public final class Block {
         return attachmentAllowed;
     }
 
+    /**
+     * Set can another block be attached on this block
+     * @param attachmentAllowed True to allow attach another block on this block
+     */
     public void setAttachmentAllowed(boolean attachmentAllowed) {
         this.attachmentAllowed = attachmentAllowed;
     }
 
+    /**
+     * Check can a block attach in the side of this block
+     * @param side The side of attaching
+     * @return False if this block is not allowed attachment or the side of this block is not full side
+     */
     public boolean canAttachTo(Side side) {
         return attachmentAllowed && fullSide.get(side);
     }
@@ -383,6 +412,10 @@ public final class Block {
         return supportRequired;
     }
 
+    /**
+     * Set should the block be destroyed when no longer attached
+     * @param supportRequired True to set the block should destroyed when no longer attached
+     */
     public void setSupportRequired(boolean supportRequired) {
         this.supportRequired = supportRequired;
     }
@@ -448,6 +481,11 @@ public final class Block {
         return hardness;
     }
 
+    /**
+     * Set how much damage it takes to destroy the block
+     * Indestructible if hardness is 0
+     * @param hardness how much damage it takes to destroy the block, indestructible if hardness is 0
+     */
     public void setHardness(int hardness) {
         this.hardness = hardness;
     }
@@ -463,6 +501,10 @@ public final class Block {
         return luminance;
     }
 
+    /**
+     * Set the light level produced by this block
+     * @param luminance the light level produced by this block
+     */
     public void setLuminance(byte luminance) {
         this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
@@ -556,7 +598,8 @@ public final class Block {
     }
 
     /**
-     * @param side
+     * Check is the side of this block is full side
+     * @param side checking side
      * @return Is the given side of the block "full" (a full square filling the side)
      */
     public boolean isFullSide(Side side) {
@@ -588,6 +631,11 @@ public final class Block {
         return color;
     }
 
+    /**
+     * Set the collision box for the block
+     * @param offset
+     * @param shape The shape of collision box
+     */
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;

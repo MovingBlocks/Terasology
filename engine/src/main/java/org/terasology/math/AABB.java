@@ -107,6 +107,9 @@ public final class AABB {
         return AABB.createMinMax(min, max);
     }
 
+    /**
+     * @return The size of the extents
+     */
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
@@ -114,6 +117,9 @@ public final class AABB {
         return dimensions;
     }
 
+    /**
+     * @return the center point vector of AABB
+     */
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
@@ -121,14 +127,25 @@ public final class AABB {
         return dimensions;
     }
 
+    /**
+     * @return the vector of min point
+     */
     public Vector3f getMin() {
         return new Vector3f(min);
     }
 
+    /**
+     * @return the vector of max point
+     */
     public Vector3f getMax() {
         return new Vector3f(max);
     }
 
+    /**
+     * Get a new AABB which have a new location base on the offset
+     * @param offset The offset between the current AABB and the new AABB
+     * @return the new AABB
+     */
     public AABB move(Vector3f offset) {
         Vector3f newMin = new Vector3f(min);
         newMin.add(offset);
@@ -337,26 +354,44 @@ public final class AABB {
         return new Vector3f();
     }
 
+    /**
+     * @return the x coordinate of the min point
+     */
     public float minX() {
         return min.x;
     }
 
+    /**
+     * @return the y coordinate of the min point
+     */
     public float minY() {
         return min.y;
     }
 
+    /**
+     * @return the z coordinate of the min point
+     */
     public float minZ() {
         return min.z;
     }
 
+    /**
+     * @return the x coordinate of the max point
+     */
     public float maxX() {
         return max.x;
     }
 
+    /**
+     * @return the y coordinate of the max point
+     */
     public float maxY() {
         return max.y;
     }
 
+    /**
+     * @return the z coordinate of the max point
+     */
     public float maxZ() {
         return max.z;
     }
