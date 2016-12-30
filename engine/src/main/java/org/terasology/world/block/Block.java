@@ -329,7 +329,7 @@ public final class Block {
 
     /**
      * Set can this block be targetted for interactions
-     * @param targetable True if this block be targetted for interactions
+     * @param targetable True if this block can be targetted for interactions
      */
     public void setTargetable(boolean targetable) {
         this.targetable = targetable;
