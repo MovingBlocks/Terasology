@@ -189,7 +189,7 @@ public final class RenderTaskListGenerator {
     private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
 
         for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {
-            if (stateChange.getClass() == stateChangeReset.getClass() ) {
+            if (stateChange.getClass() == stateChangeReset.getClass()) {
                 return false; // we did find it! And yes, returning false is correct, see method name.
 
                 // note: we don't worry about the details of the two state changes (i.e. if they are value-identical)
