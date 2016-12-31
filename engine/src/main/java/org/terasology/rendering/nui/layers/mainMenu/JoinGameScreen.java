@@ -455,4 +455,5 @@ public class JoinGameScreen extends CoreScreenLayer {
         extInfo.clear();
         visibleList.setSelection(i);
     }
+
 }

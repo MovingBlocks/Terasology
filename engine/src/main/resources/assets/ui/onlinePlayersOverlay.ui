@@ -6,7 +6,6 @@
         "contents": [
             {
                 "type": "UIBox",
-                "id": "box",
                 "layoutInfo": {
                     "width": 200,
                     "use-content-height": true,
@@ -25,22 +24,11 @@
                             "family": "title"
                         },
                         {
-                            "type": "RowLayout",
-                            "id": "row",
-                            "contents":[
-                                {
-                                    "type": "UIText",
-                                    "readOnly": true,
-                                    "multiline": true,
-                                    "id": "playerList",
-                                    "family": "history"
-                                }
-                            ],
-                            "layoutInfo": {
-                                "use-content-height": true,
-                                "position-horizontal-center": {},
-                                "position-vertical-center": {}
-                            }
+                            "type": "UIText",
+                            "readOnly": true,
+                            "multiline": true,
+                            "id": "playerList",
+                            "family": "history"
                         }
                     ]
                 }
