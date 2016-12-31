@@ -44,6 +44,11 @@ public final class Region3i implements Iterable<Vector3i> {
         this.size.set(size);
     }
 
+    /**
+     * @param min the min point of the region
+     * @param size the size of the region
+     * @return a new region base on the min point and region size, empty if the size is negative
+     */
     public static Region3i createFromMinAndSize(BaseVector3i min, BaseVector3i size) {
         if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
             return EMPTY;
@@ -106,9 +111,9 @@ public final class Region3i implements Iterable<Vector3i> {
 
     /**
      * Create a region by two point
-     * @param a vertex a
-     * @param b the diagonal vertex of a
-     * @return a new region base on vertex a and b
+     * @param min the min point of the region
+     * @param max the max point of the region
+     * @return a new region base on min and max point
      */
     public static Region3i createFromMinMax(BaseVector3i min, BaseVector3i max) {
         Vector3i size = new Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
@@ -162,24 +167,14 @@ public final class Region3i implements Iterable<Vector3i> {
         return new Vector3i(size);
     }
 
-
-    /**
-     * @return The size of x-coordinate of the region
-     */
     public int sizeX() {
         return size.x;
     }
 
-    /**
-     * @return The size of y-coordinate of the region
-     */
     public int sizeY() {
         return size.y;
     }
 
-    /**
-     * @return The size of z-coordinate of the region
-     */
     public int sizeZ() {
         return size.z;
     }

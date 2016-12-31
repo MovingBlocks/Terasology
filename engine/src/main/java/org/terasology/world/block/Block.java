@@ -328,25 +328,16 @@ public final class Block {
     }
 
     /**
-     * Set can this block be targetted for interactions
      * @param targetable True if this block can be targetted for interactions
      */
     public void setTargetable(boolean targetable) {
         this.targetable = targetable;
     }
 
-    /**
-     * Checks if the block can be climbed by player
-     * @return True if the block can be climbed by player
-     */
     public boolean isClimbable() {
         return climbable;
     }
 
-    /**
-     * Set is the block can be climbed by player
-     * @param value True to allow player climb on this block
-     */
     public void setClimbable(boolean value) {
         this.climbable = value;
     }
@@ -359,7 +350,6 @@ public final class Block {
     }
 
     /**
-     * Set is this block waves in the wind
      * @param waving True to waves in the wind
      */
     public void setWaving(boolean waving) {
@@ -374,7 +364,6 @@ public final class Block {
     }
 
     /**
-     * Set is this block can be replaced freely by other blocks
      * @param replacementAllowed True to allow replace freely by other blocks
      */
     public void setReplacementAllowed(boolean replacementAllowed) {
@@ -389,7 +378,6 @@ public final class Block {
     }
 
     /**
-     * Set can another block be attached on this block
      * @param attachmentAllowed True to allow attach another block on this block
      */
     public void setAttachmentAllowed(boolean attachmentAllowed) {
@@ -413,7 +401,6 @@ public final class Block {
     }
 
     /**
-     * Set should the block be destroyed when no longer attached
      * @param supportRequired True to set the block should destroyed when no longer attached
      */
     public void setSupportRequired(boolean supportRequired) {
@@ -482,7 +469,6 @@ public final class Block {
     }
 
     /**
-     * Set how much damage it takes to destroy the block
      * Indestructible if hardness is 0
      * @param hardness how much damage it takes to destroy the block, indestructible if hardness is 0
      */
@@ -502,7 +488,6 @@ public final class Block {
     }
 
     /**
-     * Set the light level produced by this block
      * @param luminance the light level produced by this block
      */
     public void setLuminance(byte luminance) {
@@ -598,8 +583,7 @@ public final class Block {
     }
 
     /**
-     * Check is the side of this block is full side
-     * @param side checking side
+     * @param side
      * @return Is the given side of the block "full" (a full square filling the side)
      */
     public boolean isFullSide(Side side) {
@@ -633,7 +617,7 @@ public final class Block {
 
     /**
      * Set the collision box for the block
-     * @param offset
+     * @param offset The offset to the block's center
      * @param shape The shape of collision box
      */
     public void setCollision(Vector3f offset, CollisionShape shape) {
