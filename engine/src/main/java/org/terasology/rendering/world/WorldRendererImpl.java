@@ -305,14 +305,24 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
         renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
 
+        // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
+        // and then it's 2D post-processing all the way to the image shown on the display.
+        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
+        renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
+
+        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
+        renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
+
+        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
+        renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
+
+        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
+        renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
+
         // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
         // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
 
-
-        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
-        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
-        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
-        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class);
         Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
@@ -321,11 +331,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
 
-        renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
-        renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
-        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
-        renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
-        renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
         renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");

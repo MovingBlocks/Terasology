@@ -128,7 +128,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case LIGHT_SHAFTS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
+                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             default:

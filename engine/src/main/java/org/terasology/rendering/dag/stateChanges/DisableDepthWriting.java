@@ -21,20 +21,33 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetDepthMaskTask;
 
 /**
- * TODO: Add javadocs
+ * Instances of this class disable writing to the depth buffer.
+ *
+ * This can be useful when rendering semi-transparent objects, as the meaning of the depth value of a fragment
+ * associated with a semi-transparent object is ambiguous and therefore has to be chosen arbitrarily:
+ * should it be the object's distance from the near plane or should it be the first thing behind it?
  */
-public final class DisableDepthMask implements StateChange {
-    private static StateChange defaultInstance = new DisableDepthMask(true);
+public final class DisableDepthWriting implements StateChange {
+    private static StateChange defaultInstance = new DisableDepthWriting(true);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
 
     private final boolean enabled;
 
-    public DisableDepthMask() {
+    /** Constructs an instance of this StateChange. This can then be used in a node's initialise() method in the form:
+     *
+     * addDesiredStateChange(new DisableDepthWriting());
+     *
+     * This triggers the inclusion of a SetDepthMaskTask(false) instance and a SetDepthMaskTask(true) instance
+     * in the rendering task list, each instance disabling/enabling writing to the depth buffer respectively. The
+     * two task instances frame the execution of a node's process() method unless they are deemed redundant,
+     * i.e. because the upstream or downstream node also disables depth buffer writing.
+     */
+    public DisableDepthWriting() {
         this(false);
     }
 
-    private DisableDepthMask(boolean enabled) {
+    private DisableDepthWriting(boolean enabled) {
         this.enabled = enabled;
         enablingTask = new SetDepthMaskTask(true);
         disablingTask = new SetDepthMaskTask(false);
@@ -61,7 +74,7 @@ public final class DisableDepthMask implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof DisableDepthMask) && this.enabled == ((DisableDepthMask) obj).isEnabled();
+        return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).isEnabled();
     }
 
     @Override

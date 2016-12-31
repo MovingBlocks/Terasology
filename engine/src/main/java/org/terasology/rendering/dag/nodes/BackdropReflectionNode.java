@@ -23,7 +23,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
+import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
@@ -81,7 +81,7 @@ public class BackdropReflectionNode extends AbstractNode {
         addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
-        addDesiredStateChange(new DisableDepthMask());
+        addDesiredStateChange(new DisableDepthWriting());
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
     }
 
