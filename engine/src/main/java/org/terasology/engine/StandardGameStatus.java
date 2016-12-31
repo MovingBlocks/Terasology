@@ -26,7 +26,7 @@ public enum StandardGameStatus implements EngineStatus {
 
     private final String defaultDescription;
 
-    private StandardGameStatus(String defaultDescription) {
+     StandardGameStatus(String defaultDescription) {
         this.defaultDescription = defaultDescription;
     }
 

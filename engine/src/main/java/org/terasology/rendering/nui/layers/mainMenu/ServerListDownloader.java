@@ -59,7 +59,7 @@ class ServerListDownloader {
 
     private final Thread dlThread;
 
-    public ServerListDownloader(String serverAddress) {
+     ServerListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
         dlThread = new Thread(this::download);
         dlThread.setName("ServerList Downloader");

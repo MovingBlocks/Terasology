@@ -92,7 +92,7 @@ public class RenderingExecTimeMeansMode extends MetricsMode {
         public String activityName;
         public double metricsValue;
 
-        public MetricsEntry(String activityName, double metricsValue) {
+         MetricsEntry(String activityName, double metricsValue) {
             this.activityName = activityName;
             this.metricsValue = metricsValue;
         }

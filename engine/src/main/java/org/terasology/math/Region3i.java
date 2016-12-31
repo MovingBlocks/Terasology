@@ -296,7 +296,7 @@ public final class Region3i implements Iterable<Vector3i> {
     private class Region3iIterator implements Iterator<Vector3i> {
         Vector3i pos;
 
-        public Region3iIterator() {
+         Region3iIterator() {
             this.pos = new Vector3i();
         }
 
@@ -331,7 +331,7 @@ public final class Region3i implements Iterable<Vector3i> {
         private Vector3i next;
         private Region3i other;
 
-        public SubtractiveIterator(Region3i other) {
+         SubtractiveIterator(Region3i other) {
             this.other = other;
             innerIterator = iterator();
             updateNext();

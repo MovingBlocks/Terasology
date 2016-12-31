@@ -29,7 +29,7 @@ public enum TerasologyEngineStatus implements EngineStatus {
 
     private final String defaultDescription;
 
-    private TerasologyEngineStatus(String defaultDescription) {
+     TerasologyEngineStatus(String defaultDescription) {
         this.defaultDescription = defaultDescription;
     }
 

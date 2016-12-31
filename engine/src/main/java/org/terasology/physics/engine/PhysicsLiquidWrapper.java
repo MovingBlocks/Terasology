@@ -51,7 +51,7 @@ public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
         private Vector3i position;
         private Vector3f offset;
 
-        public LiquidVoxelInfo(Block block, Vector3i position) {
+         LiquidVoxelInfo(Block block, Vector3i position) {
             this.shape = block.getCollisionShape();
             this.offset = block.getCollisionOffset();
             this.colliding = block.isLiquid();

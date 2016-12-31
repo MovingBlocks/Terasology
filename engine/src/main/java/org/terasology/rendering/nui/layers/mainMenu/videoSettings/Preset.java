@@ -109,7 +109,7 @@ public enum Preset {
 
     private String displayName;
 
-    private Preset(String displayName) {
+     Preset(String displayName) {
         this.displayName = displayName;
     }
 
