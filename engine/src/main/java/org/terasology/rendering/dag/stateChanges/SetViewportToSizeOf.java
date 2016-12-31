@@ -75,7 +75,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
     @Override
