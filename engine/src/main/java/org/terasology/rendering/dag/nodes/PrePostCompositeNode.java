@@ -22,57 +22,62 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: Add diagram of this node
+ * An instance of this class takes advantage of the content of a number of previously filled buffers
+ * to add screen-space ambient occlusion (SSAO), outlines, reflections [1], atmospheric haze and volumetric fog [2]
+ *
+ * As this node does not quite use 3D geometry and only relies on 2D sources and a 2D output buffer, it
+ * could be argued that, despite its name, it represents the first step of the PostProcessing portion
+ * of the rendering engine. This line of thinking draws a parallel from the film industry where
+ * Post-Processing (or Post-Production) is everything that happens -after- the footage for the film
+ * has been shot on stage or on location.
+ *
+ * [1] And refractions? To be verified.
+ * [2] Currently not working: the code is there but it is never enabled.
  */
 public class PrePostCompositeNode extends AbstractNode {
-    public static final ResourceUrn REFLECTIVE_REFRACTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
+    private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:fbo.reflectiveRefractive");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    private FBO sceneReflectiveRefractive;
-
+    /**
+     * This method must be called once shortly after instantiation to fully initialize the node
+     * and make it ready for rendering.
+     */
     @Override
     public void initialise() {
-        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new EnableMaterial("engine:prog.combine"));
+        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
         addDesiredStateChange(new BindFBO(WRITE_ONLY_GBUFFER));
-        // TODO: verify if there should be bound textures after bind.
         addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
+
+        // TODO: bind input textures from ShaderParametersCombine class
     }
 
     /**
-     * Adds outlines and ambient occlusion to the rendering obtained so far stored in the primary FBO.
-     * Stores the resulting output back into the primary buffer.
+     * Called every frame, the shader program used by this method only composites per-pixel information from a number
+     * of buffers and renders it into a full-screen quad, which is the only piece of geometry processed.
      */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: verify this is necessary
 
         renderFullscreenQuad();
+
+        // TODO: review - the following line is necessary, but at this stage it's unclear why.
         displayResolutionDependentFBOs.swapReadWriteBuffers();
 
-        sceneReflectiveRefractive = displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE);
-        READ_ONLY_GBUFFER.attachDepthBufferTo(sceneReflectiveRefractive);
-        // TODO: verify why we can't move the buffer attachment to before the swap by using WRITE_ONLY_GBUFFER instead.
-        // TODO: See right-side streaks in https://cloud.githubusercontent.com/assets/136392/17794231/456f542a-65b6-11e6-83bb-f2cc3f10ee66.png
+        // The following line doesn't seem to have an effect: for the time being I keep it here for safety.
+        // READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE_FBO));
+
         PerformanceMonitor.endActivity();
     }
 }

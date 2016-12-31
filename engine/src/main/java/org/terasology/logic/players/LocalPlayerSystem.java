@@ -234,14 +234,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent
     public void onAutoMove(PeriodicActionTriggeredEvent event, EntityRef entity) {
-        if (event.getActionId().equals(AUTO_MOVE_ID) && isAutoMove) {
-            ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
-            Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
-            clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
-        } else if (!isAutoMove) {
-
-            // If isAutoMove turns false, cancel the action.
-            delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+        if (event.getActionId().equals(AUTO_MOVE_ID)) {
+            if (isAutoMove) {
+                ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+                Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
+                clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
+            } else {
+                // If isAutoMove turns false, cancel the action.
+                delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
+            }
         }
     }
 

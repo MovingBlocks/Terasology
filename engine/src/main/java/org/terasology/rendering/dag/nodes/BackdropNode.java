@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 import org.terasology.rendering.dag.WireframeTrigger;
-import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
+import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
@@ -74,7 +74,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
         // set by the latest glClear statement.
-        addDesiredStateChange(new DisableDepthMask());
+        addDesiredStateChange(new DisableDepthWriting());
 
         // Note: culling GL_FRONT polygons is necessary as we are inside the sphere and
         //       due to vertex ordering the polygons we do see are the GL_BACK ones.

@@ -136,7 +136,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
     private int fetchTextureId() {

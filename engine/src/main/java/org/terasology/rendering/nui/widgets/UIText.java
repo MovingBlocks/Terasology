@@ -635,8 +635,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Check if the text in the text box needs multiple lines to be displayed.
-     *
      * @return Whether the text in the text box is multiline
      */
     public boolean isMultiline() {
@@ -644,8 +642,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Set whether the text in the text box should be displayed on multiple lines.
-     *
      * @param multiline Whether the text in the text box should be multiline
      */
     public void setMultiline(boolean multiline) {
@@ -653,8 +649,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Check whether the text box is read-only.
-     *
      * @return Whether the text box is read-only
      */
     public boolean isReadOnly() {
@@ -662,8 +656,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Set whether the text box is read-only.
-     *
      * @param readOnly Whether the text box should be read-only
      */
     public void setReadOnly(boolean readOnly) {
@@ -792,8 +784,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Get the current cursor position.
-     *
      * @return The current cursor position
      */
     public int getCursorPosition() {
@@ -801,8 +791,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Set the cursor position. Moves the start of the selected text with the cursor.
-     *
      * @param position The new cursor position
      */
     public void setCursorPosition(int position) {
@@ -810,8 +798,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Set the cursor position.
-     *
      * @param position           The new cursor position
      * @param moveSelectionStart Whether the start of the selected text should be moved with the cursor
      * @param callEvent          Whether this action should be reported as an event
@@ -834,8 +820,6 @@ public class UIText extends CoreWidget {
     }
 
     /**
-     * Set the cursor position/
-     *
      * @param position           The new cursor position
      * @param moveSelectionStart Whether the start of the selected text should be moved with the cursor
      */

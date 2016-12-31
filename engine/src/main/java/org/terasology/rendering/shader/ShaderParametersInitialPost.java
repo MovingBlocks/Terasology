@@ -40,7 +40,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * Shader parameters for the Post-processing shader program.
  *
  */
-public class ShaderParametersPrePost extends ShaderParametersBase {
+public class ShaderParametersInitialPost extends ShaderParametersBase {
 
     @Range(min = 0.0f, max = 0.1f)
     float aberrationOffsetX;
@@ -82,7 +82,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         // TODO: monitor config parameter by subscribing to it
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
+            displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_FBO);
             program.setInt("texLightShafts", texId++, true);
         }
 

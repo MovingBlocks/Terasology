@@ -71,7 +71,7 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
     private static Material getMaterial(String assetId) {

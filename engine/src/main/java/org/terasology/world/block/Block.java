@@ -327,6 +327,9 @@ public final class Block {
         return targetable;
     }
 
+    /**
+     * @param targetable True if this block can be targetted for interactions
+     */
     public void setTargetable(boolean targetable) {
         this.targetable = targetable;
     }
@@ -346,6 +349,9 @@ public final class Block {
         return waving;
     }
 
+    /**
+     * @param waving True to waves in the wind
+     */
     public void setWaving(boolean waving) {
         this.waving = waving;
     }
@@ -357,6 +363,9 @@ public final class Block {
         return replacementAllowed;
     }
 
+    /**
+     * @param replacementAllowed True to allow replace freely by other blocks
+     */
     public void setReplacementAllowed(boolean replacementAllowed) {
         this.replacementAllowed = replacementAllowed;
     }
@@ -368,10 +377,18 @@ public final class Block {
         return attachmentAllowed;
     }
 
+    /**
+     * @param attachmentAllowed True to allow attach another block on this block
+     */
     public void setAttachmentAllowed(boolean attachmentAllowed) {
         this.attachmentAllowed = attachmentAllowed;
     }
 
+    /**
+     * Check can a block attach in the side of this block
+     * @param side The side of attaching
+     * @return False if this block is not allowed attachment or the side of this block is not full side
+     */
     public boolean canAttachTo(Side side) {
         return attachmentAllowed && fullSide.get(side);
     }
@@ -383,6 +400,9 @@ public final class Block {
         return supportRequired;
     }
 
+    /**
+     * @param supportRequired True to set the block should destroyed when no longer attached
+     */
     public void setSupportRequired(boolean supportRequired) {
         this.supportRequired = supportRequired;
     }
@@ -448,6 +468,10 @@ public final class Block {
         return hardness;
     }
 
+    /**
+     * Indestructible if hardness is 0
+     * @param hardness how much damage it takes to destroy the block, indestructible if hardness is 0
+     */
     public void setHardness(int hardness) {
         this.hardness = hardness;
     }
@@ -463,6 +487,9 @@ public final class Block {
         return luminance;
     }
 
+    /**
+     * @param luminance the light level produced by this block
+     */
     public void setLuminance(byte luminance) {
         this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
@@ -588,6 +615,11 @@ public final class Block {
         return color;
     }
 
+    /**
+     * Set the collision box for the block
+     * @param offset The offset to the block's center
+     * @param shape The shape of collision box
+     */
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;

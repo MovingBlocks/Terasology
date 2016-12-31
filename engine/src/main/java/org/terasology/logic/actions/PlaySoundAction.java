@@ -31,6 +31,8 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 /**
+ * This systems handles the playing of sounds in response to events, on both server and client,
+ * allowing the prediction system a chance to play expected sounds on time even if the server is lagging
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {
@@ -43,6 +45,11 @@ public class PlaySoundAction extends BaseComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    /**
+     * This method plays sound in prediction for preventing not playing song because of server lags
+     * @param event contains the details for the predicted event, used here for location purposes
+     * @param entity is source of the playsound
+     */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivationPredicted(ActivationPredicted event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
@@ -64,6 +71,11 @@ public class PlaySoundAction extends BaseComponentSystem {
         }
     }
 
+    /**
+     * This method plays sound if it wasn't played by prediction system
+     * @param event contains the details for the active event, used here for location purposes
+     * @param entity is source of the playsound
+     */
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         if (event.getInstigator().equals(localPlayer.getCharacterEntity())) {
