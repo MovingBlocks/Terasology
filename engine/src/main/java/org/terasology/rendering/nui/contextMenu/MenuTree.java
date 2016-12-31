@@ -29,13 +29,14 @@ public final class MenuTree implements AbstractContextMenuItem {
      */
     protected List<AbstractContextMenuItem> options = Lists.newArrayList();
 
-    public MenuTree(String name) {
-        this.name = name;
-    }
     /**
      * The name of the menu.
      */
     private String name;
+
+    public MenuTree(String name) {
+        this.name = name;
+    }
 
     List<AbstractContextMenuItem> getOptions() {
         return this.options;
