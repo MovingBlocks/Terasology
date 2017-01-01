@@ -185,7 +185,6 @@ public final class RenderTaskListGenerator {
         return taskList;
     }
 
-    // TODO: Rename method and remove comments
     private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
 
         for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {

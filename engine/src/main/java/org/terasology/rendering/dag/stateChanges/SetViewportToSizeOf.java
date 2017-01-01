@@ -19,14 +19,11 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
-
 import java.util.Objects;
-
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.SetViewportToSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
-
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
@@ -69,7 +66,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public int hashCode() {
-        return Objects.hash(getWidth(), getHeight());
+        return Objects.hash(getFbo().width(), getFbo().height());
     }
 
     @Override
@@ -79,7 +76,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
         SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
 
-        return getWidth() == other.getWidth() && getHeight() == other.getHeight();
+        return getFbo().width() == other.getFbo().width() && getFbo().height() == other.getFbo().height();
     }
 
     @Override
@@ -89,20 +86,12 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public void update() {
-        task.setDimensions(getWidth(), getHeight());
+        task.setDimensions(getFbo().width(), getFbo().height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
-    }
-
-    public int getWidth() {
-        return getFbo().width();
-    }
-
-    public int getHeight() {
-        return getFbo().height();
     }
 
     private FBO getFbo() {
