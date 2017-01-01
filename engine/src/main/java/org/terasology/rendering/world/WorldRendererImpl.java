@@ -20,6 +20,7 @@ import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
@@ -328,6 +329,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
+
+        Node highPassNode = nodeFactory.createInstance(HighPassNode.class);
+        renderGraph.addNode(highPassNode, "highPassNode");
 
         Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class); // TODO: next PR
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");

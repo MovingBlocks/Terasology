@@ -22,6 +22,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
@@ -118,7 +119,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case HIGH_PASS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(BloomPassesNode.HIGH_PASS);
+                displayResolutionDependentFBOs.bindFboColorTexture(HighPassNode.HIGH_PASS_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SKY_BAND:
