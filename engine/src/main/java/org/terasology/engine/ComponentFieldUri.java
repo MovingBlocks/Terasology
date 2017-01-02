@@ -29,16 +29,26 @@ import java.util.Objects;
 @API
 public final class ComponentFieldUri implements Uri {
 
-    public static final String FIELD_SEPARATOR = ".";
-    private final SimpleUri componentUri;
-    private final String fieldName;
-
-
+    public static final String FIELD_SEPARATOR = ".";  //The character used to separate the URI into different pieces of information
+    private final SimpleUri componentUri;  //A SimpleUri object used to identify the field of a component
+    private final String fieldName; //The name of the field which the componentUri will be describing
+    
+    /**
+     * The Constructor for the ComponentFieldUri Object
+     * 
+     * @param componentUri  A SimpleUri object used to identify the field of a component
+     * @param fieldName     The name of the field which the componentUri is describing      
+     */
     public ComponentFieldUri(SimpleUri componentUri, String fieldName) {
         this.componentUri = componentUri;
         this.fieldName = fieldName;
     }
-
+    
+    /**
+     * The Constructor for the ComponentFieldUri
+     * 
+     * @param textVersion  The String version of the Uri
+     */
     public ComponentFieldUri(String textVersion) {
         int seperatorIndex = textVersion.indexOf(FIELD_SEPARATOR, 2);
 
@@ -51,29 +61,60 @@ public final class ComponentFieldUri implements Uri {
             componentUri = new SimpleUri();
         }
     }
-
+    
+    /**
+     * Returns a Name object which is the object name of the componentUri
+     * 
+     * @return a Name object which contains the object name of the componentUri
+     */
     public Name getObjectName() {
         return componentUri.getObjectName();
     }
-
+    
+    /**
+     * Returns a boolean with the value 'True' if the ComponentFieldUri is valid
+     * 
+     * @return a Boolean  with the value 'True' if the ComponentFieldUri is valid
+     */
     @Override
     public boolean isValid() {
         return componentUri.isValid() && fieldName != null;
     }
-
+    
+    /**
+     * Returns a Name object which is the module name of the componentUri
+     * 
+     * @return a Name object which contains the module name of the componentUri
+     */
     @Override
     public Name getModuleName() {
         return componentUri.getModuleName();
     }
-
+    
+    /**
+     * Returns the componentUri of the ComponentFieldUri object
+     * 
+     * @return a SimpleUri which is the componentUri of the ComponentFieldUri object
+     */
     public SimpleUri getComponentUri() {
         return componentUri;
     }
-
+    
+    /**
+     * Returns the fieldName of the ComponentFieldUri object
+     * 
+     * @return a String which contains the fieldName of the ComponentFieldUri object
+     */
     public String getFieldName() {
         return fieldName;
     }
-
+    
+    /**
+     * Returns a boolean with the value of True if the other object is equal to itself
+     * 
+     * @param o   The object which is being compared to itself
+     * @return    a Boolean with the value of True if the other object is equal to itself
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,14 +131,24 @@ public final class ComponentFieldUri implements Uri {
         }
         return Objects.equals(fieldName, that.fieldName);
     }
-
+    
+    /**
+     * Calculates and returns an int which is the hash value of the ComponentFieldUri object
+     * 
+     * @return an int which is equal to the hash value of the ComponentFieldUri object
+     */
     @Override
     public int hashCode() {
         int result = componentUri.hashCode();
         result = 31 * result + (fieldName != null ? fieldName.hashCode() : 0);
         return result;
     }
-
+    
+    /**
+     * Returns a String representation of the ComponentFieldUri object.
+     * 
+     * @return a String representation of the ComponentFieldUri object. Will return an empty String if ComponentFieldUri is invalid
+     */
     @Override
     public String toString() {
         if (!isValid()) {

@@ -20,26 +20,49 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
+ * The Event for Destruction
  */
 public class DoDestroyEvent implements Event {
     private EntityRef instigator;
     private EntityRef directCause;
     private Prefab damageType;
-
+    
+    /**
+     * Constructor of the DoDestroyEvent object
+     * 
+     * @param instigator     The object which is the instigator of the DoDestroyEvent
+     * @param directCause    The object which is the direct cause of the DoDestroyEvent
+     * @param damageType    The damage type of the DoDestroyEvent
+    */
     public DoDestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
         this.directCause = directCause;
         this.damageType = damageType;
     }
-
+    
+    /**
+     * Returns the instigator data of the DoDestroyEvent object
+     * 
+     * @return an EntityRef object which is the instigator of the destruction
+    */
     public EntityRef getInstigator() {
         return instigator;
     }
-
+    
+    /**
+     * Returns the instigator data of the DoDestroyEvent object
+     * 
+     * @return an EntityRef object which is the direct cause of the destruction
+     */
     public EntityRef getDirectCause() {
         return directCause;
     }
-
+    
+    /**
+     * Returns the prefab of the damage type used by the DoDestroyEvent object
+     * 
+     * @return a Prefab of the damage type used by the DoDestroyEvent object
+     */
     public Prefab getDamageType() {
         return damageType;
     }
