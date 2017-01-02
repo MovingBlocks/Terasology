@@ -92,8 +92,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
     }
     
     /**
-     * The method first checks for any issues with the value or position. If the position is invalid or the value
-     * is null, then it'll return an error. If the root (start of the tree) is null, then a new node will be
+     * Adds a new value to the SpaceTree. If the root (start of the tree) is null, then a new node will be
      * created. Otherwise, it'll call upon the addToNode() method to add the new value to the root node. 
      *
      * @param position   The position of the new node 
@@ -102,12 +101,12 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
      */
     @Override
     public T add(float[] position, T value) {
-        validatePosition(position);
-        if (value == null) {
+        validatePosition(position);    //Checks if the position is valid
+        if (value == null) {           //If the value is null, then throws an error
             throw new IllegalArgumentException("Value cannot be null");
         }
 
-        if (rootNode == null) {
+        if (rootNode == null) {     //If root is null, create a new node and make it root
             float[] min = new float[dimensions];
             float[] max = new float[dimensions];
             for (int i = 0; i < dimensions; i++) {
@@ -116,29 +115,24 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             }
             rootNode = createNewNode(position, min, max, value);
             return null;
-        } else {
+        } else {  //If root is not null, add a node to the root
             return addToNode(position, rootNode, value);
         }
     }
     
     /**
-     * The method will first verify that the position is a valid one. If not, an error will be raised.
-     * If the root node is null, then the return value is null, since there's nothing to remove. Otherwise,
-     * the method will attempt to remove the node with the position given as a parameter. If it cannot find
-     * the node with the position specified, it'll return null. If the removed node is not a leaf, then it'll 
-     * also piece back together the tree so that the removed node's children are not removed. If a leaf, then 
-     * the node will just be removed.
+     * Removes a node and then returns the value of the removed node
      *
      * @param position   The position of the node to be removed
      * @return a T object which is the value of the node removed (null if root node was null)
      */
     @Override
     public T remove(float[] position) {
-        validatePosition(position);
-
-        if (rootNode == null) {
+        validatePosition(position);   // Checks if position is valid
+ 
+        if (rootNode == null) {    // Returns null if root is null
             return null;
-        } else {
+        } else {   // If the node to be removed is not a leaf, then reattach the tree so the removed node's children remain in the tree
             if (rootNode.center != null) {
                 // This is not a leaf
                 int subNodeIndex = getSubNodeIndex(position, rootNode.center);
@@ -154,7 +148,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                 } else {
                     return removeFromSubNodeOfNode(position, rootNode, subNodeIndex);
                 }
-            } else {
+            } else {     // If the node to be removed is a leaf, just remove it
                 // This is a leaf so need to check bucket
                 for (NodeEntry<T> nodeEntry : rootNode.nodeBucket) {
                     if (distanceFunction.getDistance(nodeEntry.position, position) == 0) {
@@ -173,10 +167,8 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
     }
     
     /**
-     * Throws are exception if either the count or within parameter is less than 1 or less than 0
-     * respectively or if the position is invalid. Otherwise, it'll return a collection of entry
-     * objects that was created as a result of the search. The search is finding count number of 
-     * nodes which are within a distance of 'within' from the node specified by the position
+     * Returns a collection of entry objects that was created as a result of the search. The search is finding 'count' number of 
+     * nodes which are within 'within' distance away from the node specified by the position
      *
      * @param position    The position of the node to be searched around
      * @param count       The number of nodes to be found during the search
@@ -186,17 +178,17 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
      */
     @Override
     public Collection<Entry<T>> findNearest(float[] position, int count, float within) {
-        validatePosition(position);
-        if (count < 1) {
+        validatePosition(position);  // Checks if position is valid
+        if (count < 1) {   // The count must be greater than or equal to 1
             throw new IllegalArgumentException("Count cannot be smaller than 1");
-        }
-        if (within < 0) {
+        }  
+        if (within < 0) {  // The within distance must be greater than 1
             throw new IllegalArgumentException("Within cannot be smaller than 0");
         }
 
-        if (rootNode == null) {
+        if (rootNode == null) {  // If the tree is empty, then return null
             return Collections.emptyList();
-        } else {
+        } else {  // Do the search
             TreeSearch<T> treeSearch = new TreeSearch<>(within, count);
             executeSearchInNode(position, rootNode, treeSearch);
             return Collections.unmodifiableCollection(treeSearch.results.values());
@@ -437,15 +429,14 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
         }
         
         /**
-         * Adds an object to the results of the search. If the max capacity is reached, then
-         * the max distance is changed so that it is equal to the distance of the last entry added
+         * Adds an object to the results of the search as long as maxCapacity nor maxDistance is not exceeded
          *
          * @param entry     The object to add to the results of the search
          */
         public void addEntry(Entry<T> entry) {
-            results.put(entry.distance, entry);
-            int size = results.size();
-            if (size > maxCapacity) {
+            results.put(entry.distance, entry);   //Adds the new entry
+            int size = results.size();   //Gets the size (number of entries)
+            if (size > maxCapacity) {   //Removes some entries if maxCapacity is exceeded
                 Float maxDistanceInResults = results.keySet().last();
                 NavigableSet<Entry<T>> entriesAtThisDistance = results.get(maxDistanceInResults);
                 entriesAtThisDistance.pollLast();
@@ -453,7 +444,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
                     results.removeAll(maxDistanceInResults);
                 }
                 maxDistance = results.keySet().last();
-            } else if (size == maxCapacity) {
+            } else if (size == maxCapacity) {   //If the size is at maxCapacity, then set maxDistance to the distance of the last entry
                 maxDistance = results.keySet().last();
             }
         }
@@ -503,9 +494,7 @@ public class SpaceTree<T> extends AbstractDimensionalMap<T> {
             this.maxValues = maxValues;
         }
         /**
-         * Splits the node into two nodes to help maintain order within the tree (the split
-         * does not make two of the same nodes, it creates two nodes that can 'add up' to
-         * the original one)
+         * Splits the node into two nodes to help maintain order within the tree 
          */
         public void splitNode() {
             Iterator<NodeEntry<T>> iterator = nodeBucket.iterator();
