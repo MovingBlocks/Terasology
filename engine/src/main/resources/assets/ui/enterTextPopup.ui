@@ -18,7 +18,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Enter name",
+                            "text": ${engine:menu#enter-name},
                             "family": "title"
                         },
                         {
@@ -36,12 +36,12 @@
                         },
                         {
                             "type": "UIButton",
-                            "text": "Ok",
+                            "text": ${engine:menu#ok},
                             "id": "ok"
                         },
                         {
                             "type": "UIButton",
-                            "text": "Cancel",
+                            "text": ${engine:menu#cancel},
                             "id": "cancel"
                         }
                     ]

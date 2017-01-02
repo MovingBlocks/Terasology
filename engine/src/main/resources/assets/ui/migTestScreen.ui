@@ -19,7 +19,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "disabled",
+                "text": ${engine:menu#disabled},
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -27,7 +27,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "min",
+                "text": ${engine:menu#min},
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -35,7 +35,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "pref",
+                "text": ${engine:menu#pref},
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -43,7 +43,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "grow",
+                "text": ${engine:menu#grow},
                 "layoutInfo": {
                     "cc": "grow"
                 }
@@ -51,7 +51,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UILabel",
+                "text": "${engine:menu#uilabel},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -59,7 +59,7 @@
             {
                 "type": "UILabel",
                 "id": "label1",
-                "text": "label1",
+                "text": ${engine:menu#label1},
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -68,7 +68,7 @@
             {
                 "type": "UILabel",
                 "id": "label2",
-                "text": "label2",
+                "text": ${engine:menu#label2},
                 "layoutInfo": {
                     "cc": "w min, h min"
                 }
@@ -76,7 +76,7 @@
             {
                 "type": "UILabel",
                 "id": "label3",
-                "text": "label3",
+                "text": ${engine:menu#label3},
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -84,7 +84,7 @@
             {
                 "type": "UILabel",
                 "id": "label4",
-                "text": "label4",
+                "text": ${engine:menu#label4},
                 "layoutInfo": {
                     "cc": "grow"
                 }
@@ -92,7 +92,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIButton",
+                "text": ${engine:menu#uibutton},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -100,7 +100,7 @@
             {
                 "type": "UIButton",
                 "id": "button1",
-                "text": "button1",
+                "text": ${engine:menu#button1},
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -109,7 +109,7 @@
             {
                 "type": "UIButton",
                 "id": "button2",
-                "text": "button2",
+                "text": ${engine:menu#button2},
                 "layoutInfo": {
                     "cc": "w min, h min"
                 }
@@ -117,7 +117,7 @@
             {
                 "type": "UIButton",
                 "id": "button3",
-                "text": "button3",
+                "text": ${engine:menu#button3},
                 "layoutInfo": {
                     "cc": ""
                 }
@@ -125,7 +125,7 @@
             {
                 "type": "UIButton",
                 "id": "button4",
-                "text": "button4",
+                "text": ${engine:menu#button4},
                 "layoutInfo": {
                     "cc": "grow"
                 }
@@ -133,14 +133,14 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UISlider",
+                "text": ${engine:menu#uislider},
                 "layoutInfo": {
                     "cc": "newline"
                 }
             },
             {
                 "type": "UISlider",
-                "id": "slider1",
+                "id": ${engine:menu#slider1},
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -148,21 +148,21 @@
             },
             {
                 "type": "UISlider",
-                "id": "slider2",
+                "id": ${engine:menu#slider2},
                 "layoutInfo": {
                     "cc": "w min, h min"
                 }
             },
             {
                 "type": "UISlider",
-                "id": "slider3",
+                "id": ${engine:menu#slider3},
                 "layoutInfo": {
                     "cc": ""
                 }
             },
             {
                 "type": "UISlider",
-                "id": "slider4",
+                "id": ${engine:menu#slider4},
                 "layoutInfo": {
                     "cc": "grow"
                 }
@@ -170,7 +170,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIDoubleSlider",
+                "text": ${engine:menu#uidoubleslider},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -207,7 +207,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIText",
+                "text": ${engine:menu#uitext},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -215,7 +215,7 @@
             {
                 "type": "UIText",
                 "id": "text1",
-                "text": "text1",
+                "text": ${engine:menu#text1},
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -246,7 +246,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "ResettableUIText",
+                "text": ${engine:menu#resettableuitext},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -254,7 +254,7 @@
             {
                 "type": "ResettableUIText",
                 "id": "rtext1",
-                "text": "text1",
+                "text": ${engine:menu#text1},
                 "layoutInfo": {
                     "cc": ""
                 },
@@ -285,7 +285,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIDropdown",
+                "text": ${engine:menu#uidropdown},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -322,7 +322,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIDropdownScrollable",
+                "text": ${engine:menu#uidropdownscrollable},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -359,7 +359,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UICheckbox",
+                "text":  ${engine:menu#uicheckbox},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -396,7 +396,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIList",
+                "text": ${engine:menu#uilist},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -433,7 +433,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UIBox",
+                "text":  ${engine:menu#uibox},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -469,7 +469,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Example"
+                            "text": ${engine:menu#example}
                         },
                         {
                             "type": "UISlider"
@@ -509,7 +509,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Example"
+                            "text":  ${engine:menu#example}
                         },
                         {
                             "type": "UISlider"
@@ -548,7 +548,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Example"
+                            "text": ${engine:menu#example}
                         },
                         {
                             "type": "UISlider"
@@ -587,7 +587,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Example"
+                            "text": ${engine:menu#example}
                         },
                         {
                             "type": "UISlider"
@@ -598,7 +598,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "ScrollableArea",
+                "text": ${engine:menu#scrollablearea},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -617,7 +617,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "id": "message",
+                            "id": ${engine:menu#message},
                             "text": "Lorem ipsum, Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum",
                             "layoutInfo": {
                                 "position-left": {},
@@ -653,7 +653,7 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UISpace",
+                "text": ${engine:menu#uispace},
                 "layoutInfo": {
                     "cc": "newline"
                 }
@@ -675,7 +675,7 @@
             },
             {
                 "type": "UISpace",
-                "id": "space3",
+                "id": "space3",man
                 "layoutInfo": {
                     "cc": ""
                 }
