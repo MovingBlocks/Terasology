@@ -89,6 +89,11 @@ public class PlayerConfig {
         return "Player" + new FastRandom().nextInt(10000, 99999);
     }
     
+    /**
+     * Randomly generates a default color for the player via a random int generator using FastRandom object
+     *
+     * @return a Color object with the player's default color
+     */
     private Color defaultPlayerColor() {
         Random rng = new FastRandom();
         List<Color> colors = CieCamColors.L65C65;
