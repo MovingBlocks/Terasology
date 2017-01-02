@@ -3,13 +3,16 @@ new File(rootDir, 'modules').eachDir { possibleSubprojectDir ->
     def subprojectName = 'modules:' + possibleSubprojectDir.name
     //println "Gradle is reviewing module $subprojectName for inclusion as a sub-project"
     File buildFile = new File(possibleSubprojectDir, "build.gradle")
-    if (buildFile.exists()) {
-        println "Module $subprojectName has a build file so counting it complete and including it"
-        include subprojectName
-        def subprojectPath = ':' + subprojectName
-        def subproject = project(subprojectPath)
-        subproject.projectDir = possibleSubprojectDir
+    if (!buildFile.exists()) {
+        println "Module $subprojectName has no build file, adding build.gradle file from core and including it"
+        File replacementGradle = new File(rootDir, 'modules/Core/build.gradle')
+        File targetFile = new File(possibleSubprojectDir, "build.gradle")
+        targetFile << replacementGradle.text
     } else {
-        println "***** WARNING: Found a module without a build.gradle, corrupt dir? NOT including $subprojectName *****"
+        println "Module $subprojectName has a build file so counting it complete and including it"
     }
+    include subprojectName
+    def subprojectPath = ':' + subprojectName
+    def subproject = project(subprojectPath)
+    subproject.projectDir = possibleSubprojectDir
 }
