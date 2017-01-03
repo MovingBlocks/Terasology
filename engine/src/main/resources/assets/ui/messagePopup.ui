@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Title",
+                            "text": ${engine:menu#title},
                             "id": "title",
                             "family": "title"
                         },
@@ -29,7 +29,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Message",
+                            "text": ${engine:menu#message},
                             "id": "message"
                         },
                         {

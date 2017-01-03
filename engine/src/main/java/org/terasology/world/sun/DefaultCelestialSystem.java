@@ -63,7 +63,11 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
         float sunPosAngle = model.getSunPosAngle(days);
         return sunPosAngle;
     }
-
+   /**
+     * Updates the game perception of the time of day via launching a new OnMiddayEvent(), 
+     * OnDuskEvent(), OnMidnightEvent(), or OnDawnEvent() based on the time of day when 
+     * this method is called upon.
+     */
     protected void fireEvents() {
         long startTime = worldTime.getMilliseconds();
         long delta = startTime - lastUpdate;
