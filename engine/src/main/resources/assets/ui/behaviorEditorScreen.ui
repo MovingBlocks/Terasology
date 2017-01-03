@@ -62,12 +62,12 @@
                     {
                         "type": "UIButton",
                         "id": "layout",
-                        "text": "layout"
+                        "text": "${engine:menu#nui-editor-layout}"
                     },
                     {
                         "type": "UIButton",
                         "id": "new",
-                        "text": "new"
+                        "text": "${engine:menu#nui-editor-new}"
                     },
                     {
                         "type": "UIButton",
@@ -77,7 +77,7 @@
                     {
                         "type": "UIButton",
                         "id": "assign",
-                        "text": "assign"
+                        "text": "${engine:menu#nui-editor-assign}"
                     }
                 ]
             },
