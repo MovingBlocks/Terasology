@@ -18,7 +18,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Enter name",
+                            "text":  "${engine:menu#player-name}" + ": ",
                             "family": "title"
                         },
                         {
@@ -36,12 +36,12 @@
                         },
                         {
                             "type": "UIButton",
-                            "text": "Ok",
+                            "text":  "${engine:menu#dialog-ok}",
                             "id": "ok"
                         },
                         {
                             "type": "UIButton",
-                            "text": "Cancel",
+                            "text":  "${engine:menu#dialog-cancel}",
                             "id": "cancel"
                         }
                     ]
