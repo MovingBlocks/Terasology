@@ -29,7 +29,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": " "${engine:menu#please-wait}"",
+                            "text": "${engine:menu#please-wait}",
                             "id": "message"
                         },
                         {

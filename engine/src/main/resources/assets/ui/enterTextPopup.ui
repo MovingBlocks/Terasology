@@ -18,7 +18,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text":  "${engine:menu#player-name}" + ": ",
+                            "text":  "${engine:menu#player-name}:",
                             "family": "title"
                         },
                         {
