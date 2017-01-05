@@ -46,7 +46,7 @@ import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.BackdropNode;
-import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
@@ -93,6 +93,8 @@ import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 
@@ -128,7 +130,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
-    private ScreenGrabber screenGrabber;
 
     private RenderTaskListGenerator renderTaskListGenerator;
     private boolean requestedTaskListRefresh;
@@ -137,7 +138,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-    private ImmutableFBOs immutableFBOs;
     private OpenVRProvider vrProvider;
 
     /**
@@ -188,28 +188,21 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        screenGrabber = new ScreenGrabber(context);
-        context.put(ScreenGrabber.class, screenGrabber);
+        context.put(ScreenGrabber.class, new ScreenGrabber(context));
 
         displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
-        immutableFBOs = new ImmutableFBOs();
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
-        context.put(ImmutableFBOs.class, immutableFBOs);
+        context.put(ImmutableFBOs.class, new ImmutableFBOs());
         context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
-        initMaterials();
 
         context.put(WorldRenderer.class, this);
         context.put(RenderQueuesHelper.class, renderQueues);
         context.put(RenderableWorld.class, renderableWorld);
         initRenderGraph();
-    }
-
-    private void initMaterials() {
-        //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
     private void initRenderGraph() {
@@ -239,8 +232,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-
-        // TODO: write snippets and shaders to inspect content of a color/depth buffer - debug mode
 
         // sky rendering
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
@@ -330,12 +321,30 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
 
+        // Bloom Effect: one high-pass filter and three blur passes
         Node highPassNode = nodeFactory.createInstance(HighPassNode.class);
         renderGraph.addNode(highPassNode, "highPassNode");
 
-        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class); // TODO: next PR
-        renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
+        FBOConfig halfScaleBloomConfig = new FBOConfig(BloomBlurNode.HALF_SCALE_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+        FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO, QUARTER_SCALE, FBO.Type.DEFAULT);
+        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO, ONE_8TH_SCALE, FBO.Type.DEFAULT);
 
+        aLabel = "halfScaleBlurredBloom";
+        BloomBlurNode halfScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        halfScaleBlurredBloom.initialise(HighPassNode.HIGH_PASS_FBO_CONFIG, halfScaleBloomConfig, aLabel);
+        renderGraph.addNode(halfScaleBlurredBloom, aLabel);
+
+        aLabel = "quarterScaleBlurredBloom";
+        BloomBlurNode quarterScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        quarterScaleBlurredBloom.initialise(halfScaleBloomConfig, quarterScaleBloomConfig, aLabel);
+        renderGraph.addNode(quarterScaleBlurredBloom, aLabel);
+
+        aLabel = "one8thScaleBlurredBloom";
+        BloomBlurNode one8thScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        one8thScaleBlurredBloom.initialise(quarterScaleBloomConfig, one8thScaleBloomConfig, aLabel);
+        renderGraph.addNode(one8thScaleBlurredBloom, aLabel);
+
+        // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects - TODO: place next line closer to ToneMappingNode eventually.
         FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR);
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);

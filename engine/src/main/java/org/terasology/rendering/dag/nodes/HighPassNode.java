@@ -41,6 +41,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.*;
  */
 public class HighPassNode extends ConditionDependentNode {
     public static final ResourceUrn HIGH_PASS_FBO = new ResourceUrn("engine:fbo.highPass");
+    public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL = new ResourceUrn("engine:prog.highPass");
 
     @Range(min = 0.0f, max = 5.0f)
@@ -64,7 +65,7 @@ public class HighPassNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
 
-        requiresFBO(new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(HIGH_PASS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));
 
