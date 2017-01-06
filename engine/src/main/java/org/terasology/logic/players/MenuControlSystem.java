@@ -16,6 +16,7 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.health;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -25,6 +27,9 @@ public class DoDestroyEvent implements Event {
     private EntityRef instigator;
     private EntityRef directCause;
     private Prefab damageType;
+    private String instigatorString;
+    private String damageTypeString;
+    private static final Logger logger = LoggerFactory.getLogger(DoDestroyEvent.class);
 
     public DoDestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
@@ -36,11 +41,34 @@ public class DoDestroyEvent implements Event {
         return instigator;
     }
 
+    public String getInstigatorString() {
+        if (instigator == null)
+            return "";
+        if (instigator.getParentPrefab() != null) {
+            instigatorString = instigator.getParentPrefab().getName();
+            instigatorString = instigatorString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+            logger.info("instigator" + instigatorString);
+            instigatorString = instigatorString.replaceAll("([A-Z])", " $1");
+            logger.info("instigator" + instigatorString);
+            instigatorString = Character.toUpperCase(instigatorString.charAt(0)) + instigatorString.substring(1);
+            logger.info("instigator" + instigatorString);
+            return instigatorString;
+        }
+        else
+            return instigatorString;
+    }
+
     public EntityRef getDirectCause() {
         return directCause;
     }
 
     public Prefab getDamageType() {
         return damageType;
+    }
+
+    public String getDamageTypeString() {
+        damageTypeString = damageType.getName().toString().substring(7);
+        damageTypeString = damageTypeString.replaceAll("([a-z]*)Damage", "$1 damage");
+        return damageTypeString;
     }
 }

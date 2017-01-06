@@ -15,17 +15,23 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.slf4j.Logger;
 
 /**
  */
 public class DeathScreen extends CoreScreenLayer {
+
+    private static final Logger logger = LoggerFactory.getLogger(CharacterComponent.class);
 
     @Override
     protected boolean isEscapeToCloseAllowed() {
@@ -34,6 +40,17 @@ public class DeathScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
+        UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
+        if(character.damageType != "" && character.damageType != null) {
+            causeOfDeath.setText("You died due to " + character.damageType + ".\n");
+        }
+        if(character.instigator != "" && character.instigator != null) {
+            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
+        }
+        if(character.directCause != "" && character.directCause != null) {
+            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
+        }
         WidgetUtil.trySubscribe(this, "respawn", widget -> {
             CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
             getManager().closeScreen(DeathScreen.this);
