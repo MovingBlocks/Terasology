@@ -117,7 +117,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
         prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("down", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersToneMapping());
         prepareAndStoreShaderProgramInstance("sky", new ShaderParametersSky());
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
