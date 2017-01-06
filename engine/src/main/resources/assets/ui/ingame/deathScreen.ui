@@ -18,7 +18,7 @@
                     },
                     {
                         "type": "UILabel",
-                        "text": "${DeathScreen:causeOfDeath}",
+                        "text": "",
                         "id": "causeOfDeath"
                     },
                     {

@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 /**
  */
 public class DeathScreen extends CoreScreenLayer {
-    
+
     @Override
     protected boolean isEscapeToCloseAllowed() {
         return false;
@@ -60,7 +60,27 @@ public class DeathScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void update(float delta) {
+        super.update(delta);
+        updateDeathScreen();
+    }
+
+    @Override
     public boolean isLowerLayerVisible() {
         return false;
+    }
+
+    public void updateDeathScreen() {
+        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
+        UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
+        if(character.damageType != "" && character.damageType != null) {
+            causeOfDeath.setText("You died due to " + character.damageType + ".\n");
+        }
+        if(character.instigator != "" && character.instigator != null) {
+            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
+        }
+        if(character.directCause != "" && character.directCause != null) {
+            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
+        }
     }
 }
