@@ -61,8 +61,10 @@ public class DoDestroyEvent implements Event {
     }
 
     public String getDamageTypeString() {
-        damageTypeString = damageType.getName().toString().substring(7);
-        damageTypeString = damageTypeString.replaceAll("([a-z]*)Damage", "$1 damage");
+        damageTypeString = damageType.getName().toString();
+        damageTypeString = damageTypeString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+        damageTypeString = damageTypeString.replaceAll("([A-Z])", " $1");
+        damageTypeString = Character.toUpperCase(damageTypeString.charAt(0)) + damageTypeString.substring(1);
         return damageTypeString;
     }
 }
