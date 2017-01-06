@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.logic.characters.CharacterComponent;
@@ -25,14 +24,11 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.slf4j.Logger;
 
 /**
  */
 public class DeathScreen extends CoreScreenLayer {
-
-    private static final Logger logger = LoggerFactory.getLogger(CharacterComponent.class);
-
+    
     @Override
     protected boolean isEscapeToCloseAllowed() {
         return false;
