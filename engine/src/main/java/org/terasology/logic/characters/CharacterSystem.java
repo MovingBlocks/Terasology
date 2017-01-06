@@ -45,6 +45,7 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -76,6 +77,30 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DoDestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
+
+        EntityRef controller = character.controller;
+        String info = controller.toFullDescription();
+        ClientComponent clientComponent = controller.getComponent(ClientComponent.class);
+        EntityRef clientInfo = clientComponent.clientInfo;
+        ClientInfoComponent clientInfoComponent = clientInfo.getComponent(ClientInfoComponent.class);
+
+        character.instigator = event.getInstigatorString();
+        character.damageType = event.getDamageTypeString();
+
+        if (character.damageType != null && !character.damageType.equals("")) {
+            clientInfoComponent.deathReason = "You died due to " + character.damageType + ".\n";
+        } else {
+            clientInfoComponent.deathReason = "";
+        }
+
+        if (character.instigator != null && !character.instigator.equals("")) {
+            clientInfoComponent.deathReason = clientInfoComponent.deathReason + character.instigator + " killed you\n";
+        }
+
+        if (character.directCause != null && !character.directCause.equals("")) {
+            clientInfoComponent.deathReason = clientInfoComponent.deathReason + "You died because of " + character.directCause + "\n";
+        }
+
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
@@ -335,6 +360,4 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         float epsilon = 0.00001f;
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
     }
-
-
 }

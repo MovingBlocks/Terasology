@@ -70,6 +70,22 @@ public final class CharacterComponent implements Component {
      */
     public int predictedInteractionId;
 
+    /**
+     * instigator of death event
+     */
+    public String instigator;
+
+    /**
+     * direct cause of death event
+     */
+    public String directCause;
+
+    /**
+     * damage type recieved by player during death event
+     */
+    public String damageType;
+
+
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     @Owns
     public EntityRef movingItem = EntityRef.NULL;

@@ -40,4 +40,10 @@ public final class ClientInfoComponent implements Component {
      */
     @Replicate
     public EntityRef client = EntityRef.NULL;
+
+    /**
+     * Holds the reason for the most recent death of the client's character, if any.
+     * Put here since by the time the player is dead the character may be unavailable.
+     */
+    public String deathReason;
 }

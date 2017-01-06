@@ -19,8 +19,11 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
@@ -65,6 +68,9 @@ import org.terasology.utilities.random.Random;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthAuthoritySystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
+
     @In
     private EntityManager entityManager;
 
@@ -225,7 +231,9 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     @ReceiveEvent(components = {HealthComponent.class})
     public void onLand(VerticalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
-
+        CharacterComponent characterComponent = new CharacterComponent();
+        characterComponent.instigator = "The ground";
+        characterComponent.directCause = "you fell hard on your head.";
         if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
             int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
