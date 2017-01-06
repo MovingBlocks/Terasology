@@ -76,6 +76,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DoDestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        character.instigator = event.getInstigatorString();
+        character.damageType = event.getDamageTypeString();
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
@@ -335,6 +337,4 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         float epsilon = 0.00001f;
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
     }
-
-
 }

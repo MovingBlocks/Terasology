@@ -17,6 +17,11 @@
                         "size": [1, 16]
                     },
                     {
+                        "type": "UILabel",
+                        "text": "",
+                        "id": "causeOfDeath"
+                    },
+                    {
                         "type": "UIButton",
                         "text": "${engine:menu#respawn}",
                         "id": "respawn"
