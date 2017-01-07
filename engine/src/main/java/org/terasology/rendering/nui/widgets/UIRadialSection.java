@@ -39,24 +39,31 @@ public class UIRadialSection extends CoreWidget {
     @LayoutConfig
     private TextureRegion icon;
     @LayoutConfig
-    private String text = "";
+    private String text;
     @LayoutConfig
     private UIWidget info;
+    @LayoutConfig
+    private int submenu = -1;
 
     public void onDraw(Canvas canvas) {
         canvas.getRegion();
-        if (icon != null) {
-            canvas.drawTexture(icon, sectionRegion);
-        }
         canvas.drawTexture(sectionTexture, sectionRegion);
+
+        if (icon != null) {
+            //canvas.drawTexture(icon, sectionRegion);
+        }
+
         if (text != null) {
-            canvas.drawText(text, sectionRegion);
+            //canvas.drawText(text, sectionRegion);
         }
         if (isSelected) {
-            canvas.drawTexture(selectedTexture,
-                    canvas.getRegion());
+            canvas.drawTexture(selectedTexture, sectionRegion);
             canvas.drawWidget(info, infoRegion);
         }
+    }
+
+    public int getSubmenu() {
+        return submenu;
     }
 
     @Override
@@ -106,7 +113,7 @@ public class UIRadialSection extends CoreWidget {
     }
 
     public boolean getIsSubmenu() {
-        return info instanceof UIRadialSection;
+        return submenu != -1;
     }
 
     public void setCenter(Rect2i region) {
