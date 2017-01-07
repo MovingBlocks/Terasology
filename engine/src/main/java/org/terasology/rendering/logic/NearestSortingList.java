@@ -422,7 +422,8 @@ public class NearestSortingList implements Iterable<EntityRef> {
                  * game to crash. Instead we shall output an error to the logger
                  * and continue.
                  */
-                logger.error("Uncaught exception in sorting thread: " + ex.toString());
+                //for ArrayIndexOutOfBoundsException see issue #2742
+                logger.error("Uncaught exception in sorting thread", ex);
             }
         }
 
