@@ -31,38 +31,62 @@ public class AudioConfig {
 
     private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+    /**
+     * @return Returns a float of the sound volume
+     */
     public float getSoundVolume() {
         return soundVolume;
     }
 
+    /**
+     * @param soundVolume Sets the sound volume starting from the previous value and going to the soundVolume passed in
+     */
     public void setSoundVolume(float soundVolume) {
         float oldValue = this.soundVolume;
         this.soundVolume = soundVolume;
         propertyChangeSupport.firePropertyChange(SOUND_VOLUME, oldValue, soundVolume);
     }
 
+    /**
+     * @return Returns music volume
+     */
     public float getMusicVolume() {
         return musicVolume;
     }
 
+    /**
+     * @param musicVolume Sets music volume using the same principle as setSoundVolume()
+     */
     public void setMusicVolume(float musicVolume) {
         float oldValue = this.musicVolume;
         this.musicVolume = musicVolume;
         propertyChangeSupport.firePropertyChange(MUSIC_VOLUME, oldValue, musicVolume);
     }
 
+    /**
+     * @return A boolean indicating if sound is disabled
+     */
     public boolean isDisableSound() {
         return disableSound;
     }
 
+    /**
+     * @param disableSound Sets either true or false if sound is disabled or not
+     */
     public void setDisableSound(boolean disableSound) {
         this.disableSound = disableSound;
     }
 
+    /**
+     * @param changeListener The PropertyChangeListener to subscribe to
+     */
     public void subscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(changeListener);
     }
 
+    /**
+     * @param changeListener The PropertyChangeListener to unsusbcribe from
+     */
     public void unsubscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }
