@@ -52,53 +52,49 @@ public class DeathScreen extends CoreScreenLayer {
         String info = client.toFullDescription();
         UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
         causeOfDeath.setText("You died due to " + character.damageType + ".\n");
-        if(character.damageType != "" && character.damageType != null) {
+        if (character.damageType != "" && character.damageType != null) {
             causeOfDeath.setText("You died due to " + character.damageType + " .\n");
         }
-        if(character.instigator != "" && character.instigator != null) {
+        if (character.instigator != "" && character.instigator != null) {
             causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
         }
-        if(character.directCause != "" && character.directCause != null) {
+        if (character.directCause != "" && character.directCause != null) {
             causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
-        if (causeOfDeath != null) {
-            causeOfDeath.bindText(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    EntityRef client = lp.getClientEntity();
-                    ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-                    EntityRef clientInfoEntity = clientComponent.clientInfo;
-                    ClientInfoComponent clientInfoComponent = clientInfoEntity.getComponent(ClientInfoComponent.class);
-                    if (clientInfoComponent!= null) {
-                        return clientInfoComponent.deathReason;
-                    } else {
-                        return "";
+            if (causeOfDeath != null) {
+                causeOfDeath.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        EntityRef client = lp.getClientEntity();
+                        ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+                        EntityRef clientInfoEntity = clientComponent.clientInfo;
+                        ClientInfoComponent clientInfoComponent = clientInfoEntity.getComponent(ClientInfoComponent.class);
+                        if (clientInfoComponent != null) {
+                            return clientInfoComponent.deathReason;
+                        } else {
+                            return "";
+                        }
                     }
-                }
+                });
+            }
+
+
+            WidgetUtil.trySubscribe(this, "respawn", widget -> {
+                CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
+                getManager().closeScreen(DeathScreen.this);
             });
+            WidgetUtil.trySubscribe(this, "settings", widget -> getManager().pushScreen("settingsMenuScreen"));
+            WidgetUtil.trySubscribe(this, "mainMenu", widget -> {
+                CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            });
+            WidgetUtil.trySubscribe(this, "exitGame", widget -> CoreRegistry.get(GameEngine.class).shutdown());
         }
 
-
-
-
-        WidgetUtil.trySubscribe(this, "respawn", widget -> {
-            CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
-            getManager().closeScreen(DeathScreen.this);
-        });
-        WidgetUtil.trySubscribe(this, "settings", widget -> getManager().pushScreen("settingsMenuScreen"));
-        WidgetUtil.trySubscribe(this, "mainMenu", widget -> {
-            CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
-            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-        });
-        WidgetUtil.trySubscribe(this, "exitGame", widget -> CoreRegistry.get(GameEngine.class).shutdown());
+        @Override
+        public boolean isLowerLayerVisible() {
+            return false;
+        }
     }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return false;
-    }
-<<<<<<< HEAD
-}
-=======
 
     public void updateDeathScreen() {
         CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
