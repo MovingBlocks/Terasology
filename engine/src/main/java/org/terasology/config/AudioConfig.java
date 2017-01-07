@@ -31,38 +31,62 @@ public class AudioConfig {
 
     private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+    /**
+     * @return the sound volume as a float, with 0 meaning no sound and 100 (or 1?) being the maximum volume.
+     */
     public float getSoundVolume() {
         return soundVolume;
     }
 
+    /**
+     * @param soundVolume Sets the sound volume starting from the previous value and going to the soundVolume passed in
+     */
     public void setSoundVolume(float soundVolume) {
         float oldValue = this.soundVolume;
         this.soundVolume = soundVolume;
         propertyChangeSupport.firePropertyChange(SOUND_VOLUME, oldValue, soundVolume);
     }
 
+    /**
+     * @returns the music volume as a float, 0 meaning no music and 100 (or 1?) meaning music at the highest volume.
+     */
     public float getMusicVolume() {
         return musicVolume;
     }
 
+    /**
+     * @param musicVolume Sets the music volume starting from the previous value and going to the musicVolume passed in
+     */
     public void setMusicVolume(float musicVolume) {
         float oldValue = this.musicVolume;
         this.musicVolume = musicVolume;
         propertyChangeSupport.firePropertyChange(MUSIC_VOLUME, oldValue, musicVolume);
     }
 
+    /**
+     * @return whether sound is disabled
+     */
     public boolean isDisableSound() {
         return disableSound;
     }
 
+    /**
+     * @param disableSound whether sound is disabled
+     */
     public void setDisableSound(boolean disableSound) {
         this.disableSound = disableSound;
     }
 
+    /**
+     * @param changeListener The PropertyChangeListener to subscribe to
+     */
     public void subscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(changeListener);
     }
 
+    /**
+     * @param changeListener The PropertyChangeListener to unsusbcribe from
+     */
     public void unsubscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }
