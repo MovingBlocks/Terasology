@@ -161,7 +161,7 @@
     "nui-editor-undo": "Undo",
     "oculus-rift-support": "Oculus Rift Support",
     "online-players": "Online Spelers",
-    "open-inventory": "Open Inventaris";
+    "open-inventory": "Open Inventaris",
     "outline": "Outline",
     "particle-effect-limit": "Particle Effect Limiet",
     "parallax-mapping": "Parallax Mapping",
@@ -214,7 +214,7 @@
     "ssao": "SSAO",
     "start-game": "Speel",
     "start-singleplayer-game": "Singleplayer",
-    "this-language-English": "Engels",
+    "this-language-English": "Dutch",
     "this-language-native": "Nederlands",
     "update-module": "Update",
     "video-display-mode": "Weergave mode",
