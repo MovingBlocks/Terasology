@@ -20,8 +20,10 @@ import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.dag.nodes.DownSamplerNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
+import org.terasology.rendering.dag.nodes.UpdateExposureNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -51,7 +53,6 @@ import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
-import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
 import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
@@ -308,15 +309,18 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
 
-        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+        // Post-Processing proper: tone mapping, light shafts, bloom and blur passes
         Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
         renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
 
         Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
-        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class); // TODO: next PR
-        renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
+        Node downSamplerNode = nodeFactory.createInstance(DownSamplerNode.class); // TODO: split in multiple DownSampleNodes
+        renderGraph.addNode(downSamplerNode, "downSamplerNode");
+
+        Node updateExposureNode = nodeFactory.createInstance(UpdateExposureNode.class);
+        renderGraph.addNode(updateExposureNode, "updateExposureNode");
 
         Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");

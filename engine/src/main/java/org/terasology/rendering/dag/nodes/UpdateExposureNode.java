@@ -19,45 +19,35 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.nui.properties.Range;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import java.nio.ByteBuffer;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.dag.nodes.DownSamplerNode.SCENE_1;
 
 /**
- * TODO: Break this node into several nodes
- * TODO: Rework on dependency of ScreenGrabber's set/getExposure()
+ * An instance of this node takes advantage of a downsampled version of the scene,
+ * calculates its relative luminance (1) and updates the exposure parameter of the
+ * ScreenGrabber accordingly.
+ *
+ * Notice that while this node takes advantage of the content of an FBO, it
+ * doesn't actually render anything.
+ *
+ * (1) See https://en.wikipedia.org/wiki/Luma_(video)#Use_of_relative_luminance
  */
-public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
+public class UpdateExposureNode extends AbstractNode {
 
-    private static final Logger logger = LoggerFactory.getLogger(DownSampleSceneAndUpdateExposureNode.class);
-
-    private static final ResourceUrn DOWN_SAMPLER_MATERIAL = new ResourceUrn("engine:prog.downSampler");
-
-    private static final ResourceUrn SCENE_16 = new ResourceUrn("engine:fbo.scene16");
-    private static final ResourceUrn SCENE_8 = new ResourceUrn("engine:fbo.scene8");
-    private static final ResourceUrn SCENE_4 = new ResourceUrn("engine:fbo.scene4");
-    private static final ResourceUrn SCENE_2 = new ResourceUrn("engine:fbo.scene2");
-    private static final ResourceUrn SCENE_1 = new ResourceUrn("engine:fbo.scene1");
-
-    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
-                                // This data is then used in the context of eye adaptation.
+    private static final Logger logger = LoggerFactory.getLogger(UpdateExposureNode.class);
 
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
@@ -85,29 +75,26 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
     private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
-    private FBO[] downSampledScene = new FBO[5];
-    private Material downSampler;
+    private FBO downSampledScene;
+    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
+                                // This data is then used in the context of eye adaptation.
 
+    /**
+     * Initializes an UpdateExposureNode instance.This method must be called once shortly after instantiation
+     * to fully initialize the node and make it ready for rendering.
+     */
     @Override
     public void initialise() {
-
         renderingConfig = config.getRendering();
-
-        downSampledScene[4] = requiresFBO(new FBOConfig(SCENE_16, 16, 16, FBO.Type.DEFAULT), immutableFBOs);
-        downSampledScene[3] = requiresFBO(new FBOConfig(SCENE_8, 8, 8, FBO.Type.DEFAULT), immutableFBOs);
-        downSampledScene[2] = requiresFBO(new FBOConfig(SCENE_4, 4, 4, FBO.Type.DEFAULT), immutableFBOs);
-        downSampledScene[1] = requiresFBO(new FBOConfig(SCENE_2, 2, 2, FBO.Type.DEFAULT), immutableFBOs);
-        downSampledScene[0] = requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
-
-        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL.toString()));
-        downSampler = getMaterial(DOWN_SAMPLER_MATERIAL);
-
+        downSampledScene = requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
         writeOnlyPBO = new PBO(1, 1);
     }
 
     /**
-     * First downsamples the rendering obtained so far, after the initial post processing, into a 1x1 pixel buffer.
-     * Then calculate its pixel's luma to update the exposure value. This is used later, during tone mapping.
+     * If Eye Adaptation is enabled, given the 1-pixel output of the downSamplerNode,
+     * calculates the relative luminance of the scene and updates the exposure accordingly.
+     *
+     * If Eye Adaptation is disabled, sets the exposure to default day/night values.
      */
     // TODO: verify if this can be achieved entirely in the GPU, during tone mapping perhaps?
     @Override
@@ -115,9 +102,7 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            downSampleSceneInto1x1pixelsBuffer();
-
-            writeOnlyPBO.copyFromFBO(downSampledScene[0].fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            writeOnlyPBO.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
             ByteBuffer pixels = writeOnlyPBO.readBackPixels();
 
             if (pixels.limit() < 3) {
@@ -160,28 +145,6 @@ public class DownSampleSceneAndUpdateExposureNode extends AbstractNode {
                 screenGrabber.setExposure(hdrExposureDefault);
             }
         }
-    }
-
-    private void downSampleSceneInto1x1pixelsBuffer() {
-        PerformanceMonitor.startActivity("rendering/updateExposure/downSampleScene");
-
-        for (int i = 4; i >= 0; i--) {
-            FBO downSampledFBO = downSampledScene[i];
-            downSampler.setFloat("size", downSampledFBO.width(), true);
-
-            if (i == 4) {
-                READ_ONLY_GBUFFER.bindTexture();
-            } else {
-                downSampledScene[i + 1].bindTexture();
-            }
-
-            downSampledFBO.bind();
-            setViewportToSizeOf(downSampledFBO);
-
-            renderFullscreenQuad();
-        }
-
-        PerformanceMonitor.endActivity();
     }
 
 }
