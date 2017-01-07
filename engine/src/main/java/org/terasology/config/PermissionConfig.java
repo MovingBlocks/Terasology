@@ -29,7 +29,7 @@ public class PermissionConfig {
 
     /**
      * @return Builds a random key on the priniciple stated below:
-     * Create a random object, and a list of possible characters
+     * Create a SecureRandom object, and a list of possible characters
      * Populate possible characters with A-Z, a-z, and 2-9.
      * Remove all 'l', 'I' and 'O' characters
      * Create a StringBuilder called codeBuilder and do this:
@@ -78,4 +78,6 @@ public class PermissionConfig {
     public void setOneTimeAuthorizationKey(String oneTimeAuthorizationKey) {
         this.oneTimeAuthorizationKey = oneTimeAuthorizationKey;
     }
+
+
 }
