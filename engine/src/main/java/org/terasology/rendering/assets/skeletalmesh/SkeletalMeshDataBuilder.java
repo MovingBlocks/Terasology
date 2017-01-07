@@ -38,8 +38,8 @@ public class SkeletalMeshDataBuilder {
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
     private MeshBuilder.TextureMapper textureMapper;
-    private Vector3f minOfAABB = null;
-    private Vector3f maxOfAABB = null;
+    private Vector3f minOfAABB;
+    private Vector3f maxOfAABB;
 
     public SkeletalMeshDataBuilder() {
 

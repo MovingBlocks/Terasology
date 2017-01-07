@@ -60,7 +60,6 @@ import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;

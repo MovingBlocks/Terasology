@@ -38,7 +38,7 @@ public abstract class BenchmarkResult {
     private boolean aborted;
     private final List<BenchmarkError> errors = Lists.newLinkedList();
 
-    public static enum Alignment {
+    public enum Alignment {
         LEFT {
             @Override
             public String pad(String value, int size) {

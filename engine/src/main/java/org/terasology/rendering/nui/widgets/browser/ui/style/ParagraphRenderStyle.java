@@ -19,11 +19,11 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 
 public interface ParagraphRenderStyle extends TextRenderStyle {
-    public enum FloatStyle {
+     enum FloatStyle {
         LEFT, RIGHT, NONE
     }
 
-    public enum ClearStyle {
+     enum ClearStyle {
         LEFT, RIGHT, BOTH, NONE
     }
 

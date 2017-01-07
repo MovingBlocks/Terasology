@@ -24,12 +24,12 @@ import com.google.common.base.Preconditions;
  */
 public class BenchmarkError {
 
-    public static enum Type {
+    public enum Type {
         Setup(true), Warmup(true), PreRun(true), Run(true), PostRun(true), Finish(false);
 
         public final boolean abort;
 
-        private Type(boolean abort) {
+        Type(boolean abort) {
             this.abort = abort;
         }
     }

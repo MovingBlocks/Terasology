@@ -55,7 +55,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         private Vector3i position;
         private Vector3f offset;
 
-        public TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
+         TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
             this.shape = block.getCollisionShape();
             this.offset = block.getCollisionOffset();
             this.colliding = shape != null && colliding;

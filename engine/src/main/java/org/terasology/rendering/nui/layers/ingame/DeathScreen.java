@@ -17,17 +17,23 @@ package org.terasology.rendering.nui.layers.ingame;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
  */
 public class DeathScreen extends CoreScreenLayer {
+    @In
+    private LocalPlayer lp;
 
     @Override
     protected boolean isEscapeToCloseAllowed() {
@@ -36,16 +42,22 @@ public class DeathScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
         UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
-        if(character.damageType != "" && character.damageType != null) {
-            causeOfDeath.setText("You died due to " + character.damageType + ".\n");
-        }
-        if(character.instigator != "" && character.instigator != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
-        }
-        if(character.directCause != "" && character.directCause != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
+        if (causeOfDeath != null) {
+            causeOfDeath.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    EntityRef client = lp.getClientEntity();
+                    ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+                    EntityRef clientInfoEntity = clientComponent.clientInfo;
+                    ClientInfoComponent clientInfoComponent = clientInfoEntity.getComponent(ClientInfoComponent.class);
+                    if (clientInfoComponent!= null) {
+                        return clientInfoComponent.deathReason;
+                    } else {
+                        return "";
+                    }
+                }
+            });
         }
         WidgetUtil.trySubscribe(this, "respawn", widget -> {
             CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
@@ -60,27 +72,7 @@ public class DeathScreen extends CoreScreenLayer {
     }
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-        updateDeathScreen();
-    }
-
-    @Override
     public boolean isLowerLayerVisible() {
         return false;
-    }
-
-    public void updateDeathScreen() {
-        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
-        UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
-        if(character.damageType != "" && character.damageType != null) {
-            causeOfDeath.setText("You died due to " + character.damageType + ".\n");
-        }
-        if(character.instigator != "" && character.instigator != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
-        }
-        if(character.directCause != "" && character.directCause != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
-        }
     }
 }

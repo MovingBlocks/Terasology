@@ -46,7 +46,7 @@ public enum RegisterMode {
     private boolean validWhenRemote;
     private boolean validWhenHeadless;
 
-    private RegisterMode(boolean validWhenAuthority, boolean validWhenRemote, boolean validWhenHeadless) {
+     RegisterMode(boolean validWhenAuthority, boolean validWhenRemote, boolean validWhenHeadless) {
         this.validWhenAuthority = validWhenAuthority;
         this.validWhenRemote = validWhenRemote;
         this.validWhenHeadless = validWhenHeadless;

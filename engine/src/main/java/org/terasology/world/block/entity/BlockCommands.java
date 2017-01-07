@@ -110,14 +110,15 @@ public class BlockCommands extends BaseComponentSystem {
         targetSystem = new TargetSystem(blockRegistry, physics);
     }
 
-    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words after the commands, e.g.: \"startsWith engine: core:\" will list all items from the engine and core module",
+    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
+            "after the commands, e.g.: \"startsWith engine: core:\" will list all items from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listItems(@CommandParam(value = "startsWith",  required = false) String[] startsWith) {
 
         List<String> stringItems = Lists.newArrayList();
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
-            if(!uriStartsWithAnyString(prefab.getName(), startsWith)) {
+            if (!uriStartsWithAnyString(prefab.getName(), startsWith)) {
                 continue;
             }
             stringItems.add(prefab.getName());
@@ -137,7 +138,8 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
 
-    @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
+    @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
+            "commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -147,7 +149,7 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
-            if(!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
+            if (!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
                 continue;
             }
             stringBuilder.append(blockUri.toString());
@@ -161,7 +163,7 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> availableBlocks = sortItems(blockExplorer.getAvailableBlockFamilies());
         for (BlockUri blockUri : availableBlocks) {
-            if(!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
+            if (!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
                 continue;
             }
             stringBuilder.append(blockUri.toString());
@@ -171,7 +173,8 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
+    @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the" +
+            "commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listShapes(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -181,7 +184,7 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
         for (ResourceUrn uri : sortedUris) {
-            if(!uriStartsWithAnyString(uri.toString(), startsWith)) {
+            if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
                 continue;
             }
             stringBuilder.append(uri.toString());
@@ -192,7 +195,9 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists available free shape blocks",
-            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\nYou can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks engine: core:\" will list all free shape blocks from the engine and core module",
+            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\n" +
+                    "You can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks" +
+                    "engine: core:\" will list all free shape blocks from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String listFreeShapeBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -202,7 +207,7 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> sortedUris = sortItems(blockExplorer.getFreeformBlockFamilies());
         for (BlockUri uri : sortedUris) {
-            if(!uriStartsWithAnyString(uri.toString(), startsWith)) {
+            if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
                 continue;
             }
             stringBuilder.append(uri.toString());
@@ -375,12 +380,13 @@ public class BlockCommands extends BaseComponentSystem {
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */
     private boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
-        if(startsWithArray == null || startsWithArray.length == 0) {
+        if (startsWithArray == null || startsWithArray.length == 0) {
             return true;
         }
-        for(String startsWith : startsWithArray) {
-            if(uri.startsWith(startsWith))
+        for (String startsWith : startsWithArray) {
+            if (uri.startsWith(startsWith)) {
                 return true;
+            }
         }
         return false;
     }

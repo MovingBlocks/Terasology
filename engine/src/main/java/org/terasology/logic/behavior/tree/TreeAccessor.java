@@ -37,7 +37,7 @@ public interface TreeAccessor<N> {
 
     int getMaxChildren();
 
-    public static class ChainedTreeAccessor<N> implements TreeAccessor<N> {
+      class ChainedTreeAccessor<N> implements TreeAccessor<N> {
         private List<TreeAccessor<N>> accessors;
 
         public ChainedTreeAccessor(TreeAccessor<N>... accessors) {

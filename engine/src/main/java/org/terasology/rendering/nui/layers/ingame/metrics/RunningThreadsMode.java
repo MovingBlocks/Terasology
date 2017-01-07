@@ -23,7 +23,7 @@ import org.terasology.monitoring.impl.SingleThreadMonitor;
  */
 final class RunningThreadsMode extends MetricsMode {
 
-    public RunningThreadsMode() {
+     RunningThreadsMode() {
         super("Running Threads");
     }
 

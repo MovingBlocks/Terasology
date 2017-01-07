@@ -124,7 +124,7 @@ public class Translation extends Asset<TranslationData> {
         private final List<Consumer<Translation>> changeListeners = new CopyOnWriteArrayList<>();
         private final WeakReference<Translation> asset;
 
-        public DisposalAction(Translation asset) {
+         DisposalAction(Translation asset) {
             this.asset = new WeakReference<>(asset);
         }
 

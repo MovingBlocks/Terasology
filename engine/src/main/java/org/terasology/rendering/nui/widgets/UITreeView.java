@@ -45,7 +45,6 @@ import org.terasology.rendering.nui.widgets.treeView.TreeMouseClickListener;
 import org.terasology.rendering.nui.widgets.treeView.TreeViewState;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A Tree View widget. Presents a hierarchical view of items, visualised by indentation.

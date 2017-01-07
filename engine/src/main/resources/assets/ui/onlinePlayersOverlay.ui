@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "Online Players",
+                            "text": "${engine:menu#online-players}",
                             "id": "title",
                             "family": "title"
                         },
