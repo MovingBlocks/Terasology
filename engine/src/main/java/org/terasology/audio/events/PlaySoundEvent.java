@@ -21,21 +21,20 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.BroadcastEvent;
 
 /**
+ * This event is sent whenever a sound is to be played.
+ * The event is not sent to or played for the client of the entity that sent the event as they have simulated it already.
  */
 @BroadcastEvent(skipInstigator = true)
 public class PlaySoundEvent extends AbstractPlaySoundEvent {
     protected PlaySoundEvent() {
     }
 
+
     public PlaySoundEvent(StaticSound sound, float volume) {
         super(sound, volume);
     }
 
-    /**
-     * @param exceptOwner The sound is not sent to the owner of this entity.
-     * @param sound
-     * @param volume
-     */
+
     public PlaySoundEvent(EntityRef exceptOwner, StaticSound sound, float volume) {
         super(exceptOwner, sound, volume);
     }

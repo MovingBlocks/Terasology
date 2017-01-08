@@ -20,6 +20,10 @@ import org.terasology.assets.AssetData;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
+/**
+ * An abstract class
+ * @param <T> The asset type this asset belongs to
+ */
 public abstract class Sound<T extends AssetData> extends Asset<T> {
 
     /**

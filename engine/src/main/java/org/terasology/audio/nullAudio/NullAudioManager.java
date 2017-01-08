@@ -28,7 +28,6 @@ import org.terasology.math.geom.Vector3f;
 
 /**
  * Null implementation of the AudioManager
- *
  */
 public class NullAudioManager implements AudioManager {
     @Override
