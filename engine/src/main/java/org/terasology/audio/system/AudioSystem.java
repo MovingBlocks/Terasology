@@ -37,6 +37,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 
 /**
+ * This system handles receiving the PlaySound events and activating the AudioManager to play them
  */
 @RegisterSystem
 public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
@@ -48,12 +49,25 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     @In
     private AudioManager audioManager;
 
+    /**
+     * Toggles the muting of sounds.
+     *
+     * @param sender The entity requesting the mute
+     * @return A human readable string of the mute status
+     */
     @Command(shortDescription = "Toggle muting all sound", requiredPermission = PermissionManager.NO_PERMISSION)
     public String mute(@Sender EntityRef sender) {
         audioManager.setMute(!audioManager.isMute());
         return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");
     }
 
+    /**
+     * Plays a test dig sound at an offset from the player in the x and z axis.
+     *
+     * @param sender The entity sending the sound request
+     * @param xOffset The x axis offset from the player to play the sound at.
+     * @param zOffset The z axis offset from the player to play the sound at.
+     */
     @Command(shortDescription = "Plays a test sound")
     public void playTestSound(@Sender EntityRef sender, @CommandParam("xOffset") float xOffset, @CommandParam("zOffset") float zOffset) {
         Vector3f position = localPlayer.getPosition();
@@ -62,6 +76,12 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
         audioManager.playSound(Assets.getSound("engine:dig").get(), position);
     }
 
+    /**
+     * Receives the sound played event and calls on the AudioManager to play it.
+     *
+     * @param playSoundEvent The sound event.
+     * @param entity The entity that instigated the event.
+     */
     @ReceiveEvent
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -72,6 +92,13 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
         }
     }
 
+    /**
+     * Receives an event send when a sound should be played for the entity owner as well.
+     * Calls on the AudioManager to play it.
+     *
+     * @param playSoundEvent The sound event.
+     * @param entity The entity that instigated the event.
+     */
     @ReceiveEvent
     public void onPlaySound(PlaySoundForOwnerEvent playSoundEvent, EntityRef entity) {
         ClientComponent clientComponent = networkSystem.getOwnerEntity(entity).getComponent(ClientComponent.class);

@@ -85,10 +85,22 @@ public interface SoundPool<SOUND extends Sound<?>, SOURCE extends SoundSource<SO
      */
     void update(float delta);
 
+    /**
+     * @param volume The new volume to set the sounds to
+     */
     void setVolume(float volume);
 
+
+    /**
+     * @return The volume of the sounds in the pool
+     */
     float getVolume();
 
+    /**
+     * Remove a sound from the pool
+     *
+     * @param sound The sound to remove
+     */
     void purge(Sound<?> sound);
 
 }

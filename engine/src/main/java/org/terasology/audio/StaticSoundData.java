@@ -36,6 +36,7 @@ public class StaticSoundData implements AssetData {
         this.bufferBits = bufferBits;
     }
 
+
     public ByteBuffer getData() {
         return data;
     }
