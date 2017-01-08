@@ -18,8 +18,8 @@
                     },
                     {
                         "type": "UILabel",
-                        "text": "",
-                        "id": "causeOfDeath"
+                        "text": "Your cause of death is unknown.",
+                        "id": "damageType"
                     },
                     {
                         "type": "UIButton",
