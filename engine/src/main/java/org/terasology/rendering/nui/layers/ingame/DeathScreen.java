@@ -17,69 +17,28 @@ package org.terasology.rendering.nui.layers.ingame;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
  */
 public class DeathScreen extends CoreScreenLayer {
-    @In
-    private LocalPlayer lp;
 
     @Override
     protected boolean isEscapeToCloseAllowed() {
         return false;
     }
 
+    private UILabel damageType;
+
+
     @Override
     public void initialise() {
-
-
-        // TODO: Should be able to skip this whole block now, death reason is prepared over in CharacterSystem instead
-        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
-        LocalPlayer lp = CoreRegistry.get(LocalPlayer.class);
-        EntityRef client = lp.getClientEntity();
-        String info = client.toFullDescription();
-        UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
-        causeOfDeath.setText("You died due to " + character.damageType + ".\n");
-        if(character.damageType != "" && character.damageType != null) {
-            causeOfDeath.setText("You died due to " + character.damageType + " .\n");
-        }
-        if(character.instigator != "" && character.instigator != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
-        }
-        if(character.directCause != "" && character.directCause != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
-        if (causeOfDeath != null) {
-            causeOfDeath.bindText(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    EntityRef client = lp.getClientEntity();
-                    ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-                    EntityRef clientInfoEntity = clientComponent.clientInfo;
-                    ClientInfoComponent clientInfoComponent = clientInfoEntity.getComponent(ClientInfoComponent.class);
-                    if (clientInfoComponent!= null) {
-                        return clientInfoComponent.deathReason;
-                    } else {
-                        return "";
-                    }
-                }
-            });
-        }
-
-
-
-
+        damageType = find("damageType", UILabel.class);
         WidgetUtil.trySubscribe(this, "respawn", widget -> {
             CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
             getManager().closeScreen(DeathScreen.this);
@@ -92,40 +51,12 @@ public class DeathScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "exitGame", widget -> CoreRegistry.get(GameEngine.class).shutdown());
     }
 
+    public void setDamageType(String cause) {
+        damageType.setText("Your cause of death is " + cause);
+    }
+
     @Override
     public boolean isLowerLayerVisible() {
         return false;
     }
-<<<<<<< HEAD
 }
-=======
-
-    public void updateDeathScreen() {
-        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
-
-        LocalPlayer lp = CoreRegistry.get(LocalPlayer.class);
-        EntityRef client = lp.getClientEntity();
-        ClientComponent clientComponent = client.getComponent(ClientComponent.class);
-        EntityRef clientInfoEntity = clientComponent.clientInfo;
-        ClientInfoComponent clientInfoComponent = clientInfoEntity.getComponent(ClientInfoComponent.class);
-
-        String info = client.toFullDescription();
-
-        UILabel causeOfDeath = find("causeOfDeath", UILabel.class);
-        if (causeOfDeath != null && clientInfoComponent.deathReason != null) {
-            causeOfDeath.setText(clientInfoComponent.deathReason);
-        }
-
-        /*
-        if(character.damageType != "" && character.damageType != null) {
-            causeOfDeath.setText("You died due to " + character.damageType + ".\n");
-        }
-        if(character.instigator != "" && character.instigator != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + character.instigator + " killed you\n");
-        }
-        if(character.directCause != "" && character.directCause != null) {
-            causeOfDeath.setText(causeOfDeath.getText() + "You died because of " + character.directCause + "\n");
-        }*/
-    }
-}
->>>>>>> 4d4f5a691dbefde088459bb324c0ea13f2a8b63f
