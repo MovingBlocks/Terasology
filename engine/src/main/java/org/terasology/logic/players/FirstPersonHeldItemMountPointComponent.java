@@ -48,8 +48,8 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     private WorldRenderer worldRenderer;
 
     // The hand/tool models seem to have an origin other than the pivot point. This is a best-effort correction,
-    // in the form of a 4x4 homogenous transformation matrix
-    private Matrix4f toolAdjustmentMatrix= new Matrix4f(
+    // in the form of a 4x4 homogeneous transformation matrix
+    private Matrix4f toolAdjustmentMatrix = new Matrix4f(
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, (float) Math.cos(230.* TeraMath.DEG_TO_RAD), (float) Math.sin(230. * TeraMath.DEG_TO_RAD), 0.0f,
             0.0f, (float) -Math.sin(230. * TeraMath.DEG_TO_RAD), (float) Math.cos(230. * TeraMath.DEG_TO_RAD), 0.0f,
