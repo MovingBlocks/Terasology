@@ -34,6 +34,11 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
  * the update and render methods as they are central to a rendering implementation.
  */
 public interface WorldRenderer {
+    // This is exposed so that controller-related functions can create callbacks.
+    // Ideally, these classes would be able to do so with dependency injection, but that
+    // is broken for at least FirstPersonHeldMountPointComponent.java. Could be reltaed to:
+    // https://github.com/MovingBlocks/Terasology/issues/2336A
+    // TODO: take this out and do dependency injection properly for any classes that depend on this being exposed.
     public OpenVRProvider VR_PROVIDER = new OpenVRProvider();
 
     float BLOCK_LIGHT_POW = 0.96f;
@@ -43,11 +48,6 @@ public interface WorldRenderer {
 
     float getSecondsSinceLastFrame();
 
-    // This is exposed so that controller-related functions can create callbacks.
-    // Ideally, these classes would be able to do so with dependency injection, but that
-    // is broken for at least FirstPersonHeldMountPointComponent.java. Could be reltaed to:
-    // https://github.com/MovingBlocks/Terasology/issues/2336A
-    // TODO: take this out and do dependency injection properly for any classes that depend on this being exposed.
     Material getMaterial(String assetId);
 
     boolean isFirstRenderingStageForCurrentFrame();
