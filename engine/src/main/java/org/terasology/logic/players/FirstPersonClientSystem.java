@@ -241,7 +241,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                     TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
             Vector3f offset = new Vector3f(0.25f * animateAmount, -0.12f * animateAmount, 0f);
             offset.add(mountPointComponent.translate);
-            locationComponent.setLocalPosition(mountPointComponent.translate);
+            locationComponent.setLocalPosition(offset);
         }
         else {
             // In the case that we have obtained the quaternion directly, just set it.
