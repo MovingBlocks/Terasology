@@ -134,7 +134,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
-    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -159,9 +158,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
         if (renderingConfig.isVrSupport()) {
-            this.vrProvider = new OpenVRProvider();
             context.put(OpenVRProvider.class, vrProvider);
-            if (this.vrProvider.init()) {
+            if (vrProvider.init()) {
                 playerCamera = new OpenVRStereoCamera(this.vrProvider);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {

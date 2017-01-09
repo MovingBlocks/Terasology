@@ -38,7 +38,6 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  */
@@ -48,8 +47,6 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @In
     private LocalPlayer localPlayer;
-    @In
-    private WorldRenderer worldRenderer;
     @In
     private EntityManager entityManager;
     @In
@@ -78,6 +75,9 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
             firstPersonHeldItemMountPointComponent.mountPointEntity = builder.build();
             camera.saveComponent(firstPersonHeldItemMountPointComponent);
         }
+
+        // subscribe to vr controller pose updates if possible
+        firstPersonHeldItemMountPointComponent.trySubscribeToControllerPoses();
 
         // link the mount point entity to the camera
         Location.removeChild(camera, firstPersonHeldItemMountPointComponent.mountPointEntity);
@@ -234,13 +234,23 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         }
         float addPitch = 15f * animateAmount;
         float addYaw = 10f * animateAmount;
-        locationComponent.setLocalRotation(new Quat4f(
-                TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
-                TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
-                TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
-        Vector3f offset = new Vector3f(0.25f * animateAmount, -0.12f * animateAmount, 0f);
-        offset.add(mountPointComponent.translate);
-        locationComponent.setLocalPosition(offset);
+        if (mountPointComponent.rotationQuaternion == null) {
+            locationComponent.setLocalRotation(new Quat4f(
+                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.y + addYaw),
+                    TeraMath.DEG_TO_RAD * (mountPointComponent.rotateDegrees.x + addPitch),
+                    TeraMath.DEG_TO_RAD * mountPointComponent.rotateDegrees.z));
+            Vector3f offset = new Vector3f(0.25f * animateAmount, -0.12f * animateAmount, 0f);
+            offset.add(mountPointComponent.translate);
+            locationComponent.setLocalPosition(mountPointComponent.translate);
+        }
+        else {
+            // In the case that we have obtained the quaternion directly, just set it.
+            // Receiving a quaternion directly is also signalling to us that we received
+            // it from OpenVR, so we omit the animation (since we want the item to track
+            // the player's hand.
+            locationComponent.setLocalRotation(mountPointComponent.rotationQuaternion);
+            locationComponent.setLocalPosition(mountPointComponent.translate);
+        }
 
         mountPointComponent.mountPointEntity.saveComponent(locationComponent);
     }

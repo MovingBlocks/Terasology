@@ -15,18 +15,82 @@
  */
 package org.terasology.logic.players;
 
+import jopenvr.VRControllerState_t;
+import org.joml.Matrix4f;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.registry.In;
+import org.terasology.rendering.openvrprovider.ControllerListener;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.math.geom.Quat4f;
 
 /**
  * Only used by the client side so that held items can be positioned in line with the camera
  */
-public class FirstPersonHeldItemMountPointComponent implements Component {
+public class FirstPersonHeldItemMountPointComponent implements Component, ControllerListener {
+    //@In
+    private OpenVRProvider vrProvider = null;
+
+    // Ideally we should be able to @In for OpenVRProvider here. We're likely being prevented by this bug:
+    // https://github.com/MovingBlocks/Terasology/issues/2336
+    @In
+    private WorldRenderer worldRenderer;
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
     public Vector3f rotateDegrees = Vector3f.zero();
     public Vector3f translate = Vector3f.zero();
+    public Quat4f rotationQuaternion = null;
     public float scale = 1f;
+    private static final Logger logger = LoggerFactory.getLogger(FirstPersonHeldItemTransformComponent.class);
+
+    // The hand/tool models seem to have an origin other than the pivot point. This is a best-effort correction,
+    // in the form of a 4x4 homogenous transformation matrix
+    private Matrix4f toolAdjustmentMatrix= new Matrix4f(
+            1.0f,0.0f,0.0f,0.0f,
+            0.0f, (float)Math.cos(230.* TeraMath.DEG_TO_RAD),(float)Math.sin(230. * TeraMath.DEG_TO_RAD),0.0f,
+            0.0f, (float)-Math.sin(230. * TeraMath.DEG_TO_RAD),(float)Math.cos(230. * TeraMath.DEG_TO_RAD),0.0f,
+            0.0f,-0.05f,-0.2f,1.0f
+    );
+
+
+    public void trySubscribeToControllerPoses() {
+        if (worldRenderer.vrProvider != null) {
+            worldRenderer.vrProvider.vrState.addControllerListener(this);
+            logger.info("Subscribed to VR controller updates.");
+        }
+        else
+        {
+            logger.info("VR Provider is not present, so did not subscribe to controller updates.");
+        }
+    }
+
+    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController)
+    {
+        // nothing for now
+    }
+
+    public void poseChanged(Matrix4f pose, int handIndex)
+    {
+        // do nothing for the second controller
+        // TODO: put a hand for the second controller.
+        if (handIndex != 0)
+            return;
+        // y axis rotation - tweak
+        Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
+        translate = new Vector3f(adjustedPose.m30(),adjustedPose.m31(),adjustedPose.m32());
+        org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
+        if (rotationQuaternion == null) {
+            rotationQuaternion = new Quat4f(jomlQuaternion.x ,jomlQuaternion.y,jomlQuaternion.z,jomlQuaternion.w);
+        }
+        else
+        {
+            rotationQuaternion.set(jomlQuaternion.x,jomlQuaternion.y,jomlQuaternion.z,jomlQuaternion.w);
+        }
+    }
 }
