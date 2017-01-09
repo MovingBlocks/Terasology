@@ -45,7 +45,6 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
-
     float getSecondsSinceLastFrame();
 
     Material getMaterial(String assetId);
