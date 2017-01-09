@@ -34,11 +34,12 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
  * the update and render methods as they are central to a rendering implementation.
  */
 public interface WorldRenderer {
+    public OpenVRProvider VR_PROVIDER = new OpenVRProvider();
+
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
-    public OpenVRProvider getVrProvider();
 
     float getSecondsSinceLastFrame();
 

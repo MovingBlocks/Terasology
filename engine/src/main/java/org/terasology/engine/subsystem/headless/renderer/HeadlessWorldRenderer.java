@@ -62,10 +62,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         config = context.get(Config.class);
     }
 
-    public OpenVRProvider getVrProvider() {
-        return null;
-    }
-
     @Override
     public float getSecondsSinceLastFrame() {
         return 0;

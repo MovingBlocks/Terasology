@@ -17,8 +17,6 @@ package org.terasology.logic.players;
 
 import jopenvr.VRControllerState_t;
 import org.joml.Matrix4f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,7 +24,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.math.geom.Quat4f;
 
@@ -58,7 +55,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
 
 
     public void trySubscribeToControllerPoses() {
-        worldRenderer.getVrProvider().vrState.addControllerListener(this);
+        worldRenderer.VR_PROVIDER.vrState.addControllerListener(this);
     }
 
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {

@@ -113,7 +113,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
-    private OpenVRProvider vrProvider = new OpenVRProvider();
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
@@ -159,9 +158,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
         if (renderingConfig.isVrSupport()) {
-            context.put(OpenVRProvider.class, vrProvider);
-            if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(this.vrProvider);
+            context.put(OpenVRProvider.class, VR_PROVIDER);
+            if (VR_PROVIDER.init()) {
+                playerCamera = new OpenVRStereoCamera(VR_PROVIDER);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
@@ -181,8 +180,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         initRenderingSupport();
     }
-
-    public OpenVRProvider getVrProvider() { return vrProvider; }
 
     private void initRenderingSupport() {
         screenGrabber = new ScreenGrabber(context);
