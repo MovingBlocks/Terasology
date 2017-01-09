@@ -25,7 +25,7 @@ import org.joml.Vector4f;
 /**
  * Utility functions that don't interact with the headset (conversions and the like).
  */
-final public class OpenVRUtil {
+public final class OpenVRUtil {
 
     private OpenVRUtil() {
         // Not called
@@ -78,71 +78,83 @@ final public class OpenVRUtil {
     /*
     * Takes 3 unit vectors, representing an orthonormal basis, and generates a unit quaternion.
      */
-	public static Vector4f getQuaternion(boolean normalizeAxes,
-								  float xx, float xy, float xz,
-								  float yx, float yy, float yz,
-								  float zx, float zy, float zz) {
-    	float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
-		if (normalizeAxes) {
-			final float lx = 1f / new Vector3f(xx, xy, xz).length();
-			final float ly = 1f / new Vector3f(yx, yy, yz).length();
-			final float lz = 1f / new Vector3f(zx, zy, zz).length();
-			xx *= lx;
-			xy *= lx;
-			xz *= lx;
-			yx *= ly;
-			yy *= ly;
-			yz *= ly;
-			zx *= lz;
-			zy *= lz;
-			zz *= lz;
-		}
-		// the trace is the sum of the diagonal elements; see
-		// http://mathworld.wolfram.com/MatrixTrace.html
-		final float t = xx + yy + zz;
+    public static Vector4f getQuaternion(boolean normalizeAxes,
+                                  float xxInput, float xyInput, float xzInput,
+                                  float yxInput, float yyInput, float yzInput,
+                                  float zxInput, float zyInput, float zzInput) {
+        float xx = xxInput;
+        float xy = xyInput;
+        float xz = xzInput;
+        float yx = yxInput;
+        float yy = yyInput;
+        float yz = yzInput;
+        float zx = zxInput;
+        float zy = zyInput;
+        float zz = zzInput;
+        float x;
+        float y;
+        float z;
+        float w;
+        if (normalizeAxes) {
+            final float lx = 1f / new Vector3f(xx, xy, xz).length();
+            final float ly = 1f / new Vector3f(yx, yy, yz).length();
+            final float lz = 1f / new Vector3f(zx, zy, zz).length();
+            xx *= lx;
+            xy *= lx;
+            xz *= lx;
+            yx *= ly;
+            yy *= ly;
+            yz *= ly;
+            zx *= lz;
+            zy *= lz;
+            zz *= lz;
+        }
+        // the trace is the sum of the diagonal elements; see
+        // http://mathworld.wolfram.com/MatrixTrace.html
+        final float t = xx + yy + zz;
 
-		// we protect the division by s by ensuring that s>=1
-		if (t >= 0) { // |w| >= .5
-			float s = (float)Math.sqrt(t + 1); // |s|>=1 ...
-			w = 0.5f * s;
-			s = 0.5f / s; // so this division isn't bad
-			x = (zy - yz) * s;
-			y = (xz - zx) * s;
-			z = (yx - xy) * s;
-		} else if ((xx > yy) && (xx > zz)) {
-			float s = (float)Math.sqrt(1.0 + xx - yy - zz); // |s|>=1
-			x = s * 0.5f; // |x| >= .5
-			s = 0.5f / s;
-			y = (yx + xy) * s;
-			z = (xz + zx) * s;
-			w = (zy - yz) * s;
-		} else if (yy > zz) {
-			float s = (float)Math.sqrt(1.0 + yy - xx - zz); // |s|>=1
-			y = s * 0.5f; // |y| >= .5
-			s = 0.5f / s;
-			x = (yx + xy) * s;
-			z = (zy + yz) * s;
-			w = (xz - zx) * s;
-		} else {
-			float s = (float)Math.sqrt(1.0 + zz - xx - yy); // |s|>=1
-			z = s * 0.5f; // |z| >= .5
-			s = 0.5f / s;
-			x = (xz + zx) * s;
-			y = (zy + yz) * s;
-			w = (yx - xy) * s;
-		}
-		return new Vector4f(x,y,z,w);
-	}
+        // we protect the division by s by ensuring that s>=1
+        if (t >= 0) { // |w| >= .5
+            float s = (float) Math.sqrt(t + 1); // |s|>=1 ...
+            w = 0.5f * s;
+            s = 0.5f / s; // so this division isn't bad
+            x = (zy - yz) * s;
+            y = (xz - zx) * s;
+            z = (yx - xy) * s;
+        } else if ((xx > yy) && (xx > zz)) {
+            float s = (float) Math.sqrt(1.0 + xx - yy - zz); // |s|>=1
+            x = s * 0.5f; // |x| >= .5
+            s = 0.5f / s;
+            y = (yx + xy) * s;
+            z = (xz + zx) * s;
+            w = (zy - yz) * s;
+        } else if (yy > zz) {
+            float s = (float) Math.sqrt(1.0 + yy - xx - zz); // |s|>=1
+            y = s * 0.5f; // |y| >= .5
+            s = 0.5f / s;
+            x = (yx + xy) * s;
+            z = (zy + yz) * s;
+            w = (xz - zx) * s;
+        } else {
+            float s = (float) Math.sqrt(1.0 + zz - xx - yy); // |s|>=1
+            z = s * 0.5f; // |z| >= .5
+            s = 0.5f / s;
+            x = (xz + zx) * s;
+            y = (zy + yz) * s;
+            w = (yx - xy) * s;
+        }
+        return new Vector4f(x, y, z, w);
+    }
 
-	/*
-	* Converts the rotation portion of a 4x4 matrix into a unit quaternion.
-	 */
+    /*
+    * Converts the rotation portion of a 4x4 matrix into a unit quaternion.
+     */
     public static Vector4f convertToQuaternion(Matrix4f m1) {
-    	return getQuaternion(true,
-    			m1.m00(),m1.m10(),m1.m20(),
-				m1.m01(),m1.m11(),m1.m21(),
-				m1.m02(),m1.m12(),m1.m22()
-		);
+        return getQuaternion(true,
+                m1.m00(), m1.m10(), m1.m20(),
+                m1.m01(), m1.m11(), m1.m21(),
+                m1.m02(), m1.m12(), m1.m22()
+        );
 }
 
     static Matrix4f createIdentityMatrix4f() {

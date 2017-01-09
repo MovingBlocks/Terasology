@@ -242,8 +242,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
             Vector3f offset = new Vector3f(0.25f * animateAmount, -0.12f * animateAmount, 0f);
             offset.add(mountPointComponent.translate);
             locationComponent.setLocalPosition(offset);
-        }
-        else {
+        } else {
             // In the case that we have obtained the quaternion directly, just set it.
             // Receiving a quaternion directly is also signalling to us that we received
             // it from OpenVR, so we omit the animation (since we want the item to track

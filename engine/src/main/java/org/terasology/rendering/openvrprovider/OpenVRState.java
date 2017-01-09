@@ -31,7 +31,6 @@ public class OpenVRState {
 
     // Controllers
     private static Matrix4f[] controllerPose = new Matrix4f[2];
-    private static Matrix4f tempPose = new Matrix4f();
     private static VRControllerState_t[] lastControllerState = new VRControllerState_t[2];
 
     private List<ControllerListener> controllerListeners = new ArrayList<>();
@@ -71,7 +70,7 @@ public class OpenVRState {
     void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
         for (ControllerListener listener : controllerListeners) {
-            listener.poseChanged(controllerPose[nIndex],nIndex);
+            listener.poseChanged(controllerPose[nIndex], nIndex);
         }
     }
 

@@ -113,6 +113,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
+    private OpenVRProvider vrProvider = new OpenVRProvider();
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
@@ -180,6 +181,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         initRenderingSupport();
     }
+
+    public OpenVRProvider getVrProvider() { return vrProvider; }
 
     private void initRenderingSupport() {
         screenGrabber = new ScreenGrabber(context);

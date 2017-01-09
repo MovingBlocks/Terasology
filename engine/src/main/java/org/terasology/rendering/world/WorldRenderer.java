@@ -38,18 +38,18 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
+    public OpenVRProvider getVrProvider();
+
     float getSecondsSinceLastFrame();
-
-    Material getMaterial(String assetId);
-
-    boolean isFirstRenderingStageForCurrentFrame();
 
     // This is exposed so that controller-related functions can create callbacks.
     // Ideally, these classes would be able to do so with dependency injection, but that
     // is broken for at least FirstPersonHeldMountPointComponent.java. Could be reltaed to:
     // https://github.com/MovingBlocks/Terasology/issues/2336A
     // TODO: take this out and do dependency injection properly for any classes that depend on this being exposed.
-    final public OpenVRProvider vrProvider = new OpenVRProvider();
+    Material getMaterial(String assetId);
+
+    boolean isFirstRenderingStageForCurrentFrame();
 
     /**
      * This method is triggered when a chunk has been loaded.
