@@ -53,7 +53,6 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
             0.0f, -0.05f, -0.2f, 1.0f
     );
 
-
     public void trySubscribeToControllerPoses() {
         worldRenderer.VR_PROVIDER.vrState.addControllerListener(this);
     }
