@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,19 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
- * Gives the entity to the target entity
+ * Removes the entity from the target entity
  */
 @ServerEvent
-public class GiveItemEvent implements Event {
+public class RemoveItemEvent implements Event {
     private EntityRef targetEntity = EntityRef.NULL;
     private boolean handled;
+    private boolean destroyRemoved = false;
+    private int count = 1;
 
-    public GiveItemEvent() {
+    public RemoveItemEvent() {
     }
 
-    public GiveItemEvent(EntityRef targetEntity) {
+    public RemoveItemEvent(EntityRef targetEntity) {
         // ensure that null values do not happen, replace with correct null reference
         this.targetEntity = targetEntity == null ? EntityRef.NULL : targetEntity;
     }
@@ -46,4 +48,21 @@ public class GiveItemEvent implements Event {
     public void setHandled(boolean handled) {
         this.handled = handled;
     }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setDestroyRemoved(boolean destroyRemoved) {
+        this.destroyRemoved = destroyRemoved;
+    }
+
+    public boolean getDestroyRemoved() {
+        return destroyRemoved;
+    }
+
 }
