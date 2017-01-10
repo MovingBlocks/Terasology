@@ -19,7 +19,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
@@ -34,7 +33,6 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
  * the update and render methods as they are central to a rendering implementation.
  */
 public interface WorldRenderer {
-
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
