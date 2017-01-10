@@ -21,6 +21,7 @@ import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.rendering.openvrprovider.OpenVRProviderSingleton;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -114,6 +115,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
 
+    // TODO: @In
+    private final OpenVRProvider vrProvider = OpenVRProviderSingleton.vrProvider;
+
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
 
@@ -158,9 +162,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
         if (renderingConfig.isVrSupport()) {
-            context.put(OpenVRProvider.class, VR_PROVIDER);
-            if (VR_PROVIDER.init()) {
-                playerCamera = new OpenVRStereoCamera(VR_PROVIDER);
+            context.put(OpenVRProvider.class, vrProvider);
+            if (vrProvider.init()) {
+                playerCamera = new OpenVRStereoCamera(vrProvider);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());

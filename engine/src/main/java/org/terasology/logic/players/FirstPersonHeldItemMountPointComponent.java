@@ -22,10 +22,10 @@ import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.In;
 import org.terasology.rendering.openvrprovider.ControllerListener;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
+import org.terasology.rendering.openvrprovider.OpenVRProviderSingleton;
 
 /**
  * Only used by the client side so that held items can be positioned in line with the camera
@@ -39,10 +39,8 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public Quat4f rotationQuaternion;
     public float scale = 1f;
 
-    // Ideally we should be able to @In for OpenVRProvider here. We're likely being prevented by this bug:
-    // https://github.com/MovingBlocks/Terasology/issues/2336
-    @In
-    private WorldRenderer worldRenderer;
+    // TODO: @In
+    private OpenVRProvider vrProvider = OpenVRProviderSingleton.vrProvider;
 
     // The hand/tool models seem to have an origin other than the pivot point. This is a best-effort correction,
     // in the form of a 4x4 homogeneous transformation matrix
@@ -54,7 +52,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     );
 
     public void trySubscribeToControllerPoses() {
-        worldRenderer.VR_PROVIDER.vrState.addControllerListener(this);
+        vrProvider.vrState.addControllerListener(this);
     }
 
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {
@@ -67,7 +65,6 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
         if (handIndex != 0) {
             return;
         }
-        // y axis rotation - tweak
         Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
         translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
         org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);
