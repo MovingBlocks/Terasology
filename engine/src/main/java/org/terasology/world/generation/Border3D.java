@@ -23,7 +23,7 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Objects;
 
 /**
- * Borders are needed to give the rasterizer access to build outside of the chunk, allowing buildings bigger than a chunk.
+ * Borders extend the facet's data range. This is necessary for most Facets which may cross Chunk borders.
  */
 public class Border3D {
     private final int top;
