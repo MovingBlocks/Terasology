@@ -55,7 +55,7 @@ public class ArrowAction extends BaseComponentSystem {
     private Time time;
 
     private CollisionGroup filter = StandardCollisionGroup.ALL;
-    private float lastTime = 0.0f;
+    private float lastTime;
 
     @Override
     public void initialise() {

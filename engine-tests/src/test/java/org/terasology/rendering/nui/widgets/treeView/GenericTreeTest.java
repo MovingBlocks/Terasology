@@ -91,7 +91,19 @@ public class GenericTreeTest {
 
     @Test
     public void testDepthFirstIterator() {
-        List<GenericTree<Integer>> expected = Arrays.asList(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3), nodes.get(7), nodes.get(4), nodes.get(8), nodes.get(5), nodes.get(6), nodes.get(9), nodes.get(10));
+        List<GenericTree<Integer>> expected = Arrays.asList(
+                nodes.get(0),
+                nodes.get(1),
+                nodes.get(2),
+                nodes.get(3),
+                nodes.get(7),
+                nodes.get(4),
+                nodes.get(8),
+                nodes.get(5),
+                nodes.get(6),
+                nodes.get(9),
+                nodes.get(10)
+        );
 
         List<GenericTree<Integer>> actual = Lists.newArrayList();
         Iterator i = nodes.get(0).getDepthFirstIterator(false);
