@@ -19,5 +19,5 @@ package org.terasology.rendering.openvrprovider;
  * Created by john on 1/9/17.
  */
 public class OpenVRProviderSingleton {
-    public static OpenVRProvider vrProvider;
+    public static OpenVRProvider vrProvider = new OpenVRProvider();
 }
