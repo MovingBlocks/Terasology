@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,6 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
-/**
- */
 public class SolidRasterizer implements WorldRasterizer {
 
     private Block water;
@@ -74,6 +72,7 @@ public class SolidRasterizer implements WorldRasterizer {
             pos2d.set(pos.x, pos.z);
             int posY = pos.y + chunk.getChunkWorldOffsetY();
 
+            // Check for an optional depth for this layer - if defined stop generating below that level
             if (surfaceDepthFacet != null && posY < surfaceDepthFacet.get(pos2d)) {
                 continue;
             }
