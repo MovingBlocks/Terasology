@@ -20,6 +20,7 @@ import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -45,7 +46,6 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
-import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
@@ -86,6 +86,9 @@ import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -320,28 +323,42 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
-        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
-        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-
-        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class);
-        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
-        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
-        Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
-        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
-        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
-
+        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class); // TODO: next PR
         renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
+
+        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
+
+        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class); // TODO: next PR
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
-        renderGraph.addNode(blurPassesNode, "blurPassesNode");
+
+        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR);
+        FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+        FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+
+        aLabel = "firstLateBlurNode";
+        LateBlurNode firstLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        firstLateBlurNode.initialise(toneMappedConfig, firstLateBlurConfig, aLabel);
+        renderGraph.addNode(firstLateBlurNode, aLabel);
+
+        aLabel = "secondLateBlurNode";
+        LateBlurNode secondLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        secondLateBlurNode.initialise(firstLateBlurConfig, secondLateBlurConfig, aLabel);
+        renderGraph.addNode(secondLateBlurNode, aLabel);
+
+        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
+
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 
