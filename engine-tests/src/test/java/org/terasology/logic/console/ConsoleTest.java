@@ -26,7 +26,7 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testClearCommand() {
-        for(int i=0;i<10;i++) {
+        for (int i = 0; i < 10; i++) {
             getConsole().addMessage("Just a message");
         }
 

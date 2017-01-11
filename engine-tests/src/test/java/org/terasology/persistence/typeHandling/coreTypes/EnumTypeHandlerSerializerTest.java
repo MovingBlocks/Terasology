@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.coreTypes.EnumTypeHandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
