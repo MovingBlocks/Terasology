@@ -13,27 +13,57 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.setting;
 
+import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.flexible.setting.validators.SettingValueValidator;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-public class Setting<T extends SettingValue> implements GeneralSubscribable {
+public class Setting<T> implements GeneralSubscribable {
     private final T defaultValue;
+
     private ResourceUrn id;
+    private String idString;
+
     private T value;
 
     private String name;
     private String description;
 
+    private SettingValueValidator<T> valueValidator;
+
     private List<PropertyChangeListener> subscribers;
 
-    public Setting(ResourceUrn id, T defaultValue) {
+    public Setting(ResourceUrn id, T defaultValue, SettingValueValidator<T> valueValidator) {
         this.id = id;
+        // Precomputing for performance
+        this.idString = id.toString();
+
         this.defaultValue = defaultValue;
+        this.value = this.defaultValue;
+
+        this.valueValidator = valueValidator;
+
+        this.subscribers = Lists.newArrayList();
+    }
+
+    public SettingValueValidator<T> getValueValidator() {
+        return valueValidator;
+    }
+
+    public void setValueValidator(SettingValueValidator<T> valueValidator) {
+        this.valueValidator = valueValidator;
+    }
+
+    private void dispatchChangedEvent(PropertyChangeEvent event) {
+        for (PropertyChangeListener subscriber : subscribers) {
+            subscriber.propertyChange(event);
+        }
     }
 
     public void subscribe(PropertyChangeListener listener) {
@@ -42,6 +72,10 @@ public class Setting<T extends SettingValue> implements GeneralSubscribable {
 
     public void unsubscribe(PropertyChangeListener listener) {
         subscribers.remove(listener);
+    }
+
+    public boolean hasSubscribers() {
+        return !subscribers.isEmpty();
     }
 
     public ResourceUrn getId() {
@@ -56,8 +90,17 @@ public class Setting<T extends SettingValue> implements GeneralSubscribable {
         return value;
     }
 
-    public void setValue(T value) {
+    public boolean setValue(T value) {
+        if (!valueValidator.isValid(value))
+            return false;
+
+        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);
+
         this.value = value;
+
+        dispatchChangedEvent(event);
+
+        return true;
     }
 
     public String getName() {

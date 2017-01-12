@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.setting.validators;
 
-public interface SettingValue {
-    boolean isValid();
+public interface SettingValueValidator<T> {
+    /**
+     * Checks whether the given value is valid or not.
+     * @param value The value to validate.
+     * @return True if the value is valid, false otherwise.
+     */
+    boolean isValid(T value);
 }

@@ -15,15 +15,39 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.flexible.setting.Setting;
 
 import java.util.Map;
 
 public class FlexibleConfig {
     private Map<ResourceUrn, Setting> settings;
 
+    public FlexibleConfig() {
+        this.settings = Maps.newHashMap();
+    }
+
     public void add(Setting setting) {
         // Maybe throw an exception?
         settings.putIfAbsent(setting.getId(), setting);
+    }
+
+    public boolean remove(ResourceUrn id) {
+        Setting setting = get(id);
+
+        if (setting == null || setting.hasSubscribers())
+            return false;
+
+        settings.remove(id);
+        return true;
+    }
+
+    public Setting get(ResourceUrn id) {
+        return settings.get(id);
+    }
+
+    public boolean has(ResourceUrn id) {
+        return settings.containsKey(id);
     }
 }
