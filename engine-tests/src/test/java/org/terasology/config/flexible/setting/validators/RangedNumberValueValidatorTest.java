@@ -38,8 +38,8 @@ public class RangedNumberValueValidatorTest {
                 assertTrue(String.format("%d returned invalid", i), validator.isValid(i));
             }
 
-            assertFalse(validator.isValid(101));
-            assertFalse(validator.isValid(-99));
+            assertFalse(validator.isValid(validator.getHigh() + 1));
+            assertFalse(validator.isValid(validator.getLow() - 1));
         }
 
 
@@ -51,8 +51,42 @@ public class RangedNumberValueValidatorTest {
                 assertTrue(String.format("%d returned invalid", i), validator.isValid(i));
             }
 
-            assertFalse(validator.isValid(100));
-            assertFalse(validator.isValid(0));
+            assertFalse(validator.isValid(validator.getHigh()));
+            assertFalse(validator.isValid(validator.getLow()));
+        }
+
+        @Test
+        public void testLowUnbounded() {
+            validator.removeLowBound();
+
+            assertTrue(validator.isValid(-1000));
+            assertTrue(validator.isValid(-50000));
+            assertTrue(validator.isValid(50));
+
+            assertFalse(validator.isValid(validator.getHigh() + 1));
+        }
+
+        @Test
+        public void testHighUnbounded() {
+            validator.removeHighBound();
+
+            assertTrue(validator.isValid(1000));
+            assertTrue(validator.isValid(50000));
+            assertTrue(validator.isValid(50));
+
+            assertFalse(validator.isValid(validator.getLow() - 1));
+        }
+
+        @Test
+        public void testAllUnbounded() {
+            validator.removeAllBounds();
+
+            assertTrue(validator.isValid(1000));
+            assertTrue(validator.isValid(50000));
+            assertTrue(validator.isValid(50));
+
+            assertTrue(validator.isValid(-1000));
+            assertTrue(validator.isValid(-50000));
         }
     }
 
@@ -85,8 +119,42 @@ public class RangedNumberValueValidatorTest {
                 assertTrue(String.format("%f returned invalid", i), validator.isValid(i));
             }
 
-            assertFalse(validator.isValid(100d));
-            assertFalse(validator.isValid(0d));
+            assertFalse(validator.isValid(validator.getLow()));
+            assertFalse(validator.isValid(validator.getHigh()));
+        }
+
+        @Test
+        public void testLowUnbounded() {
+            validator.removeLowBound();
+
+            assertTrue(validator.isValid(-1000d));
+            assertTrue(validator.isValid(-50000d));
+            assertTrue(validator.isValid(50d));
+
+            assertFalse(validator.isValid(validator.getHigh() + EPSILON));
+        }
+
+        @Test
+        public void testHighUnbounded() {
+            validator.removeHighBound();
+
+            assertTrue(validator.isValid(1000d));
+            assertTrue(validator.isValid(50000d));
+            assertTrue(validator.isValid(50d));
+
+            assertFalse(validator.isValid(validator.getLow() - EPSILON));
+        }
+
+        @Test
+        public void testAllUnbounded() {
+            validator.removeAllBounds();
+
+            assertTrue(validator.isValid(1000d));
+            assertTrue(validator.isValid(50000d));
+            assertTrue(validator.isValid(50d));
+
+            assertTrue(validator.isValid(-1000d));
+            assertTrue(validator.isValid(-50000d));
         }
     }
 }

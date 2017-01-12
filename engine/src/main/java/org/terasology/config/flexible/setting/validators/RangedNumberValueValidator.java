@@ -58,6 +58,19 @@ public class RangedNumberValueValidator<T extends Number & Comparable<? super T>
         this.high = high;
     }
 
+    public void removeLowBound() {
+        low = null;
+    }
+
+    public void removeHighBound() {
+        high = null;
+    }
+
+    public void removeAllBounds() {
+        removeHighBound();
+        removeLowBound();
+    }
+
     /**
      * {@inheritDoc}
      */
