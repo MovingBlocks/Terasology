@@ -55,7 +55,7 @@ public class AudioConfig {
     }
 
     /**
-     * @param musicVolume Sets music volume using the same principle as setSoundVolume()
+     * @param musicVolume Sets the music volume starting from the previous value and going to the musicVolume passed in
      */
     public void setMusicVolume(float musicVolume) {
         float oldValue = this.musicVolume;
