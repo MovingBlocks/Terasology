@@ -1,5 +1,5 @@
 {
-    "activate-module": "Embark",
+    "activate-module": "Select th' module!",
     "add-server": "Add New",
     "add-server-tip": "Ye can press ENTER t' copy th' name t' th' address field",
     "advanced-usage": "Advanced Usage!",
@@ -7,7 +7,7 @@
     "animate-water": "Moving Water, argh",
     "audio-settings": "Noise",
     "audio-settings-title": "Noise Options",
-    "back": "rear",
+    "back": "turn back",
     "behavior-editor-assign": "dispense",
     "behavior-editor-copy": "mark down",
     "behavior-editor-layout": "layout",
