@@ -32,7 +32,7 @@ public class AudioConfig {
     private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /**
-     * @return Returns a float of the sound volume
+     * @return the sound volume as a float, with 0 meaning no sound and 100 (or 1?) being the maximum volume.
      */
     public float getSoundVolume() {
         return soundVolume;
