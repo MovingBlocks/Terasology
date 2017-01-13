@@ -48,7 +48,7 @@ public class AudioConfig {
     }
 
     /**
-     * @return Returns music volume
+     * @returns the music volume as a float, 0 meaning no music and 100 (or 1?) meaning music at the highest volume.
      */
     public float getMusicVolume() {
         return musicVolume;
