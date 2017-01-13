@@ -64,14 +64,14 @@ public class AudioConfig {
     }
 
     /**
-     * @return A boolean indicating if sound is disabled
+     * @return whether sound is disabled
      */
     public boolean isDisableSound() {
         return disableSound;
     }
 
     /**
-     * @param disableSound Sets either true or false if sound is disabled or not
+     * @param disableSound whether sound is disabled
      */
     public void setDisableSound(boolean disableSound) {
         this.disableSound = disableSound;
