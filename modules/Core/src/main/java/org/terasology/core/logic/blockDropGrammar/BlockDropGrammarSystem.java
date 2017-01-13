@@ -23,9 +23,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.inventory.events.GiveItemEvent;
+import org.terasology.logic.items.components.ItemComponent;
+import org.terasology.logic.items.events.ItemDropEvent;
+import org.terasology.logic.items.events.ItemGiveEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
@@ -125,7 +125,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
                         EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
                         if (dropParser.getCount() > 1) {
                             ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
-                            itemComponent.stackCount = (byte) dropParser.getCount();
+                            //itemComponent.stackCount = (byte) dropParser.getCount();
                         }
                         EntityRef dropItem = dropEntity.build();
                         if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
@@ -142,14 +142,14 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
                 || !giveItem(event.getInstigator(), dropItem);
     }
 
-    private boolean giveItem(EntityRef instigator, EntityRef dropItem) {
-        GiveItemEvent event = new GiveItemEvent(instigator);
+    private boolean giveItem(EntityRef dest, EntityRef dropItem) {
+        ItemGiveEvent event = new ItemGiveEvent(dest);
         dropItem.send(event);
-        return event.isHandled();
+        return event.wasSuccessful();
     }
 
     private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {
-        item.send(new DropItemEvent(location));
+        item.send(new ItemDropEvent(location));
         if (applyMovement) {
             item.send(new ImpulseEvent(random.nextVector3f(30.0f)));
         }

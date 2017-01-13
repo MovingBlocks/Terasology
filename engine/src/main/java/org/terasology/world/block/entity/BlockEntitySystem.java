@@ -25,8 +25,8 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
-import org.terasology.logic.inventory.events.DropItemEvent;
-import org.terasology.logic.inventory.events.GiveItemEvent;
+import org.terasology.logic.items.events.ItemDropEvent;
+import org.terasology.logic.items.events.ItemGiveEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
@@ -140,9 +140,9 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private boolean giveItem(CreateBlockDropsEvent event, EntityRef item) {
-        GiveItemEvent giveItemEvent = new GiveItemEvent(event.getInstigator());
+        ItemGiveEvent giveItemEvent = new ItemGiveEvent(event.getInstigator());
         item.send(giveItemEvent);
-        return giveItemEvent.isHandled();
+        return giveItemEvent.wasSuccessful();
     }
 
     private boolean isDirectPickup(Block block, BlockDamageModifierComponent blockDamageModifierComponent) {
@@ -164,7 +164,7 @@ public class BlockEntitySystem extends BaseComponentSystem {
     }
 
     private void processDropping(EntityRef item, Vector3i location, float impulsePower) {
-        item.send(new DropItemEvent(location.toVector3f()));
+        item.send(new ItemDropEvent(location.toVector3f()));
         item.send(new ImpulseEvent(random.nextVector3f(impulsePower)));
     }
 

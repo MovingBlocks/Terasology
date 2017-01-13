@@ -3,6 +3,7 @@
         "name": "Unknown"
     },
     "Item": {
+
         "damageType": "engine:physicalDamage",
         "pickupPrefab": "engine:itemPickup",
         "cooldownTime": 200

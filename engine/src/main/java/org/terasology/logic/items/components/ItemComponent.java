@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.BuilderSampleGameplay.logic;
+package org.terasology.logic.items.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Owns;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.network.FieldReplicateType;
+import org.terasology.network.Replicate;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
-public class CharacterOwnedItemComponent implements Component {
-    @Owns
-    public EntityRef item;
+public class ItemComponent implements Component {
 
-    public CharacterOwnedItemComponent() {
-    }
-
-    public CharacterOwnedItemComponent(EntityRef item) {
-        this.item = item;
-    }
+    /**
+     * Name of the icon this item should be rendered with
+     */
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    public TextureRegionAsset<?> icon;
+    public int cooldownTime = 200;
+    public int baseDamage = 1;
+    public Prefab damageType;
 }

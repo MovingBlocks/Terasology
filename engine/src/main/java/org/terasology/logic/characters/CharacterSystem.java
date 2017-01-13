@@ -41,7 +41,7 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.items.components.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;

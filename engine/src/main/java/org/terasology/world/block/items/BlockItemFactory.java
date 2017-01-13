@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -65,11 +64,11 @@ public class BlockItemFactory {
         DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
         displayNameComponent.name = blockFamily.getDisplayName();
 
-        ItemComponent item = builder.getComponent(ItemComponent.class);
+       /* ItemComponent item = builder.getComponent(ItemComponent.class);
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) quantity;
-        }
+        }*/
 
         BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;
@@ -107,11 +106,11 @@ public class BlockItemFactory {
             displayNameComponent.name = blockFamily.getDisplayName();
         }
 
-        ItemComponent item = builder.getComponent(ItemComponent.class);
+      /*  ItemComponent item = builder.getComponent(ItemComponent.class);
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) 1;
-        }
+        }*/
 
         BlockItemComponent blockItem = builder.getComponent(BlockItemComponent.class);
         blockItem.blockFamily = blockFamily;

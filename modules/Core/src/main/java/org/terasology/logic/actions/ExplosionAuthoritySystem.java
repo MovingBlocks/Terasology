@@ -30,7 +30,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.items.components.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;

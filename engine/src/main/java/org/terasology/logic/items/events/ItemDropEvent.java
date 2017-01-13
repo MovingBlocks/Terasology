@@ -13,24 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory.events;
+package org.terasology.logic.items.events;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ServerEvent;
 
 /**
- * Fire this event on an item in order for the authority to add the necessary components to put it in the world.
+ * Event to be fired to drop an item into the world.
  */
 @ServerEvent
-public class DropItemEvent implements Event {
+public class ItemDropEvent implements Event {
     private Vector3f position;
+    private EntityRef item;
 
-    public DropItemEvent() {
+
+    public ItemDropEvent(Vector3f position) {
+        this(position, EntityRef.NULL);
     }
 
-    public DropItemEvent(Vector3f position) {
+    public ItemDropEvent(Vector3f position, EntityRef item) {
+        this.item = item;
         this.position = position;
+    }
+
+    public EntityRef getItem() {
+        return item;
     }
 
     public Vector3f getPosition() {

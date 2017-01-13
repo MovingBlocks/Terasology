@@ -16,6 +16,7 @@
 
 package org.terasology.world.block.items;
 
+import org.terasology.logic.items.components.ItemComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -26,7 +27,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.KinematicCharacterMover;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Side;

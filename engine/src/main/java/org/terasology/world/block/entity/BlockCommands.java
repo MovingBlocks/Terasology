@@ -32,7 +32,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.logic.inventory.events.GiveItemEvent;
+import org.terasology.logic.items.events.ItemGiveEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayer;
@@ -355,9 +355,9 @@ public class BlockCommands extends BaseComponentSystem {
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 
-        GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
-        item.send(giveItemEvent);
-        if (!giveItemEvent.isHandled()) {
+        ItemGiveEvent giveEvent = new ItemGiveEvent(playerEntity);
+        item.send(giveEvent);
+        if (!giveEvent.wasSuccessful()) {
             item.destroy();
         }
 

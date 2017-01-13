@@ -37,7 +37,7 @@ import org.terasology.logic.characters.CharacterSoundSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.items.components.ItemComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
