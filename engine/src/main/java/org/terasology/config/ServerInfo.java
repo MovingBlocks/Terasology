@@ -53,7 +53,6 @@ public class ServerInfo {
     }
 
     /**
-     * Precondition: The name of the server is not null or empty
      * @param name Sets the name of the server
      */
     public void setName(String name) {
@@ -69,7 +68,6 @@ public class ServerInfo {
     }
 
     /**
-     * Precondition: The address (URL) is not null or empty
      * @param address Sets the address
      */
     public void setAddress(String address) {
@@ -78,7 +76,7 @@ public class ServerInfo {
     }
 
     /**
-     * @return Returns the port
+     * @return Returns the port an integer value representing the port number, in the [0-65535] range, inclusive
      */
     public int getPort() {
         return port;
