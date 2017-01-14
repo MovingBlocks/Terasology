@@ -29,6 +29,9 @@ public class ItemComponent implements Component {
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public TextureRegionAsset<?> icon;
     public int cooldownTime = 200;
+    public Prefab onDroppedPrefab;
+
+    //TODO: Remove to health system
     public int baseDamage = 1;
     public Prefab damageType;
 }
