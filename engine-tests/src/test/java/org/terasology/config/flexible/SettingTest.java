@@ -21,6 +21,10 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.flexible.validators.RangedNumberValueValidator;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
+
+import java.beans.PropertyChangeListener;
 
 import static org.junit.Assert.*;
 
@@ -53,6 +57,90 @@ public class SettingTest {
             assertFalse(setting.setValue(101));
 
             assertEquals(-1, eventResult);
+        }
+    }
+
+    public static class Subscribers {
+        private Setting<Integer> setting;
+
+        private PropertyChangeListener listener;
+
+        private int eventCallCount;
+
+        @Before
+        public void setUp() {
+            setting = new Setting<>(new ResourceUrn("engine-tests", "TestSetting"),
+                    50, new RangedNumberValueValidator<>(0, 100));
+
+            eventCallCount = 0;
+
+            listener = propertyChangeEvent -> eventCallCount++;
+        }
+
+        @Test
+        public void testSetEventCall() {
+            setting.subscribe(listener);
+
+            Random random = new FastRandom();
+
+            final int n = 50;
+            int expectedEventCallCount = 0;
+
+            for (int i = 0; i < n; i++) {
+                int r = random.nextInt(-50, 150);
+                expectedEventCallCount += setting.setValue(r) ? 1 : 0;
+            }
+
+            assertEquals(expectedEventCallCount, eventCallCount);
+        }
+
+        @Test
+        public void testSubscribe() {
+            final int n = 10;
+
+            for (int i = 0; i < n; i++) {
+                setting.subscribe(listener);
+            }
+
+            setting.setValue(30);
+
+            assertEquals(n, eventCallCount);
+        }
+
+        @Test
+        public void testUnsubscribe() {
+            int n = 10;
+
+            for (int i = 0; i < n; i++) {
+                setting.subscribe(listener);
+            }
+
+            int halfN = n / 2;
+
+            for(int i = 0; i < new FastRandom().nextInt(halfN); i++){
+                setting.unsubscribe(listener);
+                n--;
+            }
+
+            setting.setValue(30);
+
+            assertEquals(n, eventCallCount);
+        }
+    }
+
+    public static class SetValueValidator {
+        @Test
+        public void testSetValueValidator() {
+            Setting<Integer> setting = new Setting<>(new ResourceUrn("engine-tests", "TestSetting"),
+                    50, new RangedNumberValueValidator<>(0, 100));
+
+            assertTrue(setting.setValue(5));
+            assertTrue(setting.setValue(95));
+
+            setting.setValueValidator(new RangedNumberValueValidator<Integer>(10, 50));
+
+            assertFalse(setting.setValue(5));
+            assertFalse(setting.setValue(95));
         }
     }
 }
