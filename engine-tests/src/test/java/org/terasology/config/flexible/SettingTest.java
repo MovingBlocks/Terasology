@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.flexible.setting.Setting;
-import org.terasology.config.flexible.setting.validators.RangedNumberValueValidator;
-import org.terasology.persistence.typeHandling.coreTypes.DoubleTypeHandler;
+import org.terasology.config.flexible.validators.RangedNumberValueValidator;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
 public class SettingTest {
@@ -53,7 +49,7 @@ public class SettingTest {
         }
 
         @Test
-        public void testNotSetsValue() {
+        public void testDoesNotSetValue() {
             assertFalse(setting.setValue(101));
 
             assertEquals(-1, eventResult);

@@ -15,8 +15,24 @@
  */
 package org.terasology.config.flexible;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.terasology.assets.ResourceUrn;
+import org.terasology.config.flexible.validators.RangedNumberValueValidator;
 
-class FlexibleConfigTest {
+import static org.junit.Assert.assertEquals;
 
+public class FlexibleConfigTest {
+    @Test
+    public void testGet() throws Exception {
+        FlexibleConfig config = new FlexibleConfig();
+
+        ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+
+        FlexibleConfig.Key<Integer> key = config.add(new Setting<>(id, 50,
+                new RangedNumberValueValidator<>(0, 100)));
+
+        Setting<Integer> setting = config.get(key);
+
+        assertEquals(50, setting.getValue().intValue());
+    }
 }

@@ -17,37 +17,70 @@ package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.flexible.setting.Setting;
 
 import java.util.Map;
 
 public class FlexibleConfig {
-    private Map<ResourceUrn, Setting> settings;
+    private Map<Key<?>, Setting> settingMap;
 
     public FlexibleConfig() {
-        this.settings = Maps.newHashMap();
+        this.settingMap = Maps.newHashMap();
     }
 
-    public void add(Setting setting) {
+    public <V> Key<V> add(Setting<V> setting) {
+        Key<V> key = new Key<>(setting.getId(), setting.getValue());
+
         // Maybe throw an exception?
-        settings.putIfAbsent(setting.getId(), setting);
+        if (has(key))
+            return null;
+
+        settingMap.put(key, setting);
+        return key;
     }
 
-    public boolean remove(ResourceUrn id) {
+    public boolean remove(Key<?> id) {
         Setting setting = get(id);
 
         if (setting == null || setting.hasSubscribers())
             return false;
 
-        settings.remove(id);
+        settingMap.remove(id);
         return true;
     }
 
-    public Setting get(ResourceUrn id) {
-        return settings.get(id);
+    public <V> Setting<V> get(Key<V> key) {
+        Setting setting = settingMap.get(key);
+
+        return key.vClass.isInstance(setting.getValue()) ? Setting.cast(setting, key.vClass) : null;
     }
 
-    public boolean has(ResourceUrn id) {
-        return settings.containsKey(id);
+    public boolean has(Key<?> id) {
+        return settingMap.containsKey(id);
+    }
+
+    static final class Key<V> {
+        private final ResourceUrn key;
+        private final Class<V> vClass;
+
+        @SuppressWarnings("unchecked")
+        Key(ResourceUrn key, V value) {
+            // this cast will always be safe unless the outside world is doing something fishy like using raw types
+            this(key, (Class<V>) value.getClass());
+        }
+
+        Key(ResourceUrn key, Class<V> vClass) {
+            this.key = key;
+            this.vClass = vClass;
+        }
+
+        @Override
+        public int hashCode() {
+            return key.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return (o instanceof Key<?>) && ((Key<?>) o).key.equals(key);
+        }
     }
 }

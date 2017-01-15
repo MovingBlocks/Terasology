@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.setting;
+package org.terasology.config.flexible;
 
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.flexible.setting.validators.SettingValueValidator;
+import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
 
 import java.beans.PropertyChangeEvent;
@@ -28,15 +28,14 @@ public class Setting<T> implements GeneralSubscribable {
     private final T defaultValue;
 
     private ResourceUrn id;
-    private String idString;
 
+    private String idString;
     private T value;
 
     private String name;
+
     private String description;
-
     private SettingValueValidator<T> valueValidator;
-
     private List<PropertyChangeListener> subscribers;
 
     public Setting(ResourceUrn id, T defaultValue, SettingValueValidator<T> valueValidator) {
@@ -50,6 +49,23 @@ public class Setting<T> implements GeneralSubscribable {
         this.valueValidator = valueValidator;
 
         this.subscribers = Lists.newArrayList();
+    }
+
+    @SuppressWarnings("unchecked")
+    static <V> Setting<V> cast(Setting rawSetting, Class<V> valueClass) {
+        Setting<V> castedSetting = new Setting<>(rawSetting.getId(), valueClass.cast(rawSetting.getDefaultValue()),
+                (SettingValueValidator<V>) rawSetting.getValueValidator());
+
+        castedSetting.setValue(valueClass.cast(rawSetting.getValue()));
+
+        castedSetting.setName(castedSetting.getName());
+        castedSetting.setDescription(castedSetting.getDescription());
+
+        return castedSetting;
+    }
+
+    public Class<? extends SettingValueValidator> getValidatorClass() {
+        return valueValidator.getClass();
     }
 
     public SettingValueValidator<T> getValueValidator() {
@@ -94,7 +110,7 @@ public class Setting<T> implements GeneralSubscribable {
         if (!valueValidator.isValid(value))
             return false;
 
-        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);
+        PropertyChangeEvent event = new PropertyChangeEvent(this, idString, this.value, value);
 
         this.value = value;
 
