@@ -78,6 +78,17 @@ public class SettingTest {
         }
 
         @Test
+        public void testHasSubscribers() {
+            setting.subscribe(listener);
+
+            assertTrue(setting.hasSubscribers());
+
+            setting.unsubscribe(listener);
+
+            assertFalse(setting.hasSubscribers());
+        }
+
+        @Test
         public void testSetEventCall() {
             setting.subscribe(listener);
 

@@ -48,14 +48,21 @@ public class FlexibleConfig {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     public <V> Setting<V> get(Key<V> key) {
+        if (key == null || key.vClass == null) return null;
+
         Setting setting = settingMap.get(key);
 
-        return key.vClass.isInstance(setting.getValue()) ? Setting.cast(setting, key.vClass) : null;
+        if (setting == null) return null;
+
+        // Possibly raise an exception?
+        // The Setting<V> cast will always be safe if the below condition is true
+        return key.vClass.isInstance(setting.getValue()) ? (Setting<V>) setting : null;
     }
 
-    public boolean has(Key<?> id) {
-        return settingMap.containsKey(id);
+    public boolean has(Key<?> key) {
+        return settingMap.containsKey(key);
     }
 
     static final class Key<V> {

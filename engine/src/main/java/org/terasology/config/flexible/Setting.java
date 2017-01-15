@@ -51,19 +51,6 @@ public class Setting<T> implements GeneralSubscribable {
         this.subscribers = Lists.newArrayList();
     }
 
-    @SuppressWarnings("unchecked")
-    static <V> Setting<V> cast(Setting rawSetting, Class<V> valueClass) {
-        Setting<V> castedSetting = new Setting<>(rawSetting.getId(), valueClass.cast(rawSetting.getDefaultValue()),
-                (SettingValueValidator<V>) rawSetting.getValueValidator());
-
-        castedSetting.setValue(valueClass.cast(rawSetting.getValue()));
-
-        castedSetting.setName(castedSetting.getName());
-        castedSetting.setDescription(castedSetting.getDescription());
-
-        return castedSetting;
-    }
-
     public Class<? extends SettingValueValidator> getValidatorClass() {
         return valueValidator.getClass();
     }
