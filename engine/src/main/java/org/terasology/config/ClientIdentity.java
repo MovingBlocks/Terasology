@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package org.terasology.config;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 
-/**
- *
- */
 public class ClientIdentity {
 
 
@@ -44,8 +41,7 @@ public class ClientIdentity {
     }
 
     /**
-     * Precondition: The system security manager is not null and you have permission for private certificate access
-     * @return A PrivateIndentityCertificate belonging to the player
+     * @return A PrivateIndentityCertificate belonging to the player, if possible (exists and is allowed)
      */
     public PrivateIdentityCertificate getPlayerPrivateCertificate() {
         if (System.getSecurityManager() != null) {

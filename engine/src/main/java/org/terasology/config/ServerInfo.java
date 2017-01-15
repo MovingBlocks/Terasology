@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.config;
 
 import com.google.common.base.Preconditions;
-
 
 public class ServerInfo {
     private String name;
@@ -32,8 +30,7 @@ public class ServerInfo {
 
 
     /**
-     * ServerInfo constructor
-     * Example parameters to pass: ServerInfo("My New Terasology Server", "my.address", 12345);
+     * ServerInfo constructor.
      *
      * @param name    Sets the name of the server.
      * @param address Sets the address (URL) of the server.
@@ -83,8 +80,7 @@ public class ServerInfo {
     }
 
     /**
-     * Precondition: The port ranges from 0 to 65535 inclusive
-     * @param port Sets the port
+     * @param port Sets the port, ranges from 0 to 65535 inclusive
      */
     public void setPort(int port) {
         Preconditions.checkArgument(port >= 0 && port <= 65535, "Server port must be in the range [0..65535]");

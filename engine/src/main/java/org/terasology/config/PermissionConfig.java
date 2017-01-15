@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.config;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
-TODO
-*/
 public class PermissionConfig {
     /**
      * Used for first time authentication at a headless server which may be at a remote location.

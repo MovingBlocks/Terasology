@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.config;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-/**
- */
 public class AudioConfig {
     public static final String SOUND_VOLUME = "soundVolume";
     public static final String MUSIC_VOLUME = "musicVolume";
@@ -39,7 +36,7 @@ public class AudioConfig {
     }
 
     /**
-     * @param soundVolume Sets the sound volume starting from the previous value and going to the soundVolume passed in
+     * @param soundVolume Sets the sound volume offering both the new as well as prior value if needed
      */
     public void setSoundVolume(float soundVolume) {
         float oldValue = this.soundVolume;
@@ -55,7 +52,7 @@ public class AudioConfig {
     }
 
     /**
-     * @param musicVolume Sets the music volume starting from the previous value and going to the musicVolume passed in
+     * @param musicVolume Sets the music volume offering both the new as well as prior value if needed
      */
     public void setMusicVolume(float musicVolume) {
         float oldValue = this.musicVolume;
