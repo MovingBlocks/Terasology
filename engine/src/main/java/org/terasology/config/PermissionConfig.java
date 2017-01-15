@@ -28,16 +28,8 @@ public class PermissionConfig {
     private String oneTimeAuthorizationKey = createRandomKey();
 
     /**
-     * @return Builds a random key on the priniciple stated below:
-     * Create a SecureRandom object, and a list of possible characters
-     * Populate possible characters with A-Z, a-z, and 2-9.
-     * Remove all 'l', 'I' and 'O' characters
-     * Create a StringBuilder called codeBuilder and do this:
-     * Loop 20 times
-     * If 1 is not zero, and you have reached a character that is a multiple of four, add a dash
-     * Dash or not, append something random from possibleCharacters.
-     * Once complete return the StringBuilder codeBuilder.toString();
-     */
+     * @return Builds a random key with A-Z, a-z and 2-9.
+    */
     private static String createRandomKey() {
         SecureRandom random = new SecureRandom();
         List<Character> possibleCharacters = new ArrayList<>();
