@@ -20,7 +20,9 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+TODO
+*/
 public class PermissionConfig {
     /**
      * Used for first time authentication at a headless server which may be at a remote location.
