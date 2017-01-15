@@ -27,15 +27,26 @@ public class ClientIdentity {
     private PublicIdentityCertificate playerPublicCertificate;
     private PrivateIdentityCertificate playerPrivateCertificate;
 
+    /**
+     * @param publicCert  The public certificate to be passed
+     * @param privateCert The private certificate to be passed
+     */
     public ClientIdentity(PublicIdentityCertificate publicCert, PrivateIdentityCertificate privateCert) {
         this.playerPublicCertificate = publicCert;
         this.playerPrivateCertificate = privateCert;
     }
 
+    /**
+     * @return A PublicIdentityCertificate belonging to the player
+     */
     public PublicIdentityCertificate getPlayerPublicCertificate() {
         return playerPublicCertificate;
     }
 
+    /**
+     * Precondition: The system security manager is not null and you have permission for private certificate access
+     * @return A PrivateIndentityCertificate belonging to the player
+     */
     public PrivateIdentityCertificate getPlayerPrivateCertificate() {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(SecurityConfig.PRIVATE_CERTIFICATE_ACCESS_PERMISSION);
