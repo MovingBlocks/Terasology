@@ -161,7 +161,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
         private int count;
         private String resultDrop;
 
-        public DropParser(Random rnd, String drop) {
+        DropParser(Random rnd, String drop) {
             this.rnd = rnd;
             this.drop = drop;
         }

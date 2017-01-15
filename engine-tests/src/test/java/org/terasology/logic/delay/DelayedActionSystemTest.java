@@ -17,16 +17,10 @@ package org.terasology.logic.delay;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.Time;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.CoreRegistryTest;
-import org.terasology.registry.In;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,17 +31,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DelayedActionSystemTest extends TerasologyTestingEnvironment {
+
+    long nextFakeEntityId = 1;
+    int lookingForId; // Use this for ordering the time events. 0 is earliest.
+
     private DelayedActionSystem delayedActionSystem;
     private List<Integer> vals; // Use this for ordering the expected values.
 
     private Time time;
 
-    long nextFakeEntityId = 1;
-    int lookingForId = 0; // Use this for ordering the time events. 0 is earliest.
-
     @Before
     @Override
-    public void setup() throws Exception{
+    public void setup() throws Exception {
         super.setup();
 
         delayedActionSystem = new DelayedActionSystem();

@@ -18,7 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -61,13 +61,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
         // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPED);
+        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPED_FBO);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor property rather than check every frame
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.get(BlurPassesNode.BLUR_1).bindTexture();
+            displayResolutionDependentFBOs.get(LateBlurNode.SECOND_LATE_BLUR_FBO).bindTexture();
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
