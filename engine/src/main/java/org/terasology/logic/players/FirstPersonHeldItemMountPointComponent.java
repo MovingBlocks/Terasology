@@ -25,7 +25,6 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.openvrprovider.ControllerListener;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.openvrprovider.OpenVRProviderSingleton;
 
 /**
  * Only used by the client side so that held items can be positioned in line with the camera
@@ -40,7 +39,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public float scale = 1f;
 
     // TODO: @In
-    private OpenVRProvider vrProvider = OpenVRProviderSingleton.vrProvider;
+    private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
 
     // The hand/tool models seem to have an origin other than the pivot point. This is a best-effort correction,
     // in the form of a 4x4 homogeneous transformation matrix

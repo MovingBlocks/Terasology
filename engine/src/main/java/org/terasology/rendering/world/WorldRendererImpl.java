@@ -22,7 +22,6 @@ import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.openvrprovider.OpenVRProviderSingleton;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -119,7 +118,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final Camera playerCamera;
 
     // TODO: @In
-    private final OpenVRProvider vrProvider = OpenVRProviderSingleton.vrProvider;
+    private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;

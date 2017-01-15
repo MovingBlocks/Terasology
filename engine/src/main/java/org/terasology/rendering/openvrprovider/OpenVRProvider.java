@@ -70,6 +70,19 @@ public class OpenVRProvider {
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
+    private static OpenVRProvider instance = null;
+
+    // Get a singleton instance.
+    /*
+    * As a general rule, we should use this class as a singleton, because multiple instantiation
+    * will likely cause problems in the upstream native library. This provides a convenient method
+    * of using OpenVRProvider as a singleton.
+     */
+    public static OpenVRProvider getInstance() {
+        if (instance == null)
+            instance = new OpenVRProvider();
+        return instance;
+    }
 
     public OpenVRProvider() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
