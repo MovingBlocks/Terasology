@@ -43,7 +43,7 @@ import static org.terasology.rendering.openvrprovider.ControllerListener.RIGHT_C
  * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
  * or OpenVRState
  */
-public class OpenVRProvider {
+public final class OpenVRProvider {
     public static Texture_t[] texType = new Texture_t[2];
 
     private static boolean initialized;
@@ -63,6 +63,7 @@ public class OpenVRProvider {
     //keyboard
     private static boolean keyboardShowing;
     private static boolean headIsTracking;
+    private static OpenVRProvider instance;
 
     public OpenVRState vrState = new OpenVRState();
 
@@ -70,7 +71,10 @@ public class OpenVRProvider {
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
-    private static OpenVRProvider instance = null;
+
+    // Call getInstance() to instantiate
+    private OpenVRProvider() {
+    }
 
     // Get a singleton instance.
     /*
@@ -79,12 +83,13 @@ public class OpenVRProvider {
     * of using OpenVRProvider as a singleton.
      */
     public static OpenVRProvider getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new OpenVRProvider();
+        }
         return instance;
     }
 
-    public OpenVRProvider() {
+    public boolean init() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
             controllerDeviceIndex[handIndex] = -1;
             controllerStateReference[handIndex] = new VRControllerState_t();
@@ -94,9 +99,6 @@ public class OpenVRProvider {
             inputStateRefernceArray[handIndex].setAutoSynch(false);
             texType[handIndex] = new Texture_t();
         }
-    }
-
-    public boolean init() {
         if (!initializeOpenVRLibrary()) {
             logger.warn("JOpenVR library loading failed.");
             return false;
