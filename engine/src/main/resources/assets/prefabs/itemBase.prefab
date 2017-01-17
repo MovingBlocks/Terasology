@@ -5,7 +5,7 @@
     "Item": {
 
         "damageType": "engine:physicalDamage",
-        "pickupPrefab": "engine:itemPickup",
+        "onDroppedPrefab": "engine:itemPickup",
         "cooldownTime": 200
     },
     "BoxShape": {

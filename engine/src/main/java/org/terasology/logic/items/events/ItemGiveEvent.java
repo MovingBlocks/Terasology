@@ -17,11 +17,13 @@ package org.terasology.logic.items.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.ServerEvent;
 
 /**
  * Event to be sent when an item should be added to an inventory
  */
+@API
 @ServerEvent
 public class ItemGiveEvent implements Event {
     private EntityRef destInv = EntityRef.NULL;
@@ -30,12 +32,15 @@ public class ItemGiveEvent implements Event {
     private boolean success;
     private int count = 1;
 
-    public ItemGiveEvent(EntityRef dest) {
-        this(dest, EntityRef.NULL, 1);
+    public ItemGiveEvent() {
     }
 
-    public ItemGiveEvent(EntityRef dest, EntityRef item) {
-        this(dest, item, 1);
+    public ItemGiveEvent(EntityRef dest) {
+        this(dest, 1, EntityRef.NULL);
+    }
+
+    public ItemGiveEvent(EntityRef dest, int count) {
+        this(dest, count, EntityRef.NULL);
     }
 
     /**
@@ -43,7 +48,7 @@ public class ItemGiveEvent implements Event {
      * @param item  The item to give inventory.
      * @param count The number of items to give.
      */
-    public ItemGiveEvent(EntityRef dest, EntityRef item, int count) {
+    public ItemGiveEvent(EntityRef dest, int count, EntityRef item) {
         destInv = dest;
         this.item = item;
         this.count = count;

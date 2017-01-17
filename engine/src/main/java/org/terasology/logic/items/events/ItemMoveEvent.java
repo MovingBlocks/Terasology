@@ -17,12 +17,14 @@ package org.terasology.logic.items.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.ServerEvent;
 
 /**
  * Event to be fired when an item should be moved from one inventory to another.
  */
 @ServerEvent
+@API
 public class ItemMoveEvent implements Event {
     private EntityRef destInv = EntityRef.NULL;
     private EntityRef sourceInv = EntityRef.NULL;
@@ -38,6 +40,9 @@ public class ItemMoveEvent implements Event {
      * 2 = Move the first item with component to the first valid slot
      */
     private int moveType = 0;
+
+    public ItemMoveEvent() {
+    }
 
     public ItemMoveEvent(EntityRef source, EntityRef dest) {
         this(dest, source, 1, EntityRef.NULL);

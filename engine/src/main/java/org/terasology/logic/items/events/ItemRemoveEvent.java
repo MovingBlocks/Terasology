@@ -17,18 +17,23 @@ package org.terasology.logic.items.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.ServerEvent;
 
 /**
  * Event to be fired when an item should be removed from an inventory
  */
 @ServerEvent
+@API
 public class ItemRemoveEvent implements Event {
     private EntityRef sourceInv = EntityRef.NULL;
     private EntityRef item = EntityRef.NULL;
 
     private boolean success;
     private int count = 1;
+
+    public ItemRemoveEvent() {
+    }
 
     public ItemRemoveEvent(EntityRef source) {
         this(source, 1, EntityRef.NULL);

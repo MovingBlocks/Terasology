@@ -18,16 +18,21 @@ package org.terasology.logic.items.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.ServerEvent;
 
 /**
  * Event to be fired to drop an item into the world.
  */
 @ServerEvent
+@API
 public class ItemDropEvent implements Event {
     private Vector3f position;
     private EntityRef item;
 
+
+    public ItemDropEvent() {
+    }
 
     public ItemDropEvent(Vector3f position) {
         this(position, EntityRef.NULL);

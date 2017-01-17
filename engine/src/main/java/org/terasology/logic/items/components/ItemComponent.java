@@ -17,17 +17,19 @@ package org.terasology.logic.items.components;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
 
+@API
 public class ItemComponent implements Component {
 
     /**
      * Name of the icon this item should be rendered with
      */
-    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public TextureRegionAsset<?> icon;
+
     public int cooldownTime = 200;
     public Prefab onDroppedPrefab;
 
