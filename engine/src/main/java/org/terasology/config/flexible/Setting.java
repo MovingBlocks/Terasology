@@ -52,10 +52,6 @@ public class Setting<T> implements GeneralSubscribable {
         return valueValidator;
     }
 
-    public void setValueValidator(SettingValueValidator<T> valueValidator) {
-        this.valueValidator = valueValidator;
-    }
-
     private void dispatchChangedEvent(PropertyChangeEvent event) {
         for (PropertyChangeListener subscriber : subscribers) {
             subscriber.propertyChange(event);
@@ -103,15 +99,7 @@ public class Setting<T> implements GeneralSubscribable {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

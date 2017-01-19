@@ -138,20 +138,4 @@ public class SettingTest {
             assertEquals(n, eventCallCount);
         }
     }
-
-    public static class SetValueValidator {
-        @Test
-        public void testSetValueValidator() {
-            Setting<Integer> setting = new Setting<>(new SimpleUri("engine-tests:TestSetting"),
-                    50, new RangedNumberValueValidator<>(0, 100));
-
-            assertTrue(setting.setValue(5));
-            assertTrue(setting.setValue(95));
-
-            setting.setValueValidator(new RangedNumberValueValidator<Integer>(10, 50));
-
-            assertFalse(setting.setValue(5));
-            assertFalse(setting.setValue(95));
-        }
-    }
 }
