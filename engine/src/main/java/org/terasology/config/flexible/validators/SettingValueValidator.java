@@ -21,5 +21,5 @@ public interface SettingValueValidator<T> {
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
-    boolean isValid(T value);
+    boolean validate(T value);
 }

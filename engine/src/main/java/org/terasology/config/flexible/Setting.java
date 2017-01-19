@@ -16,7 +16,6 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Lists;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
@@ -88,7 +87,7 @@ public class Setting<T> implements GeneralSubscribable {
     }
 
     public boolean setValue(T value) {
-        if (!valueValidator.isValid(value))
+        if (!valueValidator.validate(value))
             return false;
 
         PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);

@@ -35,11 +35,11 @@ public class RangedNumberValueValidatorTest {
         @Test
         public void testInclusive() {
             for (int i = validator.getLow(); i <= validator.getHigh(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.isValid(i));
+                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.isValid(validator.getHigh() + 1));
-            assertFalse(validator.isValid(validator.getLow() - 1));
+            assertFalse(validator.validate(validator.getHigh() + 1));
+            assertFalse(validator.validate(validator.getLow() - 1));
         }
 
 
@@ -48,45 +48,45 @@ public class RangedNumberValueValidatorTest {
             validator.setInclusive(false);
 
             for (int i = validator.getLow() + 1; i < validator.getHigh(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.isValid(i));
+                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.isValid(validator.getHigh()));
-            assertFalse(validator.isValid(validator.getLow()));
+            assertFalse(validator.validate(validator.getHigh()));
+            assertFalse(validator.validate(validator.getLow()));
         }
 
         @Test
         public void testLowUnbounded() {
             validator.removeLowBound();
 
-            assertTrue(validator.isValid(-1000));
-            assertTrue(validator.isValid(-50000));
-            assertTrue(validator.isValid(50));
+            assertTrue(validator.validate(-1000));
+            assertTrue(validator.validate(-50000));
+            assertTrue(validator.validate(50));
 
-            assertFalse(validator.isValid(validator.getHigh() + 1));
+            assertFalse(validator.validate(validator.getHigh() + 1));
         }
 
         @Test
         public void testHighUnbounded() {
             validator.removeHighBound();
 
-            assertTrue(validator.isValid(1000));
-            assertTrue(validator.isValid(50000));
-            assertTrue(validator.isValid(50));
+            assertTrue(validator.validate(1000));
+            assertTrue(validator.validate(50000));
+            assertTrue(validator.validate(50));
 
-            assertFalse(validator.isValid(validator.getLow() - 1));
+            assertFalse(validator.validate(validator.getLow() - 1));
         }
 
         @Test
         public void testAllUnbounded() {
             validator.removeAllBounds();
 
-            assertTrue(validator.isValid(1000));
-            assertTrue(validator.isValid(50000));
-            assertTrue(validator.isValid(50));
+            assertTrue(validator.validate(1000));
+            assertTrue(validator.validate(50000));
+            assertTrue(validator.validate(50));
 
-            assertTrue(validator.isValid(-1000));
-            assertTrue(validator.isValid(-50000));
+            assertTrue(validator.validate(-1000));
+            assertTrue(validator.validate(-50000));
         }
     }
 
@@ -103,11 +103,11 @@ public class RangedNumberValueValidatorTest {
         @Test
         public void testInclusive() {
             for (double i = validator.getLow(); i <= validator.getHigh(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.isValid(i));
+                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.isValid(validator.getLow() - EPSILON));
-            assertFalse(validator.isValid(validator.getHigh() + EPSILON));
+            assertFalse(validator.validate(validator.getLow() - EPSILON));
+            assertFalse(validator.validate(validator.getHigh() + EPSILON));
         }
 
 
@@ -116,45 +116,45 @@ public class RangedNumberValueValidatorTest {
             validator.setInclusive(false);
 
             for (double i = validator.getLow() + EPSILON; i < validator.getHigh(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.isValid(i));
+                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.isValid(validator.getLow()));
-            assertFalse(validator.isValid(validator.getHigh()));
+            assertFalse(validator.validate(validator.getLow()));
+            assertFalse(validator.validate(validator.getHigh()));
         }
 
         @Test
         public void testLowUnbounded() {
             validator.removeLowBound();
 
-            assertTrue(validator.isValid(-1000d));
-            assertTrue(validator.isValid(-50000d));
-            assertTrue(validator.isValid(50d));
+            assertTrue(validator.validate(-1000d));
+            assertTrue(validator.validate(-50000d));
+            assertTrue(validator.validate(50d));
 
-            assertFalse(validator.isValid(validator.getHigh() + EPSILON));
+            assertFalse(validator.validate(validator.getHigh() + EPSILON));
         }
 
         @Test
         public void testHighUnbounded() {
             validator.removeHighBound();
 
-            assertTrue(validator.isValid(1000d));
-            assertTrue(validator.isValid(50000d));
-            assertTrue(validator.isValid(50d));
+            assertTrue(validator.validate(1000d));
+            assertTrue(validator.validate(50000d));
+            assertTrue(validator.validate(50d));
 
-            assertFalse(validator.isValid(validator.getLow() - EPSILON));
+            assertFalse(validator.validate(validator.getLow() - EPSILON));
         }
 
         @Test
         public void testAllUnbounded() {
             validator.removeAllBounds();
 
-            assertTrue(validator.isValid(1000d));
-            assertTrue(validator.isValid(50000d));
-            assertTrue(validator.isValid(50d));
+            assertTrue(validator.validate(1000d));
+            assertTrue(validator.validate(50000d));
+            assertTrue(validator.validate(50d));
 
-            assertTrue(validator.isValid(-1000d));
-            assertTrue(validator.isValid(-50000d));
+            assertTrue(validator.validate(-1000d));
+            assertTrue(validator.validate(-50000d));
         }
     }
 }

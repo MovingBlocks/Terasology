@@ -75,7 +75,7 @@ public class RangedNumberValueValidator<T extends Number & Comparable<? super T>
      * {@inheritDoc}
      */
     @Override
-    public boolean isValid(T value) {
+    public boolean validate(T value) {
         int lowComp = low != null ? low.compareTo(value) : -1;
         int highComp = high != null ? high.compareTo(value) : 1;
 
