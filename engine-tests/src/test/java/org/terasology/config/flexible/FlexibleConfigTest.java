@@ -21,7 +21,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.flexible.validators.RangedNumberValueValidator;
-import org.terasology.registry.In;
+import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.*;
 
@@ -37,8 +37,8 @@ public class FlexibleConfigTest {
 
         @Test
         public void testGet() throws Exception {
-            ResourceUrn id1 = new ResourceUrn("engine-tests", "TestSetting1");
-            ResourceUrn id2 = new ResourceUrn("engine-tests", "TestSetting2");
+            SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
+            SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
             FlexibleConfig.Key<Integer> key1 = config.add(new Setting<>(id1, 50,
                     new RangedNumberValueValidator<>(0, 100)));
@@ -52,7 +52,7 @@ public class FlexibleConfigTest {
 
         @Test
         public void testGetInvalidType() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100)));
@@ -75,7 +75,7 @@ public class FlexibleConfigTest {
 
         @Test
         public void testHas() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             FlexibleConfig.Key<Integer> key = config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100)));
@@ -85,12 +85,12 @@ public class FlexibleConfigTest {
 
         @Test
         public void testNotHas() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100)));
 
-            FlexibleConfig.Key<Integer> key = new FlexibleConfig.Key<>(new ResourceUrn(id, "frag"),
+            FlexibleConfig.Key<Integer> key = new FlexibleConfig.Key<>(new SimpleUri("engine-tests:TestSettingX"),
                     Integer.class);
 
             assertFalse(config.has(key));
@@ -107,7 +107,7 @@ public class FlexibleConfigTest {
 
         @Test
         public void testAdd() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             assertNotNull(config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100))));
@@ -115,7 +115,7 @@ public class FlexibleConfigTest {
 
         @Test
         public void testAddExisting() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             assertNotNull(config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100))));
@@ -135,8 +135,8 @@ public class FlexibleConfigTest {
 
         @Test
         public void testRemove() throws Exception {
-            ResourceUrn id1 = new ResourceUrn("engine-tests", "TestSetting1");
-            ResourceUrn id2 = new ResourceUrn("engine-tests", "TestSetting2");
+            SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
+            SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
             FlexibleConfig.Key<Integer> key1 = config.add(new Setting<>(id1, 50,
                     new RangedNumberValueValidator<>(0, 100)));
@@ -150,12 +150,12 @@ public class FlexibleConfigTest {
 
         @Test
         public void testNonexistentRemove() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100)));
 
-            FlexibleConfig.Key<Integer> key = new FlexibleConfig.Key<>(new ResourceUrn(id, "frag"),
+            FlexibleConfig.Key<Integer> key = new FlexibleConfig.Key<>(new SimpleUri("engine-tests:TestSettingX"),
                     Integer.class);
 
             assertFalse(config.remove(key));
@@ -163,7 +163,7 @@ public class FlexibleConfigTest {
 
         @Test
         public void testSubscribedRemove() throws Exception {
-            ResourceUrn id = new ResourceUrn("engine-tests", "TestSetting");
+            SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             FlexibleConfig.Key<Integer> key = config.add(new Setting<>(id, 50,
                     new RangedNumberValueValidator<>(0, 100)));

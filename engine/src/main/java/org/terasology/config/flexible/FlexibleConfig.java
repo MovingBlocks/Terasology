@@ -16,7 +16,7 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 
 import java.util.Map;
 
@@ -66,16 +66,16 @@ public class FlexibleConfig {
     }
 
     static final class Key<V> {
-        private final ResourceUrn key;
+        private final SimpleUri key;
         private final Class<V> vClass;
 
         @SuppressWarnings("unchecked")
-        Key(ResourceUrn key, V value) {
+        Key(SimpleUri key, V value) {
             // this cast will always be safe unless the outside world is doing something fishy like using raw types
             this(key, (Class<V>) value.getClass());
         }
 
-        Key(ResourceUrn key, Class<V> vClass) {
+        Key(SimpleUri key, Class<V> vClass) {
             this.key = key;
             this.vClass = vClass;
         }

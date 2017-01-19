@@ -18,6 +18,7 @@ package org.terasology.config.flexible;
 import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.flexible.validators.SettingValueValidator;
+import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
 
 import java.beans.PropertyChangeEvent;
@@ -27,9 +28,8 @@ import java.util.List;
 public class Setting<T> implements GeneralSubscribable {
     private final T defaultValue;
 
-    private ResourceUrn id;
+    private SimpleUri id;
 
-    private String idString;
     private T value;
 
     private String name;
@@ -38,10 +38,8 @@ public class Setting<T> implements GeneralSubscribable {
     private SettingValueValidator<T> valueValidator;
     private List<PropertyChangeListener> subscribers;
 
-    public Setting(ResourceUrn id, T defaultValue, SettingValueValidator<T> valueValidator) {
+    public Setting(SimpleUri id, T defaultValue, SettingValueValidator<T> valueValidator) {
         this.id = id;
-        // Precomputing for performance
-        this.idString = id.toString();
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
@@ -49,10 +47,6 @@ public class Setting<T> implements GeneralSubscribable {
         this.valueValidator = valueValidator;
 
         this.subscribers = Lists.newArrayList();
-    }
-
-    public Class<? extends SettingValueValidator> getValidatorClass() {
-        return valueValidator.getClass();
     }
 
     public SettingValueValidator<T> getValueValidator() {
@@ -81,7 +75,7 @@ public class Setting<T> implements GeneralSubscribable {
         return !subscribers.isEmpty();
     }
 
-    public ResourceUrn getId() {
+    public SimpleUri getId() {
         return id;
     }
 
@@ -97,7 +91,7 @@ public class Setting<T> implements GeneralSubscribable {
         if (!valueValidator.isValid(value))
             return false;
 
-        PropertyChangeEvent event = new PropertyChangeEvent(this, idString, this.value, value);
+        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);
 
         this.value = value;
 
