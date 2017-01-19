@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -91,9 +92,11 @@ public class ChatScreen extends CoreScreenLayer {
             @Override
             public String get() {
                 StringBuilder messageList = new StringBuilder();
-                for (Message msg : console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION)) {
-                    messageList.append(msg.getMessage());
-                    messageList.append(Console.NEW_LINE);
+                for (Iterator<Message> it = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION).iterator(); it.hasNext();) {
+                    messageList.append(it.next().getMessage());
+                    if (it.hasNext()) {
+                        messageList.append(Console.NEW_LINE);
+                    }
                 }
                 return messageList.toString();
             }
