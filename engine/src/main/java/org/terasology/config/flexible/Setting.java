@@ -82,7 +82,7 @@ public class Setting<T> implements GeneralSubscribable {
     }
 
     public boolean hasSubscribers() {
-        return !subscribers.isEmpty();
+        return subscribers != null;
     }
 
     public SimpleUri getId() {
