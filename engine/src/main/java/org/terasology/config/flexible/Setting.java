@@ -34,16 +34,23 @@ public class Setting<T> implements GeneralSubscribable {
     private String name;
 
     private String description;
-    private SettingValueValidator<T> valueValidator;
+    private SettingValueValidator<T> validator;
     private List<PropertyChangeListener> subscribers;
 
-    public Setting(SimpleUri id, T defaultValue, SettingValueValidator<T> valueValidator) {
+    public Setting(SimpleUri id, T defaultValue) {
+        this(id, defaultValue, null);
+    }
+
+    public Setting(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
+
+        this.validator = validator;
+
+        if (!validate(defaultValue))
+            throw new IllegalArgumentException("The default value must be a valid value.");
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
-
-        this.valueValidator = valueValidator;
 
         this.subscribers = Lists.newArrayList();
     }
@@ -52,6 +59,10 @@ public class Setting<T> implements GeneralSubscribable {
         for (PropertyChangeListener subscriber : subscribers) {
             subscriber.propertyChange(event);
         }
+    }
+
+    private boolean validate(T value) {
+        return validator == null || validator.validate(value);
     }
 
     public void subscribe(PropertyChangeListener listener) {
@@ -70,8 +81,8 @@ public class Setting<T> implements GeneralSubscribable {
         return id;
     }
 
-    public SettingValueValidator<T> getValueValidator() {
-        return valueValidator;
+    public SettingValueValidator<T> getValidator() {
+        return validator;
     }
 
     public T getDefaultValue() {
@@ -83,7 +94,7 @@ public class Setting<T> implements GeneralSubscribable {
     }
 
     public boolean setValue(T value) {
-        if (!valueValidator.validate(value))
+        if (!validator.validate(value))
             return false;
 
         PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);
