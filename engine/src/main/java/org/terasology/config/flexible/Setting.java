@@ -52,7 +52,7 @@ public class Setting<T> implements GeneralSubscribable {
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
 
-        this.subscribers = Lists.newArrayList();
+        this.subscribers = null;
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
@@ -66,11 +66,19 @@ public class Setting<T> implements GeneralSubscribable {
     }
 
     public void subscribe(PropertyChangeListener listener) {
+        if (subscribers == null) {
+            subscribers = Lists.newArrayList();
+        }
+
         subscribers.add(listener);
     }
 
     public void unsubscribe(PropertyChangeListener listener) {
         subscribers.remove(listener);
+
+        if (subscribers.size() <= 0) {
+            subscribers = null;
+        }
     }
 
     public boolean hasSubscribers() {
