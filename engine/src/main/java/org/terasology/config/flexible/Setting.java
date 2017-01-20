@@ -48,10 +48,6 @@ public class Setting<T> implements GeneralSubscribable {
         this.subscribers = Lists.newArrayList();
     }
 
-    public SettingValueValidator<T> getValueValidator() {
-        return valueValidator;
-    }
-
     private void dispatchChangedEvent(PropertyChangeEvent event) {
         for (PropertyChangeListener subscriber : subscribers) {
             subscriber.propertyChange(event);
@@ -72,6 +68,10 @@ public class Setting<T> implements GeneralSubscribable {
 
     public SimpleUri getId() {
         return id;
+    }
+
+    public SettingValueValidator<T> getValueValidator() {
+        return valueValidator;
     }
 
     public T getDefaultValue() {
