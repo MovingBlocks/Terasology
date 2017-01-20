@@ -16,11 +16,15 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
 import java.util.Map;
 
 public class FlexibleConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfig.class);
+
     private Map<SimpleUri, Setting> settingMap;
 
     public FlexibleConfig() {
@@ -40,8 +44,14 @@ public class FlexibleConfig {
     public boolean remove(SimpleUri id) {
         Setting setting = get(id);
 
-        if (setting == null || setting.hasSubscribers())
+        if (setting == null) {
+            LOGGER.warn("The setting to remove with the id \"{}\" does not exist in the config.", id);
             return false;
+        }
+        else if (setting.hasSubscribers()) {
+            LOGGER.warn("The setting with the id \"{}\" still has subscribers and cannot be removed.", id);
+            return false;
+        }
 
         settingMap.remove(id);
         return true;
