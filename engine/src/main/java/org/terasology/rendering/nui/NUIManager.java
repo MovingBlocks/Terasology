@@ -35,6 +35,7 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     boolean isOpen(ResourceUrn screenUri);
 
+    /* @deprecated */
     @Deprecated
     boolean isOpen(UIElement element);
 
@@ -48,13 +49,17 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void closeScreen(UIScreenLayer screen);
 
+    /* @deprecated */
     @Deprecated
     void closeScreen(UIElement element);
+
+    void closeAllScreens();
 
     void toggleScreen(String screenUri);
 
     void toggleScreen(ResourceUrn screenUri);
 
+    /* @deprecated */
     @Deprecated
     void toggleScreen(UIElement element);
 
@@ -70,6 +75,7 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer pushScreen(String screenUri);
 
+    /* @deprecated */
     @Deprecated
     UIScreenLayer pushScreen(UIElement element);
 
@@ -77,6 +83,7 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
 
+    /* @deprecated */
     @Deprecated
     <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType);
 
@@ -88,9 +95,11 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     <T extends ControlWidget> T addOverlay(ResourceUrn screenUri, Class<T> expectedType);
 
+    /* @deprecated */
     @Deprecated
     <T extends ControlWidget> T addOverlay(UIElement element, Class<T> expectedType);
 
+    /* @deprecated */
     @Deprecated
     void removeOverlay(UIElement overlay);
 
@@ -119,4 +128,5 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setForceReleasingMouse(boolean value);
 
     void invalidate();
+
 }

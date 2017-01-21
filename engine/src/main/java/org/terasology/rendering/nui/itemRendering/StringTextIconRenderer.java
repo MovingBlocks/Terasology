@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.itemRendering;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.TextLineBuilder;
 
@@ -49,7 +49,7 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
     @Override
     public void draw(T value, Canvas canvas) {
         // Drawing the icon
-        Texture texture = getTexture(value);
+        TextureRegion texture = getTexture(value);
 
         if (texture != null) {
             if (marginTop + texture.getHeight() + marginBottom > canvas.size().y) {
@@ -82,7 +82,7 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
         Font font = canvas.getCurrentStyle().getFont();
         String text = getString(value);
 
-        Texture texture = getTexture(value);
+        TextureRegion texture = getTexture(value);
         if (texture == null) {
             List<String> lines = TextLineBuilder.getLines(font, text, canvas.size().x);
             return font.getSize(lines);
@@ -95,5 +95,5 @@ public abstract class StringTextIconRenderer<T> extends AbstractItemRenderer<T> 
 
     public abstract String getString(T value);
 
-    public abstract Texture getTexture(T value);
+    public abstract TextureRegion getTexture(T value);
 }

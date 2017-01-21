@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableList;
  */
 class RemoteModule extends BaseModule {
 
-    public RemoteModule(ModuleMetadata meta) {
+     RemoteModule(ModuleMetadata meta) {
         super(Collections.emptyList(), meta);
     }
 

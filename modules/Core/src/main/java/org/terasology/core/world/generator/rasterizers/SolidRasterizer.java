@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.SurfaceDepthFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
-/**
- */
 public class SolidRasterizer implements WorldRasterizer {
 
     private Block water;
@@ -63,6 +62,7 @@ public class SolidRasterizer implements WorldRasterizer {
         LiquidData waterLiquid = new LiquidData(LiquidType.WATER, LiquidData.MAX_LIQUID_DEPTH);
         DensityFacet solidityFacet = chunkRegion.getFacet(DensityFacet.class);
         SurfaceHeightFacet surfaceFacet = chunkRegion.getFacet(SurfaceHeightFacet.class);
+        SurfaceDepthFacet surfaceDepthFacet = chunkRegion.getFacet(SurfaceDepthFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
         SeaLevelFacet seaLevelFacet = chunkRegion.getFacet(SeaLevelFacet.class);
         int seaLevel = seaLevelFacet.getSeaLevel();
@@ -70,10 +70,16 @@ public class SolidRasterizer implements WorldRasterizer {
         Vector2i pos2d = new Vector2i();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             pos2d.set(pos.x, pos.z);
+            int posY = pos.y + chunk.getChunkWorldOffsetY();
+
+            // Check for an optional depth for this layer - if defined stop generating below that level
+            if (surfaceDepthFacet != null && posY < surfaceDepthFacet.get(pos2d)) {
+                continue;
+            }
+
             Biome biome = biomeFacet.get(pos2d);
             chunk.setBiome(pos.x, pos.y, pos.z, biome);
 
-            int posY = pos.y + chunk.getChunkWorldOffsetY();
             float density = solidityFacet.get(pos);
 
             if (density >= 32) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Physics engine implementation using TeraBullet (a customised version of JBullet)
+ * Physics engine implementation using TeraBullet (a customised version of JBullet).
  */
 public class BulletPhysics implements PhysicsEngine {
 
@@ -210,7 +210,7 @@ public class BulletPhysics implements PhysicsEngine {
     public HitResult rayTrace(org.terasology.math.geom.Vector3f from1, org.terasology.math.geom.Vector3f direction, float distance, Set<EntityRef> excludedEntities,
             CollisionGroup... collisionGroups) {
         if (excludedEntities == null) {
-            return rayTrace(from1, direction,distance,collisionGroups);
+            return rayTrace(from1, direction, distance, collisionGroups);
         }
         Vector3f to = new Vector3f(VecMath.to(direction));
         Vector3f from = VecMath.to(from1);
@@ -744,7 +744,7 @@ public class BulletPhysics implements PhysicsEngine {
     private static class ClosestRayResultWithUserDataCallbackExcludingCollisionIds extends CollisionWorld.ClosestRayResultWithUserDataCallback {
         Set<Integer> excludedIds;
 
-        public ClosestRayResultWithUserDataCallbackExcludingCollisionIds(Vector3f rayFromWorld, Vector3f rayToWorld, Set<Integer> excludedIds) {
+        ClosestRayResultWithUserDataCallbackExcludingCollisionIds(Vector3f rayFromWorld, Vector3f rayToWorld, Set<Integer> excludedIds) {
             super(rayFromWorld, rayToWorld);
             this.excludedIds = excludedIds;
         }
@@ -764,7 +764,7 @@ public class BulletPhysics implements PhysicsEngine {
         final short groups;
         final short filter;
 
-        public RigidBodyRequest(BulletRigidBody body, short groups, short filter) {
+        RigidBodyRequest(BulletRigidBody body, short groups, short filter) {
             this.body = body;
             this.groups = groups;
             this.filter = filter;

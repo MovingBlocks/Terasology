@@ -15,9 +15,12 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
+import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -41,11 +44,8 @@ import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
-import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
-import org.terasology.rendering.dag.nodes.BlurPassesNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
@@ -86,6 +86,9 @@ import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -285,56 +288,77 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
         renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
 
-        // TODO next!
         Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
         renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
 
         Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
 
-        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
-        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-
-        // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
-        Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
-        renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
-
-        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
         Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
-        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
-        Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
-        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
-        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
-        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
-        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
-        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class);
-        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
-        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
-        Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
-        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
-        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
-        
-
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
+
+        // 3d-based decorations (versus purely 2d, post-production effects)
+        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         renderGraph.addNode(outlineNode, "outlineNode");
-        renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
+
+        Node ambientOcclusionNode = nodeFactory.createInstance(AmbientOcclusionNode.class);
+        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
+
+        Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
+        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
+
+        // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
+        // and then it's 2D post-processing all the way to the image shown on the display.
+        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
+
+        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
+
         // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
         renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
+
+        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
+
+        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class); // TODO: next PR
         renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
+
+        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
+
+        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class); // TODO: next PR
         renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
-        renderGraph.addNode(blurPassesNode, "blurPassesNode");
+
+        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR);
+        FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+        FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+
+        aLabel = "firstLateBlurNode";
+        LateBlurNode firstLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        firstLateBlurNode.initialise(toneMappedConfig, firstLateBlurConfig, aLabel);
+        renderGraph.addNode(firstLateBlurNode, aLabel);
+
+        aLabel = "secondLateBlurNode";
+        LateBlurNode secondLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        secondLateBlurNode.initialise(firstLateBlurConfig, secondLateBlurConfig, aLabel);
+        renderGraph.addNode(secondLateBlurNode, aLabel);
+
+        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
+
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 

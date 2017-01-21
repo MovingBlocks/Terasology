@@ -17,10 +17,10 @@ package org.terasology.rendering.backdrop;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+import org.terasology.context.Context;
 import org.terasology.utilities.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
@@ -49,8 +49,8 @@ public class Skysphere implements BackdropProvider, BackdropRenderer {
 
     private final CelestialSystem celSystem;
 
-    public Skysphere() {
-        celSystem = CoreRegistry.get(CelestialSystem.class);
+    public Skysphere(Context context) {
+        celSystem = context.get(CelestialSystem.class);
     }
 
     @Override

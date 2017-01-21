@@ -43,7 +43,7 @@ public final class PeriodicActionComponent implements Component {
     }
 
     public void removeScheduledActionId(String actionId) {
-        final long removedWakeUp = actionIdsWakeUp.remove(actionId);
+        final Long removedWakeUp = actionIdsWakeUp.remove(actionId);
         actionIdsPeriod.remove(actionId);
         if (removedWakeUp == lowestWakeUp) {
             lowestWakeUp = findSmallestWakeUp();

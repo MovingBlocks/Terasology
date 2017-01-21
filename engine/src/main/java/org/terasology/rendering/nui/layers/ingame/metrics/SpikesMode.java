@@ -23,7 +23,7 @@ import org.terasology.monitoring.PerformanceMonitor;
  */
 final class SpikesMode extends TimeMetricsMode {
 
-    public SpikesMode() {
+     SpikesMode() {
         super("Spikes", 10);
     }
 

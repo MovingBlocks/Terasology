@@ -38,7 +38,7 @@ public final class MeshComponent implements Component {
 
     // Use this for the mesh to light itself.  Useful for held lights where the point light is inside the mesh.
     @Replicate
-    public float selfLuminance = 0f;
+    public float selfLuminance;
 
     public boolean hideFromOwner;
 

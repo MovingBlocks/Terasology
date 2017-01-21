@@ -25,9 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- *
- */
 public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends SoundSource<SOUND>> implements SoundPool<SOUND, SOURCE> {
 
     private static final int DEFAULT_POOL_SIZE = 32;

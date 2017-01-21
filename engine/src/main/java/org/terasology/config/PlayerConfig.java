@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ public class PlayerConfig {
 
     private Float eyeHeight = DEFAULT_PLAYER_EYE_HEIGHT;
 
+    private boolean hasEnteredUsername;
+
     public String getName() {
         return name;
     }
@@ -71,19 +73,28 @@ public class PlayerConfig {
         }
     }
 
-    private static String defaultPlayerName() {
-        try {
-            String login = System.getProperty("user.name");
-            if (login != null && !login.isEmpty()) {
-                return login;
-            }
-        } catch (SecurityException e) {
-            // thrown by all Sandbox RIAs (Webstart, Applets)
-            e.getMessage(); // dummy method call to trick CheckStyle
-        }
-        return "Player_" + new FastRandom().nextInt(10000, 99999);
+    public boolean hasEnteredUsername() {
+        return hasEnteredUsername;
     }
 
+    public void setHasEnteredUsername(boolean entered) {
+        this.hasEnteredUsername = entered;
+    }
+
+    /**
+     * Generates the player's default name. The default name is the string "Player" followed by a random 5 digit code ranging from 10000 to 99999.
+     *
+     * @return a String with the player's default name.
+     */
+    private static String defaultPlayerName() {
+        return "Player" + new FastRandom().nextInt(10000, 99999);
+    }
+
+    /**
+     * Randomly generates a default color for the player via a random int generator using FastRandom object.
+     *
+     * @return a Color object with the player's default color.
+     */
     private Color defaultPlayerColor() {
         Random rng = new FastRandom();
         List<Color> colors = CieCamColors.L65C65;

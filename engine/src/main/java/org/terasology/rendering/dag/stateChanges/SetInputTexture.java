@@ -108,7 +108,7 @@ public class SetInputTexture implements StateChange {
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 }
 

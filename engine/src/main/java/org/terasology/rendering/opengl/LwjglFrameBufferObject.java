@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
@@ -39,7 +38,6 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
- *
  */
 public class LwjglFrameBufferObject implements FrameBufferObject {
     private int frame;

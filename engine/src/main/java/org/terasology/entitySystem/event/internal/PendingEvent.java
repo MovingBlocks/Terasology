@@ -27,12 +27,12 @@ class PendingEvent {
     private Event event;
     private Component component;
 
-    public PendingEvent(EntityRef entity, Event event) {
+     PendingEvent(EntityRef entity, Event event) {
         this.event = event;
         this.entity = entity;
     }
 
-    public PendingEvent(EntityRef entity, Event event, Component component) {
+     PendingEvent(EntityRef entity, Event event, Component component) {
         this.entity = entity;
         this.event = event;
         this.component = component;

@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
+ * A value bar that uses Icons
  */
 public class UIIconBar extends CoreWidget {
 
@@ -45,7 +46,10 @@ public class UIIconBar extends CoreWidget {
     @LayoutConfig
     private TextureRegion icon;
 
+    @LayoutConfig
     private Binding<Float> value = new DefaultBinding<>(0f);
+
+    @LayoutConfig
     private Binding<Float> maxValue = new DefaultBinding<>(10f);
 
     @Override
@@ -129,10 +133,16 @@ public class UIIconBar extends CoreWidget {
         return new Vector2i(width, height);
     }
 
+    /**
+     * @return The icon used.
+     */
     public TextureRegion getIcon() {
         return icon;
     }
 
+    /**
+     * @param icon The icon to use in the bar.
+     */
     public void setIcon(TextureRegion icon) {
         this.icon = icon;
     }
@@ -141,10 +151,16 @@ public class UIIconBar extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * @return The current value.
+     */
     public float getValue() {
         return value.get();
     }
 
+    /**
+     * @param val The value to set it to.
+     */
     public void setValue(float val) {
         value.set(val);
     }
@@ -153,18 +169,30 @@ public class UIIconBar extends CoreWidget {
         maxValue = binding;
     }
 
+    /**
+     * @return The maximum value the bar can be set to.
+     */
     public float getMaxValue() {
         return maxValue.get();
     }
 
+    /**
+     * @param val The new max value the bar can be set to.
+     */
     public void setMaxValue(float val) {
         maxValue.set(val);
     }
 
+    /**
+     * @return The current HalfIconMode used.
+     */
     public HalfIconMode getHalfIconMode() {
         return halfIconMode;
     }
 
+    /**
+     * @param halfIconMode The new mode to use.
+     */
     public void setHalfIconMode(HalfIconMode halfIconMode) {
         this.halfIconMode = halfIconMode;
     }

@@ -35,8 +35,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  */
 public class BlurNode extends ConditionDependentNode implements FBOManagerSubscriber {
 
+    protected float blurRadius;
+
     private Material blurMaterial;
-    private float blurRadius;
     private String performanceMonitorLabel;
 
     private BaseFBOsManager fboManager;
@@ -75,7 +76,8 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
         addDesiredStateChange(new BindFBO(outputFBOConfig.getName(), fboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFBOConfig.getName(), fboManager));
 
-        update();
+        inputFBO = fboManager.get(inputFBOConfig.getName());
+        outputFBO = fboManager.get(outputFBOConfig.getName());
         fboManager.subscribe(this);
 
         setupConditions();

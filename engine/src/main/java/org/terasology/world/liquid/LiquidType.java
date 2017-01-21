@@ -36,7 +36,7 @@ public enum LiquidType {
         }
     }
 
-    private LiquidType(int typeVal) {
+    LiquidType(int typeVal) {
         typeValue = (byte) typeVal;
     }
 

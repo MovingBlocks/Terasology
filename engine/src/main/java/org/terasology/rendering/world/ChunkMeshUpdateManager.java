@@ -137,7 +137,7 @@ public final class ChunkMeshUpdateManager {
         private WorldProvider worldProvider;
         private ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        public ChunkUpdateTask(RenderableChunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
+        ChunkUpdateTask(RenderableChunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
             this.chunkMeshUpdateManager = chunkMeshUpdateManager;
             this.c = chunk;
             this.tessellator = tessellator;

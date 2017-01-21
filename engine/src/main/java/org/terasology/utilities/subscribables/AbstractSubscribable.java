@@ -28,6 +28,7 @@ public abstract class AbstractSubscribable implements Subscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(changeListener);
     }
@@ -35,6 +36,7 @@ public abstract class AbstractSubscribable implements Subscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unsubscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(changeListener);
     }
@@ -42,6 +44,7 @@ public abstract class AbstractSubscribable implements Subscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void subscribe(String propertyName, PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(propertyName, changeListener);
     }
@@ -49,6 +52,7 @@ public abstract class AbstractSubscribable implements Subscribable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void unsubscribe(String propertyName, PropertyChangeListener changeListener) {
         this.propertyChangeSupport.removePropertyChangeListener(propertyName, changeListener);
     }

@@ -90,6 +90,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.testUtil.ModuleManagerFactory;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -110,6 +111,12 @@ import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.NullWorldAtlas;
 import org.terasology.world.block.tiles.TileData;
 import org.terasology.world.block.tiles.WorldAtlas;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.sun.BasicCelestialModel;
+import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.DefaultCelestialSystem;
+import org.terasology.world.time.WorldTime;
+import org.terasology.world.time.WorldTimeImpl;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -117,6 +124,7 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Setup a headless ( = no graphics ) environment.
@@ -125,6 +133,7 @@ import static org.mockito.Mockito.mock;
  */
 public class HeadlessEnvironment extends Environment {
 
+    protected static final WorldTime worldTime = new WorldTimeImpl();
     private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
 
     /**
@@ -299,6 +308,20 @@ public class HeadlessEnvironment extends Environment {
         ComponentSystemManager componentSystemManager = new ComponentSystemManager(context);
         componentSystemManager.initialise();
         context.put(ComponentSystemManager.class, componentSystemManager);
+    }
+
+    @Override
+    protected void setupWorldProvider() {
+        WorldProvider worldProvider = mock(WorldProvider.class);
+        when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
+        when(worldProvider.getTime()).thenReturn(worldTime);
+        context.put(WorldProvider.class, worldProvider);
+    }
+
+    @Override
+    protected void setupCelestialSystem() {
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel(), context);
+        context.put(CelestialSystem.class, celestialSystem);
     }
 
     @Override

@@ -44,7 +44,7 @@ public interface FieldSerializeCheck<T> extends DeserializeFieldCheck {
     /**
      * Null implementation, returns true for all fields
      */
-    public static final class NullCheck<T> implements FieldSerializeCheck<T> {
+     final class NullCheck<T> implements FieldSerializeCheck<T> {
 
         private static final NullCheck INSTANCE = new NullCheck();
 

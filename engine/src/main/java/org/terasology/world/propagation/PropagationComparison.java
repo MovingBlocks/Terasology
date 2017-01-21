@@ -35,7 +35,7 @@ public enum PropagationComparison {
     private boolean restricting;
     private boolean permitting;
 
-    private PropagationComparison(boolean restricts, boolean permits) {
+     PropagationComparison(boolean restricts, boolean permits) {
         this.restricting = restricts;
         this.permitting = permits;
     }

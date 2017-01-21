@@ -757,7 +757,7 @@ public class PojoEntityManager implements EngineEntityManager {
         private EntityRef key;
         private T value;
 
-        public EntityEntry(EntityRef ref, T value) {
+        EntityEntry(EntityRef ref, T value) {
             this.key = ref;
             this.value = value;
         }
@@ -781,7 +781,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private class EntityIterable implements Iterable<EntityRef> {
         private TLongList list;
 
-        public EntityIterable(TLongList list) {
+        EntityIterable(TLongList list) {
             this.list = list;
         }
 
@@ -794,7 +794,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private class EntityIterator implements Iterator<EntityRef> {
         private TLongIterator idIterator;
 
-        public EntityIterator(TLongIterator idIterator) {
+        EntityIterator(TLongIterator idIterator) {
             this.idIterator = idIterator;
         }
 

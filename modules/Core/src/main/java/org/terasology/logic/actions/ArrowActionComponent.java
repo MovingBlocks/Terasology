@@ -19,7 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.health.EngineDamageTypes;
 
-public class ArrowActionComponent implements Component{
+public class ArrowActionComponent implements Component {
 
     /**
      * The max distance the arrow will fly.

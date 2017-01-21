@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
+ * An animated loading bar
  */
 public class UILoadBar extends CoreWidget {
 
@@ -38,6 +39,7 @@ public class UILoadBar extends CoreWidget {
     @LayoutConfig
     private boolean animate = true;
 
+    @LayoutConfig
     private Binding<Float> value = new DefaultBinding<>(0f);
     private Time time = CoreRegistry.get(Time.class);
 
@@ -78,18 +80,30 @@ public class UILoadBar extends CoreWidget {
         super.update(delta);
     }
 
+    /**
+     * @return The texture used in the bar.
+     */
     public TextureRegion getFillTexture() {
         return fillTexture;
     }
 
+    /**
+     * @param fillTexture The new texture to use.
+     */
     public void setFillTexture(TextureRegion fillTexture) {
         this.fillTexture = fillTexture;
     }
 
+    /**
+     * @return A Boolean indicating whether. the bar is animated.
+     */
     public boolean isAnimate() {
         return animate;
     }
 
+    /**
+     * @param animate A Boolean indicating if the bar should be animated.
+     */
     public void setAnimate(boolean animate) {
         this.animate = animate;
     }
@@ -98,10 +112,16 @@ public class UILoadBar extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * @return A Float between 0 and 1 indicating the percentage of the bar.
+     */
     public float getValue() {
         return value.get();
     }
 
+    /**
+     * @param val A float from 0 to 1 indicating the percentage loaded.
+     */
     public void setValue(float val) {
         value.set(val);
     }

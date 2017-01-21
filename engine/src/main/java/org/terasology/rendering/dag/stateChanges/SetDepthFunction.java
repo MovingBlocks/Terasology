@@ -89,7 +89,7 @@ public class SetDepthFunction implements StateChange {
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
     @Override

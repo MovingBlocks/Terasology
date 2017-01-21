@@ -16,7 +16,6 @@
 package org.terasology.logic.delay;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
 
 public class ArbritaryDelayActionComponent implements Component {
     public int value = 1;

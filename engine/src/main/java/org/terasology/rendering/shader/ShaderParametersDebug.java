@@ -20,7 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
+import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BloomPassesNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
@@ -88,7 +88,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case SSAO:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO);
+                displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionNode.SSAO_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SOBEL:
@@ -128,7 +128,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case LIGHT_SHAFTS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
+                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             default:

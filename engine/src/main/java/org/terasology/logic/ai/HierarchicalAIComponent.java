@@ -79,6 +79,4 @@ public final class HierarchicalAIComponent implements Component {
     //TODO remove this when fight system is ready!!!
     public int damage = 50;
     public int damageFrequency = 500;
-
-
 }

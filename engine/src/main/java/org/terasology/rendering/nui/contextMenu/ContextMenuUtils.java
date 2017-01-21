@@ -29,7 +29,7 @@ import java.util.List;
  * <p>
  * Should be used in favor of manually creating the screen.
  */
-public class ContextMenuUtils {
+public final class ContextMenuUtils {
     private ContextMenuUtils() {
 
     }
@@ -96,7 +96,7 @@ public class ContextMenuUtils {
         private List<AbstractContextMenuItem> options = Lists.newArrayList();
         private boolean visible;
 
-        public VisibleTree(MenuTree tree, boolean visible) {
+        VisibleTree(MenuTree tree, boolean visible) {
             this.name = tree.getName();
             for (AbstractContextMenuItem option : tree.getOptions()) {
                 if (option instanceof MenuTree) {

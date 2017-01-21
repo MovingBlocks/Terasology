@@ -406,7 +406,7 @@ public class EventSystemImpl implements EventSystem {
         private ImmutableList<Class<? extends Component>> componentParams;
         private int priority;
 
-        public ReflectedEventHandlerInfo(ComponentSystem handler,
+        ReflectedEventHandlerInfo(ComponentSystem handler,
                                          Method method,
                                          int priority,
                                          Collection<Class<? extends Component>> filterComponents,
@@ -463,7 +463,7 @@ public class EventSystemImpl implements EventSystem {
         private ImmutableList<Class<? extends Component>> componentParams;
         private int priority;
 
-        public ByteCodeEventHandlerInfo(ComponentSystem handler,
+        ByteCodeEventHandlerInfo(ComponentSystem handler,
                                         Method method,
                                         int priority,
                                         String activity,
@@ -530,7 +530,7 @@ public class EventSystemImpl implements EventSystem {
         private Class<? extends Component>[] components;
         private int priority;
 
-        public ReceiverEventHandlerInfo(EventReceiver<T> receiver, int priority, Class<? extends Component>... components) {
+        ReceiverEventHandlerInfo(EventReceiver<T> receiver, int priority, Class<? extends Component>... components) {
             this.receiver = receiver;
             this.priority = priority;
             this.components = Arrays.copyOf(components, components.length);

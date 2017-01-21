@@ -1,5 +1,5 @@
 /*
-  * Copyright 2014 MovingBlocks
+  * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,7 @@ import java.math.RoundingMode;
 import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 
 /**
- * A base class that fires events at
- * different times of the day.
+ * A base class that fires events at different times of the day.
  */
 public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 
@@ -60,10 +59,14 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     @Override
     public float getSunPosAngle() {
         float days = getWorldTime().getDays();
-        float sunPosAngle = model.getSunPosAngle(days);
-        return sunPosAngle;
+        return  model.getSunPosAngle(days);
     }
 
+    /**
+     * Updates the game perception of the time of day via launching a new OnMiddayEvent(),
+     * OnDuskEvent(), OnMidnightEvent(), or OnDawnEvent() based on the time of day when
+     * this method is called upon.
+     */
     protected void fireEvents() {
         long startTime = worldTime.getMilliseconds();
         long delta = startTime - lastUpdate;

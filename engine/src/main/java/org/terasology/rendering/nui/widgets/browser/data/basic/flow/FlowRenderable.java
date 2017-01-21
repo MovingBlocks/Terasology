@@ -32,7 +32,7 @@ public interface FlowRenderable<T extends FlowRenderable<T>> {
 
     SplitResult<T> splitAt(TextRenderStyle defaultRenderStyle, int width);
 
-    public class SplitResult<T> {
+    class SplitResult<T> {
         public final T before;
         public final T rest;
 

@@ -34,6 +34,10 @@ public class PlaySoundActionComponent implements Component {
     public PlaySoundActionComponent() {
     }
 
+    /**
+     * Creates new instance of PlaySoundActionComponent
+     * @param sounds provided sounds via vararg
+     */
     public PlaySoundActionComponent(StaticSound... sounds) {
         this.sounds.addAll(Arrays.asList(sounds));
     }

@@ -31,7 +31,7 @@ public enum Pitch {
     private float radians;
     private int increments;
 
-    private Pitch(byte index, float radians, int increments) {
+     Pitch(byte index, float radians, int increments) {
         this.index = index;
         this.radians = radians;
         this.increments = increments;

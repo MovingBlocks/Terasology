@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
+ * A simple scrollbar
  */
 public class UIScrollbar extends CoreWidget {
 
@@ -39,6 +40,7 @@ public class UIScrollbar extends CoreWidget {
     @LayoutConfig
     private Binding<Integer> range = new DefaultBinding<>(100);
 
+    @LayoutConfig
     private Binding<Integer> value = new DefaultBinding<>(0);
 
     @LayoutConfig
@@ -194,10 +196,16 @@ public class UIScrollbar extends CoreWidget {
         minimum = binding;
     }
 
+    /**
+     * @return The minimum value scrollable to.
+     */
     public int getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * @param val The new minimum above zero.
+     */
     public void setMinimum(int val) {
         minimum.set(val);
     }
@@ -206,10 +214,16 @@ public class UIScrollbar extends CoreWidget {
         range = binding;
     }
 
+    /**
+     * @return The max value scrollable to.
+     */
     public int getRange() {
         return range.get();
     }
 
+    /**
+     * @param val The new maximum scrollable.
+     */
     public void setRange(int val) {
         range.set(val);
     }
@@ -218,10 +232,16 @@ public class UIScrollbar extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * @return The current scroll value.
+     */
     public int getValue() {
         return TeraMath.clamp(value.get(), getMinimum(), getMinimum() + getRange());
     }
 
+    /**
+     * @param val The new level of scrolling to set.
+     */
     public void setValue(int val) {
         value.set(val);
     }

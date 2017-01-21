@@ -31,7 +31,7 @@ public enum StandardModuleExtension implements ModuleExtension {
     private final String key;
     private final Class<?> valueType;
 
-    private StandardModuleExtension(String key, Class<?> valueType) {
+     StandardModuleExtension(String key, Class<?> valueType) {
         this.key = key;
         this.valueType = valueType;
     }
