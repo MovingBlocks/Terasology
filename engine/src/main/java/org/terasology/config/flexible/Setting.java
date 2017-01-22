@@ -15,110 +15,24 @@
  */
 package org.terasology.config.flexible;
 
-import com.google.common.collect.Lists;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
+public interface Setting<T> extends GeneralSubscribable {
+    SimpleUri getId();
 
-public class Setting<T> implements GeneralSubscribable {
-    private final T defaultValue;
+    SettingValueValidator<T> getValidator();
 
-    private SimpleUri id;
+    T getDefaultValue();
 
-    private T value;
+    T getValue();
 
-    private String humanReadableName;
+    boolean setValue(T newValue);
 
-    private String description;
-    private SettingValueValidator<T> validator;
-    private List<PropertyChangeListener> subscribers;
+    String getHumanReadableName();
 
-    public Setting(SimpleUri id, T defaultValue) {
-        this(id, defaultValue, null);
-    }
+    String getDescription();
 
-    public Setting(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
-        this.id = id;
-
-        this.validator = validator;
-
-        if (!validate(defaultValue))
-            throw new IllegalArgumentException("The default value must be a valid value.");
-
-        this.defaultValue = defaultValue;
-        this.value = this.defaultValue;
-
-        this.subscribers = null;
-    }
-
-    private void dispatchChangedEvent(PropertyChangeEvent event) {
-        for (PropertyChangeListener subscriber : subscribers) {
-            subscriber.propertyChange(event);
-        }
-    }
-
-    private boolean validate(T value) {
-        return validator == null || validator.validate(value);
-    }
-
-    public void subscribe(PropertyChangeListener listener) {
-        if (subscribers == null) {
-            subscribers = Lists.newArrayList();
-        }
-
-        subscribers.add(listener);
-    }
-
-    public void unsubscribe(PropertyChangeListener listener) {
-        subscribers.remove(listener);
-
-        if (subscribers.size() <= 0) {
-            subscribers = null;
-        }
-    }
-
-    public boolean hasSubscribers() {
-        return subscribers != null;
-    }
-
-    public SimpleUri getId() {
-        return id;
-    }
-
-    public SettingValueValidator<T> getValidator() {
-        return validator;
-    }
-
-    public T getDefaultValue() {
-        return defaultValue;
-    }
-
-    public T getValue() {
-        return value;
-    }
-
-    public boolean setValue(T newValue) {
-        if (!validator.validate(newValue))
-            return false;
-
-        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
-
-        this.value = newValue;
-
-        dispatchChangedEvent(event);
-
-        return true;
-    }
-
-    public String getHumanReadableName() {
-        return humanReadableName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    boolean hasSubscribers();
 }

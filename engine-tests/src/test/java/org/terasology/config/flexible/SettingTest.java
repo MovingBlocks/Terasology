@@ -37,7 +37,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new Setting<>(new SimpleUri("engine-tests:TestSetting"),
+            setting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting"),
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventResult = -1;
@@ -69,7 +69,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new Setting<>(new SimpleUri("engine-tests:TestSetting"),
+            setting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting"),
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventCallCount = 0;
