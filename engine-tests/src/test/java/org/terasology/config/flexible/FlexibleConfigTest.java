@@ -55,7 +55,7 @@ public class FlexibleConfigTest {
         }
     }
 
-    public static class HasTest {
+    public static class ContainsTest {
         private FlexibleConfig config;
 
         @Before
@@ -64,23 +64,23 @@ public class FlexibleConfigTest {
         }
 
         @Test
-        public void testHas() throws Exception {
+        public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new SettingImpl<>(id, 50,
                     new RangedNumberValidator<>(0, 100, false, false)));
 
-            assertTrue(config.has(id));
+            assertTrue(config.contains(id));
         }
 
         @Test
-        public void testNotHas() throws Exception {
+        public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new SettingImpl<>(id, 50,
                     new RangedNumberValidator<>(0, 100, false, false)));
 
-            assertFalse(config.has(KEY_NON_EXISTENT));
+            assertFalse(config.contains(KEY_NON_EXISTENT));
         }
     }
 

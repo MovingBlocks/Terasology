@@ -24,5 +24,5 @@ public interface FlexibleConfig {
 
     boolean remove(SimpleUri id);
 
-    boolean has(SimpleUri id);
+    boolean contains(SimpleUri id);
 }

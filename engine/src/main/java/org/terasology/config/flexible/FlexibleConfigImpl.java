@@ -34,7 +34,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     public <V> boolean add(Setting<V> setting) {
         SimpleUri key = setting.getId();
 
-        if (key == null || has(key))
+        if (key == null || contains(key))
             return false;
 
         settingMap.put(key, setting);
@@ -62,7 +62,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         return (Setting<V>) settingMap.get(id);
     }
 
-    public boolean has(SimpleUri id) {
+    public boolean contains(SimpleUri id) {
         return settingMap.containsKey(id);
     }
 }
