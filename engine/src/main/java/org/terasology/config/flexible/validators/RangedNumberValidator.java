@@ -19,16 +19,16 @@ package org.terasology.config.flexible.validators;
  * Validates a {@link Number} within the specified range.
  * @param <T> The type of the {@link Number} to validate.
  */
-public class RangedNumberValueValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
+public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
     private boolean inclusive;
     private T low;
     private T high;
 
-    public RangedNumberValueValidator(T low, T high) {
+    public RangedNumberValidator(T low, T high) {
         this(low, high, false);
     }
 
-    public RangedNumberValueValidator(T low, T high, boolean inclusive) {
+    public RangedNumberValidator(T low, T high, boolean inclusive) {
         this.low = low;
         this.high = high;
         this.inclusive = inclusive;

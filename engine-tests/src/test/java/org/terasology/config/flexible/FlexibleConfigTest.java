@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.validators.RangedNumberValueValidator;
+import org.terasology.config.flexible.validators.RangedNumberValidator;
 import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.*;
@@ -42,10 +42,10 @@ public class FlexibleConfigTest {
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
             config.add(new Setting<>(id1, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             config.add(new Setting<>(id2, 25d,
-                    new RangedNumberValueValidator<>(0d, 100d)));
+                    new RangedNumberValidator<>(0d, 100d)));
 
             Setting<Integer> setting1 = config.get(id1);
             Setting<Double> setting2 = config.get(id2);
@@ -68,7 +68,7 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             assertTrue(config.has(id));
         }
@@ -78,7 +78,7 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             assertFalse(config.has(KEY_NON_EXISTENT));
         }
@@ -97,7 +97,7 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             assertNotNull(config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100))));
+                    new RangedNumberValidator<>(0, 100))));
         }
 
         @Test
@@ -105,10 +105,10 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             assertTrue(config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100))));
+                    new RangedNumberValidator<>(0, 100))));
 
             assertFalse(config.add(new Setting<>(id, 5d,
-                    new RangedNumberValueValidator<>(1d, 100d))));
+                    new RangedNumberValidator<>(1d, 100d))));
         }
     }
 
@@ -126,10 +126,10 @@ public class FlexibleConfigTest {
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
             config.add(new Setting<>(id1, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             config.add(new Setting<>(id2, 25d,
-                    new RangedNumberValueValidator<>(0d, 100d)));
+                    new RangedNumberValidator<>(0d, 100d)));
 
             assertTrue(config.remove(id1));
             assertTrue(config.remove(id2));
@@ -140,7 +140,7 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             assertFalse(config.remove(KEY_NON_EXISTENT));
         }
@@ -150,7 +150,7 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             config.add(new Setting<>(id, 50,
-                    new RangedNumberValueValidator<>(0, 100)));
+                    new RangedNumberValidator<>(0, 100)));
 
             Setting<Integer> setting = config.get(id);
 

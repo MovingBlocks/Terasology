@@ -23,13 +23,13 @@ import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
-public class RangedNumberValueValidatorTest {
+public class RangedNumberValidatorTest {
     public static class IntegerValidator {
-        private RangedNumberValueValidator<Integer> validator;
+        private RangedNumberValidator<Integer> validator;
 
         @Before
         public void setUp() {
-            validator = new RangedNumberValueValidator<>(0, 100, true);
+            validator = new RangedNumberValidator<>(0, 100, true);
         }
 
         @Test
@@ -93,11 +93,11 @@ public class RangedNumberValueValidatorTest {
     public static class DoubleValidator {
         private static final double EPSILON = 0.000001d;
 
-        private RangedNumberValueValidator<Double> validator;
+        private RangedNumberValidator<Double> validator;
 
         @Before
         public void setUp() {
-            validator = new RangedNumberValueValidator<>(0d, 100d, true);
+            validator = new RangedNumberValidator<>(0d, 100d, true);
         }
 
         @Test
