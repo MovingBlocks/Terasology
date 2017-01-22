@@ -17,6 +17,7 @@ package org.terasology.config.flexible.validators;
 
 /**
  * Validates a {@link Number} within the specified range.
+ *
  * @param <T> The type of the {@link Number} to validate.
  */
 public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
@@ -55,17 +56,26 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      */
     @Override
     public boolean validate(T value) {
-        int minComp = min != null ? min.compareTo(value) : -1;
-        int maxComp = max != null ? max.compareTo(value) : 1;
+        boolean withinMinBoundary = true;
 
-        boolean isValid = minComp < 0 && maxComp > 0;
+        if (min != null) {
+            if (minInclusive) {
+                withinMinBoundary = value.compareTo(min) >= 0;
+            } else {
+                withinMinBoundary = value.compareTo(min) > 0;
+            }
+        }
 
-        if(minInclusive)
-            isValid = isValid || minComp == 0;
+        boolean withinMaxBoundary = true;
 
-        if(maxInclusive)
-            isValid = isValid || maxComp == 0;
+        if (max != null) {
+            if (maxInclusive) {
+                withinMaxBoundary = value.compareTo(max) <= 0;
+            } else {
+                withinMaxBoundary = value.compareTo(max) < 0;
+            }
+        }
 
-        return isValid;
+        return withinMinBoundary && withinMaxBoundary;
     }
 }

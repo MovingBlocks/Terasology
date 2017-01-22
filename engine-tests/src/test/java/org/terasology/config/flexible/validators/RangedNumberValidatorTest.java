@@ -33,28 +33,51 @@ public class RangedNumberValidatorTest {
         }
 
         @Test
-        public void testInclusive() {
+        public void testAllInclusive() {
             initValidator(0, 100, true, true);
 
             for (int i = validator.getMin(); i <= validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getMax() + 1));
             assertFalse(validator.validate(validator.getMin() - 1));
+            assertFalse(validator.validate(validator.getMax() + 1));
         }
 
+        @Test
+        public void testMinExclusive() {
+            initValidator(0, 100, false, true);
+
+            for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
+                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+            }
+
+            assertFalse(validator.validate(validator.getMin()));
+            assertTrue(validator.validate(validator.getMax()));
+        }
 
         @Test
-        public void testExclusive() {
+        public void testMaxExclusive() {
+            initValidator(0, 100, true, false);
+
+            for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
+                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+            }
+
+            assertTrue(validator.validate(validator.getMin()));
+            assertFalse(validator.validate(validator.getMax()));
+        }
+
+        @Test
+        public void testAllExclusive() {
             initValidator(0, 100, false, false);
 
             for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getMax()));
             assertFalse(validator.validate(validator.getMin()));
+            assertFalse(validator.validate(validator.getMax()));
         }
 
         @Test
@@ -104,7 +127,7 @@ public class RangedNumberValidatorTest {
         }
 
         @Test
-        public void testInclusive() {
+        public void testAllInclusive() {
             initValidator(0d, 100d, true, true);
 
             for (double i = validator.getMin(); i <= validator.getMax(); i++) {
@@ -115,9 +138,32 @@ public class RangedNumberValidatorTest {
             assertFalse(validator.validate(validator.getMax() + EPSILON));
         }
 
+        @Test
+        public void testMinExclusive() {
+            initValidator(0d, 100d, false, true);
+
+            for (double i = validator.getMin() + 1; i < validator.getMax(); i++) {
+                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+            }
+
+            assertFalse(validator.validate(validator.getMin()));
+            assertTrue(validator.validate(validator.getMax()));
+        }
 
         @Test
-        public void testExclusive() {
+        public void testMaxExclusive() {
+            initValidator(0d, 100d, true, false);
+
+            for (double i = validator.getMin() + 1; i < validator.getMax(); i++) {
+                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+            }
+
+            assertTrue(validator.validate(validator.getMin()));
+            assertFalse(validator.validate(validator.getMax()));
+        }
+
+        @Test
+        public void testAllExclusive() {
             initValidator(0d, 100d, false, false);
 
             for (double i = validator.getMin() + EPSILON; i < validator.getMax(); i++) {
