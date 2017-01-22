@@ -38,39 +38,13 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
         return inclusive;
     }
 
-    public void setInclusive(boolean inclusive) {
-        this.inclusive = inclusive;
-    }
-
     public T getLow() {
         return low;
-    }
-
-    public void setLow(T low) {
-        this.low = low;
     }
 
     public T getHigh() {
         return high;
     }
-
-    public void setHigh(T high) {
-        this.high = high;
-    }
-
-    public void removeLowBound() {
-        low = null;
-    }
-
-    public void removeHighBound() {
-        high = null;
-    }
-
-    public void removeAllBounds() {
-        removeHighBound();
-        removeLowBound();
-    }
-
     /**
      * {@inheritDoc}
      */
