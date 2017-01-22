@@ -31,7 +31,7 @@ public class Setting<T> implements GeneralSubscribable {
 
     private T value;
 
-    private String name;
+    private String humanReadableName;
 
     private String description;
     private SettingValueValidator<T> validator;
@@ -101,21 +101,21 @@ public class Setting<T> implements GeneralSubscribable {
         return value;
     }
 
-    public boolean setValue(T value) {
-        if (!validator.validate(value))
+    public boolean setValue(T newValue) {
+        if (!validator.validate(newValue))
             return false;
 
-        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, value);
+        PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
 
-        this.value = value;
+        this.value = newValue;
 
         dispatchChangedEvent(event);
 
         return true;
     }
 
-    public String getName() {
-        return name;
+    public String getHumanReadableName() {
+        return humanReadableName;
     }
 
     public String getDescription() {
