@@ -34,12 +34,12 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testInclusive() {
-            for (int i = validator.getLow(); i <= validator.getHigh(); i++) {
+            for (int i = validator.getMin(); i <= validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getHigh() + 1));
-            assertFalse(validator.validate(validator.getLow() - 1));
+            assertFalse(validator.validate(validator.getMax() + 1));
+            assertFalse(validator.validate(validator.getMin() - 1));
         }
 
 
@@ -47,12 +47,12 @@ public class RangedNumberValidatorTest {
         public void testExclusive() {
             validator.setInclusive(false);
 
-            for (int i = validator.getLow() + 1; i < validator.getHigh(); i++) {
+            for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getHigh()));
-            assertFalse(validator.validate(validator.getLow()));
+            assertFalse(validator.validate(validator.getMax()));
+            assertFalse(validator.validate(validator.getMin()));
         }
 
         @Test
@@ -63,7 +63,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.validate(-50000));
             assertTrue(validator.validate(50));
 
-            assertFalse(validator.validate(validator.getHigh() + 1));
+            assertFalse(validator.validate(validator.getMax() + 1));
         }
 
         @Test
@@ -74,7 +74,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.validate(50000));
             assertTrue(validator.validate(50));
 
-            assertFalse(validator.validate(validator.getLow() - 1));
+            assertFalse(validator.validate(validator.getMin() - 1));
         }
 
         @Test
@@ -102,12 +102,12 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testInclusive() {
-            for (double i = validator.getLow(); i <= validator.getHigh(); i++) {
+            for (double i = validator.getMin(); i <= validator.getMax(); i++) {
                 assertTrue(String.format("%f returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getLow() - EPSILON));
-            assertFalse(validator.validate(validator.getHigh() + EPSILON));
+            assertFalse(validator.validate(validator.getMin() - EPSILON));
+            assertFalse(validator.validate(validator.getMax() + EPSILON));
         }
 
 
@@ -115,12 +115,12 @@ public class RangedNumberValidatorTest {
         public void testExclusive() {
             validator.setInclusive(false);
 
-            for (double i = validator.getLow() + EPSILON; i < validator.getHigh(); i++) {
+            for (double i = validator.getMin() + EPSILON; i < validator.getMax(); i++) {
                 assertTrue(String.format("%f returned invalid", i), validator.validate(i));
             }
 
-            assertFalse(validator.validate(validator.getLow()));
-            assertFalse(validator.validate(validator.getHigh()));
+            assertFalse(validator.validate(validator.getMin()));
+            assertFalse(validator.validate(validator.getMax()));
         }
 
         @Test
@@ -131,7 +131,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.validate(-50000d));
             assertTrue(validator.validate(50d));
 
-            assertFalse(validator.validate(validator.getHigh() + EPSILON));
+            assertFalse(validator.validate(validator.getMax() + EPSILON));
         }
 
         @Test
@@ -142,7 +142,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.validate(50000d));
             assertTrue(validator.validate(50d));
 
-            assertFalse(validator.validate(validator.getLow() - EPSILON));
+            assertFalse(validator.validate(validator.getMin() - EPSILON));
         }
 
         @Test

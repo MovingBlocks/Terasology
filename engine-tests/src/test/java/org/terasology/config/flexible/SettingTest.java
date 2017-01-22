@@ -128,7 +128,7 @@ public class SettingTest {
 
             int halfN = n / 2;
 
-            for(int i = 0; i < new FastRandom().nextInt(halfN); i++){
+            for (int i = 0; i < new FastRandom().nextInt(halfN); i++) {
                 setting.unsubscribe(listener);
                 n--;
             }

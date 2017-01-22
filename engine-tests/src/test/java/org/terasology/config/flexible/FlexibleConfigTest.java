@@ -154,7 +154,8 @@ public class FlexibleConfigTest {
 
             Setting<Integer> setting = config.get(id);
 
-            setting.subscribe(propertyChangeEvent -> {});
+            setting.subscribe(propertyChangeEvent -> {
+            });
 
             assertFalse(config.remove(id));
         }

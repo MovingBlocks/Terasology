@@ -21,16 +21,16 @@ package org.terasology.config.flexible.validators;
  */
 public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
     private boolean inclusive;
-    private T low;
-    private T high;
+    private T min;
+    private T max;
 
-    public RangedNumberValidator(T low, T high) {
-        this(low, high, false);
+    public RangedNumberValidator(T min, T max) {
+        this(min, max, false);
     }
 
-    public RangedNumberValidator(T low, T high, boolean inclusive) {
-        this.low = low;
-        this.high = high;
+    public RangedNumberValidator(T min, T max, boolean inclusive) {
+        this.min = min;
+        this.max = max;
         this.inclusive = inclusive;
     }
 
@@ -38,20 +38,21 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
         return inclusive;
     }
 
-    public T getLow() {
-        return low;
+    public T getMin() {
+        return min;
     }
 
-    public T getHigh() {
-        return high;
+    public T getMax() {
+        return max;
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean validate(T value) {
-        int lowComp = low != null ? low.compareTo(value) : -1;
-        int highComp = high != null ? high.compareTo(value) : 1;
+        int lowComp = min != null ? min.compareTo(value) : -1;
+        int highComp = max != null ? max.compareTo(value) : 1;
 
         boolean isValid = lowComp < 0 && highComp > 0;
 
