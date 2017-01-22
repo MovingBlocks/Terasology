@@ -33,7 +33,7 @@ public class FlexibleConfigTest {
 
         @Before
         public void setUp() throws Exception {
-            config = new FlexibleConfig();
+            config = new FlexibleConfigImpl();
         }
 
         @Test
@@ -60,7 +60,7 @@ public class FlexibleConfigTest {
 
         @Before
         public void setUp() throws Exception {
-            config = new FlexibleConfig();
+            config = new FlexibleConfigImpl();
         }
 
         @Test
@@ -89,7 +89,7 @@ public class FlexibleConfigTest {
 
         @Before
         public void setUp() throws Exception {
-            config = new FlexibleConfig();
+            config = new FlexibleConfigImpl();
         }
 
         @Test
@@ -117,7 +117,7 @@ public class FlexibleConfigTest {
 
         @Before
         public void setUp() throws Exception {
-            config = new FlexibleConfig();
+            config = new FlexibleConfigImpl();
         }
 
         @Test

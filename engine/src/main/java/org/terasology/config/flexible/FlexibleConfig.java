@@ -15,54 +15,14 @@
  */
 package org.terasology.config.flexible;
 
-import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
-import java.util.Map;
+public interface FlexibleConfig {
+    <V> boolean add(Setting<V> setting);
 
-public class FlexibleConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfig.class);
+    <V> Setting<V> get(SimpleUri id);
 
-    private Map<SimpleUri, Setting> settingMap;
+    boolean remove(SimpleUri id);
 
-    public FlexibleConfig() {
-        this.settingMap = Maps.newHashMap();
-    }
-
-    public <V> boolean add(Setting<V> setting) {
-        SimpleUri key = setting.getId();
-
-        if (key == null || has(key))
-            return false;
-
-        settingMap.put(key, setting);
-        return true;
-    }
-
-    public boolean remove(SimpleUri id) {
-        Setting setting = get(id);
-
-        if (setting == null) {
-            LOGGER.warn("The setting to remove with the id \"{}\" does not exist in the config.", id);
-            return false;
-        }
-        else if (setting.hasSubscribers()) {
-            LOGGER.warn("The setting with the id \"{}\" still has subscribers and cannot be removed.", id);
-            return false;
-        }
-
-        settingMap.remove(id);
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <V> Setting<V> get(SimpleUri key) {
-        return (Setting<V>) settingMap.get(key);
-    }
-
-    public boolean has(SimpleUri key) {
-        return settingMap.containsKey(key);
-    }
+    boolean has(SimpleUri id);
 }
