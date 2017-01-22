@@ -20,22 +20,26 @@ package org.terasology.config.flexible.validators;
  * @param <T> The type of the {@link Number} to validate.
  */
 public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
-    private boolean inclusive;
+    private boolean minInclusive;
+    private boolean maxInclusive;
+
     private T min;
     private T max;
 
-    public RangedNumberValidator(T min, T max) {
-        this(min, max, false);
-    }
-
-    public RangedNumberValidator(T min, T max, boolean inclusive) {
+    public RangedNumberValidator(T min, T max, boolean minInclusive, boolean maxInclusive) {
         this.min = min;
         this.max = max;
-        this.inclusive = inclusive;
+
+        this.minInclusive = minInclusive;
+        this.maxInclusive = maxInclusive;
     }
 
-    public boolean isInclusive() {
-        return inclusive;
+    public boolean isMinInclusive() {
+        return minInclusive;
+    }
+
+    public boolean isMaxInclusive() {
+        return maxInclusive;
     }
 
     public T getMin() {
@@ -51,13 +55,16 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      */
     @Override
     public boolean validate(T value) {
-        int lowComp = min != null ? min.compareTo(value) : -1;
-        int highComp = max != null ? max.compareTo(value) : 1;
+        int minComp = min != null ? min.compareTo(value) : -1;
+        int maxComp = max != null ? max.compareTo(value) : 1;
 
-        boolean isValid = lowComp < 0 && highComp > 0;
+        boolean isValid = minComp < 0 && maxComp > 0;
 
-        if(inclusive)
-            isValid = isValid || lowComp == 0 || highComp == 0;
+        if(minInclusive)
+            isValid = isValid || minComp == 0;
+
+        if(maxInclusive)
+            isValid = isValid || maxComp == 0;
 
         return isValid;
     }

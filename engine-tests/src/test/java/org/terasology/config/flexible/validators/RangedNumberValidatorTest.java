@@ -20,20 +20,22 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Enclosed.class)
 public class RangedNumberValidatorTest {
     public static class IntegerValidator {
         private RangedNumberValidator<Integer> validator;
 
-        @Before
-        public void setUp() {
-            validator = new RangedNumberValidator<>(0, 100, true);
+        private void initValidator(Integer min, Integer max, boolean minInclusive, boolean maxInclusive) {
+            validator = new RangedNumberValidator<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test
         public void testInclusive() {
+            initValidator(0, 100, true, true);
+
             for (int i = validator.getMin(); i <= validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
             }
@@ -45,7 +47,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testExclusive() {
-            validator.setInclusive(false);
+            initValidator(0, 100, false, false);
 
             for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
                 assertTrue(String.format("%d returned invalid", i), validator.validate(i));
@@ -57,10 +59,11 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testLowUnbounded() {
-            validator.removeLowBound();
+            initValidator(null, 100, false, false);
 
             assertTrue(validator.validate(-1000));
             assertTrue(validator.validate(-50000));
+
             assertTrue(validator.validate(50));
 
             assertFalse(validator.validate(validator.getMax() + 1));
@@ -68,10 +71,11 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testHighUnbounded() {
-            validator.removeHighBound();
+            initValidator(0, null, false, false);
 
             assertTrue(validator.validate(1000));
             assertTrue(validator.validate(50000));
+
             assertTrue(validator.validate(50));
 
             assertFalse(validator.validate(validator.getMin() - 1));
@@ -79,7 +83,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testAllUnbounded() {
-            validator.removeAllBounds();
+            initValidator(null, null, false, false);
 
             assertTrue(validator.validate(1000));
             assertTrue(validator.validate(50000));
@@ -95,13 +99,14 @@ public class RangedNumberValidatorTest {
 
         private RangedNumberValidator<Double> validator;
 
-        @Before
-        public void setUp() {
-            validator = new RangedNumberValidator<>(0d, 100d, true);
+        private void initValidator(Double min, Double max, boolean minInclusive, boolean maxInclusive) {
+            validator = new RangedNumberValidator<>(min, max, minInclusive, maxInclusive);
         }
 
         @Test
         public void testInclusive() {
+            initValidator(0d, 100d, true, true);
+
             for (double i = validator.getMin(); i <= validator.getMax(); i++) {
                 assertTrue(String.format("%f returned invalid", i), validator.validate(i));
             }
@@ -113,7 +118,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testExclusive() {
-            validator.setInclusive(false);
+            initValidator(0d, 100d, false, false);
 
             for (double i = validator.getMin() + EPSILON; i < validator.getMax(); i++) {
                 assertTrue(String.format("%f returned invalid", i), validator.validate(i));
@@ -125,7 +130,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testLowUnbounded() {
-            validator.removeLowBound();
+            initValidator(null, 100d, false, false);
 
             assertTrue(validator.validate(-1000d));
             assertTrue(validator.validate(-50000d));
@@ -136,7 +141,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testHighUnbounded() {
-            validator.removeHighBound();
+            initValidator(0d, null, false, false);
 
             assertTrue(validator.validate(1000d));
             assertTrue(validator.validate(50000d));
@@ -147,7 +152,7 @@ public class RangedNumberValidatorTest {
 
         @Test
         public void testAllUnbounded() {
-            validator.removeAllBounds();
+            initValidator(null, null, false, false);
 
             assertTrue(validator.validate(1000d));
             assertTrue(validator.validate(50000d));
