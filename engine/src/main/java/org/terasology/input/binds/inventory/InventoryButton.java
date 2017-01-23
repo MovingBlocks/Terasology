@@ -22,6 +22,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
+ * Button used to toggle open the main inventory screen.
  */
 @RegisterBindButton(id = "inventory", description = "${engine:menu#open-inventory}", category = "inventory")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.I)
