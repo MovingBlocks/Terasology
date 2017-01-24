@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class FlexibleConfigTest {
     private static final SimpleUri KEY_NON_EXISTENT = new SimpleUri("engine-tests:TestSettingX");
 
-    public static class GetTest {
+    public static class Get {
         private FlexibleConfig config;
 
         @Before
@@ -55,7 +55,7 @@ public class FlexibleConfigTest {
         }
     }
 
-    public static class ContainsTest {
+    public static class Contains {
         private FlexibleConfig config;
 
         @Before
@@ -84,7 +84,7 @@ public class FlexibleConfigTest {
         }
     }
 
-    public static class AddTest {
+    public static class Add {
         private FlexibleConfig config;
 
         @Before
@@ -112,7 +112,7 @@ public class FlexibleConfigTest {
         }
     }
 
-    public static class RemoveTest {
+    public static class Remove {
         private FlexibleConfig config;
 
         @Before
