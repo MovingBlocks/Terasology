@@ -35,10 +35,10 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         SimpleUri id = setting.getId();
 
         if (id == null) {
-            LOGGER.warn("The id of the setting can not be null.");
+            LOGGER.warn("The id of a setting cannot be null.");
             return false;
         } else if (contains(id)) {
-            LOGGER.warn("A Setting with the id \"{}\" already exists in the config.", id);
+            LOGGER.warn("A Setting with the id \"{}\" already exists.", id);
             return false;
         }
 

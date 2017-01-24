@@ -16,6 +16,8 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -24,6 +26,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 public class SettingImpl<T> implements Setting<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
     private final T defaultValue;
 
     private SimpleUri id;
@@ -101,13 +104,13 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     public boolean setValue(T newValue) {
-        if (!validator.validate(newValue))
+        if (!validator.validate(newValue)) {
+            LOGGER.warn("The passed value {} is invalid.", newValue);
             return false;
+        }
 
         PropertyChangeEvent event = new PropertyChangeEvent(this, id.toString(), this.value, newValue);
-
         this.value = newValue;
-
         dispatchChangedEvent(event);
 
         return true;
