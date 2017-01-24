@@ -32,12 +32,17 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     }
 
     public <V> boolean add(Setting<V> setting) {
-        SimpleUri key = setting.getId();
+        SimpleUri id = setting.getId();
 
-        if (key == null || contains(key))
+        if (id == null) {
+            LOGGER.warn("The id of the setting can not be null.");
             return false;
+        } else if (contains(id)) {
+            LOGGER.warn("A Setting with the id \"{}\" already exists in the config.", id);
+            return false;
+        }
 
-        settingMap.put(key, setting);
+        settingMap.put(id, setting);
         return true;
     }
 
@@ -45,11 +50,10 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         Setting setting = get(id);
 
         if (setting == null) {
-            LOGGER.warn("The setting to remove with the id \"{}\" does not exist in the config.", id);
+            LOGGER.warn("Setting \"{}\" does not exist.", id);
             return false;
-        }
-        else if (setting.hasSubscribers()) {
-            LOGGER.warn("The setting with the id \"{}\" still has subscribers and cannot be removed.", id);
+        } else if (setting.hasSubscribers()) {
+            LOGGER.warn("Setting \"{}\" cannot be removed while it has subscribers.", id);
             return false;
         }
 
