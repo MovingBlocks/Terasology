@@ -65,7 +65,7 @@ public final class OpenVRProvider {
     private static boolean headIsTracking;
     private static OpenVRProvider instance;
 
-    public OpenVRState vrState = new OpenVRState();
+    private static final OpenVRState vrState = new OpenVRState();
 
     // TextureIDs of framebuffers for each eye
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
@@ -87,6 +87,10 @@ public final class OpenVRProvider {
             instance = new OpenVRProvider();
         }
         return instance;
+    }
+
+    public OpenVRState getState() {
+        return vrState;
     }
 
     public boolean init() {
@@ -156,7 +160,6 @@ public final class OpenVRProvider {
         vrCompositor = null;
         vrOverlay = null;
         vrSettings = null;
-        vrState = null;
         initialized = false;
     }
 

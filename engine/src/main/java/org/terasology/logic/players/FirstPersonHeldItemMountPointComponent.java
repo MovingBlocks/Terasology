@@ -51,7 +51,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     );
 
     public void trySubscribeToControllerPoses() {
-        vrProvider.vrState.addControllerListener(this);
+        vrProvider.getState().addControllerListener(this);
     }
 
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {
