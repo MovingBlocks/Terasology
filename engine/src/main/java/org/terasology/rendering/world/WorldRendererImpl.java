@@ -166,6 +166,10 @@ public final class WorldRendererImpl implements WorldRenderer {
         vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
             context.put(OpenVRProvider.class, vrProvider);
+            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
+            // reason (for example, no HMD is connected). In that case, even though the configuration requests
+            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
+            // the log.
             if (vrProvider.init()) {
                 playerCamera = new OpenVRStereoCamera(vrProvider);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
