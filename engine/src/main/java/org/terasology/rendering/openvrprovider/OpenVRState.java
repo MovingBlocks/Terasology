@@ -55,8 +55,32 @@ public class OpenVRState {
         }
     }
 
+    /**
+     * Add a controller listener. This listener will receive pose and button state updates for the controller.
+     * @param toAdd - the controller listener. Implements the ControllerListener interface.
+     */
     public void addControllerListener(ControllerListener toAdd) {
         controllerListeners.add(toAdd);
+    }
+
+    /**
+     * Get the pose of eye eyeIndex.
+     * @param eyeIndex - the eye index. 0 is left, 1 is right.
+     * @return
+     */
+    public Matrix4f getEyePose(int eyeIndex) {
+        Matrix4f matrixReturn = new Matrix4f(headPose);
+        matrixReturn.mul(eyePoses[eyeIndex]);
+        return matrixReturn;
+    }
+
+    /**
+     * Get the projection matrix for eye eyeIndex.
+     * @param eyeIndex - The target eye. 0 is left, 1 is right.
+     * @return
+     */
+    public Matrix4f getEyeProjectionMatrix(int eyeIndex) {
+        return new Matrix4f(projectionMatrices[eyeIndex]);
     }
 
     void setHeadPose(HmdMatrix34_t inputPose) {
@@ -72,16 +96,6 @@ public class OpenVRState {
         for (ControllerListener listener : controllerListeners) {
             listener.poseChanged(controllerPose[nIndex], nIndex);
         }
-    }
-
-    public Matrix4f getEyePose(int nEye) {
-        Matrix4f matrixReturn = new Matrix4f(headPose);
-        matrixReturn.mul(eyePoses[nEye]);
-        return matrixReturn;
-    }
-
-    public Matrix4f getEyeProjectionMatrix(int nEye) {
-        return new Matrix4f(projectionMatrices[nEye]);
     }
 
     void updateControllerButtonState(
@@ -110,8 +124,8 @@ public class OpenVRState {
 
     void setProjectionMatrix(
             HmdMatrix44_t inputPose,
-            int nEye) {
-        OpenVRUtil.setSteamVRMatrix44ToMatrix4f(inputPose, projectionMatrices[nEye]);
+            int eyeIndex) {
+        OpenVRUtil.setSteamVRMatrix44ToMatrix4f(inputPose, projectionMatrices[eyeIndex]);
     }
 
 }

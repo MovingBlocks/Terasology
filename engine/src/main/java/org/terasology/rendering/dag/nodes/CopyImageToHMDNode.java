@@ -61,6 +61,10 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private FBO leftEye;
     private FBO rightEye;
 
+    /**
+     * Perform the initialization of this node. Specifically, initialize the vrProvider and inject the frame buffer
+     * information for the vrProvider to use.
+     */
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
@@ -83,6 +87,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
+    /**
+     * Actually perform the rendering-related tasks.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToHMD");
@@ -91,6 +98,11 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         PerformanceMonitor.endActivity();
     }
 
+    /**
+     * Render the stereo image (per eye). This method also calls the appropriate methods in the VR library depending
+     * on what eye is being rendered.
+     * @param renderingStage - The eye that is being rendered this pass.
+     */
     private void renderFinalStereoImage(RenderingStage renderingStage) {
         // TODO: verify if we can use glCopyTexSubImage2D instead of pass-through shaders,
         // TODO: in terms of code simplicity and performance.

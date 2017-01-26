@@ -72,12 +72,14 @@ public final class OpenVRProvider {
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
 
-    // Call getInstance() to instantiate
+    /**
+    * Call getInstance() to instantiate
+     */
     private OpenVRProvider() {
     }
 
     // Get a singleton instance.
-    /*
+    /**
     * As a general rule, we should use this class as a singleton, because multiple instantiation
     * will likely cause problems in the upstream native library. This provides a convenient method
     * of using OpenVRProvider as a singleton.
@@ -89,10 +91,18 @@ public final class OpenVRProvider {
         return instance;
     }
 
+    /**
+     * Get the state of the VR system. This contains the poses of the eyes, controllers, etc...
+     * @return the VR state.
+     */
     public OpenVRState getState() {
         return vrState;
     }
 
+    /**
+     * Initialize the VR system. Note that calling this method will cause OpenVR to launch.
+     * @return true if successful.
+     */
     public boolean init() {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
             controllerDeviceIndex[handIndex] = -1;
@@ -142,18 +152,34 @@ public final class OpenVRProvider {
         return true;
     }
 
+    /**
+     *
+     * @return true if initialized.
+     */
     public boolean isInitialized() {
         return initialized;
     }
 
+    /**
+     *
+     * @return true if the pose of the headset is currently considered reliable.
+     */
     public boolean isHeadTracking() {
         return headIsTracking;
     }
 
+    /**
+     *
+     * @param controllerIndex - 0 for left, 1 for right
+     * @return true if the pose of the controller is currently considered reliable.
+     */
     public boolean isControllerTrackint(int controllerIndex) {
         return controllerTracking[controllerIndex];
     }
 
+    /**
+     * Shut down the VR system.
+     */
     public void shutdown() {
         JOpenVRLibrary.VR_ShutdownInternal();
         vrSystem = null;
@@ -163,10 +189,85 @@ public final class OpenVRProvider {
         initialized = false;
     }
 
+    /**
+     * Query the VR library and update the VR state, gettable with getState(). This method should be called once per
+     * render cycle.
+     */
     public void updateState() {
         updatePose();
         pollControllers();
         pollInputEvents();
+    }
+
+    /**
+     * Make the specified controller vibrate
+     * @param controller - the hand index, 0 for left and 1 for right.
+     * @param strength - the strength of the pulse.
+     */
+    public static void triggerHapticPulse(int controller, int strength) {
+        if (controllerDeviceIndex[controller] == -1) {
+            return;
+        }
+        vrSystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
+    }
+
+    public void submitFrame() {
+        for (int nEye = 0; nEye < 2; nEye++) {
+            vrCompositor.Submit.apply(
+                    nEye,
+                    texType[nEye], null,
+                    JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
+        }
+        if (vrCompositor.PostPresentHandoff != null) {
+            vrCompositor.PostPresentHandoff.apply();
+        }
+    }
+
+    /**
+     * Set the near clip. This will influence the projection matrix that comes from the
+     * vrProvider.getState().getProjectionMatrix(...) method.
+     * @param nearClipIn - the near clip to set.
+     */
+    public void setNearClip(float nearClipIn) {
+        nearClip = nearClipIn;
+    }
+
+    /**
+     * Set the far clip. This will influence the projection matrix that comes from the
+     * vrProvider.getState().getProjectionMatrix(...) method.
+     * @param farClipIn - the near clip to set.
+     */
+    public void setFarClip(float farClipIn) {
+        farClip = farClipIn;
+    }
+
+    /**
+     * Turn on the keyboard overlay. This is a keyboard that hovers in front of the user.
+     * @param showingState - true or false
+     * @return - true if successful.
+     */
+    public static boolean setKeyboardOverlayShowing(boolean showingState) {
+        int ret;
+        if (showingState) {
+            Pointer pointer = new Memory(3);
+            pointer.setString(0, "mc");
+            Pointer empty = new Memory(1);
+            empty.setString(0, "");
+            ret = vrOverlay.ShowKeyboard.apply(0, 0, pointer, 256, empty, (byte) 1, 0);
+            keyboardShowing = 0 == ret; //0 = no error, > 0 see EVROverlayError
+            if (ret != 0) {
+                logger.error("VR Overlay Error: " + vrOverlay.GetOverlayErrorNameFromEnum.apply(ret).getString(0));
+            }
+        } else {
+            try {
+                vrOverlay.HideKeyboard.apply();
+            } catch (Error e) {
+                logger.error("Error bringing up keyboard overlay.");
+            }
+            keyboardShowing = false;
+        }
+
+        return keyboardShowing;
     }
 
     private void pollControllers() {
@@ -299,30 +400,6 @@ public final class OpenVRProvider {
         return true;
     }
 
-    public static boolean setKeyboardOverlayShowing(boolean showingState) {
-        int ret;
-        if (showingState) {
-            Pointer pointer = new Memory(3);
-            pointer.setString(0, "mc");
-            Pointer empty = new Memory(1);
-            empty.setString(0, "");
-            ret = vrOverlay.ShowKeyboard.apply(0, 0, pointer, 256, empty, (byte) 1, 0);
-            keyboardShowing = 0 == ret; //0 = no error, > 0 see EVROverlayError
-            if (ret != 0) {
-                logger.error("VR Overlay Error: " + vrOverlay.GetOverlayErrorNameFromEnum.apply(ret).getString(0));
-            }
-        } else {
-            try {
-                vrOverlay.HideKeyboard.apply();
-            } catch (Error e) {
-                logger.error("Error bringing up keyboard overlay.");
-            }
-            keyboardShowing = false;
-        }
-
-        return keyboardShowing;
-    }
-
     private static void findControllerDevices() {
         controllerDeviceIndex[RIGHT_CONTROLLER] = -1;
         controllerDeviceIndex[LEFT_CONTROLLER] = -1;
@@ -388,30 +465,4 @@ public final class OpenVRProvider {
         }
     }
 
-    public static void triggerHapticPulse(int controller, int strength) {
-        if (controllerDeviceIndex[controller] == -1) {
-            return;
-        }
-        vrSystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
-    }
-
-    public void submitFrame() {
-        for (int nEye = 0; nEye < 2; nEye++) {
-            vrCompositor.Submit.apply(
-                    nEye,
-                    texType[nEye], null,
-                    JOpenVRLibrary.EVRSubmitFlags.EVRSubmitFlags_Submit_Default);
-        }
-        if (vrCompositor.PostPresentHandoff != null) {
-            vrCompositor.PostPresentHandoff.apply();
-        }
-    }
-
-    public void setNearClip(float nearClipIn) {
-        nearClip = nearClipIn;
-    }
-
-    public void setFarClip(float farClipIn) {
-        farClip = farClipIn;
-    }
 }

@@ -50,14 +50,28 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
             0.0f, -0.05f, -0.2f, 1.0f
     );
 
+    /**
+     * If possible, make this object listen for controller pose upates.
+     */
     public void trySubscribeToControllerPoses() {
         vrProvider.getState().addControllerListener(this);
     }
 
+    /**
+     * A callback target for the controller listener. Not intended to be called manually.
+     * @param stateBefore - the state before the state change.
+     * @param stateAfter - the state after the state change.
+     * @param nController - the hand index, 0 for left and 1 for right.
+     */
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController) {
         // nothing for now
     }
 
+    /**
+     * A callback target for the controller listener. Not intended to be called manually.
+     * @param pose - the controller pose - a homogenous transformation matrix.
+     * @param handIndex - the hand index - 0 for left and 1 for right.
+     */
     public void poseChanged(Matrix4f pose, int handIndex) {
         // do nothing for the second controller
         // TODO: put a hand for the second controller.
