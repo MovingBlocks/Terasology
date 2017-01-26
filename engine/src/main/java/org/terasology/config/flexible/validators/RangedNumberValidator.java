@@ -31,6 +31,13 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
     private T min;
     private T max;
 
+    /**
+     * Creates a new instance of {@link RangedNumberValidator}.
+     * @param min The minimum value in the range. A null value signifies the absence of any minimum value.
+     * @param max The maximum value in the range. A null value signifies the absence of any maximum value.
+     * @param minInclusive Should the minimum value be included in the range?
+     * @param maxInclusive Should the maximum value be included in the range?
+     */
     public RangedNumberValidator(T min, T max, boolean minInclusive, boolean maxInclusive) {
         this.min = min;
         this.max = max;
@@ -39,18 +46,30 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
         this.maxInclusive = maxInclusive;
     }
 
+    /**
+     * Returns a boolean stating whether the minimum value should be included in the range.
+     */
     public boolean isMinInclusive() {
         return minInclusive;
     }
 
+    /**
+     * Returns a boolean stating whether the maximum value should be included in the range.
+     */
     public boolean isMaxInclusive() {
         return maxInclusive;
     }
 
+    /**
+     * Returns the minimum value in the range. A null value signifies the absence of any minimum value.
+     */
     public T getMin() {
         return min;
     }
 
+    /**
+     * Returns the maximum value in the range. A null value signifies the absence of any maximum value.
+     */
     public T getMax() {
         return max;
     }
@@ -83,6 +102,10 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
         return withinMinBoundary && withinMaxBoundary;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void issueWarnings(T value) {
         LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
