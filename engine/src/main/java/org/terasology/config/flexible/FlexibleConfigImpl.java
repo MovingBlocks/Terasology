@@ -31,7 +31,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         this.settingMap = Maps.newHashMap();
     }
 
-    public <V> boolean add(Setting<V> setting) {
+    public boolean add(Setting setting) {
         SimpleUri id = setting.getId();
 
         if (id == null) {
