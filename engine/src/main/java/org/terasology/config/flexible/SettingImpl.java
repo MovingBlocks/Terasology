@@ -25,6 +25,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+/**
+ * {@inheritDoc}
+ * @param <T> The type of the value this {@link SettingImpl} contains.
+ */
 public class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
     private final T defaultValue;
@@ -39,10 +43,21 @@ public class SettingImpl<T> implements Setting<T> {
     private SettingValueValidator<T> validator;
     private List<PropertyChangeListener> subscribers;
 
+    /**
+     * Creates a new {@link SettingImpl} that does not use a validator with the given id and default value.
+     * @param id the id of the setting.
+     * @param defaultValue the default value of the setting.
+     */
     public SettingImpl(SimpleUri id, T defaultValue) {
         this(id, defaultValue, null);
     }
 
+    /**
+     * Creates a new {@link SettingImpl} with the given id, default value and validator.
+     * @param id the id of the setting.
+     * @param defaultValue the default value of the setting.
+     * @param validator the validator to be used to validate values.
+     */
     public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
 
@@ -67,6 +82,9 @@ public class SettingImpl<T> implements Setting<T> {
         return validator == null || validator.validate(value);
     }
 
+    /**
+     * Subscribe a listener that will be notified when the value stored in the setting changes.
+     */
     public void subscribe(PropertyChangeListener listener) {
         if (subscribers == null) {
             subscribers = Lists.newArrayList();
@@ -75,6 +93,9 @@ public class SettingImpl<T> implements Setting<T> {
         subscribers.add(listener);
     }
 
+    /**
+     * Unsubscribe a listener that will be notified when the value stored in the setting changes.
+     */
     public void unsubscribe(PropertyChangeListener listener) {
         subscribers.remove(listener);
 
@@ -83,26 +104,48 @@ public class SettingImpl<T> implements Setting<T> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasSubscribers() {
         return subscribers != null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SimpleUri getId() {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SettingValueValidator<T> getValidator() {
         return validator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public T getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public T getValue() {
         return value;
     }
 
+    /**
+     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. If it is invalid, the stored
+     * value is not updated and a warning is logged. On successfully updating the value, the subscribers are
+     * notified of the change.
+     * @param newValue The new value to store.
+     * @return True if the value was valid and was stored successfully, false otherwise.
+     */
     public boolean setValue(T newValue) {
         if (!validator.validateWithWarnings(newValue)) {
             return false;
@@ -115,10 +158,16 @@ public class SettingImpl<T> implements Setting<T> {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getHumanReadableName() {
         return humanReadableName;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription() {
         return description;
     }
