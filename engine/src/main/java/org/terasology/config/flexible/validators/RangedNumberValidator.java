@@ -15,12 +15,16 @@
  */
 package org.terasology.config.flexible.validators;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Validates a {@link Number} within the specified range.
  *
  * @param <T> The type of the {@link Number} to validate.
  */
 public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RangedNumberValidator.class);
     private boolean minInclusive;
     private boolean maxInclusive;
 
@@ -77,5 +81,11 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
         }
 
         return withinMinBoundary && withinMaxBoundary;
+    }
+
+    @Override
+    public void issueWarnings(T value) {
+        LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
+                min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
     }
 }

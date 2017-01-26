@@ -104,8 +104,7 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     public boolean setValue(T newValue) {
-        if (!validator.validate(newValue)) {
-            LOGGER.warn("The passed value {} is invalid.", newValue);
+        if (!validator.validateWithWarnings(newValue)) {
             return false;
         }
 
