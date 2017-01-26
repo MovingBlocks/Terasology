@@ -22,15 +22,24 @@ import org.terasology.engine.SimpleUri;
 
 import java.util.Map;
 
+/**
+ * {@inheritDoc}
+ */
 public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
 
     private Map<SimpleUri, Setting> settingMap;
 
+    /**
+     * Creates a new {@link FlexibleConfigImpl} instance.
+     */
     public FlexibleConfigImpl() {
         this.settingMap = Maps.newHashMap();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean add(Setting setting) {
         SimpleUri id = setting.getId();
 
@@ -46,6 +55,9 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean remove(SimpleUri id) {
         Setting setting = get(id);
 
@@ -61,11 +73,17 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id) {
         return (Setting<V>) settingMap.get(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean contains(SimpleUri id) {
         return settingMap.containsKey(id);
     }

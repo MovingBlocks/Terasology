@@ -35,6 +35,8 @@ public interface FlexibleConfig {
      * @param <V> The type of the value the retrieved {@link Setting} must contain.
      * @return The {@link Setting<V>}, if found in the config. Null if a {@link Setting} with the given id
      * does not exist in the config.
+     * @throws ClassCastException when {@link V} does not match the type of the values stored inside the retrieved
+     * {@link Setting}.
      */
     <V> Setting<V> get(SimpleUri id);
 
