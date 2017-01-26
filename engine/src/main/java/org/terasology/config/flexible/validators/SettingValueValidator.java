@@ -15,6 +15,10 @@
  */
 package org.terasology.config.flexible.validators;
 
+/**
+ * Validates the given value and optionally issues warnings if the value is invalid.
+ * @param <T> The type of values this {@link SettingValueValidator} validates.
+ */
 public interface SettingValueValidator<T> {
     /**
      * Checks whether the given value is valid or not.
