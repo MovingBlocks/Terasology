@@ -133,6 +133,9 @@ dependencies {
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
+
+    // Dependency on CrashReporter
+    compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.0'
 }
 
 // Instructions for packaging a jar file for the engine
