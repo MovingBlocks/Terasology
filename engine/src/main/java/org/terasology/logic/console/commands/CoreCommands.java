@@ -55,6 +55,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingService;
 import org.terasology.network.Server;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -418,11 +419,8 @@ public class CoreCommands extends BaseComponentSystem {
         String address = remoteAddress[1];
         int port = Integer.valueOf(remoteAddress[2]);
         try {
-            Instant starts = Instant.now();
-            Socket sock = new Socket(address, port);
-            Instant ends = Instant.now();
-            sock.close();
-            long delay = Duration.between(starts, ends).toMillis();
+            PingService pingService = new PingService(address, port);
+            long delay = pingService.call();
             return String.format("%d ms", delay);
         } catch (UnknownHostException e) {
             return String.format("Error: Unknown host \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
