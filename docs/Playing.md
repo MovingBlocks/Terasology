@@ -22,7 +22,7 @@ You can also run a headless server, but this is harder to configure at the momen
 
 `java -jar libs/Terasology.jar -headless -homedir=server`
 
-This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system). You can add `-serverPort=#####` to run on a different port than default 25777.
+This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same System). You can add `-serverPort=#####` to run on a different port than default 25777.
 
 In this case *there is no default player with rights beyond "chat"*. You need to gain admin powers yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`. This gives you all permission types except "debug"
 

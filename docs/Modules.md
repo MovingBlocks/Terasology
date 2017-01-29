@@ -14,7 +14,7 @@ Module source repositories live under the [Terasology organization](https://gith
 
 Here's a list of modules bundled with the game by default (this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.terasology.org/view/Modules and you can download updated modules from there if needed.
 
-*Note about "Tutorial" modules:* These are more likely for some time to be for developers/modders to learn about different kinds of content and systems, not for players to actually learn stuff in-game. That's usually handled by actual content modules including their own in-game help system.
+*Note about "Tutorial" modules:* These are more likely for some time to be for developers/modders to learn about different kinds of content and systems, not for players to actually learn stuff in-game. That's usually handled by actual content modules including their own in-game help System.
 
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
@@ -45,9 +45,9 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Dialogs](https://github.com/Terasology/Dialogs) - supports opening dialogs for interactions with NPCs and such
 * [Durability](https://github.com/Terasology/Durability) - library module to support destructible items (wear and tear eventually breaks them)
 * [DynamicCities](https://github.com/Terasology/DynamicCities) - variant of Cities that places then grows cities dynamically over time 
-* [Economy](https://github.com/Terasology/Economy) - a module to simulate a basic supply & demand economy system
-* [Equipment](https://github.com/Terasology/Equipment) - an equipment system with a character screen (`c`) showing stats and slots for various equipment types
-* [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill system, a bit akin to EVE Online's system
+* [Economy](https://github.com/Terasology/Economy) - a module to simulate a basic supply & demand economy System
+* [Equipment](https://github.com/Terasology/Equipment) - an equipment System with a character screen (`c`) showing stats and slots for various equipment types
+* [EventualSkills](https://github.com/Terasology/EventualSkills) - a time-based skill System, a bit akin to EVE Online's System
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FluidComputerIntegration](https://github.com/Terasology/FluidComputerIntegration) - allows for interactions with fluids via computers
@@ -56,7 +56,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
-* [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game, default key `P`
+* [InGameHelp](https://github.com/Terasology/InGameHelp) - System for showing help in-game, default key `P`
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
@@ -71,11 +71,11 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ManualLaborEventualSkills](https://github.com/Terasology/ManualLaborEventualSkills) - bridge module for adding EventualSkills to ManualLabor
 * [MarcinScIncubator](https://github.com/Terasology/MarcinScIncubator) - parking lot for tools used in @MarcinSc's many modules without a more explicit home yet
 * [MarkovChains](https://github.com/Terasology/MarkovChains) - Library module with some pseudo random math stuff
-* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key `O`
+* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command System, default show/hide key `O`
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [MedievalCities](https://github.com/Terasology/MedievalCities) - a set of building templates for a medieval era city
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
-* [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
+* [Miniion](https://github.com/Terasology/Miniion) - base creature control System, used by MasterOfOreon - old module that has gone through a few redesigns
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap. Show/hide with `M` by default and zoom with numpad `-` and `+`
 * [MobileBlocks](https://github.com/Terasology/MobileBlocks) - supports blocks that can move their location based on some directions
 * [ModularComputers](https://github.com/Terasology/ModularComputers) - central module for the creation of computers that themselves can have "hardware modules" of sorts added to them in-game to add interesting functionality
@@ -83,10 +83,10 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [MultiBlock](https://github.com/Terasology/MultiBlock) - supports the concept of multiple blocks being part of the same structure
 * [MusicDirector](https://github.com/Terasology/MusicDirector) - allows music assets to be prepared for dynamic inclusion in appropriate contexts (like time of day)
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
-* [OreGeneration](https://github.com/Terasology/OreGeneration) - ore generation plugin system based on CustomOreGen (this one enables easy definition of what ores you want in a world)
+* [OreGeneration](https://github.com/Terasology/OreGeneration) - ore generation plugin System based on CustomOreGen (this one enables easy definition of what ores you want in a world)
 * [Oreons](https://github.com/Terasology/Oreons) - little sentient cookie people! Don't do much yet. Place with `spawnPrefab OreonGuard` in the console (other types exist)
 * [Pathfinding](https://github.com/Terasology/Pathfinding) - framework for pathfinding used by other modules
-* [PhysicalStats](https://github.com/Terasology/PhysicalStats) - introduces a basic attributes system akin to traditional RPGs
+* [PhysicalStats](https://github.com/Terasology/PhysicalStats) - introduces a basic attributes System akin to traditional RPGs
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Throughout the Ages gameplay
 * [PolyWorld](https://github.com/Terasology/PolyWorld) - creates very neat island worlds based on the [map generating algorithm by Amit Patel of Red Blob Games](http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/)
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `give portal`
@@ -105,11 +105,11 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StaticCities](https://github.com/Terasology/StaticCities) - variant of Cities that places all cities during world generation without later dynamic growth
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
-* [StructureTemplates](https://github.com/Terasology/StructureTemplates) - a system for placing structures as per some template
+* [StructureTemplates](https://github.com/Terasology/StructureTemplates) - a System for placing structures as per some template
 * [SubstanceMatters](https://github.com/Terasology/SubstanceMatters) - library for the definition and usage of materials in various contexts, such as tools with dynamic looks based on material
 * [Tasks](https://github.com/Terasology/Tasks) - allows for the definition of tasks/quests
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
-* [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
+* [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset System, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
 * ~~[TutorialGraphicTweaks](https://github.com/Terasology/TutorialGraphicTweaks) - GSOC 2016 project tutorial / docs. Contains examples of how to modify rendering from a module~~ (pending some refactoring before final merge of needed changes to the engine)
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
