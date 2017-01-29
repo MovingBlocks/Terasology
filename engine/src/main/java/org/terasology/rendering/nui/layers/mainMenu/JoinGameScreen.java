@@ -18,12 +18,14 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
@@ -32,6 +34,7 @@ import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingService;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
@@ -54,10 +57,6 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -418,27 +417,22 @@ public class JoinGameScreen extends CoreScreenLayer {
         UILabel ping = find("ping", UILabel.class);
         ping.setText("Requested");
 
-        Thread getPing = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Instant starts = Instant.now();
-                    Socket sock = new Socket();
-                    sock.connect(new InetSocketAddress(address, port), 10000);
-                    Instant ends = Instant.now();
-                    sock.close();
-                    String response = String.valueOf(Duration.between(starts, ends));
-                    String millis = response.replaceAll("[^\\d.]", "");
-                    float intMillis = Float.valueOf(millis) * 1000;
-                    String pingText = String.valueOf(intMillis).substring(0, String.valueOf(intMillis).length() - 2) + " ms";
-                    if (visibleList.getSelection().getAddress().equals(address)) {
-                        ping.setText(pingText);
-                    }
-                } catch (IOException e) {
-                    ping.setText(FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED));
+        Thread getPing = new Thread(() -> {
+            PingService pingService = new PingService(address, port);
+            // we're not on the game thread, so we cannot modify GUI elements directly
+            try {
+                long responseTime = pingService.call();
+                if (visibleList.getSelection().getAddress().equals(address)) {
+                    GameThread.asynch(() -> ping.setText(responseTime + " ms."));
                 }
+            } catch (IOException e) {
+                String text = translationSystem.translate("${engine:menu#connection-failed}");
+                GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
             }
         });
+
+        // TODO: once the common thread pool is in place this could be posted there and the
+        // returned Future could be kept and cancelled as soon the selected menu entry changes
         getPing.start();
     }
 
