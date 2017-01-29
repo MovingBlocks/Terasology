@@ -51,14 +51,18 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     );
 
     /**
-     * If possible, make this object listen for controller pose upates.
+     * If possible, make this object listen for controller pose updates. If the vrProvider is not active (i.e. no headset
+     * is connected), then the callback methods will not get called for the first time, and this component will act as
+     * it would in its default state (static location, activation triggered upon use of equipped object).
      */
     public void trySubscribeToControllerPoses() {
         vrProvider.getState().addControllerListener(this);
     }
 
     /**
-     * A callback target for the controller listener. Not intended to be called manually.
+     * A callback target for the controller listener. This callback triggers when a button is pressed on the controllers.
+     * It's currently ignored by this class. This method and the below method are both designed to be called in their
+     * roles as listeners, and not really part of the public interface of this class.
      * @param stateBefore - the state before the state change.
      * @param stateAfter - the state after the state change.
      * @param nController - the hand index, 0 for left and 1 for right.
@@ -68,7 +72,9 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     }
 
     /**
-     * A callback target for the controller listener. Not intended to be called manually.
+     * A callback target for the controller listener. When this callback triggers, the pos of the mount point will
+     * cuange to the value of the pose parameter. This is mainly designed as a callback, and not intended to be part
+     * of the public interface of this class.
      * @param pose - the controller pose - a homogenous transformation matrix.
      * @param handIndex - the hand index - 0 for left and 1 for right.
      */

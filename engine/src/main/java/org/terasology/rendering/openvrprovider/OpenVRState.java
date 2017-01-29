@@ -57,16 +57,16 @@ public class OpenVRState {
 
     /**
      * Add a controller listener. This listener will receive pose and button state updates for the controller.
-     * @param toAdd - the controller listener. Implements the ControllerListener interface.
+     * @param listener - An object implementing the ControllerListener interface.
      */
-    public void addControllerListener(ControllerListener toAdd) {
-        controllerListeners.add(toAdd);
+    public void addControllerListener(ControllerListener listener) {
+        controllerListeners.add(listener);
     }
 
     /**
-     * Get the pose of eye eyeIndex.
-     * @param eyeIndex - the eye index. 0 is left, 1 is right.
-     * @return
+     * Get the pose of an eye.
+     * @param eyeIndex - An integer specifying the eye: 0 for the left eye, 1 for the right eye.
+     * @return the pose, as a Matrix4f
      */
     public Matrix4f getEyePose(int eyeIndex) {
         Matrix4f matrixReturn = new Matrix4f(headPose);
@@ -75,9 +75,9 @@ public class OpenVRState {
     }
 
     /**
-     * Get the projection matrix for eye eyeIndex.
-     * @param eyeIndex - The target eye. 0 is left, 1 is right.
-     * @return
+     * Get the projection matrix for an eye.
+     * @param eyeIndex - An integer specifying the eye: 0 for the left eye, 1 for the right eye.
+     * @return the projection matrix, as a Matrix4f.
      */
     public Matrix4f getEyeProjectionMatrix(int eyeIndex) {
         return new Matrix4f(projectionMatrices[eyeIndex]);

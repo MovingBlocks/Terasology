@@ -72,9 +72,6 @@ public final class OpenVRProvider {
     private float nearClip = 0.5f;
     private float farClip = 500.0f;
 
-    /**
-    * Call getInstance() to instantiate
-     */
     private OpenVRProvider() {
     }
 
@@ -100,7 +97,9 @@ public final class OpenVRProvider {
     }
 
     /**
-     * Initialize the VR system. Note that calling this method will cause OpenVR to launch.
+     * Initialize the VR system. Note that calling this method will cause OpenVR to launch. If there is no headset
+     * connected, or if the OpenVR library fails to initialize for some reason, this will return false, and a log
+     * entry about why initialization failed will be written.
      * @return true if successful.
      */
     public boolean init() {
@@ -161,6 +160,10 @@ public final class OpenVRProvider {
     }
 
     /**
+     * In some instances, OpenVR will lose tracking on the head set. For example, if the line of sight to both light
+     * houses is obstructed, it is impossible to track the head set. In this case, the head set cannot be reliably
+     * tracked. In such cases, this method will return false, signaling that the head set tracking information returned
+     * by getEyePose() is unreliable.
      *
      * @return true if the pose of the headset is currently considered reliable.
      */
@@ -170,7 +173,7 @@ public final class OpenVRProvider {
 
     /**
      *
-     * @param controllerIndex - 0 for left, 1 for right
+     * @param controllerIndex - 0 for left, 1 for right, an integer.
      * @return true if the pose of the controller is currently considered reliable.
      */
     public boolean isControllerTrackint(int controllerIndex) {
@@ -190,8 +193,8 @@ public final class OpenVRProvider {
     }
 
     /**
-     * Query the VR library and update the VR state, gettable with getState(). This method should be called once per
-     * render cycle.
+     * Query the VR library and update the VR state, which can then be retrieved via getState().
+     * This method should be called once per frame.
      */
     public void updateState() {
         updatePose();
@@ -201,8 +204,8 @@ public final class OpenVRProvider {
 
     /**
      * Make the specified controller vibrate
-     * @param controller - the hand index, 0 for left and 1 for right.
-     * @param strength - the strength of the pulse.
+     * @param controller - the hand index, 0 for left and 1 for right, an integer.
+     * @param strength - the strength of the pulse - a short value from 0 - 3999.
      */
     public static void triggerHapticPulse(int controller, int strength) {
         if (controllerDeviceIndex[controller] == -1) {
@@ -211,6 +214,11 @@ public final class OpenVRProvider {
         vrSystem.TriggerHapticPulse.apply(controllerDeviceIndex[controller], 0, (short) strength);
     }
 
+    /**
+     * Submit the frame stored in the frame buffers for the left and right eyes to the compositor. When this method is
+     * called, the contnts of those frame buffers will show up in the head set. This method should be called exactly
+     * once per frame.
+     */
     public void submitFrame() {
         for (int nEye = 0; nEye < 2; nEye++) {
             vrCompositor.Submit.apply(
@@ -224,27 +232,28 @@ public final class OpenVRProvider {
     }
 
     /**
-     * Set the near clip. This will influence the projection matrix that comes from the
+     * Set the distance of the camera from the near clipping plane, in OpenGL units, as a float.
      * vrProvider.getState().getProjectionMatrix(...) method.
      * @param nearClipIn - the near clip to set.
      */
     public void setNearClip(float nearClipIn) {
-        nearClip = nearClipIn;
+        this.nearClip = nearClipIn;
     }
 
     /**
-     * Set the far clip. This will influence the projection matrix that comes from the
+     * Set the distance of the camera from the far clipping plane, in OpenGL units, as a float.
      * vrProvider.getState().getProjectionMatrix(...) method.
      * @param farClipIn - the near clip to set.
      */
     public void setFarClip(float farClipIn) {
-        farClip = farClipIn;
+        this.farClip = farClipIn;
     }
 
     /**
-     * Turn on the keyboard overlay. This is a keyboard that hovers in front of the user.
+     * Turn on the keyboard overlay. This is a keyboard that hovers in front of the user, that can be typed upon by
+     * pointing the ray extending from the top of the controller at the key the user wants to press.
      * @param showingState - true or false
-     * @return - true if successful.
+     * @return - true if successful. If this call fails, an error is logged.
      */
     public static boolean setKeyboardOverlayShowing(boolean showingState) {
         int ret;
@@ -262,7 +271,7 @@ public final class OpenVRProvider {
             try {
                 vrOverlay.HideKeyboard.apply();
             } catch (Error e) {
-                logger.error("Error bringing up keyboard overlay.");
+                logger.error("Error bringing up keyboard overlay: " + e.toString());
             }
             keyboardShowing = false;
         }
