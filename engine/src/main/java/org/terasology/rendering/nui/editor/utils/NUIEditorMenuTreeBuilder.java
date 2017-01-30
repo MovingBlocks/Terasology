@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Border;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
@@ -39,6 +40,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -250,7 +252,7 @@ public class NUIEditorMenuTreeBuilder {
                 // If the node is part of a layout, add an option to add the layoutInfo node.
                 if (nodeInfo.getLayoutClass() != null) {
                     String layoutInfo = "layoutInfo";
-                    if (!node.hasChildWithKey(layoutInfo)) {
+                    if (!Objects.equals(node.getValue().getKey(), layoutInfo) && !node.hasChildWithKey(layoutInfo)) {
                         addTree.addOption(layoutInfo, n -> {
                             JsonTree child = new JsonTree(new JsonTreeValue(layoutInfo, null, JsonTreeValue.Type.OBJECT));
                             child.setExpanded(true);
@@ -336,8 +338,14 @@ public class NUIEditorMenuTreeBuilder {
         } else {
             Object value;
             if (Binding.class.isAssignableFrom(field.getType())) {
-                Binding binding = (Binding) field.get(newInstance(clazz));
-                value = binding.get();
+                if (AbstractWidget.class.isAssignableFrom(clazz) && Objects.equals(field.getName(), "family")) {
+                    // The default - and acceptable - value for the AbstractWidget.family binding is null, but a user
+                    // most likely wants to use a custom family. Therefore, the default is set to an empty string instead.
+                    value = "";
+                } else {
+                    Binding binding = (Binding) field.get(newInstance(clazz));
+                    value = binding.get();
+                }
             } else if (Optional.class.isAssignableFrom(field.getType())) {
                 value = newInstance((Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
             } else {
@@ -368,6 +376,9 @@ public class NUIEditorMenuTreeBuilder {
         }
         if (Number.class.isAssignableFrom(clazz)) {
             return 0;
+        }
+        if (String.class.isAssignableFrom(clazz)) {
+            return "";
         }
         if (TextureRegion.class.isAssignableFrom(clazz)) {
             return "";
