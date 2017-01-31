@@ -110,7 +110,7 @@ public class SettingTest {
             final int n = 10;
 
             for (int i = 0; i < n; i++) {
-                setting.subscribe(listener);
+                setting.subscribe(propertyChangeEvent -> eventCallCount++);
             }
 
             setting.setValue(30);
@@ -122,14 +122,17 @@ public class SettingTest {
         public void testUnsubscribe() {
             int n = 10;
 
+            PropertyChangeListener[] listeners = new PropertyChangeListener[n];
+
             for (int i = 0; i < n; i++) {
-                setting.subscribe(listener);
+                listeners[i] = propertyChangeEvent -> eventCallCount++;
+                setting.subscribe(listeners[i]);
             }
 
             int halfN = n / 2;
 
             for (int i = 0; i < new FastRandom().nextInt(halfN); i++) {
-                setting.unsubscribe(listener);
+                setting.unsubscribe(listeners[i]);
                 n--;
             }
 
