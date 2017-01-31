@@ -44,7 +44,7 @@ public class SettingImpl<T> implements Setting<T> {
     private List<PropertyChangeListener> subscribers;
 
     /**
-     * Creates a new {@link SettingImpl} that does not use a validator with the given id and default value.
+     * Creates a new {@link SettingImpl} with the given id and default value but no validator.
      * @param id the id of the setting.
      * @param defaultValue the default value of the setting.
      */
@@ -140,11 +140,12 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     /**
-     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. If it is invalid, the stored
-     * value is not updated and a warning is logged. On successfully updating the value, the subscribers are
-     * notified of the change.
+     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. When no Validator is
+     * present the new value immediately replaces the stored one and any subscriber is notified of the change.
+     * If a Validator is present, the value is first validated. Only if the value is valid it replaces the
+     * stored one and subscribers are notified.
      * @param newValue The new value to store.
-     * @return True if the value was valid and was stored successfully, false otherwise.
+     * @return True if the value was stored successfully, false otherwise.
      */
     public boolean setValue(T newValue) {
         if (!validator.validateWithWarnings(newValue)) {
