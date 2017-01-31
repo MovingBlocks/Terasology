@@ -15,7 +15,7 @@
  */
 package org.terasology.config.flexible;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
@@ -23,7 +23,7 @@ import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.Set;
 
 /**
  * {@inheritDoc}
@@ -41,7 +41,7 @@ public class SettingImpl<T> implements Setting<T> {
 
     private String description;
     private SettingValueValidator<T> validator;
-    private List<PropertyChangeListener> subscribers;
+    private Set<PropertyChangeListener> subscribers;
 
     /**
      * Creates a new {@link SettingImpl} with the given id and default value but no validator.
@@ -87,7 +87,7 @@ public class SettingImpl<T> implements Setting<T> {
      */
     public void subscribe(PropertyChangeListener listener) {
         if (subscribers == null) {
-            subscribers = Lists.newArrayList();
+            subscribers = Sets.newHashSet();
         }
 
         subscribers.add(listener);
