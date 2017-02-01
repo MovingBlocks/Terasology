@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.contextMenu.MenuTree;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -91,7 +92,7 @@ public class NUIEditorMenuTreeBuilder {
 
         // Create the ADD_EXTENDED level.
         if ((type == JsonTreeValue.Type.ARRAY && !"contents".equals(node.getValue().getKey()))
-            || type == JsonTreeValue.Type.OBJECT) {
+                || type == JsonTreeValue.Type.OBJECT) {
             MenuTree addTree = createAddContextMenu(node);
             primaryTree.addSubmenu(addTree);
         }
@@ -107,8 +108,8 @@ public class NUIEditorMenuTreeBuilder {
 
         // Unless the node is an OBJECT child of an ARRAY (should always have an empty key), add the edit option.
         if (type != JsonTreeValue.Type.NULL && !(type == JsonTreeValue.Type.OBJECT
-            && !node.isRoot()
-            && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
+                && !node.isRoot()
+                && node.getParent().getValue().getType() == JsonTreeValue.Type.ARRAY)) {
             primaryTree.addOption(OPTION_EDIT, externalConsumers.get(OPTION_EDIT), node);
         }
 
@@ -126,7 +127,7 @@ public class NUIEditorMenuTreeBuilder {
 
         // Create the ADD_EXTENDED level.
         if (type == JsonTreeValue.Type.ARRAY || (type == JsonTreeValue.Type.OBJECT
-            && !"elements".equals(node.getValue().getKey()))) {
+                && !"elements".equals(node.getValue().getKey()))) {
             MenuTree addTree = createAddSkinContextMenu(node);
             primaryTree.addSubmenu(addTree);
         }
@@ -231,8 +232,8 @@ public class NUIEditorMenuTreeBuilder {
             if (clazz != null) {
                 for (Field field : ReflectionUtils.getAllFields(clazz)) {
                     if ((!UIWidget.class.isAssignableFrom(clazz) || field.isAnnotationPresent(LayoutConfig.class))
-                        // Exclude static final fields, as they shouldn't be modified.
-                        && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
+                            // Exclude static final fields, as they shouldn't be modified.
+                            && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
                         field.setAccessible(true);
                         String name = getNodeName(field);
                         if (!node.hasChildWithKey(name)) {
@@ -250,9 +251,18 @@ public class NUIEditorMenuTreeBuilder {
                     }
                 }
                 // If the node is part of a layout, add an option to add the layoutInfo node.
-                if (nodeInfo.getLayoutClass() != null) {
+                if (!node.isRoot() && !node.getParent().isRoot()) {
                     String layoutInfo = "layoutInfo";
-                    if (!Objects.equals(node.getValue().getKey(), layoutInfo) && !node.hasChildWithKey(layoutInfo)) {
+                    String contents = "contents";
+                    Class parentParentClass = NUIEditorNodeUtils
+                            .getNodeInfo((JsonTree) node.getParent().getParent(), nuiManager)
+                            .getNodeClass();
+                    if (!node.hasChildWithKey(layoutInfo)
+                            && UIWidget.class.isAssignableFrom(clazz)
+                            && node.getParent().getValue() != null
+                            && node.getParent().getValue().getKey() != null
+                            && node.getParent().getValue().getKey().equals(contents)
+                            && UILayout.class.isAssignableFrom(parentParentClass)) {
                         addTree.addOption(layoutInfo, n -> {
                             JsonTree child = new JsonTree(new JsonTreeValue(layoutInfo, null, JsonTreeValue.Type.OBJECT));
                             child.setExpanded(true);
@@ -267,7 +277,7 @@ public class NUIEditorMenuTreeBuilder {
     }
 
     private JsonTree createChild(String name, JsonTree node, Field field, Class clazz)
-        throws IllegalAccessException, InstantiationException {
+            throws IllegalAccessException, InstantiationException {
         JsonTreeValue childValue = new JsonTreeValue();
         childValue.setKey(name);
 
@@ -294,8 +304,8 @@ public class NUIEditorMenuTreeBuilder {
     private boolean isWidget(Field field) throws IllegalAccessException {
         // The field is a Binding<? extends UIWidget>.
         if (Binding.class.isAssignableFrom(field.getType())
-            && UIWidget.class.isAssignableFrom((Class<?>)
-            ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0])) {
+                && UIWidget.class.isAssignableFrom((Class<?>)
+                ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0])) {
             return true;
         }
 
@@ -305,9 +315,9 @@ public class NUIEditorMenuTreeBuilder {
     private void createWidgetChild(String name, JsonTree node) {
         JsonTree widgetTree = new JsonTree(new JsonTreeValue(name, null, JsonTreeValue.Type.OBJECT));
         NUIEditorNodeUtils
-            .createNewWidget("UILabel", "newWidget", false)
-            .getChildren()
-            .forEach(widgetTree::addChild);
+                .createNewWidget("UILabel", "newWidget", false)
+                .getChildren()
+                .forEach(widgetTree::addChild);
         widgetTree.addChild(new JsonTreeValue("text", "", JsonTreeValue.Type.KEY_VALUE_PAIR));
         node.addChild(widgetTree);
     }
@@ -318,7 +328,7 @@ public class NUIEditorMenuTreeBuilder {
      */
     private String getNodeName(Field field) {
         return field.isAnnotationPresent(SerializedName.class)
-            ? field.getAnnotation(SerializedName.class).value() : field.getName();
+                ? field.getAnnotation(SerializedName.class).value() : field.getName();
     }
 
     /**
@@ -328,8 +338,8 @@ public class NUIEditorMenuTreeBuilder {
      */
     private JsonTreeValue.Type getNodeType(Field field, Object value) {
         return Enum.class.isAssignableFrom(field.getType()) || value instanceof UISkin
-            || value instanceof Boolean || value instanceof String || value instanceof Number
-            ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT;
+                || value instanceof Boolean || value instanceof String || value instanceof Number
+                ? JsonTreeValue.Type.KEY_VALUE_PAIR : JsonTreeValue.Type.OBJECT;
     }
 
     private Object getFieldValue(Field field, Class clazz) throws IllegalAccessException, InstantiationException {
@@ -357,7 +367,7 @@ public class NUIEditorMenuTreeBuilder {
             }
 
             return (value != null || Binding.class.isAssignableFrom(field.getType()))
-                ? value : newInstance(field.getType());
+                    ? value : newInstance(field.getType());
         }
     }
 
