@@ -84,13 +84,14 @@ public class ComponentSystemManager {
             Name moduleId = environment.getModuleProviding(type);
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode, isHeadless)) {
-                if(registerInfo.requiresOptional().length != 0){
-                    for(String s : registerInfo.requiresOptional()){
-                        if(environment.get(new Name(s))!=null)systemsByModule.put(moduleId, type);
+                systemsByModule.put(moduleId, type);
+                if(registerInfo.requiresOptional().length != 0) {
+                    for(String s : registerInfo.requiresOptional()) {
+                        if(environment.get(new Name(s))==null) {
+                            systemsByModule.remove(moduleId, type);
+                            break;
+                        }
                     }
-                }
-                else {
-                    systemsByModule.put(moduleId, type);
                 }
             }
         }
