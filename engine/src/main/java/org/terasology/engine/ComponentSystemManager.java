@@ -71,6 +71,14 @@ public class ComponentSystemManager {
         this.context = context;
     }
 
+    private boolean ifRegister(RegisterSystem registerSystem, ModuleEnvironment environment) {
+        if (registerSystem.requiresOptional().length == 0) return true;
+        for (String moduleName :registerSystem.requiresOptional()) {
+            if(environment.get(new Name(moduleName)) == null) return false;
+        }
+        return true;
+    }
+
     public void loadSystems(ModuleEnvironment environment, NetworkMode netMode) {
         DisplayDevice display = context.get(DisplayDevice.class);
         boolean isHeadless = display.isHeadless();
@@ -83,16 +91,8 @@ public class ComponentSystemManager {
             }
             Name moduleId = environment.getModuleProviding(type);
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode, isHeadless)) {
+            if (registerInfo.value().isValidFor(netMode, isHeadless) && ifRegister(registerInfo,environment)) {
                 systemsByModule.put(moduleId, type);
-                if(registerInfo.requiresOptional().length != 0) {
-                    for(String s : registerInfo.requiresOptional()) {
-                        if(environment.get(new Name(s))==null) {
-                            systemsByModule.remove(moduleId, type);
-                            break;
-                        }
-                    }
-                }
             }
         }
 
