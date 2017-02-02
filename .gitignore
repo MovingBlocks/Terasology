@@ -81,6 +81,7 @@ Thumbs.db
 /terasology-3rdclient/
 config.cfg
 entityDump.txt
+nuiEditorAutosave.json
 
 # Historical Output
 /SAVED_WORLDS/
