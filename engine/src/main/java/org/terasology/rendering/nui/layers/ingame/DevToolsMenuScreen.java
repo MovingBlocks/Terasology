@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.layers.ingame;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.crashreporter.CrashReporter;
+import org.terasology.engine.LoggingContext;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -36,6 +38,7 @@ public class DevToolsMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
         WidgetUtil.trySubscribe(this, "nuiEditor", button -> nuiEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "nuiSkinEditor", button -> nuiSkinEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "btEditor", button -> getManager().toggleScreen("engine:behaviorEditorScreen"));
