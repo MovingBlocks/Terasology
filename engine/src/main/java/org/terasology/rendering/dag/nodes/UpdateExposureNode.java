@@ -28,12 +28,10 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import java.nio.ByteBuffer;
-import static org.terasology.rendering.dag.nodes.DownSamplerNode.SCENE_1;
 
 /**
  * An instance of this node takes advantage of a downsampled version of the scene,
@@ -86,7 +84,7 @@ public class UpdateExposureNode extends AbstractNode {
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
-        downSampledScene = requiresFBO(new FBOConfig(SCENE_1, 1, 1, FBO.Type.DEFAULT), immutableFBOs);
+        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, immutableFBOs);
         writeOnlyPBO = new PBO(1, 1);
     }
 

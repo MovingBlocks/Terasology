@@ -67,7 +67,8 @@ public abstract class AbstractNode implements Node {
 
     protected void addDesiredStateChange(StateChange stateChange) {
         if (stateChange.isTheDefaultInstance()) {
-            logger.error("Attempted to add default state change %s to the set of desired state changes", stateChange.getClass().getSimpleName());
+            logger.error("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
+                    stateChange.getClass().getSimpleName(), this.toString());
         }
         desiredStateChanges.add(stateChange);
         desiredStateResets.add(stateChange.getDefaultInstance());

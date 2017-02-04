@@ -20,7 +20,7 @@ import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
-import org.terasology.rendering.dag.nodes.DownSamplerNode;
+import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.UpdateExposureNode;
@@ -88,6 +88,7 @@ import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
+import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.*;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
 import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
@@ -137,6 +138,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
+    private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private OpenVRProvider vrProvider;
@@ -191,11 +193,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     private void initRenderingSupport() {
         context.put(ScreenGrabber.class, new ScreenGrabber(context));
 
+        immutableFBOs = new ImmutableFBOs();
         displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
-        context.put(ImmutableFBOs.class, new ImmutableFBOs());
+        context.put(ImmutableFBOs.class, immutableFBOs);
         context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
@@ -316,8 +319,30 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
-        Node downSamplerNode = nodeFactory.createInstance(DownSamplerNode.class); // TODO: split in multiple DownSampleNodes
-        renderGraph.addNode(downSamplerNode, "downSamplerNode");
+        aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo16pixels.initialise(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
+
+        aLabel = "downSampling_16x16px_to_8x8px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo8pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo8pixels.initialise(FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo8pixels, aLabel);
+
+        aLabel = "downSampling_8x8px_to_4x4px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo4pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo4pixels.initialise(FBO_8X8_CONFIG, immutableFBOs, FBO_4X4_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo4pixels, aLabel);
+
+        aLabel = "downSampling_4x4px_to_2x2px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo2pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo2pixels.initialise(FBO_4X4_CONFIG, immutableFBOs, FBO_2X2_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo2pixels, aLabel);
+
+        aLabel = "downSampling_2x2px_to_1x1px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo1pixel = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo1pixel.initialise(FBO_2X2_CONFIG, immutableFBOs, FBO_1X1_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo1pixel, aLabel);
 
         Node updateExposureNode = nodeFactory.createInstance(UpdateExposureNode.class);
         renderGraph.addNode(updateExposureNode, "updateExposureNode");

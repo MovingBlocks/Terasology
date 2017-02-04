@@ -79,11 +79,12 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         this.textureType = textureType;
         this.fboURN = fboURN;
         this.inputFbo = fbosManager.get(fboURN);
-        this.fbosManager = fbosManager;
-        fbosManager.subscribe(this);
 
         this.materialURN = materialURN;
         this.parameterName = parameterName;
+
+        this.fbosManager = fbosManager;
+        fbosManager.subscribe(this);
     }
 
     // TODO: either take advantage of this constructor or remove it. Note: it will probably be removed.
@@ -99,11 +100,12 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         this.inputFbo = defaultDynamicFbo.getFbo();
         this.fboURN = defaultDynamicFbo.getName();
         this.inputFbo = fbosManager.get(fboURN);
-        this.fbosManager = fbosManager;
-        fbosManager.subscribe(this);
 
         this.materialURN = materialURN;
         this.parameterName = parameterName;
+
+        this.fbosManager = fbosManager;
+        fbosManager.subscribe(this);
     }
 
     private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialURN, String parameterName) {
