@@ -92,6 +92,7 @@
     "error-downloading-server-list": "Error downloading server list!",
     "exit-game": "Exit Terasology",
     "extra-lighting": "Extra Lighting",
+    "experimental": "Experimental",
     "eye-adaption": "Eye-Adaption",
     "failed-to-join": "Failed to Join",
     "flickering-lights": "Flickering Lights",
@@ -161,7 +162,7 @@
     "nui-editor-undo": "Undo",
     "oculus-rift-support": "Oculus Rift Support",
     "online-players": "Online Players",
-    "open-inventory": "Open Inventory";
+    "open-inventory": "Open Inventory",
     "outline": "Outline",
     "particle-effect-limit": "Particle Effect Limit",
     "parallax-mapping": "Parallax Mapping",

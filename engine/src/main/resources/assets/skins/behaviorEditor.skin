@@ -1,7 +1,7 @@
 {
     "inherit": "mainMenu",
     "text-shadowed": true,
-    "font": "default",
+    "font": "NotoSans-Regular",
     "elements": {
         "UITooltip": {
             "text-align-horizontal": "left"
