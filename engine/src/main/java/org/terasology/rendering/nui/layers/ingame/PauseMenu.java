@@ -15,9 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.LoggingContext;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.CoreScreenLayer;
