@@ -32,6 +32,7 @@ public class ItemComponent implements Component {
 
     public int cooldownTime = 200;
     public Prefab onDroppedPrefab;
+    public boolean exclusiveStack = false;
 
     //TODO: Remove to health system
     public int baseDamage = 1;

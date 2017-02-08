@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -28,6 +29,7 @@ import org.terasology.logic.items.components.ItemComponent;
 import org.terasology.logic.items.events.ItemDropEvent;
 import org.terasology.logic.items.events.ItemGiveEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.registry.In;
@@ -41,6 +43,9 @@ import org.terasology.world.block.items.BlockItemComponent;
 @RegisterSystem()
 public class ItemSystem extends BaseComponentSystem {
     Logger logger = LoggerFactory.getLogger(ItemSystem.class);
+
+    @In
+    LocalPlayer localPlayer;
 
     @In
     private EntitySystemLibrary library;
@@ -85,6 +90,7 @@ public class ItemSystem extends BaseComponentSystem {
         } else {
             item.addOrSaveComponent(getItemMesh(itemComponent, item));
         }
+        item.setOwner(localPlayer.getCharacterEntity());
     }
 
 
@@ -95,6 +101,7 @@ public class ItemSystem extends BaseComponentSystem {
         if (itemComponent.icon != null) {
             meshComponent.mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
         }
+        meshComponent.hideFromOwner = false;
         return meshComponent;
     }
 
