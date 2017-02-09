@@ -38,7 +38,7 @@ public class DevToolsMenuScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath(), false));
         WidgetUtil.trySubscribe(this, "nuiEditor", button -> nuiEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "nuiSkinEditor", button -> nuiSkinEditorSystem.toggleEditor());
         WidgetUtil.trySubscribe(this, "btEditor", button -> getManager().toggleScreen("engine:behaviorEditorScreen"));
