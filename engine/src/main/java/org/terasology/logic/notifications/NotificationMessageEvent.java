@@ -21,11 +21,14 @@ import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.players.PlayerUtil;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.OwnerEvent;
 
 /**
  * A notification message
  */
+
+@API
 @OwnerEvent
 public class NotificationMessageEvent implements MessageEvent {
     private String message;
