@@ -45,6 +45,7 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -81,7 +82,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
     }
-
 
     @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
@@ -335,6 +335,4 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         float epsilon = 0.00001f;
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
     }
-
-
 }

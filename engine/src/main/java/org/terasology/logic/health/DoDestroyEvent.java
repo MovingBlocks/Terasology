@@ -25,6 +25,8 @@ public class DoDestroyEvent implements Event {
     private EntityRef instigator;
     private EntityRef directCause;
     private Prefab damageType;
+    private String instigatorString;
+    private String damageTypeString;
 
     public DoDestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
@@ -36,11 +38,33 @@ public class DoDestroyEvent implements Event {
         return instigator;
     }
 
+    public String getInstigatorString() {
+        if (instigator == null)
+            return "";
+        if (instigator.getParentPrefab() != null) {
+            instigatorString = instigator.getParentPrefab().getName();
+            instigatorString = instigatorString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+            instigatorString = instigatorString.replaceAll("([A-Z])", " $1");
+            instigatorString = Character.toUpperCase(instigatorString.charAt(0)) + instigatorString.substring(1);
+            return instigatorString;
+        }
+        else
+            return "";
+    }
+
     public EntityRef getDirectCause() {
         return directCause;
     }
 
     public Prefab getDamageType() {
         return damageType;
+    }
+
+    public String getDamageTypeString() {
+        damageTypeString = damageType.getName().toString();
+        damageTypeString = damageTypeString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+        damageTypeString = damageTypeString.replaceAll("([A-Z])", " $1");
+        damageTypeString = Character.toUpperCase(damageTypeString.charAt(0)) + damageTypeString.substring(1);
+        return damageTypeString;
     }
 }
