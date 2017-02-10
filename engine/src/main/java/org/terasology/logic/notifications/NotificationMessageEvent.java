@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.terasology.logic.notifications;
 
 import org.terasology.entitySystem.entity.EntityRef;
