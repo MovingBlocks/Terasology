@@ -23,7 +23,12 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 /**
- * TODO
+ * Extends the DownSamplerNode class purely to:
+ * A) override the setupConditions() method so that instances of this class are enabled if isEyeAdaptation() returns true
+ * B) provide a number of FBOConfigs used to downsample the rendering multiple times, down to 1x1 pixels
+ *
+ * Once the rendering achieved so far has been downsampled to a 1x1 pixel image the RGB values of the pixel effectively
+ * encode the average brightness of the rendering, which in turn is used to tweak the exposure parameter later nodes use.
  */
 public class DownSamplerForExposureNode extends DownSamplerNode {
 

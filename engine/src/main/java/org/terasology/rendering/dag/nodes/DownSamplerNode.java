@@ -32,7 +32,8 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.F
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: write
+ * Instances of this class take the content of the color attachment of an input FBO
+ * and downsamples it into the color attachment of a smaller output FBO.
  */
 public class DownSamplerNode extends ConditionDependentNode implements FBOManagerSubscriber {
 
@@ -55,7 +56,7 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
     }
 
     /**
-     * Initializes the BlurNode instance.
+     * Initializes the DownSamplerNode instance. This method is meant to be called once, shortly after instantiation.
      *
      * @param inputConfig an FBOConfig instance describing the input FBO, to be retrieved from the FBO manager
      * @param inputManager the FBO manager from which to retrieve the input FBO
@@ -97,7 +98,7 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
     protected void setupConditions() { }
 
     /**
-     * TODO
+     * Processes the input FBO downsampling its color attachment into the color attachment of the output FBO.
      */
     @Override
     public void process() {
@@ -113,7 +114,7 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
     @Override
     public void update() {
         // Note: we don't need to update the inputFBO because only SetInputTextureFromFBO
-        // needs to keep it up to date and takes care of it internally.
+        // needs to keep it up to date and takes care of that internally.
         outputFBO = outputFBOmanager.get(outputFBOconfig.getName());
     }
 
