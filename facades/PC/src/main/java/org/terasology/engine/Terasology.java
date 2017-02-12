@@ -380,7 +380,7 @@ public final class Terasology {
         Path logPath = LoggingContext.getLoggingPath();
 
         if (!GraphicsEnvironment.isHeadless() && crashReportEnabled) {
-            CrashReporter.report(throwable, logPath, true);
+            CrashReporter.report(throwable, logPath);
         } else {
             throwable.printStackTrace();
             System.err.println("For more details, see the log files in " + logPath.toAbsolutePath().normalize());
