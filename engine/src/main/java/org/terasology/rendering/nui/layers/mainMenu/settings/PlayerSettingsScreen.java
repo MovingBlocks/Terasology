@@ -61,8 +61,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     /**
      * Remove language x from this languagesExcluded table when it is ready for testing
      */
-    private final Locale[] languagesExcluded = {Locale.forLanguageTag("zh"), Locale.forLanguageTag("hi"),
-            Locale.forLanguageTag("ar"), Locale.forLanguageTag("ko"), Locale.forLanguageTag("fa")};
+    private final Locale[] languagesExcluded =
+            {Locale.forLanguageTag("zh"), // TODO: Chinese symbols not yet available
+            Locale.forLanguageTag("hi"), // TODO: Hindi (Indian) symbols not yet available
+            Locale.forLanguageTag("ar"), // TODO: Arabic symbols not yet available, no translated entries yet
+            Locale.forLanguageTag("ko"), // TODO: Korean symbols not yet available
+            Locale.forLanguageTag("fa")}; // TODO: Farsi (Persian) symbols not yet available
 
     private UIText nametext;
     private UISlider slider;
