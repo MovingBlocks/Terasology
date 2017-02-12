@@ -58,6 +58,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private final List<Color> colors = CieCamColors.L65C65;
 
+    /**
+     * Remove language x from this languagesExcluded table when it is ready for testing
+     */
+    private final Locale[] languagesExcluded = {Locale.forLanguageTag("zh"), Locale.forLanguageTag("hi"),
+            Locale.forLanguageTag("ar"), Locale.forLanguageTag("ko"), Locale.forLanguageTag("fa")};
+
     private UIText nametext;
     private UISlider slider;
     private UISlider heightSlider;
@@ -135,6 +141,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            for (Locale languageExcluded : languagesExcluded) {
+                locales.remove(languageExcluded);
+            }
             Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
             language.setOptions(Lists.newArrayList(locales));
             language.setVisibleOptions(5); // Set maximum number of options visible for scrolling
