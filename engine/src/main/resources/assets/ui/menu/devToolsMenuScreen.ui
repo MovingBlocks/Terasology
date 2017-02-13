@@ -52,11 +52,6 @@
                 "contents": [
                     {
                         "type": "UIButton",
-                        "id": "crashReporter",
-                        "text": "${engine:menu#crash-reporter}"
-                    },
-                    {
-                        "type": "UIButton",
                         "id": "nuiEditor",
                         "text": "${engine:menu#dev-tools-nui-editor}"
                     },

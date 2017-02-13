@@ -77,7 +77,7 @@ import java.util.List;
  * <tr><td>-headless</td><td>Start headless.</td></tr>
  * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
  * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
- * <tr><td>-noCrashReport</td><td>Disable crash reporting when having a crash.</td></tr>
+ * <tr><td>-noCrashReport</td><td>Disable crash reporting.</td></tr>
  * <tr><td>-noSound</td><td>Disable sound.</td></tr>
  * <tr><td>-noSplash</td><td>Disable splash screen.</td></tr>
  * <tr><td>-serverPort=xxxxx</td><td>Change the server port.</td></tr>
