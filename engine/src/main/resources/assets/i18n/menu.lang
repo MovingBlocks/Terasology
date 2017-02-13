@@ -163,6 +163,7 @@
     "particle-effect-limit": "particle-effect-limit",
     "parallax-mapping": "parallax-mapping",
     "parsing-content": "parsing-content",
+    "ping" : "ping",
     "player-color": "player-color",
     "player-name": "player-name",
     "player-height": "player-height",

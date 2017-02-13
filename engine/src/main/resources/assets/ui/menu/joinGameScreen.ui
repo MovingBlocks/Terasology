@@ -276,6 +276,15 @@
                                     },
                                     {
                                         "type": "UILabel",
+                                        "text": "${engine:menu#ping}:"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "ping",
+                                        "text": ""
+                                    },
+                                    {
+                                        "type": "UILabel",
                                         "text": "${engine:menu#game-worlds}: "
                                     },
                                     {
