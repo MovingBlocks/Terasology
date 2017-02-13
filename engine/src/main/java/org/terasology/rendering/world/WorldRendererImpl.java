@@ -117,6 +117,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final ShaderManager shaderManager;
     private final Camera playerCamera;
 
+    // TODO: @In
+    private final OpenVRProvider vrProvider;
+
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
 
@@ -137,7 +140,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
     private ImmutableFBOs immutableFBOs;
-    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -161,11 +163,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
+        vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
-            this.vrProvider = new OpenVRProvider();
             context.put(OpenVRProvider.class, vrProvider);
-            if (this.vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(this.vrProvider);
+            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
+            // reason (for example, no HMD is connected). In that case, even though the configuration requests
+            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
+            // the log.
+            if (vrProvider.init()) {
+                playerCamera = new OpenVRStereoCamera(vrProvider);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
