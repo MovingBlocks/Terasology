@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,8 @@ import java.nio.IntBuffer;
 import static org.terasology.rendering.openvrprovider.ControllerListener.LEFT_CONTROLLER;
 import static org.terasology.rendering.openvrprovider.ControllerListener.RIGHT_CONTROLLER;
 
-/** This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
+/**
+ * This class is designed to make all API calls to OpenVR, thereby insulating it from the user. If you're looking to get
  * some information from the headset/controllers you should probably look at OpenVRStereoRenderer, ControllerListener,
  * or OpenVRState
  */
@@ -216,7 +217,7 @@ public final class OpenVRProvider {
 
     /**
      * Submit the frame stored in the frame buffers for the left and right eyes to the compositor. When this method is
-     * called, the contnts of those frame buffers will show up in the head set. This method should be called exactly
+     * called, the contents of those frame buffers will show up in the head set. This method should be called exactly
      * once per frame.
      */
     public void submitFrame() {
@@ -473,5 +474,4 @@ public final class OpenVRProvider {
             }
         }
     }
-
 }
