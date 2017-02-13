@@ -79,7 +79,7 @@
                     "position-bottom": {
                         "offset": 8
                     },
-                        "position-right": {
+                    "position-right": {
                         "offset": 8,
                         "target": "LEFT",
                         "widget": "devTools"
