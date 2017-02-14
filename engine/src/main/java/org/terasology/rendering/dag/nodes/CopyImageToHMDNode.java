@@ -61,6 +61,10 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private FBO leftEye;
     private FBO rightEye;
 
+    /**
+     * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
+     * information for the vrProvider to use.
+     */
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
@@ -83,6 +87,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
+    /**
+     * Actually perform the rendering-related tasks.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToHMD");

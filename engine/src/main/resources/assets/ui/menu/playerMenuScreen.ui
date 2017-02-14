@@ -89,7 +89,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Experimental:                                                                        "
+                            "text": "${engine:menu#experimental}:                                                                        "
                         },
                         {
                             "type": "UILabel",
