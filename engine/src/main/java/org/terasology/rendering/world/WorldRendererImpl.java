@@ -144,7 +144,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
