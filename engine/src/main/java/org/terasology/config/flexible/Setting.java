@@ -20,9 +20,8 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.utilities.subscribables.GeneralSubscribable;
 
 /**
- * Represents a setting stored in a {@link FlexibleConfig} identified by an id. Contains a value that can
- * optionally be validated by a {@link SettingValueValidator<T>} and notifies its subscribers when the value
- * stored is changed.
+ * Represents a setting uniquely identified by an id. Contains a value that may be validated by a
+ * {@link SettingValueValidator<T>} and notifies subscribers when the stored value is changed.
  * @param <T> The type of the value this {@link Setting} contains.
  */
 public interface Setting<T> extends GeneralSubscribable {
@@ -32,7 +31,8 @@ public interface Setting<T> extends GeneralSubscribable {
     SimpleUri getId();
 
     /**
-     * Returns the {@link SettingValueValidator<T>} used by this {@link Setting<T>}.
+     * Returns the {@link SettingValueValidator<T>} used by this {@link Setting<T>}, if present.
+     * Returns null otherwise.
      */
     SettingValueValidator<T> getValidator();
 
@@ -47,10 +47,12 @@ public interface Setting<T> extends GeneralSubscribable {
     T getValue();
 
     /**
-     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. If it is invalid, the stored
-     * value is not updated. On successfully updating the value, the subscribers are notified of the change.
+     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. When no Validator is
+     * present the new value immediately replaces the stored one and any subscriber is notified of the change.
+     * If a Validator is present, the value is first validated. Only if the value is valid it replaces the
+     * stored one and subscribers are notified.
      * @param newValue The new value to store.
-     * @return True if the value was valid and was stored successfully, false otherwise.
+     * @return True if the value was stored successfully, false otherwise.
      */
     boolean setValue(T newValue);
 
@@ -60,7 +62,7 @@ public interface Setting<T> extends GeneralSubscribable {
     String getHumanReadableName();
 
     /**
-     * Returns the description of this {@link Setting}.
+     * Returns a potentially verbose description of this {@link Setting}.
      */
     String getDescription();
 

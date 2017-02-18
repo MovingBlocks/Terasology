@@ -140,12 +140,7 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     /**
-     * Sets the value stored in this {@link Setting<T>} if the passed value is valid. When no Validator is
-     * present the new value immediately replaces the stored one and any subscriber is notified of the change.
-     * If a Validator is present, the value is first validated. Only if the value is valid it replaces the
-     * stored one and subscribers are notified.
-     * @param newValue The new value to store.
-     * @return True if the value was stored successfully, false otherwise.
+     * {@inheritDoc}
      */
     public boolean setValue(T newValue) {
         if (!validator.validateWithWarnings(newValue)) {
