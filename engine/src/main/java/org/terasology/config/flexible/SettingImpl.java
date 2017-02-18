@@ -143,7 +143,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     public boolean setValue(T newValue) {
-        if (!validator.validate(newValue)) {
+        if (validator != null && !validator.validate(newValue)) {
             return false;
         }
 
