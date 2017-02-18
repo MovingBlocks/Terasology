@@ -78,7 +78,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> imp
      * {@inheritDoc}
      */
     @Override
-    public boolean validate(T value) {
+    public boolean fastValidate(T value) {
         boolean withinMinBoundary = true;
 
         if (min != null) {

@@ -15,7 +15,6 @@
  */
 package org.terasology.config.flexible.validators;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -37,11 +36,11 @@ public class RangedNumberValidatorTest {
             initValidator(0, 100, true, true);
 
             for (int i = validator.getMin(); i <= validator.getMax(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%d returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin() - 1));
-            assertFalse(validator.validate(validator.getMax() + 1));
+            assertFalse(validator.fastValidate(validator.getMin() - 1));
+            assertFalse(validator.fastValidate(validator.getMax() + 1));
         }
 
         @Test
@@ -49,11 +48,11 @@ public class RangedNumberValidatorTest {
             initValidator(0, 100, false, true);
 
             for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%d returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin()));
-            assertTrue(validator.validate(validator.getMax()));
+            assertFalse(validator.fastValidate(validator.getMin()));
+            assertTrue(validator.fastValidate(validator.getMax()));
         }
 
         @Test
@@ -61,11 +60,11 @@ public class RangedNumberValidatorTest {
             initValidator(0, 100, true, false);
 
             for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%d returned invalid", i), validator.fastValidate(i));
             }
 
-            assertTrue(validator.validate(validator.getMin()));
-            assertFalse(validator.validate(validator.getMax()));
+            assertTrue(validator.fastValidate(validator.getMin()));
+            assertFalse(validator.fastValidate(validator.getMax()));
         }
 
         @Test
@@ -73,47 +72,47 @@ public class RangedNumberValidatorTest {
             initValidator(0, 100, false, false);
 
             for (int i = validator.getMin() + 1; i < validator.getMax(); i++) {
-                assertTrue(String.format("%d returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%d returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin()));
-            assertFalse(validator.validate(validator.getMax()));
+            assertFalse(validator.fastValidate(validator.getMin()));
+            assertFalse(validator.fastValidate(validator.getMax()));
         }
 
         @Test
         public void testLowUnbounded() {
             initValidator(null, 100, false, false);
 
-            assertTrue(validator.validate(-1000));
-            assertTrue(validator.validate(-50000));
+            assertTrue(validator.fastValidate(-1000));
+            assertTrue(validator.fastValidate(-50000));
 
-            assertTrue(validator.validate(50));
+            assertTrue(validator.fastValidate(50));
 
-            assertFalse(validator.validate(validator.getMax() + 1));
+            assertFalse(validator.fastValidate(validator.getMax() + 1));
         }
 
         @Test
         public void testHighUnbounded() {
             initValidator(0, null, false, false);
 
-            assertTrue(validator.validate(1000));
-            assertTrue(validator.validate(50000));
+            assertTrue(validator.fastValidate(1000));
+            assertTrue(validator.fastValidate(50000));
 
-            assertTrue(validator.validate(50));
+            assertTrue(validator.fastValidate(50));
 
-            assertFalse(validator.validate(validator.getMin() - 1));
+            assertFalse(validator.fastValidate(validator.getMin() - 1));
         }
 
         @Test
         public void testAllUnbounded() {
             initValidator(null, null, false, false);
 
-            assertTrue(validator.validate(1000));
-            assertTrue(validator.validate(50000));
-            assertTrue(validator.validate(50));
+            assertTrue(validator.fastValidate(1000));
+            assertTrue(validator.fastValidate(50000));
+            assertTrue(validator.fastValidate(50));
 
-            assertTrue(validator.validate(-1000));
-            assertTrue(validator.validate(-50000));
+            assertTrue(validator.fastValidate(-1000));
+            assertTrue(validator.fastValidate(-50000));
         }
     }
 
@@ -131,11 +130,11 @@ public class RangedNumberValidatorTest {
             initValidator(0d, 100d, true, true);
 
             for (double i = validator.getMin(); i <= validator.getMax(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%f returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin() - EPSILON));
-            assertFalse(validator.validate(validator.getMax() + EPSILON));
+            assertFalse(validator.fastValidate(validator.getMin() - EPSILON));
+            assertFalse(validator.fastValidate(validator.getMax() + EPSILON));
         }
 
         @Test
@@ -143,11 +142,11 @@ public class RangedNumberValidatorTest {
             initValidator(0d, 100d, false, true);
 
             for (double i = validator.getMin() + 1; i < validator.getMax(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%f returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin()));
-            assertTrue(validator.validate(validator.getMax()));
+            assertFalse(validator.fastValidate(validator.getMin()));
+            assertTrue(validator.fastValidate(validator.getMax()));
         }
 
         @Test
@@ -155,11 +154,11 @@ public class RangedNumberValidatorTest {
             initValidator(0d, 100d, true, false);
 
             for (double i = validator.getMin() + 1; i < validator.getMax(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%f returned invalid", i), validator.fastValidate(i));
             }
 
-            assertTrue(validator.validate(validator.getMin()));
-            assertFalse(validator.validate(validator.getMax()));
+            assertTrue(validator.fastValidate(validator.getMin()));
+            assertFalse(validator.fastValidate(validator.getMax()));
         }
 
         @Test
@@ -167,45 +166,45 @@ public class RangedNumberValidatorTest {
             initValidator(0d, 100d, false, false);
 
             for (double i = validator.getMin() + EPSILON; i < validator.getMax(); i++) {
-                assertTrue(String.format("%f returned invalid", i), validator.validate(i));
+                assertTrue(String.format("%f returned invalid", i), validator.fastValidate(i));
             }
 
-            assertFalse(validator.validate(validator.getMin()));
-            assertFalse(validator.validate(validator.getMax()));
+            assertFalse(validator.fastValidate(validator.getMin()));
+            assertFalse(validator.fastValidate(validator.getMax()));
         }
 
         @Test
         public void testLowUnbounded() {
             initValidator(null, 100d, false, false);
 
-            assertTrue(validator.validate(-1000d));
-            assertTrue(validator.validate(-50000d));
-            assertTrue(validator.validate(50d));
+            assertTrue(validator.fastValidate(-1000d));
+            assertTrue(validator.fastValidate(-50000d));
+            assertTrue(validator.fastValidate(50d));
 
-            assertFalse(validator.validate(validator.getMax() + EPSILON));
+            assertFalse(validator.fastValidate(validator.getMax() + EPSILON));
         }
 
         @Test
         public void testHighUnbounded() {
             initValidator(0d, null, false, false);
 
-            assertTrue(validator.validate(1000d));
-            assertTrue(validator.validate(50000d));
-            assertTrue(validator.validate(50d));
+            assertTrue(validator.fastValidate(1000d));
+            assertTrue(validator.fastValidate(50000d));
+            assertTrue(validator.fastValidate(50d));
 
-            assertFalse(validator.validate(validator.getMin() - EPSILON));
+            assertFalse(validator.fastValidate(validator.getMin() - EPSILON));
         }
 
         @Test
         public void testAllUnbounded() {
             initValidator(null, null, false, false);
 
-            assertTrue(validator.validate(1000d));
-            assertTrue(validator.validate(50000d));
-            assertTrue(validator.validate(50d));
+            assertTrue(validator.fastValidate(1000d));
+            assertTrue(validator.fastValidate(50000d));
+            assertTrue(validator.fastValidate(50d));
 
-            assertTrue(validator.validate(-1000d));
-            assertTrue(validator.validate(-50000d));
+            assertTrue(validator.fastValidate(-1000d));
+            assertTrue(validator.fastValidate(-50000d));
         }
     }
 }

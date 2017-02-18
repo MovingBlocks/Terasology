@@ -79,7 +79,7 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private boolean validate(T value) {
-        return validator == null || validator.validate(value);
+        return validator == null || validator.fastValidate(value);
     }
 
     /**
@@ -143,7 +143,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     public boolean setValue(T newValue) {
-        if (!validator.validateWithWarnings(newValue)) {
+        if (!validator.validate(newValue)) {
             return false;
         }
 

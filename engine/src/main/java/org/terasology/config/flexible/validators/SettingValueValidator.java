@@ -25,7 +25,7 @@ public interface SettingValueValidator<T> {
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
-    boolean validate(T value);
+    boolean fastValidate(T value);
 
     /**
      * Issues (logs) appropriate warnings if the given value is invalid.
@@ -38,8 +38,8 @@ public interface SettingValueValidator<T> {
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
-    default boolean validateWithWarnings(T value) {
-        boolean isValid = validate(value);
+    default boolean validate(T value) {
+        boolean isValid = fastValidate(value);
 
         if (!isValid) {
             issueWarnings(value);
