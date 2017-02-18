@@ -57,6 +57,13 @@ public interface Setting<T> extends GeneralSubscribable {
     boolean setValue(T newValue);
 
     /**
+     * Resets the value stored in this {@link Setting<T>} to the default value.
+     */
+    default void resetValue() {
+        setValue(getDefaultValue());
+    }
+
+    /**
      * Returns the human readable name of this {@link Setting}.
      */
     String getHumanReadableName();
