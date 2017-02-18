@@ -46,7 +46,7 @@ public class BloomBlurNode extends BlurNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     /**
-     * Initializes a BloomBlurNode instance.This method must be called once shortly after instantiation
+     * Initializes a BloomBlurNode instance. This method must be called once shortly after instantiation
      * to fully initialize the node and make it ready for rendering.
      *
      * @param inputConfig an FBOConfig describing the input FBO, to be retrieved from an injected DisplayResolutionDependentFBOs instance.
