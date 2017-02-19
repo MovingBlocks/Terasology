@@ -144,7 +144,7 @@ public class ShadowMapNode extends ConditionDependentNode {
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
-            positionShadowMapCamera();
+            positionShadowMapCamera(); // TODO: extract these calculation into a separate node.
 
             int numberOfRenderedTriangles = 0;
             int numberOfChunksThatAreNotReadyYet = 0;
