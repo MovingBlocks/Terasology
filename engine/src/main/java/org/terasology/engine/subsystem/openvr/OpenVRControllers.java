@@ -161,7 +161,7 @@ public class OpenVRControllers implements ControllerDevice, ControllerListener {
     }
 
     /**
-     * Called whenever the OpenVR cohntroller pose changes for a given controller (left or right). This particular
+     * Called whenever the OpenVR controller pose changes for a given controller (left or right). This particular
      * listener just ignores pose updates.
      * @param pose - the pose of the controller (a 4x4 matrix).
      * @param handIndex - the hand index, an integer - 0 for left, 1 for right.
