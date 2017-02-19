@@ -19,10 +19,10 @@ import java.util.Objects;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetCameraReflectedMode;
+import org.terasology.rendering.dag.tasks.SetCameraReflectedModeTask;
 
 /**
- * TODO
+ * Instances of this state change generate the tasks that set or reset the reflected flag of a given camera.
  */
 public class SetCameraToReflected implements StateChange {
 
@@ -33,6 +33,11 @@ public class SetCameraToReflected implements StateChange {
 
     private RenderPipelineTask task;
 
+    /**
+     * Constructs an instance of this class initialized with a given Camera instance.
+     *
+     * @param camera An instance implementing the Camera interface.
+     */
     public SetCameraToReflected(Camera camera) {
         this(camera, true);
         defaultInstance = new SetCameraToReflected(camera, false);
@@ -43,10 +48,13 @@ public class SetCameraToReflected implements StateChange {
         this.reflected = reflected;
     }
 
+    /**
+     * @return a RenderPipelineTask configured to set or reset the reflection flag of the camera given on construction.
+     */
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new SetCameraReflectedMode(camera, reflected);
+            task = new SetCameraReflectedModeTask(camera, reflected);
         }
         return task;
     }
@@ -59,9 +67,15 @@ public class SetCameraToReflected implements StateChange {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetCameraToReflected) && this.camera == ((SetCameraToReflected) obj).camera
-                                                    && (this.reflected == ((SetCameraToReflected) obj).reflected);
+                                                     && (this.reflected == ((SetCameraToReflected) obj).reflected);
     }
 
+    /**
+     * Returns an instance of this class configured to generate a task resetting
+     * the reflected flag of the camera provided on construction.
+     *
+     * @return the default instance of SetCameraToReflected
+     */
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
@@ -72,4 +86,8 @@ public class SetCameraToReflected implements StateChange {
         return this.equals(defaultInstance);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%30s: %s for %s", this.getClass().getSimpleName(), reflected ? "true" : "false", camera.toString());
+    }
 }

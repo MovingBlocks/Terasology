@@ -19,14 +19,22 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
 /**
- * TODO
+ * Instances of this task set and unset the reflected flag of a camera.
+ *
+ * A reflected camera is helpful to render a reflected scene, which can then be used to render reflective surfaces.
  */
-public class SetCameraReflectedMode implements RenderPipelineTask {
+public class SetCameraReflectedModeTask implements RenderPipelineTask {
 
     private Camera camera;
     private boolean reflected;
 
-    public SetCameraReflectedMode(Camera camera, boolean reflected) {
+    /**
+     * Constructs an instance of this class, setting or resetting the reflected flag on the given camera.
+     *
+     * @param camera an instance implementing the Camera interface
+     * @param reflected a boolean determining if the camera should be set to reflected or not.
+     */
+    public SetCameraReflectedModeTask(Camera camera, boolean reflected) {
         this.camera = camera;
         this.reflected = reflected;
     }

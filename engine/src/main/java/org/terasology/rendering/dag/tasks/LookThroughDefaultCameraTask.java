@@ -17,25 +17,32 @@ package org.terasology.rendering.dag.tasks;
 
 import org.terasology.rendering.dag.RenderPipelineTask;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
- * TODO
+ * Instances of this class reset the ModelView and Projection matrices to identity matrices,
+ * as per opengl default.
+ *
+ * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+ * Modules or other parts of the engine should take advantage of them through classes
+ * inheriting from StateChange.
  */
 public class LookThroughDefaultCameraTask implements RenderPipelineTask {
 
     @Override
     public void execute() {
-        glMatrixMode(GL_MODELVIEW);
+        glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        glMatrixMode(GL_PROJECTION);
+        glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
 
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), "default opengl camera");
-
     }
 }

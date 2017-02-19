@@ -18,13 +18,27 @@ package org.terasology.rendering.dag.tasks;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.RenderPipelineTask;
 
+// TODO: implement bobbing via multiple cameras and different steady/bobbing attachment points
 /**
- * TODO
+ * Instances of this class set the ModelView and Projection matrices so that
+ * the scene can be seen through the camera provided on construction.
+ *
+ * Differently from the LookThroughTask, the view from the given
+ * camera -will not- bob up and down even if bobbing is enabled.
+ *
+ * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+ * Modules or other parts of the engine should take advantage of them through classes
+ * inheriting from StateChange.
  */
 public class LookThroughNormalizedTask implements RenderPipelineTask {
 
     private Camera camera;
 
+    /**
+     * Constructs an instance of this class initialized with the given camera.
+     *
+     * @param camera an instance implementing the Camera interface
+     */
     public LookThroughNormalizedTask(Camera camera) {
         this.camera = camera;
     }
