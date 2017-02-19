@@ -37,10 +37,20 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
 import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.protobuf.EntityData;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.RunnableFuture;
 
 /**
  */
@@ -51,6 +61,8 @@ public class ChatSystem extends BaseComponentSystem {
     private static final ResourceUrn CHAT_UI = new ResourceUrn("engine:chat");
     private static final ResourceUrn CONSOLE_UI = new ResourceUrn("engine:console");
     private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
+
+    private boolean ifReceiveResponce = false;
 
     @In
     private EntityManager entityManager;
@@ -88,6 +100,19 @@ public class ChatSystem extends BaseComponentSystem {
             }
         }
     }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onPingFromServer(PingMessageEvent event, EntityRef entity) {
+        ClientComponent client = entity.getComponent(ClientComponent.class);
+        if (client.local) {
+            Message message = event.getFormattedMessage();
+                if (event.isToClient()==true) {
+                    event.getFrom().send(new PingMessageEvent(client.clientInfo,false));
+                }
+                else ifReceiveResponce = true;
+        }
+    }
+
 
     @Command(runOnServer = true,
             requiredPermission = PermissionManager.CHAT_PERMISSION,
@@ -171,5 +196,32 @@ public class ChatSystem extends BaseComponentSystem {
         targetClient.send(new ChatMessageEvent(targetMessage, senderClientComponent.clientInfo));
 
         return senderMessage;
+    }
+
+    @Command(runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION,
+            shortDescription = "Ping to every client")
+    public void pingToClients(@Sender EntityRef sender) {
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run(){
+                Map<EntityRef, Long> pingMap = new HashMap<EntityRef, Long>();
+                for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+                    pingMap.put(client, pingToClient(sender, client));
+                    logger.info("***************"+pingMap.get(client).toString());
+                }
+            }
+        };
+    }
+
+    private long pingToClient(EntityRef server, EntityRef client) {
+        Instant start = Instant.now();
+        client.send(new PingMessageEvent(server,true));
+        while(!ifReceiveResponce);
+        ifReceiveResponce = false;
+        Instant end = Instant.now();
+        long millis = Duration.between(start, end).toMillis();
+
+        return millis;
     }
 }
