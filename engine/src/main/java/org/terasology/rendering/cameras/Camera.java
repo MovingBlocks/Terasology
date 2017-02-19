@@ -17,6 +17,7 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
@@ -34,6 +35,7 @@ import org.terasology.math.geom.Vector3f;
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
+    protected Quat4f gazeDirection = new Quat4f();
     protected final Vector3f position = new Vector3f(0, 0, 0);
     protected final Vector3f up = new Vector3f(0, 1, 0);
     protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
@@ -202,6 +204,22 @@ public abstract class Camera {
 
     public Vector3f getViewingDirection() {
         return viewingDirection;
+    }
+
+    /**
+     * Get the gaze direction.
+     * @return the gaze direction, a quaternion.
+     */
+    public Quat4f getGazeDirection() {
+        return gazeDirection;
+    }
+
+    /**
+     Try to set the gaze direction. * Some cameras might be immovable, such as a VR camera, thus "request."
+     * @param gazeDirectionIn
+     */
+    public void requestSetGazeDirection(Quat4f gazeDirectionIn) {
+        gazeDirection = gazeDirectionIn;
     }
 
     public Vector3f getUp() {

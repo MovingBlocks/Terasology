@@ -15,12 +15,16 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Quaternionf;
+import org.joml.Vector4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
@@ -241,8 +245,16 @@ public class OpenVRStereoCamera extends Camera {
         float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
                 + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
+
+        // set gaze direction
+        Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
+        Quaternionf quaternion = new Quaternionf(vecQuaternion.x,vecQuaternion.y,vecQuaternion.z,vecQuaternion.w);
+        gazeDirection.set(quaternion.x,quaternion.y,quaternion.z,quaternion.w);
+
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
+
+
         if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2))  < 0.25)  {
             return;
         }
@@ -280,12 +292,25 @@ public class OpenVRStereoCamera extends Camera {
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
+        inverseViewProjectionMatrixLeftEye = new Matrix4f(viewProjectionMatrixLeftEye);
+        inverseViewProjectionMatrixRightEye = new Matrix4f(viewProjectionMatrixRightEye);
         inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
         inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);
 
+        inverseProjectionMatrixLeftEye = new Matrix4f(projectionMatrixLeftEye);
+        inverseProjectionMatrixRightEye = new Matrix4f(projectionMatrixRightEye);
         inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
         inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
 
         updateFrustum();
+    }
+
+    /**
+     * In this specific case, we do not allow the gaze direction to be set, because only the player is allowed to do
+     * that by moving his/her head.
+     * @param gazeDirectionIn - ignored
+     */
+    @Override
+    public void requestSetGazeDirection(Quat4f gazeDirectionIn) {
     }
 }

@@ -176,6 +176,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             // the log.
             if (vrProvider.init()) {
                 playerCamera = new OpenVRStereoCamera(vrProvider);
+                vrProvider.getState().setGroundPlaneAdjustmentFactor(-0.80f - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
@@ -397,6 +398,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
 
+        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
         Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
 

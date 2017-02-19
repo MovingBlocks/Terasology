@@ -44,6 +44,10 @@ public class TargetSystem {
         this.physics = physics;
     }
 
+    public Vector3i getTargetBlockPosition() {
+        return targetBlockPos;
+    }
+
     public boolean isTargetAvailable() {
         return target.exists() || targetBlockPos != null;
     }

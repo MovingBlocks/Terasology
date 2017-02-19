@@ -37,6 +37,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public Vector3f translate = Vector3f.zero();
     public Quat4f rotationQuaternion;
     public float scale = 1f;
+    public boolean isTracked = false;
 
     // TODO: @In
     private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
@@ -84,6 +85,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
         if (handIndex != 0) {
             return;
         }
+        isTracked = true;
         Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
         translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
         org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);

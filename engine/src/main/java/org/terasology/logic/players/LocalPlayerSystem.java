@@ -163,7 +163,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         switch (characterMovementComponent.mode) {
             case WALKING:
                 viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
-                viewRot.rotate(relMove, relMove);
+                playerCamera.requestSetGazeDirection(viewRot);
+                playerCamera.getGazeDirection().rotate(relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
@@ -171,7 +172,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             default:
                 viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
-                viewRot.rotate(relMove, relMove);
+                playerCamera.requestSetGazeDirection(viewRot);
+                playerCamera.getGazeDirection().rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }

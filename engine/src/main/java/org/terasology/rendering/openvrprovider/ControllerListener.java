@@ -33,7 +33,7 @@ public interface ControllerListener {
     long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
-    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
+    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex);
     // TODO: touch, axes
     public void poseChanged(Matrix4f pose, int handIndex);
 }

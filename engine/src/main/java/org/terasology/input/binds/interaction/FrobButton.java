@@ -27,6 +27,6 @@ import org.terasology.input.RegisterBindButton;
  */
 @RegisterBindButton(id = "frob", description = "${engine:menu#binding-frob}")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.E)
-@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.ONE)
+@DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.FOUR)
 public class FrobButton extends BindButtonEvent {
 }
