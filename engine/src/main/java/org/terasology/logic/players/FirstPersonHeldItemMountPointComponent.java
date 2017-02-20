@@ -30,6 +30,7 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
  * Only used by the client side so that held items can be positioned in line with the camera
  */
 public class FirstPersonHeldItemMountPointComponent implements Component, ControllerListener {
+    private boolean trackingDataReceived = false;
 
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
@@ -37,7 +38,6 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public Vector3f translate = Vector3f.zero();
     public Quat4f rotationQuaternion;
     public float scale = 1f;
-    private boolean trackingDataReceived = false;
 
     // TODO: @In
     private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
@@ -51,6 +51,11 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
             0.0f, -0.05f, -0.2f, 1.0f
     );
 
+    /**
+     * Sometimes, a tracking system (i.e. for room-scale VR) provides a pose for the player hand position. In this
+     * case, spe$ial handling is necessary, and this accessor gives a way to check.
+     * @return true if this class is receiving tracking updates, false if not.
+     */
     public boolean isTracked() {
         return trackingDataReceived;
     }
