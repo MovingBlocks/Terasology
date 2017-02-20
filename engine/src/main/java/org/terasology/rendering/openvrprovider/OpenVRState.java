@@ -38,7 +38,7 @@ public class OpenVRState {
     // In the head frame
     private Matrix4f[] eyePoses = new Matrix4f[2];
     private Matrix4f[] projectionMatrices = new Matrix4f[2];
-    private float groundPlaneAdjustmentFactor = 0.0f;
+    private float groundPlaneYOffset = 0.0f;
 
     // In the tracking system intertial frame
     private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
@@ -90,7 +90,7 @@ public class OpenVRState {
                                 1,0,0,0,
                                 0,1,0,0,
                                 0,0,1,0,
-                                0,groundPlaneAdjustmentFactor,0,1
+                                0,groundPlaneYOffset,0,1
                         ).mul(headPose);
     }
 
@@ -104,7 +104,7 @@ public class OpenVRState {
                 1,0,0,0,
                 0,1,0,0,
                 0,0,1,0,
-                0,groundPlaneAdjustmentFactor,0,1
+                0,groundPlaneYOffset,0,1
         ).mul(controllerPose[nIndex]);
         for (ControllerListener listener : controllerListeners) {
             listener.poseChanged(controllerPose[nIndex], nIndex);
@@ -138,10 +138,10 @@ public class OpenVRState {
     /**
      * Set the offset of the default head pose from the ground (along the y axis). This is useful if there is some
      * built-in "rest" camera position (i.e. some games will default to the height of a standing player).
-     * @param inputFactor - the height (in meters) by which to raise the camera.
+     * @param inputOffset - the height (in meters) by which to raise the camera.
      */
-    public void setGroundPlaneAdjustmentFactor(float inputFactor) {
-        groundPlaneAdjustmentFactor = inputFactor;
+    public void setGroundPlaneYOffset(float inputOffset) {
+        groundPlaneYOffset = inputOffset;
     }
 
     void setProjectionMatrix(
