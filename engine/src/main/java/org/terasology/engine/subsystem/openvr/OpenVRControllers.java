@@ -112,16 +112,13 @@ public class OpenVRControllers implements ControllerDevice, ControllerListener {
             if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.SIX),
                         "OpenVR", ButtonState.DOWN, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y < 0) {
+            } else if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.SEVEN),
                         "OpenVR", ButtonState.DOWN, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
+            } else if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.EIGHT),
                         "OpenVR", ButtonState.DOWN, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y > 0) {
+            } else if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y > 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.NINE),
                         "OpenVR", ButtonState.DOWN, 1.0f));
             }
@@ -129,16 +126,13 @@ public class OpenVRControllers implements ControllerDevice, ControllerListener {
             if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.SIX),
                         "OpenVR", ButtonState.UP, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y < 0) {
+            } else if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.SEVEN),
                         "OpenVR", ButtonState.UP, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
+            } else if (stateAfter.rAxis[0].x < 0 && stateAfter.rAxis[0].y < 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.EIGHT),
                         "OpenVR", ButtonState.UP, 1.0f));
-            }
-            if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y > 0) {
+            } else if (stateAfter.rAxis[0].x > 0 && stateAfter.rAxis[0].y > 0) {
                 queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(ControllerId.NINE),
                         "OpenVR", ButtonState.UP, 1.0f));
             }
