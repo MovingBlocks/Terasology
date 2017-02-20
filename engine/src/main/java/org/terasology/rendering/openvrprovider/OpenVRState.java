@@ -65,6 +65,14 @@ public class OpenVRState {
     }
 
     /**
+     * Removes a controller listener.
+     * @param listener - An object implementing the ControllerListener interface.
+     */
+    public void removeControllerListener(ControllerListener listener) {
+        controllerListeners.remove(listener);
+    }
+
+    /**
      * Get the pose of an eye.
      * @param eyeIndex - An integer specifying the eye: 0 for the left eye, 1 for the right eye.
      * @return the pose, as a Matrix4f

@@ -77,7 +77,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private Time time;
 
     @In
-    PlayerTargetSystem targetSystem;
+    private PlayerTargetSystem targetSystem;
 
     @In
     private BlockEntityRegistry blockRegistry;

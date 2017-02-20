@@ -33,7 +33,18 @@ public interface ControllerListener {
     long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
+    /**
+     * Override this method with a handler for whenever the state of the OpenVR controller changes.
+     * @param stateBefore - the controller state before the change.
+     * @param stateAfter - the controller state after the change.
+     * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
+     */
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex);
-    // TODO: touch, axes
+
+    /**
+     * Override this method with a handler for whenever the pose of the OpenVR controller changes.
+     * @param pose - the pose of the controller at the point of update, a 4x4 homogenous transformation matrix.
+     * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
+     */
     public void poseChanged(Matrix4f pose, int handIndex);
 }

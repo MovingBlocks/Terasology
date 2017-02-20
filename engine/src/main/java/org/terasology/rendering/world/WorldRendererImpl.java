@@ -176,6 +176,12 @@ public final class WorldRendererImpl implements WorldRenderer {
             // the log.
             if (vrProvider.init()) {
                 playerCamera = new OpenVRStereoCamera(vrProvider);
+                /*
+                * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
+                * such that the ground plane of the rendering system and the ground plane of the room the VR user is
+                * in match.
+                 */
+                //
                 vrProvider.getState().setGroundPlaneYOffset(-0.80f - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {

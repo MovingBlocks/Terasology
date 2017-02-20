@@ -29,6 +29,8 @@ public class OpenVRInput implements EngineSubsystem {
 
     private OpenVRProvider vrProvider;
 
+    private OpenVRControllers controllerDevice = new OpenVRControllers();
+
     /**
      * Get the name of this subsystem.
      * @return the name of the subsystem, a string.
@@ -72,13 +74,12 @@ public class OpenVRInput implements EngineSubsystem {
             context.put(InputSystem.class, inputSystem);
         }
 
-        OpenVRControllers controllerDevice = new OpenVRControllers();
         vrProvider.getState().addControllerListener(controllerDevice);
         inputSystem.setControllerDevice(controllerDevice);
     }
 
     /**
-     *
+     * Tasks to perform after an update.
      * @param currentState The current state
      * @param delta The total time this frame/update cycle
      */
@@ -88,9 +89,10 @@ public class OpenVRInput implements EngineSubsystem {
     }
 
     /**
-     *
+     * Clean up all objects in this class.
      */
     @Override
     public void shutdown() {
+        vrProvider.getState().removeControllerListener(controllerDevice);
     }
 }
