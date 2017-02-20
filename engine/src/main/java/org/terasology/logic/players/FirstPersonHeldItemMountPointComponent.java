@@ -37,7 +37,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     public Vector3f translate = Vector3f.zero();
     public Quat4f rotationQuaternion;
     public float scale = 1f;
-    public boolean isTracked = false;
+    private boolean trackingDataReceived = false;
 
     // TODO: @In
     private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
@@ -50,6 +50,10 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
             0.0f, (float) -Math.sin(230. * TeraMath.DEG_TO_RAD), (float) Math.cos(230. * TeraMath.DEG_TO_RAD), 0.0f,
             0.0f, -0.05f, -0.2f, 1.0f
     );
+
+    public boolean isTracked() {
+        return trackingDataReceived;
+    }
 
     /**
      * If possible, make this object listen for controller pose updates. If the vrProvider is not active (i.e. no headset
@@ -85,7 +89,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
         if (handIndex != 0) {
             return;
         }
-        isTracked = true;
+        trackingDataReceived = true;
         Matrix4f adjustedPose = pose.mul(toolAdjustmentMatrix);
         translate = new Vector3f(adjustedPose.m30(), adjustedPose.m31(), adjustedPose.m32());
         org.joml.Vector4f jomlQuaternion = org.terasology.rendering.openvrprovider.OpenVRUtil.convertToQuaternion(adjustedPose);

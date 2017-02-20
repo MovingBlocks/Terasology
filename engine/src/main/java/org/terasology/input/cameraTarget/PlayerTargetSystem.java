@@ -77,7 +77,7 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
                 Vector3f dir = player.getViewDirection();
                 float maxDist = charComp.interactionRange;
                 FirstPersonHeldItemMountPointComponent heldItemMountPoint = player.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
-                if (heldItemMountPoint != null && heldItemMountPoint.isTracked) {
+                if (heldItemMountPoint != null && heldItemMountPoint.isTracked()) {
                     maxDist = heldItemMountPoint.translate.length() + 0.25f;
                     dir = heldItemMountPoint.translate.normalize();
                 }
