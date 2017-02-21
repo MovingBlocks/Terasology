@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetCameraToReflected;
+import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -90,7 +90,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new SetCameraToReflected(playerCamera)); // this has to go before the LookThrough state change
+        addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(playerCamera));
 
         renderingConfig = config.getRendering();

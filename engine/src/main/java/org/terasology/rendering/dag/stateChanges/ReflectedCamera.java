@@ -23,10 +23,13 @@ import org.terasology.rendering.dag.tasks.SetCameraReflectedModeTask;
 
 /**
  * Instances of this state change generate the tasks that set or reset the reflected flag of a given camera.
+ *
+ * Warning: instances of this class -must- be added to the list of desired state changes in a node
+ * -before- any instance of LookThrough and LookThroughNormalized.
  */
-public class SetCameraToReflected implements StateChange {
+public class ReflectedCamera implements StateChange {
 
-    private SetCameraToReflected defaultInstance;
+    private ReflectedCamera defaultInstance;
 
     private Camera camera;
     private boolean reflected;
@@ -38,12 +41,12 @@ public class SetCameraToReflected implements StateChange {
      *
      * @param camera An instance implementing the Camera interface.
      */
-    public SetCameraToReflected(Camera camera) {
+    public ReflectedCamera(Camera camera) {
         this(camera, true);
-        defaultInstance = new SetCameraToReflected(camera, false);
+        defaultInstance = new ReflectedCamera(camera, false);
     }
 
-    private SetCameraToReflected(Camera camera, boolean reflected) {
+    private ReflectedCamera(Camera camera, boolean reflected) {
         this.camera = camera;
         this.reflected = reflected;
     }
@@ -66,15 +69,15 @@ public class SetCameraToReflected implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetCameraToReflected) && this.camera == ((SetCameraToReflected) obj).camera
-                                                     && (this.reflected == ((SetCameraToReflected) obj).reflected);
+        return (obj instanceof ReflectedCamera) && this.camera == ((ReflectedCamera) obj).camera
+                                                     && (this.reflected == ((ReflectedCamera) obj).reflected);
     }
 
     /**
      * Returns an instance of this class configured to generate a task resetting
      * the reflected flag of the camera provided on construction.
      *
-     * @return the default instance of SetCameraToReflected
+     * @return the default instance of ReflectedCamera
      */
     @Override
     public StateChange getDefaultInstance() {

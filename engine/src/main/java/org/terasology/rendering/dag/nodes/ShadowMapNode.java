@@ -168,8 +168,6 @@ public class ShadowMapNode extends ConditionDependentNode {
                 }
             }
 
-            playerCamera.lookThrough(); //TODO: camera setting need to go into a state change: enable camera, back to default camera
-
             worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
             worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 

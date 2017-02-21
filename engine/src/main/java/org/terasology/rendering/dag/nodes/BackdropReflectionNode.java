@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
-import org.terasology.rendering.dag.stateChanges.SetCameraToReflected;
+import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -77,7 +77,7 @@ public class BackdropReflectionNode extends AbstractNode {
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new SetCameraToReflected(playerCamera));
+        addDesiredStateChange(new ReflectedCamera(playerCamera));
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();
 
