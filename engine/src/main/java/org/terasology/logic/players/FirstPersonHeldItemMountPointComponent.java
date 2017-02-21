@@ -53,7 +53,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
 
     /**
      * Sometimes, a tracking system (i.e. for room-scale VR) provides a pose for the player hand position. In this
-     * case, spe$ial handling is necessary, and this accessor gives a way to check.
+     * case, special handling is necessary, and this accessor gives a way to check.
      * @return true if this class is receiving tracking updates, false if not.
      */
     public boolean isTracked() {
