@@ -223,7 +223,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Auto move is disabled every time any other movement event occurs.
+     * Auto move is disabled when the associated key is pressed again.
+     * This cancels the simulated repeated key stroke for the forward input button.
      */
     private void stopAutoMove() {
         isAutoMove = false;
@@ -233,7 +234,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     /**
-     * Start a periodic action that moves the entity in the camera direction at every period of 0.2 seconds.
+     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key.
+     * For an input that repeats, the key must be in Down state before Repeat state can be applied to it.
      */
     private void startAutoMove() {
         isAutoMove = true;
