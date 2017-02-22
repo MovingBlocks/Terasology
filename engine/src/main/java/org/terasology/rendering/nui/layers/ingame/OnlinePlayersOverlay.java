@@ -22,6 +22,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.FontColor;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -35,6 +37,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
 
     @In
     private EntityManager entityManager;
+
 
     @Override
     public void initialise() {
@@ -50,7 +53,8 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
                 sb.append("\n");
             }
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
+            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo) +
+                    " "+ FontColor.getColored(clientComp.ping, Color.GREEN));
             first = false;
         }
         return sb.toString();

@@ -530,7 +530,12 @@ public class CoreCommands extends BaseComponentSystem {
         Server server = networkSystem.getServer();
         if (server == null) {
             //TODO: i18n
-            return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+            if (networkSystem.getMode().isServer()) {
+                return "Your player is running on the server";
+            }
+            else {
+                return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+            }
         }
         String[] remoteAddress = server.getRemoteAddress().split("-");
         String address = remoteAddress[1];

@@ -33,5 +33,8 @@ public class ClientComponent implements Component {
     @Replicate
     public EntityRef character = EntityRef.NULL;
 
+    @Replicate
+    public String ping = "";
+
     public EntityRef camera = EntityRef.NULL;
 }
