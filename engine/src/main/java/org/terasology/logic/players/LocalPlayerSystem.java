@@ -18,7 +18,9 @@ package org.terasology.logic.players;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -27,6 +29,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
+import org.terasology.input.InputSystem;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.AutoMoveButton;
@@ -47,7 +51,6 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
-import org.terasology.logic.characters.CharacterImpulseEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.GazeMountPointComponent;
@@ -57,7 +60,6 @@ import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
 import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -82,15 +84,14 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.util.List;
+
 import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
-
-    private static final Logger logger = LoggerFactory.getLogger(LocalPlayerSystem.class);
-    private static final String AUTO_MOVE_ID = "AUTO_MOVE";
 
     @In
     NetworkSystem networkSystem;
@@ -108,12 +109,16 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private Config config;
+    @In
+    private InputSystem inputSystem;
+
+    private BindsConfig bindsConfig;
     private float bobFactor;
     private float lastStepDelta;
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean isAutoMove;
+    private boolean isAutoMove = false;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean jump;
@@ -222,28 +227,21 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      */
     private void stopAutoMove() {
         isAutoMove = false;
+        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        Input forwardKey = inputs.get(0);
+        inputSystem.cancelSimulatedKeyStroke(forwardKey);
     }
 
     /**
      * Start a periodic action that moves the entity in the camera direction at every period of 0.2 seconds.
      */
-    private void startAutoMove(EntityRef entity) {
+    private void startAutoMove() {
         isAutoMove = true;
-        delayManager.addPeriodicAction(entity, AUTO_MOVE_ID, 0, 200);
-    }
-
-    @ReceiveEvent
-    public void onAutoMove(PeriodicActionTriggeredEvent event, EntityRef entity) {
-        if (event.getActionId().equals(AUTO_MOVE_ID)) {
-            if (isAutoMove) {
-                ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
-                Vector3f viewDir = entity.getComponent(LocationComponent.class).getWorldDirection();
-                clientComponent.character.send(new CharacterImpulseEvent(viewDir.mul(8f)));
-            } else {
-                // If isAutoMove turns false, cancel the action.
-                delayManager.cancelPeriodicAction(entity, AUTO_MOVE_ID);
-            }
-        }
+        bindsConfig = config.getInput().getBinds();
+        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        Input forwardKey = inputs.get(0);
+        inputSystem.simulateSingleKeyStroke(forwardKey);
+        inputSystem.simulateRepeatedKeyStroke(forwardKey);
     }
 
     @ReceiveEvent
@@ -304,42 +302,39 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.z = event.getValue();
+        if(relativeMovement.z == 0f && isAutoMove) {
+            stopAutoMove();
+        }
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.x = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.y = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsRealMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.z = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateStrafeMovement(StrafeRealMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.x = event.getValue();
         event.consume();
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateVerticalMovement(VerticalRealMovementAxis event, EntityRef entity) {
-        stopAutoMove();
         relativeMovement.y = event.getValue();
         event.consume();
     }
@@ -382,7 +377,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
         if (event.isDown()) {
             if (!isAutoMove) {
-                startAutoMove(entity);
+                startAutoMove();
             } else {
                 stopAutoMove();
             }

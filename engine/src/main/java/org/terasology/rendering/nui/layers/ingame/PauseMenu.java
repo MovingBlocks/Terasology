@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.terasology.crashreporter.CrashReporter;
+//import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
 import org.terasology.engine.modes.StateMainMenu;
@@ -33,7 +33,7 @@ public class PauseMenu extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "settings", widget -> getManager().pushScreen("settingsMenuScreen"));
         WidgetUtil.trySubscribe(this, "mainMenu", widget -> CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu()));
         WidgetUtil.trySubscribe(this, "exit", widget -> CoreRegistry.get(GameEngine.class).shutdown());
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
+//        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
         WidgetUtil.trySubscribe(this, "devTools", widget -> getManager().pushScreen("devToolsMenuScreen"));
     }
 }
