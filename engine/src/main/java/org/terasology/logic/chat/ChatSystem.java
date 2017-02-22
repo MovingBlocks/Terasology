@@ -52,8 +52,6 @@ public class ChatSystem extends BaseComponentSystem {
     private static final ResourceUrn CONSOLE_UI = new ResourceUrn("engine:console");
     private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
 
-    private boolean ifReceiveResponce = false;
-
     @In
     private EntityManager entityManager;
 
@@ -88,7 +86,6 @@ public class ChatSystem extends BaseComponentSystem {
                     overlay.setVisible(true);
                 }
             }
-
         }
     }
 
@@ -175,7 +172,4 @@ public class ChatSystem extends BaseComponentSystem {
 
         return senderMessage;
     }
-
 }
-
-

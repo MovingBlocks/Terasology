@@ -54,15 +54,10 @@ public class ServerPingSystem extends BaseComponentSystem implements Component{
 
     private HashMap<EntityRef, Instant> endMap = new HashMap<>();
 
-    @Replicate
-    private HashMap<EntityRef, Long> pingMap = new HashMap<>();
-
-
     @ReceiveEvent(components = ClientComponent.class)
     public void onConnect(ConnectedEvent event, EntityRef entity) {
         if(networkSystem.getMode().isServer()) {
                 delayManager.addPeriodicAction(entity, PING_ACTION_ID, 10000, 10000);
-
         }
     }
 

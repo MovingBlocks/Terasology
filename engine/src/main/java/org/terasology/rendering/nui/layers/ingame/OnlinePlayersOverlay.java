@@ -37,8 +37,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
 
     @In
     private EntityManager entityManager;
-
-
+    
     @Override
     public void initialise() {
         this.text = find("playerList", UIText.class);

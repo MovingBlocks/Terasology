@@ -16,8 +16,6 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.entity.EntityRef;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
