@@ -29,14 +29,15 @@ import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
 import org.terasology.registry.In;
-import org.terasology.registry.Share;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 
+/**
+ * This system implement the server ping to all clients(include server local player)
+ */
 @RegisterSystem
-@Share(ServerPingSystem.class)
 public class ServerPingSystem extends BaseComponentSystem implements Component{
 
     private static final String PING_ACTION_ID = "PING_ACTION";
@@ -90,11 +91,11 @@ public class ServerPingSystem extends BaseComponentSystem implements Component{
         if (networkSystem.getMode().isServer()) {
             Instant end = Instant.now();
             endMap.put(entity, end);
-            updatePingMap(entity);
+            updatePing(entity);
         }
     }
 
-    private void updatePingMap(EntityRef entity) {
+    private void updatePing(EntityRef entity) {
         if(startMap.containsKey(entity) && endMap.containsKey(entity)) {
             ClientComponent clientComp = entity.getComponent(ClientComponent.class);
             long pingTime = Duration.between(startMap.get(entity), endMap.get(entity)).toMillis();

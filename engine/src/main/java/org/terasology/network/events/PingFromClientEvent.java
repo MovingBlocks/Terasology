@@ -18,6 +18,9 @@ package org.terasology.network.events;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
+/**
+ * This event, from client to server, implement one part of ping to all clients
+ */
 @ServerEvent
 public class PingFromClientEvent implements Event {
 }
