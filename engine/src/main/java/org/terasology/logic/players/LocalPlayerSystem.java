@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.players;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
