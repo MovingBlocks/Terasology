@@ -222,15 +222,28 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
     }
 
+    // To check if a valid key has been assigned, either primary or secondary and return it
+    private Input getValidKey(List<Input> inputs) {
+        for(Input input: inputs) {
+            if(input != null) {
+                return input;
+            }
+        }
+        return null;
+    }
+
     /**
      * Auto move is disabled when the associated key is pressed again.
      * This cancels the simulated repeated key stroke for the forward input button.
      */
     private void stopAutoMove() {
-        isAutoMove = false;
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
-        Input forwardKey = inputs.get(0);
-        inputSystem.cancelSimulatedKeyStroke(forwardKey);
+        Input forwardKey = getValidKey(inputs);
+        if(forwardKey != null) {
+            inputSystem.cancelSimulatedKeyStroke(forwardKey);
+            isAutoMove = false;
+        }
+
     }
 
     /**
@@ -238,12 +251,15 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * For an input that repeats, the key must be in Down state before Repeat state can be applied to it.
      */
     private void startAutoMove() {
-        isAutoMove = true;
+        isAutoMove = false;
         bindsConfig = config.getInput().getBinds();
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
-        Input forwardKey = inputs.get(0);
-        inputSystem.simulateSingleKeyStroke(forwardKey);
-        inputSystem.simulateRepeatedKeyStroke(forwardKey);
+        Input forwardKey = getValidKey(inputs);
+        if(forwardKey != null) {
+            isAutoMove = true;
+            inputSystem.simulateSingleKeyStroke(forwardKey);
+            inputSystem.simulateRepeatedKeyStroke(forwardKey);
+        }
     }
 
     @ReceiveEvent
