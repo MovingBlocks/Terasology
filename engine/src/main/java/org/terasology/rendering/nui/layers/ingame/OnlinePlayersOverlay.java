@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,9 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
                 sb.append("\n");
             }
             ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo) +
-                    " "+ FontColor.getColored(clientComp.ping, Color.GREEN));
+            sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
+            sb.append(" ");
+            sb.append(FontColor.getColored(clientComp.ping, Color.GREEN));
             first = false;
         }
         return sb.toString();

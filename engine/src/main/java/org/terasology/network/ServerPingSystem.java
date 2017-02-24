@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package org.terasology.network;
-
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -35,7 +34,8 @@ import java.time.Instant;
 import java.util.HashMap;
 
 /**
- * This system implement the server ping to all clients(include server local player)
+ * This system implement the server ping to all clients (include server local player).
+ * It add a periodic action, which is ping from the server to a client, when the client is connected. Then the client will respond.
  */
 @RegisterSystem
 public class ServerPingSystem extends BaseComponentSystem implements Component{
@@ -63,7 +63,7 @@ public class ServerPingSystem extends BaseComponentSystem implements Component{
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onDisconncet(DisconnectedEvent event, EntityRef entity) {
+    public void onDisconnect(DisconnectedEvent event, EntityRef entity) {
         if (networkSystem.getMode().isServer()) {
             delayManager.cancelPeriodicAction(entity, PING_ACTION_ID);
         }
@@ -100,6 +100,7 @@ public class ServerPingSystem extends BaseComponentSystem implements Component{
             ClientComponent clientComp = entity.getComponent(ClientComponent.class);
             long pingTime = Duration.between(startMap.get(entity), endMap.get(entity)).toMillis();
             clientComp.ping = String.valueOf(pingTime) + "ms";
+            entity.saveComponent(clientComp);
         }
     }
 }

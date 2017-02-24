@@ -19,7 +19,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
- * This event, from client to server, implement one part of ping to all clients
+ * This event handles the ping from one client to the server.
  */
 @ServerEvent
 public class PingFromClientEvent implements Event {
