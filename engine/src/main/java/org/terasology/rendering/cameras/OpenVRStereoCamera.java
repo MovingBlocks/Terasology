@@ -249,7 +249,10 @@ public class OpenVRStereoCamera extends Camera {
         // set gaze direction
         Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
         Quaternionf quaternion = new Quaternionf(vecQuaternion.x,vecQuaternion.y,vecQuaternion.z,vecQuaternion.w);
-        gazeDirection.set(quaternion.x,quaternion.y,quaternion.z,quaternion.w);
+        Quat4f quaternionTerasology = new Quat4f(quaternion.x,quaternion.y,quaternion.z,quaternion.w);
+        viewingDirection = quaternionTerasology.getAxis();
+        viewingAngle = quaternionTerasology.getAngle();
+
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
@@ -308,9 +311,9 @@ public class OpenVRStereoCamera extends Camera {
     /**
      * In this specific case, we do not allow the gaze direction to be set, because only the player is allowed to do
      * that by moving his/her head.
-     * @param gazeDirectionIn - ignored
+     * @param orientation - ignored
      */
     @Override
-    public void requestSetGazeDirection(Quat4f gazeDirectionIn) {
+    public void requestSetOrientation(Quat4f orientation) {
     }
 }

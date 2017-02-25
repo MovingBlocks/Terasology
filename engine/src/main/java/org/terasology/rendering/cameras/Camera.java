@@ -35,10 +35,10 @@ import org.terasology.math.geom.Vector3f;
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
-    protected Quat4f gazeDirection = new Quat4f();
     protected final Vector3f position = new Vector3f(0, 0, 0);
     protected final Vector3f up = new Vector3f(0, 1, 0);
-    protected final Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected float viewingAngle;
 
     protected float zNear = 0.1f;
     // TODO: This is too large, but many properties have to be adjusted if it changes
@@ -207,23 +207,20 @@ public abstract class Camera {
     }
 
     /**
-     * Get the gaze direction.
-     * @return the gaze direction, a quaternion.
+     * Get the viewing direction.
+     * @return the viewing direction, a quaternion.
      */
-    public Quat4f getGazeDirection() {
-        return gazeDirection;
+    public Quat4f getOrientation() {
+        return new Quat4f(viewingDirection,viewingAngle);
     }
 
     /**
-     Try to set the gaze direction. * Some cameras might be immovable, such as a VR camera, thus "request."
-     * @param gazeDirectionIn
+     Try to set the viewing direction. * Some cameras might be immovable, such as a VR camera, thus "request."
+     * @param direction
      */
-    public void requestSetGazeDirection(Quat4f gazeDirectionIn) {
-        gazeDirection = gazeDirectionIn;
-    }
-
-    public Vector3f getUp() {
-        return up;
+    public void requestSetOrientation(Quat4f direction) {
+        viewingDirection = direction.getAxis();
+        viewingAngle = direction.getAngle();
     }
 
     public ViewFrustum getViewFrustum() {
