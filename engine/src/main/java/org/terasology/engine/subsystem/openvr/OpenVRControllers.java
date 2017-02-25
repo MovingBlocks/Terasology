@@ -98,8 +98,8 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
             addAction(ControllerId.X_AXIS, ButtonState.DOWN, -cachedStateAfter.rAxis[0].x);
             addAction(ControllerId.Y_AXIS, ButtonState.DOWN, cachedStateAfter.rAxis[0].y);
         } else if (switchedUp(ControllerListener.BUTTON_TOUCHPAD)) {
-            addAction(ControllerId.X_AXIS, ButtonState.UP, 0);
-            addAction(ControllerId.Y_AXIS, ButtonState.UP, 0);
+            addAction(ControllerId.X_AXIS, ButtonState.UP, 0.0f);
+            addAction(ControllerId.Y_AXIS, ButtonState.UP, 0.0f);
         }
     }
 
@@ -149,6 +149,8 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex) {
         cachedStateBefore = stateBefore;
         cachedStateAfter = stateAfter;
+        queuedActions.add(new ControllerAction(InputType.CONTROLLER_BUTTON.getInput(ControllerId.X_AXIS),
+                "OpenVR", ButtonState.DOWN, 1.0f));
         if (handIndex == 0) {
             handleController0();
         } else {
