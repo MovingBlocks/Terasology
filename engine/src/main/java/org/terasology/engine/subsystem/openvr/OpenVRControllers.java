@@ -72,69 +72,70 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
         return OpenVRUtil.switchedDown(buttonIndex, cachedStateBefore.ulButtonPressed, cachedStateAfter.ulButtonPressed);
     }
 
-    private void addAction(int controllerButton, ButtonState buttonState, float axisValue) {
-        queuedActions.add(new ControllerAction(InputType.CONTROLLER_BUTTON.getInput(controllerButton),
+    private void addAxisAction(int controllerButton, ButtonState buttonState, float axisValue) {
+        queuedActions.add(new ControllerAction(InputType.CONTROLLER_AXIS.getInput(controllerButton),
                     "OpenVR", buttonState, axisValue));
     }
 
-    private void addAction(int controllerButton, ButtonState buttonState) {
-        addAction(controllerButton, buttonState, 1.0f);
+    private void addButtonAction(int controllerButton, ButtonState buttonState) {
+        queuedActions.add(new ControllerAction(InputType.CONTROLLER_BUTTON.getInput(controllerButton),
+                "OpenVR", buttonState, 1.0f));
     }
 
     private void handleController0() {
         if (switchedUp(ControllerListener.BUTTON_TRIGGER)) {
-            addAction(ControllerId.ZERO, ButtonState.UP);
+            addButtonAction(ControllerId.ZERO, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_TRIGGER)) {
-            addAction(ControllerId.ZERO, ButtonState.DOWN);
+            addButtonAction(ControllerId.ZERO, ButtonState.DOWN);
         } else if (switchedUp(ControllerListener.BUTTON_GRIP)) {
-            addAction(ControllerId.ONE, ButtonState.UP);
+            addButtonAction(ControllerId.ONE, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_GRIP)) {
-            addAction(ControllerId.ONE, ButtonState.DOWN);
+            addButtonAction(ControllerId.ONE, ButtonState.DOWN);
         } else if (switchedUp(ControllerListener.BUTTON_APP_MENU)) {
-            addAction(ControllerId.TWO, ButtonState.UP);
+            addButtonAction(ControllerId.TWO, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_APP_MENU)) {
-            addAction(ControllerId.TWO, ButtonState.DOWN);
+            addButtonAction(ControllerId.TWO, ButtonState.DOWN);
         } else if (switchedDown(ControllerListener.BUTTON_TOUCHPAD)) {
-            addAction(ControllerId.X_AXIS, ButtonState.DOWN, -cachedStateAfter.rAxis[0].x);
-            addAction(ControllerId.Y_AXIS, ButtonState.DOWN, cachedStateAfter.rAxis[0].y);
+            addAxisAction(ControllerId.X_AXIS, ButtonState.DOWN, -cachedStateAfter.rAxis[0].x);
+            addAxisAction(ControllerId.Y_AXIS, ButtonState.DOWN, cachedStateAfter.rAxis[0].y);
         } else if (switchedUp(ControllerListener.BUTTON_TOUCHPAD)) {
-            addAction(ControllerId.X_AXIS, ButtonState.UP, 0.0f);
-            addAction(ControllerId.Y_AXIS, ButtonState.UP, 0.0f);
+            addAxisAction(ControllerId.X_AXIS, ButtonState.UP, 0.0f);
+            addAxisAction(ControllerId.Y_AXIS, ButtonState.UP, 0.0f);
         }
     }
 
     private void handleController1() {
         if (switchedUp(ControllerListener.BUTTON_TRIGGER)) {
-            addAction(ControllerId.THREE, ButtonState.UP);
+            addButtonAction(ControllerId.THREE, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_TRIGGER)) {
-            addAction(ControllerId.THREE, ButtonState.DOWN);
+            addButtonAction(ControllerId.THREE, ButtonState.DOWN);
         } else if (switchedUp(ControllerListener.BUTTON_GRIP)) {
-            addAction(ControllerId.FOUR, ButtonState.UP);
+            addButtonAction(ControllerId.FOUR, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_GRIP)) {
-            addAction(ControllerId.FOUR, ButtonState.DOWN);
+            addButtonAction(ControllerId.FOUR, ButtonState.DOWN);
         } else if (switchedUp(ControllerListener.BUTTON_APP_MENU)) {
-            addAction(ControllerId.FIVE, ButtonState.UP);
+            addButtonAction(ControllerId.FIVE, ButtonState.UP);
         } else if (switchedDown(ControllerListener.BUTTON_APP_MENU)) {
-            addAction(ControllerId.FIVE, ButtonState.DOWN);
+            addButtonAction(ControllerId.FIVE, ButtonState.DOWN);
         } else if (switchedDown(ControllerListener.BUTTON_TOUCHPAD)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.SIX, ButtonState.DOWN);
+                addButtonAction(ControllerId.SIX, ButtonState.DOWN);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.SEVEN, ButtonState.DOWN);
+                addButtonAction(ControllerId.SEVEN, ButtonState.DOWN);
             } else if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.EIGHT, ButtonState.DOWN);
+                addButtonAction(ControllerId.EIGHT, ButtonState.DOWN);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y > 0) {
-                addAction(ControllerId.NINE, ButtonState.DOWN);
+                addButtonAction(ControllerId.NINE, ButtonState.DOWN);
             }
         } else if (switchedUp(ControllerListener.BUTTON_TOUCHPAD)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.SIX, ButtonState.UP);
+                addButtonAction(ControllerId.SIX, ButtonState.UP);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.SEVEN, ButtonState.UP);
+                addButtonAction(ControllerId.SEVEN, ButtonState.UP);
             } else if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
-                addAction(ControllerId.EIGHT, ButtonState.UP);
+                addButtonAction(ControllerId.EIGHT, ButtonState.UP);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y > 0) {
-                addAction(ControllerId.NINE, ButtonState.UP);
+                addButtonAction(ControllerId.NINE, ButtonState.UP);
             }
         }
     }
