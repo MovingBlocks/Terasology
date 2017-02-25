@@ -181,8 +181,7 @@ public final class WorldRendererImpl implements WorldRenderer {
                 * such that the ground plane of the rendering system and the ground plane of the room the VR user is
                 * in match.
                  */
-                //
-                vrProvider.getState().setGroundPlaneYOffset(-0.80f - context.get(Config.class).getPlayer().getEyeHeight());
+                vrProvider.getState().setGroundPlaneYOffset(-context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());

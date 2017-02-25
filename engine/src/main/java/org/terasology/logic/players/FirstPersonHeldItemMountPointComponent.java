@@ -52,7 +52,7 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
     );
 
     /**
-     * Sometimes, a tracking system (i.e. for room-scale VR) provides a pose for the player hand position. In this
+     * Sometimes, a tracking system (i.e. for room-scale VR) provides a pose for this mount point. In this
      * case, special handling is necessary, and this accessor gives a way to check.
      * @return true if this class is receiving tracking updates, false if not.
      */

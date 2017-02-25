@@ -19,7 +19,6 @@ import jopenvr.JOpenVRLibrary;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.tasks.BindFBOTask;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
@@ -28,6 +27,9 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.*;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -127,6 +129,6 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         // we bind the default FBO here at the end.  This is a bit brittle
         // because it assumes that FBO 0 is bound before this node is run.
         // TODO: break this node into two different nodes that use addDesiredStateChange(BindFBO...))
-        new BindFBOTask(0,DEFAULT_FRAME_BUFFER_URN).execute();
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 }

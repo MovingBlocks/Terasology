@@ -60,7 +60,7 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
 
     /**
      * Get the position of the block that is currently targeted.
-     * @return the position of the block, a vector.
+     * @return the position of the block, as a Vector3i
      */
     public Vector3i getTargetBlockPosition() {
         return targetSystem.getTargetBlockPosition();

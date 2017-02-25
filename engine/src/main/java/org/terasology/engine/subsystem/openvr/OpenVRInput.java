@@ -29,7 +29,7 @@ public class OpenVRInput implements EngineSubsystem {
 
     private OpenVRProvider vrProvider;
 
-    private OpenVRControllers controllerDevice = new OpenVRControllers();
+    private OpenVRControllers controllerDevice;
 
     /**
      * Get the name of this subsystem.
@@ -75,6 +75,7 @@ public class OpenVRInput implements EngineSubsystem {
         }
 
         vrProvider.getState().addControllerListener(controllerDevice);
+        controllerDevice = new OpenVRControllers();
         inputSystem.setControllerDevice(controllerDevice);
     }
 
