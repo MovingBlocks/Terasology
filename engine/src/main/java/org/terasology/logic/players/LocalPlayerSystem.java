@@ -162,8 +162,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Quat4f viewRot;
         switch (characterMovementComponent.mode) {
             case WALKING:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
-                playerCamera.requestSetOrientation(viewRot);
+                if (!playerCamera.isTracked()) {
+                    viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    playerCamera.setOrientation(viewRot);
+                }
                 playerCamera.getOrientation().rotate(relMove, relMove);
                 break;
             case CLIMBING:
@@ -171,8 +173,10 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 relMove.y += relativeMovement.y;
                 break;
             default:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
-                playerCamera.requestSetOrientation(viewRot);
+                if (playerCamera.isTracked()) {
+                    viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    playerCamera.setOrientation(viewRot);
+                }
                 playerCamera.getOrientation().rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;

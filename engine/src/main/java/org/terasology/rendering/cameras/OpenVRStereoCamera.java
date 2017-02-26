@@ -249,9 +249,7 @@ public class OpenVRStereoCamera extends Camera {
         // set camera orientation
         Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
         Quaternionf quaternion = new Quaternionf(vecQuaternion.x,vecQuaternion.y,vecQuaternion.z,vecQuaternion.w);
-        Quat4f quaternionTerasology = new Quat4f(quaternion.x,quaternion.y,quaternion.z,quaternion.w);
-        viewingDirection = quaternionTerasology.getAxis();
-        viewingAngle = quaternionTerasology.getAngle();
+        setOrientation(new Quat4f(quaternion.x,quaternion.y,quaternion.z,quaternion.w));
 
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
@@ -309,11 +307,11 @@ public class OpenVRStereoCamera extends Camera {
     }
 
     /**
-     * In this specific case, we do not allow the orientation be set, because only the player is allowed to do
-     * that by moving his/her head.
-     * @param orientation - ignored
+     * OpenVR provides external tracking information.
+     * @return true
      */
     @Override
-    public void requestSetOrientation(Quat4f orientation) {
+    public boolean isTracked() {
+        return true;
     }
 }

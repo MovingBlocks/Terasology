@@ -215,10 +215,10 @@ public abstract class Camera {
     }
 
     /**
-     Try to set the viewing direction. * Some cameras might be immovable, such as a VR camera, thus "request."
+     Try to set the viewing direction.
      * @param direction
      */
-    public void requestSetOrientation(Quat4f direction) {
+    public void setOrientation(Quat4f direction) {
         viewingDirection = direction.getAxis();
         viewingAngle = direction.getAngle();
     }
@@ -253,5 +253,13 @@ public abstract class Camera {
 
     public boolean hasInSight(AABB aabb) {
         return viewFrustum.intersects(aabb);
+    }
+
+    /**
+     * Used to determine whether a camera is tracked by some external tracking system. Used for VR/AR devices.
+     * @return true if the camera is tracked by an external system, false if it isn't.
+     */
+    public boolean isTracked() {
+        return false;
     }
 }
