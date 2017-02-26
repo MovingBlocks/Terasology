@@ -64,11 +64,11 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
         return result;
     }
 
-    private boolean switchedUp(long buttonIndex) {
+    private boolean buttonUp(long buttonIndex) {
         return OpenVRUtil.switchedUp(buttonIndex, cachedStateBefore.ulButtonPressed, cachedStateAfter.ulButtonPressed);
     }
 
-    private boolean switchedDown(long buttonIndex) {
+    private boolean buttonDown(long buttonIndex) {
         return OpenVRUtil.switchedDown(buttonIndex, cachedStateBefore.ulButtonPressed, cachedStateAfter.ulButtonPressed);
     }
 
@@ -83,41 +83,41 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
     }
 
     private void handleController0() {
-        if (switchedUp(ControllerListener.BUTTON_TRIGGER)) {
+        if (buttonUp(ControllerListener.BUTTON_TRIGGER)) {
             addButtonAction(ControllerId.ZERO, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_TRIGGER)) {
+        } else if (buttonDown(ControllerListener.BUTTON_TRIGGER)) {
             addButtonAction(ControllerId.ZERO, ButtonState.DOWN);
-        } else if (switchedUp(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonUp(ControllerListener.BUTTON_GRIP)) {
             addButtonAction(ControllerId.ONE, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonDown(ControllerListener.BUTTON_GRIP)) {
             addButtonAction(ControllerId.ONE, ButtonState.DOWN);
-        } else if (switchedUp(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonUp(ControllerListener.BUTTON_APP_MENU)) {
             addButtonAction(ControllerId.TWO, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonDown(ControllerListener.BUTTON_APP_MENU)) {
             addButtonAction(ControllerId.TWO, ButtonState.DOWN);
-        } else if (switchedDown(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonDown(ControllerListener.BUTTON_TOUCHPAD)) {
             addAxisAction(ControllerId.X_AXIS, ButtonState.DOWN, -cachedStateAfter.rAxis[0].x);
             addAxisAction(ControllerId.Y_AXIS, ButtonState.DOWN, cachedStateAfter.rAxis[0].y);
-        } else if (switchedUp(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonUp(ControllerListener.BUTTON_TOUCHPAD)) {
             addAxisAction(ControllerId.X_AXIS, ButtonState.UP, 0.0f);
             addAxisAction(ControllerId.Y_AXIS, ButtonState.UP, 0.0f);
         }
     }
 
     private void handleController1() {
-        if (switchedUp(ControllerListener.BUTTON_TRIGGER)) {
+        if (buttonUp(ControllerListener.BUTTON_TRIGGER)) {
             addButtonAction(ControllerId.THREE, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_TRIGGER)) {
+        } else if (buttonDown(ControllerListener.BUTTON_TRIGGER)) {
             addButtonAction(ControllerId.THREE, ButtonState.DOWN);
-        } else if (switchedUp(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonUp(ControllerListener.BUTTON_GRIP)) {
             addButtonAction(ControllerId.FOUR, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonDown(ControllerListener.BUTTON_GRIP)) {
             addButtonAction(ControllerId.FOUR, ButtonState.DOWN);
-        } else if (switchedUp(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonUp(ControllerListener.BUTTON_APP_MENU)) {
             addButtonAction(ControllerId.FIVE, ButtonState.UP);
-        } else if (switchedDown(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonDown(ControllerListener.BUTTON_APP_MENU)) {
             addButtonAction(ControllerId.FIVE, ButtonState.DOWN);
-        } else if (switchedDown(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonDown(ControllerListener.BUTTON_TOUCHPAD)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
                 addButtonAction(ControllerId.SIX, ButtonState.DOWN);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
@@ -127,7 +127,7 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y > 0) {
                 addButtonAction(ControllerId.NINE, ButtonState.DOWN);
             }
-        } else if (switchedUp(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonUp(ControllerListener.BUTTON_TOUCHPAD)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
                 addButtonAction(ControllerId.SIX, ButtonState.UP);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
