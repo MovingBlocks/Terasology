@@ -150,8 +150,6 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
     public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex) {
         cachedStateBefore = stateBefore;
         cachedStateAfter = stateAfter;
-        queuedActions.add(new ControllerAction(InputType.CONTROLLER_BUTTON.getInput(ControllerId.X_AXIS),
-                "OpenVR", ButtonState.DOWN, 1.0f));
         if (handIndex == 0) {
             handleController0();
         } else {
