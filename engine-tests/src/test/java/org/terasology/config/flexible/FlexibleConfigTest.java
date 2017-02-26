@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.terasology.config.flexible.validators.RangedNumberValidator;
 import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.*;
@@ -41,17 +40,18 @@ public class FlexibleConfigTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.add(new SettingImpl<>(id1, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            Setting<Integer> expectedSetting1 = new MockSetting<>(id1);
+            config.add(expectedSetting1);
 
-            config.add(new SettingImpl<>(id2, 25d,
-                    new RangedNumberValidator<>(0d, 100d, false, false)));
+            Setting<Double> expectedSetting2 = new MockSetting<>(id2);
+            config.add(expectedSetting2);
 
-            Setting<Integer> setting1 = config.get(id1);
-            Setting<Double> setting2 = config.get(id2);
+            Setting<Integer> retrievedSetting1 = config.get(id1);
+            Setting<Double> retrievedSetting2 = config.get(id2);
 
-            assertEquals(50, setting1.getValue().intValue());
-            assertEquals(25d, setting2.getValue(), 0.00001d);
+            // We need the references to be equal
+            assertEquals(expectedSetting1, retrievedSetting1);
+            assertEquals(expectedSetting2, retrievedSetting2);
         }
     }
 
@@ -67,8 +67,7 @@ public class FlexibleConfigTest {
         public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            config.add(new MockSetting<Integer>(id));
 
             assertTrue(config.contains(id));
         }
@@ -77,8 +76,7 @@ public class FlexibleConfigTest {
         public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            config.add(new MockSetting<Integer>(id));
 
             assertFalse(config.contains(KEY_NON_EXISTENT));
         }
@@ -96,19 +94,16 @@ public class FlexibleConfigTest {
         public void testAdd() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            assertNotNull(config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false))));
+            assertTrue(config.add(new MockSetting(id)));
         }
 
         @Test
         public void testAddExisting() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            assertTrue(config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false))));
+            assertTrue(config.add(new MockSetting<Integer>(id)));
 
-            assertFalse(config.add(new SettingImpl<>(id, 5d,
-                    new RangedNumberValidator<>(1d, 100d, false, false))));
+            assertFalse(config.add(new MockSetting<Double>(id)));
         }
     }
 
@@ -125,11 +120,9 @@ public class FlexibleConfigTest {
             SimpleUri id1 = new SimpleUri("engine-tests:TestSetting1");
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
-            config.add(new SettingImpl<>(id1, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            config.add(new MockSetting(id1));
 
-            config.add(new SettingImpl<>(id2, 25d,
-                    new RangedNumberValidator<>(0d, 100d, false, false)));
+            config.add(new MockSetting(id2));
 
             assertTrue(config.remove(id1));
             assertTrue(config.remove(id2));
@@ -139,8 +132,7 @@ public class FlexibleConfigTest {
         public void testNonexistentRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            config.add(new MockSetting(id));
 
             assertFalse(config.remove(KEY_NON_EXISTENT));
         }
@@ -149,10 +141,9 @@ public class FlexibleConfigTest {
         public void testSubscribedRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
-            config.add(new SettingImpl<>(id, 50,
-                    new RangedNumberValidator<>(0, 100, false, false)));
+            Setting setting = new MockSetting(id);
 
-            Setting<Integer> setting = config.get(id);
+            config.add(setting);
 
             setting.subscribe(propertyChangeEvent -> {
             });
