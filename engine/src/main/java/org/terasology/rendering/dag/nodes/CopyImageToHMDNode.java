@@ -109,12 +109,14 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
             case LEFT_EYE:
                 vrProvider.updateState();
                 leftEye.bind();
+                // TODO: test if we still need to clear() here
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad();
                 break;
 
             case RIGHT_EYE:
                 rightEye.bind();
+                // TODO: test if we still need to clear() here
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad();
                 vrProvider.submitFrame();
