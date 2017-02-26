@@ -18,18 +18,19 @@ package org.terasology.config.flexible;
 import org.terasology.engine.SimpleUri;
 
 /**
- * Stores multiple potentially related {@link Setting} instances that can be retrieved using their id.
+ * Stores multiple {@link Setting} instances that can be retrieved using their id.
  */
 public interface FlexibleConfig {
     /**
-     * Adds a {@link Setting} to the config if the id of the {@link Setting} is valid.
+     * Adds a {@link Setting} to the config. In case of failure warnings will be issued through the logger
+     * detailing the exact nature of the failure.
      * @param setting The {@link Setting} to add.
      * @return True if the {@link Setting} was added, false otherwise.
      */
     boolean add(Setting setting);
 
     /**
-     * Returns a {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not
+     * Returns the {@link Setting<V>} with the given id. Null is returned if a setting with the given id does not
      * exist in the config.
      * @param id The id of the {@link Setting} to retrieve.
      * @param <V> The type of the value the retrieved {@link Setting} must contain.
@@ -41,8 +42,9 @@ public interface FlexibleConfig {
     <V> Setting<V> get(SimpleUri id);
 
     /**
-     * Removes a {@link Setting} with the given id from the config only if the id exists in the config and if the
-     * {@link Setting} does not have any subscribers.
+     * Removes the {@link Setting} with the given id if it exists in the config and if the {@link Setting} does
+     * not have any subscribers. In case of failure warnings will be issued through the logger detailing the
+     * exact nature of the failure.
      * @param id The id of the {@link Setting} to remove.
      * @return True if the {@link Setting} was removed, false otherwise.
      */
