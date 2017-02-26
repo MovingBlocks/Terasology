@@ -107,7 +107,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> ext
      * {@inheritDoc}
      */
     @Override
-    public void issueWarnings(T value) {
+    protected void issueWarnings(T value) {
         LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
                 min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
     }
