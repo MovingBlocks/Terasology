@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
+ * PingStockComponent stock the ping information of one user.
+ * <p>
+ * Might be used to stock ping information and display it in future.
  */
-public class ClientComponent implements Component {
-    public boolean local;
+public class PingStockComponent implements Component {
 
-    @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
+    // For now this component just stock one value
+    public long pingValue;
 
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
-
-    public EntityRef camera = EntityRef.NULL;
+    public PingStockComponent(long pingValue) {
+        this.pingValue = pingValue;
+    }
 }

@@ -15,18 +15,18 @@
  */
 package org.terasology.network;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.delay.DelayManager;
-import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
-import org.terasology.network.events.ConnectedEvent;
-import org.terasology.network.events.DisconnectedEvent;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.network.events.DeactivatePingClientEvent;
+import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
+import org.terasology.network.events.PingValueEvent;
 import org.terasology.registry.In;
 
 import java.time.Duration;
@@ -34,73 +34,66 @@ import java.time.Instant;
 import java.util.HashMap;
 
 /**
- * This system implement the server ping to all clients (include server local player).
- * It add a periodic action, which is ping from the server to a client, when the client is connected. Then the client will respond.
+ * This system implement the server ping to clients on need base.
+ * It runs on the server, pings to all clients who subscribe this function.
  */
-@RegisterSystem
-public class ServerPingSystem extends BaseComponentSystem implements Component{
+@RegisterSystem (RegisterMode.AUTHORITY)
+public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem{
 
-    private static final String PING_ACTION_ID = "PING_ACTION";
-
-    @In
-    private NetworkSystem networkSystem;
+    private static final long pingPeriod = 10000;
 
     @In
     private EntityManager entityManager;
-
-    @In
-    private DelayManager delayManager;
 
     private HashMap<EntityRef, Instant> startMap = new HashMap<>();
 
     private HashMap<EntityRef, Instant> endMap = new HashMap<>();
 
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onConnect(ConnectedEvent event, EntityRef entity) {
-        if(networkSystem.getMode().isServer()) {
-                delayManager.addPeriodicAction(entity, PING_ACTION_ID, 10000, 10000);
+    private HashMap<EntityRef, Long> pingMap = new HashMap<>();
+
+    private Instant lastPingTime;
+
+    @Override
+    public void initialise() {
+        lastPingTime = Instant.now();
+    }
+
+    @Override
+    public void update(float delta) {
+        long time = Duration.between(lastPingTime, Instant.now()).toMillis();
+        if (time > pingPeriod) {
+            Iterable<EntityRef>  clients = entityManager.getEntitiesWith(PingSubscriberComponent.class);
+            for (EntityRef client : clients) {
+                Instant start = Instant.now();
+                startMap.put(client, start);
+                client.send(new PingFromServerEvent());
+            }
+            lastPingTime = Instant.now();
         }
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onDisconnect(DisconnectedEvent event, EntityRef entity) {
-        if (networkSystem.getMode().isServer()) {
-            delayManager.cancelPeriodicAction(entity, PING_ACTION_ID);
-        }
-    }
+    public void onPingFromClient(PingFromClientEvent event, EntityRef entity) {
+        Instant end = Instant.now();
+        endMap.put(entity, end);
+        updatePing(entity);
 
-    @ReceiveEvent
-    public void onPingAction(PeriodicActionTriggeredEvent event, EntityRef entity) {
-        if (event.getActionId().equals(PING_ACTION_ID)) {
-            Instant start = Instant.now();
-            startMap.put(entity, start);
-            entity.send(new PingFromServerEvent());
-        }
-    }
+        entity.send(new PingValueEvent(pingMap.get(entity)));
 
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onPingFromServer(PingFromServerEvent event, EntityRef entity){
-        ClientComponent client = entity.getComponent(ClientComponent.class);
-        if (client.local) {
-            entity.send(new PingFromClientEvent());
-        }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onPingFromClient(PingFromClientEvent event, EntityRef entity){
-        if (networkSystem.getMode().isServer()) {
-            Instant end = Instant.now();
-            endMap.put(entity, end);
-            updatePing(entity);
-        }
     }
 
     private void updatePing(EntityRef entity) {
         if(startMap.containsKey(entity) && endMap.containsKey(entity)) {
-            ClientComponent clientComp = entity.getComponent(ClientComponent.class);
             long pingTime = Duration.between(startMap.get(entity), endMap.get(entity)).toMillis();
-            clientComp.ping = String.valueOf(pingTime) + "ms";
-            entity.saveComponent(clientComp);
+            pingMap.put(entity, pingTime);
         }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDeactivatePing(DeactivatePingServerEvent event, EntityRef entity) {
+        startMap.remove(entity);
+        endMap.remove(entity);
+        pingMap.remove(entity);
+        entity.send(new DeactivatePingClientEvent());
     }
 }

@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.network.events;
 
-package org.terasology.network;
-
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.OwnerEvent;
 
 /**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
+ * PingValueEvent which is from the server to the client, contains the ping value of this client.
  */
-public class ClientComponent implements Component {
-    public boolean local;
+@OwnerEvent
+public class PingValueEvent implements Event {
 
-    @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
+    private long pingValue;
 
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
+    protected PingValueEvent() {
+    }
 
-    public EntityRef camera = EntityRef.NULL;
+    public PingValueEvent(long pingValue) {
+        this.pingValue = pingValue;
+    }
+
+    public long getPingValue() {
+        return pingValue;
+    }
 }

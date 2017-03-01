@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.HashMap;
+
 /**
- * The component that marks an entity as being a Client Entity (essentially, a player) and ties them to a
- * client info entity (for replicated information) and character entity (their body).
- *
+ * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.
+ * <p>
+ * It can be used to stock the ping information of users in future.
  */
-public class ClientComponent implements Component {
-    public boolean local;
-
-    @Replicate
-    public EntityRef clientInfo = EntityRef.NULL;
-
-    @Replicate
-    public EntityRef character = EntityRef.NULL;
-
-    public EntityRef camera = EntityRef.NULL;
+public class PingSubscriberComponent implements Component {
 }
