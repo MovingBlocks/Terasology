@@ -174,7 +174,17 @@ Contributors
  [eviltak](https://github.com/eviltak),
  [iojw](https://github.com/iojw),
  [Setako](https://github.com/Setako), 
- [TheJYKoder](https://github.com/TheJYKoder)
+ [TheJYKoder](https://github.com/TheJYKoder),
+ [smsunarto](https://github.com/smsunarto),
+ [SufurElite](https://github.com/SufurElite),
+ [mjuvekar7](https://github.com/mjuvekar7),
+ [gkaretka](https://github.com/gkaretka),
+ [jellysnake](https://github.com/jellysnake),
+ [kcirtaptrick](https://github.com/kcirtaptrick),
+ [TimVerhaegen](https://github.com/TimVerhaegen),
+ [ron-popov](https://github.com/ron-popov),
+ [madmate](https://github.com/madmate),
+ [J0hnCena](https://github.com/J0hnCena)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
