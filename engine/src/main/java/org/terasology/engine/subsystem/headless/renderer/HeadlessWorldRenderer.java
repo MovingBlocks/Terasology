@@ -17,6 +17,7 @@ package org.terasology.engine.subsystem.headless.renderer;
 
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.Region3i;
@@ -175,12 +176,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public boolean isHeadUnderWater() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public float getMillisecondsSinceRenderingStart() {
         // TODO Auto-generated method stub
         return 0;
@@ -299,5 +294,16 @@ public class HeadlessWorldRenderer implements WorldRenderer {
             return distance2 > distance ? -1 : 1;
         }
     }
+
+	@Override
+	public RenderingConfig getRenderingConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public WorldProvider getWorldProvider() {
+		return worldProvider;
+	}
 
 }

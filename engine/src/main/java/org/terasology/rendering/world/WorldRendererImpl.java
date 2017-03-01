@@ -35,7 +35,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -556,22 +555,14 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void setViewDistance(ViewDistance viewDistance) {
         renderableWorld.updateChunksInProximity(viewDistance);
     }
-
+    
     @Override
-    public boolean isHeadUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
-
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
+    public RenderingConfig getRenderingConfig(){
+    	return renderingConfig;
+    }
+    @Override
+    public WorldProvider getWorldProvider(){
+    	return worldProvider;
     }
 
     @Override

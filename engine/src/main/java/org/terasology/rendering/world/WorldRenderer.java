@@ -15,11 +15,13 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
+import org.terasology.world.WorldProvider;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -189,17 +191,20 @@ public interface WorldRenderer {
      * @return a float value representing the time-smoothed light intensity of the main light at the camera's coordinates
      */
     float getTimeSmoothedMainLightIntensity();
-
+    
     /**
-     * Returns True if the head of the player is underwater. False otherwise.
-     *
-     * Implementations must take in account waves if present.
-     *
-     * @return True if the head of the player is underwater. False otherwise.
+     * Returns the rendering configuration for the current/new world
+     * 
+     * @return the world rendering configuration
      */
-    // TODO: while useful to the renderer, this should probably be moved somewhere closer
-    // TODO: to the camera-handling classes and perhaps renamed isCameraUnderWater()
-    boolean isHeadUnderWater();
+    public RenderingConfig getRenderingConfig();
+    /**
+     * Returns the provider for the current/new world
+     * 
+     * @return the world provider
+     */
+    
+    public WorldProvider getWorldProvider();
 
     /**
      * Returns the current tick, an always progressing time value animations are based on.
