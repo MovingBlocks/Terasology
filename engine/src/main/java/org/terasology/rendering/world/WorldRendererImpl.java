@@ -35,6 +35,7 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -132,7 +133,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
     private int statRenderedTriangles;
-
+    
     private final RenderingConfig renderingConfig;
 
     private RenderTaskListGenerator renderTaskListGenerator;
@@ -163,8 +164,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
+        InjectionHelper.inject(this.worldProvider);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
+        InjectionHelper.inject(this.renderingConfig);
         this.shaderManager = context.get(ShaderManager.class);
         vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
@@ -184,15 +187,17 @@ public final class WorldRendererImpl implements WorldRenderer {
             playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
             currentRenderingStage = RenderingStage.MONO;
         }
-
+        playerCamera.setRenderingConfig(renderingConfig);
+        playerCamera.setWorldProvider(worldProvider);
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
-        renderQueues = renderableWorld.getRenderQueues();
-
+        renderQueues = renderableWorld.getRenderQueues(); 
+        
         initRenderingSupport();
+        
     }
 
     private void initRenderingSupport() {
