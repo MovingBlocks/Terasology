@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,15 +94,28 @@ public class ChatSystem extends BaseComponentSystem {
             shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
-            @CommandParam(value = "message") String message
+            @CommandParam(value = "message") String[] message
     ) {
-        logger.debug("Received chat message from {} : '{}'", sender, message);
+        String messageToString = join(message, " ");
+
+        logger.debug("Received chat message from {} : '{}'", sender, messageToString);
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(new ChatMessageEvent(message, sender.getComponent(ClientComponent.class).clientInfo));
+            client.send(new ChatMessageEvent(messageToString, sender.getComponent(ClientComponent.class).clientInfo));
         }
 
         return "Message sent.";
+    }
+
+    private String join(String[] strings, String cement) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : strings) {
+            stringBuilder.append(s);
+            stringBuilder.append(cement);
+        }
+        stringBuilder.delete(stringBuilder.length() - cement.length(), stringBuilder.length());
+
+        return stringBuilder.toString();
     }
 
     @Command(runOnServer = true,
@@ -111,8 +124,10 @@ public class ChatSystem extends BaseComponentSystem {
     public String whisper(
             @Sender EntityRef sender,
             @CommandParam(value = "user", suggester = OnlineUsernameSuggester.class) String username,
-            @CommandParam("message") String message
+            @CommandParam("message") String[] message
     ) {
+        String messageToString = join(message, " ");
+
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
         boolean unique = true;
@@ -164,9 +179,9 @@ public class ChatSystem extends BaseComponentSystem {
         ClientComponent targetClientComponent = targetClient.getComponent(ClientComponent.class);
         DisplayNameComponent targetDisplayNameComponent = targetClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
         String targetMessage = FontColor.getColored("*whispering* ", ConsoleColors.ERROR)
-                + FontColor.getColored(message, ConsoleColors.CHAT);
+                + FontColor.getColored(messageToString, ConsoleColors.CHAT);
         String senderMessage = "You -> " + targetDisplayNameComponent.name
-                + ": " + FontColor.getColored(message, ConsoleColors.CHAT);
+                + ": " + FontColor.getColored(messageToString, ConsoleColors.CHAT);
 
         targetClient.send(new ChatMessageEvent(targetMessage, senderClientComponent.clientInfo));
 
