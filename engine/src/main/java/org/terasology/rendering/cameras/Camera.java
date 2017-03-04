@@ -260,8 +260,6 @@ public abstract class Camera {
      *
      * Implementations must take in account waves if present.
      *
-     * @param World Rendering Configuration and the World Provider
-     *
      * @return True if the head of the player is underwater. False otherwise.
      */    
     public boolean isUnderWater() {
