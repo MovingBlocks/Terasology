@@ -78,9 +78,16 @@ public abstract class Camera {
     private float reflectionHeight = 32;
     
     /* Used for Underwater Checks */
-    // TODO: Get these variables using injection
     private WorldProvider worldProvider;
     private RenderingConfig renderingConfig;
+    
+    public Camera(){
+    }
+    
+    public Camera(WorldProvider worldProvider, RenderingConfig renderingConfig){
+    	this.worldProvider = worldProvider;
+    	this.renderingConfig = renderingConfig;
+    }
 
     /**
      * Applies the projection and modelview matrix.
@@ -248,17 +255,12 @@ public abstract class Camera {
         return viewFrustum.intersects(aabb);
     }
     
-    public void setRenderingConfig(RenderingConfig renderingConfig){
-    	this.renderingConfig = renderingConfig;
-    }
-    public void setWorldProvider(WorldProvider worldProvider){
-    	this.worldProvider = worldProvider;
-    }
-    
     /**
      * Returns True if the head of the player is underwater. False otherwise.
      *
      * Implementations must take in account waves if present.
+     *
+     * @param World Rendering Configuration and the World Provider
      *
      * @return True if the head of the player is underwater. False otherwise.
      */    
@@ -266,7 +268,7 @@ public abstract class Camera {
         // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
         // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
         Vector3f cameraPosition = new Vector3f(this.getPosition());
- 
+
         // Compensate for waves
         if (renderingConfig.isAnimateWater()) {
             cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());

@@ -17,11 +17,13 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
+import org.terasology.world.WorldProvider;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -49,7 +51,8 @@ public class PerspectiveCamera extends Camera {
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(PerspectiveCameraSettings cameraSettings) {
+    public PerspectiveCamera(PerspectiveCameraSettings cameraSettings, WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    	super(worldProvider, renderingConfig);
         this.cameraSettings = cameraSettings;
     }
 

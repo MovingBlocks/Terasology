@@ -15,13 +15,11 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.config.RenderingConfig;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
-import org.terasology.world.WorldProvider;
 
 /**
  * Implementations of this class are responsible for rendering the whole 3D world,
@@ -191,20 +189,6 @@ public interface WorldRenderer {
      * @return a float value representing the time-smoothed light intensity of the main light at the camera's coordinates
      */
     float getTimeSmoothedMainLightIntensity();
-    
-    /**
-     * Returns the rendering configuration for the current/new world
-     * 
-     * @return the world rendering configuration
-     */
-    public RenderingConfig getRenderingConfig();
-    /**
-     * Returns the provider for the current/new world
-     * 
-     * @return the world provider
-     */
-    
-    public WorldProvider getWorldProvider();
 
     /**
      * Returns the current tick, an always progressing time value animations are based on.

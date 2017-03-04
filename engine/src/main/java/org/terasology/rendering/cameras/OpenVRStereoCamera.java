@@ -17,12 +17,14 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
+import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -60,7 +62,8 @@ public class OpenVRStereoCamera extends Camera {
     private Matrix4f viewTranslationRightEye = new Matrix4f();
     private OpenVRProvider vrProvider;
 
-    public OpenVRStereoCamera(OpenVRProvider provider) {
+    public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    	super(worldProvider, renderingConfig);
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;

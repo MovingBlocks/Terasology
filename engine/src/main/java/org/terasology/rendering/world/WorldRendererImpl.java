@@ -35,7 +35,6 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -133,7 +132,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
     private int statRenderedTriangles;
-    
+
     private final RenderingConfig renderingConfig;
 
     private RenderTaskListGenerator renderTaskListGenerator;
@@ -164,10 +163,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
         this.context = context;
         this.worldProvider = context.get(WorldProvider.class);
-        InjectionHelper.inject(this.worldProvider);
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
-        InjectionHelper.inject(this.renderingConfig);
         this.shaderManager = context.get(ShaderManager.class);
         vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
@@ -177,27 +174,24 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
+                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings(), worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings(), worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
-        playerCamera.setRenderingConfig(renderingConfig);
-        playerCamera.setWorldProvider(worldProvider);
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
 
         renderableWorld = new RenderableWorldImpl(worldProvider, context.get(ChunkProvider.class), bufferPool, playerCamera);
-        renderQueues = renderableWorld.getRenderQueues(); 
-        
+        renderQueues = renderableWorld.getRenderQueues();
+
         initRenderingSupport();
-        
     }
 
     private void initRenderingSupport() {
@@ -559,15 +553,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public void setViewDistance(ViewDistance viewDistance) {
         renderableWorld.updateChunksInProximity(viewDistance);
-    }
-    
-    @Override
-    public RenderingConfig getRenderingConfig(){
-    	return renderingConfig;
-    }
-    @Override
-    public WorldProvider getWorldProvider(){
-    	return worldProvider;
     }
 
     @Override
