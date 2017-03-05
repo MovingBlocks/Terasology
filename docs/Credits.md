@@ -184,7 +184,8 @@ Contributors
  [TimVerhaegen](https://github.com/TimVerhaegen),
  [ron-popov](https://github.com/ron-popov),
  [madmate](https://github.com/madmate),
- [J0hnCena](https://github.com/J0hnCena)
+ [J0hnCena](https://github.com/J0hnCena),
+ [GabrielXia](https://github.com/GabrielXia)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
