@@ -240,8 +240,8 @@ public abstract class Camera {
         return viewFrustum.intersects(aabb);
     }
 
-	public boolean isUnderWater() {
-		return false;
-	}
+    public boolean isUnderWater() {
+	return false;
+    }
     
 }
