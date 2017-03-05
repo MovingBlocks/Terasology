@@ -25,7 +25,7 @@ import org.terasology.entitySystem.Component;
 public class PingStockComponent implements Component {
 
     // For now this component just stock one value
-    public long pingValue;
+    public Long pingValue;
 
     public PingStockComponent(long pingValue) {
         this.pingValue = pingValue;

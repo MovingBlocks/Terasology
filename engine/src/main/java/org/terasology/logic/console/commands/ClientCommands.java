@@ -70,9 +70,9 @@ public class ClientCommands extends BaseComponentSystem {
      * @return       The subscription state
      */
     @Command(runOnServer = true,
-            shortDescription = "Subscribes the ping from server function",
+            shortDescription = "Once activated the ping wil be shown in the top right corner of the debug overlay",
             requiredPermission = PermissionManager.NO_PERMISSION)
-    public String subscribePing(@Sender EntityRef sender) {
+    public String togglePingInDebugScreen(@Sender EntityRef sender) {
         if (sender.getComponent(ClientComponent.class).local) {
             return "You are on server or single player mode, don't need the ping information";
         }
@@ -80,7 +80,7 @@ public class ClientCommands extends BaseComponentSystem {
         if (!sender.hasComponent(PingSubscriberComponent.class)) {
             PingSubscriberComponent pingSubscriberComp = new PingSubscriberComponent();
             sender.addComponent(pingSubscriberComp);
-            return "Ping from server function activated";
+            return "Ping from server function activated, see in the debug overlay";
         }
         else {
             sender.removeComponent(PingSubscriberComponent.class);
