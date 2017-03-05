@@ -11,19 +11,19 @@ public abstract class SubmersibleCamera extends Camera {
     private WorldProvider worldProvider;
     private RenderingConfig renderingConfig;
 
-	public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
-		this.worldProvider = worldProvider;
+    public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
+	this.worldProvider = worldProvider;
     	this.renderingConfig = renderingConfig;
-	}
+    }
 	
-    /**
-     * Returns True if the head of the player is underwater. False otherwise.
-     *
-     * Implementations must take in account waves if present.
-     *
-     * @return True if the head of the player is underwater. False otherwise.
-     */
-	@Override
+   /**
+    * Returns True if the head of the player is underwater. False otherwise.
+    *
+    * Implementations must take in account waves if present.
+    *
+    * @return True if the head of the player is underwater. False otherwise.
+    */
+    @Override
     public boolean isUnderWater() {
         // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
         // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
