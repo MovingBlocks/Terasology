@@ -20,7 +20,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -53,7 +53,7 @@ public class ShaderParametersBase implements ShaderParameters {
             program.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
             program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
 
-            Camera activeCamera = worldRenderer.getActiveCamera();
+            SubmersibleCamera activeCamera = worldRenderer.getActiveCamera();
             if (activeCamera != null) {
                 final Vector3f cameraDir = activeCamera.getViewingDirection();
                 final Vector3f cameraPosition = activeCamera.getPosition();

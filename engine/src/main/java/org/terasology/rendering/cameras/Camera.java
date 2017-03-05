@@ -239,9 +239,5 @@ public abstract class Camera {
     public boolean hasInSight(AABB aabb) {
         return viewFrustum.intersects(aabb);
     }
-
-    public boolean isUnderWater() {
-	return false;
-    }
     
 }

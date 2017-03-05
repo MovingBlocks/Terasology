@@ -19,6 +19,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
@@ -80,9 +81,9 @@ public interface WorldRenderer {
     /**
      * Retrieves the camera the world is being rendered from.
      *
-     * @return a Camera object
+     * @return a SubmersibleCamera object
      */
-    Camera getActiveCamera();
+    SubmersibleCamera getActiveCamera();
 
     /**
      * Retrieves the camera positioned and oriented to look down on the world from the point of view
