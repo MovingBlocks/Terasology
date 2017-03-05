@@ -11,10 +11,10 @@ public abstract class SubmersibleCamera extends Camera {
     private WorldProvider worldProvider;
     private RenderingConfig renderingConfig;
 
-	public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
-		this.worldProvider = worldProvider;
+    public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    	this.worldProvider = worldProvider;
     	this.renderingConfig = renderingConfig;
-	}
+    }
 	
     /**
      * Returns True if the head of the player is underwater. False otherwise.
