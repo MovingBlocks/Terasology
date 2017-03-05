@@ -177,11 +177,11 @@ public final class WorldRendererImpl implements WorldRenderer {
                 playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings(), worldProvider, renderingConfig);
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings(), worldProvider, renderingConfig);
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
         // TODO: won't need localPlayerSystem here once camera is in the ES proper

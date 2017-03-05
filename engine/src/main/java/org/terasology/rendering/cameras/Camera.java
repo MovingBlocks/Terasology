@@ -16,11 +16,8 @@
 package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.math.AABB;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.RenderHelper;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
@@ -76,18 +73,6 @@ public abstract class Camera {
     /* (Water) Reflection */
     private boolean reflected;
     private float reflectionHeight = 32;
-    
-    /* Used for Underwater Checks */
-    private WorldProvider worldProvider;
-    private RenderingConfig renderingConfig;
-    
-    public Camera(){
-    }
-    
-    public Camera(WorldProvider worldProvider, RenderingConfig renderingConfig){
-    	this.worldProvider = worldProvider;
-    	this.renderingConfig = renderingConfig;
-    }
 
     /**
      * Applies the projection and modelview matrix.
@@ -254,28 +239,9 @@ public abstract class Camera {
     public boolean hasInSight(AABB aabb) {
         return viewFrustum.intersects(aabb);
     }
-    
-    /**
-     * Returns True if the head of the player is underwater. False otherwise.
-     *
-     * Implementations must take in account waves if present.
-     *
-     * @return True if the head of the player is underwater. False otherwise.
-     */    
-    public boolean isUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(this.getPosition());
 
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
-    }
+	public boolean isUnderWater() {
+		return false;
+	}
     
 }

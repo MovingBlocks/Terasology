@@ -33,7 +33,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  * Camera which can be used to render stereoscopic images of the scene for VR.
  *
  */
-public class OpenVRStereoCamera extends Camera {
+public class OpenVRStereoCamera extends SubmersibleCamera {
 
     private Matrix4f projectionMatrixLeftEye = new Matrix4f();
     private Matrix4f projectionMatrixRightEye = new Matrix4f();

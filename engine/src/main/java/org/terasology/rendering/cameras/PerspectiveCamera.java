@@ -35,7 +35,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  * Simple default camera.
  *
  */
-public class PerspectiveCamera extends Camera {
+public class PerspectiveCamera extends SubmersibleCamera {
     // Values used for smoothing
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
@@ -51,9 +51,9 @@ public class PerspectiveCamera extends Camera {
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(PerspectiveCameraSettings cameraSettings, WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
     	super(worldProvider, renderingConfig);
-        this.cameraSettings = cameraSettings;
+        this.cameraSettings = renderingConfig.getCameraSettings();
     }
 
     @Override
