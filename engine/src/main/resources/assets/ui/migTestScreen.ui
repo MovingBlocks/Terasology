@@ -246,6 +246,49 @@
             {
                 "type": "UILabel",
                 "id": "",
+                "text": "UITextHint",
+                "layoutInfo": {
+                    "cc": "newline"
+                }
+            },
+            {
+                "type": "UITextHint",
+                "id": "text1",
+                "hintText": "Enter text here",
+                "text": "text1",
+                "layoutInfo": {
+                    "cc": ""
+                },
+                "readOnly": true,
+                "enabled": false
+            },
+            {
+                "type": "UITextHint",
+                "id": "text2",
+                "hintText": "Enter text here",
+                "layoutInfo": {
+                    "cc": "w min, h min"
+                }
+            },
+            {
+                "type": "UITextHint",
+                "id": "text3",
+                "hintText": "Enter text here",
+                "layoutInfo": {
+                    "cc": ""
+                }
+            },
+            {
+                "type": "UITextHint",
+                "id": "text4",
+                "hintText": "Enter text here",
+                "layoutInfo": {
+                    "cc": "grow"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "",
                 "text": "ResettableUIText",
                 "layoutInfo": {
                     "cc": "newline"

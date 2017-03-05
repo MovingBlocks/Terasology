@@ -46,6 +46,7 @@ public class UIStyle {
     private Font font = Assets.getFont("engine:default").get();
     private Color textColor = Color.WHITE;
     private Color textShadowColor = Color.BLACK;
+    private Color hintTextColor = Color.GREY;
     private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
@@ -76,6 +77,7 @@ public class UIStyle {
         this.textColor = other.textColor;
         this.textShadowColor = other.textShadowColor;
         this.textShadowed = other.textShadowed;
+        this.hintTextColor = other.hintTextColor;
         this.textAlignmentH = other.textAlignmentH;
         this.textAlignmentV = other.textAlignmentV;
         this.textUnderlined = other.textUnderlined;
@@ -178,6 +180,17 @@ public class UIStyle {
 
     public void setTextShadowColor(Color textShadowColor) {
         this.textShadowColor = textShadowColor;
+    }
+
+    /**
+    * @return The color of the hint text
+     */
+    public Color getHintTextColor() {
+        return hintTextColor;
+    }
+
+    public void setHintTextColor(Color hintTextColor) {
+        this.hintTextColor = hintTextColor;
     }
 
     /**

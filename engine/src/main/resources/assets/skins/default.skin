@@ -54,6 +54,30 @@
                 }
             }
         },
+        "UITextHint": {
+            "hint-text-color": "C0C0C0FF",
+            "text-align-horizontal": "left",
+            "text-align-vertical": "top",
+            "background": "engine:box",
+            "background-border": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
+            },
+            "margin": {
+                "top": 4,
+                "bottom": 4,
+                "left": 4,
+                "right": 4
+            },
+            "modes": {
+                "disabled": {
+                    "text-color": "888888FF",
+                    "background": "engine:boxDisabled"
+                }
+            }
+        },
         "ResettableUIText": {
             "background": "engine:resetBox",
             "background-border": {
