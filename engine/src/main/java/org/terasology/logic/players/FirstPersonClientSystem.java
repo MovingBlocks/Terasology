@@ -40,8 +40,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
 
-/**
- */
 @RegisterSystem(RegisterMode.CLIENT)
 public class FirstPersonClientSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final int USEANIMATIONLENGTH = 200;

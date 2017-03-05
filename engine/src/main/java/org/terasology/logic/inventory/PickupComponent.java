@@ -20,7 +20,7 @@ import org.terasology.entitySystem.Component;
 
 
 public class PickupComponent implements Component {
-    public long timeToPickUp = 0;
+    public long timeToPickUp;
 
-    public long timeDropped = 0;
+    public long timeDropped;
 }

@@ -70,7 +70,7 @@ public final class EnableStencilTest extends SetStateParameter {
 
     @Override
     public boolean isTheDefaultInstance() {
-        return this == defaultInstance;
+        return this.equals(defaultInstance);
     }
 
 }

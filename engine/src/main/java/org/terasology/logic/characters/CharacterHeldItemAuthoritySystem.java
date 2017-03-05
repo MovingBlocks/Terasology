@@ -28,7 +28,6 @@ public class CharacterHeldItemAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onChangeHeldItemRequest(ChangeHeldItemRequest event, EntityRef character,
                                         CharacterHeldItemComponent characterHeldItemComponent) {
-        EntityRef oldItem = characterHeldItemComponent.selectedItem;
         characterHeldItemComponent.selectedItem = event.getItem();
         character.saveComponent(characterHeldItemComponent);
     }

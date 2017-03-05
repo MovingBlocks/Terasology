@@ -53,6 +53,8 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     @Deprecated
     void closeScreen(UIElement element);
 
+    void closeAllScreens();
+
     void toggleScreen(String screenUri);
 
     void toggleScreen(ResourceUrn screenUri);
@@ -126,4 +128,5 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setForceReleasingMouse(boolean value);
 
     void invalidate();
+
 }

@@ -17,6 +17,7 @@ package org.terasology.rendering.openvrprovider;
 
 import jopenvr.JOpenVRLibrary;
 import jopenvr.VRControllerState_t;
+import org.joml.Matrix4f;
 
 /**
  * Interface intended to be front-facing to user for controller interaction.
@@ -32,6 +33,7 @@ public interface ControllerListener {
     long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
-    void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
+    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
     // TODO: touch, axes
+    public void poseChanged(Matrix4f pose, int handIndex);
 }

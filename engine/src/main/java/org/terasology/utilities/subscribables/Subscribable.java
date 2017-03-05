@@ -15,11 +15,11 @@
  */
 package org.terasology.utilities.subscribables;
 
-import java.beans.PropertyChangeListener;
-
 /**
  * Originally created to provide Observable-like functionality to config classes,
  * it can be used by any class that wishes to be monitored for both general and specific
  * changes to its properties.
  */
-public interface Subscribable extends GeneralSubscribable, SpecificSubscribable {}
+public interface Subscribable extends GeneralSubscribable, SpecificSubscribable {
+
+}

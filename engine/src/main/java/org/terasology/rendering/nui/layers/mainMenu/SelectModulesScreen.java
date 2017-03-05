@@ -618,7 +618,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         private Map<URL, Path> urlToTargetMap;
         private ProgressListener progressListener;
 
-        public MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
+         MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
             this.urlToTargetMap = urlToTargetMap;
             this.progressListener = progressListener;
         }

@@ -28,7 +28,8 @@ import java.nio.file.Paths;
  */
 public final class TerasologyConstants {
     /**
-     * Name and extension of an entities data file. (Not currently in use) Used to contain state data on world entities for loading/saving. See AbstractStorageManager for details.
+     * Name and extension of an entities data file. (Not currently in use) Used to contain state data on world entities
+     * for loading/saving. See AbstractStorageManager for details.
      */
     public static final String ENTITY_DATA_FILE = "entity.dat";
     /**

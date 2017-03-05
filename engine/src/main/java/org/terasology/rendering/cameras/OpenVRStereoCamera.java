@@ -234,10 +234,10 @@ public class OpenVRStereoCamera extends Camera {
     public void updateMatrices(float fov) {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
 
-        org.joml.Matrix4f leftEyeProjection = vrProvider.vrState.getEyeProjectionMatrix(0);
-        org.joml.Matrix4f rightEyeProjection = vrProvider.vrState.getEyeProjectionMatrix(1);
-        org.joml.Matrix4f leftEyePose = vrProvider.vrState.getEyePose(0);
-        org.joml.Matrix4f rightEyePose = vrProvider.vrState.getEyePose(1);
+        org.joml.Matrix4f leftEyeProjection = vrProvider.getState().getEyeProjectionMatrix(0);
+        org.joml.Matrix4f rightEyeProjection = vrProvider.getState().getEyeProjectionMatrix(1);
+        org.joml.Matrix4f leftEyePose = vrProvider.getState().getEyePose(0);
+        org.joml.Matrix4f rightEyePose = vrProvider.getState().getEyePose(1);
         float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
                 + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;

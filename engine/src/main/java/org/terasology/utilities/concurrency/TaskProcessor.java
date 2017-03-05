@@ -33,7 +33,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
     private String name;
     private BlockingQueue<T> queue;
 
-    public TaskProcessor(String name, BlockingQueue<T> taskQueue) {
+     TaskProcessor(String name, BlockingQueue<T> taskQueue) {
         this.queue = taskQueue;
         this.name = name;
     }

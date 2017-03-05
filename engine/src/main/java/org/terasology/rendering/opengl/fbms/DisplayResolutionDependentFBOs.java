@@ -74,24 +74,31 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         return fbo;
     }
 
+    private void updateFullScale() {
+        if (screenGrabber.isNotTakingScreenshot()) {
+            fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
+        } else {
+            fullScale = new FBO.Dimensions(
+                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
+            );
+        }
+
+        fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
+    }
+
     /**
      * Invoked before real-rendering starts
      * TODO: how about completely removing this, and make Display observable and this FBM as an observer
      */
     public void update() {
         updateFullScale();
-        if (get(READ_ONLY_GBUFFER.getName()).dimensions().areDifferentFrom(fullScale)) {
+        if (READ_ONLY_GBUFFER.getFbo().dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
             updateDefaultFBOs();
             notifySubscribers();
         }
-    }
-
-    private void updateDefaultFBOs() {
-        READ_ONLY_GBUFFER.setFbo(fboLookup.get(READ_ONLY_GBUFFER.getName()));
-        WRITE_ONLY_GBUFFER.setFbo(fboLookup.get(WRITE_ONLY_GBUFFER.getName()));
-        FINAL.setFbo(fboLookup.get(FINAL.getName()));
     }
 
     private void disposeAllFBOs() {
@@ -107,17 +114,10 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         }
     }
 
-    private void updateFullScale() {
-        if (screenGrabber.isNotTakingScreenshot()) {
-            fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
-        } else {
-            fullScale = new FBO.Dimensions(
-                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
-            );
-        }
-
-        fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
+    private void updateDefaultFBOs() {
+        READ_ONLY_GBUFFER.setFbo(fboLookup.get(READ_ONLY_GBUFFER.getName()));
+        WRITE_ONLY_GBUFFER.setFbo(fboLookup.get(WRITE_ONLY_GBUFFER.getName()));
+        FINAL.setFbo(fboLookup.get(FINAL.getName()));
     }
 
     // TODO: Pairing FBOs for swapping functionality

@@ -33,6 +33,7 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
@@ -75,6 +76,7 @@ public class DeferredPointLightsNode extends AbstractNode {
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThrough(playerCamera));
 
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
@@ -123,9 +125,7 @@ public class DeferredPointLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
-
-        playerCamera.lookThrough(); // TODO: remove and replace with a state change
-
+        
         READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
         READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
 

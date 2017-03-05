@@ -31,7 +31,7 @@ public enum Roll {
     private float radians;
     private int increments;
 
-    private Roll(byte index, float radians, int increments) {
+     Roll(byte index, float radians, int increments) {
         this.index = index;
         this.radians = radians;
         this.increments = increments;

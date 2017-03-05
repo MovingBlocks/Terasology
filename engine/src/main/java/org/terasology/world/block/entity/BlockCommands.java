@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Contains a series of handy game console commands associated with blocks.
+ */
 @RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands extends BaseComponentSystem {
@@ -110,13 +113,17 @@ public class BlockCommands extends BaseComponentSystem {
         targetSystem = new TargetSystem(blockRegistry, physics);
     }
 
-    @Command(shortDescription = "Lists all available items (prefabs)",
+    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
+            "after the commands, e.g.: \"startsWith engine: core:\" will list all items from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listItems() {
+    public String listItems(@CommandParam(value = "startsWith",  required = false) String[] startsWith) {
 
         List<String> stringItems = Lists.newArrayList();
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
+            if (!uriStartsWithAnyString(prefab.getName(), startsWith)) {
+                continue;
+            }
             stringItems.add(prefab.getName());
         }
 
@@ -133,9 +140,10 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-
-    @Command(shortDescription = "List all available blocks", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listBlocks() {
+    @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
+            "commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String listBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
         stringBuilder.append(Console.NEW_LINE);
@@ -143,6 +151,9 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
+            if (!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
+                continue;
+            }
             stringBuilder.append(blockUri.toString());
             stringBuilder.append(Console.NEW_LINE);
         }
@@ -154,6 +165,9 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> availableBlocks = sortItems(blockExplorer.getAvailableBlockFamilies());
         for (BlockUri blockUri : availableBlocks) {
+            if (!uriStartsWithAnyString(blockUri.toString(), startsWith)) {
+                continue;
+            }
             stringBuilder.append(blockUri.toString());
             stringBuilder.append(Console.NEW_LINE);
         }
@@ -161,9 +175,10 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all available shapes",
+    @Command(shortDescription = "Lists all available shapes\nYou can filter by adding the beginning of words after the" +
+            "commands, e.g.: \"listShapes engine: core:\" will list all shapes from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listShapes() {
+    public String listShapes(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
         stringBuilder.append(Console.NEW_LINE);
@@ -171,6 +186,9 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<ResourceUrn> sortedUris = sortItems(Assets.list(BlockShape.class));
         for (ResourceUrn uri : sortedUris) {
+            if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
+                continue;
+            }
             stringBuilder.append(uri.toString());
             stringBuilder.append(Console.NEW_LINE);
         }
@@ -179,9 +197,11 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists available free shape blocks",
-            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.",
+            helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.\n" +
+                    "You can filter by adding the beginning of words after the commands, e.g.: \"listFreeShapeBlocks" +
+                    "engine: core:\" will list all free shape blocks from the engine and core module",
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listFreeShapeBlocks() {
+    public String listFreeShapeBlocks(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
         stringBuilder.append(Console.NEW_LINE);
@@ -189,13 +209,15 @@ public class BlockCommands extends BaseComponentSystem {
         stringBuilder.append(Console.NEW_LINE);
         List<BlockUri> sortedUris = sortItems(blockExplorer.getFreeformBlockFamilies());
         for (BlockUri uri : sortedUris) {
+            if (!uriStartsWithAnyString(uri.toString(), startsWith)) {
+                continue;
+            }
             stringBuilder.append(uri.toString());
             stringBuilder.append(Console.NEW_LINE);
         }
 
         return stringBuilder.toString();
     }
-
 
     @Command(shortDescription = "Replaces a block in front of user",
             helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
@@ -228,9 +250,7 @@ public class BlockCommands extends BaseComponentSystem {
                     }
                 }
             }
-
         }
-
     }
 
     @Command(shortDescription = "Gives multiple stacks of blocks matching a search",
@@ -327,17 +347,21 @@ public class BlockCommands extends BaseComponentSystem {
         if (quantity < 1) {
             return "Here, have these zero (0) blocks just like you wanted";
         }
+        //continue giving blocks until there are no more blocks to give
+        //TODO reference maxStackSize instead of explicitly subtracting 99 and introduce an upper bound? 10 million lags ..
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft -= 99) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, quantityLeft > 99 ? 99 : quantityLeft);
+            if (!item.exists()) {
+                throw new IllegalArgumentException("Unknown block or item");
+            }
 
-        EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
-        if (!item.exists()) {
-            throw new IllegalArgumentException("Unknown block or item");
-        }
-        EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 
-        GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
-        item.send(giveItemEvent);
-        if (!giveItemEvent.isHandled()) {
-            item.destroy();
+            GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
+            item.send(giveItemEvent);
+            if (!giveItemEvent.isHandled()) {
+                item.destroy();
+            }
         }
 
         return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
@@ -352,4 +376,21 @@ public class BlockCommands extends BaseComponentSystem {
         return result;
     }
 
+    /**
+     * Used to check if an item/prefab/etc name starts with a string that is in {@code uri}
+     * @param uri the name to be checked
+     * @param startsWithArray array of possible word to match at the beginning of {@code uri}
+     * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
+     */
+    private boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
+        if (startsWithArray == null || startsWithArray.length == 0) {
+            return true;
+        }
+        for (String startsWith : startsWithArray) {
+            if (uri.startsWith(startsWith)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

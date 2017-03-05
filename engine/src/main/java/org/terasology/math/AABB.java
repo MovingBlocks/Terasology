@@ -107,6 +107,9 @@ public final class AABB {
         return AABB.createMinMax(min, max);
     }
 
+    /**
+     * @return The distance from the center to the max node
+     */
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
@@ -129,6 +132,11 @@ public final class AABB {
         return new Vector3f(max);
     }
 
+    /**
+     * Get a new AABB which have a new location base on the offset
+     * @param offset The offset between the current AABB and the new AABB
+     * @return the new AABB
+     */
     public AABB move(Vector3f offset) {
         Vector3f newMin = new Vector3f(min);
         newMin.add(offset);

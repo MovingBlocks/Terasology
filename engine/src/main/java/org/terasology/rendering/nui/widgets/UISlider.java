@@ -32,6 +32,9 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
+/**
+ * A simple value slider bar with one handle
+ */
 public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
@@ -81,6 +84,7 @@ public class UISlider extends CoreWidget {
     @LayoutConfig
     private int precision = 1;
 
+    @LayoutConfig
     private Binding<Float> value = new DefaultBinding<>(0.7f);
 
     private int sliderWidth;
@@ -176,10 +180,16 @@ public class UISlider extends CoreWidget {
         this.minimum = binding;
     }
 
+    /**
+     * @return The minimum value possible.
+     */
     public float getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * @param min The new minimum value
+     */
     public void setMinimum(float min) {
         this.minimum.set(min);
     }
@@ -188,10 +198,16 @@ public class UISlider extends CoreWidget {
         this.range = binding;
     }
 
+    /**
+     * @return The maxiumum value possible.
+     */
     public float getRange() {
         return range.get();
     }
 
+    /**
+     * @param val The new maximum value.
+     */
     public void setRange(float val) {
         range.set(val);
     }
@@ -200,10 +216,16 @@ public class UISlider extends CoreWidget {
         increment = binding;
     }
 
+    /**
+     * @return The smallest increment possible.
+     */
     public float getIncrement() {
         return increment.get();
     }
 
+    /**
+     * @param val The new smallest increment to set to.
+     */
     public void setIncrement(float val) {
         increment.set(val);
     }
@@ -212,18 +234,30 @@ public class UISlider extends CoreWidget {
         value = binding;
     }
 
+    /**
+     * @return The current value.
+     */
     public float getValue() {
         return value.get();
     }
 
+    /**
+     * @param val The new current value.
+     */
     public void setValue(float val) {
         value.set(val);
     }
 
+    /**
+     * @return The number of decimal points used.
+     */
     public int getPrecision() {
         return precision;
     }
 
+    /**
+     * @param precision The number of decimal points.
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
     }

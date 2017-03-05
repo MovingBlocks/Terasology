@@ -116,7 +116,7 @@ public enum Side {
     private boolean canPitch;
     private boolean canRoll;
 
-    private Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
+     Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
         this.vector3iDir = vector3i;
         this.canPitch = canPitch;
         this.canYaw = canYaw;

@@ -216,12 +216,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         public PlayerStore playerStore;
         public Vector3f position;
 
-        public SpawningClientInfo(EntityRef client, Vector3f position) {
+         SpawningClientInfo(EntityRef client, Vector3f position) {
             this.clientEntity = client;
             this.position = position;
         }
 
-        public SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
+         SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
             this(client, position);
             this.playerStore = playerStore;
         }

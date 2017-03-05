@@ -16,6 +16,7 @@
 package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Iterables;
+import org.codehaus.plexus.util.StringUtils;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -41,6 +42,8 @@ public class MiniChatOverlay extends CoreScreenLayer {
     private static final float TIME_FADE = 0.3f;
 
     private static final int MAX_MESSAGES = 6;
+
+    private static final int MAX_CHAR_PER_MSG = 250;
 
     private enum State {
         FADE_IN,
@@ -71,7 +74,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
 
                 for (Message msg : msgs) {
                     if (count > size - MAX_MESSAGES) {
-                        messageHistory.append(msg.getMessage());
+                        messageHistory.append(StringUtils.abbreviate(msg.getMessage(), MAX_CHAR_PER_MSG));
                         if (count < size) {
                             messageHistory.append(Console.NEW_LINE);
                         }

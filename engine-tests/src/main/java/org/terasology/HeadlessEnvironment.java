@@ -133,8 +133,8 @@ import static org.mockito.Mockito.when;
  */
 public class HeadlessEnvironment extends Environment {
 
-    private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
     protected static final WorldTime worldTime = new WorldTimeImpl();
+    private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
 
     /**
      * Setup a headless ( = no graphics ) environment

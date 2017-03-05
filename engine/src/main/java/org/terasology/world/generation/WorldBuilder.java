@@ -158,7 +158,7 @@ public class WorldBuilder {
                 }
 //Get biggest border for facet?! Create an array of borders and search for maximum.
 // Check if there are update annotation for facet, if there are search for biggest border requested from providers and replace value
-                if(updates != null) {
+                if (updates != null) {
                     for (Facet producedFacetAnnotation : updates.value()) {
                         if (producedFacetAnnotation.value() == facet) {
 

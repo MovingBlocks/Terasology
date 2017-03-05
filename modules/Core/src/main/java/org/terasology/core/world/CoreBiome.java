@@ -32,7 +32,7 @@ public enum CoreBiome implements Biome {
     private final float humidity;
     private final float temperature;
 
-    private CoreBiome(String name, float fog, float humidity, float temperature) {
+    CoreBiome(String name, float fog, float humidity, float temperature) {
         this.id = "Core:" + name().toLowerCase();
         this.name = name;
         this.fog = fog;

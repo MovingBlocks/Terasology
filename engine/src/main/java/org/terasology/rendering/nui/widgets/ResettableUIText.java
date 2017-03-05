@@ -50,7 +50,8 @@ public class ResettableUIText extends UIText {
         lastWidth = canvas.size().x - clearButtonRegion.size().x;
         if (isEnabled()) {
             canvas.addInteractionRegion(interactionListener, Rect2i.createFromMinAndMax(0, 0, canvas.size().x, canvas.size().y));
-            canvas.addInteractionRegion(clearInteractionListener, Rect2i.createFromMinAndMax(canvas.size().x, 0, canvas.size().x + clearButtonRegion.size().x, canvas.size().y));
+            canvas.addInteractionRegion(clearInteractionListener, Rect2i.createFromMinAndMax(canvas.size().x, 0, canvas.size().x +
+                    clearButtonRegion.size().x, canvas.size().y));
         }
         correctCursor();
 

@@ -36,7 +36,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Shader parameters for the Combine shader program.
  *
  */
-public class ShaderParametersCombine extends ShaderParametersBase {
+public class ShaderParametersPrePostComposite extends ShaderParametersBase {
     @Range(min = 0.001f, max = 0.005f)
     private float outlineDepthThreshold = 0.001f;
     @Range(min = 0.0f, max = 1.0f)

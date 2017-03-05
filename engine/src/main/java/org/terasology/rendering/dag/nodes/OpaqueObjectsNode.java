@@ -25,6 +25,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
@@ -64,6 +65,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        addDesiredStateChange(new LookThrough(playerCamera));
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
     }
 
@@ -89,8 +91,6 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
         READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
-
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();

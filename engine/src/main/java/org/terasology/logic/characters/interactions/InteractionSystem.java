@@ -114,6 +114,7 @@ public class InteractionSystem extends BaseComponentSystem {
         }
         ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
         if (controller != null && controller.local) {
+            nuiManager.closeAllScreens();
             nuiManager.pushScreen(interactionScreenComponent.screen);
         }
     }

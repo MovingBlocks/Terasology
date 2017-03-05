@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.layouts;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
@@ -58,13 +57,13 @@ public class CardLayoutTest {
         //                                                  |       |
         //                                                  +-------+
 
-        when(widget1.getPreferredContentSize(eq(canvas),any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
-        when(widget2.getPreferredContentSize(eq(canvas),any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(widget3.getPreferredContentSize(eq(canvas),any(Vector2i.class))).thenReturn(new Vector2i(10, 15));
+        when(widget1.getPreferredContentSize(eq(canvas), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
+        when(widget2.getPreferredContentSize(eq(canvas), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
+        when(widget3.getPreferredContentSize(eq(canvas), any(Vector2i.class))).thenReturn(new Vector2i(10, 15));
 
-        when (widget1.getId()).thenReturn("widget1");
-        when (widget2.getId()).thenReturn("widget2");
-        when (widget3.getId()).thenReturn("widget3");
+        when(widget1.getId()).thenReturn("widget1");
+        when(widget2.getId()).thenReturn("widget2");
+        when(widget3.getId()).thenReturn("widget3");
 
         Vector2i availableSize = new Vector2i(200, 200);
         when(canvas.size()).thenReturn(availableSize);

@@ -31,7 +31,7 @@ public enum Yaw {
     private float radians;
     private int increments;
 
-    private Yaw(byte index, float radians, int increments) {
+     Yaw(byte index, float radians, int increments) {
         this.index = index;
         this.radians = radians;
         this.increments = increments;

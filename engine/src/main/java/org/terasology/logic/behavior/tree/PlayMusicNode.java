@@ -51,7 +51,7 @@ public class PlayMusicNode extends Node {
         private boolean playing;
         private boolean finished;
 
-        public PlayMusicTask(PlayMusicNode node) {
+         PlayMusicTask(PlayMusicNode node) {
             super(node);
         }
 

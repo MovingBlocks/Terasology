@@ -179,7 +179,7 @@ public abstract class TimeBase implements EngineTime {
         private long deltaPerCycle;
         private int currentCycle;
 
-        public TimeStepper(int cycles, long deltaPerCycle) {
+         TimeStepper(int cycles, long deltaPerCycle) {
             this.cycles = cycles;
             this.deltaPerCycle = deltaPerCycle;
         }

@@ -53,7 +53,7 @@ public class ThreadMonitorPanel extends JPanel {
 
         private String name;
 
-        public Task(String name) {
+         Task(String name) {
             this.name = name;
         }
 
@@ -94,7 +94,7 @@ public class ThreadMonitorPanel extends JPanel {
             private Dimension dId = new Dimension(0, 0);
             private Dimension dName = new Dimension(0, 0);
 
-            public MyRenderer() {
+             MyRenderer() {
                 setBackground(BACKGROUND);
                 setLayout(new BorderLayout());
 
