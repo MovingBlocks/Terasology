@@ -122,6 +122,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+    	super.onOpened();
         if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
