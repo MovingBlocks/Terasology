@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.
- *
  */
 public class OpenVRStereoCamera extends SubmersibleCamera {
 
@@ -63,7 +62,7 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
     private OpenVRProvider vrProvider;
 
     public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
-    	super(worldProvider, renderingConfig);
+        super(worldProvider, renderingConfig);
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;

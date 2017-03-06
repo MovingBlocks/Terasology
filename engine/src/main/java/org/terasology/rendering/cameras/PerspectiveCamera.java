@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Simple default camera.
- *
  */
 public class PerspectiveCamera extends SubmersibleCamera {
     // Values used for smoothing
@@ -52,7 +51,7 @@ public class PerspectiveCamera extends SubmersibleCamera {
     private Vector3f tempRightVector = new Vector3f();
 
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
-    	super(worldProvider, renderingConfig);
+        super(worldProvider, renderingConfig);
         this.cameraSettings = renderingConfig.getCameraSettings();
     }
 

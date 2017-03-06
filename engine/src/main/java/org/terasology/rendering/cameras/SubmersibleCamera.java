@@ -6,16 +6,16 @@ import org.terasology.rendering.RenderHelper;
 import org.terasology.world.WorldProvider;
 
 public abstract class SubmersibleCamera extends Camera {
-	
-	/* Used for Underwater Checks */
+
+    /* Used for Underwater Checks */
     private WorldProvider worldProvider;
     private RenderingConfig renderingConfig;
 
     public SubmersibleCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
-    	this.worldProvider = worldProvider;
-    	this.renderingConfig = renderingConfig;
+        this.worldProvider = worldProvider;
+        this.renderingConfig = renderingConfig;
     }
-	
+
     /**
      * Returns True if the head of the player is underwater. False otherwise.
      *
@@ -38,5 +38,4 @@ public abstract class SubmersibleCamera extends Camera {
         }
         return false;
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.terasology.world.WorldProvider;
 
 /**
  * Basic shader parameters for all shader program.
- *
  */
 public class ShaderParametersBase implements ShaderParameters {
 
@@ -35,7 +34,6 @@ public class ShaderParametersBase implements ShaderParameters {
 
     @Override
     public void initialParameters(Material material) {
-
     }
 
     @Override
