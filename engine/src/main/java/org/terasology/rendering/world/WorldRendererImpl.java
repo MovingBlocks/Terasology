@@ -35,13 +35,13 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
@@ -120,7 +120,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final Camera playerCamera;
+    private final SubmersibleCamera playerCamera;
 
     // TODO: @In
     private final OpenVRProvider vrProvider;
@@ -175,17 +175,16 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
+                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
-
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
@@ -558,23 +557,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public boolean isHeadUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
-
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
-    }
-
-    @Override
     public float getTimeSmoothedMainLightIntensity() {
         return timeSmoothedMainLightIntensity;
     }
@@ -627,7 +609,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public Camera getActiveCamera() {
+    public SubmersibleCamera getActiveCamera() {
         return playerCamera;
     }
 

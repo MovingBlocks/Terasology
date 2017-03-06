@@ -25,6 +25,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -87,8 +88,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
-    public Camera getActiveCamera() {
-        return noCamera;
+    public SubmersibleCamera getActiveCamera() {
+        return (SubmersibleCamera) noCamera;
     }
 
     @Override
@@ -172,12 +173,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public float getTimeSmoothedMainLightIntensity() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public boolean isHeadUnderWater() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

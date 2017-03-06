@@ -20,7 +20,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -50,15 +50,15 @@ public class ShaderParametersBase implements ShaderParameters {
         // TODO: move into BaseMaterial?
         if (worldRenderer != null && backdropProvider != null) {
             program.setFloat("daylight", backdropProvider.getDaylight(), true);
-            program.setFloat("swimming", worldRenderer.isHeadUnderWater() ? 1.0f : 0.0f, true);
             program.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
             program.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
 
-            Camera activeCamera = worldRenderer.getActiveCamera();
+            SubmersibleCamera activeCamera = worldRenderer.getActiveCamera();
             if (activeCamera != null) {
                 final Vector3f cameraDir = activeCamera.getViewingDirection();
                 final Vector3f cameraPosition = activeCamera.getPosition();
-
+                
+                program.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
                 program.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
                 program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
                 program.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
