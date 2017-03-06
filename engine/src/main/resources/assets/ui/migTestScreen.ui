@@ -246,13 +246,13 @@
             {
                 "type": "UILabel",
                 "id": "",
-                "text": "UITextHint",
+                "text": "UIText with hint",
                 "layoutInfo": {
                     "cc": "newline"
                 }
             },
             {
-                "type": "UITextHint",
+                "type": "UIText",
                 "id": "text1",
                 "hintText": "Enter text here",
                 "text": "text1",
@@ -263,7 +263,7 @@
                 "enabled": false
             },
             {
-                "type": "UITextHint",
+                "type": "UIText",
                 "id": "text2",
                 "hintText": "Enter text here",
                 "layoutInfo": {
@@ -271,7 +271,7 @@
                 }
             },
             {
-                "type": "UITextHint",
+                "type": "UIText",
                 "id": "text3",
                 "hintText": "Enter text here",
                 "layoutInfo": {
@@ -279,9 +279,9 @@
                 }
             },
             {
-                "type": "UITextHint",
+                "type": "UIText",
                 "id": "text4",
-                "hintText": "Enter text here",
+                "hintText": "Enter extra long hint text here that just keeps on going",
                 "layoutInfo": {
                     "cc": "grow"
                 }
