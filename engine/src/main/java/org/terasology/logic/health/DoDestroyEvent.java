@@ -19,8 +19,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
-/**
- */
 public class DoDestroyEvent implements Event {
     private EntityRef instigator;
     private EntityRef directCause;
@@ -36,11 +34,34 @@ public class DoDestroyEvent implements Event {
         return instigator;
     }
 
+    public String getInstigatorString() {
+        if (instigator == null) {
+            return "Unknown";
+        }
+        if (instigator.getParentPrefab() != null) {
+            String instigatorString = instigator.getParentPrefab().getName();
+            instigatorString = instigatorString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+            instigatorString = instigatorString.replaceAll("([A-Z])", " $1");
+            instigatorString = Character.toUpperCase(instigatorString.charAt(0)) + instigatorString.substring(1);
+            return instigatorString;
+        } else {
+            return "Unknown";
+        }
+    }
+
     public EntityRef getDirectCause() {
         return directCause;
     }
 
     public Prefab getDamageType() {
         return damageType;
+    }
+
+    public String getDamageTypeString() {
+        String damageTypeString = damageType.getName();
+        damageTypeString = damageTypeString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+        damageTypeString = damageTypeString.replaceAll("([A-Z])", " $1");
+        damageTypeString = Character.toUpperCase(damageTypeString.charAt(0)) + damageTypeString.substring(1);
+        return damageTypeString;
     }
 }

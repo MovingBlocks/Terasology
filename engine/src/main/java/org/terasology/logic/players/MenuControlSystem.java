@@ -16,9 +16,9 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -28,18 +28,25 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.events.KeyDownEvent;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.ingame.DeathScreen;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.utilities.Assets;
 
 /**
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
+
+    private String lastDamage = "Unknown";
+    private String lastInstigator = "Unknown";
 
     @In
     private NUIManager nuiManager;
@@ -70,7 +77,19 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
+    //Get the type of the most recent damage for the character
+    @ReceiveEvent(components = {CharacterComponent.class}, priority = EventPriority.PRIORITY_HIGH)
+    public void destructionDone(DoDestroyEvent event, EntityRef entity) {
+        lastDamage = event.getDamageTypeString();
+        lastInstigator = event.getInstigatorString();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_HIGH)
+    public void loadDeathDetails(DeathEvent event, EntityRef entity) {
+        ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(lastInstigator, lastDamage);
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDeath(DeathEvent event, EntityRef entity) {
         if (entity.getComponent(ClientComponent.class).local) {
             nuiManager.pushScreen("engine:deathScreen");
