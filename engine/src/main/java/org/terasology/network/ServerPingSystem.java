@@ -104,8 +104,6 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onDeactivatePing(DeactivatePingServerEvent event, EntityRef entity) {
-        entity.removeComponent(PingSubscriberComponent.class);
-        entity.send(new DeactivatePingClientEvent(entity));
         if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) == 0) {
             startMap.clear();
             endMap.clear();
