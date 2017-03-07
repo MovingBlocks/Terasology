@@ -27,6 +27,7 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
@@ -59,14 +60,11 @@ public class MenuControlSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onKeyDown(KeyDownEvent event, EntityRef entity) {
-        switch (event.getKey().getId()) {
-            case Keyboard.KeyId.F12:
-                CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
-                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
-                break;
-            default:
-                break;
+    public void onScreenshotCapture(ScreenshotButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
+            CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
+            event.consume();
         }
     }
 
