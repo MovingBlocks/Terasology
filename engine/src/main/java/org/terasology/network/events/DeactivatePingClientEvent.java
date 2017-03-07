@@ -15,12 +15,26 @@
  */
 package org.terasology.network.events;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
- * DeactivatePingClientEvent, from the server to the client, helps the client remove PingStockComponent.
+ * DeactivatePingClientEvent, from the server to the client, helps the client remove or clean up PingStockComponent.
  */
 @OwnerEvent
 public class DeactivatePingClientEvent implements Event {
+
+    private EntityRef clientDeactivated;
+
+    protected DeactivatePingClientEvent() {
+    }
+
+    public DeactivatePingClientEvent(EntityRef clientDeactivated) {
+        this.clientDeactivated = clientDeactivated;
+    }
+
+    public EntityRef getClientDeactivated() {
+        return clientDeactivated;
+    }
 }

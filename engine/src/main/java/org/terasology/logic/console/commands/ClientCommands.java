@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.network.PingSubscriberComponent;
+import org.terasology.network.events.DeactivatePingClientEvent;
 import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -41,6 +44,9 @@ public class ClientCommands extends BaseComponentSystem {
 
     @In
     private WorldProvider worldProvider;
+
+    @In
+    private NetworkSystem networkSystem;
 
     /**
      * Displays debug information on the target entity for the target the camera is pointing at
@@ -70,20 +76,23 @@ public class ClientCommands extends BaseComponentSystem {
      * @return       The subscription state
      */
     @Command(runOnServer = true,
-            shortDescription = "Once activated the ping wil be shown in the top right corner of the debug overlay",
+            shortDescription = "Once activated the ping wil be shown in online player overlay",
             requiredPermission = PermissionManager.NO_PERMISSION)
-    public String togglePingInDebugScreen(@Sender EntityRef sender) {
-        if (sender.getComponent(ClientComponent.class).local) {
-            return "You are on server or single player mode, don't need the ping information";
+    public String showPingInPlayerlist(@Sender EntityRef sender) {
+        if (networkSystem.getMode() == NetworkMode.NONE) {
+            return "You are on single player mode, don't need the ping information";
         }
 
         if (!sender.hasComponent(PingSubscriberComponent.class)) {
             PingSubscriberComponent pingSubscriberComp = new PingSubscriberComponent();
             sender.addComponent(pingSubscriberComp);
-            return "Ping from server function activated, see in the debug overlay";
+            return "Ping from server function activated, see in online player overlay";
         }
         else {
             sender.removeComponent(PingSubscriberComponent.class);
+            sender.send(new DeactivatePingClientEvent(sender));
+
+            //Clean ping map in server if necessary
             sender.send(new DeactivatePingServerEvent());
             return "Ping from server function deactivated";
         }

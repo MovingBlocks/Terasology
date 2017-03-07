@@ -26,9 +26,9 @@ import org.terasology.network.events.PingFromServerEvent;
 import org.terasology.network.events.PingValueEvent;
 
 /**
- * This system, registered on the remote client, will respond to the ping event from server.
+ * This system, registered on the client, will respond to the ping event from server.
  */
-@RegisterSystem(RegisterMode.REMOTE_CLIENT)
+@RegisterSystem(RegisterMode.CLIENT)
 public class ClientPingSystem extends BaseComponentSystem{
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -41,16 +41,25 @@ public class ClientPingSystem extends BaseComponentSystem{
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onPingInformation(PingValueEvent event, EntityRef entity) {
+        EntityRef clientRelated = event.getClientRelated();
+        long pingValue = event.getPingValue();
         if (!entity.hasComponent(PingStockComponent.class)) {
-            entity.addComponent(new PingStockComponent(event.getPingValue()));
+            entity.addComponent(new PingStockComponent(clientRelated, pingValue));
         }
         else {
-            entity.getComponent(PingStockComponent.class).pingValue = event.getPingValue();
+            entity.getComponent(PingStockComponent.class).pingMap.put(clientRelated, pingValue);
         }
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onDeActivatePing(DeactivatePingClientEvent event, EntityRef entity) {
-        entity.removeComponent(PingStockComponent.class);
+    public void onDeactivatePing(DeactivatePingClientEvent event, EntityRef entity) {
+        EntityRef clientDeactivated = event.getClientDeactivated();
+        if (clientDeactivated.equals(entity)) {
+            entity.removeComponent(PingStockComponent.class);
+        }
+        else {
+            PingStockComponent pingStockComp = entity.getComponent(PingStockComponent.class);
+            pingStockComp.pingMap.remove(clientDeactivated);
+        }
     }
 }

@@ -22,8 +22,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.DeactivatePingClientEvent;
 import org.terasology.network.events.DeactivatePingServerEvent;
+import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
 import org.terasology.network.events.PingValueEvent;
@@ -45,6 +47,9 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
     @In
     private EntityManager entityManager;
 
+    @In
+    private LocalPlayer localPlayer;
+
     private HashMap<EntityRef, Instant> startMap = new HashMap<>();
 
     private HashMap<EntityRef, Instant> endMap = new HashMap<>();
@@ -62,13 +67,20 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
     public void update(float delta) {
         long time = Duration.between(lastPingTime, Instant.now()).toMillis();
         if (time > pingPeriod) {
-            Iterable<EntityRef>  clients = entityManager.getEntitiesWith(PingSubscriberComponent.class);
-            for (EntityRef client : clients) {
-                Instant start = Instant.now();
-                startMap.put(client, start);
-                client.send(new PingFromServerEvent());
+
+            // Server ping to all clients only if there are clients who subscribe
+            if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) != 0) {
+                Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
+                for (EntityRef client : clients) {
+                    if (client.equals(localPlayer.getClientEntity())) {
+                        continue;
+                    }
+                    Instant start = Instant.now();
+                    startMap.put(client, start);
+                    client.send(new PingFromServerEvent());
+                }
+                lastPingTime = Instant.now();
             }
-            lastPingTime = Instant.now();
         }
     }
 
@@ -78,8 +90,9 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
         endMap.put(entity, end);
         updatePing(entity);
 
-        entity.send(new PingValueEvent(pingMap.get(entity)));
-
+        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
+            client.send(new PingValueEvent(entity, pingMap.get(entity)));
+        }
     }
 
     private void updatePing(EntityRef entity) {
@@ -91,9 +104,26 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onDeactivatePing(DeactivatePingServerEvent event, EntityRef entity) {
-        startMap.remove(entity);
-        endMap.remove(entity);
-        pingMap.remove(entity);
-        entity.send(new DeactivatePingClientEvent());
+        entity.removeComponent(PingSubscriberComponent.class);
+        entity.send(new DeactivatePingClientEvent(entity));
+        if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) == 0) {
+            startMap.clear();
+            endMap.clear();
+            pingMap.clear();
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
+        if (entity.hasComponent(PingSubscriberComponent.class)) {
+
+            //clean pingMaps in server and pingMaps in client entity
+            startMap.remove(entity);
+            endMap.remove(entity);
+            pingMap.remove(entity);
+            for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
+                client.send(new DeactivatePingClientEvent(entity));
+            }
+        }
     }
 }

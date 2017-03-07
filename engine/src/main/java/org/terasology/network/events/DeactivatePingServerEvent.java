@@ -19,7 +19,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
 /**
- * DeactivatePingServerEvent helps clean the ping information map in server.
+ * DeactivatePingServerEvent helps clean the pingMaps information map in server.
  */
 @ServerEvent
 public class DeactivatePingServerEvent implements Event {

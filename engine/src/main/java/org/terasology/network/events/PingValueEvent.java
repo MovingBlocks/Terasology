@@ -15,6 +15,7 @@
  */
 package org.terasology.network.events;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
@@ -24,15 +25,21 @@ import org.terasology.network.OwnerEvent;
 @OwnerEvent
 public class PingValueEvent implements Event {
 
+    private EntityRef clientRelated;
+
     private long pingValue;
 
     protected PingValueEvent() {
     }
 
-    public PingValueEvent(long pingValue) {
+    public PingValueEvent(EntityRef clientRelated, long pingValue) {
+        this.clientRelated = clientRelated;
         this.pingValue = pingValue;
     }
 
+    public EntityRef getClientRelated() {
+        return clientRelated;
+    }
     public long getPingValue() {
         return pingValue;
     }

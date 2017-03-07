@@ -18,14 +18,12 @@ package org.terasology.rendering.nui.layers.ingame.metrics;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.PingStockComponent;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -88,8 +86,8 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-                        return String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f MB, max mem: %.2f MB, ping: %s",
-                                time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0, getPing());
+                        return String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f MB, max mem: %.2f MB",
+                                time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
                 }
             });
         }
@@ -160,15 +158,6 @@ public class DebugOverlay extends CoreScreenLayer {
         }
 
         metricsLabel = find("metrics", UILabel.class);
-    }
-
-    private String getPing() {
-        if (localPlayer.getClientEntity().hasComponent(PingStockComponent.class)) {
-            PingStockComponent pingStockComp = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
-            return new StringBuffer(pingStockComp.pingValue.toString()).append(" ms").toString();
-        } else {
-            return "not activated";
-        }
     }
 
     @Override

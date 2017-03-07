@@ -16,18 +16,22 @@
 package org.terasology.network;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
+
+import java.util.HashMap;
 
 /**
  * PingStockComponent stock the ping information of one user.
  * <p>
  * Might be used to stock ping information and display it in future.
  */
-public class PingStockComponent implements Component {
+public final class PingStockComponent implements Component {
 
     // For now this component just stock one value
-    public Long pingValue;
+    public HashMap<EntityRef,Long> pingMap;
 
-    public PingStockComponent(long pingValue) {
-        this.pingValue = pingValue;
+    public PingStockComponent(EntityRef clientRelated, long pingValue) {
+        pingMap = new HashMap<>();
+        pingMap.put(clientRelated, pingValue);
     }
 }

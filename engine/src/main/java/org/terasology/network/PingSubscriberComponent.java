@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 /**
  * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.
+ * Server will only send ping information to the clients subscribed.
  * <p>
  * It can be used to stock the ping information of users in future.
  */
