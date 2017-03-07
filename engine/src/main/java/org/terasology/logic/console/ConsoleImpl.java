@@ -198,7 +198,7 @@ public class ConsoleImpl implements Console {
         ClientComponent cc = callingClient.getComponent(ClientComponent.class);
 
         if (cc.local) {
-            if (!rawCommand.isEmpty() && (localCommandHistory.isEmpty() || localCommandHistory.getLast() != rawCommand))
+            if (!rawCommand.isEmpty() && (localCommandHistory.isEmpty() || !localCommandHistory.getLast().equals(rawCommand)))
                 localCommandHistory.add(rawCommand);
         }
 
