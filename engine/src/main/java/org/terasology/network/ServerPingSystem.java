@@ -113,15 +113,13 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
-        if (entity.hasComponent(PingSubscriberComponent.class)) {
 
-            //clean pingMaps in server and pingMaps in client entity
-            startMap.remove(entity);
-            endMap.remove(entity);
-            pingMap.remove(entity);
-            for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
-                client.send(new DeactivatePingClientEvent(entity));
-            }
+        //clean pingMaps in server and pingMaps in client
+        startMap.remove(entity);
+        endMap.remove(entity);
+        pingMap.remove(entity);
+        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
+            client.send(new DeactivatePingClientEvent(entity));
         }
     }
 }
