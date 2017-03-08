@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@
 package org.terasology.input.binds.general;
 
 import org.terasology.input.BindButtonEvent;
-import org.terasology.input.ControllerId;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
-/**
- */
 @RegisterBindButton(id = "screenshot", description = "${engine:menu#binding-screenshot}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.F12)
 public class ScreenshotButton extends BindButtonEvent {

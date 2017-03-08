@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
-import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.binds.general.ScreenshotButton;
-import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
@@ -37,8 +35,6 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
 
-/**
- */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
 
