@@ -159,12 +159,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRot;
+        Quat4f viewRotation;
         switch (characterMovementComponent.mode) {
             case WALKING:
                 if (!playerCamera.isTracked()) {
-                    viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
-                    playerCamera.setOrientation(viewRot);
+                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    playerCamera.setOrientation(viewRotation);
                 }
                 playerCamera.getOrientation().rotate(relMove, relMove);
                 break;
@@ -174,8 +174,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 break;
             default:
                 if (playerCamera.isTracked()) {
-                    viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
-                    playerCamera.setOrientation(viewRot);
+                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    playerCamera.setOrientation(viewRotation);
                 }
                 playerCamera.getOrientation().rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
