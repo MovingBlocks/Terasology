@@ -333,33 +333,6 @@
                 }
             }
         },
-        "UIInputBindButton": {
-            "text-align-horizontal": "center",
-            "text-align-vertical": "middle",
-            "background": "button",
-            "background-border": {
-                "top": 2,
-                "bottom": 2,
-                "left": 2,
-                "right": 2
-            },
-            "margin": {
-                "top": 6,
-                "bottom": 6,
-                "left": 4,
-                "right": 4
-            },
-            "texture-scale-mode": "scale fit",
-            "modes": {
-                "hover": {
-                    "background": "buttonOver"
-                },
-                "active": {
-                    "background": "buttonDown",
-                    "text-color": "FFFF00FF"
-                }
-            }
-        },
         "UICheckbox": {
             "background": "engine:checkbox",
             "fixed-width": 24,
