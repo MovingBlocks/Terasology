@@ -83,41 +83,41 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
     }
 
     private void handleController0() {
-        if (buttonUp(ControllerListener.BUTTON_TRIGGER)) {
+        if (buttonUp(ControllerListener.TRIGGER_BUTTON)) {
             addButtonAction(ControllerId.ZERO, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_TRIGGER)) {
+        } else if (buttonDown(ControllerListener.TRIGGER_BUTTON)) {
             addButtonAction(ControllerId.ZERO, ButtonState.DOWN);
-        } else if (buttonUp(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonUp(ControllerListener.GRIP_BUTTON)) {
             addButtonAction(ControllerId.ONE, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonDown(ControllerListener.GRIP_BUTTON)) {
             addButtonAction(ControllerId.ONE, ButtonState.DOWN);
-        } else if (buttonUp(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonUp(ControllerListener.APP_MENU_BUTTON)) {
             addButtonAction(ControllerId.TWO, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonDown(ControllerListener.APP_MENU_BUTTON)) {
             addButtonAction(ControllerId.TWO, ButtonState.DOWN);
-        } else if (buttonDown(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonDown(ControllerListener.TOUCHPAD_BUTTON)) {
             addAxisAction(ControllerId.X_AXIS, ButtonState.DOWN, -cachedStateAfter.rAxis[0].x);
             addAxisAction(ControllerId.Y_AXIS, ButtonState.DOWN, cachedStateAfter.rAxis[0].y);
-        } else if (buttonUp(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonUp(ControllerListener.TOUCHPAD_BUTTON)) {
             addAxisAction(ControllerId.X_AXIS, ButtonState.UP, 0.0f);
             addAxisAction(ControllerId.Y_AXIS, ButtonState.UP, 0.0f);
         }
     }
 
     private void handleController1() {
-        if (buttonUp(ControllerListener.BUTTON_TRIGGER)) {
+        if (buttonUp(ControllerListener.TRIGGER_BUTTON)) {
             addButtonAction(ControllerId.THREE, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_TRIGGER)) {
+        } else if (buttonDown(ControllerListener.TRIGGER_BUTTON)) {
             addButtonAction(ControllerId.THREE, ButtonState.DOWN);
-        } else if (buttonUp(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonUp(ControllerListener.GRIP_BUTTON)) {
             addButtonAction(ControllerId.FOUR, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_GRIP)) {
+        } else if (buttonDown(ControllerListener.GRIP_BUTTON)) {
             addButtonAction(ControllerId.FOUR, ButtonState.DOWN);
-        } else if (buttonUp(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonUp(ControllerListener.APP_MENU_BUTTON)) {
             addButtonAction(ControllerId.FIVE, ButtonState.UP);
-        } else if (buttonDown(ControllerListener.BUTTON_APP_MENU)) {
+        } else if (buttonDown(ControllerListener.APP_MENU_BUTTON)) {
             addButtonAction(ControllerId.FIVE, ButtonState.DOWN);
-        } else if (buttonDown(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonDown(ControllerListener.TOUCHPAD_BUTTON)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
                 addButtonAction(ControllerId.SIX, ButtonState.DOWN);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
@@ -127,7 +127,7 @@ class OpenVRControllers implements ControllerDevice, ControllerListener {
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y > 0) {
                 addButtonAction(ControllerId.NINE, ButtonState.DOWN);
             }
-        } else if (buttonUp(ControllerListener.BUTTON_TOUCHPAD)) {
+        } else if (buttonUp(ControllerListener.TOUCHPAD_BUTTON)) {
             if (cachedStateAfter.rAxis[0].x < 0 && cachedStateAfter.rAxis[0].y < 0) {
                 addButtonAction(ControllerId.SIX, ButtonState.UP);
             } else if (cachedStateAfter.rAxis[0].x > 0 && cachedStateAfter.rAxis[0].y < 0) {
