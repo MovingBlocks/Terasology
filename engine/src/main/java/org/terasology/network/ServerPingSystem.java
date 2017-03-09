@@ -23,12 +23,10 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.events.DeactivatePingClientEvent;
 import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
-import org.terasology.network.events.PingValueEvent;
 import org.terasology.registry.In;
 
 import java.time.Duration;
@@ -39,8 +37,8 @@ import java.util.HashMap;
  * This system implement the server ping to clients on need base.
  * It runs on the server, pings to all clients who subscribe this function.
  */
-@RegisterSystem (RegisterMode.AUTHORITY)
-public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem{
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     private static final long pingPeriod = 10000;
 
@@ -79,8 +77,21 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
                     startMap.put(client, start);
                     client.send(new PingFromServerEvent());
                 }
-                lastPingTime = Instant.now();
             }
+            
+            //update ping data for all clients
+            for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
+                PingStockComponent pingStockComponent;
+                if (!client.hasComponent(PingStockComponent.class)) {
+                    pingStockComponent = new PingStockComponent();
+                } else {
+                    pingStockComponent = client.getComponent(PingStockComponent.class);
+                }
+                pingStockComponent.setValues(pingMap);
+                client.addOrSaveComponent(pingStockComponent);
+            }
+
+            lastPingTime = Instant.now();
         }
     }
 
@@ -89,14 +100,10 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
         Instant end = Instant.now();
         endMap.put(entity, end);
         updatePing(entity);
-
-        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
-            client.send(new PingValueEvent(entity, pingMap.get(entity)));
-        }
     }
 
     private void updatePing(EntityRef entity) {
-        if(startMap.containsKey(entity) && endMap.containsKey(entity)) {
+        if (startMap.containsKey(entity) && endMap.containsKey(entity)) {
             long pingTime = Duration.between(startMap.get(entity), endMap.get(entity)).toMillis();
             pingMap.put(entity, pingTime);
         }
@@ -113,13 +120,8 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
-
-        //clean pingMaps in server and pingMaps in client
         startMap.remove(entity);
         endMap.remove(entity);
         pingMap.remove(entity);
-        for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
-            client.send(new DeactivatePingClientEvent(entity));
-        }
     }
 }

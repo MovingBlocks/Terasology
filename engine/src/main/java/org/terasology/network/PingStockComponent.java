@@ -18,7 +18,10 @@ package org.terasology.network;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * PingStockComponent stock the ping information of one user.
@@ -27,11 +30,29 @@ import java.util.HashMap;
  */
 public final class PingStockComponent implements Component {
 
-    // For now this component just stock one value
-    public HashMap<EntityRef,Long> pingMap;
+    // TODO Map<EntityRef,Long> is not supported for replication (no type handler),
+    // therefore keys and values are replicated via lists.
+    // Not the best solution for performance but for <100 players and low update rates it should do the job
 
-    public PingStockComponent(EntityRef clientRelated, long pingValue) {
-        pingMap = new HashMap<>();
-        pingMap.put(clientRelated, pingValue);
+    @Replicate
+    private List<EntityRef> pingKeys = new ArrayList<>();
+    @Replicate
+    private List<Long> pingValues = new ArrayList<>();
+
+    public void setValues(Map<EntityRef, Long> values) {
+        pingKeys.clear();
+        pingValues.clear();
+        for (Map.Entry<EntityRef, Long> entry : values.entrySet()) {
+            pingKeys.add(entry.getKey());
+            pingValues.add(entry.getValue());
+        }
+    }
+
+    public Map<EntityRef, Long> getValues() {
+        Map<EntityRef, Long> returnValues = new HashMap<>();
+        for (int i = 0; i < pingKeys.size(); i++) {
+            returnValues.put(pingKeys.get(i), pingValues.get(i));
+        }
+        return returnValues;
     }
 }

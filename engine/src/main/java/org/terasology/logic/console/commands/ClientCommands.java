@@ -23,11 +23,10 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingStockComponent;
 import org.terasology.network.PingSubscriberComponent;
-import org.terasology.network.events.DeactivatePingClientEvent;
 import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -90,7 +89,7 @@ public class ClientCommands extends BaseComponentSystem {
         }
         else {
             sender.removeComponent(PingSubscriberComponent.class);
-            sender.send(new DeactivatePingClientEvent(sender));
+            sender.removeComponent(PingStockComponent.class);
 
             //Clean ping map in server if necessary
             sender.send(new DeactivatePingServerEvent());

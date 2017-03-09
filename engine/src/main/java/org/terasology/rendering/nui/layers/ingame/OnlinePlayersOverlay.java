@@ -24,16 +24,16 @@ import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.PingStockComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Overlay that lists all players that are currently online.
  */
 public class OnlinePlayersOverlay extends CoreScreenLayer {
+
     private static final Logger logger = LoggerFactory.getLogger(OnlinePlayersOverlay.class);
 
     private UIText text;
@@ -43,7 +43,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
-    
+
     @Override
     public void initialise() {
         this.text = find("playerList", UIText.class);
@@ -66,7 +66,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
 
     private String determinePlayerAndPing(PingStockComponent pingStockComponent) {
         Iterable<EntityRef> allClients = entityManager.getEntitiesWith(ClientComponent.class);
-        HashMap<EntityRef,Long> pingMap = pingStockComponent.pingMap;
+        Map<EntityRef, Long> pingMap = pingStockComponent.getValues();
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (EntityRef clientEntity : allClients) {
@@ -79,8 +79,7 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             Long pingValue = pingMap.get(clientEntity);
             if (pingValue == null) {
                 sb.append("-");
-            }
-            else {
+            } else {
                 sb.append(pingValue.toString());
                 sb.append("ms");
             }
@@ -97,15 +96,12 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             if (pingStockComp == null) {
                 String playerListText = determinePlayerListText();
                 text.setText(playerListText);
-            }
-            else {
+            } else {
                 String playerAndPing = determinePlayerAndPing(pingStockComp);
                 text.setText(playerAndPing);
             }
-        }
-        else {
+        } else {
             logger.error("no  playerList");
         }
     }
-
 }

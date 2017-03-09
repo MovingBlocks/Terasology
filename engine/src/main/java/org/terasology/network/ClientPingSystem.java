@@ -20,66 +20,20 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.network.events.DeactivatePingClientEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
-import org.terasology.network.events.PingValueEvent;
-import org.terasology.protobuf.EntityData;
-
-import java.util.Iterator;
 
 /**
  * This system, registered on the client, will respond to the ping event from server.
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class ClientPingSystem extends BaseComponentSystem{
+public class ClientPingSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onPingFromServer(PingFromServerEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
             entity.send(new PingFromClientEvent());
-        }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onPingInformation(PingValueEvent event, EntityRef entity) {
-        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
-        if (!clientComp.local) {
-            return;
-        }
-
-        EntityRef clientRelated = event.getClientRelated();
-        long pingValue = event.getPingValue();
-        if (!entity.hasComponent(PingStockComponent.class)) {
-            entity.addComponent(new PingStockComponent(clientRelated, pingValue));
-        }
-        else {
-            entity.getComponent(PingStockComponent.class).pingMap.put(clientRelated, pingValue);
-        }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onDeactivatePing(DeactivatePingClientEvent event, EntityRef entity) {
-        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
-        if (!clientComp.local) {
-            return;
-        }
-
-        EntityRef clientDeactivated = event.getClientDeactivated();
-        if (clientDeactivated.equals(entity)) {
-            entity.removeComponent(PingStockComponent.class);
-        }
-        else {
-            PingStockComponent pingStockComp = entity.getComponent(PingStockComponent.class);
-            Iterator<EntityRef> it = pingStockComp.pingMap.keySet().iterator();
-            while(it.hasNext()) {
-                EntityRef client = it.next();
-                if (!client.isActive()) {
-                    it.remove();
-                }
-            }
-            entity.saveComponent(pingStockComp);
         }
     }
 }
