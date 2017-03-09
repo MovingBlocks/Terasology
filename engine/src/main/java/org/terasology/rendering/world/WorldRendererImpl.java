@@ -126,7 +126,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
     * It's not, so for now, we use this factor to adjust for the disparity.
      */
-    private final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
+    private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
 
     // TODO: @In
     private final OpenVRProvider vrProvider;
