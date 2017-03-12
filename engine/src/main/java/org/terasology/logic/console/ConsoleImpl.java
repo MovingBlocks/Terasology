@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,9 @@ public class ConsoleImpl implements Console {
         ClientComponent cc = callingClient.getComponent(ClientComponent.class);
 
         if (cc.local) {
-            localCommandHistory.add(rawCommand);
+            if (!rawCommand.isEmpty() && (localCommandHistory.isEmpty() || !localCommandHistory.getLast().equals(rawCommand))) {
+                localCommandHistory.add(rawCommand);
+            }
         }
 
         return execute(new Name(commandName), processedParameters, callingClient);
