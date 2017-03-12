@@ -140,6 +140,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setPosition(new Vector3f(event.getTargetPosition()));
+        newState.setVelocity(Vector3f.zero());
         newState.setTime(time.getGameTimeInMs());
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
