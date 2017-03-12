@@ -284,7 +284,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     public boolean isCapturingMouse() {
-        return capturingMouse && display.hasFocus();
+        return true;
     }
 
     public void setCapturingMouse(boolean capturingMouse) {

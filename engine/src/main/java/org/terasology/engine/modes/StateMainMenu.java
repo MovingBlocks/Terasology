@@ -21,17 +21,16 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
 import org.terasology.engine.bootstrap.EntitySystemSetupUtil;
-import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.input.InputSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
+import org.terasology.input.MenuInputSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
 import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
@@ -54,7 +53,7 @@ public class StateMainMenu implements GameState {
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
-    private InputSystem inputSystem;
+    private MenuInputSystem menuInputSystem;
 
     private String messageOnLoad = "";
 
@@ -86,12 +85,13 @@ public class StateMainMenu implements GameState {
         componentSystemManager = new ComponentSystemManager(context);
         context.put(ComponentSystemManager.class, componentSystemManager);
 
-        // TODO: Reduce coupling between Input system and CameraTargetSystem,
-        // TODO: potentially eliminating the following lines. See Issue #1126
-        CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
-        context.put(CameraTargetSystem.class, cameraTargetSystem);
+        LocalPlayerSystem localPlayerSystem = new LocalPlayerSystem();
+        componentSystemManager.register(localPlayerSystem, "engine:localPlayerSystem");
+        context.put(LocalPlayerSystem.class, localPlayerSystem);
 
-        componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
+        menuInputSystem = context.get(MenuInputSystem.class);
+        componentSystemManager.register(menuInputSystem, "engine:MenuInputSystem");
+
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
@@ -102,11 +102,6 @@ public class StateMainMenu implements GameState {
         NUISkinEditorSystem nuiSkinEditorSystem = new NUISkinEditorSystem();
         context.put(NUISkinEditorSystem.class, nuiSkinEditorSystem);
         componentSystemManager.register(nuiSkinEditorSystem, "engine:NUISkinEditorSystem");
-
-        inputSystem = context.get(InputSystem.class);
-
-        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
-        new RegisterInputSystem(context).step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = new LocalPlayer();
@@ -145,7 +140,7 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void handleInput(float delta) {
-        inputSystem.update(delta);
+        menuInputSystem.update(delta);
     }
 
     @Override
