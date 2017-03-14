@@ -67,6 +67,13 @@ public class UIText extends CoreWidget {
     @LayoutConfig
     protected Binding<String> text = new DefaultBinding<>("");
 
+    /* The placeholder hint text. */
+    @LayoutConfig
+    private String hintText = "";
+
+    /* Whether the box is currently showing the hint text. */
+    private boolean isShowingHintText = true;
+
     /** Whether the content needs to be displayed on multiple lines. */
     @LayoutConfig
     protected boolean multiline;
@@ -180,6 +187,18 @@ public class UIText extends CoreWidget {
         if (text.get() == null) {
             text.set("");
         }
+        if (text.get().equals("")) {
+            text.set(hintText);
+            isShowingHintText = true;
+        }
+        if (isShowingHintText) {
+            setCursorPosition(0);
+            if (!text.get().equals(hintText) && text.get().endsWith(hintText)) {
+                text.set(text.get().substring(0, text.get().length()-hintText.length()));
+                setCursorPosition(text.get().length());
+                isShowingHintText = false;
+            }
+        }
         lastFont = canvas.getCurrentStyle().getFont();
         lastWidth = canvas.size().x;
         if (isEnabled()) {
@@ -191,7 +210,11 @@ public class UIText extends CoreWidget {
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
-            canvas.drawText(text.get(), canvas.getRegion());
+            if (isShowingHintText && !readOnly) {
+                canvas.drawTextRaw(text.get(), lastFont, canvas.getCurrentStyle().getHintTextColor(), canvas.getRegion());
+            } else {
+                canvas.drawText(text.get(), canvas.getRegion());
+            }
             if (isFocused()) {
                 if (hasSelection()) {
                     drawSelection(canvas);
@@ -322,110 +345,128 @@ public class UIText extends CoreWidget {
         correctCursor();
         boolean eventHandled = false;
         if (isEnabled() && event.isDown() && lastFont != null) {
-            String fullText = text.get();
+            if (isShowingHintText && !readOnly) {
+                if (event.getKeyboard().isKeyDown(Keyboard.KeyId.LEFT_CTRL)
+                        || event.getKeyboard().isKeyDown(Keyboard.KeyId.RIGHT_CTRL)) {
+                    if (event.getKey() == Keyboard.Key.V) {
+                        removeSelection();
+                        paste();
+                        eventHandled = true;
+                    }
+                }
+                if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
+                    String fullText = text.get();
+                    String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
+                    String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
+                    setText(before + event.getKeyCharacter() + after);
+                    setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                }
+            } else {
+                String fullText = text.get();
 
-            switch (event.getKey().getId()) {
-                case KeyId.LEFT: {
-                    if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
-                        setCursorPosition(Math.min(getCursorPosition(), selectionStart));
-                    } else if (getCursorPosition() > 0) {
-                        decreaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
-                    }
-                    eventHandled = true;
-                    break;
-                }
-                case KeyId.RIGHT: {
-                    if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
-                        setCursorPosition(Math.max(getCursorPosition(), selectionStart));
-                    } else if (getCursorPosition() < fullText.length()) {
-                        increaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
-                    }
-                    eventHandled = true;
-                    break;
-                }
-                case KeyId.HOME: {
-                    setCursorPosition(0, !isSelectionModifierActive(event.getKeyboard()));
-                    offset = 0;
-                    eventHandled = true;
-                    break;
-                }
-                case KeyId.END: {
-                    setCursorPosition(fullText.length(), !isSelectionModifierActive(event.getKeyboard()));
-                    eventHandled = true;
-                    break;
-                }
-                default: {
-                    if (event.getKeyboard().isKeyDown(KeyId.LEFT_CTRL)
-                            || event.getKeyboard().isKeyDown(KeyId.RIGHT_CTRL)) {
-                        if (event.getKey() == Keyboard.Key.C) {
-                            copySelection();
-                            eventHandled = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (!readOnly) {
                 switch (event.getKey().getId()) {
-                    case KeyId.BACKSPACE: {
-                        if (hasSelection()) {
-                            removeSelection();
+                    case KeyId.LEFT: {
+                        if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
+                            setCursorPosition(Math.min(getCursorPosition(), selectionStart));
                         } else if (getCursorPosition() > 0) {
-                            String before = fullText.substring(0, getCursorPosition() - 1);
-                            String after = fullText.substring(getCursorPosition());
-
-                            if (getCursorPosition() < fullText.length()) {
-                                decreaseCursorPosition(1);
-                            }
-
-                            setText(before + after);
+                            decreaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
                         eventHandled = true;
                         break;
                     }
-                    case KeyId.DELETE: {
-                        if (hasSelection()) {
-                            removeSelection();
+                    case KeyId.RIGHT: {
+                        if (hasSelection() && !isSelectionModifierActive(event.getKeyboard())) {
+                            setCursorPosition(Math.max(getCursorPosition(), selectionStart));
                         } else if (getCursorPosition() < fullText.length()) {
-                            String before = fullText.substring(0, getCursorPosition());
-                            String after = fullText.substring(getCursorPosition() + 1);
-                            setText(before + after);
+                            increaseCursorPosition(1, !isSelectionModifierActive(event.getKeyboard()));
                         }
                         eventHandled = true;
                         break;
                     }
-                    case KeyId.ENTER:
-                    case KeyId.NUMPAD_ENTER: {
-                        for (ActivateEventListener listener : activationListeners) {
-                            listener.onActivated(this);
-                        }
+                    case KeyId.HOME: {
+                        setCursorPosition(0, !isSelectionModifierActive(event.getKeyboard()));
+                        offset = 0;
+                        eventHandled = true;
+                        break;
+                    }
+                    case KeyId.END: {
+                        setCursorPosition(fullText.length(), !isSelectionModifierActive(event.getKeyboard()));
                         eventHandled = true;
                         break;
                     }
                     default: {
                         if (event.getKeyboard().isKeyDown(KeyId.LEFT_CTRL)
                                 || event.getKeyboard().isKeyDown(KeyId.RIGHT_CTRL)) {
-                            if (event.getKey() == Keyboard.Key.V) {
-                                removeSelection();
-                                paste();
-                                eventHandled = true;
-                                break;
-                            } else if (event.getKey() == Keyboard.Key.X) {
+                            if (event.getKey() == Keyboard.Key.C) {
                                 copySelection();
-                                removeSelection();
                                 eventHandled = true;
                                 break;
                             }
                         }
-                        if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                            String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
-                            String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
-                            setText(before + event.getKeyCharacter() + after);
-                            setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                    }
+                }
+
+                if (!readOnly) {
+                    switch (event.getKey().getId()) {
+                        case KeyId.BACKSPACE: {
+                            if (hasSelection()) {
+                                removeSelection();
+                            } else if (getCursorPosition() > 0) {
+                                String before = fullText.substring(0, getCursorPosition() - 1);
+                                String after = fullText.substring(getCursorPosition());
+
+                                if (getCursorPosition() < fullText.length()) {
+                                    decreaseCursorPosition(1);
+                                }
+
+                                setText(before + after);
+                            }
                             eventHandled = true;
+                            break;
                         }
-                        break;
+                        case KeyId.DELETE: {
+                            if (hasSelection()) {
+                                removeSelection();
+                            } else if (getCursorPosition() < fullText.length()) {
+                                String before = fullText.substring(0, getCursorPosition());
+                                String after = fullText.substring(getCursorPosition() + 1);
+                                setText(before + after);
+                            }
+                            eventHandled = true;
+                            break;
+                        }
+                        case KeyId.ENTER:
+                        case KeyId.NUMPAD_ENTER: {
+                            for (ActivateEventListener listener : activationListeners) {
+                                listener.onActivated(this);
+                            }
+                            eventHandled = true;
+                            break;
+                        }
+                        default: {
+                            if (event.getKeyboard().isKeyDown(KeyId.LEFT_CTRL)
+                                    || event.getKeyboard().isKeyDown(KeyId.RIGHT_CTRL)) {
+                                if (event.getKey() == Keyboard.Key.V) {
+                                    removeSelection();
+                                    paste();
+                                    eventHandled = true;
+                                    break;
+                                } else if (event.getKey() == Keyboard.Key.X) {
+                                    copySelection();
+                                    removeSelection();
+                                    eventHandled = true;
+                                    break;
+                                }
+                            }
+                            if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
+                                String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
+                                String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
+                                setText(before + event.getKeyCharacter() + after);
+                                setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                                eventHandled = true;
+                            }
+                            break;
+                        }
                     }
                 }
             }

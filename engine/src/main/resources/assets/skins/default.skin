@@ -34,6 +34,7 @@
         "UIText": {
             "text-align-horizontal": "left",
             "text-align-vertical": "top",
+            "hint-text-color": "C0C0C0FF",
             "background": "engine:box",
             "background-border": {
                 "top": 4,
