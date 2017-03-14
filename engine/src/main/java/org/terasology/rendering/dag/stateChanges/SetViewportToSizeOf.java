@@ -22,14 +22,41 @@ import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import java.util.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetViewportToSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
+
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
+
+    private final class SetViewportToSizeOfTask implements RenderPipelineTask {
+        private int width;
+        private int height;
+        private ResourceUrn fboName;
+
+        private SetViewportToSizeOfTask(ResourceUrn fboName) {
+            this.fboName = fboName;
+        }
+
+        private void setDimensions(int w, int h) {
+            this.width = w;
+            this.height = h;
+        }
+
+        @Override
+        public void execute() {
+            glViewport(0, 0, width, height);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
+        }
+    }
+
     private static SetViewportToSizeOf defaultInstance = new SetViewportToSizeOf(READ_ONLY_GBUFFER);
 
     private BaseFBOsManager frameBuffersManager;

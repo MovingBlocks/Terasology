@@ -20,7 +20,6 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.tasks.LookThroughDefaultCameraTask;
-import org.terasology.rendering.dag.tasks.LookThroughNormalizedTask;
 
 // TODO: implement bobbing via multiple cameras and different steady/bobbing attachment points
 /**
@@ -33,6 +32,31 @@ import org.terasology.rendering.dag.tasks.LookThroughNormalizedTask;
  * The default instance of this class resets both matrices to identity matrices, opengl's default.
  */
 public class LookThroughNormalized implements StateChange {
+
+    private class LookThroughNormalizedTask implements RenderPipelineTask {
+
+        private Camera camera;
+
+        /**
+         * Constructs an instance of this class initialized with the given camera.
+         *
+         * @param camera an instance implementing the Camera interface
+         */
+        private LookThroughNormalizedTask(Camera camera) {
+            this.camera = camera;
+        }
+
+        @Override
+        public void execute() {
+            camera.lookThroughNormalized();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), camera.toString());
+        }
+    }
+
 
     private static LookThroughNormalized defaultInstance = new LookThroughNormalized();
 

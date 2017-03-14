@@ -16,14 +16,48 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import java.util.Objects;
+
+import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetWireframeTask;
+
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINE;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
+
+    private final class SetWireframeTask implements RenderPipelineTask {
+        private static final int ENABLED = GL_LINE;
+        private static final int DISABLED = GL_FILL;
+        private int mode;
+
+        private SetWireframeTask(boolean enabled) {
+            if (enabled) {
+                this.mode = ENABLED;
+            } else {
+                this.mode = DISABLED;
+            }
+        }
+
+        @Override
+        public void execute() {
+            GL11.glPolygonMode(GL_FRONT_AND_BACK, mode);
+        }
+
+        @Override
+        public String toString() {
+            String status = "disabled";
+            if (mode == ENABLED) {
+                status = "enabled";
+            }
+            return String.format("%30s: %s", this.getClass().getSimpleName(), status);
+        }
+    }
+
     private static SetWireframe defaultInstance = new SetWireframe(false);
     private static SetWireframeTask enablingTask;
     private static SetWireframeTask disablingTask;
