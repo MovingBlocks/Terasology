@@ -80,7 +80,7 @@ public final class EntityDataJSONFormat {
         try {
             return newGson().fromJson(reader, EntityData.Prefab.class);
         } catch (JsonSyntaxException e) {
-            throw new IOException("Failed to load prefab", e);
+            return null;
         }
     }
 

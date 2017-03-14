@@ -54,7 +54,8 @@ public class PrefabFormat extends AbstractAssetFileFormat<PrefabData> {
                 PrefabSerializer serializer = new PrefabSerializer(componentLibrary, typeSerializationLibrary);
                 return serializer.deserialize(prefabData);
             } else {
-                throw new IOException("Failed to read prefab for '" + resourceUrn + "'");
+                logger.error("Failed to read prefab for '" + resourceUrn + "'");
+                return null;
             }
         }
     }
