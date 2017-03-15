@@ -22,6 +22,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  */
@@ -50,7 +51,7 @@ public class PostBeginSystems extends StepBasedLoadProcess {
             try {
                 currentSystem = componentSystems.next();
                 currentSystem.postBegin();
-            } catch(Exception e){
+            } catch (NoSuchElementException e) {
                 logger.error("Failed to load system : '" + currentSystem.toString() + "'");
             }
         }
