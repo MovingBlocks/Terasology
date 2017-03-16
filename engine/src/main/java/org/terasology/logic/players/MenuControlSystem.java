@@ -24,8 +24,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.binds.general.LoadButton;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.general.SaveButton;
 import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
@@ -60,6 +62,19 @@ public class MenuControlSystem extends BaseComponentSystem {
         if (event.getState() == ButtonState.DOWN) {
             CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
             CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onSave(SaveButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            event.consume();
+        }
+
+    }@ReceiveEvent(components = {ClientComponent.class})
+    public void onLoad(LoadButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
             event.consume();
         }
     }
