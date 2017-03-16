@@ -31,24 +31,6 @@ import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
  */
 public final class SetFacesToCull implements StateChange {
 
-    private final class SetFacesToCullTask implements RenderPipelineTask {
-        private int mode;
-
-        private SetFacesToCullTask(int mode) {
-            this.mode = mode;
-        }
-
-        @Override
-        public void execute() {
-            GL11.glCullFace(mode);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
-        }
-    }
-
     private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
     private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL_BACK, "GL_BACK",
             GL_FRONT, "GL_FRONT",
@@ -104,5 +86,24 @@ public final class SetFacesToCull implements StateChange {
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getModeName(mode));
+    }
+
+
+    private final class SetFacesToCullTask implements RenderPipelineTask {
+        private int mode;
+
+        private SetFacesToCullTask(int mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void execute() {
+            GL11.glCullFace(mode);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
+        }
     }
 }

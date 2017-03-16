@@ -30,29 +30,6 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
  */
 public final class DisableDepthWriting implements StateChange {
 
-    private final class SetDepthMaskTask implements RenderPipelineTask {
-        private boolean enabled;
-
-        private SetDepthMaskTask(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        @Override
-        public void execute() {
-            glDepthMask(enabled);
-        }
-
-        @Override
-        public String toString() {
-            String status = "disabled";
-            if (enabled) {
-                status = "enabled";
-            }
-            return String.format("%30s: %s", this.getClass().getSimpleName(), status);
-        }
-    }
-
-
     private static StateChange defaultInstance = new DisableDepthWriting(true);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
@@ -125,4 +102,25 @@ public final class DisableDepthWriting implements StateChange {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
     }
 
+    private final class SetDepthMaskTask implements RenderPipelineTask {
+        private boolean enabled;
+
+        private SetDepthMaskTask(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        @Override
+        public void execute() {
+            glDepthMask(enabled);
+        }
+
+        @Override
+        public String toString() {
+            String status = "disabled";
+            if (enabled) {
+                status = "enabled";
+            }
+            return String.format("%30s: %s", this.getClass().getSimpleName(), status);
+        }
+    }
 }

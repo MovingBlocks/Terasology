@@ -32,31 +32,6 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
 
-    private final class SetViewportToSizeOfTask implements RenderPipelineTask {
-        private int width;
-        private int height;
-        private ResourceUrn fboName;
-
-        private SetViewportToSizeOfTask(ResourceUrn fboName) {
-            this.fboName = fboName;
-        }
-
-        private void setDimensions(int w, int h) {
-            this.width = w;
-            this.height = h;
-        }
-
-        @Override
-        public void execute() {
-            glViewport(0, 0, width, height);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
-        }
-    }
-
     private static SetViewportToSizeOf defaultInstance = new SetViewportToSizeOf(READ_ONLY_GBUFFER);
 
     private BaseFBOsManager frameBuffersManager;
@@ -124,5 +99,30 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     private FBO getFbo() {
         return defaultDynamicFBO != null ? defaultDynamicFBO.getFbo() : frameBuffersManager.get(fboName);
 
+    }
+
+    private final class SetViewportToSizeOfTask implements RenderPipelineTask {
+        private int width;
+        private int height;
+        private ResourceUrn fboName;
+
+        private SetViewportToSizeOfTask(ResourceUrn fboName) {
+            this.fboName = fboName;
+        }
+
+        private void setDimensions(int w, int h) {
+            this.width = w;
+            this.height = h;
+        }
+
+        @Override
+        public void execute() {
+            glViewport(0, 0, width, height);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
+        }
     }
 }

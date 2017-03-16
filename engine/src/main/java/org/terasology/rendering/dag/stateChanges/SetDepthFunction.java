@@ -31,39 +31,6 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class SetDepthFunction implements StateChange {
 
-    /**
-     * Instances of this class change the depth function used for the depth test while rendering.
-     *
-     * See glDepthFunct for more information.
-     *
-     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
-     * Modules or other parts of the engine should take advantage of them through classes
-     * inheriting from StateChange.
-     */
-    private class SetDepthFunctionTask implements RenderPipelineTask {
-        private int depthFunction;
-
-        /**
-         * Constructs an instance of this class and initializes it with the given depth function.
-         *
-         * @param depthFunction An integer representing one of the depth functions known to OpenGL,
-         *                      i.e. GL_LEQUAL (Terasology's default), GL_LESS (OpenGL default), etc.
-         */
-        private SetDepthFunctionTask(int depthFunction) {
-            this.depthFunction = depthFunction;
-        }
-
-        @Override
-        public void execute() {
-            GL11.glDepthFunc(depthFunction);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), SetDepthFunction.OGL_TO_STRING.get(depthFunction));
-        }
-    }
-
     public static final ImmutableMap<Integer, String> OGL_TO_STRING =
             ImmutableMap.<Integer, String>builder()
                     .put(GL_NEVER, "GL_NEVER")
@@ -128,5 +95,38 @@ public class SetDepthFunction implements StateChange {
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), OGL_TO_STRING.get(depthFunction));
+    }
+
+    /**
+     * Instances of this class change the depth function used for the depth test while rendering.
+     *
+     * See glDepthFunct for more information.
+     *
+     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+     * Modules or other parts of the engine should take advantage of them through classes
+     * inheriting from StateChange.
+     */
+    private class SetDepthFunctionTask implements RenderPipelineTask {
+        private int depthFunction;
+
+        /**
+         * Constructs an instance of this class and initializes it with the given depth function.
+         *
+         * @param depthFunction An integer representing one of the depth functions known to OpenGL,
+         *                      i.e. GL_LEQUAL (Terasology's default), GL_LESS (OpenGL default), etc.
+         */
+        private SetDepthFunctionTask(int depthFunction) {
+            this.depthFunction = depthFunction;
+        }
+
+        @Override
+        public void execute() {
+            GL11.glDepthFunc(depthFunction);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), SetDepthFunction.OGL_TO_STRING.get(depthFunction));
+        }
     }
 }

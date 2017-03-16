@@ -31,32 +31,6 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  */
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
-    private final class BindFBOTask implements RenderPipelineTask {
-
-        private int fboId;
-        private final ResourceUrn fboName;
-
-        private BindFBOTask(int fboId, ResourceUrn fboName) {
-            this.fboId = fboId;
-            this.fboName = fboName;
-        }
-
-        @Override
-        public void execute() {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-        }
-
-        private void setFboId(int fboId) {
-            this.fboId = fboId;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
-        }
-    }
-
-
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
@@ -131,5 +105,30 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
+    }
+
+    private final class BindFBOTask implements RenderPipelineTask {
+
+        private int fboId;
+        private final ResourceUrn fboName;
+
+        private BindFBOTask(int fboId, ResourceUrn fboName) {
+            this.fboId = fboId;
+            this.fboName = fboName;
+        }
+
+        @Override
+        public void execute() {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+        }
+
+        private void setFboId(int fboId) {
+            this.fboId = fboId;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
+        }
     }
 }

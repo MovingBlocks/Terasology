@@ -30,44 +30,6 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class SetBlendFunction implements StateChange {
 
-    /**
-     * Instances of this class change the factors used for blending.
-     *
-     * See glBlendFunc for more information.
-     *
-     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
-     * Modules or other parts of the engine should take advantage of them through classes
-     * inheriting from StateChange.
-     */
-    private class SetBlendFunctionTask implements RenderPipelineTask {
-        private int sourceFactor;
-        private int destinationFactor;
-
-        /**
-         * Constructs an instance of SetBlendFunction initialised with the given blend function factors.
-         *
-         * @param sourceFactor An integer representing one of the possible blend factors known to OpenGL,
-         *                      i.e. GL_ONE, GL_SRC_COLOR, etc...
-         * @param destinationFactor An integer representing one of the possible blend factors known to OpenGL,
-         *                      i.e. GL_ZERO, GL_DST_COLOR, etc...
-         */
-        private SetBlendFunctionTask(int sourceFactor, int destinationFactor) {
-            this.sourceFactor = sourceFactor;
-            this.destinationFactor = destinationFactor;
-        }
-
-        @Override
-        public void execute() {
-            glBlendFunc(sourceFactor, destinationFactor);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s, %s", this.getClass().getSimpleName(), SetBlendFunction.OGL_TO_STRING.get(sourceFactor),
-                    SetBlendFunction.OGL_TO_STRING.get(destinationFactor));
-        }
-    }
-
     public static final ImmutableMap<Integer, String> OGL_TO_STRING =
             ImmutableMap.<Integer, String>builder()
                 .put(GL_ZERO, "GL_ZERO")
@@ -146,4 +108,41 @@ public class SetBlendFunction implements StateChange {
         return String.format("%30s: %s, %s", this.getClass().getSimpleName(), OGL_TO_STRING.get(sourceFactor), OGL_TO_STRING.get(destinationFactor));
     }
 
+    /**
+     * Instances of this class change the factors used for blending.
+     *
+     * See glBlendFunc for more information.
+     *
+     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+     * Modules or other parts of the engine should take advantage of them through classes
+     * inheriting from StateChange.
+     */
+    private class SetBlendFunctionTask implements RenderPipelineTask {
+        private int sourceFactor;
+        private int destinationFactor;
+
+        /**
+         * Constructs an instance of SetBlendFunction initialised with the given blend function factors.
+         *
+         * @param sourceFactor An integer representing one of the possible blend factors known to OpenGL,
+         *                      i.e. GL_ONE, GL_SRC_COLOR, etc...
+         * @param destinationFactor An integer representing one of the possible blend factors known to OpenGL,
+         *                      i.e. GL_ZERO, GL_DST_COLOR, etc...
+         */
+        private SetBlendFunctionTask(int sourceFactor, int destinationFactor) {
+            this.sourceFactor = sourceFactor;
+            this.destinationFactor = destinationFactor;
+        }
+
+        @Override
+        public void execute() {
+            glBlendFunc(sourceFactor, destinationFactor);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s, %s", this.getClass().getSimpleName(), SetBlendFunction.OGL_TO_STRING.get(sourceFactor),
+                    SetBlendFunction.OGL_TO_STRING.get(destinationFactor));
+        }
+    }
 }

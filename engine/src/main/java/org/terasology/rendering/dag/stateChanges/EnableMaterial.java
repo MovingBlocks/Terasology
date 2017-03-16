@@ -28,40 +28,6 @@ import org.terasology.utilities.Assets;
  */
 public final class EnableMaterial implements StateChange {
 
-    private class DisableMaterialTask implements RenderPipelineTask {
-        private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
-
-        @Override
-        public void execute() {
-            shaderManager.disableShader();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: program 0", this.getClass().getSimpleName());
-        }
-    }
-
-    private class EnableMaterialTask implements RenderPipelineTask {
-        private Material material;
-        private String materialName;
-
-        private EnableMaterialTask(Material material, String materialName) {
-            this.material = material;
-            this.materialName = materialName;
-        }
-
-        @Override
-        public void execute() {
-            material.enable();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
-        }
-    }
-
     private static final String DEFAULT_MATERIAL_NAME = "DEFAULT";
     private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_NAME);
 
@@ -72,7 +38,7 @@ public final class EnableMaterial implements StateChange {
         this.materialName = materialName;
     }
 
-    private String getMaterialName() {
+    public String getMaterialName() {
         return materialName;
     }
 
@@ -117,5 +83,39 @@ public final class EnableMaterial implements StateChange {
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
+    }
+
+    private class DisableMaterialTask implements RenderPipelineTask {
+        private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
+
+        @Override
+        public void execute() {
+            shaderManager.disableShader();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: program 0", this.getClass().getSimpleName());
+        }
+    }
+
+    private class EnableMaterialTask implements RenderPipelineTask {
+        private Material material;
+        private String materialName;
+
+        private EnableMaterialTask(Material material, String materialName) {
+            this.material = material;
+            this.materialName = materialName;
+        }
+
+        @Override
+        public void execute() {
+            material.enable();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
+        }
     }
 }
