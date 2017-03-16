@@ -394,6 +394,9 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private void processControllerInput(float delta) {
+        if (!display.hasFocus()) {
+            return;
+        }
         for (ControllerAction action : controllers.getInputQueue()) {
             // TODO: send event to entity system
             boolean consumed = false;
