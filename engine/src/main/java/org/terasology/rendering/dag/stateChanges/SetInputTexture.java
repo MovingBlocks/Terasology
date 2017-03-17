@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,11 +104,6 @@ public class SetInputTexture implements StateChange {
             defaultInstance = new SetInputTexture(textureSlot, materialURN, materialParameter);
         }
         return defaultInstance;
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
     }
 }
 

@@ -52,11 +52,6 @@ public class SetName implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), name);
     }
@@ -65,4 +60,3 @@ public class SetName implements StateChange {
         return name;
     }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  */
 public class ShaderParametersDefault extends ShaderParametersBase {
-
     @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
@@ -35,5 +34,4 @@ public class ShaderParametersDefault extends ShaderParametersBase {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, 0);
     }
-
 }

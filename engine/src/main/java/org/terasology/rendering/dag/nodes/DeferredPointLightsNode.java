@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -125,9 +125,11 @@ public class DeferredPointLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
-        
-        READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+
+        sceneOpaqueFbo.bind(); // TODO: remove and replace with a state change
+        sceneOpaqueFbo.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -172,7 +174,7 @@ public class DeferredPointLightsNode extends AbstractNode {
             }
         }
 
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
+        sceneOpaqueFbo.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
 
         PerformanceMonitor.endActivity();
     }

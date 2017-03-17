@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.*;
 
 /**
@@ -52,24 +51,25 @@ public class ApplyDeferredLightingNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-
-        addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
+        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaquePingPong"), displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().colorBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
+                textureSlot++, sceneOpaqueFbo.colorBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().depthStencilTextureId,  DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
+                textureSlot++, sceneOpaqueFbo.depthStencilTextureId,  DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot++, READ_ONLY_GBUFFER.getFbo().normalsBufferTextureId, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
+                textureSlot++, sceneOpaqueFbo.normalsBufferTextureId, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTexture(
-                textureSlot,   READ_ONLY_GBUFFER.getFbo().lightBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
+                textureSlot,   sceneOpaqueFbo.lightBufferTextureId,   DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
     }
 
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering, stored in the READ_ONLY_GBUFFER.
+     * calculations to the previously flat-lit world rendering, stored in the engine:sceneOpaque.
      * <p>
      * See http://en.wikipedia.org/wiki/Deferred_shading for more information on the general subject.
      */
@@ -77,14 +77,16 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        WRITE_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
-        WRITE_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
+        FBO sceneOpaquePingPongFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaquePingPong"));
+
+        sceneOpaquePingPongFbo.bind(); // TODO: remove and replace with a state change
+        sceneOpaquePingPongFbo.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
 
         displayResolutionDependentFBOs.swapReadWriteBuffers();
-        READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
+        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
 
         PerformanceMonitor.endActivity();
     }

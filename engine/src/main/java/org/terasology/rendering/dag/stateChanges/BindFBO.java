@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
@@ -43,11 +42,6 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
         this.fboName = fboName;
     }
 
-    public BindFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        // TODO: consider removing this constructor whenever defaultDynamicFBOs are nameless
-        this(defaultDynamicFBO.getName(), defaultDynamicFBO.getFrameBufferManager());
-    }
-
     private BindFBO(ResourceUrn fboName) {
         this.fboName = fboName;
     }
@@ -59,11 +53,6 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
     }
 
     @Override

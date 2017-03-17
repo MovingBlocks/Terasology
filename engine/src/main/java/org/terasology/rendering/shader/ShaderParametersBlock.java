@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 // TODO: Put these values in a material and use that.
 public class ShaderParametersBlock extends ShaderParametersBase {
-
     public ShaderParametersBlock() {
     }
 
@@ -54,5 +53,4 @@ public class ShaderParametersBlock extends ShaderParametersBase {
         program.setBoolean("textured", true, true);
         program.setFloat("alpha", 1.0f, true);
     }
-
 }

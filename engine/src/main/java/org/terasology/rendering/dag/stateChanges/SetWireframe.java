@@ -69,11 +69,6 @@ public final class SetWireframe implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         String status = "disabled";
         if (enabled) {

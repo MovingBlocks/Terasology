@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,6 +231,25 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         }
 
         return fbo;
+    }
+
+    /**
+     * Returns an FBOConfig given its name.
+     *
+     * If no FBOConfig maps to the given name, null is returned and an error is logged.
+     *
+     * @param fboName
+     * @return an FBOConfig or null
+     */
+    @Override
+    public FBOConfig getFboConfig(ResourceUrn fboName) {
+        FBOConfig fboConfig = fboConfigs.get(fboName);
+
+        if (fboConfigs == null) {
+            logger.error("Failed to retrieve FBOConfig '" + fboName + "'!");
+        }
+
+        return fboConfig;
     }
 
     /**

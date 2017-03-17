@@ -20,7 +20,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
@@ -51,7 +50,6 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     private int textureSlot;
     private ResourceUrn fboURN;
     private FBO inputFbo;
-    private DefaultDynamicFBOs defaultFBO; // TODO: remove/change references to default FBOs when they are no longer implemented as enums.
     private FboTexturesTypes textureType;
     private BaseFBOsManager fbosManager;
     private ResourceUrn materialURN;
@@ -87,27 +85,6 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         fbosManager.subscribe(this);
     }
 
-    // TODO: either take advantage of this constructor or remove it. Note: it will probably be removed.
-
-    /**
-     * Warning: seemingly disfunctional - deprecated for the time being.
-     */
-    public SetInputTextureFromFBO(int textureSlot, DefaultDynamicFBOs defaultDynamicFbo, FboTexturesTypes textureType, BaseFBOsManager fbosManager,
-                                  ResourceUrn materialURN, String parameterName) {
-        this.textureSlot = textureSlot;
-        this.textureType = textureType;
-        this.defaultFBO = defaultDynamicFbo;
-        this.inputFbo = defaultDynamicFbo.getFbo();
-        this.fboURN = defaultDynamicFbo.getName();
-        this.inputFbo = fbosManager.get(fboURN);
-
-        this.materialURN = materialURN;
-        this.parameterName = parameterName;
-
-        this.fbosManager = fbosManager;
-        fbosManager.subscribe(this);
-    }
-
     private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialURN, String parameterName) {
         this.textureSlot = textureSlot;
         this.materialURN = materialURN;
@@ -134,11 +111,6 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
             defaultInstance = new SetInputTextureFromFBO(this.textureSlot, materialURN, this.parameterName);
         }
         return defaultInstance;
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
     }
 
     private int fetchTextureId() {
@@ -180,12 +152,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     @Override
     public void update() {
 
-        if (defaultFBO == null) {
-            inputFbo = fbosManager.get(fboURN);
-        } else {
-            this.inputFbo = defaultFBO.getFbo();
-            this.fboURN = defaultFBO.getName();
-        }
+        inputFbo = fbosManager.get(fboURN);
 
         // If a node taking advantage of this state change is disabled when a game is started, task is null.
         // This is due to the task list generator not having yet called the generateTask() method.

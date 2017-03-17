@@ -69,11 +69,6 @@ public final class EnableMaterial implements StateChange {
         return (obj instanceof EnableMaterial) && materialName.equals(((EnableMaterial) obj).getMaterialName());
     }
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
     private static Material getMaterial(String assetId) {
         return Assets.getMaterial(assetId).orElseThrow(() ->
                 new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));

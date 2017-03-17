@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.nodes.ShadowMapNode;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
@@ -36,7 +38,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  */
 public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
-
     @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
@@ -44,20 +45,23 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         // TODO: obtain once in the superclass and monitor from there?
         // TODO: switch from CoreRegistry to Context.
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = CoreRegistry.get(ShadowMapResolutionDependentFBOs.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
 
         int texId = 0;
-        if (READ_ONLY_GBUFFER.getFbo() != null) {
+        if (sceneOpaqueFbo != null) {
             // TODO: move content of this block into the node
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            READ_ONLY_GBUFFER.bindDepthTexture();
+            sceneOpaqueFbo.bindDepthTexture();
             program.setInt("texSceneOpaqueDepth", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            READ_ONLY_GBUFFER.bindNormalsTexture();
+            sceneOpaqueFbo.bindNormalsTexture();
             program.setInt("texSceneOpaqueNormals", texId++, true);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            READ_ONLY_GBUFFER.bindLightBufferTexture();
+            sceneOpaqueFbo.bindLightBufferTexture();
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 

@@ -31,7 +31,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.OpenGLUtils.*;
 import static org.terasology.rendering.opengl.ScalingFactors.*;
 
@@ -73,7 +72,7 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL.toString()));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READ_ONLY_GBUFFER.getName(), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, new ResourceUrn("engine:sceneOpaque"), ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)

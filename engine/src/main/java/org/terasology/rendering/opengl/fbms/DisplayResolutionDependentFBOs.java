@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,8 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
@@ -41,21 +39,17 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     public DisplayResolutionDependentFBOs(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
         screenGrabber = context.get(ScreenGrabber.class);
-        fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
+
+        updateFullScale();
         generateDefaultFBOs();
     }
 
     private void generateDefaultFBOs() {
-        generateDefaultFBO(READ_ONLY_GBUFFER);
-        generateDefaultFBO(WRITE_ONLY_GBUFFER);
-        generateDefaultFBO(FINAL);
-    }
-
-    private void generateDefaultFBO(DefaultDynamicFBOs defaultDynamicFBO) {
-        FBOConfig fboConfig = defaultDynamicFBO.getConfig();
-        FBO fbo = generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
-        defaultDynamicFBO.setFbo(fbo);
-        defaultDynamicFBO.setFrameBufferManager(this);
+        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), FULL_SCALE, FBO.Type.HDR)
+                .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
+        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), FULL_SCALE, FBO.Type.HDR)
+                .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
+        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneFinal"), FULL_SCALE, FBO.Type.DEFAULT), fullScale);
     }
 
     @Override
@@ -93,10 +87,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
      */
     public void update() {
         updateFullScale();
-        if (READ_ONLY_GBUFFER.getFbo().dimensions().areDifferentFrom(fullScale)) {
+        if (get(new ResourceUrn("engine:sceneOpaque")).dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
-            updateDefaultFBOs();
             notifySubscribers();
         }
     }
@@ -114,19 +107,11 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         }
     }
 
-    private void updateDefaultFBOs() {
-        READ_ONLY_GBUFFER.setFbo(fboLookup.get(READ_ONLY_GBUFFER.getName()));
-        WRITE_ONLY_GBUFFER.setFbo(fboLookup.get(WRITE_ONLY_GBUFFER.getName()));
-        FINAL.setFbo(fboLookup.get(FINAL.getName()));
-    }
-
     // TODO: Pairing FBOs for swapping functionality
     public void swapReadWriteBuffers() {
-        FBO fbo = READ_ONLY_GBUFFER.getFbo();
-        READ_ONLY_GBUFFER.setFbo(WRITE_ONLY_GBUFFER.getFbo());
-        WRITE_ONLY_GBUFFER.setFbo(fbo);
-        fboLookup.put(READ_ONLY_GBUFFER.getName(), READ_ONLY_GBUFFER.getFbo());
-        fboLookup.put(WRITE_ONLY_GBUFFER.getName(), WRITE_ONLY_GBUFFER.getFbo());
+        FBO fbo = get(new ResourceUrn("engine:sceneOpaque"));
+        fboLookup.put(new ResourceUrn("engine:sceneOpaque"), get(new ResourceUrn("engine:sceneOpaquePingPong")));
+        fboLookup.put(new ResourceUrn("engine:sceneOpaquePingPong"), fbo);
         notifySubscribers();
     }
 }
