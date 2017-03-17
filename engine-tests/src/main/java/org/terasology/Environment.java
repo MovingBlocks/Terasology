@@ -150,7 +150,7 @@ public class Environment {
     }
 
     protected void setupCelestialSystem() {
-        // empty
+        // test test test
     }
 
     /**
