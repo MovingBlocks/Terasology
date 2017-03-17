@@ -16,6 +16,20 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.config.Config;
+import org.terasology.context.Context;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.game.GameManifest;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commands.ServerCommands;
+import org.terasology.logic.permission.PermissionManager;
+import org.terasology.network.NetworkMode;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.StoragePathProvider;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -36,12 +50,25 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.jar.Manifest;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(ServerCommands.class);
+    private StoragePathProvider storagePathProvider;
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private StorageManager storageManager;
+
 
     @Override
     public void initialise() {
@@ -66,15 +93,42 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
+    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     @ReceiveEvent(components = {ClientComponent.class})
-    public void onSave(SaveButton event, EntityRef entity) {
+    public void onSave(SaveButton event, EntityRef entity) throws IOException {
         if (event.getState() == ButtonState.DOWN) {
+            GameManifest latestManifest = getLatestGameManifest();
+            boolean isQuickSaveCreated = false;
+            List<GameInfo> savedGames = GameProvider.getSavedGames();
+            for (GameInfo savedGame : savedGames) {
+                if (savedGame.getManifest().getTitle().equals(latestManifest.getTitle() + " Quick Save")){
+                    isQuickSaveCreated = true;
+                    break;
+                }
+            }
+
+            if (isQuickSaveCreated){
+                //save to quick save file
+                storageManager.requestSaving(); //have to specify path of quick save somehow
+            }
+            else{
+                //create a new file
+                GameManifest newGameManifest = new GameManifest(latestManifest);
+                newGameManifest.setTitle(latestManifest.getTitle() + " Quick Save");
+                GameManifest.save(PathManager.getInstance().getSavePath(newGameManifest.getTitle()), newGameManifest);
+            }
             event.consume();
         }
 
-    }@ReceiveEvent(components = {ClientComponent.class})
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
     public void onLoad(LoadButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
+            GameManifest latestManifest = getLatestGameManifest();
+            //CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE)); not sure how to get the "loadingAsServer" boolean here
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, NetworkMode.NONE));
             event.consume();
         }
     }
@@ -99,4 +153,19 @@ public class MenuControlSystem extends BaseComponentSystem {
         event.consume();
     }
 
+    private static GameManifest getLatestGameManifest() {
+        GameInfo latestGame = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        for (GameInfo savedGame : savedGames) {
+            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
+                latestGame = savedGame;
+            }
+        }
+
+        if (latestGame == null) {
+            return null;
+        }
+
+        return latestGame.getManifest();
+    }
 }
