@@ -20,12 +20,15 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.WorldRendererImpl;
 
 /**
  * TODO: Add javadocs
@@ -35,13 +38,15 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     private FBO.Dimensions fullScale;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
+    Context context;
 
     public DisplayResolutionDependentFBOs(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
         screenGrabber = context.get(ScreenGrabber.class);
-
         updateFullScale();
         generateDefaultFBOs();
+
+        this.context = context;
     }
 
     private void generateDefaultFBOs() {
@@ -91,6 +96,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
             disposeAllFBOs();
             createFBOs();
             notifySubscribers();
+
+            WorldRendererImpl worldRendererImpl = ((WorldRendererImpl)context.get(WorldRenderer.class));
+            worldRendererImpl.initRenderGraph();
         }
     }
 
