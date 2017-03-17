@@ -25,6 +25,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.PingStockComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.Map;
@@ -47,6 +48,19 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
     @Override
     public void initialise() {
         this.text = find("playerList", UIText.class);
+        text.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                PingStockComponent pingStockComp = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
+                if (pingStockComp == null) {
+                    String playerListText = determinePlayerListText();
+                    return playerListText;
+                } else {
+                    String playerAndPing = determinePlayerAndPing(pingStockComp);
+                    return playerAndPing;
+                }
+            }
+        });
     }
 
     private String determinePlayerListText() {
@@ -86,22 +100,5 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             first = false;
         }
         return sb.toString();
-    }
-
-    @Override
-    public void onOpened() {
-        super.onOpened();
-        if (text != null) {
-            PingStockComponent pingStockComp = localPlayer.getClientEntity().getComponent(PingStockComponent.class);
-            if (pingStockComp == null) {
-                String playerListText = determinePlayerListText();
-                text.setText(playerListText);
-            } else {
-                String playerAndPing = determinePlayerAndPing(pingStockComp);
-                text.setText(playerAndPing);
-            }
-        } else {
-            logger.error("no  playerList");
-        }
     }
 }

@@ -40,7 +40,7 @@ import java.util.HashMap;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
-    private static final long pingPeriod = 10000;
+    private static final long PING_PERIOD = 400;
 
     @In
     private EntityManager entityManager;
@@ -64,7 +64,7 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
     @Override
     public void update(float delta) {
         long time = Duration.between(lastPingTime, Instant.now()).toMillis();
-        if (time > pingPeriod) {
+        if (time > PING_PERIOD) {
 
             // Server ping to all clients only if there are clients who subscribe
             if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) != 0) {
