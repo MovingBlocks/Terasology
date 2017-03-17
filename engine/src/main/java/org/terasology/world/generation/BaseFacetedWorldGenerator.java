@@ -25,7 +25,7 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
     private final SimpleUri uri;
 
     private String worldSeed;
-    private WorldBuilder worldBuilder;
+    protected WorldBuilder worldBuilder;
     private World world;
 
     private FacetedWorldConfigurator configurator;

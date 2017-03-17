@@ -45,7 +45,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     private WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
 
-    private Camera noCamera = new NullCamera();
+    private Camera noCamera = new NullCamera(null, null);
 
     /* CHUNKS */
     private boolean pendingChunks;

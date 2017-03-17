@@ -186,7 +186,11 @@ Contributors
  [madmate](https://github.com/madmate),
  [J0hnCena](https://github.com/J0hnCena),
  [GabrielXia](https://github.com/GabrielXia),
- [fabriond](https://github.com/fabriond)
+ [fabriond](https://github.com/fabriond),
+ [0shine0](https://github.com/0shine0),
+ [AWildBeard ](https://github.com/AWildBeard ),
+ [vampcat](https://github.com/vampcat),
+ [ThompsonTyler](https://github.com/ThompsonTyler)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
