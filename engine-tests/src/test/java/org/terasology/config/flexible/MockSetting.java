@@ -29,13 +29,15 @@ class MockSetting<T> implements Setting<T> {
     }
 
     @Override
-    public void subscribe(PropertyChangeListener changeListener) {
+    public boolean subscribe(PropertyChangeListener changeListener) {
         isSubscribedTo = true;
+        return true;
     }
 
     @Override
-    public void unsubscribe(PropertyChangeListener changeListener) {
+    public boolean unsubscribe(PropertyChangeListener changeListener) {
         isSubscribedTo = false;
+        return false;
     }
 
     @Override

@@ -17,14 +17,15 @@ package org.terasology.config.flexible;
 
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
-import org.terasology.utilities.subscribables.GeneralSubscribable;
+
+import java.beans.PropertyChangeListener;
 
 /**
  * Represents a setting uniquely identified by an id. Contains a value that may be validated by a
  * {@link SettingValueValidator<T>} and notifies subscribers when the stored value is changed.
  * @param <T> The type of the value this {@link Setting} contains.
  */
-public interface Setting<T> extends GeneralSubscribable {
+public interface Setting<T> {
     /**
      * Returns the id of this {@link Setting}.
      */
@@ -72,6 +73,24 @@ public interface Setting<T> extends GeneralSubscribable {
      * Returns a potentially verbose description of this {@link Setting}.
      */
     String getDescription();
+
+    /**
+     * Subscribe a {@link PropertyChangeListener} that will be notified when the value stored in the setting
+     * changes. In case of failure warnings will be issued through the logger detailing the exact nature of the failure.
+     *
+     * @param listener The {@link PropertyChangeListener} to subscribe.
+     * @return True if the {@link PropertyChangeListener} was subscribed, false otherwise.
+     */
+    boolean subscribe(PropertyChangeListener listener);
+
+    /**
+     * Unsubscribe a {@link PropertyChangeListener} that will be notified when the value stored in the setting
+     * changes. In case of failure warnings will be issued through the logger detailing the exact nature of the failure.
+     *
+     * @param listener The {@link PropertyChangeListener} to unsubscribe.
+     * @return True if the {@link PropertyChangeListener} was unsubscribed, false otherwise.
+     */
+    boolean unsubscribe(PropertyChangeListener listener);
 
     /**
      * Returns a boolean stating whether this {@link Setting} has any subscribers.

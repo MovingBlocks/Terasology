@@ -87,25 +87,44 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     /**
-     * Subscribe a listener that will be notified when the value stored in the setting changes.
+     * {@inheritDoc}
      */
-    public void subscribe(PropertyChangeListener listener) {
+    public boolean subscribe(PropertyChangeListener listener) {
         if (subscribers == null) {
             subscribers = Sets.newHashSet();
         }
 
+        if (listener == null) {
+            // TODO: Create a warning format string which contains the id of the setting
+            LOGGER.warn("Setting {}: A null subscriber cannot be added", id);
+            return false;
+        }
+        if (subscribers.contains(listener)) {
+            LOGGER.warn("Setting {}: The listener has already been subscribed", id);
+            return false;
+        }
+
         subscribers.add(listener);
+
+        return true;
     }
 
     /**
-     * Unsubscribe a listener that will be notified when the value stored in the setting changes.
+     * {@inheritDoc}
      */
-    public void unsubscribe(PropertyChangeListener listener) {
+    public boolean unsubscribe(PropertyChangeListener listener) {
+        if (!subscribers.contains(listener)) {
+            LOGGER.warn("Setting {}: The listener does not exist in the subscriber list", id);
+            return false;
+        }
+
         subscribers.remove(listener);
 
         if (subscribers.size() <= 0) {
             subscribers = null;
         }
+
+        return true;
     }
 
     /**
@@ -147,7 +166,7 @@ public class SettingImpl<T> implements Setting<T> {
      * {@inheritDoc}
      */
     public boolean setValue(T newValue) {
-        if (validator != null && !validator.validate(newValue)) {
+        if (!validate(newValue)) {
             return false;
         }
 
