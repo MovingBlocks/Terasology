@@ -100,9 +100,6 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
             disposeAllFBOs();
             createFBOs();
             notifySubscribers();
-
-            WorldRendererImpl worldRendererImpl = ((WorldRendererImpl)context.get(WorldRenderer.class));
-            worldRendererImpl.initRenderGraph();
         }
     }
 

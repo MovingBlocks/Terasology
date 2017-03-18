@@ -213,7 +213,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         initRenderGraph();
     }
 
-    public void initRenderGraph() {
+    private void initRenderGraph() {
         // FIXME: init pipeline without specifying them as a field in this class
         NodeFactory nodeFactory = new NodeFactory(context);
         RenderGraph renderGraph = new RenderGraph();
