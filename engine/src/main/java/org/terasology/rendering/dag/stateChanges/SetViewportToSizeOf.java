@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * TODO: Add javadocs
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
-    private static SetViewportToSizeOf defaultInstance;
+    private static SetViewportToSizeOf defaultInstance = new SetViewportToSizeOf(SCENE_OPAQUE, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
 
     private BaseFBOsManager frameBuffersManager;
     private SetViewportToSizeOfTask task;
@@ -45,9 +45,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public StateChange getDefaultInstance() {
-        // VAMPCAT : TODO: Try initializing while declaring instead of doing it here
-        if (defaultInstance == null)
-            defaultInstance = new SetViewportToSizeOf(SCENE_OPAQUE, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
         return defaultInstance;
     }
 
@@ -88,7 +85,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     }
 
     private FBO getFbo() {
-        //VAMPCAT : Maybe store the fbo in the class, instead of fetching every time?
         return frameBuffersManager.get(fboName);
     }
 }
