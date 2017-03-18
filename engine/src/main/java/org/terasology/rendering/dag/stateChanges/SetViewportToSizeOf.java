@@ -23,15 +23,10 @@ import java.util.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.FBO;
-<<<<<<< HEAD
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
-=======
-
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
->>>>>>> 862565e55eaffd2488997186627a8ad106af3b28
 
 /**
  * TODO: Add javadocs
