@@ -42,6 +42,10 @@ import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
+import java.util.Arrays;
+
+import static java.util.stream.Collectors.joining;
+
 /**
  */
 @RegisterSystem
@@ -104,18 +108,11 @@ public class ChatSystem extends BaseComponentSystem {
             client.send(new ChatMessageEvent(messageToString, sender.getComponent(ClientComponent.class).clientInfo));
         }
 
-        return "Message sent.";
+        return "Message sent";
     }
 
-    private String join(String[] strings, String cement) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String s : strings) {
-            stringBuilder.append(s);
-            stringBuilder.append(cement);
-        }
-        stringBuilder.delete(stringBuilder.length() - cement.length(), stringBuilder.length());
-
-        return stringBuilder.toString();
+    private String join(String[] words, String sep) {
+        return Arrays.stream(words).collect(joining(sep));
     }
 
     @Command(runOnServer = true,

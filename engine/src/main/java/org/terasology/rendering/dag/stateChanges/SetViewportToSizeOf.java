@@ -22,11 +22,16 @@ import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import java.util.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetViewportToSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
+<<<<<<< HEAD
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+=======
+
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+>>>>>>> 862565e55eaffd2488997186627a8ad106af3b28
 
 /**
  * TODO: Add javadocs
@@ -86,5 +91,30 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     private FBO getFbo() {
         return frameBuffersManager.get(fboName);
+    }
+
+    private final class SetViewportToSizeOfTask implements RenderPipelineTask {
+        private int width;
+        private int height;
+        private ResourceUrn fboName;
+
+        private SetViewportToSizeOfTask(ResourceUrn fboName) {
+            this.fboName = fboName;
+        }
+
+        private void setDimensions(int w, int h) {
+            this.width = w;
+            this.height = h;
+        }
+
+        @Override
+        public void execute() {
+            glViewport(0, 0, width, height);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, width, height);
+        }
     }
 }
