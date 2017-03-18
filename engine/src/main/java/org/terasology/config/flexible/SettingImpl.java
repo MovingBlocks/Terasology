@@ -27,6 +27,7 @@ import java.util.Set;
 
 /**
  * {@inheritDoc}
+ *
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
 public class SettingImpl<T> implements Setting<T> {
@@ -45,7 +46,8 @@ public class SettingImpl<T> implements Setting<T> {
 
     /**
      * Creates a new {@link SettingImpl} with the given id and default value but no validator.
-     * @param id the id of the setting.
+     *
+     * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
      */
     public SettingImpl(SimpleUri id, T defaultValue) {
@@ -54,9 +56,10 @@ public class SettingImpl<T> implements Setting<T> {
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and validator.
-     * @param id the id of the setting.
+     *
+     * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
-     * @param validator the validator to be used to validate values.
+     * @param validator    the validator to be used to validate values.
      */
     public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
@@ -64,7 +67,8 @@ public class SettingImpl<T> implements Setting<T> {
         this.validator = validator;
 
         if (!validate(defaultValue))
-            throw new IllegalArgumentException("The default value must be a valid value.");
+            throw new IllegalArgumentException("The default value must be a valid value. " +
+                    "Check the logs for more information.");
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
@@ -79,7 +83,7 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private boolean validate(T value) {
-        return validator == null || validator.fastValidate(value);
+        return validator == null || validator.validate(value);
     }
 
     /**
