@@ -34,7 +34,7 @@ public class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
     private final T defaultValue;
 
-    private SimpleUri id;
+    private final SimpleUri id;
 
     private T value;
 
