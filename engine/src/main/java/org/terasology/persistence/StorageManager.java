@@ -20,6 +20,7 @@ import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
@@ -42,6 +43,8 @@ public interface StorageManager {
     PlayerStore loadPlayerStore(String playerId);
 
     void requestSaving();
+
+    void setSavePath(Path savePath);
 
     void waitForCompletionOfPreviousSaveAndStartSaving();
 

@@ -27,7 +27,6 @@ import org.terasology.logic.console.commands.ServerCommands;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StoragePathProvider;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.Assets;
@@ -54,14 +53,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.jar.Manifest;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(ServerCommands.class);
-    private StoragePathProvider storagePathProvider;
+    private static final Logger logger = LoggerFactory.getLogger(GameProvider.class);
 
     @In
     private NUIManager nuiManager;
@@ -96,39 +95,23 @@ public class MenuControlSystem extends BaseComponentSystem {
     @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
             requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     @ReceiveEvent(components = {ClientComponent.class})
-    public void onSave(SaveButton event, EntityRef entity) throws IOException {
+    public void onSave(SaveButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             GameManifest latestManifest = getLatestGameManifest();
-            boolean isQuickSaveCreated = false;
-            List<GameInfo> savedGames = GameProvider.getSavedGames();
-            for (GameInfo savedGame : savedGames) {
-                if (savedGame.getManifest().getTitle().equals(latestManifest.getTitle() + " Quick Save")){
-                    isQuickSaveCreated = true;
-                    break;
-                }
-            }
-
-            if (isQuickSaveCreated){
-                //save to quick save file
-                storageManager.requestSaving(); //have to specify path of quick save somehow
-            }
-            else{
-                //create a new file
-                GameManifest newGameManifest = new GameManifest(latestManifest);
-                newGameManifest.setTitle(latestManifest.getTitle() + " Quick Save");
-                GameManifest.save(PathManager.getInstance().getSavePath(newGameManifest.getTitle()), newGameManifest);
-            }
+            storageManager.setSavePath(PathManager.getInstance().getSavePath(latestManifest.getTitle()).resolve(latestManifest.getTitle() + " Quick Save"));
+            storageManager.requestSaving();
             event.consume();
         }
-
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
     public void onLoad(LoadButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            GameManifest latestManifest = getLatestGameManifest();
             //CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE)); not sure how to get the "loadingAsServer" boolean here
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, NetworkMode.NONE));
+            GameManifest quickSaveGameManifest = getQuickSaveGameManifest();
+            if (quickSaveGameManifest != null) {
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE));
+            }
             event.consume();
         }
     }
@@ -167,5 +150,22 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
 
         return latestGame.getManifest();
+    }
+
+    private static GameManifest getQuickSaveGameManifest() {
+        GameManifest latestManifest=getLatestGameManifest();
+        try {
+            String title = latestManifest.getTitle();
+            return GameManifest.load(
+                    PathManager.getInstance()
+                            .getSavePath(title)
+                            .resolve(title
+                                    + " Quick Save"
+                                    + System.getProperty("file.separator")
+                                    + "manifest.json"));
+        } catch (IOException e) {
+            logger.error("Failed to find Quick Load Save.", e);
+            return null;
+        }
     }
 }

@@ -57,7 +57,7 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractStorageManager.class);
 
-    private final StoragePathProvider storagePathProvider;
+    private StoragePathProvider storagePathProvider;
     private final BlockManager blockManager;
     private final BiomeManager biomeManager;
 
@@ -225,6 +225,17 @@ public abstract class AbstractStorageManager implements StorageManager {
         return entityManager;
     }
 
+    protected BlockManager getBlockManager(){
+        return blockManager;
+    }
+
+    protected BiomeManager getBiomeManager() {
+        return biomeManager;
+    }
+
+    public void setSavePath(Path savePath){
+        this.storagePathProvider = new StoragePathProvider(savePath);
+    }
     protected PrefabSerializer getPrefabSerializer() {
         return prefabSerializer;
     }

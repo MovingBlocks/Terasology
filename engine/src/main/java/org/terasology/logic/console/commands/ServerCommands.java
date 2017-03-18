@@ -19,10 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.game.GameManifest;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -39,7 +41,11 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.chunks.ChunkProvider;
+
+import java.util.List;
 
 /**
  * Commands to administer a remote server
@@ -186,6 +192,8 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
             requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     public void save() {
+        GameManifest latestManifest = getLatestGameManifest();
+        storageManager.setSavePath(PathManager.getInstance().getSavePath(latestManifest.getTitle()).resolve(latestManifest.getTitle() + " Quick Save"));
         storageManager.requestSaving();
     }
 
@@ -204,5 +212,21 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
     public void purgeWorld() {
         chunkProvider.purgeWorld();
+    }
+
+    private static GameManifest getLatestGameManifest() {
+        GameInfo latestGame = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        for (GameInfo savedGame : savedGames) {
+            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
+                latestGame = savedGame;
+            }
+        }
+
+        if (latestGame == null) {
+            return null;
+        }
+
+        return latestGame.getManifest();
     }
 }
