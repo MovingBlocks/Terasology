@@ -30,8 +30,11 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
@@ -40,7 +43,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
-
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
     @In
@@ -57,12 +59,15 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
@@ -70,7 +75,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
     }
 
@@ -109,7 +114,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/overlays");
 
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).bind(); // TODO: remove when we can bind this via a StateChange
+        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();

@@ -29,6 +29,8 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.*;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
 
 /**
  * The ApplyDeferredLightingNode takes advantage of the information stored by previous nodes
@@ -44,6 +46,10 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    private FBO sceneOpaqueFbo;
+    private FBO sceneOpaquePingPongFbo;
+    private FBO refractiveReflectiveFbo;
+
     /**
      * Initializes an instance of this node.
      *
@@ -51,10 +57,12 @@ public class ApplyDeferredLightingNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaquePingPong"), displayResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        sceneOpaquePingPongFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE_PING_PONG);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(
@@ -77,16 +85,14 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        FBO sceneOpaquePingPongFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaquePingPong"));
-
         sceneOpaquePingPongFbo.bind(); // TODO: remove and replace with a state change
         sceneOpaquePingPongFbo.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
 
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
+        displayResolutionDependentFBOs.swapReadWriteBuffers(); // Doesn't exactly help with a lean process() function..
+        sceneOpaqueFbo.attachDepthBufferTo(refractiveReflectiveFbo);
 
         PerformanceMonitor.endActivity();
     }

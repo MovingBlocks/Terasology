@@ -32,6 +32,7 @@ import org.terasology.rendering.nui.properties.Range;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * Shader parameters for the Chunk shader program.
@@ -129,7 +130,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(new ResourceUrn("engine:sceneOpaque"));
+        displayResolutionDependentFBOs.bindFboColorTexture(SCENE_OPAQUE);
         program.setInt("texSceneOpaque", texId++, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame

@@ -33,6 +33,7 @@ import org.terasology.rendering.logic.LightComponent;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -66,6 +67,7 @@ public class DeferredMainLightNode extends AbstractNode {
     private LightComponent mainLightComponent = new LightComponent();
     private Camera playerCamera;
     private Material lightGeometryMaterial;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initializes an instance of this node.
@@ -74,6 +76,8 @@ public class DeferredMainLightNode extends AbstractNode {
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
@@ -105,8 +109,6 @@ public class DeferredMainLightNode extends AbstractNode {
 
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it - I think.
-
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
 
         sceneOpaqueFbo.bind(); // TODO: remove and replace with a state change
         sceneOpaqueFbo.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer

@@ -238,14 +238,14 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      *
      * If no FBOConfig maps to the given name, null is returned and an error is logged.
      *
-     * @param fboName
-     * @return an FBOConfig or null
+     * @param fboName a ResourceUrn representing the name of an FBO
+     * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
      */
     @Override
     public FBOConfig getFboConfig(ResourceUrn fboName) {
         FBOConfig fboConfig = fboConfigs.get(fboName);
 
-        if (fboConfigs == null) {
+        if (fboConfig == null) {
             logger.error("Failed to retrieve FBOConfig '" + fboName + "'!");
         }
 

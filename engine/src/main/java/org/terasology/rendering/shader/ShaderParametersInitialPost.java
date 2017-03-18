@@ -35,6 +35,7 @@ import org.terasology.world.WorldProvider;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -64,7 +65,7 @@ public class ShaderParametersInitialPost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(new ResourceUrn("engine:sceneOpaque"));
+        displayResolutionDependentFBOs.bindFboColorTexture(SCENE_OPAQUE);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor config parameter by subscribing to it

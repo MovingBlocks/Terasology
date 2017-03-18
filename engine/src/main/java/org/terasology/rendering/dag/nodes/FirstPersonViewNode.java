@@ -30,16 +30,17 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
  */
 public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
-
     @In
     private WorldRenderer worldRenderer;
 
@@ -55,9 +56,12 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
     private SetWireframe wireframeStateChange;
+    private FBO sceneOpaqueFbo;
 
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
@@ -67,7 +71,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
@@ -91,7 +95,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     public void process() {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
 
-            displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).bind(); // TODO: to be removed - will eventually be bound with a state change
+            sceneOpaqueFbo.bind(); // TODO: to be removed - will eventually be bound with a state change
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();

@@ -39,6 +39,7 @@ import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -52,7 +53,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * content of other buffers to correctly light up the scene.
  */
 public class DeferredPointLightsNode extends AbstractNode {
-
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;
 
@@ -67,6 +67,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
     private Material lightGeometryMaterial;
     private Camera playerCamera;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initializes an instance of this node.
@@ -75,6 +76,8 @@ public class DeferredPointLightsNode extends AbstractNode {
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
@@ -125,8 +128,6 @@ public class DeferredPointLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
-
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
 
         sceneOpaqueFbo.bind(); // TODO: remove and replace with a state change
         sceneOpaqueFbo.setRenderBufferMask(false, false, true); // Only write to the light buffer

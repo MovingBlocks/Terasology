@@ -25,6 +25,8 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 
@@ -50,7 +52,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * semi-transparent objects are handled here, after nodes relying on the depth buffer have done their job.
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
-
     @In
     private WorldRenderer worldRenderer;
 
@@ -69,8 +70,8 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(SCENE_OPAQUE, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

@@ -31,6 +31,8 @@ import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
 
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -69,12 +71,17 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     private Camera playerCamera;
     private Material chunkShader;
+    private FBO sceneOpaqueFbo;
+    private FBO refractiveReflectiveFbo;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
@@ -133,7 +140,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void update() {
-        // TODO: renames, maybe?
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
+        // TODO: Review this code, it seems redundant because the same code is called in process() of ApplyDeferredLightingNode
+        sceneOpaqueFbo.attachDepthBufferTo(refractiveReflectiveFbo);
     }
 }

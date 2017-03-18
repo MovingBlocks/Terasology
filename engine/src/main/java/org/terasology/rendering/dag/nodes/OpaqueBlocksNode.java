@@ -33,6 +33,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -40,6 +41,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
 /**
@@ -48,7 +50,6 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * In a typical world this is the majority of the world's landscape.
  */
 public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
-
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -67,12 +68,15 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
@@ -80,7 +84,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
     }
@@ -123,7 +127,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).bind(); // TODO: remove when we can bind this via a StateChange
+        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {

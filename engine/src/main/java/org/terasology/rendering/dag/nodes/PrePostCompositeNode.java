@@ -27,6 +27,7 @@ import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
 
 /**
  * An instance of this class takes advantage of the content of a number of previously filled buffers
@@ -55,8 +56,8 @@ public class PrePostCompositeNode extends AbstractNode {
     public void initialise() {
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
-        addDesiredStateChange(new BindFBO(new ResourceUrn("engine:sceneOpaquePingPong"), displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaquePingPong"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
 
         // TODO: bind input textures from ShaderParametersCombine class
     }

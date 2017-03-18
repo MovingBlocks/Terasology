@@ -32,6 +32,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * Shader parameters for the LightBufferPass shader program.
@@ -47,7 +48,7 @@ public class ShaderParametersLightGeometryPass extends ShaderParametersBase {
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = CoreRegistry.get(ShadowMapResolutionDependentFBOs.class);
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
 
         int texId = 0;
         if (sceneOpaqueFbo != null) {

@@ -28,6 +28,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+
 /**
  * Shader parameters for the Light Shafts shader program.
  *
@@ -50,7 +52,7 @@ public class ShaderParametersLightShafts extends ShaderParametersBase {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
 
         int texId = 0;
 

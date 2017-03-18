@@ -27,6 +27,8 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
 
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
@@ -50,7 +52,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
-
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
@@ -68,6 +69,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
+    private FBO sceneOpaqueFbo;
 
     /**
      * This method must be called once shortly after instantiation to fully initialize the node
@@ -75,6 +77,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
 
@@ -84,7 +88,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaquePingPong"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
 
         // We do not call requireFBO as we can count this default buffer is there.
         //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
@@ -120,8 +124,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
 
         sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
         sceneOpaqueFbo.setRenderBufferMask(true, false, false);

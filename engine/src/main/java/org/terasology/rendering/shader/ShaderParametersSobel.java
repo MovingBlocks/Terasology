@@ -23,6 +23,8 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+
 /**
  * Shader parameters for the Post-processing shader program.
  *
@@ -40,7 +42,7 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         // TODO: obtain once in superclass? The super class could then have the monitoring functionality.
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
 
         // TODO: move to node
         if (sceneOpaqueFbo != null) {

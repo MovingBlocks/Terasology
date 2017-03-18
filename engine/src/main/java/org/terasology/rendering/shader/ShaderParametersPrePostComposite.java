@@ -32,6 +32,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+
 /**
  * Shader parameters for the Combine shader program.
  *
@@ -57,7 +59,7 @@ public class ShaderParametersPrePostComposite extends ShaderParametersBase {
         // TODO: obtain these objects once in superclass and add there monitoring functionality as needed?
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque"));
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
 
         // TODO: move texture bindings to the appropriate nodes
         if (sceneOpaqueFbo != null) {

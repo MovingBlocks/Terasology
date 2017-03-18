@@ -98,6 +98,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -241,13 +242,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
 
         // sky rendering
-        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
+        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
+        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(SCENE_OPAQUE);
+
         BufferClearingNode readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
-        readBufferClearingNode.initialise(displayResolutionDependentFBOs.getFboConfig(new ResourceUrn("engine:sceneOpaque")), displayResolutionDependentFBOs,
+        readBufferClearingNode.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs,
                 GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
 
@@ -257,7 +260,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
         HazeNode hazeIntermediateNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
-        hazeIntermediateNode.initialise(displayResolutionDependentFBOs.getFboConfig(new ResourceUrn("engine:sceneOpaque")), hazeIntermediateConfig, aLabel);
+        hazeIntermediateNode.initialise(sceneOpaqueFboConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -324,7 +327,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo16pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
-        exposureDownSamplerTo16pixels.initialise(displayResolutionDependentFBOs.getFboConfig(new ResourceUrn("engine:sceneOpaque")), displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        exposureDownSamplerTo16pixels.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";

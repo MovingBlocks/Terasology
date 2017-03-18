@@ -29,8 +29,11 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
 
 /**
  * This node renders the opaque (as opposed to semi-transparent)
@@ -40,7 +43,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
 public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
-
     @In
     private ComponentSystemManager componentSystemManager;
 
@@ -56,12 +58,15 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
@@ -69,7 +74,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
     }
 
     public void enableWireframe() {
@@ -93,7 +98,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     public void process() {
         PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneOpaque")).bind(); // TODO: remove when we can bind this via a StateChange
+        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();

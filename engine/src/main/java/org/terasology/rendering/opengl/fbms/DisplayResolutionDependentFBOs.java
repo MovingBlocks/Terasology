@@ -34,6 +34,10 @@ import org.terasology.rendering.world.WorldRendererImpl;
  * TODO: Better naming
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
+    public static final ResourceUrn SCENE_OPAQUE = new ResourceUrn("engine:sceneOpaque");
+    public static final ResourceUrn SCENE_OPAQUE_PING_PONG = new ResourceUrn("engine:sceneOpaquePingPong");
+    public static final ResourceUrn SCENE_FINAL = new ResourceUrn("engine:sceneFinal");
+
     private FBO.Dimensions fullScale;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
@@ -49,11 +53,11 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     }
 
     private void generateDefaultFBOs() {
-        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneOpaque"), FULL_SCALE, FBO.Type.HDR)
+        generateWithDimensions(new FBOConfig(SCENE_OPAQUE, FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneOpaquePingPong"), FULL_SCALE, FBO.Type.HDR)
+        generateWithDimensions(new FBOConfig(SCENE_OPAQUE_PING_PONG, FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        generateWithDimensions(new FBOConfig(new ResourceUrn("engine:sceneFinal"), FULL_SCALE, FBO.Type.DEFAULT), fullScale);
+        generateWithDimensions(new FBOConfig(SCENE_FINAL, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
     }
 
     @Override
@@ -76,10 +80,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         if (screenGrabber.isNotTakingScreenshot()) {
             fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
         } else {
-            fullScale = new FBO.Dimensions(
-                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
-            );
+
+            fullScale = new FBO.Dimensions(renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight()));
         }
 
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
@@ -91,7 +94,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
      */
     public void update() {
         updateFullScale();
-        if (get(new ResourceUrn("engine:sceneOpaque")).dimensions().areDifferentFrom(fullScale)) {
+
+        FBO sceneOpaqueFbo = get(SCENE_OPAQUE);
+        if (sceneOpaqueFbo.dimensions().areDifferentFrom(fullScale)) {
             disposeAllFBOs();
             createFBOs();
             notifySubscribers();
@@ -116,9 +121,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
 
     // TODO: Pairing FBOs for swapping functionality
     public void swapReadWriteBuffers() {
-        FBO fbo = get(new ResourceUrn("engine:sceneOpaque"));
-        fboLookup.put(new ResourceUrn("engine:sceneOpaque"), get(new ResourceUrn("engine:sceneOpaquePingPong")));
-        fboLookup.put(new ResourceUrn("engine:sceneOpaquePingPong"), fbo);
+        FBO fbo = get(SCENE_OPAQUE);
+        fboLookup.put(SCENE_OPAQUE, get(SCENE_OPAQUE_PING_PONG));
+        fboLookup.put(SCENE_OPAQUE_PING_PONG, fbo);
         notifySubscribers();
     }
 }

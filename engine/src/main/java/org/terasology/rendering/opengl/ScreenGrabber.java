@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.opengl;
 
-import com.sun.jna.platform.unix.X11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -38,6 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -98,7 +99,7 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneFinal"));
+        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
 
         final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();
         if (buffer == null) {

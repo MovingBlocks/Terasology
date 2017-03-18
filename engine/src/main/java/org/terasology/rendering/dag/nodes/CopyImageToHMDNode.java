@@ -35,6 +35,7 @@ import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
 
 public class CopyImageToHMDNode extends ConditionDependentNode {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
@@ -59,6 +60,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private RenderingConfig renderingConfig;
     private FBO leftEye;
     private FBO rightEye;
+    private FBO sceneFinalFbo;
 
     /**
      * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
@@ -66,6 +68,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
      */
     @Override
     public void initialise() {
+        sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
+
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
                 && vrProvider.isInitialized()));
@@ -92,7 +96,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToHMD");
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneFinal")).bindTexture();
+        sceneFinalFbo.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();
     }

@@ -23,14 +23,15 @@ import org.terasology.registry.In;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode {
-
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
     @In
@@ -42,8 +43,12 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    private FBO sceneFinalFbo;
+
     @Override
     public void initialise() {
+        sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
+
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
@@ -52,7 +57,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        displayResolutionDependentFBOs.get(new ResourceUrn("engine:sceneFinal")).bindTexture();
+        sceneFinalFbo.bindTexture();
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }

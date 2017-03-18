@@ -26,10 +26,14 @@ import org.terasology.rendering.dag.tasks.SetViewportToSizeOfTask;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
+    private static SetViewportToSizeOf defaultInstance;
+
     private BaseFBOsManager frameBuffersManager;
     private SetViewportToSizeOfTask task;
     private ResourceUrn fboName;
@@ -41,7 +45,10 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public StateChange getDefaultInstance() {
-        return new SetViewportToSizeOf(new ResourceUrn("engine:sceneOpaque"), CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+        // VAMPCAT : TODO: Try initializing while declaring instead of doing it here
+        if (defaultInstance == null)
+            defaultInstance = new SetViewportToSizeOf(SCENE_OPAQUE, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+        return defaultInstance;
     }
 
     @Override
@@ -81,6 +88,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     }
 
     private FBO getFbo() {
+        //VAMPCAT : Maybe store the fbo in the class, instead of fetching every time?
         return frameBuffersManager.get(fboName);
     }
 }
