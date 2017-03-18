@@ -23,6 +23,7 @@ import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.MessageFormat;
 import java.util.Set;
 
 /**
@@ -32,9 +33,11 @@ import java.util.Set;
  */
 public class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
-    private final T defaultValue;
 
     private final SimpleUri id;
+    private final String warningFormatString;
+
+    private final T defaultValue;
 
     private T value;
 
@@ -63,6 +66,7 @@ public class SettingImpl<T> implements Setting<T> {
      */
     public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
+        this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
         this.validator = validator;
 
@@ -95,12 +99,15 @@ public class SettingImpl<T> implements Setting<T> {
         }
 
         if (listener == null) {
-            // TODO: Create a warning format string which contains the id of the setting
-            LOGGER.warn("Setting {}: A null subscriber cannot be added", id);
+            LOGGER.warn(MessageFormat.format(this.warningFormatString,
+                    "A null subscriber cannot be added"));
+
             return false;
         }
         if (subscribers.contains(listener)) {
-            LOGGER.warn("Setting {}: The listener has already been subscribed", id);
+            LOGGER.warn(MessageFormat.format(this.warningFormatString,
+                    "The listener has already been subscribed"));
+
             return false;
         }
 
@@ -114,7 +121,8 @@ public class SettingImpl<T> implements Setting<T> {
      */
     public boolean unsubscribe(PropertyChangeListener listener) {
         if (!subscribers.contains(listener)) {
-            LOGGER.warn("Setting {}: The listener does not exist in the subscriber list", id);
+            LOGGER.warn(MessageFormat.format(this.warningFormatString,
+                    "The listener does not exist in the subscriber list"), id);
             return false;
         }
 
