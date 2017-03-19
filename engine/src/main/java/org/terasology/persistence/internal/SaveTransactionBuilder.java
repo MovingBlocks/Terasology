@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -33,6 +34,7 @@ class SaveTransactionBuilder {
     private final Lock worldDirectoryWriteLock;
     private final EngineEntityManager privateEntityManager;
     private final EntitySetDeltaRecorder deltaToSave;
+    private final StorageManager storageManager;
     private Map<String, EntityData.PlayerStore> unloadedPlayers = Maps.newHashMap();
     private Map<String, PlayerStoreBuilder> loadedPlayers = Maps.newHashMap();
     private Map<Vector3i, CompressedChunkBuilder> unloadedChunks = Maps.newHashMap();
@@ -42,9 +44,10 @@ class SaveTransactionBuilder {
     private final StoragePathProvider storagePathProvider;
     private GameManifest gameManifest;
 
-    SaveTransactionBuilder(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+    SaveTransactionBuilder(StorageManager storageManager, EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            boolean storeChunksInZips, StoragePathProvider storagePathProvider,
                            Lock worldDirectoryWriteLock) {
+        this.storageManager = storageManager;
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.storeChunksInZips = storeChunksInZips;
@@ -74,7 +77,7 @@ class SaveTransactionBuilder {
     }
 
     public SaveTransaction build() {
-        return new SaveTransaction(privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers, globalStoreBuilder,
+        return new SaveTransaction(storageManager, privateEntityManager, deltaToSave, unloadedPlayers, loadedPlayers, globalStoreBuilder,
                 unloadedChunks, loadedChunks, gameManifest, storeChunksInZips, storagePathProvider,
                 worldDirectoryWriteLock);
 

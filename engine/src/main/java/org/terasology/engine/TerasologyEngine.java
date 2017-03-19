@@ -486,6 +486,11 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    @Override
+    public void changeState(GameState newState, boolean saveRequested) {
+            switchState(newState, saveRequested);      // immediate change
+    }
+
     private void processPendingState() {
         if (pendingState != null) {
             switchState(pendingState);
@@ -497,6 +502,16 @@ public class TerasologyEngine implements GameEngine {
         if (currentState != null) {
             currentState.dispose();
         }
+        currentState = newState;
+        LoggingContext.setGameState(newState);
+        newState.init(this);
+        stateChangeSubscribers.forEach(StateChangeSubscriber::onStateChange);
+        InputSystem inputSystem = rootContext.get(InputSystem.class);
+        inputSystem.drainQueues();
+    }
+
+    private void switchState(GameState newState, boolean saveRequested){
+        currentState.dispose(saveRequested);
         currentState = newState;
         LoggingContext.setGameState(newState);
         newState.init(this);
