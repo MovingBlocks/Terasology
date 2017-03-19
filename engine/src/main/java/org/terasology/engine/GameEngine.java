@@ -71,8 +71,6 @@ public interface GameEngine {
      */
     void changeState(GameState newState);
 
-    void changeState(GameState newState, boolean saveRequested);
-
     void subscribeToStateChange(StateChangeSubscriber subscriber);
 
     void unsubscribeToStateChange(StateChangeSubscriber subscriber);

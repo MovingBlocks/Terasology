@@ -1,4 +1,0 @@
-{
-    "filterMode": "Linear",
-    "wrapMode": "Repeat"
-}

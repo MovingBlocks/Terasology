@@ -135,10 +135,6 @@ public class StateMainMenu implements GameState {
         entityManager.clear();
     }
 
-    @Override
-    public void dispose(boolean saveRequested){
-    }
-
     private void playBackgroundMusic() {
         context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get());
     }

@@ -1,8 +1,0 @@
-{
-    "inherit": "mainmenu",
-    "elements": {
-        "UIScreenLayer": {
-            "background": "loadingBackground"
-        }
-    }
-}

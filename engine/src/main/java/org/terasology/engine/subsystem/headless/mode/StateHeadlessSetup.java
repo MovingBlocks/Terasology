@@ -154,10 +154,6 @@ public class StateHeadlessSetup implements GameState {
     }
 
     @Override
-    public void dispose(boolean saveRequested){
-    }
-
-    @Override
     public void handleInput(float delta) {
     }
 

@@ -107,13 +107,10 @@ public class MenuControlSystem extends BaseComponentSystem {
     @ReceiveEvent(components = {ClientComponent.class})
     public void onLoad(LoadButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
+            //CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE)); not sure how to get the "loadingAsServer" boolean here
             GameManifest quickSaveGameManifest = getQuickSaveGameManifest();
-            //quickSaveGameManifest.setTitle(quickSaveGameManifest.getTitle()+ " Quick Save");
             if (quickSaveGameManifest != null) {
-                //CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE)); not sure how to get the "loadingAsServer" boolean here
-                boolean saveRequested = false;
-                boolean isQuickLoad = true;
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE, isQuickLoad), saveRequested); //quick load shouldn't cause the game to save
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE));
             }
             event.consume();
         }
@@ -159,7 +156,13 @@ public class MenuControlSystem extends BaseComponentSystem {
         GameManifest latestManifest=getLatestGameManifest();
         try {
             String title = latestManifest.getTitle();
-            return GameManifest.load(PathManager.getInstance().getSavePath(title).resolve(title + " Quick Save" + System.getProperty("file.separator") + "manifest.json"));
+            return GameManifest.load(
+                    PathManager.getInstance()
+                            .getSavePath(title)
+                            .resolve(title
+                                    + " Quick Save"
+                                    + System.getProperty("file.separator")
+                                    + "manifest.json"));
         } catch (IOException e) {
             logger.error("Failed to find Quick Load Save.", e);
             return null;

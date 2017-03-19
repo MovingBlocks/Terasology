@@ -1,7 +1,0 @@
-{
-    "parent": "engine:directDamage",
-    "blockDamageModifier": {
-        "skipPerBlockEffects": true,
-        "directPickup": true
-    }
-}

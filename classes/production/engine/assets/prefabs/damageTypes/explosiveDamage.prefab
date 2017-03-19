@@ -1,8 +1,0 @@
-{
-    "parent": "engine:physicalDamage",
-    "blockDamageModifier": {
-        "blockAnnihilationChance": 0.85,
-        "skipPerBlockEffects": true,
-        "impulsePower": 200
-    }
-}
