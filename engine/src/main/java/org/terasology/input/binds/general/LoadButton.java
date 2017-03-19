@@ -21,9 +21,7 @@ import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
-/**
- * Created by Daniel on 3/16/2017.
- */
+
 @RegisterBindButton(id = "load", description = "${engine:menu#binding-load}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.RIGHT_BRACKET)
 public class LoadButton extends BindButtonEvent {

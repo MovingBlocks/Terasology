@@ -21,9 +21,7 @@ import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
-/**
- * Created by Daniel on 3/16/2017.
- */
+
 @RegisterBindButton(id = "save", description = "${engine:menu#binding-save}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_BRACKET)
 public class SaveButton extends BindButtonEvent {
