@@ -37,11 +37,11 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_URN);
 
     private BindFBOTask task;
-    private BaseFBOsManager frameBuffersManager;
+    private BaseFBOsManager fboManager;
     private ResourceUrn fboName;
 
-    public BindFBO(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
-        this.frameBuffersManager = frameBuffersManager;
+    public BindFBO(ResourceUrn fboName, BaseFBOsManager fboManager) {
+        this.fboManager = fboManager;
         this.fboName = fboName;
     }
 
@@ -63,8 +63,8 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
         if (task == null) {
             // Subscription is only needed if fboID is different than default frame buffer id.
             if (!fboName.equals(DEFAULT_FRAME_BUFFER_URN)) {
-                task = new BindFBOTask(frameBuffersManager.get(fboName).fboId, fboName);
-                frameBuffersManager.subscribe(this);
+                task = new BindFBOTask(fboManager.get(fboName).fboId, fboName);
+                fboManager.subscribe(this);
             } else {
                 task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_URN);
             }
@@ -88,7 +88,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        task.setFboId(frameBuffersManager.get(fboName).fboId);
+        task.setFboId(fboManager.get(fboName).fboId);
     }
 
     @Override

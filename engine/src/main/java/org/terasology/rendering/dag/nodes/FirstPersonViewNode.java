@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.ComponentSystemManager;
@@ -35,7 +34,7 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
@@ -60,8 +59,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
 
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
-
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
@@ -71,7 +68,8 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));

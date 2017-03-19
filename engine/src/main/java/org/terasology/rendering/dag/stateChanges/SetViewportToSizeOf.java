@@ -25,26 +25,29 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
-    private static SetViewportToSizeOf defaultInstance = new SetViewportToSizeOf(SCENE_OPAQUE, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+    private static SetViewportToSizeOf defaultInstance;
 
-    private BaseFBOsManager frameBuffersManager;
+    private BaseFBOsManager fboManager;
     private SetViewportToSizeOfTask task;
     private ResourceUrn fboName;
 
     public SetViewportToSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
-        this.frameBuffersManager = frameBuffersManager;
+        this.fboManager = frameBuffersManager;
         this.fboName = fboName;
     }
 
     @Override
     public StateChange getDefaultInstance() {
+        if (defaultInstance == null) {
+            defaultInstance = new SetViewportToSizeOf(READONLY_GBUFFER, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+        }
         return defaultInstance;
     }
 
@@ -52,7 +55,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     public RenderPipelineTask generateTask() {
         if (task == null) {
             task = new SetViewportToSizeOfTask(fboName);
-            frameBuffersManager.subscribe(this);
+            fboManager.subscribe(this);
             update();
         }
 
@@ -71,12 +74,17 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
         SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
 
-        return getFbo().width() == other.getFbo().width() && getFbo().height() == other.getFbo().height();
+        FBO fbo = getFbo();
+        FBO otherFbo = other.getFbo();
+
+        return fbo.width() == otherFbo.width() && fbo.height() == otherFbo.height();
     }
 
     @Override
     public void update() {
-        task.setDimensions(getFbo().width(), getFbo().height());
+        FBO fbo = getFbo();
+
+        task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
@@ -85,7 +93,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     }
 
     private FBO getFbo() {
-        return frameBuffersManager.get(fboName);
+        return fboManager.get(fboName);
     }
 
     private final class SetViewportToSizeOfTask implements RenderPipelineTask {

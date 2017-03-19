@@ -16,7 +16,6 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
@@ -28,7 +27,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Light Shafts shader program.
@@ -52,7 +51,7 @@ public class ShaderParametersLightShafts extends ShaderParametersBase {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         int texId = 0;
 

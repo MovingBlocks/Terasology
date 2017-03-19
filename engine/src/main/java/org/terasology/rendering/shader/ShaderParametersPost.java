@@ -18,7 +18,6 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -38,7 +37,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -85,7 +84,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        FBO sceneCombined = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        FBO sceneCombined = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         if (sceneCombined != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

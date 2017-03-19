@@ -27,7 +27,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
@@ -47,7 +47,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
 
     @Override
     public void initialise() {
-        sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
+        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));

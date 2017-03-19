@@ -29,8 +29,8 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.*;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
  * The ApplyDeferredLightingNode takes advantage of the information stored by previous nodes
@@ -57,11 +57,11 @@ public class ApplyDeferredLightingNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
-        sceneOpaquePingPongFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE_PING_PONG);
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        sceneOpaquePingPongFbo = displayResolutionDependentFBOs.get(WRITEONLY_GBUFFER);
         refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
 
         int textureSlot = 0;
@@ -91,8 +91,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         renderFullscreenQuad();
 
-        displayResolutionDependentFBOs.swapReadWriteBuffers(); // Doesn't exactly help with a lean process() function..
-        sceneOpaqueFbo.attachDepthBufferTo(refractiveReflectiveFbo);
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         PerformanceMonitor.endActivity();
     }

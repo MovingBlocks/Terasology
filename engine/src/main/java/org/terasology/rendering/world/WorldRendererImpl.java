@@ -25,7 +25,6 @@ import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.UpdateExposureNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -98,7 +97,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -198,7 +197,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(ScreenGrabber.class, new ScreenGrabber(context));
 
         immutableFBOs = new ImmutableFBOs();
-        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context.get(Config.class).getRendering(), context.get(ScreenGrabber.class));
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
@@ -247,7 +246,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(SCENE_OPAQUE);
+        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
 
         BufferClearingNode readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         readBufferClearingNode.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs,

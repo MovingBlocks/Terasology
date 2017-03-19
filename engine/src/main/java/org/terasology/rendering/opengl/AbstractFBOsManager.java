@@ -227,7 +227,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.error("Failed to retrieve FBO '" + fboName + "'!");
+            logger.warn("Failed to retrieve FBO '" + fboName + "'!");
         }
 
         return fbo;
@@ -246,7 +246,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         FBOConfig fboConfig = fboConfigs.get(fboName);
 
         if (fboConfig == null) {
-            logger.error("Failed to retrieve FBOConfig '" + fboName + "'!");
+            logger.warn("Failed to retrieve FBOConfig '" + fboName + "'!");
         }
 
         return fboConfig;

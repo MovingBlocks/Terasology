@@ -34,7 +34,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
@@ -66,16 +66,16 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
-
-        playerCamera = worldRenderer.getActiveCamera();
-
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
+
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
     }
 

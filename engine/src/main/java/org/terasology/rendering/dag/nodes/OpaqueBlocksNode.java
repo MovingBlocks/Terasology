@@ -41,7 +41,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
 /**
@@ -75,16 +75,16 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
-
-        playerCamera = worldRenderer.getActiveCamera();
-
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE, displayResolutionDependentFBOs));
+
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
     }

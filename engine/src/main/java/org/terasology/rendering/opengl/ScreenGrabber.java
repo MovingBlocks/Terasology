@@ -17,7 +17,6 @@ package org.terasology.rendering.opengl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -38,7 +37,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -99,7 +98,7 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
+        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
         final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();
         if (buffer == null) {

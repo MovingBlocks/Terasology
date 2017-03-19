@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -27,8 +26,8 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE_PING_PONG;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
@@ -77,8 +76,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
-
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
 
@@ -88,7 +85,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_OPAQUE_PING_PONG, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         // We do not call requireFBO as we can count this default buffer is there.
         //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.

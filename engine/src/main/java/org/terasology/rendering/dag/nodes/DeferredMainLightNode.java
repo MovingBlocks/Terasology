@@ -33,7 +33,7 @@ import org.terasology.rendering.logic.LightComponent;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -76,7 +76,7 @@ public class DeferredMainLightNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         playerCamera = worldRenderer.getActiveCamera();
 

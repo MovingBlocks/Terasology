@@ -40,7 +40,7 @@ import java.nio.FloatBuffer;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -93,7 +93,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(SCENE_OPAQUE);
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         int texId = 0;
 

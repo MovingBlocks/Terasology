@@ -35,7 +35,7 @@ import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 public class CopyImageToHMDNode extends ConditionDependentNode {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
@@ -68,7 +68,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
      */
     @Override
     public void initialise() {
-        sceneFinalFbo = displayResolutionDependentFBOs.get(SCENE_FINAL);
+        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()

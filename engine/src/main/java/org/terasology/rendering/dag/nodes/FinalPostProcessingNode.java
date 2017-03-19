@@ -33,7 +33,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
@@ -82,8 +82,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             addDesiredStateChange(enableDebugMaterial);
         }
 
-        addDesiredStateChange(new BindFBO(SCENE_FINAL, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SCENE_FINAL, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(FINAL_BUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
     }
 
     /**

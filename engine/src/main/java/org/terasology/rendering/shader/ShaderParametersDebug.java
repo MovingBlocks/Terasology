@@ -16,7 +16,6 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -33,7 +32,7 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.SCENE_OPAQUE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Debug shader program.
@@ -62,23 +61,23 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case OPAQUE_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboColorTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_NORMALS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboNormalsTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboNormalsTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_DEPTH:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboDepthTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboDepthTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_SUNLIGHT:
             case OPAQUE_LIGHT_BUFFER:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboLightBufferTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboLightBufferTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case TRANSPARENT_COLOR:
@@ -98,7 +97,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case BAKED_OCCLUSION:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboColorTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case RECONSTRUCTED_POSITION:
@@ -108,7 +107,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 }
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboDepthTexture(SCENE_OPAQUE);
+                displayResolutionDependentFBOs.bindFboDepthTexture(READONLY_GBUFFER);
                 program.setInt("texDebug", texId++, true);
                 break;
             case BLOOM:
