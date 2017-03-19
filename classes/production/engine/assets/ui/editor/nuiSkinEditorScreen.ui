@@ -1,0 +1,105 @@
+{
+    "type": "engine:nuiSkinEditorScreen",
+    "skin": "engine:nuiEditorScreen",
+    "contents": {
+        "type": "migLayout",
+        "layoutConstraints": "",
+        "colConstraints": "[grow, 25%][grow, 75%]",
+        "rowConstraints": "[min][grow, fill][min]",
+        "debug": true,
+        "contents": [
+            {
+                "type": "UIBox",
+                "id": "selectedScreen",
+                "updateContent": false,
+                "layoutInfo": {
+                    "cc": "cell 1 1"
+                }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 1 0"
+                },
+                "contents": [
+                    {
+                        "type": "UIDropdownScrollable",
+                        "id": "availableScreens"
+                    }
+                ]
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 2, spanx 2"
+                },
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "id": "override",
+                        "text": "${engine:menu#nui-editor-override}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "save",
+                        "text": "${engine:menu#nui-editor-save}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "copy",
+                        "text": "${engine:menu#nui-editor-copy}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "paste",
+                        "text": "${engine:menu#nui-editor-paste}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "undo",
+                        "text": "${engine:menu#nui-editor-undo}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "redo",
+                        "text": "${engine:menu#nui-editor-redo}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "settings",
+                        "text": "${engine:menu#settings-title}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "close",
+                        "text": "${engine:menu#nui-editor-close}"
+                    }
+                ]
+            },
+            {
+                "type": "ScrollableArea",
+                "layoutInfo": {
+                    "cc": "cell 0 1"
+                },
+                "verticalScrollbar": true,
+                "horizontalScrollbar": true,
+                "content": {
+                    "type": "JsonEditorTreeView",
+                    "id": "editor"
+                }
+            },
+            {
+                "type": "migLayout",
+                "layoutInfo": {
+                    "cc": "cell 0 0"
+                },
+                "contents": [
+                    {
+                        "type": "UIDropdownScrollable",
+                        "id": "availableAssets"
+                    }
+                ]
+            }
+        ]
+    }
+}

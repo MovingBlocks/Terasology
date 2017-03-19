@@ -1,0 +1,51 @@
+<configuration>
+
+  <!-- Report all changes to this configuration on System.out -->
+  <!--statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" /-->
+
+  <!-- Propagate all log level changes to java.util.logging -->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <!-- in the absence of the class attribute, it is assumed that the
+         desired discriminator type is MDCBasedDiscriminator -->
+    <discriminator>
+      <key>phase</key>
+      <defaultValue>init</defaultValue>
+    </discriminator>
+    <timeout>30 seconds</timeout>
+    <sift>
+      <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logFileFolder}/Terasology-${phase}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <!-- daily rollover -->
+          <fileNamePattern>${logFileFolder}/Terasology-${phase}-%d{yyyy-MM-dd}.log</fileNamePattern>
+
+          <!-- keep 3 days' worth of history -->
+          <maxHistory>3</maxHistory>
+        </rollingPolicy>
+        <encoder>
+          <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${logOverrideLevel:-debug}">
+    <appender-ref ref="SIFT" />
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+  <logger name="org.terasology" level="${logOverrideLevel:-info}" />
+  <logger name="org.reflections.Reflections" level="${logOverrideLevel:-error}" />
+
+</configuration>

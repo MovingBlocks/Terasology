@@ -1,0 +1,11 @@
+{
+    "BehaviorNode": {
+        "type": "PlayMusicNode",
+        "name": "Play Music",
+        "category": "logic",
+        "shape": "rect",
+        "description": "Properties: music\nRUNNING: while music is playing\nSUCCESS: once music ends playing\nFAILURE: otherwise",
+        "color": [180, 180, 180, 255],
+        "textColor": [0, 0, 0, 255]
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "translucent": true,
+    "invisible": true,
+    "targetable": false,
+    "penetrable": false,
+    "replacementAllowed": false,
+    "shadowCasting": false,
+    "attachmentAllowed": false,
+    "hardness": 0,
+    "displayName": "Unloaded",
+    "rotation": "symmetric",
+    "sounds": "none",
+    "shape": "engine:none"
+}

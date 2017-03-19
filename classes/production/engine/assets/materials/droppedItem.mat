@@ -1,0 +1,7 @@
+{
+    "shader": "engine:block",
+    "params": {
+        "colorOffset": [1.0, 1.0, 1.0],
+        "textured": false
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "type": "InspectionScreen",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "ScrollableArea",
+                "id": "scrollArea",
+                "content": {
+                    "type": "UIText",
+                    "readOnly": true,
+                    "multiline": true,
+                    "id": "fullDescriptionLabel"
+                },
+                "layoutInfo": {
+                    "height": 300,
+                    "width": 500,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                }
+            },
+            {
+                "type": "RowLayout",
+                "contents": [
+                    {
+                        "type": "UILabel",
+                        "text": "Entity Id: ",
+                        "layoutInfo": {
+                            "useContentWidth": true
+                        }
+                    },
+                    {
+                        "type": "UIText",
+                        "multiline": false,
+                        "id": "entityIdField"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#inspection-set}",
+                        "id": "setEntityIdButton",
+                        "layoutInfo": {
+                            "relativeWidth": 0.1
+                        }
+                    }
+                ],
+                "layoutInfo": {
+                    "use-content-height": true,
+                    "width": 500,
+                    "position-horizontal-center": {},
+                    "position-vertical-top": {},
+                    "position-bottom": {
+                        "widget": "scrollArea",
+                        "target": "TOP"
+                    }
+                }
+            }
+        ]
+    }
+}

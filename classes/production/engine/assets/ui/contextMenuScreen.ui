@@ -1,0 +1,8 @@
+{
+    "type": "engine:contextMenuScreen",
+    "skin": "engine:contextMenuScreen",
+    "contents": {
+        "type": "UIList",
+        "id": "menu"
+    }
+}

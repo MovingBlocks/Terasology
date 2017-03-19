@@ -1,0 +1,126 @@
+{
+    "type": "addServerPopup",
+    "skin": "popup",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#edit-server-title}",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#server-name}: ",
+                                    "family": "option-grid",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.3
+                                    }
+                                },
+                                {
+                                    "type": "UIText",
+                                    "id": "name"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#server-owner}: ",
+                                    "family": "option-grid",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.3
+                                    }
+                                },
+                                {
+                                    "type": "UIText",
+                                    "id": "owner"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#server-address}: ",
+                                    "family": "option-grid",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.3
+                                    }
+                                },
+                                {
+                                    "type": "UIText",
+                                    "id": "address"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#server-port}: ",
+                                    "family": "option-grid",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.3
+                                    }
+                                },
+                                {
+                                    "type": "UIText",
+                                    "id": "port"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#add-server-tip}"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-ok}",
+                                    "id": "ok"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-cancel}",
+                                    "id": "cancel"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

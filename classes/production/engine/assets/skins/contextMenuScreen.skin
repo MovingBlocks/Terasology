@@ -1,0 +1,24 @@
+{
+    "inherit": "engine:default",
+    "elements": {
+        "UIList": {
+            "text-align-horizontal": "left",
+            "parts": {
+                "base": {
+                    "margin": {
+                        "top": 4,
+                        "bottom": 4,
+                        "left": 4,
+                        "right": 4
+                    }
+                },
+                "item": {
+                    "margin": {
+                        "left": 4,
+                        "right": 4
+                    }
+                }
+            }
+        }
+    }
+}

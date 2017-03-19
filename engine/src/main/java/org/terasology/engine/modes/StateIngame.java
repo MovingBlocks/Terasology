@@ -149,6 +149,52 @@ public class StateIngame implements GameState {
          */
         nuiManager.getHUD().clearVisibleBinding();
     }
+    @Override
+    public void dispose(boolean saveRequested) {
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+        chunkProvider.dispose();
+
+        if (saveRequested) {
+            storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
+        }
+
+        networkSystem.shutdown();
+        // TODO: Shutdown background threads
+        eventSystem.process();
+        GameThread.processWaitingProcesses();
+        nuiManager.clear();
+
+        context.get(AudioManager.class).stopAllSounds();
+
+        if (worldRenderer != null) {
+            worldRenderer.dispose();
+            worldRenderer = null;
+        }
+        componentSystemManager.shutdown();
+
+        context.get(PhysicsEngine.class).dispose();
+
+        entityManager.clear();
+
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
+
+        ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
+        context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
+        if (oldEnvironment != null) {
+            oldEnvironment.close();
+        }
+        context.get(Console.class).dispose();
+        GameThread.clearWaitingProcesses();
+
+        /*
+         * Clear the binding as otherwise the complete ingame state would be
+         * referenced.
+         */
+        nuiManager.getHUD().clearVisibleBinding();
+    }
 
     @Override
     public void update(float delta) {

@@ -1,0 +1,14 @@
+{
+    "parent": "engine:itemBase",
+    "Item": {
+        "consumedOnUse": true,
+        "usage": "ON_BLOCK"
+    },
+    "BlockItem": {},
+    "RenderItemBlockMesh": {},
+    "FirstPersonHeldItemTransform": {
+        "rotateDegrees": [0, 0, 0],
+        "translate": [-0.1, -0.5, 0],
+        "scale": 0.75
+    }
+}

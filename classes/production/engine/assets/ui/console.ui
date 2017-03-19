@@ -1,0 +1,51 @@
+{
+    "type": "ConsoleScreen",
+    "skin": "console",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "RelativeLayout",
+                "contents": [
+                    {
+                        "type": "ScrollableArea",
+                        "id": "scrollArea",
+                        "stickToBottom": true,
+                        "content": {
+                            "type": "UIText",
+                            "readOnly": true,
+                            "multiline": true,
+                            "id": "messageHistory",
+                            "family": "history"
+                        },
+                        "layoutInfo": {
+                            "position-horizontal-center": {},
+                            "position-top": {
+                            },
+                            "position-bottom": {
+                                "widget": "commandLine",
+                                "target": "TOP"
+                            }
+                        }
+                    },
+                    {
+                        "type": "UICommandEntry",
+                        "id": "commandLine",
+                        "layoutInfo": {
+                            "position-left": {},
+                            "position-right": {},
+                            "use-content-height": true,
+                            "position-bottom": {}
+                        }
+                    }
+                ],
+                "layoutInfo": {
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "MIDDLE"
+                    }
+                }
+            }
+        ]
+    }
+}

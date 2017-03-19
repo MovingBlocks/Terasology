@@ -1,0 +1,106 @@
+{
+    "inherit": "default",
+    "elements": {
+        "UIScreenLayer": {
+            "background-scale-mode": "scale_fill",
+            "background": "menuBackground"
+        },
+        "UIButton": {
+            "modes": {
+                "disabled": {
+                    "text-color": "AAAAAAFF"
+                }
+            }
+        }
+    },
+    "families": {
+        "menu-options": {
+            "elements": {
+                "UIButton": {
+                    "min-width": 192,
+                    "min-height": 32
+                }
+            }
+        },
+        "option-grid": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "middle",
+                    "text-align-horizontal": "right"
+                }
+            }
+        },
+        "title": {
+            "font": "NotoSans-Regular-Large",
+            "text-color": "F0F0F0FF"
+        },
+        "subtitle": {
+            "font": "NotoSans-Regular-Medium",
+            "text-color": "F0F0F0FF"
+        },
+        "error": {
+            "text-color": "FF4444FF"
+        },
+        "warning": {
+            "text-color": "FF4500FF"
+        },
+        "highlight": {
+            "text-color": "FFFF00FF",
+            "font": "NotoSans-Bold"
+        },
+        "subheading": {
+            "font": "NotoSans-Regular-Medium",
+            "text-align-horizontal": "left",
+            "margin": {
+                "bottom": 4,
+                "left": 4
+            }
+        },
+        "left-label": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "bottom",
+                    "text-align-horizontal": "left"
+                }
+            }
+        },
+        "module-list": {
+            "elements": {
+                "UIList": {
+                    "parts": {
+                        "item": {
+                            "modes": {
+                                "gameplay": {
+                                    "text-color": "8B85FFFF"
+                                },
+                                "enabled": {
+                                    "text-color": "00FF00FF"
+                                },
+                                "dependency": {
+                                    "text-color": "FFFF00FF"
+                                },
+                                "available": {
+                                    "text-color": "FFFFFFFF"
+                                },
+                                "disabled": {
+                                    "text-color": "AAAAAAFF"
+                                },
+                                "invalid": {
+                                    "text-color": "FF0000FF"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "description": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "top",
+                    "text-align-horizontal": "left"
+                }
+            }
+        }
+    }
+}

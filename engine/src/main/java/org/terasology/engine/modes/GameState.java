@@ -33,6 +33,8 @@ public interface GameState {
 
     void dispose();
 
+    void dispose(boolean saveRequested);
+
     void handleInput(float delta);
 
     void update(float delta);

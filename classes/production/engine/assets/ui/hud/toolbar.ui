@@ -1,0 +1,46 @@
+{
+    "type": "HudToolbar",
+    "skin": "HUD",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIIconBar",
+                "id": "breathBar",
+                "icon": "engine:icons#bubble",
+                "family": "breathBar",
+                "emptyIcon": "engine:icons#burstBubble",
+                "halfIconMode": "shrink",
+                "spacing": 2,
+                "maxIcons": 10,
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-left": {
+                        "target": "CENTER"
+                    },
+                    "position-right": {
+                        "target": "RIGHT",
+                        "widget": "healthBar"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "healthBar",
+                        "offset": 1
+                    }
+                }
+            },
+            {
+                "type": "UICrosshair",
+                "id": "crosshair",
+                "crosshairIcon": "engine:gui#crosshair",
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                }
+            }
+        ]
+    }
+}

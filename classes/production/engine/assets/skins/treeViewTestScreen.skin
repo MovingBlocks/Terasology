@@ -1,0 +1,9 @@
+{
+    "inherit": "engine:mainMenu",
+    "elements": {
+        "ScrollableArea": {
+            "background": "",
+            "background-border": {}
+        }
+    }
+}

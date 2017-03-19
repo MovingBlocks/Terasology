@@ -1,0 +1,49 @@
+{
+    "type": "deathScreen",
+    "skin": "deathScreen",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "ColumnLayout",
+                "verticalSpacing": 8,
+                "contents": [
+                    {
+                        "type": "UILabel",
+                        "text": "${engine:menu#death-screen-title}"
+                    },
+                    {
+                        "type": "UISpace",
+                        "size": [1, 16]
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#respawn}",
+                        "id": "respawn"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#game-settings}",
+                        "id": "settings"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#return-main-menu}",
+                        "id": "mainMenu"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#exit-game}",
+                        "id": "exitGame"
+                    }
+                ],
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                }
+            }
+        ]
+    }
+}

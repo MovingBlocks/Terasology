@@ -1,0 +1,49 @@
+{
+    "type": "messagePopup",
+    "skin": "messageBox",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "Title",
+                            "id": "title",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "Message",
+                            "id": "message"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "UIButton",
+                            "text": "${engine:menu#dialog-ok}",
+                            "id": "ok"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

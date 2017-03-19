@@ -1,0 +1,20 @@
+<configuration>
+
+  <!-- Report all changes to this configuration on System.out -->
+  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${logOverrideLevel:-debug}">
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+  <logger name="org.terasology" level="${logOverrideLevel:-info}" />
+  <logger name="org.reflections.Reflections" level="${logOverrideLevel:-warn}" />
+
+</configuration>

@@ -1,0 +1,91 @@
+{
+    "type": "engine:NUIEditorSettingsScreen",
+    "skin": "popup",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#nui-editor-settings-title}",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-disable-icons}"
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "disableIcons"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-disable-autosave}"
+                                },
+                                {
+                                    "type": "UICheckbox",
+                                    "id": "disableAutosave"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 8,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#nui-editor-alternative-locale}"
+                                },
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "alternativeLocale"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UIButton",
+                            "text": "${engine:menu#back}",
+                            "id": "close"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

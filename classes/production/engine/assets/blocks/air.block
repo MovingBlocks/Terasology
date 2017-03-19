@@ -1,0 +1,14 @@
+{
+    "translucent": true,
+    "invisible": true,
+    "targetable": false,
+    "penetrable": true,
+    "replacementAllowed": true,
+    "shadowCasting": false,
+    "attachmentAllowed": false,
+    "hardness": 0,
+    "displayName": "Air",
+    "rotation": "symmetric",
+    "sounds": "none",
+    "shape": "engine:none"
+}

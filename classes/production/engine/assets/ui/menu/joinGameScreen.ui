@@ -1,0 +1,371 @@
+{
+    "type": "joinGameScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "subtitle",
+                "family": "title",
+                "text": "${engine:menu#join-server-title}",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "UIBox",
+                "id": "container",
+                "layoutInfo": {
+                    "width": 600,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "subtitle"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 16
+                    }
+                }
+            },
+            {
+                "type": "ColumnLayout",
+                "columns": 2,
+                "column-widths": [
+                    0.4,
+                    0.6
+                ],
+                "verticalSpacing": 16,
+                "horizontalSpacing": 8,
+                "layoutInfo": {
+                    "width": 584,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "widget": "container",
+                        "offset": 8
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 24
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "RelativeLayout",
+                        "contents": [
+                            {
+                                "type": "RowLayout",
+                                "id": "serverTypeRow",
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "onlineButton",
+                                        "text": "${engine:menu#listed-servers}",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.5
+                                        }
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "customButton",
+                                        "text": "${engine:menu#custom-servers}"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                }
+                            },
+                            {
+                                "type": "CardLayout",
+                                "id": "cards",
+                                "defaultCard": "onlineServerListScrollArea",
+                                "contents": [
+                                    {
+                                        "type": "RelativeLayout",
+                                        "id": "customServerListScrollArea",
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "UIList",
+                                                    "id": "customServerList",
+                                                    "family": "module-list"
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    },
+                                                    "position-bottom": {
+                                                        "target": "TOP",
+                                                        "widget": "edit",
+                                                        "offset": 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "UIButton",
+                                                "id": "edit",
+                                                "text": "${engine:menu#edit-server}",
+                                                "layoutInfo": {
+                                                    "use-content-height": true,
+                                                    "width": 135,
+                                                    "position-bottom": {
+                                                        "target": "TOP",
+                                                        "widget": "add",
+                                                        "offset": 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "UIButton",
+                                                "id": "remove",
+                                                "text": "${engine:menu#remove-server}",
+                                                "layoutInfo": {
+                                                    "use-content-height": true,
+                                                    "position-left": {
+                                                        "target": "RIGHT",
+                                                        "widget": "edit",
+                                                        "offset": 8
+                                                    },
+                                                    "position-bottom": {
+                                                        "target": "TOP",
+                                                        "widget": "add",
+                                                        "offset": 8
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "UIButton",
+                                                "id": "add",
+                                                "text": "${engine:menu#add-server}",
+                                                "layoutInfo": {
+                                                    "use-content-height": true,
+                                                    "position-bottom": {
+                                                        "target": "BOTTOM"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "RelativeLayout",
+                                        "id": "onlineServerListScrollArea",
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "UIList",
+                                                    "id": "onlineServerList",
+                                                    "family": "module-list"
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    },
+                                                    "position-bottom": {
+                                                        "target": "TOP",
+                                                        "widget": "download",
+                                                        "offset": 4
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "UILabel",
+                                                "id": "download",
+                                                "text": "\u003cdownload info text\u003e",
+                                                "layoutInfo": {
+                                                    "use-content-height": true,
+                                                    "position-bottom": {
+                                                        "target": "BOTTOM",
+                                                        "offset": 4
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "position-top": {
+                                        "target": "BOTTOM",
+                                        "widget": "serverTypeRow"
+                                    },
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "RelativeLayout",
+                        "family": "description",
+                        "contents": [
+                            {
+                                "type": "ColumnLayout",
+                                "id": "simpleItems",
+                                "columns": 2,
+                                "column-widths": [
+                                    0.25,
+                                    0.75
+                                ],
+                                "extendLast": true,
+                                "verticalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#server-name}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "name",
+                                        "text": "Server Name Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#server-owner}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "owner",
+                                        "text": "Server Owner Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#server-address}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "address",
+                                        "text": "Server Address Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#server-port}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "port",
+                                        "text": "Server Port Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#ping}:"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "ping",
+                                        "text": ""
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#game-worlds}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "worlds",
+                                        "text": "World Info Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-list}: "
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "content": {
+                                            "type": "UILabel",
+                                            "id": "modules",
+                                            "text": "Module Info Goes Here"
+                                        }
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP",
+                                        "offset": 8
+                                    },
+                                    "position-bottom": {
+                                        "target": "TOP",
+                                        "widget": "buttonRow",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "buttonRow",
+                                "horizontalSpacing": 4,
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#join-server-refresh}",
+                                        "id": "refresh"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "join",
+                                        "text": "${engine:menu#join-server-action}",
+                                        "family": "highlight",
+                                        "layoutInfo": {
+                                            "height": 40,
+                                            "position-bottom": {
+                                                "target": "BOTTOM"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    },
+                                    "height": 40
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

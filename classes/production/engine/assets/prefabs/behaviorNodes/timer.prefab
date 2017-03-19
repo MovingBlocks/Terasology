@@ -1,0 +1,11 @@
+{
+    "BehaviorNode": {
+        "type": "TimerNode",
+        "name": "Timer",
+        "category": "logic",
+        "shape": "rect",
+        "description": "Decorator\nStarts the decorated node.\nSUCCESS: as soon as decorated node finishes with SUCCESS.\nFAILURE: after x seconds.",
+        "color": [180, 180, 180, 255],
+        "textColor": [0, 0, 0, 255]
+    }
+}

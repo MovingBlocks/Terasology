@@ -1,0 +1,197 @@
+{
+    "type": "engine:createGameScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "subtitle",
+                "family": "title",
+                "text": "${engine:menu#create-game-title}",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "gameTypeTitle",
+                "family": "subtitle",
+                "text": "${engine:menu#select-singleplayer-game-sub-title}",
+                "layoutInfo": {
+                    "height": 30,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "subtitle"
+                    }
+                }
+            },
+            {
+                "type": "UIBox",
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 4,
+                    "horizontalSpacing": 4,
+                    "family": "left-label",
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#game-name}:"
+                        },
+                        {
+                            "type": "UIText",
+                            "id": "worldName"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#gameplay} (${engine:menu#gameplay-info}):"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "gameplay",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.7
+                                    }
+                                },
+                                {
+                                    "type": "ColumnLayout",
+                                    "contents": [
+                                        {
+                                            "type": "UIButton",
+                                            "text": "${engine:menu#select-modules}",
+                                            "id": "mods"
+                                        },
+                                        {
+                                            "type": "UILabel",
+                                            "text": "${engine:menu#advanced-usage}"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "id": "gameplayDescription"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#world-seed}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIText",
+                                    "id": "seed",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.7
+                                    }
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#world-config-preview}",
+                                    "id": "previewSeed"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UISpace",
+                             "size": [1, 16]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#select-world-gen} (${engine:menu#select-world-gen-info}):"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIDropdownScrollable",
+                                    "id": "worldGenerator",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.7
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "gameTypeTitle"
+                    }
+                }
+            },
+            {
+                "type": "RowLayout",
+                "id": "actionsRow",
+                "horizontalSpacing": 4,
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#start-game}",
+                        "id": "play"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#back}",
+                        "id": "close"
+                    }
+                ],
+                "layoutInfo": {
+                    "width": 400,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "DisplayName": {
+        "name": "Unknown"
+    },
+    "Item": {
+        "damageType": "engine:physicalDamage",
+        "pickupPrefab": "engine:itemPickup",
+        "cooldownTime": 200
+    },
+    "BoxShape": {
+        "extents": [1, 1, 1]
+    },
+    "Network": {
+        "replicateMode": "RELEVANT"
+    },
+    "FirstPersonHeldItemTransform": {
+        "rotateDegrees": [0, -80, 0],
+        "translate": [0, -0.5, 0],
+        "scale": 0.75
+    }
+}

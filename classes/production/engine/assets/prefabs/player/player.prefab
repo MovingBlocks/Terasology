@@ -1,0 +1,52 @@
+{
+    "persisted": true,
+    "Location": {
+        "replicateChanges": false
+    },
+    "Character": {},
+    "Network": {
+        "replicateMode": "ALWAYS"
+    },
+    "CharacterMovement": {
+        "groundFriction": 16,
+        "maxGroundSpeed": 3,
+        "distanceBetweenFootsteps": 1.5,
+        "distanceBetweenSwimStrokes": 2.5,
+        "height": 1.8,
+        "radius": 0.3,
+        "jumpSpeed": 12
+    },
+    "Mesh": {
+        "mesh": "engine:testmonkey",
+        "material": "engine:monkeyHead9",
+        "hideFromOwner": true
+    },
+    "BoxShape": {
+        "extents": [1.5, 1.8, 1.5]
+    },
+    "Trigger": {
+        "detectGroups": ["engine:debris", "engine:sensor"]
+    },
+    "CharacterSound": {
+        "footstepSounds": ["engine:FootGrass1", "engine:FootGrass2", "engine:FootGrass3", "engine:FootGrass4", "engine:FootGrass5"],
+        "damageSounds": ["engine:HeartBeat"],
+        "landingSounds": ["engine:Land"],
+        "deathSounds": ["engine:Death"],
+        "swimSounds": ["engine:Slime4"],
+        "enterWaterSounds": ["engine:Slime1"],
+        "leaveWaterSounds": ["engine:Slime3"],
+        "footstepVolume": 0.5,
+        "damageVolume": 0.25,
+        "deathVolume": 1.0,
+        "respawnVolume": 1.0,
+        "swimmingVolume": 0.25,
+        "diveVolume": 0.5,
+        "landingVolume": 0.25
+    },
+    "CharacterHeldItem": {
+    },
+    "Breather": {},
+    "GazeMountPoint": {
+        "translate": [0, 0.7, 0]
+    }
+}

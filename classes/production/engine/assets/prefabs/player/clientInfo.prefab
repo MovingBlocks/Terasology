@@ -1,0 +1,13 @@
+{
+    "persisted": true,
+    "DisplayName": {
+        "name": "Unknown",
+        "description": "A player"
+    },
+    "Network": {
+        "replicateMode": "ALWAYS"
+    },
+    "PermissionSet": {
+        "permissions": ["chat"]
+    }
+}

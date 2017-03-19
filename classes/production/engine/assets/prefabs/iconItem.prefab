@@ -1,0 +1,7 @@
+{
+    "parent": "engine:itemBase",
+    "BoxShape": {
+        "extents": [2, 2, 0.2]
+    },
+    "RenderItemIconMesh": {}
+}

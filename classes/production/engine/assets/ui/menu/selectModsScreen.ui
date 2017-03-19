@@ -1,0 +1,283 @@
+{
+    "type": "selectModulesScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 40
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "subtitle",
+                "family": "title",
+                "text": "${engine:menu#select-modules-title}",
+                "layoutInfo": {
+                    "height": 18,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "warning",
+                "text": "${engine:menu#warn-modules}",
+                "family": "warning",
+                "layoutInfo": {
+                    "height": 12,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "subtitle",
+                        "offset": 36
+                    }
+                }
+            },
+            {
+                "type": "UIBox",
+                "id": "container",
+                "layoutInfo": {
+                    "width": 600,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 32,
+                        "widget": "warning"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 16
+                    }
+                }
+            },
+            {
+                "type": "ColumnLayout",
+                "columns": 2,
+                "verticalSpacing": 16,
+                "horizontalSpacing": 8,
+                "layoutInfo": {
+                    "width": 584,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "widget": "container",
+                        "offset": 8
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 24
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "RelativeLayout",
+                        "family": "description",
+                        "contents": [
+                            {
+                                "type": "RowLayout",
+                                "id": "searchLayout",
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-filter}: ",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.25
+                                        }
+                                    },
+                                    {
+                                        "type": "ResettableUIText",
+                                        "id": "moduleSearch",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.75,
+                                            "use-content-height": true
+                                        }
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                }
+                            },
+                            {
+                                "type": "ScrollableArea",
+                                "content": {
+                                    "type": "UIList",
+                                    "id": "moduleList",
+                                    "family": "module-list"
+                                },
+                                "layoutInfo": {
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP",
+                                        "offset": 32
+                                    },
+                                    "position-bottom": {
+                                        "target": "TOP",
+                                        "widget": "actionButtons",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "actionButtons",
+                                "horizontalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "disableAll",
+                                        "text": "${engine:menu#disable-all-modules}"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "width": 250,
+                                    "height": 24,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "RelativeLayout",
+                        "family": "description",
+                        "contents": [
+                            {
+                                "type": "ColumnLayout",
+                                "id": "simpleItems",
+                                "columns": 2,
+                                "column-widths": [0.3, 0.7],
+                                "verticalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-name}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "name",
+                                        "text": "Module Name Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-version-installed}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "installedVersion",
+                                        "text": "Module Version Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-version-available}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "onlineVersion",
+                                        "text": "Module Version Goes Here"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#module-status}: "
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "status",
+                                        "text": "Module Status Goes Here"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                }
+                            },
+                            {
+                                "type": "ScrollableArea",
+                                "content": {
+                                    "type": "UILabel",
+                                    "id": "description",
+                                    "text": "This is the description of a module. It can be quite long and even include new lines.\n\nLike this.\n\nI'm going to put in a lot more text to ensure the scrollable area fills up. Lorem ipsum and all that.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                                },
+                                "layoutInfo": {
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "BOTTOM",
+                                        "widget": "simpleItems",
+                                        "offset": 8
+                                    },
+                                    "position-bottom": {
+                                        "target": "TOP",
+                                        "widget": "buttonRow",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
+                                "type": "ColumnLayout",
+                                "id": "buttonRow",
+                                "columns": 2,
+                                "horizontalSpacing": 8,
+                                "verticalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "toggleActivation",
+                                        "text": "${engine:menu#activate-module}"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "id": "download",
+                                        "text": "${engine:menu#download-module}"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "height": 24,
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "type": "InputSettingsScreen",
+    "skin": "mainmenu",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "family": "title",
+                "text": "${engine:menu#input-settings-title}",
+                "id": "subtitle",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "ScrollableArea",
+                "id": "area",
+                "layoutInfo": {
+                    "width": 740,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "subtitle"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "offset": 32,
+                        "widget": "actionsRow"
+                    }
+                }
+            },
+            {
+                "type": "RowLayout",
+                "id": "actionsRow",
+                "horizontalSpacing": 8,
+                "contents": [
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#restore-defaults}",
+                        "id": "reset"
+                    },
+                    {
+                        "type": "UIButton",
+                        "text": "${engine:menu#back}",
+                        "id": "back"
+                    }
+                ],
+                "layoutInfo": {
+                    "width": 400,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

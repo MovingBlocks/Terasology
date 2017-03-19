@@ -249,7 +249,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private SaveTransaction createSaveTransaction() {
-        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
+        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(this, privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock);
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);

@@ -1,0 +1,25 @@
+{
+    "type": "PlaceholderScreen",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIButton",
+                "layoutInfo": {
+                    "position-horizontal-center": {},
+                    "position-top": {}
+                }
+            },
+            {
+                "type": "RowLayout",
+                "layoutInfo": {},
+                "contents": [
+                    {
+                        "type": "UILabel",
+                        "layoutInfo": {}
+                    }
+                ]
+            }
+        ]
+    }
+}
