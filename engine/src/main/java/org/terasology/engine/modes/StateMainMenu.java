@@ -136,7 +136,7 @@ public class StateMainMenu implements GameState {
     }
 
     @Override
-    public void dispose(boolean saveRequested){
+    public void dispose(boolean saveRequested) {
     }
 
     private void playBackgroundMusic() {

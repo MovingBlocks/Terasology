@@ -147,7 +147,7 @@ public class MenuControlSystem extends BaseComponentSystem {
     }
 
     private static GameManifest getQuickSaveGameManifest() {
-        GameManifest latestManifest=getLatestGameManifest();
+        GameManifest latestManifest = getLatestGameManifest();
         try {
             String title = latestManifest.getTitle();
             return GameManifest.load(PathManager.getInstance().getSavePath(title).resolve(title + " Quick Save" + System.getProperty("file.separator") + "manifest.json"));

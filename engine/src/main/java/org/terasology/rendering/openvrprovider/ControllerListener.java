@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public interface ControllerListener {
     long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
-    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
+    void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
     // TODO: touch, axes
-    public void poseChanged(Matrix4f pose, int handIndex);
+    void poseChanged(Matrix4f pose, int handIndex);
 }

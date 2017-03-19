@@ -73,9 +73,9 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SetViewportToSizeOf))
+        if (!(obj instanceof SetViewportToSizeOf)) {
             return false;
-
+        }
         SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
 
         return getFbo().width() == other.getFbo().width() && getFbo().height() == other.getFbo().height();

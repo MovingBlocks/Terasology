@@ -118,13 +118,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
-        Path savePath;
-        if (isQuickLoad) {
-            savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle()).resolve(gameManifest.getTitle() + " Quick Save");
-        }
-        else {
-            savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
-        }
+        Path savePath = isQuickLoad ? PathManager.getInstance().getSavePath(gameManifest.getTitle()).resolve(gameManifest.getTitle() + " Quick Save") : PathManager.getInstance().getSavePath(gameManifest.getTitle());
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled

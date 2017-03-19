@@ -510,7 +510,7 @@ public class TerasologyEngine implements GameEngine {
         inputSystem.drainQueues();
     }
 
-    private void switchState(GameState newState, boolean saveRequested){
+    private void switchState(GameState newState, boolean saveRequested) {
         currentState.dispose(saveRequested);
         currentState = newState;
         LoggingContext.setGameState(newState);

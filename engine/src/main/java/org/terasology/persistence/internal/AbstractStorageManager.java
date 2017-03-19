@@ -225,7 +225,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         return entityManager;
     }
 
-    protected BlockManager getBlockManager(){
+    protected BlockManager getBlockManager() {
         return blockManager;
     }
 
@@ -233,7 +233,7 @@ public abstract class AbstractStorageManager implements StorageManager {
         return biomeManager;
     }
 
-    public void setSavePath(Path savePath){
+    public void setSavePath(Path savePath) {
         this.storagePathProvider = new StoragePathProvider(savePath);
     }
     protected PrefabSerializer getPrefabSerializer() {

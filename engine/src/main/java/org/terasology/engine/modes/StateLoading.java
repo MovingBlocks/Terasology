@@ -237,7 +237,7 @@ public class StateLoading implements GameState {
         time.setPaused(false);
     }
     @Override
-    public void dispose(boolean saveRequested){
+    public void dispose(boolean saveRequested) {
     }
 
 
