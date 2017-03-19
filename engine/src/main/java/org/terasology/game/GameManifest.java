@@ -65,17 +65,6 @@ public class GameManifest {
         this.time = time;
     }
 
-    public GameManifest(GameManifest gameManifest){
-        this.title = gameManifest.getTitle();
-        this.seed = gameManifest.getSeed();
-        this.time = gameManifest.getTime();
-        this.registeredBlockFamilies = gameManifest.getRegisteredBlockFamilies();
-        this.blockIdMap = gameManifest.getBlockIdMap();
-        this.biomeIdMap = gameManifest.getBiomeIdMap();
-        this.worlds = gameManifest.getWorlds();
-        this.modules = gameManifest.getModules();
-    }
-
     public String getTitle() {
         return title;
     }
@@ -124,8 +113,8 @@ public class GameManifest {
         this.worlds.put(worldInfo.getTitle(), worldInfo);
     }
 
-    public Map<String, WorldInfo> getWorlds() {
-        return this.worlds;
+    public Iterable<WorldInfo> getWorlds() {
+        return this.worlds.values();
     }
 
     public Map<String, Short> getBiomeIdMap() {
