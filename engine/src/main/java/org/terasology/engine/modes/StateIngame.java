@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.terasology.engine.modes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -54,8 +52,6 @@ import java.util.Collections;
  * @version 0.1
  */
 public class StateIngame implements GameState {
-
-    private static final Logger logger = LoggerFactory.getLogger(StateIngame.class);
 
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;

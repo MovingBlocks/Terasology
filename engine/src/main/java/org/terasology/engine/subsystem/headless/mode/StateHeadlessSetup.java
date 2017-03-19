@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public class StateHeadlessSetup implements GameState {
 
         componentSystemManager.initialise();
 
-        GameManifest gameManifest = null;
+        GameManifest gameManifest;
         List<GameInfo> savedGames = GameProvider.getSavedGames();
         if (savedGames.size() > 0) {
             gameManifest = savedGames.get(0).getManifest();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,10 +119,12 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
         Path savePath;
-        if (isQuickLoad)
+        if (isQuickLoad) {
             savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle()).resolve(gameManifest.getTitle() + " Quick Save");
-        else
+        }
+        else {
             savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        }
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled

@@ -16,14 +16,11 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.config.Config;
-import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.console.commandSystem.annotations.Command;
-import org.terasology.logic.console.commands.ServerCommands;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.persistence.StorageManager;
@@ -53,10 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.jar.Manifest;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
@@ -67,7 +61,6 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private StorageManager storageManager;
-
 
     @Override
     public void initialise() {
@@ -108,12 +101,10 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onLoad(LoadButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             GameManifest quickSaveGameManifest = getQuickSaveGameManifest();
-            //quickSaveGameManifest.setTitle(quickSaveGameManifest.getTitle()+ " Quick Save");
             if (quickSaveGameManifest != null) {
-                //CoreRegistry.get(GameEngine.class).changeState(new StateLoading(latestManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE)); not sure how to get the "loadingAsServer" boolean here
-                boolean saveRequested = false;
+                boolean saveRequested = false; //quick load shouldn't cause the game to save
                 boolean isQuickLoad = true;
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE, isQuickLoad), saveRequested); //quick load shouldn't cause the game to save
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE, isQuickLoad), saveRequested);
             }
             event.consume();
         }

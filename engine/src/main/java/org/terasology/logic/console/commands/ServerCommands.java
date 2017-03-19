@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,8 +192,6 @@ public class ServerCommands extends BaseComponentSystem {
     @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
             requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
     public void save() {
-        GameManifest latestManifest = getLatestGameManifest();
-        storageManager.setSavePath(PathManager.getInstance().getSavePath(latestManifest.getTitle()).resolve(latestManifest.getTitle() + " Quick Save"));
         storageManager.requestSaving();
     }
 
@@ -214,19 +212,4 @@ public class ServerCommands extends BaseComponentSystem {
         chunkProvider.purgeWorld();
     }
 
-    private static GameManifest getLatestGameManifest() {
-        GameInfo latestGame = null;
-        List<GameInfo> savedGames = GameProvider.getSavedGames();
-        for (GameInfo savedGame : savedGames) {
-            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
-                latestGame = savedGame;
-            }
-        }
-
-        if (latestGame == null) {
-            return null;
-        }
-
-        return latestGame.getManifest();
-    }
 }

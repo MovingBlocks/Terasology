@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,11 +113,6 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      * that will use the privateEntityManager.
      */
     private ComponentLibrary entityRefReplacingComponentLibrary;
-    private Path savePath;
-
-    public ReadWriteStorageManager(Path savePath, ReadWriteStorageManager readWriteStorageManager) throws IOException {
-        this(savePath, readWriteStorageManager.getEnvironment(), readWriteStorageManager.getEntityManager(), readWriteStorageManager.getBlockManager(), readWriteStorageManager.getBiomeManager(), readWriteStorageManager.isStoreChunksInZips());
-    }
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager,
                                    BlockManager blockManager, BiomeManager biomeManager) throws IOException {
