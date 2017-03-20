@@ -347,20 +347,22 @@ public class BlockCommands extends BaseComponentSystem {
         if (quantity < 1) {
             return "Here, have these zero (0) blocks just like you wanted";
         }
-        //continue giving blocks until there are no more blocks to give
-        //TODO reference maxStackSize instead of explicitly subtracting 99 and introduce an upper bound? 10 million lags ..
-        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft -= 99) {
-            EntityRef item = blockItemFactory.newInstance(blockFamily, quantityLeft > 99 ? 99 : quantityLeft);
+
+        EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft--) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, 1);
             if (!item.exists()) {
                 throw new IllegalArgumentException("Unknown block or item");
             }
 
-            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-
             GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
             item.send(giveItemEvent);
+
             if (!giveItemEvent.isHandled()) {
                 item.destroy();
+                quantity -= quantityLeft;
+                break;
             }
         }
 
