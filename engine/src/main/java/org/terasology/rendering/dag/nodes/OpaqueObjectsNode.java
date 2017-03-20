@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,11 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * This node renders the opaque (as opposed to semi-transparent)
@@ -40,7 +42,6 @@ import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFF
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
 public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
-
     @In
     private ComponentSystemManager componentSystemManager;
 
@@ -50,23 +51,28 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     @In
     private WorldRenderer worldRenderer;
 
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
+    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
      */
     @Override
     public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
-
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 
     public void enableWireframe() {
@@ -90,7 +96,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     public void process() {
         PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
-        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
+        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();

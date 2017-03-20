@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
@@ -35,13 +34,13 @@ import org.terasology.world.WorldProvider;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  */
 public class ShaderParametersInitialPost extends ShaderParametersBase {
-
     @Range(min = 0.0f, max = 0.1f)
     float aberrationOffsetX;
     @Range(min = 0.0f, max = 0.1f)
@@ -65,7 +64,7 @@ public class ShaderParametersInitialPost extends ShaderParametersBase {
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        displayResolutionDependentFBOs.bindFboColorTexture(READONLY_GBUFFER);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor config parameter by subscribing to it

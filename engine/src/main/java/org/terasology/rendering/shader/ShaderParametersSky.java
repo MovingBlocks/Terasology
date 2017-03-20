@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import org.terasology.world.WorldProvider;
  *
  */
 public class ShaderParametersSky extends ShaderParametersBase {
-
     @Range(min = 1.0f, max = 8192.0f)
     private float sunExponent = 512.0f;
     @Range(min = 1.0f, max = 8192.0f)

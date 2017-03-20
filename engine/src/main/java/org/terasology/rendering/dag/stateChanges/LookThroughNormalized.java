@@ -91,11 +91,6 @@ public class LookThroughNormalized implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         if (this.isTheDefaultInstance()) {
             return String.format("%30s: %s", this.getClass().getSimpleName(), "default opengl camera");

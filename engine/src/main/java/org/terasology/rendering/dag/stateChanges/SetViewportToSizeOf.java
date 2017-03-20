@@ -16,42 +16,38 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import java.util.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.lwjgl.opengl.GL11.glViewport;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 /**
  * TODO: Add javadocs
  */
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
+    private static SetViewportToSizeOf defaultInstance;
 
-    private static SetViewportToSizeOf defaultInstance = new SetViewportToSizeOf(READ_ONLY_GBUFFER);
-
-    private BaseFBOsManager frameBuffersManager;
+    private BaseFBOsManager fboManager;
     private SetViewportToSizeOfTask task;
     private ResourceUrn fboName;
-    private DefaultDynamicFBOs defaultDynamicFBO;
 
     public SetViewportToSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
-        this.frameBuffersManager = frameBuffersManager;
+        this.fboManager = frameBuffersManager;
         this.fboName = fboName;
-    }
-
-    public SetViewportToSizeOf(DefaultDynamicFBOs defaultDynamicFBO) {
-        this.defaultDynamicFBO = defaultDynamicFBO;
-        this.frameBuffersManager = defaultDynamicFBO.getFrameBufferManager();
-        this.fboName = defaultDynamicFBO.getName();
     }
 
     @Override
     public StateChange getDefaultInstance() {
+        if (defaultInstance == null) {
+            defaultInstance = new SetViewportToSizeOf(READONLY_GBUFFER, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+        }
         return defaultInstance;
     }
 
@@ -59,7 +55,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     public RenderPipelineTask generateTask() {
         if (task == null) {
             task = new SetViewportToSizeOfTask(fboName);
-            frameBuffersManager.subscribe(this);
+            fboManager.subscribe(this);
             update();
         }
 
@@ -78,17 +74,17 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
         SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
 
-        return getFbo().width() == other.getFbo().width() && getFbo().height() == other.getFbo().height();
-    }
+        FBO fbo = getFbo();
+        FBO otherFbo = other.getFbo();
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
+        return fbo.width() == otherFbo.width() && fbo.height() == otherFbo.height();
     }
 
     @Override
     public void update() {
-        task.setDimensions(getFbo().width(), getFbo().height());
+        FBO fbo = getFbo();
+
+        task.setDimensions(fbo.width(), fbo.height());
     }
 
     @Override
@@ -97,8 +93,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     }
 
     private FBO getFbo() {
-        return defaultDynamicFBO != null ? defaultDynamicFBO.getFbo() : frameBuffersManager.get(fboName);
-
+        return fboManager.get(fboName);
     }
 
     private final class SetViewportToSizeOfTask implements RenderPipelineTask {

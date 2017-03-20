@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ public class SetInputTexture implements StateChange {
                 && this.materialURN.equals(((SetInputTexture) other).materialURN)
                 && this.materialParameter.equals(((SetInputTexture) other).materialParameter);
     }
-    
+
     /**
      * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot.
      * Also disconnects the texture from the shader program.
@@ -110,11 +110,6 @@ public class SetInputTexture implements StateChange {
             defaultInstance = new SetInputTexture(textureSlot, materialURN, materialParameter);
         }
         return defaultInstance;
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
     }
 
     /**
@@ -155,4 +150,3 @@ public class SetInputTexture implements StateChange {
         }
     }
 }
-

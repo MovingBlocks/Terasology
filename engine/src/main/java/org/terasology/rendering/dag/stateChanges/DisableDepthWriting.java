@@ -70,11 +70,6 @@ public final class DisableDepthWriting implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).isEnabled();
     }

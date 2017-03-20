@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,10 +73,4 @@ public final class EnableFaceCulling extends SetStateParameter {
     protected RenderPipelineTask getEnablingTask() {
         return enablingTask;
     }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
 }
