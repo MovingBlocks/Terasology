@@ -37,6 +37,9 @@ public class PrefabTypeHandler extends StringRepresentationTypeHandler<Prefab> {
 
     @Override
     public Prefab getFromString(String representation) {
+        if (representation == null) {
+            return null;
+        }
         return Assets.getPrefab(representation).orElse(null);
     }
 }
