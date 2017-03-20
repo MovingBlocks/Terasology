@@ -272,6 +272,21 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         return "Inflicted damage of " + amount;
     }
 
+    @Command(shortDescription = "Immune to all damage", runOnServer = true,
+    requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String GodMode(@Sender EntityRef client){
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
+        health.immutable = !health.immutable;
+        if(health.immutable){
+            return "God Mode";
+        }
+        else{
+            return "Remove God Mode";
+        }
+    }
+
+
     @Command(shortDescription = "Restores your health to max", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String healthMax(@Sender EntityRef clientEntity) {
