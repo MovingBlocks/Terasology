@@ -23,6 +23,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerUtil;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.PingStockComponent;
+import org.terasology.network.events.SubscribePingEvent;
+import org.terasology.network.events.UnSubscribePingEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -100,5 +102,15 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
             first = false;
         }
         return sb.toString();
+    }
+
+    @Override
+    public void onOpened() {
+        localPlayer.getClientEntity().send(new SubscribePingEvent());
+    }
+
+    @Override
+    public void onClosed() {
+        localPlayer.getClientEntity().send(new UnSubscribePingEvent());
     }
 }

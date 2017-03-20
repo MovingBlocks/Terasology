@@ -23,10 +23,11 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.events.PingFromClientEvent;
 import org.terasology.network.events.PingFromServerEvent;
+import org.terasology.network.events.SubscribePingEvent;
+import org.terasology.network.events.UnSubscribePingEvent;
 import org.terasology.registry.In;
 
 import java.time.Duration;
@@ -40,7 +41,7 @@ import java.util.HashMap;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ServerPingSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
-    private static final long PING_PERIOD = 400;
+    private static final long PING_PERIOD = 200;
 
     @In
     private EntityManager entityManager;
@@ -73,6 +74,15 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
                     if (client.equals(localPlayer.getClientEntity())) {
                         continue;
                     }
+
+                    // send ping only if client replied the last ping
+                    Instant lastPingFromClient = endMap.get(client);
+                    Instant lastPingToClient = startMap.get(client);
+                    // Only happens when server doesn't receive ping back yet 
+                    if (lastPingFromClient!= null && lastPingToClient!=null && lastPingFromClient.isBefore(lastPingToClient)) {
+                        continue;
+                    }
+
                     Instant start = Instant.now();
                     startMap.put(client, start);
                     client.send(new PingFromServerEvent());
@@ -110,18 +120,27 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onDeactivatePing(DeactivatePingServerEvent event, EntityRef entity) {
+    public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
+        startMap.remove(entity);
+        endMap.remove(entity);
+        pingMap.remove(entity);
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onSubscribePing(SubscribePingEvent event, EntityRef entity) {
+        entity.addOrSaveComponent(new PingSubscriberComponent());
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onUnSubscribePing(UnSubscribePingEvent event, EntityRef entity) {
+        entity.removeComponent(PingSubscriberComponent.class);
+        entity.removeComponent(PingStockComponent.class);
+
+        //if there is no pingSubscriber, then clean the map
         if (entityManager.getCountOfEntitiesWith(PingSubscriberComponent.class) == 0) {
             startMap.clear();
             endMap.clear();
             pingMap.clear();
         }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onDisconnected(DisconnectedEvent event, EntityRef entity) {
-        startMap.remove(entity);
-        endMap.remove(entity);
-        pingMap.remove(entity);
     }
 }

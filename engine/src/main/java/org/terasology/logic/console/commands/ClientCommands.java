@@ -21,13 +21,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
-import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.PingStockComponent;
-import org.terasology.network.PingSubscriberComponent;
-import org.terasology.network.events.DeactivatePingServerEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
@@ -67,33 +62,5 @@ public class ClientCommands extends BaseComponentSystem {
     public String setWorldTime(@CommandParam("day") float day) {
         worldProvider.getTime().setDays(day);
         return "World time changed";
-    }
-
-    /**
-     * Subscribes the ping from server function
-     * @param sender Client who sends the command
-     * @return       The subscription state
-     */
-    @Command(runOnServer = true,
-            shortDescription = "Once activated the ping wil be shown in online player overlay",
-            requiredPermission = PermissionManager.NO_PERMISSION)
-    public String showPingInPlayerlist(@Sender EntityRef sender) {
-        if (networkSystem.getMode() == NetworkMode.NONE) {
-            return "You are on single player mode, don't need the ping information";
-        }
-
-        if (!sender.hasComponent(PingSubscriberComponent.class)) {
-            PingSubscriberComponent pingSubscriberComp = new PingSubscriberComponent();
-            sender.addComponent(pingSubscriberComp);
-            return "Ping from server function activated, see in online player overlay";
-        }
-        else {
-            sender.removeComponent(PingSubscriberComponent.class);
-            sender.removeComponent(PingStockComponent.class);
-
-            //Clean ping map in server if necessary
-            sender.send(new DeactivatePingServerEvent());
-            return "Ping from server function deactivated";
-        }
     }
 }

@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.network;
+package org.terasology.network.events;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.ServerEvent;
 
 /**
- * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.
- * Server will only send ping information to the clients subscribed.
- * <p>
- * It can be used to stock the ping information of users in future.
+ * The client unSubscribes ping.
  */
-public class PingSubscriberComponent implements Component {
+@ServerEvent
+public class UnSubscribePingEvent implements Event {
 }
