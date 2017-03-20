@@ -18,6 +18,9 @@ package org.terasology.rendering.opengl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -76,7 +79,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
     protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
 
-    private Set<FBOManagerSubscriber> fboManagerSubscribers = Sets.newHashSet();
+    private List<FBOManagerSubscriber> fboManagerSubscribers = new ArrayList<>();
 
     protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
@@ -259,7 +262,13 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      */
     @Override
     public boolean subscribe(FBOManagerSubscriber subscriber) {
-        return fboManagerSubscribers.add(subscriber);
+        // TODO: Add sanity checks to ensure no object can resubscribe
+        // return fboManagerSubscribers.add(subscriber);
+
+        // VAMPCAT : TODO: RESTORE!!!
+        if (!fboManagerSubscribers.add(subscriber))
+            return false;
+        return true;
     }
 
     /**

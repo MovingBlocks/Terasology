@@ -29,6 +29,7 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -41,7 +42,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * Objects to be rendered must be registered as implementing the interface RenderSystem and
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
-public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
+public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
     @In
     private ComponentSystemManager componentSystemManager;
 
@@ -57,7 +58,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
@@ -72,7 +73,9 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -96,12 +99,17 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     public void process() {
         PerformanceMonitor.startActivity("rendering/opaqueObjects");
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
+        readOnlyGBufferFbo.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

@@ -31,6 +31,7 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -42,7 +43,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * Objects to be rendered as overlays must be registered as implementing the interface RenderSystem and
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
-public class OverlaysNode extends AbstractNode implements WireframeCapable {
+public class OverlaysNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
     @In
@@ -59,7 +60,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBuffer;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -74,9 +75,11 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     /**
@@ -114,12 +117,17 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/overlays");
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
+        readOnlyGBuffer.bind(); // TODO: remove when we can bind this via a StateChange
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBuffer = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

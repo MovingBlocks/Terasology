@@ -30,6 +30,7 @@ import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -39,7 +40,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 /**
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
  */
-public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
+public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable, FBOManagerSubscriber {
     @In
     private WorldRenderer worldRenderer;
 
@@ -55,7 +56,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
     private SetWireframe wireframeStateChange;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFbo;
 
     @Override
     public void initialise() {
@@ -69,10 +70,12 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -93,7 +96,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     public void process() {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
 
-            sceneOpaqueFbo.bind(); // TODO: to be removed - will eventually be bound with a state change
+            readOnlyGBufferFbo.bind(); // TODO: to be removed - will eventually be bound with a state change
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();
@@ -113,5 +116,10 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
             GL11.glPopMatrix();
 
             PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

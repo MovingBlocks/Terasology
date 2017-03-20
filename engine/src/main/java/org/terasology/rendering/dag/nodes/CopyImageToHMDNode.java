@@ -21,6 +21,7 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
@@ -37,7 +38,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
-public class CopyImageToHMDNode extends ConditionDependentNode {
+public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
     // TODO: make these configurable options
@@ -58,8 +59,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
-    private FBO leftEye;
-    private FBO rightEye;
+    private FBO leftEyeFbo;
+    private FBO rightEyeFbo;
     private FBO sceneFinalFbo;
 
     /**
@@ -73,21 +74,23 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
                 && vrProvider.isInitialized()));
-        leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
+        leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
+        rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         if (vrProvider != null) {
-            vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
+            vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[0].write();
-            vrProvider.texType[1].handle = rightEye.colorBufferTextureId;
+            vrProvider.texType[1].handle = rightEyeFbo.colorBufferTextureId;
             vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     /**
@@ -107,18 +110,25 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         switch (renderingStage) {
             case LEFT_EYE:
                 vrProvider.updateState();
-                leftEye.bind();
+                leftEyeFbo.bind();
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad();
                 break;
 
             case RIGHT_EYE:
-                rightEye.bind();
+                rightEyeFbo.bind();
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 renderFullscreenQuad();
                 vrProvider.submitFrame();
                 GL11.glFinish();
                 break;
         }
+    }
+
+    @Override
+    public void update() {
+        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        leftEyeFbo = displayResolutionDependentFBOs.get(LEFT_EYE_FBO);
+        rightEyeFbo = displayResolutionDependentFBOs.get(RIGHT_EYE_FBO);
     }
 }

@@ -32,6 +32,7 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -52,7 +53,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * In alpha-blending the color of a semi-transparent fragment is combined with
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
+public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -71,7 +72,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFBO;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -86,10 +87,12 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -126,7 +129,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
+        readOnlyGBufferFBO.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
@@ -151,5 +154,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

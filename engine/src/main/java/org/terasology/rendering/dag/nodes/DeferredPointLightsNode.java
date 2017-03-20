@@ -42,6 +42,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -52,7 +53,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Data from the light accumulation buffer is eventually combined with the
  * content of other buffers to correctly light up the scene.
  */
-public class DeferredPointLightsNode extends AbstractNode {
+public class DeferredPointLightsNode extends AbstractNode implements FBOManagerSubscriber {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;
 
@@ -67,7 +68,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
     private Material lightGeometryMaterial;
     private Camera playerCamera;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFBO;
 
     /**
      * Initializes an instance of this node.
@@ -76,7 +77,7 @@ public class DeferredPointLightsNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
 
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
@@ -93,6 +94,8 @@ public class DeferredPointLightsNode extends AbstractNode {
         addDesiredStateChange(new DisableDepthTest());
 
         initLightSphereDisplayList();
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     private void initLightSphereDisplayList() {
@@ -129,8 +132,8 @@ public class DeferredPointLightsNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
 
-        sceneOpaqueFbo.bind(); // TODO: remove and replace with a state change
-        sceneOpaqueFbo.setRenderBufferMask(false, false, true); // Only write to the light buffer
+        readOnlyGBufferFBO.bind(); // TODO: remove and replace with a state change
+        readOnlyGBufferFBO.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -175,9 +178,13 @@ public class DeferredPointLightsNode extends AbstractNode {
             }
         }
 
-        sceneOpaqueFbo.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
+        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
 
         PerformanceMonitor.endActivity();
     }
 
+    @Override
+    public void update() {
+        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+    }
 }

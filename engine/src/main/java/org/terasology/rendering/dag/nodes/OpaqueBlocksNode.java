@@ -34,6 +34,7 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -49,7 +50,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  *
  * In a typical world this is the majority of the world's landscape.
  */
-public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
+public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -68,7 +69,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
@@ -83,10 +84,12 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        update();
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -127,7 +130,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
+        readOnlyGBufferFbo.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {
@@ -168,5 +171,10 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         new AABBRenderer(chunk.getAABB()).renderLocally(1f);
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

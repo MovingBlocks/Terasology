@@ -86,9 +86,9 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
+        update();
 
         displayResolutionDependentFBOs.subscribe(this);
-        update(); // initializing ssaoBufferWidth/ssaoBufferHeight
 
         // TODO: check for input textures brought in by the material
     }
