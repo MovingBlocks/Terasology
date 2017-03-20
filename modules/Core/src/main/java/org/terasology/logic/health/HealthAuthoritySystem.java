@@ -186,8 +186,9 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     }
 
     private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
+        HealthComponent health = entity.getComponent(HealthComponent.class);
         BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
-        if (!beforeDamage.isConsumed()) {
+        if (!beforeDamage.isConsumed()&&!health.immutable) {
             int damageAmount = TeraMath.floorToInt(beforeDamage.getResultValue());
             if (damageAmount > 0) {
                 doDamage(entity, damageAmount, damageType, instigator, directCause);
