@@ -82,7 +82,7 @@ public final class BindsConfig {
      * @return True if newInput has been bound. False otherwise.
      */
     public boolean isBound(Input newInput) {
-        return data.containsValue(newInput);
+        return data.containsValue(newInput) && newInput != null;
     }
 
     /**
