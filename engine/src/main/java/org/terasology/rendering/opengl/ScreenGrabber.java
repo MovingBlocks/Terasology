@@ -48,8 +48,6 @@ public class ScreenGrabber {
     private ThreadManager threadManager;
     private float currentExposure;
     private boolean isTakingScreenshot;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     /**
@@ -98,6 +96,11 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
+        // Since ScreenGrabber is initialized before DisplayResolutionDependentFBOs (because the latter contains a reference to the former)
+        // on first call on saveScreenshot() displayResolutionDependentFBOs will be null.
+        if (displayResolutionDependentFBOs == null)
+            displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+
         FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
         final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();

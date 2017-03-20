@@ -78,18 +78,18 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
-
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
-        displayResolutionDependentFBOs.subscribe(this);
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
+
+        displayResolutionDependentFBOs.subscribe(this);
     }
 
     /**
@@ -139,6 +139,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void update() {
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+
         sceneOpaqueFbo.attachDepthBufferTo(refractiveReflectiveFbo);
     }
 }
