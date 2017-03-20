@@ -305,13 +305,4 @@ public class OpenVRStereoCamera extends Camera {
 
         updateFrustum();
     }
-
-    /**
-     * OpenVR provides external tracking information.
-     * @return true
-     */
-    @Override
-    public boolean isTracked() {
-        return true;
-    }
 }
