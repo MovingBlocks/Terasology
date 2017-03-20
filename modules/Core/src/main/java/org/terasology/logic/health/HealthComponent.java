@@ -39,6 +39,9 @@ public final class HealthComponent implements Component {
     public float excessSpeedDamageMultiplier = 10f;
 
     @Replicate
+    public boolean immutable = false;
+
+    @Replicate
     @TextField
     public int currentHealth = 20;
 
