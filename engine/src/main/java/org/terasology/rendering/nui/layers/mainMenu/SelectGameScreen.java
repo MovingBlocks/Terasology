@@ -84,8 +84,8 @@ public class SelectGameScreen extends CoreScreenLayer {
         refreshList(gameList);
         gameList.subscribe((widget, item) -> loadGame(item));
 
+        CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
         WidgetUtil.trySubscribe(this, "create", button -> {
-            CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
             screen.setLoadingAsServer(loadingAsServer);
             triggerForwardAnimation(screen);
         });
@@ -122,6 +122,7 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     @Override
     public void onOpened() {
+        super.onOpened();
         if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }

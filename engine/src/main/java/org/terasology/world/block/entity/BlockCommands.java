@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Contains a series of handy game console commands associated with blocks.
+ */
 @RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands extends BaseComponentSystem {
@@ -136,7 +139,6 @@ public class BlockCommands extends BaseComponentSystem {
 
         return items.toString();
     }
-
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
             "commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
@@ -217,7 +219,6 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-
     @Command(shortDescription = "Replaces a block in front of user",
             helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
@@ -249,9 +250,7 @@ public class BlockCommands extends BaseComponentSystem {
                     }
                 }
             }
-
         }
-
     }
 
     @Command(shortDescription = "Gives multiple stacks of blocks matching a search",
@@ -348,17 +347,21 @@ public class BlockCommands extends BaseComponentSystem {
         if (quantity < 1) {
             return "Here, have these zero (0) blocks just like you wanted";
         }
+        //continue giving blocks until there are no more blocks to give
+        //TODO reference maxStackSize instead of explicitly subtracting 99 and introduce an upper bound? 10 million lags ..
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft -= 99) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, quantityLeft > 99 ? 99 : quantityLeft);
+            if (!item.exists()) {
+                throw new IllegalArgumentException("Unknown block or item");
+            }
 
-        EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
-        if (!item.exists()) {
-            throw new IllegalArgumentException("Unknown block or item");
-        }
-        EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 
-        GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
-        item.send(giveItemEvent);
-        if (!giveItemEvent.isHandled()) {
-            item.destroy();
+            GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
+            item.send(giveItemEvent);
+            if (!giveItemEvent.isHandled()) {
+                item.destroy();
+            }
         }
 
         return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();

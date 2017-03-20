@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
+import org.terasology.world.WorldProvider;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -31,9 +33,8 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Simple default camera.
- *
  */
-public class PerspectiveCamera extends Camera {
+public class PerspectiveCamera extends SubmersibleCamera {
     // Values used for smoothing
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
@@ -49,8 +50,9 @@ public class PerspectiveCamera extends Camera {
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(PerspectiveCameraSettings cameraSettings) {
-        this.cameraSettings = cameraSettings;
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
+        super(worldProvider, renderingConfig);
+        this.cameraSettings = renderingConfig.getCameraSettings();
     }
 
     @Override

@@ -15,39 +15,34 @@
  */
 package org.terasology.rendering.dag.tasks;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
+
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
- * Instances of this class change the depth function used for the depth test while rendering.
- *
- * See glDepthFunct for more information.
+ * Instances of this class reset the ModelView and Projection matrices to identity matrices,
+ * as per opengl default.
  *
  * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
  * Modules or other parts of the engine should take advantage of them through classes
  * inheriting from StateChange.
  */
-public class SetDepthFunctionTask implements RenderPipelineTask {
-    private int depthFunction;
-
-    /**
-     * Constructs an instance of this class and initializes it with the given depth function.
-     *
-     * @param depthFunction An integer representing one of the depth functions known to OpenGL,
-     *                      i.e. GL_LEQUAL (Terasology's default), GL_LESS (OpenGL default), etc.
-     */
-    public SetDepthFunctionTask(int depthFunction) {
-        this.depthFunction = depthFunction;
-    }
+public class LookThroughDefaultCameraTask implements RenderPipelineTask {
 
     @Override
     public void execute() {
-        GL11.glDepthFunc(depthFunction);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), SetDepthFunction.OGL_TO_STRING.get(depthFunction));
+        return String.format("%30s: %s", this.getClass().getSimpleName(), "default opengl camera");
     }
 }

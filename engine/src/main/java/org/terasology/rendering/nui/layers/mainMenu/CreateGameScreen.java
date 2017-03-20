@@ -256,8 +256,8 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         };
         previewSeed.bindEnabled(worldGeneratorSelected);
+        PreviewWorldScreen screen = getManager().createScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
         WidgetUtil.trySubscribe(this, "previewSeed", button -> {
-            PreviewWorldScreen screen = getManager().createScreen(PreviewWorldScreen.ASSET_URI, PreviewWorldScreen.class);
             if (screen != null) {
                 screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
                 try {

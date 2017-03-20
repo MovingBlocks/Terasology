@@ -19,6 +19,7 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -27,9 +28,11 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * An instance of this class renders and blends semi-transparent objects into the content of the existing g-buffer.
@@ -49,6 +52,9 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 public class SimpleBlendMaterialsNode extends AbstractNode {
 
     @In
+    private WorldRenderer worldRenderer;
+
+    @In
     private ComponentSystemManager componentSystemManager;
 
     @In
@@ -60,6 +66,9 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
      */
     @Override
     public void initialise() {
+        Camera playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThrough(playerCamera));
+
         addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
 
