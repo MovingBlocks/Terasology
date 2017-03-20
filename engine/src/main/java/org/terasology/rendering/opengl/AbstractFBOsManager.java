@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,10 +227,29 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.error("Failed to retrieve FBO '" + fboName + "'!");
+            logger.warn("Failed to retrieve FBO '" + fboName + "'!");
         }
 
         return fbo;
+    }
+
+    /**
+     * Returns an FBOConfig given its name.
+     *
+     * If no FBOConfig maps to the given name, null is returned and an error is logged.
+     *
+     * @param fboName a ResourceUrn representing the name of an FBO
+     * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
+     */
+    @Override
+    public FBOConfig getFboConfig(ResourceUrn fboName) {
+        FBOConfig fboConfig = fboConfigs.get(fboName);
+
+        if (fboConfig == null) {
+            logger.warn("Failed to retrieve FBOConfig '" + fboName + "'!");
+        }
+
+        return fboConfig;
     }
 
     /**

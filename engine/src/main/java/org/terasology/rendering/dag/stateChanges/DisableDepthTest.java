@@ -70,10 +70,4 @@ public final class DisableDepthTest extends SetStateParameter {
     protected RenderPipelineTask getEnablingTask() {
         return enablingTask;
     }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
 }

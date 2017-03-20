@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,11 +72,6 @@ public final class SetFacesToCull implements StateChange {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetFacesToCull) && mode == ((SetFacesToCull) obj).getMode();
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return defaultInstance == this;
     }
 
     public static String getModeName(int mode) {
