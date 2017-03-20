@@ -135,4 +135,29 @@ public class ItemCommands extends BaseComponentSystem {
 
         return items.toString();
     }
+
+    @Command(shortDescription = "Gives multiple stacks of items matching a search",
+            helpText = "Adds all items that match the search parameter into your inventory",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bulkGiveItem(
+            @Sender EntityRef sender,
+            @CommandParam("searched") String searched,
+            @CommandParam(value = "quantity", required = false) Integer quantityParam) {
+        List<String> items = Lists.newArrayList();
+        for (String item : listItems(null).split("\n")) {
+            if(item.contains(searched.toLowerCase())) {
+                items.add(item);
+            }
+        }
+
+        String result = "Found " + items.size() + " item matches when searching for '" + searched + "'.";
+        if (items.size() > 0) {
+            result += "\nItems:";
+            for (String item : items) {
+                result += "\n" + item + "\n";
+                give(sender, item, quantityParam, null);
+            }
+        }
+        return result;
+    }
 }
