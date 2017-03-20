@@ -41,7 +41,6 @@ public final class HealthComponent implements Component {
     @Replicate
     public boolean immutable = false;
 
-    @Replicate
     @TextField
     public int currentHealth = 20;
 
