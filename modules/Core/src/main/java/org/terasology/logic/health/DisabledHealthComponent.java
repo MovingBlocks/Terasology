@@ -18,33 +18,9 @@ package org.terasology.logic.health;
 import org.terasology.entitySystem.Component;
 
 
-public final class DisabledHealthComponent implements Component {
-
-    // Configuration options
-    public int maxHealth = 20;
-    public float regenRate;
-    public float waitBeforeRegen;
-
-
-    public float fallingDamageSpeedThreshold = 20;
-    public float horizontalDamageSpeedThreshold = 100;
-    public float excessSpeedDamageMultiplier = 10f;
-
-    public int currentHealth = 20;
-
-    // Regen info
-    public long nextRegenTick;
-
-    public boolean destroyEntityOnNoHealth;
+public final class DisabledHealthComponent extends HealthComponent {
 
     public DisabledHealthComponent(){
-    }
-
-    public DisabledHealthComponent(int maxHealth, float regenRate, float waitBeforeRegen) {
-        this.maxHealth = maxHealth;
-        this.currentHealth = maxHealth;
-        this.regenRate = regenRate;
-        this.waitBeforeRegen = waitBeforeRegen;
     }
 
     public DisabledHealthComponent(HealthComponent health){

@@ -21,7 +21,7 @@ import org.terasology.rendering.nui.properties.TextField;
 
 /**
  */
-public final class HealthComponent implements Component {
+public class HealthComponent implements Component {
     // Configuration options
     @Replicate
     public int maxHealth = 20;
