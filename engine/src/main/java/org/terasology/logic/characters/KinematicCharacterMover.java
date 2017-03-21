@@ -673,7 +673,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
-                endVelocity.y = -0.5f * endVelocity.y;
+                endVelocity.y = -0.0f * endVelocity.y;
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
