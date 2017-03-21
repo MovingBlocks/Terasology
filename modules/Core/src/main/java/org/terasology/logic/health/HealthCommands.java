@@ -33,6 +33,9 @@ import java.util.Optional;
 @RegisterSystem
 @Share(HealthCommands.class)
 public class HealthCommands extends BaseComponentSystem {
+
+    public static boolean damageStop = true;
+
     @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true,
             requiredPermission = PermissionManager.NO_PERMISSION)
     public void killCommand(@Sender EntityRef client) {
@@ -40,6 +43,16 @@ public class HealthCommands extends BaseComponentSystem {
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
+        }
+    }
+
+    @Command(value = "damageStop", shortDescription = "Reduce the player's health to zero", runOnServer = true,
+            requiredPermission = PermissionManager.NO_PERMISSION)
+    public void damageStop(@Sender EntityRef client) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
+        if (health != null) {
+           damageStop = !damageStop;
         }
     }
 
