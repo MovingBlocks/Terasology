@@ -16,30 +16,20 @@
 package org.terasology.logic.health;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
-import org.terasology.rendering.nui.properties.TextField;
 
-/**
- */
-public final class HealthComponent implements Component {
+
+public final class DisabledHealthComponent implements Component {
+
     // Configuration options
-    @Replicate
     public int maxHealth = 20;
-    @Replicate
     public float regenRate;
-    @Replicate
     public float waitBeforeRegen;
 
-    // TODO: Should these be in a separate component?
-    @Replicate
+
     public float fallingDamageSpeedThreshold = 20;
-    @Replicate
     public float horizontalDamageSpeedThreshold = 100;
-    @Replicate
     public float excessSpeedDamageMultiplier = 10f;
 
-
-    @TextField
     public int currentHealth = 20;
 
     // Regen info
@@ -47,28 +37,31 @@ public final class HealthComponent implements Component {
 
     public boolean destroyEntityOnNoHealth;
 
-    public HealthComponent() {
+    public DisabledHealthComponent(){
     }
 
-    public HealthComponent(int maxHealth, float regenRate, float waitBeforeRegen) {
+    public DisabledHealthComponent(int maxHealth, float regenRate, float waitBeforeRegen) {
         this.maxHealth = maxHealth;
         this.currentHealth = maxHealth;
         this.regenRate = regenRate;
         this.waitBeforeRegen = waitBeforeRegen;
     }
 
-    public  HealthComponent(DisabledHealthComponent disableHealth){
-        this.maxHealth = disableHealth.maxHealth;
-        this.regenRate = disableHealth.regenRate;
-        this.waitBeforeRegen = disableHealth.waitBeforeRegen;
+    public DisabledHealthComponent(HealthComponent health){
+        this.maxHealth = health.maxHealth;
+        this.regenRate = health.regenRate;
+        this.waitBeforeRegen = health.waitBeforeRegen;
 
-        this.fallingDamageSpeedThreshold = disableHealth.fallingDamageSpeedThreshold;
-        this.horizontalDamageSpeedThreshold = disableHealth.horizontalDamageSpeedThreshold;
-        this.excessSpeedDamageMultiplier = disableHealth.excessSpeedDamageMultiplier;
+        this.fallingDamageSpeedThreshold = health.fallingDamageSpeedThreshold;
+        this.horizontalDamageSpeedThreshold = health.horizontalDamageSpeedThreshold;
+        this.excessSpeedDamageMultiplier = health.excessSpeedDamageMultiplier;
 
-        this.currentHealth = disableHealth.currentHealth;
-        this.nextRegenTick = disableHealth.nextRegenTick;
-        this.destroyEntityOnNoHealth = disableHealth.destroyEntityOnNoHealth;
+        this.currentHealth = health.currentHealth;
+
+        this.nextRegenTick = health.nextRegenTick;
+        this.destroyEntityOnNoHealth = health.destroyEntityOnNoHealth;
     }
-
 }
+
+
+

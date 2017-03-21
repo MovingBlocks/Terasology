@@ -186,9 +186,8 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     }
 
     private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
-        HealthComponent health = entity.getComponent(HealthComponent.class);
         BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
-        if (!beforeDamage.isConsumed()&&!health.immutable) {
+        if (!beforeDamage.isConsumed()) {
             int damageAmount = TeraMath.floorToInt(beforeDamage.getResultValue());
             if (damageAmount > 0) {
                 doDamage(entity, damageAmount, damageType, instigator, directCause);
@@ -275,16 +274,25 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
 
     @Command(shortDescription = "Immune to all damage", runOnServer = true,
     requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String GodMode(@Sender EntityRef client){
+    public String noDamage(@Sender EntityRef client){
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        health.immutable = !health.immutable;
-        if(health.immutable){
-            return "God Mode";
+        if (health != null){
+            DisabledHealthComponent disableHealth = new DisabledHealthComponent(health);
+            clientComp.character.removeComponent(HealthComponent.class);
+            clientComp.character.addComponent(disableHealth);
+            return "enable immutable to all damage";
         }
         else{
-            return "Remove God Mode";
+            DisabledHealthComponent disableHealth = clientComp.character.getComponent(DisabledHealthComponent.class);
+            if (disableHealth != null){
+                health = new HealthComponent(disableHealth);
+                clientComp.character.removeComponent(DisabledHealthComponent.class);
+                clientComp.character.addComponent(health);
+            }
+            return "disable immutable to all damage";
         }
+
     }
 
 
