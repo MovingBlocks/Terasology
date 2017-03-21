@@ -30,13 +30,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 import org.terasology.rendering.dag.WireframeTrigger;
-import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
-import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
-import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
-import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -87,10 +81,9 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         update();
 
-        // We do not call requireFBO as we can count this default buffer is there.
-        //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
@@ -126,7 +119,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        readOnlyGBufferFBO.bind(); // TODO: remove when we can bind this via a StateChange
         readOnlyGBufferFBO.setRenderBufferMask(true, false, false);
 
         glCallList(skySphere); // Draws the skysphere

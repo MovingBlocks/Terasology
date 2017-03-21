@@ -26,6 +26,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
@@ -70,6 +71,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         update();
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
@@ -95,8 +97,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     @Override
     public void process() {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
-
-            readOnlyGBufferFbo.bind(); // TODO: to be removed - will eventually be bound with a state change
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();

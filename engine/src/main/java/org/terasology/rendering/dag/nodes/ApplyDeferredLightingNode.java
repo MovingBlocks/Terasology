@@ -19,10 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -48,9 +45,7 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private FBO readOnlyGBufferFbo;
     private FBO writeOnlyGBufferFbo;
-    private FBO refractiveReflectiveFbo;
 
     /**
      * Initializes an instance of this node.
@@ -60,6 +55,7 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
     @Override
     public void initialise() {
         addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
         update();
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
@@ -101,7 +97,6 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        writeOnlyGBufferFbo.bind(); // TODO: remove and replace with a state change
         writeOnlyGBufferFbo.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
@@ -114,8 +109,6 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
 
     @Override
     public void update() {
-        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
         writeOnlyGBufferFbo = displayResolutionDependentFBOs.get(WRITEONLY_GBUFFER);
-        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
     }
 }

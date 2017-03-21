@@ -29,13 +29,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
-import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -77,8 +71,6 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
      */
     @Override
     public void initialise() {
-        update();
-
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
@@ -92,6 +84,9 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         addDesiredStateChange(new DisableDepthTest());
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        update();
 
         initLightSphereDisplayList();
 
@@ -108,7 +103,6 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
     }
 
     private boolean lightIsRenderable(LightComponent lightComponent, Vector3f lightPositionRelativeToCamera) {
-
         // if lightRenderingDistance is 0.0, the light is always considered, no matter the distance.
         boolean lightIsRenderable = lightComponent.lightRenderingDistance == 0.0f
                 || lightPositionRelativeToCamera.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
@@ -132,7 +126,6 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
 
-        readOnlyGBufferFBO.bind(); // TODO: remove and replace with a state change
         readOnlyGBufferFBO.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {

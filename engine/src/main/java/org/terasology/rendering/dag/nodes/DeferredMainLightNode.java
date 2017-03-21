@@ -24,10 +24,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
-import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.*;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -77,8 +74,6 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
      */
     @Override
     public void initialise() {
-        update();
-
         playerCamera = worldRenderer.getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
@@ -88,6 +83,9 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
 
         addDesiredStateChange(new EnableBlending());
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        update();
 
         initMainDirectionalLight();
 
@@ -113,7 +111,6 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it - I think.
 
-        readOnlyGBufferFbo.bind(); // TODO: remove and replace with a state change
         readOnlyGBufferFbo.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
