@@ -46,7 +46,7 @@ public class HealthCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(value = "damageStop", shortDescription = "Reduce the player's health to zero", runOnServer = true,
+    @Command(value = "damageStop", shortDescription = "Toggle fall damage", runOnServer = false,
             requiredPermission = PermissionManager.NO_PERMISSION)
     public void damageStop(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);

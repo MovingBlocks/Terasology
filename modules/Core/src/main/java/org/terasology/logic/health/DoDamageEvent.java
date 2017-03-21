@@ -54,9 +54,7 @@ public class DoDamageEvent implements Event {
         this.directCause = directCause;
     }
 
-    public int getAmount() {
-        return amount;
-    }
+    public int getAmount() {   return amount;    }
 
     public EntityRef getInstigator() {
         return instigator;
