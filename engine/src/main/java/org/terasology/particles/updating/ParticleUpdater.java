@@ -18,7 +18,7 @@ package org.terasology.particles.updating;
 import com.google.common.collect.BiMap;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.particles.ParticleSystemStateData;
+import org.terasology.particles.ParticleSystem;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.particles.rendering.ParticleRenderer;
@@ -52,7 +52,7 @@ public interface ParticleUpdater {
 
     void update(float delta);
 
-    Stream<ParticleSystemStateData> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
+    Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
 
     static ParticleUpdater create(Physics physics) {
         return new ParticleUpdaterImpl(physics);

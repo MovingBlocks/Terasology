@@ -23,7 +23,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.ParticlePool;
-import org.terasology.particles.ParticleSystemStateData;
+import org.terasology.particles.ParticleSystem;
+import org.terasology.particles.components.ParticleEmitterComponent;
 import org.terasology.particles.components.ParticleSystemComponent;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
@@ -33,6 +34,8 @@ import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.utilities.random.FastRandom;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -45,13 +48,13 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     private static final int PHYSICS_SKIP_NR = 100;
 
     /**
-     * Maps ParticleSystemComponent entity to its ParticleSystemStateData
+     * Maps ParticleSystemComponent entity to its ParticleSystem
      */
-    private final Map<EntityRef, ParticleSystemStateData> registeredParticleSystems = new HashMap<>();
+    private final Map<EntityRef, ParticleSystem> registeredParticleSystems = new HashMap<>();
 
     private final FastRandom random = new FastRandom();
     private final Physics physics;
-    private float movingAvgDelta = 1.0f / 60.0f; //Starting guess average physics update delta
+    private float movingAvgDelta = 1.0f / 60.0f; //Starting guess average physics updateParticleSystem delta
 
     //== public ========================================================================================================
 
@@ -73,7 +76,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
                 "Entity %s does not have a ParticleSystemComponent", entity
         );
 
-        registeredParticleSystems.put(entity, new ParticleSystemStateData(entity));
+        registeredParticleSystems.put(entity, new ParticleSystem(entity));
     }
 
     @Override
@@ -92,13 +95,15 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     @Override
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
-        for (ParticleSystemStateData particleSystem : registeredParticleSystems.values()) {
-            update(particleSystem, delta); // Update particle system.
+        Collection<ParticleSystem> systemIterator = new ArrayList<>(registeredParticleSystems.size());
+        systemIterator.addAll(registeredParticleSystems.values());
+        for (ParticleSystem particleSystem : systemIterator) {
+            updateParticleSystem(particleSystem, delta); // Update particle system.
         }
     }
 
     @Override
-    public Stream<ParticleSystemStateData> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer) {
+    public Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer) {
         return registeredParticleSystems.values().stream()
                 .filter(p -> p.fetchedData.particleSystemComponent.getRenderer().getName().equals(renderer.getName()));
     }
@@ -152,7 +157,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     /*
     * Updates particle life and processes particle affectors
     * */
-    private void updateParticles(final ParticleSystemStateData particleSystem, final float delta) {
+    private void updateParticles(final ParticleSystem particleSystem, final float delta) {
         updateLifeRemaining(particleSystem.particlePool, delta);
 
         particleSystem.fetchedData.affectors.forEach(
@@ -173,18 +178,18 @@ class ParticleUpdaterImpl implements ParticleUpdater {
 
     //== emission ======================================================================================================
 
-    private void emitParticle(final ParticleSystemStateData particleSystem, final ParticleSystemStateData.EmitterData emitterData) {
+    private void emitParticle(final ParticleSystem particleSystem, final ParticleSystem.ParticleEmitter particleEmitter) {
         int index = particleSystem.particlePool.reviveParticle();
 
         particleSystem.particlePool.loadTemporaryDataFrom(index, ParticleDataMask.ALL.toInt());
 
-        emitterData.generators.forEach(
+        particleEmitter.generators.forEach(
                 (component, generator) ->
                         generator.onEmission(component, particleSystem.particlePool.temporaryParticleData, random)
         );
 
         particleSystem.particlePool.temporaryParticleData.position.add(
-                emitterData.locationComponent.getWorldPosition()
+                particleEmitter.locationComponent.getWorldPosition()
         );
 
         particleSystem.particlePool.storeTemporaryDataAt(index, ParticleDataMask.ALL.toInt());
@@ -193,19 +198,19 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     /*
     * Emits particles from emitter
     * */
-    private void updateEmitter(final ParticleSystemStateData partSys, final ParticleSystemStateData.EmitterData emitterData, final int particleReviveLimit, final float delta) {
+    private void updateEmitter(final ParticleSystem partSys, final ParticleSystem.ParticleEmitter particleEmitter, final int particleReviveLimit, final float delta) {
         float deltaLeft = delta;
 
         while (deltaLeft > 0 && partSys.particlePool.deadParticles() > particleReviveLimit) {
-            if (emitterData.nextEmission < deltaLeft) {
-                deltaLeft -= emitterData.nextEmission;
-                float freq1 = 1.0f / emitterData.emitterComponent.spawnRateMax;
-                float freq2 = 1.0f / emitterData.emitterComponent.spawnRateMin;
-                emitterData.nextEmission = random.nextFloat(freq1, freq2);
+            if (particleEmitter.nextEmission < deltaLeft) {
+                deltaLeft -= particleEmitter.nextEmission;
+                float freq1 = 1.0f / particleEmitter.emitterComponent.spawnRateMax;
+                float freq2 = 1.0f / particleEmitter.emitterComponent.spawnRateMin;
+                particleEmitter.nextEmission = random.nextFloat(freq1, freq2);
 
-                emitParticle(partSys, emitterData);
+                emitParticle(partSys, particleEmitter);
             } else {
-                emitterData.nextEmission -= deltaLeft;
+                particleEmitter.nextEmission -= deltaLeft;
                 deltaLeft = 0;
             }
         }
@@ -213,21 +218,53 @@ class ParticleUpdaterImpl implements ParticleUpdater {
 
     //== general =======================================================================================================
 
-    private void update(final ParticleSystemStateData partSys, final float delta) {
+    private void updateParticleSystem(final ParticleSystem partSys, final float delta) {
+        ParticleSystemComponent particleSystem = partSys.entityRef.getComponent(ParticleSystemComponent.class);
+
         int emitterCount = partSys.fetchedData.emitters.size();
         int deadParticles = partSys.particlePool.deadParticles();
         int poolPartition = partSys.particlePool.deadParticles() / (emitterCount != 0 ? emitterCount : 1);
 
-        for (ParticleSystemStateData.EmitterData emitterData : partSys.fetchedData.emitters) {
-            deadParticles -= poolPartition;
-            updateEmitter(partSys, emitterData, deadParticles, delta / (float) emitterCount); // Emit particles
+        if (particleSystem.enabled) {
+            for (ParticleSystem.ParticleEmitter particleEmitter : partSys.fetchedData.emitters) {
+                deadParticles -= poolPartition;
+                updateEmitter(partSys, particleEmitter, deadParticles, delta / (float) emitterCount); // Emit particles
+            }
         }
 
-        updateParticles(partSys, delta); // Update lifetime and Affectors
+        updateParticles(partSys, delta); // Update particle lifetime and Affectors
 
-        checkCollision(partSys.particlePool, partSys.collisionUpdateIteration);
-        partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+        if (particleSystem.particleCollision) {
+            checkCollision(partSys.particlePool, partSys.collisionUpdateIteration);
+            partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
+        }
 
-        partSys.entityRef.getComponent(ParticleSystemComponent.class).maxLifeTime -= delta;
+        // System ran out of lifetime -> stop emission -> dispose
+        if (particleSystem.lifeTime != ParticleSystemComponent.INDEFINITE_SYSTEM_LIFETIME) {
+            particleSystem.lifeTime = Math.max(0, particleSystem.lifeTime - delta);
+
+            if (particleSystem.lifeTime == 0) {
+                particleSystem.enabled = false;
+
+                if (partSys.particlePool.deadParticles() == particleSystem.particlePoolSize) {
+                    if (particleSystem.destroyEmittersWhenDead) {
+                        for (ParticleSystem.ParticleEmitter particleEmitter : partSys.fetchedData.emitters) {
+                            if (particleEmitter.emitterComponent.destroyEntityWhenDead && !particleEmitter.emitterComponent.ownerEntity.equals(partSys.entityRef)) {
+                                particleEmitter.emitterComponent.ownerEntity.destroy();
+                            } else {
+                                particleEmitter.emitterComponent.ownerEntity.removeComponent(ParticleEmitterComponent.class);
+                            }
+                        }
+                    }
+
+                    registeredParticleSystems.remove(partSys.entityRef);
+                    if (particleSystem.destroyEntityWhenDead) {
+                        partSys.entityRef.destroy();
+                    } else {
+                        partSys.entityRef.removeComponent(ParticleSystemComponent.class);
+                    }
+                }
+            }
+        }
     }
 }

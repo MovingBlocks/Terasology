@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class ParticleEmitterComponent implements Component {
     public static final int INFINITE_PARTICLE_SPAWNS = -1;
+    public static final int INDEFINITE_EMITTER_LIFETIME = -1;
 
     /**
      * Reference to the entity this component is attached to
@@ -35,24 +36,29 @@ public class ParticleEmitterComponent implements Component {
     public EntityRef ownerEntity;
 
     /**
-     * The maximum spawn rate of this emitter
+     * The maximum spawn rate of this emitter in particles / second
      */
     public float spawnRateMax = 11.0f;
 
     /**
-     * The minimum spawn rate of this emitter
+     * The minimum spawn rate of this emitter in particles / second
      */
     public float spawnRateMin = 9.0f;
 
     /**
-     * Toggles this particle emitter.
+     * Toggles if this particle emitter should emit new particles.
      */
     public boolean enabled = true;
 
     /**
-     * The maximum life time of this emitter, the emitter will auto-remove upon reaching 0 TODO: Implement emitter lifetime
+     * The remaining life time of this emitter in seconds, the emitter will auto-remove upon reaching 0 TODO: Implement emitter lifetime
      */
-    public float maxLifeTime = Float.POSITIVE_INFINITY;
+    public float lifeTime = INDEFINITE_EMITTER_LIFETIME;
+
+    /**
+     * Toggles whether when this emitter is destroyed only the component should be destroyed or the whole entity.
+     */
+    public boolean destroyEntityWhenDead;
 
     /**
      * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0 TODO: Implement emitter max spawns
@@ -63,7 +69,7 @@ public class ParticleEmitterComponent implements Component {
     private List<EntityRef> generators = new ArrayList<>();
 
     /**
-     * Notifies ParticleSystemManagerImpl that this system needs an updated ParticleSystemStateData
+     * Notifies ParticleSystemManagerImpl that this system needs an updated ParticleSystem
      */
     private void requestUpdate() {
         if (ownerEntity != null) {

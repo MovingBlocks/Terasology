@@ -17,7 +17,7 @@ package org.terasology.particles.rendering;
 
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.particles.ParticleSystemManager;
-import org.terasology.particles.ParticleSystemStateData;
+import org.terasology.particles.ParticleSystem;
 import org.terasology.registry.In;
 
 import java.util.stream.Stream;
@@ -30,7 +30,7 @@ public abstract class ParticleRenderer implements RenderSystem {
     @In
     ParticleSystemManager particleSystemManager;
 
-    public Stream<ParticleSystemStateData> getParticleSystems() {
+    public Stream<ParticleSystem> getParticleSystems() {
         return particleSystemManager.getStateDataForRenderer(getClass());
     }
 }

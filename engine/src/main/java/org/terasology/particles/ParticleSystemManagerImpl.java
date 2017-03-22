@@ -21,7 +21,6 @@ import com.google.common.collect.HashBiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -41,7 +40,6 @@ import org.terasology.particles.updating.ParticleUpdater;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
-import org.terasology.world.WorldProvider;
 
 import java.util.stream.Stream;
 
@@ -56,12 +54,6 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     private static final Logger logger = LoggerFactory.getLogger(ParticleSystemManagerImpl.class);
 
     @In
-    private WorldProvider worldProvider;
-
-    @In
-    private EntityManager entityManager;
-
-    @In
     private Physics physics;
 
     private ParticleUpdater particleUpdater;
@@ -73,6 +65,10 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     @ReceiveEvent(components = {ParticleSystemComponent.class})
     public void onSystemActivated(OnActivatedComponent event, EntityRef entity, ParticleSystemComponent particleSystemComponent) {
         particleSystemComponent.ownerEntity = entity;
+
+        if (particleSystemComponent.isEmitter) {
+            particleSystemComponent.addEmitter(entity, false);
+        }
 
         particleUpdater.register(entity);
 
@@ -127,7 +123,7 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     }
 
     @Override
-    public Stream<ParticleSystemStateData> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer) {
+    public Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer) {
         return particleUpdater.getStateDataForRenderer(renderer);
     }
 

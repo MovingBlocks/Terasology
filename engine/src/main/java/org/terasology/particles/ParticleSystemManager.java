@@ -32,5 +32,5 @@ public interface ParticleSystemManager {
 
     void registerGeneratorFunction(GeneratorFunction generatorFunction);
 
-    Stream<ParticleSystemStateData> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
+    Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
 }

@@ -21,7 +21,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticlePool;
-import org.terasology.particles.ParticleSystemStateData;
+import org.terasology.particles.ParticleSystem;
 import org.terasology.particles.components.ParticleSystemComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -78,7 +78,7 @@ public class DisplayListParticleRenderer extends ParticleRenderer {
     }
 
     //"BIG" TODO: Have all of the work done in this method be done on the GPU by a shader. Use GPU instancing to just send some particle data after particles are already instanced and have the whole cloud rendered at once.
-    public void drawParticles(Material material, ParticleSystemStateData particleSystem, Vector3f camera) {
+    public void drawParticles(Material material, ParticleSystem particleSystem, Vector3f camera) {
         ParticlePool particlePool = particleSystem.particlePool;
         ParticleSystemComponent component = particleSystem.entityRef.getComponent(ParticleSystemComponent.class);
 

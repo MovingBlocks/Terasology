@@ -30,6 +30,7 @@ import java.util.List;
  * Represents a particle system. A particle system must have emitters in order to produce particles.
  */
 public class ParticleSystemComponent implements Component {
+    public static final int INDEFINITE_SYSTEM_LIFETIME = -1;
 
     /**
      * Reference to the entity this component is attached to
@@ -42,19 +43,44 @@ public class ParticleSystemComponent implements Component {
     private Class<ParticleRenderer> renderer;
 
     /**
-     * The lifetime of this system
+     * Toggles whether this particle system should auto-add emitters attached to the same entity. (For use in prefabs)
      */
-    public float maxLifeTime = Float.POSITIVE_INFINITY;
+    public boolean isEmitter = true;
 
     /**
-     * Destroy this particle system when its last emitter is destroyed TODO: Unimplemented
+     * The remaining lifetime of this system in seconds.
+     */
+    public float lifeTime = INDEFINITE_SYSTEM_LIFETIME;
+
+    /**
+     * Toggles whether when this system is destroyed only the component should be destroyed or the whole entity.
+     */
+    public boolean destroyEntityWhenDead;
+
+    /**
+     * Destroy this particle system's emitters when it runs out of lifetime TODO: Implement destroyWhenFinished
+     */
+    public boolean destroyEmittersWhenDead = true;
+
+    /**
+     * Destroy this particle system when its last emitter is dead TODO: Implement destroyWhenFinished
      */
     public boolean destroyWhenFinished = true;
 
     /**
      * The amount of particles in this system's pool. Emitters under this system will share the particles.
      */
-    public int particlePoolSize = 1000;
+    public int particlePoolSize = 500;
+
+    /**
+     * Toggles if this system's particles should collide with blocks.
+     */
+    public boolean particleCollision = true;
+
+    /**
+     * Toggles if this particle system should emit new particles.
+     */
+    public boolean enabled = true;
 
     @Owns
     private List<EntityRef> emitters = new LinkedList<>();
@@ -65,16 +91,21 @@ public class ParticleSystemComponent implements Component {
     /**
      * This system's particle texture
      */
-    public Texture texture = null;
+    public Texture texture;
 
     /**
      * This system's particle texture size, in percents x: [0.0, 1.0], y: [0.0, 1.0]
      */
     public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
 
+    /**
+     * This system's particle texture offset, in percents x: [0.0, 1.0], y: [0.0, 1.0]
+     */
+    public Vector2f textureOffset = new Vector2f(1.0f, 1.0f);
+
 
     /**
-     * Notifies ParticleSystemManagerImpl that this system needs an updated ParticleSystemStateData
+     * Notifies ParticleSystemManagerImpl that this system needs an updated ParticleSystem
      */
     private void requestUpdate() {
         if (ownerEntity != null) {
@@ -101,9 +132,15 @@ public class ParticleSystemComponent implements Component {
 
     // EMITTER LIST ACCESS
 
-    public void addEmitter(final EntityRef emitter) {
+    public void addEmitter(final EntityRef emitter, boolean update) {
         emitters.add(emitter);
-        requestUpdate();
+        if (update) {
+            requestUpdate();
+        }
+    }
+
+    public void addEmitter(final EntityRef emitter) {
+        addEmitter(emitter, true);
     }
 
     public boolean removeEmitter(final EntityRef emitter) {

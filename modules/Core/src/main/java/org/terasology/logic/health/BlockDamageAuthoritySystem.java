@@ -27,17 +27,25 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.particles.components.BlockBreakEffectComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.world.block.tiles.WorldAtlas;
+
+import java.util.Optional;
 
 /**
  * This system is responsible for giving blocks health when they are attacked and damaging them instead of destroying them.
@@ -51,6 +59,12 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @In
     private AudioManager audioManager;
+
+    @In
+    private WorldAtlas worldAtlas;
+
+    @In
+    private BlockManager blockManager;
 
     private Random random = new FastRandom();
 
@@ -101,9 +115,38 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     }
 
     private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location, EntityRef entityRef) {
+        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
+        if (!terrainTexture.isPresent() || !terrainTexture.get().isLoaded()) {
+            return;
+        }
+
         EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        builder.getComponent(BlockParticleEffectComponent.class).blockType = family.getURI().toString();
+        BlockBreakEffectComponent particleSystem = builder.getComponent(BlockBreakEffectComponent.class);
+
+        particleSystem.texture = terrainTexture.get();
+
+        final float tileSize = worldAtlas.getRelativeTileSize();
+        particleSystem.textureSize.set(tileSize, tileSize);
+
+        Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
+        Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
+        particleSystem.textureOffset.set(new org.lwjgl.util.vector.Vector2f(offset.x, offset.y));
+
+        if (particleSystem.randBlockTexDisplacement) {
+            final float relTileSize = worldAtlas.getRelativeTileSize();
+            Vector2f particleTexSize = new Vector2f(
+                    relTileSize * particleSystem.randBlockTexDisplacementScale.y,
+                    relTileSize * particleSystem.randBlockTexDisplacementScale.y);
+
+            particleSystem.textureSize.x *= particleSystem.randBlockTexDisplacementScale.x;
+            particleSystem.textureSize.y *= particleSystem.randBlockTexDisplacementScale.y;
+
+            particleSystem.textureOffset.set(
+                    particleSystem.textureOffset.x + random.nextFloat() * (tileSize - particleTexSize.x),
+                    particleSystem.textureOffset.y + random.nextFloat() * (tileSize - particleTexSize.y));
+        }
+
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
