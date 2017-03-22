@@ -73,8 +73,10 @@ public class ConsoleScreen extends CoreScreenLayer {
             }
         });
         commandLine.subscribe(widget -> {
-            console.execute(commandLine.getText(), localPlayer.getClientEntity());
-            commandLine.setText("");
+            String text = commandLine.getText().trim();
+            if(!text.isEmpty()) {
+                console.execute(text, localPlayer.getClientEntity());
+            }
             scrollArea.moveToBottom();
         });
 
