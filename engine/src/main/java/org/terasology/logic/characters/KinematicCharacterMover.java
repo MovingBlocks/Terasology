@@ -704,10 +704,14 @@ public class KinematicCharacterMover implements CharacterMover {
 
             state.setGrounded(false);
         }
-        state.getVelocity().set(endVelocity);
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-            entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
+              Vector3f hitVelocity = new Vector3f(state.getVelocity());
+              hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
+              hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
+              logger.debug("Hit at " + hitVelocity);
+              entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
         }
+        state.getVelocity().set(endVelocity);
         if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
