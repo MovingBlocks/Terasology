@@ -673,6 +673,12 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
+                if (input.isFirstRun()) {
+                    Vector3f hitVelocity = new Vector3f(state.getVelocity());
+                    hitVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                    logger.debug("Hit at " + hitVelocity);
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), hitVelocity));
+                }
                 endVelocity.y = -0.0f * endVelocity.y;
             }
 
