@@ -354,7 +354,13 @@ public class UIText extends CoreWidget {
                         eventHandled = true;
                     }
                 }
-                if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
+                if(event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER){
+                    for (ActivateEventListener listener : activationListeners) {
+                        listener.onActivated(this);
+                    }
+                    eventHandled = true;
+                }
+                else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
                     String fullText = text.get();
                     String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));

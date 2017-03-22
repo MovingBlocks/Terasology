@@ -73,7 +73,7 @@ public class ChatScreen extends CoreScreenLayer {
         getManager().setFocus(commandLine);
 
         commandLine.subscribe(widget -> {
-            String text = commandLine.getText();
+            String text = commandLine.getText().trim();
 
             if (!text.isEmpty()) {
                 String command = "say";
@@ -85,6 +85,10 @@ public class ChatScreen extends CoreScreenLayer {
                 scrollArea.moveToBottom();
                 MiniChatOverlay overlay = nuiManager.addOverlay("engine:minichatOverlay", MiniChatOverlay.class);
                 overlay.setVisible(true);
+                nuiManager.closeScreen(this);
+            }
+            else{
+                commandLine.setText("");
                 nuiManager.closeScreen(this);
             }
         });
