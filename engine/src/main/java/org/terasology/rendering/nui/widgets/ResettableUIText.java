@@ -46,6 +46,14 @@ public class ResettableUIText extends UIText {
         if (text.get() == null) {
             text.set("");
         }
+        if (isShowingHintText) {
+            setCursorPosition(0);
+            if (!text.get().equals(hintText) && text.get().endsWith(hintText)) {
+                text.set(text.get().substring(0, text.get().length()-hintText.length()));
+                setCursorPosition(text.get().length());
+                isShowingHintText = false;
+            }
+        }
         lastFont = canvas.getCurrentStyle().getFont();
         lastWidth = canvas.size().x - clearButtonRegion.size().x;
         if (isEnabled()) {

@@ -69,10 +69,10 @@ public class UIText extends CoreWidget {
 
     /* The placeholder hint text. */
     @LayoutConfig
-    private String hintText = "";
+    protected String hintText = "";
 
     /* Whether the box is currently showing the hint text. */
-    private boolean isShowingHintText = true;
+    protected boolean isShowingHintText = true;
 
     /** Whether the content needs to be displayed on multiple lines. */
     @LayoutConfig
