@@ -42,39 +42,12 @@ public class ResettableUIText extends UIText {
     @Override
     public void onDraw(Canvas canvas) {
         Rect2i clearButtonRegion = Rect2i.createFromMinAndSize(0, 0, 30, canvas.size().y);
-
-        if (text.get() == null) {
-            text.set("");
-        }
-        if (isShowingHintText) {
-            setCursorPosition(0);
-            if (!text.get().equals(hintText) && text.get().endsWith(hintText)) {
-                text.set(text.get().substring(0, text.get().length()-hintText.length()));
-                setCursorPosition(text.get().length());
-                isShowingHintText = false;
-            }
-        }
-        lastFont = canvas.getCurrentStyle().getFont();
         lastWidth = canvas.size().x - clearButtonRegion.size().x;
         if (isEnabled()) {
             canvas.addInteractionRegion(interactionListener, Rect2i.createFromMinAndMax(0, 0, canvas.size().x, canvas.size().y));
             canvas.addInteractionRegion(clearInteractionListener, Rect2i.createFromMinAndMax(canvas.size().x, 0, canvas.size().x +
                     clearButtonRegion.size().x, canvas.size().y));
         }
-        correctCursor();
-
-        int widthForDraw = (multiline) ? canvas.size().x - clearButtonRegion.size().x : lastFont.getWidth(getText());
-
-        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
-             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
-            canvas.drawText(text.get(), canvas.getRegion());
-            if (isFocused()) {
-                if (hasSelection()) {
-                    drawSelection(canvas);
-                } else {
-                    drawCursor(canvas);
-                }
-            }
-        }
+        drawAll(canvas, canvas.size().x - clearButtonRegion.size().x);
     }
 }
