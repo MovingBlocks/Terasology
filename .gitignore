@@ -19,6 +19,7 @@ extensions
 !/modules/Core
 !/modules/CoreSampleGameplay
 !/modules/BuilderSampleGameplay
+!/modules/Drills
 !/modules/subprojects.gradle
 /meta/*
 !/meta/subprojects.gradle
