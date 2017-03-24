@@ -35,7 +35,18 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.input.*;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindableAxis;
+import org.terasology.input.BindableButton;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.Input;
+import org.terasology.input.InputModified;
+import org.terasology.input.InputModifiedImpl;
+import org.terasology.input.InputSystem;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.RegisterBindButton;
+import org.terasology.input.RegisterRealBindAxis;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.ButtonEvent;
 import org.terasology.module.DependencyResolver;
@@ -50,9 +61,9 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
 import java.util.Collections;
+import java.util.Set;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.

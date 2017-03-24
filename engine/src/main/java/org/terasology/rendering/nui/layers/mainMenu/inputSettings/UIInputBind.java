@@ -16,7 +16,12 @@
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.audio.StaticSound;
-import org.terasology.input.*;
+import org.terasology.input.Input;
+import org.terasology.input.InputModified;
+import org.terasology.input.InputModifiedImpl;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.MouseInput;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;

@@ -15,9 +15,14 @@
  */
 package org.terasology.input.binds.movement;
 
-import org.terasology.input.*;
+
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
 @RegisterBindButton(id = "autoMoveMode", description = "${engine:menu#binding-autoMove-mode}")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R, mod = InputModified.Modifier.ALT)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R)
 public class AutoMoveButton extends BindButtonEvent {
 }
