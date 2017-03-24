@@ -50,4 +50,6 @@ public class NUIKeyEvent extends NUIInputEvent {
     public boolean isDown() {
         return state != ButtonState.UP;
     }
+
+    public boolean isUp() { return state == ButtonState.UP; }
 }

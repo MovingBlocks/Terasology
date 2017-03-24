@@ -16,9 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.audio.StaticSound;
-import org.terasology.input.Input;
-import org.terasology.input.InputType;
-import org.terasology.input.MouseInput;
+import org.terasology.input.*;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Vector2i;
@@ -46,6 +44,8 @@ public class UIInputBind extends CoreWidget {
     private Binding<Input> input = new DefaultBinding<>();
     private Binding<StaticSound> clickSound = new DefaultBinding<>();
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
+
+    private boolean readAlt = false;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -119,11 +119,26 @@ public class UIInputBind extends CoreWidget {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
+        System.out.println(readAlt);
+        if(event.isUp() && event.getKey() == Keyboard.Key.LEFT_ALT){
+            readAlt = false;
+        }
         if (event.isDown()) {
-            if (capturingInput) {
-                setNewInput(InputType.KEY.getInput(event.getKey().getId()));
-                capturingInput = false;
-                return true;
+            if(event.getKey() == Keyboard.Key.LEFT_ALT){
+                readAlt = true;
+                return false;
+            }
+            else {
+                if (capturingInput) {
+                    if(readAlt){
+                        setNewInput(new InputModifiedImpl(InputType.KEY.getInput(event.getKey().getId()), InputModified.Modifier.ALT));
+                    }
+                    else {
+                        setNewInput(InputType.KEY.getInput(event.getKey().getId()));
+                    }
+                    capturingInput = false;
+                    return true;
+                }
             }
         }
         return false;

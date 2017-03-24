@@ -30,21 +30,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.BindableAxis;
-import org.terasology.input.BindableButton;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
-import org.terasology.input.RegisterBindAxis;
-import org.terasology.input.RegisterBindButton;
-import org.terasology.input.RegisterRealBindAxis;
+import org.terasology.input.*;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.ButtonEvent;
 import org.terasology.module.DependencyResolver;
@@ -82,7 +74,12 @@ public final class BindsConfig {
      * @return True if newInput has been bound. False otherwise.
      */
     public boolean isBound(Input newInput) {
-        return data.containsValue(newInput);
+        for(Input input : data.values()){
+            if(newInput.getDisplayName().equals(input.getDisplayName())){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -128,8 +125,10 @@ public final class BindsConfig {
         Iterator<Input> iterator = data.values().iterator();
         while (iterator.hasNext()) {
             Input i = iterator.next();
-            if (uniqueInputs.contains(i)) {
-                iterator.remove();
+            for(Input u : uniqueInputs){
+                if(u.getDisplayName().equals(i.getDisplayName())){
+                    iterator.remove();
+                }
             }
         }
         data.replaceValues(bindUri, uniqueInputs);
@@ -227,7 +226,13 @@ public final class BindsConfig {
         List<Input> defaultInputs = Lists.newArrayList();
         for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
             DefaultBinding defaultBinding = (DefaultBinding) annotation;
-            Input input = defaultBinding.type().getInput(defaultBinding.id());
+            Input input;
+            if(defaultBinding.mod() != InputModified.Modifier.NONE){
+                input = new InputModifiedImpl(defaultBinding.type().getInput(defaultBinding.id()), defaultBinding.mod());
+            }
+            else{
+                input = defaultBinding.type().getInput(defaultBinding.id());
+            }
             if (!data.values().contains(input)) {
                 defaultInputs.add(input);
             }
@@ -326,10 +331,27 @@ public final class BindsConfig {
             BindsConfig result = new BindsConfig();
             JsonObject inputObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : inputObj.entrySet()) {
-                SetMultimap<String, Input> map = context.deserialize(entry.getValue(), SetMultimap.class);
-                for (String id : map.keySet()) {
-                    SimpleUri uri = new SimpleUri(new Name(entry.getKey()), id);
-                    result.data.putAll(uri, map.get(id));
+                for(Map.Entry<String, JsonElement> bind : ((JsonObject)entry.getValue()).entrySet()){
+                    SimpleUri uri = new SimpleUri(new Name(entry.getKey()), bind.getKey());
+                    if(bind.getValue().isJsonPrimitive()){ //Check for regular key
+                        Input input = context.deserialize(bind.getValue(), Input.class);
+                        result.data.put(uri, input);
+                    }
+                    else if (bind.getValue().isJsonArray()){ //If array, need to check if regular key or modified key
+                        for(JsonElement element : bind.getValue().getAsJsonArray()){
+                            Input input;
+                            if(element.isJsonPrimitive()){ //Regular key
+                                input = context.deserialize(element, Input.class);
+                            }
+                            else{ //Modified key
+                                input = context.deserialize(element, InputModifiedImpl.class);
+                            }
+                            result.data.put(uri, input);
+                        }
+                    } else { //Single modified key
+                        InputModifiedImpl input = context.deserialize(bind.getValue(), InputModifiedImpl.class);
+                        result.data.put(uri, input);
+                    }
                 }
             }
             return result;

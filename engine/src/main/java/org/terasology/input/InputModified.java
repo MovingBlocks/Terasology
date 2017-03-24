@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.input.binds.movement;
+package org.terasology.input;
 
-import org.terasology.input.*;
+/**
+ * Created by CataPC on 3/22/2017.
+ */
+public interface InputModified extends Input{
+    Modifier getModifier();
 
-@RegisterBindButton(id = "autoMoveMode", description = "${engine:menu#binding-autoMove-mode}")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R, mod = InputModified.Modifier.ALT)
-public class AutoMoveButton extends BindButtonEvent {
+    void setModifier(Modifier modifier);
+
+    enum Modifier{
+        NONE,
+        ALT,
+        CTRL,
+        SHIFT,
+    }
 }

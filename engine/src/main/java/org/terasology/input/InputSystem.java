@@ -59,6 +59,7 @@ import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.IntegerRange;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
@@ -111,6 +112,8 @@ public class InputSystem extends BaseComponentSystem {
     private Map<Input, BindableRealAxis> controllerAxisBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
+
+    private List<Integer> modifierBinds = Lists.newArrayList();
 
     private Logger logger = LoggerFactory.getLogger(InputSystem.class);
 
@@ -179,7 +182,25 @@ public class InputSystem extends BaseComponentSystem {
     public void linkBindButtonToInput(Input input, SimpleUri bindId) {
         switch (input.getType()) {
             case KEY:
-                linkBindButtonToKey(input.getId(), bindId);
+                if(input instanceof InputModifiedImpl){
+                    switch(((InputModifiedImpl) input).getModifier()){
+                        case ALT:
+                            linkBindButtonToKey(input.getId() + 500, bindId);
+                            break;
+                        case SHIFT:
+                            linkBindButtonToKey(input.getId() + 1000, bindId);
+                            break;
+                        case CTRL:
+                            linkBindButtonToKey(input.getId() + 1500, bindId);
+                            break;
+                        case NONE:
+                            linkBindButtonToKey(input.getId(), bindId);
+                            break;
+                    }
+                }
+                else {
+                    linkBindButtonToKey(input.getId(), bindId);
+                }
                 break;
             case MOUSE_BUTTON:
                 MouseInput button = MouseInput.find(input.getType(), input.getId());
@@ -459,15 +480,199 @@ public class InputSystem extends BaseComponentSystem {
         simulatedKeys.add(action);
     }
 
+    protected boolean isSelectionModifierActive(KeyboardDevice keyboard) {
+        return keyboard.isKeyDown(Keyboard.Key.LEFT_ALT.getId()) || keyboard.isKeyDown(Keyboard.Key.RIGHT_ALT.getId());
+    }
+
+
     private void processKeyboardInput(float delta) {
         Queue<KeyboardAction> keyQueue = keyboard.getInputQueue();
+        for (KeyboardAction action : keyQueue) {
+            boolean consumed;
+            boolean check = isSelectionModifierActive(keyboard);
+            if(check){
+                if(action.getInput() == Keyboard.Key.LEFT_ALT || action.getInput() == Keyboard.Key.RIGHT_ALT) {
+                    modifierBinds.clear();
+                    for (Integer key : keyBinds.keySet()) {
+                        if (key >= 500 && key < 1000) {//Alts codes are Input id + 500
+                            modifierBinds.add(key);
+                        }
+                    }
+
+                    consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, InputModified.Modifier.NONE);
+                    BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
+                    if (bind != null && action.getState() != ButtonState.REPEAT) {
+                        bind.updateBindState(
+                                action.getInput(),
+                                (action.getState() == ButtonState.DOWN),
+                                delta, getInputEntities(),
+                                targetSystem.getTarget(),
+                                targetSystem.getTargetBlockPosition(),
+                                targetSystem.getHitPosition(),
+                                targetSystem.getHitNormal(),
+                                consumed
+                        );
+                    }
+
+                    for (Integer key : modifierBinds) {
+                        if (keyboard.isKeyDown(key - 500)) {
+                            Input input = InputType.KEY.getInput(key - 500);
+                            consumed = sendKeyEvent(input, input.getDisplayName().charAt(0), action.getState(), delta, InputModified.Modifier.ALT);
+                            bind = keyBinds.get(key);
+                            if (bind != null && action.getState() != ButtonState.REPEAT) {
+                                bind.updateBindState(
+                                        new InputModifiedImpl(input, InputModified.Modifier.ALT),
+                                        (action.getState() == ButtonState.DOWN),
+                                        delta, getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                            }
+
+                            consumed = sendKeyEvent(input, input.getDisplayName().charAt(0), ButtonState.UP, delta, InputModified.Modifier.NONE);
+                            bind = keyBinds.get(key - 500);
+                            if (bind != null) { //Need to send original key as a key up
+                                bind.updateBindState(
+                                        new InputModifiedImpl(input, InputModified.Modifier.NONE),
+                                        false,
+                                        delta, getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                            }
+                        }
+                    }
+                }
+                else {
+                    consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, InputModified.Modifier.ALT);
+                    BindableButtonImpl bind = keyBinds.get(action.getInput().getId() + 500);
+                    if (bind != null && action.getState() != ButtonState.REPEAT) {
+                        bind.updateBindState(
+                                new InputModifiedImpl(action.getInput(), InputModified.Modifier.ALT),
+                                (action.getState() == ButtonState.DOWN),
+                                delta, getInputEntities(),
+                                targetSystem.getTarget(),
+                                targetSystem.getTargetBlockPosition(),
+                                targetSystem.getHitPosition(),
+                                targetSystem.getHitNormal(),
+                                consumed
+                        );
+                    }
+                }
+            }
+            else {
+                if(action.getInput() == Keyboard.Key.LEFT_ALT || action.getInput() == Keyboard.Key.RIGHT_ALT){
+                    modifierBinds.clear();
+                    for(Integer key : keyBinds.keySet()){
+                        if(key >= 500 && key < 1000) {//Alts codes are Input id + 500
+                            modifierBinds.add(key);
+                        }
+                    }
+
+                    consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, InputModified.Modifier.NONE);
+                    BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
+                    if (bind != null && action.getState() != ButtonState.REPEAT) {
+                        bind.updateBindState(
+                                action.getInput(),
+                                (action.getState() == ButtonState.DOWN),
+                                delta, getInputEntities(),
+                                targetSystem.getTarget(),
+                                targetSystem.getTargetBlockPosition(),
+                                targetSystem.getHitPosition(),
+                                targetSystem.getHitNormal(),
+                                consumed
+                        );
+                    }
+
+                    for(Integer key : modifierBinds){
+                        if(keyboard.isKeyDown(key-500)){
+                            Input input = InputType.KEY.getInput(key-500);
+                            consumed = sendKeyEvent(input, input.getDisplayName().charAt(0), action.getState(), delta, InputModified.Modifier.ALT);
+                            bind = keyBinds.get(key);
+                            if (bind != null && action.getState() != ButtonState.REPEAT) {
+                                bind.updateBindState(
+                                        new InputModifiedImpl(input, InputModified.Modifier.ALT),
+                                        (action.getState() == ButtonState.DOWN),
+                                        delta, getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                            }
+
+                            consumed = sendKeyEvent(input, input.getDisplayName().charAt(0), ButtonState.DOWN, delta, InputModified.Modifier.NONE);
+                            bind = keyBinds.get(key-500);
+                            if (bind != null && action.getState() != ButtonState.REPEAT) {
+                                bind.updateBindState(
+                                        new InputModifiedImpl(input, InputModified.Modifier.NONE),
+                                        true,
+                                        delta, getInputEntities(),
+                                        targetSystem.getTarget(),
+                                        targetSystem.getTargetBlockPosition(),
+                                        targetSystem.getHitPosition(),
+                                        targetSystem.getHitNormal(),
+                                        consumed
+                                );
+                            }
+                        }
+                    }
+                }
+                else {
+                    consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, InputModified.Modifier.NONE);
+                    BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
+                    if (bind != null && action.getState() != ButtonState.REPEAT) {
+                        bind.updateBindState(
+                                action.getInput(),
+                                (action.getState() == ButtonState.DOWN),
+                                delta, getInputEntities(),
+                                targetSystem.getTarget(),
+                                targetSystem.getTargetBlockPosition(),
+                                targetSystem.getHitPosition(),
+                                targetSystem.getHitNormal(),
+                                consumed
+                        );
+                    }
+                }
+            }
+
+            // Update bind
+
+        }
+        keyQueue.clear();
         keyQueue.addAll(simulatedKeys);
         simulatedKeys.clear();
         for (KeyboardAction action : keyQueue) {
-            boolean consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta);
-
-            // Update bind
-            BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
+            boolean consumed;
+            int id = action.getInput().getId();
+            if(action.getInput() instanceof InputModifiedImpl){
+                switch(((InputModifiedImpl) action.getInput()).getModifier()){
+                    case ALT:
+                        id += 500;
+                        break;
+                    case CTRL:
+                        id += 1000;
+                        break;
+                    case SHIFT:
+                        id += 1500;
+                        break;
+                    case NONE:
+                    default:
+                        break;
+                }
+                consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, ((InputModifiedImpl) action.getInput()).getModifier());
+            }
+            else{
+                consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta, InputModified.Modifier.NONE);
+            }
+            BindableButtonImpl bind = keyBinds.get(id);
             if (bind != null && action.getState() != ButtonState.REPEAT) {
                 bind.updateBindState(
                         action.getInput(),
@@ -497,17 +702,17 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
-    private boolean sendKeyEvent(Input key, char keyChar, ButtonState state, float delta) {
+    private boolean sendKeyEvent(Input key, char keyChar, ButtonState state, float delta, InputModified.Modifier mod) {
         KeyEvent event;
         switch (state) {
             case UP:
-                event = KeyUpEvent.create(key, keyChar, delta);
+                event = KeyUpEvent.create(key, keyChar, delta, mod);
                 break;
             case DOWN:
-                event = KeyDownEvent.create(key, keyChar, delta);
+                event = KeyDownEvent.create(key, keyChar, delta, mod);
                 break;
             case REPEAT:
-                event = KeyRepeatEvent.create(key, keyChar, delta);
+                event = KeyRepeatEvent.create(key, keyChar, delta, mod);
                 break;
             default:
                 return false;
