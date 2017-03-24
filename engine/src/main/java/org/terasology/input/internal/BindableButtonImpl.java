@@ -29,6 +29,7 @@ import org.terasology.input.Input;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -180,11 +181,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
             }
         } else if (!activeInputs.isEmpty()) {
-            for(Input i : activeInputs){
-                if(input.getDisplayName().equals(i.getDisplayName())){
-                    activeInputs.remove(i);
-                }
-            }
+            activeInputs.removeIf(i -> i.getDisplayName().equals(input.getDisplayName()));
             if (activeInputs.isEmpty() && mode.isActivatedOnRelease()) {
                 if (!keyConsumed) {
                     keyConsumed = triggerOnRelease(delta, target);
