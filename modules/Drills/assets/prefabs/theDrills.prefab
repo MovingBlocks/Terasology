@@ -5,6 +5,6 @@
 	},
 	"Item": {
 		"icon": "Drills:drill#theDrill",
-		"damageType": "Drills:damage"
+		"damageType": "Drills:drillDmg"
 	}
 }
