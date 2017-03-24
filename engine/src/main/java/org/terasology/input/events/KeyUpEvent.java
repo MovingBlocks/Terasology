@@ -15,7 +15,6 @@
  */
 package org.terasology.input.events;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.input.InputModified;

@@ -16,7 +16,8 @@
 package org.terasology.input;
 
 /**
- * Created by CataPC on 3/22/2017.
+ * The description of a key that has a modifier key attached to it.
+ *
  */
 public interface InputModified extends Input{
     Modifier getModifier();

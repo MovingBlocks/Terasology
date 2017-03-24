@@ -15,13 +15,11 @@
  */
 package org.terasology.input;
 
-import com.google.api.client.util.Lists;
 
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * Created by CataPC on 3/22/2017.
+ * Implementation of InputModified which allows for an Input(only key currently supported) to have a modifier
+ * key attached to it (alt, control, shift or none) and act as you would expect in the input system.
  */
 public class InputModifiedImpl implements InputModified{
     private Modifier modifier;
