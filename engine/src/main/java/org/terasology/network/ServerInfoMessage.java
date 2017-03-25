@@ -33,6 +33,8 @@ public interface ServerInfoMessage {
      */
     String getGameName();
 
+    String getMOTD();
+
     List<WorldInfo> getWorldInfoList();
 
     /**

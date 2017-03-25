@@ -180,6 +180,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
                 allChannels.add(listenChannel);
                 logger.info("Started server on port {}", port);
+                logger.info("Server MOTD is \"{}\"", config.getServerMOTD());
 
                 // enumerate all network interfaces that listen
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -819,6 +820,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     NetData.ServerInfoMessage getServerInfoMessage() {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
+        serverInfoMessageBuilder.setMOTD(config.getServerMOTD());
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();

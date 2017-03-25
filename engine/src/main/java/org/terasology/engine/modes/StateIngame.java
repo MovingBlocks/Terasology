@@ -100,6 +100,9 @@ public class StateIngame implements GameState {
                 return !context.get(Config.class).getRendering().getDebug().isHudHidden();
             }
         });
+
+        if (networkSystem.getMode() == NetworkMode.CLIENT)
+            System.out.println("SERVER MOTD: " + networkSystem.getServer().getInfo().getMOTD());
     }
 
     @Override
