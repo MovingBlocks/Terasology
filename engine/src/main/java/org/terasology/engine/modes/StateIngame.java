@@ -102,8 +102,9 @@ public class StateIngame implements GameState {
             }
         });
 
-        if (networkSystem.getMode() == NetworkMode.CLIENT)
+        if (networkSystem.getMode() == NetworkMode.CLIENT) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Server MOTD", networkSystem.getServer().getInfo().getMOTD());
+        }
     }
 
     @Override

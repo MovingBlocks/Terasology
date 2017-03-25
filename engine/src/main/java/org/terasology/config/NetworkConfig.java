@@ -69,7 +69,7 @@ public class NetworkConfig {
         this.serverPort = serverPort;
     }
 
-    public String getServerMOTD(){
+    public String getServerMOTD() {
         return serverMOTD;
     }
 
