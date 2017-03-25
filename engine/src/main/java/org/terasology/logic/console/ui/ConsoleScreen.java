@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem;
 import org.terasology.rendering.nui.animation.SwipeMenuAnimationSystem.Direction;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -34,8 +33,6 @@ import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.List;
 
-/**
- */
 public class ConsoleScreen extends CoreScreenLayer {
 
     @In

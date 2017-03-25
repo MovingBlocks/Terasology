@@ -25,6 +25,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -33,6 +34,9 @@ import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * The chat console widget
@@ -43,9 +47,12 @@ public class ChatScreen extends CoreScreenLayer {
 
     @In
     private Console console;
-    
+
     @In
     private LocalPlayer localPlayer;
+
+    @In
+    private NUIManager nuiManager;
 
     private InteractionListener screenListener = new BaseInteractionListener() {
         @Override
@@ -76,6 +83,9 @@ public class ChatScreen extends CoreScreenLayer {
                 console.execute(new Name(command), params, localPlayer.getClientEntity());
                 commandLine.setText("");
                 scrollArea.moveToBottom();
+                MiniChatOverlay overlay = nuiManager.addOverlay("engine:minichatOverlay", MiniChatOverlay.class);
+                overlay.setVisible(true);
+                nuiManager.closeScreen(this);
             }
         });
 
@@ -83,12 +93,9 @@ public class ChatScreen extends CoreScreenLayer {
         history.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                StringBuilder messageList = new StringBuilder();
-                for (Message msg : console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION)) {
-                    messageList.append(msg.getMessage());
-                    messageList.append(Console.NEW_LINE);
-                }
-                return messageList.toString();
+                Iterable<Message> messageIterable = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
+                Stream<Message> messageStream = StreamSupport.stream(messageIterable.spliterator(), false);
+                return messageStream.map(Message::getMessage).collect(Collectors.joining(Console.NEW_LINE));
             }
         });
     }

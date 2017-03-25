@@ -16,7 +16,9 @@
 
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.LoggingContext;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -52,7 +54,9 @@ public class MainMenuScreen extends CoreScreenLayer {
         });
         WidgetUtil.trySubscribe(this, "join", button -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
     }
 
     @Override

@@ -66,7 +66,7 @@ public class ReflectionReflectFactory implements ReflectFactory {
         private Class<T> type;
         private Constructor<T> constructor;
 
-        public ReflectionConstructor(Class<T> type) throws NoSuchMethodException {
+         ReflectionConstructor(Class<T> type) throws NoSuchMethodException {
             this.type = type;
             constructor = type.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -95,7 +95,7 @@ public class ReflectionReflectFactory implements ReflectFactory {
         private Method getter;
         private Method setter;
 
-        public ReflectionFieldAccessor(Field field, Class<U> fieldType) {
+         ReflectionFieldAccessor(Field field, Class<U> fieldType) {
             this.field = field;
             getter = ReflectionUtil.findGetter(field.getName(), field.getDeclaringClass(), fieldType);
             setter = ReflectionUtil.findSetter(field.getName(), field.getDeclaringClass(), fieldType);

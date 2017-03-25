@@ -246,6 +246,49 @@
             {
                 "type": "UILabel",
                 "id": "",
+                "text": "UIText with hint",
+                "layoutInfo": {
+                    "cc": "newline"
+                }
+            },
+            {
+                "type": "UIText",
+                "id": "text1",
+                "hintText": "Enter text here",
+                "text": "text1",
+                "layoutInfo": {
+                    "cc": ""
+                },
+                "readOnly": true,
+                "enabled": false
+            },
+            {
+                "type": "UIText",
+                "id": "text2",
+                "hintText": "Enter text here",
+                "layoutInfo": {
+                    "cc": "w min, h min"
+                }
+            },
+            {
+                "type": "UIText",
+                "id": "text3",
+                "hintText": "Enter text here",
+                "layoutInfo": {
+                    "cc": ""
+                }
+            },
+            {
+                "type": "UIText",
+                "id": "text4",
+                "hintText": "Enter extra long hint text here that just keeps on going",
+                "layoutInfo": {
+                    "cc": "grow"
+                }
+            },
+            {
+                "type": "UILabel",
+                "id": "",
                 "text": "ResettableUIText",
                 "layoutInfo": {
                     "cc": "newline"

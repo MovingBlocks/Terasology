@@ -61,15 +61,19 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
     private FBO leftEye;
     private FBO rightEye;
 
+    /**
+     * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
+     * information for the vrProvider to use.
+     */
     @Override
     public void initialise() {
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
-                && vrProvider.isInitialized() ));
+                && vrProvider.isInitialized()));
         leftEye = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
-        rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO,FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(),displayResolutionDependentFBOs);
+                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        rightEye = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
+                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         if (vrProvider != null) {
             vrProvider.texType[0].handle = leftEye.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
@@ -83,6 +87,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
+    /**
+     * Actually perform the rendering-related tasks.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToHMD");

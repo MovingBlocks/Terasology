@@ -39,7 +39,6 @@ public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private NodeTask task;
-    private RenderTaskListGenerator taskListGenerator; // TODO: investigate ways to remove nodes influence on taskList
     private boolean enabled = true;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
@@ -68,7 +67,8 @@ public abstract class AbstractNode implements Node {
 
     protected void addDesiredStateChange(StateChange stateChange) {
         if (stateChange.isTheDefaultInstance()) {
-            logger.error("Attempted to add default state change %s to the set of desired state changes", stateChange.getClass().getSimpleName());
+            logger.error("Attempted to add default state change {} to the set of desired state changes. (Node: {})",
+                    stateChange.getClass().getSimpleName(), this.toString());
         }
         desiredStateChanges.add(stateChange);
         desiredStateResets.add(stateChange.getDefaultInstance());
@@ -77,13 +77,6 @@ public abstract class AbstractNode implements Node {
     protected void removeDesiredStateChange(StateChange stateChange) {
         desiredStateChanges.remove(stateChange);
         desiredStateResets.remove(stateChange.getDefaultInstance());
-    }
-
-    // TODO: to be refactored - nodes should request a refresh but this should be pending until the end of the frame
-    protected void refreshTaskList() {
-        if (taskListGenerator != null) {
-            taskListGenerator.refresh();
-        }
     }
 
     public Set<StateChange> getDesiredStateChanges() {
@@ -103,10 +96,6 @@ public abstract class AbstractNode implements Node {
     @Override
     public String toString() {
         return String.format("%30s", this.getClass().getSimpleName());
-    }
-
-    public void setTaskListGenerator(RenderTaskListGenerator taskListGenerator) {
-        this.taskListGenerator = taskListGenerator;
     }
 
     @Override

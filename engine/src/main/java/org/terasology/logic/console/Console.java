@@ -143,4 +143,9 @@ public interface Console {
      * @param message the message to remove
      */
     void removeMessage(Message message);
+
+    /**
+     * Clears the console of all previous messages.
+     */
+    void clear();
 }

@@ -22,5 +22,9 @@ package org.terasology.audio;
  */
 @FunctionalInterface
 public interface AudioEndListener {
+
+    /**
+     * Called when the sound or music stops playing
+     */
     void onAudioEnd();
 }

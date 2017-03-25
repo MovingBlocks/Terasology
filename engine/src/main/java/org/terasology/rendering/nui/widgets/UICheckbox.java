@@ -75,10 +75,16 @@ public class UICheckbox extends CoreWidget {
         return DEFAULT_MODE;
     }
 
+    /**
+     * @return A boolean indicating the status of the checkbox
+     */
     public boolean isChecked() {
         return active.get();
     }
 
+    /**
+     * @param checked A boolean setting the ticked state of the checkbox
+     */
     public void setChecked(boolean checked) {
         active.set(checked);
     }

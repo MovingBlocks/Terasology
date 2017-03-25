@@ -299,11 +299,11 @@ public class ChunkMonitorDisplay extends JPanel {
         private BufferedImage imageA;
         private BufferedImage imageB;
 
-        public ImageBuffer(int width, int height) {
+        ImageBuffer(int width, int height) {
             resize(width, height);
         }
 
-        public ImageBuffer() {
+        ImageBuffer() {
         }
 
         public int getWidth() {
@@ -395,11 +395,11 @@ public class ChunkMonitorDisplay extends JPanel {
 
         private final boolean fastResume;
 
-        public RenderRequest(boolean fastResume) {
+        RenderRequest(boolean fastResume) {
             this.fastResume = fastResume;
         }
 
-        public RenderRequest() {
+        RenderRequest() {
             this.fastResume = false;
         }
 
@@ -452,7 +452,7 @@ public class ChunkMonitorDisplay extends JPanel {
         public final int width;
         public final int height;
 
-        public ResizeRequest(int width, int height) {
+        ResizeRequest(int width, int height) {
             this.width = width;
             this.height = height;
         }
@@ -484,7 +484,7 @@ public class ChunkMonitorDisplay extends JPanel {
 
         public final ChunkMonitorEvent event;
 
-        public ChunkRequest(ChunkMonitorEvent event) {
+        ChunkRequest(ChunkMonitorEvent event) {
             Preconditions.checkNotNull(event, "The parameter 'event' must not be null");
             this.event = event;
         }

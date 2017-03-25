@@ -203,7 +203,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private static class SelectChunkProvider implements ChunkProvider {
         private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
 
-        public SelectChunkProvider(Chunk... chunks) {
+        SelectChunkProvider(Chunk... chunks) {
             for (Chunk chunk : chunks) {
                 this.chunks.put(chunk.getPosition(), chunk);
             }

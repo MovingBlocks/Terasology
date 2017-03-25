@@ -28,7 +28,12 @@ import java.util.Objects;
 /**
  *
  */
-public class Line {
+public final class Line {
+
+    private Line() {
+
+    }
+
     /**
      * Draws a 2D line segment in OpenGL.
      *

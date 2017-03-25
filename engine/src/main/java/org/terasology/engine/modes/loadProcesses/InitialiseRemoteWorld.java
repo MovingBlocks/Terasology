@@ -79,7 +79,7 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         context.get(ComponentSystemManager.class).register(celestialSystem);
 
         // Init. a new world
-        Skysphere skysphere = new Skysphere();
+        Skysphere skysphere = new Skysphere(context);
         BackdropProvider backdropProvider = skysphere;
         BackdropRenderer backdropRenderer = skysphere;
         context.put(BackdropProvider.class, backdropProvider);

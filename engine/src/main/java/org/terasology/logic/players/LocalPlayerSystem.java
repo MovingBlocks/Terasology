@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.players;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -27,8 +27,11 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
+import org.terasology.input.InputSystem;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
+import org.terasology.input.binds.movement.AutoMoveButton;
 import org.terasology.input.binds.movement.CrouchButton;
 import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
@@ -54,6 +57,7 @@ import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.debug.MovementDebugCommands;
+import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -78,17 +82,17 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
+import java.util.List;
+
 import static org.terasology.logic.characters.KinematicCharacterMover.VERTICAL_PENETRATION_LEEWAY;
 
-/**
- */
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalPlayerSystem.class);
-
+    @In
+    NetworkSystem networkSystem;
     @In
     private LocalPlayer localPlayer;
     @In
@@ -99,15 +103,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private PhysicsEngine physics;
     @In
-    NetworkSystem networkSystem;
+    private DelayManager delayManager;
 
     @In
     private Config config;
+    @In
+    private InputSystem inputSystem;
+
+    private BindsConfig bindsConfig;
     private float bobFactor;
     private float lastStepDelta;
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
+    private boolean isAutoMove = false;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean jump;
@@ -120,13 +129,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private Time time;
 
-    private long lastItemUse;
-
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
 
     private AABB aabb;
+
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -212,6 +220,46 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         clientComp.character.send(new SetMovementModeEvent(MovementMode.WALKING));
     }
 
+    // To check if a valid key has been assigned, either primary or secondary and return it
+    private Input getValidKey(List<Input> inputs) {
+        for(Input input: inputs) {
+            if(input != null) {
+                return input;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Auto move is disabled when the associated key is pressed again.
+     * This cancels the simulated repeated key stroke for the forward input button.
+     */
+    private void stopAutoMove() {
+        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        Input forwardKey = getValidKey(inputs);
+        if(forwardKey != null) {
+            inputSystem.cancelSimulatedKeyStroke(forwardKey);
+            isAutoMove = false;
+        }
+
+    }
+
+    /**
+     * Append the input for moving forward to the keyboard command queue to simulate pressing of the forward key.
+     * For an input that repeats, the key must be in Down state before Repeat state can be applied to it.
+     */
+    private void startAutoMove() {
+        isAutoMove = false;
+        bindsConfig = config.getInput().getBinds();
+        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        Input forwardKey = getValidKey(inputs);
+        if(forwardKey != null) {
+            isAutoMove = true;
+            inputSystem.simulateSingleKeyStroke(forwardKey);
+            inputSystem.simulateRepeatedKeyStroke(forwardKey);
+        }
+    }
+
     @ReceiveEvent
     public void onPlayerSpawn(OnPlayerSpawnedEvent event, EntityRef character) {
         if (character.equals(localPlayer.getCharacterEntity())) {
@@ -271,6 +319,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = event.getValue();
+        if(relativeMovement.z == 0f && isAutoMove) {
+            stopAutoMove();
+        }
         event.consume();
     }
 
@@ -333,6 +384,18 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 crouchPlayer(entity);
             } else if (move.mode == MovementMode.CROUCHING) {
                 standPlayer(entity);
+            }
+        }
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onAutoMoveMode(AutoMoveButton event, EntityRef entity) {
+        if (event.isDown()) {
+            if (!isAutoMove) {
+                startAutoMove();
+            } else {
+                stopAutoMove();
             }
         }
         event.consume();

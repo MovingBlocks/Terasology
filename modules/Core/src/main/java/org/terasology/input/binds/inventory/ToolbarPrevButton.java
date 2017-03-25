@@ -24,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "toolbarPrev", description = "Previous Toolbar Item", mode = ActivateMode.PRESS, category = "inventory")
+@RegisterBindButton(id = "toolbarPrev", description = "${engine:menu#previous-toolbar-item}", mode = ActivateMode.PRESS, category = "inventory")
 @DefaultBinding(type = InputType.MOUSE_WHEEL, id = -1)
 public class ToolbarPrevButton extends BindButtonEvent {
 }

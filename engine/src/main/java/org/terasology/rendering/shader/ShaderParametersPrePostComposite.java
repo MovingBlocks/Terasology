@@ -22,7 +22,7 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
+import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
@@ -36,7 +36,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Shader parameters for the Combine shader program.
  *
  */
-public class ShaderParametersCombine extends ShaderParametersBase {
+public class ShaderParametersPrePostComposite extends ShaderParametersBase {
     @Range(min = 0.001f, max = 0.005f)
     private float outlineDepthThreshold = 0.001f;
     @Range(min = 0.0f, max = 1.0f)
@@ -108,7 +108,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isSsao()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO_BLURRED);
+            displayResolutionDependentFBOs.bindFboColorTexture(BlurredAmbientOcclusionNode.SSAO_BLURRED_FBO);
             program.setInt("texSsao", texId++, true);
         }
 

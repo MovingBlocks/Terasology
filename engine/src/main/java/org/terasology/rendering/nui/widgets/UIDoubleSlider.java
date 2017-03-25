@@ -32,6 +32,7 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 
 /**
+ * A simple slider bar with two handles
  */
 public class UIDoubleSlider extends CoreWidget {
     public static final String SLIDER_PART = "slider";
@@ -45,7 +46,9 @@ public class UIDoubleSlider extends CoreWidget {
     private Binding<Float> increment = new DefaultBinding<>(0.1f);
     @LayoutConfig
     private int precision = 1;
+    @LayoutConfig
     private Binding<Float> valueLeft = new DefaultBinding<>(0.3f);
+    @LayoutConfig
     private Binding<Float> valueRight = new DefaultBinding<>(0.7f);
     private int sliderWidth;
     private String formatString = "0.0";
@@ -213,10 +216,16 @@ public class UIDoubleSlider extends CoreWidget {
         this.minimum = binding;
     }
 
+    /**
+     * @return A Float indicating the minimum value.
+     */
     public float getMinimum() {
         return minimum.get();
     }
 
+    /**
+     * @param min A Float indicating the minimum value settable.
+     */
     public void setMinimum(float min) {
         this.minimum.set(min);
         generateFormatString();
@@ -226,10 +235,16 @@ public class UIDoubleSlider extends CoreWidget {
         this.range = binding;
     }
 
+    /**
+     * @return A Float indicating the range of values.
+     */
     public float getRange() {
         return range.get();
     }
 
+    /**
+     * @param val A Float specifying the range of values.
+     */
     public void setRange(float val) {
         range.set(val);
         generateFormatString();
@@ -239,10 +254,16 @@ public class UIDoubleSlider extends CoreWidget {
         increment = binding;
     }
 
+    /**
+     * @return A Float indicating the smallest increment.
+     */
     public float getIncrement() {
         return increment.get();
     }
 
+    /**
+     * @param val A Float specifying the smallest increment.
+     */
     public void setIncrement(float val) {
         increment.set(val);
     }
@@ -255,10 +276,16 @@ public class UIDoubleSlider extends CoreWidget {
         valueRight = binding;
     }
 
+    /**
+     * @return A Float containing the value of the left handle.
+     */
     public float getValueLeft() {
         return valueLeft.get();
     }
 
+    /**
+     * @param val The new value of the left handle
+     */
     public void setValueLeft(float val) {
         valueLeft.set(val);
 
@@ -267,10 +294,16 @@ public class UIDoubleSlider extends CoreWidget {
         }
     }
 
+    /**
+     * @return A Float containing the value of the right handle.
+     */
     public float getValueRight() {
         return valueRight.get();
     }
 
+    /**
+     * @param val The new value of the right handle.
+     */
     public void setValueRight(float val) {
         valueRight.set(val);
 
@@ -279,10 +312,16 @@ public class UIDoubleSlider extends CoreWidget {
         }
     }
 
+    /**
+     * @return The number of decimal points displayed.
+     */
     public int getPrecision() {
         return precision;
     }
 
+    /**
+     * @param precision The number of decimal points to display.
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
         generateFormatString();

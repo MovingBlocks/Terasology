@@ -49,6 +49,9 @@ import java.nio.IntBuffer;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * An Open AL implementation of AudioManager
+ */
 public class OpenALManager implements AudioManager {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenALManager.class);

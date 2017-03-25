@@ -52,7 +52,7 @@ public @interface CommandParam {
     /**
      * A class representing no suggester - needed, because Annotations fields don't accept nulls
      */
-    static final class EmptyCommandParameterSuggester implements CommandParameterSuggester {
+    final class EmptyCommandParameterSuggester implements CommandParameterSuggester {
         @Override
         public Set<Object> suggest(EntityRef sender, Object[] resolvedParameters) {
             return Sets.newHashSet();

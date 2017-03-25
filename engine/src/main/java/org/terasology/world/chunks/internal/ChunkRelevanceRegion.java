@@ -199,7 +199,7 @@ public class ChunkRelevanceRegion {
         Vector3i nextChunkPos;
         Iterator<Vector3i> regionPositions = currentRegion.iterator();
 
-        public NeededChunksIterator() {
+        NeededChunksIterator() {
             calculateNext();
         }
 

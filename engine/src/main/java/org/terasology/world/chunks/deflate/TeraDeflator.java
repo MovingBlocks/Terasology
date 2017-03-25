@@ -27,6 +27,6 @@ public abstract class TeraDeflator {
     public TeraDeflator() {
     }
 
-    public abstract TeraArray deflate(final TeraArray in);
+    public abstract TeraArray deflate(TeraArray in);
 
 }

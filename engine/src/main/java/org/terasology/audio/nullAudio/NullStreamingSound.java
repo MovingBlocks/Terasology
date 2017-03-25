@@ -25,7 +25,7 @@ import org.terasology.audio.StreamingSoundData;
 import java.util.Optional;
 
 /**
- *
+ * Null implementation of the StreamingSound
  */
 public final class NullStreamingSound extends StreamingSound {
 

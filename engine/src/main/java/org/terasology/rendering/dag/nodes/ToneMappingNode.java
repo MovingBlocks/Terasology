@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
@@ -27,48 +26,47 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
- * TODO: Add diagram of this node
+ * The exposure calculated earlier in the rendering process is used by an instance
+ * of this node to remap the colors of the image rendered so far, brightening otherwise
+ * undetailed dark areas or dimming otherwise burnt bright areas, depending on the circumstances.
+ *
+ * For more details on the specific algorithm used see shader resource toneMapping_frag.glsl.
+ *
+ * This node stores its output in the this.TONE_MAPPED_FBO.
  */
 public class ToneMappingNode extends AbstractNode {
-    public static final ResourceUrn TONE_MAPPED = new ResourceUrn("engine:sceneToneMapped"); // HDR tone mapping
+    public static final ResourceUrn TONE_MAPPED_FBO = new ResourceUrn("engine:fbo.toneMapping");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
+    /**
+     * This method must be called once shortly after instantiation to fully initialize the node
+     * and make it ready for rendering.
+     */
     @Override
     public void initialise() {
-        requiresFBO(new FBOConfig(TONE_MAPPED, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new BindFBO(TONE_MAPPED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial("engine:prog.hdr")); // TODO: rename shader to toneMapping)
-        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED, displayResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial("engine:prog.toneMapping"));
+
+        // TODO: bind input textures from ShaderParametersCombine class
     }
 
     /**
-     * // TODO: write javadoc
+     * Renders a full screen quad with the opengl state defined by the initialise() method,
+     * using the GBUFFER as input and filling the TONE_MAPPED_FBO with the output of
+     * the shader operations. As such, this method performs purely 2D operations.
      */
-    // TODO: Tone mapping usually maps colors from HDR to a more limited range,
-    // TODO: i.e. the 24 bit a monitor can display. This method however maps from an HDR buffer
-    // TODO: to another HDR buffer and this puzzles me. Will need to dig deep in the shader to
-    // TODO: see what it does.
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // TODO: verify this is necessary
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();

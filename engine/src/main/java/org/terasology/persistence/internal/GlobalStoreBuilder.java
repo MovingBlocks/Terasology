@@ -36,7 +36,7 @@ final class GlobalStoreBuilder {
     private final long nextEntityId;
     private final PrefabSerializer prefabSerializer;
 
-    public GlobalStoreBuilder(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+    GlobalStoreBuilder(EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.nextEntityId = entityManager.getNextId();
         this.prefabSerializer = prefabSerializer;
     }

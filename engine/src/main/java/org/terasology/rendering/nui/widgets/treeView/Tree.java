@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.widgets.treeView;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.terasology.module.sandbox.API;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -32,18 +33,11 @@ import java.util.NoSuchElementException;
  *
  * @param <T> Type of objects stored in the tree.
  */
+@API
 public abstract class Tree<T> {
     private static final String NULL_NODE_ARGUMENT = "node argument is null";
     private static final String NODE_ARGUMENT_INVALID_PARENT = "node argument is not a child of this tree";
 
-    /**
-     * The object stored in this tree.
-     */
-    protected T value;
-    /**
-     * Whether the tree is expanded, i.e. its' child elements are visible.
-     */
-    private boolean expanded;
     /**
      * The parent of this tree.
      */
@@ -52,6 +46,16 @@ public abstract class Tree<T> {
      * The children of this tree.
      */
     protected List<Tree<T>> children = Lists.newArrayList();
+
+    /**
+     * The object stored in this tree.
+     */
+    protected T value;
+
+    /**
+     * Whether the tree is expanded, i.e. its' child elements are visible.
+     */
+    private boolean expanded;
 
     /**
      * @return The object stored in this tree.

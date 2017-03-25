@@ -213,7 +213,7 @@ public class OpenGLTexture extends Texture {
         private final Texture.FilterMode filterMode;
         private final TextureData textureData;
 
-        public LoadedTextureInfo(int width, int height, int depth, TextureData data) {
+         LoadedTextureInfo(int width, int height, int depth, TextureData data) {
             this.width = width;
             this.height = height;
             this.depth = depth;
@@ -255,7 +255,7 @@ public class OpenGLTexture extends Texture {
 
         private final List<Runnable> disposalSubscribers = Lists.newArrayList();
 
-        public TextureResources(LwjglGraphics graphicsManager) {
+         TextureResources(LwjglGraphics graphicsManager) {
             this.graphicsManager = graphicsManager;
         }
 

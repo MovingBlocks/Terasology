@@ -33,7 +33,7 @@ class PlayerStoreBuilder {
     private Vector3f relevanceLocation;
     private Set<EntityRef> storedEntities;
 
-    public PlayerStoreBuilder(Long characterEntityId, Vector3f relevanceLocation) {
+     PlayerStoreBuilder(Long characterEntityId, Vector3f relevanceLocation) {
         this.characterEntityId = characterEntityId;
         this.relevanceLocation = relevanceLocation;
     }

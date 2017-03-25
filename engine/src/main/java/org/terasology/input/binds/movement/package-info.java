@@ -25,6 +25,7 @@
                 "engine:right",
                 "engine:toggleSpeedPermanently",
                 "engine:toggleSpeedTemporarily",
+                "engine:autoMoveMode",
                 "engine:crouchMode",
                 "engine:jump",
                 "engine:crouch"

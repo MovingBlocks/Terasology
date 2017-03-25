@@ -28,7 +28,7 @@ public interface ComponentSerializeCheck {
 
     boolean serialize(ComponentMetadata<? extends Component> metadata);
 
-    public static final class NullCheck implements ComponentSerializeCheck {
+     final class NullCheck implements ComponentSerializeCheck {
         private static final NullCheck INSTANCE = new NullCheck();
 
         private NullCheck() {

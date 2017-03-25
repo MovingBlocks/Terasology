@@ -23,12 +23,19 @@ import org.terasology.math.geom.Vector3i;
 import java.util.Objects;
 
 /**
+ * Borders extend the facet's data range. This is necessary for most Facets which may cross Chunk borders.
  */
 public class Border3D {
     private final int top;
     private final int bottom;
     private final int sides;
 
+    /**
+     * Constructor defining the sizes of the border.
+     * @param top The extra space at the top of chunk.
+     * @param bottom The extra space at the bottom of chunk.
+     * @param sides The extra space at the 4 sides of the chunk. These sides are North, East, South, West.
+     */
     public Border3D(int top, int bottom, int sides) {
         Preconditions.checkArgument(top >= 0);
         Preconditions.checkArgument(bottom >= 0);
@@ -38,41 +45,79 @@ public class Border3D {
         this.sides = sides;
     }
 
+    /**@return Returns the extra space at the top.    */
     public int getTop() {
         return top;
     }
 
+    /**@return Returns the extra space at the bottom.    */
     public int getBottom() {
         return bottom;
     }
 
+    /**@return Returns the extra space at the 4 sides.    */
     public int getSides() {
         return sides;
     }
 
+    /**
+     * Returns a 2D representation of the world (top view) with the given borders added to the size of the original region.
+     * @param region The original region to be used.
+     * @return The 2D representation with the additional space added to it.
+     */
     public Rect2i expandTo2D(Region3i region) {
         return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
                 region.maxX() + getSides(), region.maxZ() + getSides());
     }
 
+    /**
+     * Same as {@code {@link #expandTo2D(Region3i)}} but with a Vector3i instead of a Region3i.
+     * @param size The size used.
+     * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
+     */
     public Rect2i expandTo2D(Vector3i size) {
         return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
     }
 
+    /**
+     * Returns a 3D representation of the workd, a region in this case. With the borders added to it.
+     * @param region The region to be expanded with the borders.
+     * @return The 3D world representation with the additional space added to it in the 3 dimensions.
+     */
     public Region3i expandTo3D(Region3i region) {
         return Region3i.createFromMinMax(new Vector3i(region.minX() - sides, region.minY() - bottom, region.minZ() - sides),
                 new Vector3i(region.maxX() + sides, region.maxY() + top, region.maxZ() + sides));
     }
 
+    /**
+     * Same as {@code {@link #expandTo3D(Region3i)}}} but with a Vector3i instead of a Region3i.
+     * @param size The size to be used.
+     * @return The 3D world representation with the additional space added to it in the 3 dimensions.
+     */
     public Region3i expandTo3D(Vector3i size) {
         return Region3i.createFromMinMax(new Vector3i(-sides, -bottom, -sides),
                 new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
     }
 
+    /**
+     * Extends the border by using the sizes of another border.
+     * @param topExtension The top extension to be added.
+     * @param bottomExtension The bottom extension to be added.
+     * @param sidesExtension The side extensions to be added.
+     * @return The border with the extra extensions.
+     */
     public Border3D extendBy(int topExtension, int bottomExtension, int sidesExtension) {
         return new Border3D(top + topExtension, bottom + bottomExtension, sides + sidesExtension);
     }
 
+    /**
+     * Returns a new border, using the largest value of each extension for both borders. Border A(Sides=5,Bottom=4,Top=3) maxed with border B (Sides=3,Bottom=4,Top=5)
+     * would make a border C with boundries: (5,4,5).
+     * @param topValue The top value to compare with the instance's top value.
+     * @param bottomValue The bottom value to compare with the instance's bottom value.
+     * @param sidesValue The sides value to compare with the instance's sides value.
+     * @return The resulting Border3D.
+     */
     public Border3D maxWith(int topValue, int bottomValue, int sidesValue) {
         return new Border3D(
                 Math.max(top, topValue),
@@ -80,6 +125,9 @@ public class Border3D {
                 Math.max(sides, sidesValue));
     }
 
+    /**
+     * Checks if the fields of the instance are the same as the object passed in the parameters. It compares the size of the Border3D and returns true of all sizes are the same.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

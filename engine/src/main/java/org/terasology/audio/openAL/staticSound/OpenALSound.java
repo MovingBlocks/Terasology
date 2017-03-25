@@ -124,7 +124,7 @@ public final class OpenALSound extends StaticSound {
         private int bufferId;
         private final WeakReference<OpenALSound> asset;
 
-        public DisposalAction(ResourceUrn urn, OpenALSound openALSound) {
+        DisposalAction(ResourceUrn urn, OpenALSound openALSound) {
             this.urn = urn;
              asset = new WeakReference<>(openALSound);
         }

@@ -39,10 +39,11 @@ import java.util.Optional;
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BlockDamageRenderer extends BaseComponentSystem implements RenderSystem {
-    @In
-    private EntityManager entityManager;
 
     BlockSelectionRenderer blockSelectionRenderer;
+
+    @In
+    private EntityManager entityManager;
 
     @Override
     public void renderOverlay() {

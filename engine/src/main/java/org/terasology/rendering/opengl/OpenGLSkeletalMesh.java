@@ -201,7 +201,7 @@ public class OpenGLSkeletalMesh extends SkeletalMesh {
         private int vboUVBuffer;
         private int vboIndexBuffer;
 
-        public DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
+         DisposalAction(ResourceUrn urn, GLBufferPool bufferPool) {
             this.urn = urn;
             this.bufferPool = bufferPool;
         }

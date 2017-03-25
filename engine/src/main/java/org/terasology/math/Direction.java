@@ -57,7 +57,7 @@ public enum Direction {
         conversionMap.put(RIGHT, Side.LEFT);
     }
 
-    private Direction(Vector3i vector3i, Vector3f vector3f) {
+    Direction(Vector3i vector3i, Vector3f vector3f) {
         this.vector3iDir = vector3i;
         this.vector3fDir = vector3f;
     }

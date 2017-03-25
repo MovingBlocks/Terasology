@@ -51,13 +51,15 @@ class ServerListDownloader {
     private final String serverAddress;
 
     /**
+     * The i18n key corresponding to the current status of the downloader
+     *
      * "volatile" ensures the visibility of updates across different threads
      */
     private volatile String status;
 
     private final Thread dlThread;
 
-    public ServerListDownloader(String serverAddress) {
+     ServerListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
         dlThread = new Thread(this::download);
         dlThread.setName("ServerList Downloader");
@@ -76,7 +78,7 @@ class ServerListDownloader {
     }
 
     /**
-     * @return the current status
+     * @return the i18n key corresponding to the current status of the downloader
      */
     public String getStatus() {
         return status;
@@ -97,7 +99,7 @@ class ServerListDownloader {
                 }
             }
         } catch (Exception e) {
-            status = "Error downloading server list!";
+            status = "${engine:menu#error-downloading-server-list}";
             // we catch Exception here to make sure that it's being logged
             // alternative: re-throw as RuntimeException and use
             // Thread.setUncaughtExceptionHandler()
@@ -106,13 +108,13 @@ class ServerListDownloader {
     }
 
     private void download(String address) throws IOException {
-        status = "Downloading server list ..";
+        status = "${engine:menu#downloading-server-list}";
 
         URL url = new URL("http", address, "/servers/list");
         try (Reader reader = new InputStreamReader(url.openStream(), charset);
                 JsonReader jsonReader = new JsonReader(reader)) {
 
-            status = "Parsing content ..";
+            status = "${engine:menu#parsing-content}";
 
             jsonReader.beginArray();
 
@@ -133,7 +135,7 @@ class ServerListDownloader {
 
             jsonReader.endArray();
 
-            status = String.format("Server list complete");
+            status = String.format("${engine:menu#server-list-complete}");
         }
     }
 }

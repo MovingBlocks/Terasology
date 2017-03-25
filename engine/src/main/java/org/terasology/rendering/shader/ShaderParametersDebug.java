@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
-import org.terasology.rendering.dag.nodes.BloomPassesNode;
+import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
+import org.terasology.rendering.dag.nodes.BloomBlurNode;
+import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
@@ -88,7 +89,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case SSAO:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionPassesNode.SSAO);
+                displayResolutionDependentFBOs.bindFboColorTexture(AmbientOcclusionNode.SSAO_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SOBEL:
@@ -113,12 +114,12 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case BLOOM:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(BloomPassesNode.BLOOM_2);
+                displayResolutionDependentFBOs.bindFboColorTexture(BloomBlurNode.ONE_8TH_SCALE_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case HIGH_PASS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(BloomPassesNode.HIGH_PASS);
+                displayResolutionDependentFBOs.bindFboColorTexture(HighPassNode.HIGH_PASS_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SKY_BAND:
@@ -128,7 +129,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case LIGHT_SHAFTS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS);
+                displayResolutionDependentFBOs.bindFboColorTexture(LightShaftsNode.LIGHT_SHAFTS_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             default:

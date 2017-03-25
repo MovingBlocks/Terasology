@@ -34,7 +34,7 @@ public enum RemoteModuleExtension {
     private final String key;
     private final Class<?> valueType;
 
-    private RemoteModuleExtension(String key, Class<?> valueType) {
+     RemoteModuleExtension(String key, Class<?> valueType) {
         this.key = key;
         this.valueType = valueType;
     }

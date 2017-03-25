@@ -28,6 +28,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -78,6 +79,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        addDesiredStateChange(new LookThrough(playerCamera));
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
@@ -86,14 +88,14 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList();
+            worldRenderer.requestTaskListRefresh();
         }
     }
 
@@ -120,8 +122,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         READ_ONLY_GBUFFER.bind();   // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
         while (renderQueues.chunksAlphaReject.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaReject.poll();

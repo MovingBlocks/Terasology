@@ -29,7 +29,7 @@ public interface DeserializeFieldCheck {
     /**
      * Null implementation, returns true for all fields
      */
-    public static final class NullCheck implements DeserializeFieldCheck {
+     final class NullCheck implements DeserializeFieldCheck {
 
         private static final NullCheck INSTANCE = new NullCheck();
 

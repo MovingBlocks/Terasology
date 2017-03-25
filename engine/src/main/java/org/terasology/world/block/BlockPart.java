@@ -40,10 +40,10 @@ public enum BlockPart {
 
     private Side side;
 
-    private BlockPart() {
+    BlockPart() {
     }
 
-    private BlockPart(Side side) {
+    BlockPart(Side side) {
         this.side = side;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,15 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- */
 public class PermissionConfig {
     /**
      * Used for first time authentication at a headless server which may be at a remote location.
      */
     private String oneTimeAuthorizationKey = createRandomKey();
 
-    public String getOneTimeAuthorizationKey() {
-        return oneTimeAuthorizationKey;
-    }
-
-    public void setOneTimeAuthorizationKey(String oneTimeAuthorizationKey) {
-        this.oneTimeAuthorizationKey = oneTimeAuthorizationKey;
-    }
-
+    /**
+     * @return Builds a random key with A-Z, a-z and 2-9.
+    */
     private static String createRandomKey() {
         SecureRandom random = new SecureRandom();
         List<Character> possibleCharacters = new ArrayList<>();
@@ -61,4 +54,20 @@ public class PermissionConfig {
         }
         return codeBuilder.toString();
     }
+
+    /**
+     * @return Returns the one-time auth key
+     */
+    public String getOneTimeAuthorizationKey() {
+        return oneTimeAuthorizationKey;
+    }
+
+    /**
+     * @param oneTimeAuthorizationKey Sets the one-time authorization key to this String
+     */
+    public void setOneTimeAuthorizationKey(String oneTimeAuthorizationKey) {
+        this.oneTimeAuthorizationKey = oneTimeAuthorizationKey;
+    }
+
+
 }

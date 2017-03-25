@@ -757,11 +757,11 @@ public class CanvasImpl implements CanvasControl {
 
         private boolean drawOnTop;
 
-        public CanvasState(CanvasState previous, Rect2i drawRegion) {
+        CanvasState(CanvasState previous, Rect2i drawRegion) {
             this(previous, drawRegion, (previous != null) ? previous.cropRegion : drawRegion);
         }
 
-        public CanvasState(CanvasState previous, Rect2i drawRegion, Rect2i cropRegion) {
+        CanvasState(CanvasState previous, Rect2i drawRegion, Rect2i cropRegion) {
             if (previous != null) {
                 this.skin = previous.skin;
                 this.family = previous.family;
@@ -797,7 +797,7 @@ public class CanvasImpl implements CanvasControl {
         private CanvasState previousState;
         private boolean disposed;
 
-        public SubRegionImpl(Rect2i region, boolean crop) {
+        SubRegionImpl(Rect2i region, boolean crop) {
             previousState = state;
 
             int left = TeraMath.addClampAtMax(region.minX(), state.drawRegion.minX());
@@ -859,7 +859,7 @@ public class CanvasImpl implements CanvasControl {
         public UIWidget element;
         public UIWidget tooltipOverride;
 
-        public InteractionRegion(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget element, UIWidget tooltipOverride) {
+        InteractionRegion(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget element, UIWidget tooltipOverride) {
             this.listener = listener;
             this.region = region;
             this.offset = offset;
@@ -1027,7 +1027,7 @@ public class CanvasImpl implements CanvasControl {
         private final UIWidget currentElement;
         private final UIWidget tooltipOverride;
 
-        public DrawInteractionRegionOperation(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget currentElement, UIWidget tooltipOverride) {
+        DrawInteractionRegionOperation(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget currentElement, UIWidget tooltipOverride) {
             this.region = region;
             this.listener = listener;
             this.offset = offset;

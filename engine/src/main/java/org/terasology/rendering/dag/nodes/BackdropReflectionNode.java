@@ -23,9 +23,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
-import org.terasology.rendering.dag.stateChanges.DisableDepthMask;
+import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
+import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -75,13 +77,15 @@ public class BackdropReflectionNode extends AbstractNode {
     @Override
     public void initialise() {
         this.playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new ReflectedCamera(playerCamera));
+        addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();
 
         requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
-        addDesiredStateChange(new DisableDepthMask());
+        addDesiredStateChange(new DisableDepthWriting());
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
     }
 
@@ -96,15 +100,7 @@ public class BackdropReflectionNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/reflectedBackdropNode");
 
-        playerCamera.setReflected(true);
-        playerCamera.lookThroughNormalized(); // we don't want the reflected scene to be bobbing or moving with the player
-
         glCallList(skySphere); // Draws the skysphere
-
-        // TODO: initially avoid the next line by having a LookThroughNormalized state change
-        // TODO: eventually, when cameras are components, this node would simply use a different camera.
-        playerCamera.lookThrough();
-        playerCamera.setReflected(false);
 
         PerformanceMonitor.endActivity();
     }

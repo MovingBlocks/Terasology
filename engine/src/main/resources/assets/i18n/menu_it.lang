@@ -50,6 +50,8 @@
     "category-mouse": "Mouse",
     "category-movement": "Movimento",
     "category-nui": "NUI",
+    "change-keybind-popup-message": "è già legato a un'azione. Associare comunque?",
+    "change-keybind-popup-title": "Chiave già associata",
     "clamp-lighting": "Luce massima",
     "cloud-shadows": "Ombre delle nuvole",
     "connecting-to": "Connessione a",

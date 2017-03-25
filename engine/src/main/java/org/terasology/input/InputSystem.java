@@ -17,6 +17,9 @@ package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
@@ -63,6 +66,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
@@ -107,6 +111,10 @@ public class InputSystem extends BaseComponentSystem {
     private Map<Input, BindableRealAxis> controllerAxisBinds = Maps.newHashMap();
     private BindableButtonImpl mouseWheelUpBind;
     private BindableButtonImpl mouseWheelDownBind;
+
+    private Logger logger = LoggerFactory.getLogger(InputSystem.class);
+
+    private Queue<KeyboardAction> simulatedKeys = Queues.newArrayDeque();
 
     private boolean capturingMouse = true;
 
@@ -386,6 +394,9 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private void processControllerInput(float delta) {
+        if (!display.hasFocus()) {
+            return;
+        }
         for (ControllerAction action : controllers.getInputQueue()) {
             // TODO: send event to entity system
             boolean consumed = false;
@@ -420,8 +431,39 @@ public class InputSystem extends BaseComponentSystem {
         }
     }
 
+
+    /**
+     * Simulated key strokes: To simulate input from a keyboard, we simply have to extract the Input associated to the action
+     * and this function adds it to the keyboard's input queue.
+     * @param key The key to be simulated.
+     */
+    public void simulateSingleKeyStroke(Input key) {
+        /* TODO: Perhaps there is a better way to extract the character.
+            All the simulate functions extract keyChar by getting the first character from it's display string.
+            While it works for normal character buttons, might not work for special buttons if required later.
+        */
+        char keyChar = key.getDisplayName().charAt(0);
+        KeyboardAction action = new KeyboardAction(key, ButtonState.DOWN, keyChar);
+        simulatedKeys.add(action);
+    }
+
+    public void simulateRepeatedKeyStroke(Input key) {
+        char keyChar = key.getDisplayName().charAt(0);
+        KeyboardAction action = new KeyboardAction(key, ButtonState.REPEAT, keyChar);
+        simulatedKeys.add(action);
+    }
+
+    public void cancelSimulatedKeyStroke(Input key) {
+        char keyChar = key.getDisplayName().charAt(0);
+        KeyboardAction action = new KeyboardAction(key, ButtonState.UP, keyChar);
+        simulatedKeys.add(action);
+    }
+
     private void processKeyboardInput(float delta) {
-        for (KeyboardAction action : keyboard.getInputQueue()) {
+        Queue<KeyboardAction> keyQueue = keyboard.getInputQueue();
+        keyQueue.addAll(simulatedKeys);
+        simulatedKeys.clear();
+        for (KeyboardAction action : keyQueue) {
             boolean consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta);
 
             // Update bind

@@ -192,7 +192,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         public long startMem;
         public long ownMem;
 
-        public ActivityInfo(String activityName) {
+         ActivityInfo(String activityName) {
             this.name = activityName;
         }
 

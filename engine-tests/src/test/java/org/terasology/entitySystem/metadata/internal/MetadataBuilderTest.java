@@ -77,7 +77,7 @@ public class MetadataBuilderTest {
     }
 
     private static class NoDefaultConstructor {
-        public NoDefaultConstructor(String name) {
+        NoDefaultConstructor(String name) {
 
         }
     }

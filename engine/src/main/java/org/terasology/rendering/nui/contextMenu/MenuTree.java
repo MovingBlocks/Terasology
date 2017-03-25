@@ -25,13 +25,14 @@ import java.util.function.Consumer;
  */
 public final class MenuTree implements AbstractContextMenuItem {
     /**
-     * The name of the menu.
-     */
-    private String name;
-    /**
      * The options of this menu.
      */
     protected List<AbstractContextMenuItem> options = Lists.newArrayList();
+
+    /**
+     * The name of the menu.
+     */
+    private String name;
 
     public MenuTree(String name) {
         this.name = name;

@@ -52,7 +52,7 @@ class ModuleListDownloader {
 
     private Thread dlThread;
 
-    public ModuleListDownloader(String serverAddress) {
+    ModuleListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
         dlThread = new Thread(this::download);
         dlThread.setName("ModuleList Downloader");

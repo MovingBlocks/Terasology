@@ -13,22 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.nodes;
+package org.terasology.logic.console;
 
-import org.terasology.rendering.dag.AbstractNode;
 
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.setViewportToSizeOf;
+import org.junit.Assert;
+import org.junit.Test;
+import org.terasology.TerasologyTestingEnvironment;
 
-// TODO: eliminate this node - it is only temporary as the instructions in process() used to be in a different node
-public class BindReadOnlyFBONode extends AbstractNode {
+import java.util.Iterator;
 
-    public void initialise() {
+public class ConsoleTest extends TerasologyTestingEnvironment {
 
+    @Test
+    public void testClearCommand() {
+        for (int i = 0; i < 10; i++) {
+            getConsole().addMessage("Just a message");
+        }
+
+        getConsole().clear();
+
+        Iterator<Message> it = getConsole().getMessages().iterator();
+        Assert.assertFalse(it.hasNext());
     }
 
-    public void process() {
-        READ_ONLY_GBUFFER.bind();
-        setViewportToSizeOf(READ_ONLY_GBUFFER); // TODO: verify this is necessary
+    private Console getConsole() {
+        return context.get(Console.class);
     }
 }

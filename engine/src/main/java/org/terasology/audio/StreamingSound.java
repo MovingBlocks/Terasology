@@ -20,7 +20,7 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 
 /**
- *
+ * Interface for a sound that is streamed from storage. The entire sound is not loaded into memory
  */
 public abstract class StreamingSound extends Sound<StreamingSoundData> {
 

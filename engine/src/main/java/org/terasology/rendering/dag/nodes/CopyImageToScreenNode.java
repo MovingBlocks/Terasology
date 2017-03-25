@@ -20,7 +20,6 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
-import static org.lwjgl.opengl.GL11.*;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -33,6 +32,8 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode {
 
+    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+
     @In
     private WorldRenderer worldRenderer;
 
@@ -42,12 +43,11 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
     @Override
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
-        addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN,displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 

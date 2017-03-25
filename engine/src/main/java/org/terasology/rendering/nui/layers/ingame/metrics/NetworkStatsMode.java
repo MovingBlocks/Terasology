@@ -30,7 +30,7 @@ final class NetworkStatsMode extends MetricsMode {
     private String lastMetric;
 
 
-    public NetworkStatsMode() {
+    NetworkStatsMode() {
         super("Network");
         lastMetric = getName();
         time = CoreRegistry.get(Time.class);

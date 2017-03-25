@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,15 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
+import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
+import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
+import org.terasology.rendering.dag.nodes.HighPassNode;
+import org.terasology.rendering.dag.nodes.LateBlurNode;
+import org.terasology.rendering.dag.nodes.UpdateExposureNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -29,28 +35,24 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.RenderTaskListGenerator;
-import org.terasology.rendering.dag.nodes.AmbientOcclusionPassesNode;
 import org.terasology.rendering.dag.nodes.BackdropNode;
-import org.terasology.rendering.dag.nodes.BindReadOnlyFBONode;
-import org.terasology.rendering.dag.nodes.BloomPassesNode;
-import org.terasology.rendering.dag.nodes.BlurPassesNode;
+import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.AlphaRejectBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
-import org.terasology.rendering.dag.nodes.DownSampleSceneAndUpdateExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
 import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
@@ -86,9 +88,15 @@ import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
+import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.*;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
+import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 
@@ -101,7 +109,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
  *
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
- *
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
@@ -112,7 +119,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final Camera playerCamera;
+    private final SubmersibleCamera playerCamera;
+
+    // TODO: @In
+    private final OpenVRProvider vrProvider;
 
     private float timeSmoothedMainLightIntensity;
     private RenderingStage currentRenderingStage;
@@ -124,14 +134,15 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
-    private ScreenGrabber screenGrabber;
+
+    private RenderTaskListGenerator renderTaskListGenerator;
+    private boolean requestedTaskListRefresh;
     private List<RenderPipelineTask> renderPipelineTaskList;
     private ShadowMapNode shadowMapNode;
 
+    private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-    private ImmutableFBOs immutableFBOs;
-    private OpenVRProvider vrProvider;
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -155,21 +166,24 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
+        vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
-            this.vrProvider = new OpenVRProvider();
             context.put(OpenVRProvider.class, vrProvider);
-            if (this.vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(this.vrProvider);
+            // If vrProvider.init() returns false, this means that we are unable to initialize VR hardware for some
+            // reason (for example, no HMD is connected). In that case, even though the configuration requests
+            // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
+            // the log.
+            if (vrProvider.init()) {
+                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
-
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
@@ -181,11 +195,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderingSupport() {
-        screenGrabber = new ScreenGrabber(context);
-        context.put(ScreenGrabber.class, screenGrabber);
+        context.put(ScreenGrabber.class, new ScreenGrabber(context));
 
-        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
         immutableFBOs = new ImmutableFBOs();
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
@@ -193,16 +206,11 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(ShadowMapResolutionDependentFBOs.class, shadowMapResolutionDependentFBOs);
 
         shaderManager.initShaders();
-        initMaterials();
 
         context.put(WorldRenderer.class, this);
         context.put(RenderQueuesHelper.class, renderQueues);
         context.put(RenderableWorld.class, renderableWorld);
         initRenderGraph();
-    }
-
-    private void initMaterials() {
-        //simpleShader = getMaterial("engine:prog.simple");  // in use by the currently commented out light stencil pass
     }
 
     private void initRenderGraph() {
@@ -232,8 +240,6 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-
-        // TODO: write snippets and shaders to inspect content of a color/depth buffer - debug mode
 
         // sky rendering
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
@@ -282,56 +288,121 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
         renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
 
-        // TODO next!
         Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
         renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
 
         Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
 
-        // END OF THE SECOND REFACTORING PASS TO SWITCH NODES TO THE NEW ARCHITECTURE - each PR moves this line down.
-        // TODO: node instantiation and node addition to the graph should be handled as above, for easy deactivation of nodes during the debug.
-
-        // TODO: eventually eliminate this node. The operations in its process() method will move to the following nodes.
-        Node bindReadOnlyFBONode = nodeFactory.createInstance(BindReadOnlyFBONode.class);
-        renderGraph.addNode(bindReadOnlyFBONode, "bindReadOnlyFBONode");
-
-        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
         Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
-        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
-        Node ambientOcclusionPassesNode = nodeFactory.createInstance(AmbientOcclusionPassesNode.class);
-        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
-        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
-        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
-        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
-        Node downSampleSceneAndUpdateExposure = nodeFactory.createInstance(DownSampleSceneAndUpdateExposureNode.class);
-        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
-        Node bloomPassesNode = nodeFactory.createInstance(BloomPassesNode.class);
-        Node blurPassesNode = nodeFactory.createInstance(BlurPassesNode.class);
-        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
-        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
-        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
-        
-
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
+
+        // 3d-based decorations (versus purely 2d, post-production effects)
+        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
         renderGraph.addNode(outlineNode, "outlineNode");
-        renderGraph.addNode(ambientOcclusionPassesNode, "ambientOcclusionPassesNode");
+
+        Node ambientOcclusionNode = nodeFactory.createInstance(AmbientOcclusionNode.class);
+        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
+
+        Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
+        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
+
+        // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
+        // and then it's 2D post-processing all the way to the image shown on the display.
+        Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
+
+        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
-        // Post-Processing proper: tone mapping, bloom and blur passes // TODO: verify if the order of operations around here is correct
+
+        // Post-Processing proper: tone mapping, light shafts, bloom and blur passes
+        Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
         renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
+
+        Node initialPostProcessingNode = nodeFactory.createInstance(InitialPostProcessingNode.class);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
-        renderGraph.addNode(downSampleSceneAndUpdateExposure, "downSampleSceneAndUpdateExposure");
+
+        aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo16pixels.initialise(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
+
+        aLabel = "downSampling_16x16px_to_8x8px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo8pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo8pixels.initialise(FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo8pixels, aLabel);
+
+        aLabel = "downSampling_8x8px_to_4x4px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo4pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo4pixels.initialise(FBO_8X8_CONFIG, immutableFBOs, FBO_4X4_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo4pixels, aLabel);
+
+        aLabel = "downSampling_4x4px_to_2x2px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo2pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo2pixels.initialise(FBO_4X4_CONFIG, immutableFBOs, FBO_2X2_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo2pixels, aLabel);
+
+        aLabel = "downSampling_2x2px_to_1x1px_forExposure";
+        DownSamplerForExposureNode exposureDownSamplerTo1pixel = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
+        exposureDownSamplerTo1pixel.initialise(FBO_2X2_CONFIG, immutableFBOs, FBO_1X1_CONFIG, immutableFBOs, aLabel);
+        renderGraph.addNode(exposureDownSamplerTo1pixel, aLabel);
+
+        Node updateExposureNode = nodeFactory.createInstance(UpdateExposureNode.class);
+        renderGraph.addNode(updateExposureNode, "updateExposureNode");
+
+        Node toneMappingNode = nodeFactory.createInstance(ToneMappingNode.class);
         renderGraph.addNode(toneMappingNode, "toneMappingNode");
-        renderGraph.addNode(bloomPassesNode, "bloomPassesNode");
-        renderGraph.addNode(blurPassesNode, "blurPassesNode");
+
+        // Bloom Effect: one high-pass filter and three blur passes
+        Node highPassNode = nodeFactory.createInstance(HighPassNode.class);
+        renderGraph.addNode(highPassNode, "highPassNode");
+
+        FBOConfig halfScaleBloomConfig = new FBOConfig(BloomBlurNode.HALF_SCALE_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+        FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO, QUARTER_SCALE, FBO.Type.DEFAULT);
+        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+
+        aLabel = "halfScaleBlurredBloom";
+        BloomBlurNode halfScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        halfScaleBlurredBloom.initialise(HighPassNode.HIGH_PASS_FBO_CONFIG, halfScaleBloomConfig, aLabel);
+        renderGraph.addNode(halfScaleBlurredBloom, aLabel);
+
+        aLabel = "quarterScaleBlurredBloom";
+        BloomBlurNode quarterScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        quarterScaleBlurredBloom.initialise(halfScaleBloomConfig, quarterScaleBloomConfig, aLabel);
+        renderGraph.addNode(quarterScaleBlurredBloom, aLabel);
+
+        aLabel = "one8thScaleBlurredBloom";
+        BloomBlurNode one8thScaleBlurredBloom = nodeFactory.createInstance(BloomBlurNode.class, DELAY_INIT);
+        one8thScaleBlurredBloom.initialise(quarterScaleBloomConfig, one8thScaleBloomConfig, aLabel);
+        renderGraph.addNode(one8thScaleBlurredBloom, aLabel);
+
+        // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects - TODO: place next line closer to ToneMappingNode eventually.
+        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR);
+        FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+        FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
+
+        aLabel = "firstLateBlurNode";
+        LateBlurNode firstLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        firstLateBlurNode.initialise(toneMappedConfig, firstLateBlurConfig, aLabel);
+        renderGraph.addNode(firstLateBlurNode, aLabel);
+
+        aLabel = "secondLateBlurNode";
+        LateBlurNode secondLateBlurNode = nodeFactory.createInstance(LateBlurNode.class, DELAY_INIT);
+        secondLateBlurNode.initialise(firstLateBlurConfig, secondLateBlurConfig, aLabel);
+        renderGraph.addNode(secondLateBlurNode, aLabel);
+
+        Node finalPostProcessingNode = nodeFactory.createInstance(FinalPostProcessingNode.class);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        Node copyToVRFrameBufferNode = nodeFactory.createInstance(CopyImageToHMDNode.class);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+
+        Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
 
-        RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
+        renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 
@@ -416,6 +487,11 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // this line needs to be here as deep down it relies on the camera's frustrum, updated just above.
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
+
+        if (requestedTaskListRefresh) {
+            renderTaskListGenerator.refresh();
+            requestedTaskListRefresh = false;
+        }
     }
 
     /**
@@ -456,6 +532,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
+    public void requestTaskListRefresh() {
+        requestedTaskListRefresh = true;
+    }
+
+    @Override
     public boolean isFirstRenderingStageForCurrentFrame() {
         return isFirstRenderingStageForCurrentFrame;
     }
@@ -472,23 +553,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public void setViewDistance(ViewDistance viewDistance) {
         renderableWorld.updateChunksInProximity(viewDistance);
-    }
-
-    @Override
-    public boolean isHeadUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
-
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
     }
 
     @Override
@@ -544,7 +608,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public Camera getActiveCamera() {
+    public SubmersibleCamera getActiveCamera() {
         return playerCamera;
     }
 

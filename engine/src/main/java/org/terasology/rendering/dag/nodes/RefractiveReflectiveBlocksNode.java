@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -29,6 +28,7 @@ import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -78,9 +78,12 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
-        displayResolutionDependentFBOs.subscribe(this);
+        addDesiredStateChange(new LookThrough(playerCamera));
+
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
+        displayResolutionDependentFBOs.subscribe(this);
+
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
     }
@@ -107,14 +110,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
         chunkShader.setFloat("clip", 0.0f, true);
 
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
-
-        // TODO: This is done this way because LightGeometryNode enable but does not disable face culling.
-        // TODO: When LightGeometryNode is switched to the new architecture, this will have to change.
-        if (worldRenderer.isHeadUnderWater()) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
-
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
 
@@ -131,10 +126,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         }
 
         chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-
-        if (worldRenderer.isHeadUnderWater()) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-        }
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

@@ -71,6 +71,11 @@
                         "text": "${engine:menu#game-settings}"
                     },
                     {
+                        "type": "UIButton",
+                        "id": "credits",
+                        "text": "${engine:menu#credits}"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [1, 64]
                     },
@@ -80,6 +85,21 @@
                         "text": "${engine:menu#exit-game}"
                     }
                 ]
+            },
+            {
+                "type": "UIButton",
+                "id": "crashReporter",
+                "text": "${engine:menu#crash-reporter}",
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-bottom": {
+                        "offset": 8
+                    },
+                    "position-right": {
+                        "offset": 8
+                    }
+                }
             }
         ]
     }

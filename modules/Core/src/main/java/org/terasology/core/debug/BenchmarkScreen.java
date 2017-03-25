@@ -169,7 +169,7 @@ public class BenchmarkScreen extends BaseInteractionScreen {
         sortedDurations.add(durationInMs);
         // sort to calculate median:
         Collections.sort(sortedDurations);
-        double median = sortedDurations.get(sortedDurations.size()/2);
+        double median = sortedDurations.get(sortedDurations.size() / 2);
         sum += durationInMs;
         min = Math.min(min, durationInMs);
         max = Math.max(max, durationInMs);
@@ -184,19 +184,19 @@ public class BenchmarkScreen extends BaseInteractionScreen {
         sb.append(selectedBenchmarkType.getMaxIterations());
         sb.append("\n");
         sb.append("last duration:  ");
-        sb.append(String.format("%.1f",durationInMs));
+        sb.append(String.format("%.1f", durationInMs));
         sb.append(" ms\n");
         sb.append("min duration:  ");
-        sb.append(String.format("%.1f",min));
+        sb.append(String.format("%.1f", min));
         sb.append(" ms\n");
         sb.append("median duration:  ");
         sb.append(String.format("%.1f", median));
         sb.append(" ms\n");
         sb.append("avg duration:  ");
-        sb.append(String.format("%.1f",avgMs));
+        sb.append(String.format("%.1f", avgMs));
         sb.append(" ms\n");
         sb.append("max duration:  ");
-        sb.append(String.format("%.1f",max));
+        sb.append(String.format("%.1f", max));
         sb.append(" ms\n");
 
         if (textArea != null) {

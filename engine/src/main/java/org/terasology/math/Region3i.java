@@ -44,6 +44,11 @@ public final class Region3i implements Iterable<Vector3i> {
         this.size.set(size);
     }
 
+    /**
+     * @param min the min point of the region
+     * @param size the size of the region
+     * @return a new region base on the min point and region size, empty if the size is negative
+     */
     public static Region3i createFromMinAndSize(BaseVector3i min, BaseVector3i size) {
         if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
             return EMPTY;
@@ -51,6 +56,12 @@ public final class Region3i implements Iterable<Vector3i> {
         return new Region3i(min, size);
     }
 
+    /**
+     * Create a region with center point and x,y,z coordinate extents size
+     * @param center the center point of region
+     * @param extents the extents size of each side of region
+     * @return a new region base on the center point and extents size
+     */
     public static Region3i createFromCenterExtents(BaseVector3f center, BaseVector3f extents) {
         Vector3f min = new Vector3f(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
         Vector3f max = new Vector3f(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
@@ -60,18 +71,36 @@ public final class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(new Vector3i(min), new Vector3i(max));
     }
 
+    /**
+     * Create a region with center point and x,y,z coordinate extents size
+     * @param center the center point of region
+     * @param extents the extents size of each side of region
+     * @return a new region base on the center point and extents size
+     */
     public static Region3i createFromCenterExtents(BaseVector3i center, BaseVector3i extents) {
         Vector3i min = new Vector3i(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
         Vector3i max = new Vector3i(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
         return createFromMinMax(min, max);
     }
 
+    /**
+     * Create a region with center point and extents size
+     * @param center the center point of region
+     * @param extents the extents size of region
+     * @return a new region base on the center point and extents size
+     */
     public static Region3i createFromCenterExtents(BaseVector3i center, int extent) {
         Vector3i min = new Vector3i(center.x() - extent, center.y() - extent, center.z() - extent);
         Vector3i max = new Vector3i(center.x() + extent, center.y() + extent, center.z() + extent);
         return createFromMinMax(min, max);
     }
 
+    /**
+     * Create a region by two point
+     * @param a vertex a
+     * @param b the diagonal vertex of a
+     * @return a new region base on vertex a and b
+     */
     public static Region3i createBounded(BaseVector3i a, BaseVector3i b) {
         Vector3i min = new Vector3i(a);
         min.min(b);
@@ -80,6 +109,12 @@ public final class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(min, max);
     }
 
+    /**
+     * Create a region by two point
+     * @param min the min point of the region
+     * @param max the max point of the region
+     * @return a new region base on min and max point
+     */
     public static Region3i createFromMinMax(BaseVector3i min, BaseVector3i max) {
         Vector3i size = new Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
         if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
@@ -131,7 +166,6 @@ public final class Region3i implements Iterable<Vector3i> {
     public Vector3i size() {
         return new Vector3i(size);
     }
-
 
     public int sizeX() {
         return size.x;
@@ -296,7 +330,7 @@ public final class Region3i implements Iterable<Vector3i> {
     private class Region3iIterator implements Iterator<Vector3i> {
         Vector3i pos;
 
-        public Region3iIterator() {
+         Region3iIterator() {
             this.pos = new Vector3i();
         }
 
@@ -331,7 +365,7 @@ public final class Region3i implements Iterable<Vector3i> {
         private Vector3i next;
         private Region3i other;
 
-        public SubtractiveIterator(Region3i other) {
+         SubtractiveIterator(Region3i other) {
             this.other = other;
             innerIterator = iterator();
             updateNext();

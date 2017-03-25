@@ -366,7 +366,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
     private static class AddCommand implements Command {
         private EntityRef toAdd;
 
-        public AddCommand(EntityRef toAdd) {
+        AddCommand(EntityRef toAdd) {
             this.toAdd = toAdd;
         }
 
@@ -379,7 +379,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
     private static class RemoveCommand implements Command {
         private EntityRef toRem;
 
-        public RemoveCommand(EntityRef toRemove) {
+        RemoveCommand(EntityRef toRemove) {
             toRem = toRemove;
         }
 
@@ -407,7 +407,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
          * @param origin The entities of a NearestSortingCollection will be
          *               sorted based on their distance to this entity.
          */
-        public SortTask(Camera origin) {
+        SortTask(Camera origin) {
             originCamera = origin;
         }
 
@@ -422,7 +422,8 @@ public class NearestSortingList implements Iterable<EntityRef> {
                  * game to crash. Instead we shall output an error to the logger
                  * and continue.
                  */
-                logger.error("Uncaught exception in sorting thread: " + ex.toString());
+                //for ArrayIndexOutOfBoundsException see issue #2742
+                logger.error("Uncaught exception in sorting thread", ex);
             }
         }
 

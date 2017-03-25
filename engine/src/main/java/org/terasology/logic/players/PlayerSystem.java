@@ -39,7 +39,6 @@ import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
@@ -217,12 +216,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         public PlayerStore playerStore;
         public Vector3f position;
 
-        public SpawningClientInfo(EntityRef client, Vector3f position) {
+         SpawningClientInfo(EntityRef client, Vector3f position) {
             this.clientEntity = client;
             this.position = position;
         }
 
-        public SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
+         SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
             this(client, position);
             this.playerStore = playerStore;
         }
