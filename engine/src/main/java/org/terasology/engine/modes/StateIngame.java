@@ -42,6 +42,7 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.world.chunks.ChunkProvider;
@@ -102,7 +103,7 @@ public class StateIngame implements GameState {
         });
 
         if (networkSystem.getMode() == NetworkMode.CLIENT)
-            System.out.println("SERVER MOTD: " + networkSystem.getServer().getInfo().getMOTD());
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Server MOTD", networkSystem.getServer().getInfo().getMOTD());
     }
 
     @Override
