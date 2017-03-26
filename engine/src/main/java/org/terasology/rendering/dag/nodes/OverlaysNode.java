@@ -40,7 +40,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * Objects to be rendered as overlays must be registered as implementing the interface RenderSystem and
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
-public class OverlaysNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
+public class OverlaysNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
     @In
@@ -57,7 +57,6 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable, FBOM
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
-    private FBO readOnlyGBuffer;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -73,11 +72,8 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable, FBOM
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     /**
@@ -120,10 +116,5 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable, FBOM
         }
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBuffer = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

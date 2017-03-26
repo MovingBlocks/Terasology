@@ -61,7 +61,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
     private RenderingConfig renderingConfig;
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
-    private FBO sceneFinalFbo;
+    private FBO finalFbo;
 
     /**
      * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
@@ -69,14 +69,12 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
      */
     @Override
     public void initialise() {
-        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
-
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
                 && vrProvider.isInitialized()));
-        leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
+        requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
+        requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
                 FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         if (vrProvider != null) {
             vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
@@ -88,9 +86,11 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
-        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
 
+        update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
         displayResolutionDependentFBOs.subscribe(this);
+
+        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
     /**
@@ -99,7 +99,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToHMD");
-        sceneFinalFbo.bindTexture();
+        finalFbo.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();
     }
@@ -127,7 +127,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
 
     @Override
     public void update() {
-        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         leftEyeFbo = displayResolutionDependentFBOs.get(LEFT_EYE_FBO);
         rightEyeFbo = displayResolutionDependentFBOs.get(RIGHT_EYE_FBO);
     }

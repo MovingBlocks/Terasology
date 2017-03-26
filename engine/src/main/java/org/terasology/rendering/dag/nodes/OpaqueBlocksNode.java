@@ -47,7 +47,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  *
  * In a typical world this is the majority of the world's landscape.
  */
-public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
+public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -66,7 +66,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO readOnlyGBufferFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
@@ -82,12 +81,9 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -168,10 +164,5 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         new AABBRenderer(chunk.getAABB()).renderLocally(1f);
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

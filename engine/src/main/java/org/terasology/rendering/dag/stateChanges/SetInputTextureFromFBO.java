@@ -188,7 +188,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
          * @param textureSlot an integer indirectly identifying a texture unit on the GPU (textureUnit = GL_TEXTURE0 + textureSlot).
          * @param textureId the opengl id of a texture, usually obtained via glGenTextures().
          * @param materialURN an URN identifying a material.
-         * @param materialParameter a string
+         * @param materialParameter the name of the variable in the shader program used to sample the texture.
          */
         private Task(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
             this.textureSlot = textureSlot;

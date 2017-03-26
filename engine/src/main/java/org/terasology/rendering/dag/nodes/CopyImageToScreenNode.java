@@ -50,17 +50,16 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
-        update();
+        update(); // Cheeky way to initialise sceneFinalFbo
+        displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        sceneFinalFbo.bindTexture();
+        sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }

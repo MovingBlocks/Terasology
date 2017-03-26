@@ -29,10 +29,24 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.*;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
+import org.terasology.rendering.dag.stateChanges.EnableBlending;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
+import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.logic.LightComponent;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 import org.terasology.rendering.opengl.FBO;
@@ -85,12 +99,12 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
 
         addDesiredStateChange(new DisableDepthTest());
 
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
+        update(); // Cheeky way to initialise readOnlyGBufferFbo
+        displayResolutionDependentFBOs.subscribe(this);
 
         initLightSphereDisplayList();
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     private void initLightSphereDisplayList() {

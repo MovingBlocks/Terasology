@@ -17,16 +17,13 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-
 
 /**
  * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
@@ -256,19 +253,22 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     }
 
     /**
-     * TODO: add javadocs
+     * Adds a given FBOManagerSubscriber to the subscription list, notifying it of any changes to the FBOs.
      *
-     * @param subscriber
+     * Note that an object cannot re-subscribe.
+     *
+     * @param subscriber An FBOManagerSubscriber that wants to subscribe
+     * @return a boolean indicating whether the subscription succeeded.
      */
     @Override
     public boolean subscribe(FBOManagerSubscriber subscriber) {
-        // TODO: Add sanity checks to ensure no object can resubscribe
-        // return fboManagerSubscribers.add(subscriber);
-
-        // VAMPCAT : TODO: RESTORE!!!
-        if (!fboManagerSubscribers.add(subscriber))
-            return false;
-        return true;
+        // Iterate through all existing fboManagerSubscribers, and refuse to subscribe if the given subscriber has already subscribed
+        for (FBOManagerSubscriber fboManagerSubscriber: fboManagerSubscribers) {
+            if (fboManagerSubscriber == subscriber) {
+                return false;
+            }
+        }
+        return fboManagerSubscribers.add(subscriber);
     }
 
     /**

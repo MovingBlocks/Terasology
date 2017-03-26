@@ -70,12 +70,14 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         this.outputFboUrn = outputFboConfig.getName();
 
         requiresFBO(inputFboConfig, inputFboManager);
-        outputFbo = requiresFBO(outputFboConfig, outputFboManager);
+        requiresFBO(outputFboConfig, outputFboManager);
 
-        addDesiredStateChange(new BindFBO(outputFboConfig.getName(), outputFboManager));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFboConfig.getName(), outputFboManager));
+        addDesiredStateChange(new BindFBO(outputFboUrn, outputFboManager));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, outputFboManager));
         addDesiredStateChange(new SetInputTextureFromFBO(SLOT_0, inputFboConfig.getName(), ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
+        update(); // Cheeky way to initialise outputFbo
+        outputFboManager.subscribe(this);
 
         setupConditions();
 
@@ -83,8 +85,6 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         downSampler = getMaterial(DOWN_SAMPLER_MATERIAL);
 
         this.performanceMonitorLabel = aLabel;
-
-        outputFboManager.subscribe(this);
     }
 
     /**

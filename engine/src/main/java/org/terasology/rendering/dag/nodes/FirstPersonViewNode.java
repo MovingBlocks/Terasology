@@ -41,7 +41,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 /**
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
  */
-public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable, FBOManagerSubscriber {
+public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
     @In
     private WorldRenderer worldRenderer;
 
@@ -57,7 +57,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
     private SetWireframe wireframeStateChange;
-    private FBO readOnlyGBufferFbo;
 
     @Override
     public void initialise() {
@@ -72,12 +71,9 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -116,10 +112,5 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
             GL11.glPopMatrix();
 
             PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

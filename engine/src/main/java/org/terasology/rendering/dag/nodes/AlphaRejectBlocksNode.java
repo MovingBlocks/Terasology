@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,11 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
-import org.terasology.rendering.dag.stateChanges.*;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -50,7 +54,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * In alpha-blending the color of a semi-transparent fragment is combined with
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
+public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -69,7 +73,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO readOnlyGBufferFBO;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -85,12 +88,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -151,10 +151,5 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

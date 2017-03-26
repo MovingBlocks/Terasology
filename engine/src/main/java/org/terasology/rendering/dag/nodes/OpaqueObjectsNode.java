@@ -43,7 +43,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * Objects to be rendered must be registered as implementing the interface RenderSystem and
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
-public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
+public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
     @In
     private ComponentSystemManager componentSystemManager;
 
@@ -59,7 +59,6 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable,
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO readOnlyGBufferFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
@@ -75,9 +74,6 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable,
 
         addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
@@ -106,10 +102,5 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable,
         }
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

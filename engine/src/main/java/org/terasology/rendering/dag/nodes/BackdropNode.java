@@ -80,9 +80,10 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update();
+        update(); // Cheeky way to initialise readOnlyGBufferFbo
+        displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
 
@@ -94,8 +95,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         //       due to vertex ordering the polygons we do see are the GL_BACK ones.
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
-
-        displayResolutionDependentFBOs.subscribe(this);
     }
 
     public void enableWireframe() {
