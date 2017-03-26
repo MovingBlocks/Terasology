@@ -15,9 +15,10 @@
  */
 package org.terasology.particles;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
-import org.terasology.particles.rendering.ParticleRenderer;
+import org.terasology.particles.rendering.ParticleRenderingData;
 
 import java.util.stream.Stream;
 
@@ -32,5 +33,5 @@ public interface ParticleSystemManager {
 
     void registerGeneratorFunction(GeneratorFunction generatorFunction);
 
-    Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
+    Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent);
 }

@@ -21,7 +21,7 @@ import org.terasology.math.geom.Vector4f;
 
 /**
  * Data object to store the data of a single particle.
- * Used internally for swapping operations.
+ * Used for generator and affector operations.
  */
 public final class ParticleData {
     // scalars

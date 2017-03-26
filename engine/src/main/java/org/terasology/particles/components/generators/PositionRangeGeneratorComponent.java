@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.rendering;
+package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.particles.ParticleSystemManager;
-import org.terasology.registry.In;
-
-import java.util.stream.Stream;
+import org.terasology.math.geom.Vector3f;
 
 /**
- *
+ * Created by Linus on 7-3-2015.
  */
-public abstract class ParticleRenderer implements RenderSystem {
+public class PositionRangeGeneratorComponent implements Component {
 
-    @In
-    ParticleSystemManager particleSystemManager;
+    public Vector3f minCoords;
+    public Vector3f maxCoords;
 
-    public final Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
-        return particleSystemManager.getParticleEmittersByDataComponent(particleDataComponent);
+    public PositionRangeGeneratorComponent(final Vector3f minCoords, final Vector3f maxCoords) {
+        this.minCoords = new Vector3f(minCoords);
+        this.maxCoords = new Vector3f(maxCoords);
+    }
+
+    public PositionRangeGeneratorComponent() {
+        minCoords = new Vector3f();
+        maxCoords = new Vector3f();
     }
 }

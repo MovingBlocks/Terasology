@@ -21,8 +21,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticlePool;
-import org.terasology.particles.ParticleSystem;
-import org.terasology.particles.components.ParticleSystemComponent;
+import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
@@ -78,16 +77,15 @@ public class DisplayListParticleRenderer extends ParticleRenderer {
     }
 
     //"BIG" TODO: Have all of the work done in this method be done on the GPU by a shader. Use GPU instancing to just send some particle data after particles are already instanced and have the whole cloud rendered at once.
-    public void drawParticles(Material material, ParticleSystem particleSystem, Vector3f camera) {
+    public void drawParticles(Material material, ParticleRenderingData<ParticleDataSpriteComponent> particleSystem, Vector3f camera) {
         ParticlePool particlePool = particleSystem.particlePool;
-        ParticleSystemComponent component = particleSystem.entityRef.getComponent(ParticleSystemComponent.class);
 
-        material.setBoolean("useTexture", component.texture != null);
-        if (component.texture != null) {
+        material.setBoolean("useTexture", particleSystem.particleData.texture != null);
+        if (particleSystem.particleData.texture != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            glBindTexture(GL11.GL_TEXTURE_2D, component.texture.getId());
+            glBindTexture(GL11.GL_TEXTURE_2D, particleSystem.particleData.texture.getId());
 
-            material.setFloat2("texSize", component.textureSize.getX(), component.textureSize.getY());
+            material.setFloat2("texSize", particleSystem.particleData.textureSize.getX(), particleSystem.particleData.textureSize.getY());
         }
 
         glPushMatrix();
@@ -140,7 +138,7 @@ public class DisplayListParticleRenderer extends ParticleRenderer {
         material.enable();
         Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        getParticleSystems().forEach(p -> drawParticles(material, p, camPos));
+        getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
     }
 
     @Override

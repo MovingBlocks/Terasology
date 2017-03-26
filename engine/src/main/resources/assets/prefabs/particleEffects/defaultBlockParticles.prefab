@@ -1,10 +1,10 @@
 {
     "location": {},
     "blockBreakEffect": {
-        "randBlockTexDisplacement": true
+        "randBlockTexDisplacement": true,
+        "particleSpawnsLeft": 8
     },
-    "particleEmitter": {
-        "particleSpawnsLeft": 64
+    "particleDataSprite": {
     },
     "network": {}
 }

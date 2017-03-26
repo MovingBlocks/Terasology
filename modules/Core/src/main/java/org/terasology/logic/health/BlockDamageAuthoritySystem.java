@@ -30,6 +30,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.components.BlockBreakEffectComponent;
+import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.utilities.Assets;
@@ -123,15 +124,16 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
         BlockBreakEffectComponent particleSystem = builder.getComponent(BlockBreakEffectComponent.class);
+        ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
 
-        particleSystem.texture = terrainTexture.get();
+        spriteComponent.texture = terrainTexture.get();
 
         final float tileSize = worldAtlas.getRelativeTileSize();
-        particleSystem.textureSize.set(tileSize, tileSize);
+        spriteComponent.textureSize.set(tileSize, tileSize);
 
         Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
         Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
-        particleSystem.textureOffset.set(new org.lwjgl.util.vector.Vector2f(offset.x, offset.y));
+        spriteComponent.textureOffset.set(new org.lwjgl.util.vector.Vector2f(offset.x, offset.y));
 
         if (particleSystem.randBlockTexDisplacement) {
             final float relTileSize = worldAtlas.getRelativeTileSize();
@@ -139,12 +141,12 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
                     relTileSize * particleSystem.randBlockTexDisplacementScale.y,
                     relTileSize * particleSystem.randBlockTexDisplacementScale.y);
 
-            particleSystem.textureSize.x *= particleSystem.randBlockTexDisplacementScale.x;
-            particleSystem.textureSize.y *= particleSystem.randBlockTexDisplacementScale.y;
+            spriteComponent.textureSize.x *= particleSystem.randBlockTexDisplacementScale.x;
+            spriteComponent.textureSize.y *= particleSystem.randBlockTexDisplacementScale.y;
 
-            particleSystem.textureOffset.set(
-                    particleSystem.textureOffset.x + random.nextFloat() * (tileSize - particleTexSize.x),
-                    particleSystem.textureOffset.y + random.nextFloat() * (tileSize - particleTexSize.y));
+            spriteComponent.textureOffset.set(
+                    spriteComponent.textureOffset.x + random.nextFloat() * (tileSize - particleTexSize.x),
+                    spriteComponent.textureOffset.y + random.nextFloat() * (tileSize - particleTexSize.y));
         }
 
         builder.build();

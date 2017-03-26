@@ -18,13 +18,12 @@ package org.terasology.particles.updating;
 import com.google.common.collect.BiMap;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.particles.ParticleSystem;
+import org.terasology.particles.components.ParticleEmitterComponent;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
-import org.terasology.particles.rendering.ParticleRenderer;
 import org.terasology.physics.Physics;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 /**
  * Updates the all registered particle systems every game update. Updates a particle system's state data when it has been changed.
@@ -42,17 +41,17 @@ public interface ParticleUpdater {
     void dispose(EntityRef entity);
 
     /**
-     * @param entityRef                    The entity with the particle system whose state is being updated.
+     * @param emitter                    The particle emitter that is being updated.
      * @param registeredAffectorFunctions  The list of affector functions to use when processing the given system's affectors.
      * @param registeredGeneratorFunctions The list of generator functions to use when processing the given system's generators.
      */
-    void updateStateData(final EntityRef entityRef,
-                         final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                         final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
+    void configureEmitter(final ParticleEmitterComponent emitter,
+                          final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
+                          final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
 
     void update(float delta);
 
-    Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer);
+    Collection<ParticleEmitterComponent> getParticleEmitters();
 
     static ParticleUpdater create(Physics physics) {
         return new ParticleUpdaterImpl(physics);

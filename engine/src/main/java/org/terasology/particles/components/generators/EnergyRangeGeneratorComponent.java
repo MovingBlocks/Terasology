@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components;
+package org.terasology.particles.components.generators;
 
-import org.terasology.math.geom.Vector2f;
-import org.terasology.network.Replicate;
+import org.terasology.entitySystem.Component;
 
 /**
- *
+ * Created by Linus on 7-3-2015.
  */
-public class BlockBreakEffectComponent extends ParticleEmitterComponent {
+public class EnergyRangeGeneratorComponent implements Component {
+    public float minEnergy = 100.0f;
+    public float maxEnergy = 100.0f;
 
-    @Replicate
-    public boolean randBlockTexDisplacement;
-
-    @Replicate
-    public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
-
-    public BlockBreakEffectComponent() {
-        super();
+    public EnergyRangeGeneratorComponent(final float minEnergy, final float maxEnergy) {
+        this.minEnergy = minEnergy;
+        this.maxEnergy = maxEnergy;
     }
 
+    public EnergyRangeGeneratorComponent() {
+    }
 }

@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.rendering;
+package org.terasology.particles.components;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.particles.ParticleSystemManager;
-import org.terasology.registry.In;
-
-import java.util.stream.Stream;
+import org.terasology.rendering.assets.texture.Texture;
 
 /**
  *
  */
-public abstract class ParticleRenderer implements RenderSystem {
+public class ParticleDataSpriteComponent implements Component {
+    /**
+     * This system's particle texture
+     */
+    public Texture texture;
 
-    @In
-    ParticleSystemManager particleSystemManager;
+    /**
+     * This system's particle texture size, in percents x: [0.0, 1.0], y: [0.0, 1.0]
+     */
+    public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
 
-    public final Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
-        return particleSystemManager.getParticleEmittersByDataComponent(particleDataComponent);
-    }
+    /**
+     * This system's particle texture offset, in percents x: [0.0, 1.0], y: [0.0, 1.0]
+     */
+    public Vector2f textureOffset = new Vector2f(1.0f, 1.0f);
 }

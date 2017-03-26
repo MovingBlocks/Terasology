@@ -16,12 +16,14 @@
 package org.terasology.particles.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.particles.events.ParticleSystemUpdateEvent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.particles.ParticlePool;
+import org.terasology.particles.functions.affectors.AffectorFunction;
+import org.terasology.particles.functions.generators.GeneratorFunction;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Represents a particle emitter. A particle emitter must be added to a ParticleSystemComponent to produce particles.
@@ -31,9 +33,14 @@ public class ParticleEmitterComponent implements Component {
     public static final int INDEFINITE_EMITTER_LIFETIME = -1;
 
     /**
-     * Reference to the entity this component is attached to
+     * The amount of particles in this system's pool. Emitters under this system will share the particles.
      */
-    public EntityRef ownerEntity;
+    public int maxParticles = 250;
+
+    /**
+     * Toggles if this system's particles should collide with blocks.
+     */
+    public boolean particleCollision = true;
 
     /**
      * The maximum spawn rate of this emitter in particles / second
@@ -56,51 +63,52 @@ public class ParticleEmitterComponent implements Component {
     public float lifeTime = INDEFINITE_EMITTER_LIFETIME;
 
     /**
-     * Toggles whether when this emitter is destroyed only the component should be destroyed or the whole entity.
-     */
-    public boolean destroyEntityWhenDead;
-
-    /**
      * The maximum amount of particle this emitter can emit before auto-removing, the emitter will auto-remove upon reaching 0 TODO: Implement emitter max spawns
      */
     public int particleSpawnsLeft = INFINITE_PARTICLE_SPAWNS;
 
-    @Owns
-    private List<EntityRef> generators = new ArrayList<>();
+    /**
+     * Toggles whether when this emitter is destroyed only the component should be destroyed or the whole entity.
+     */
+    public boolean destroyEntityWhenDead;
+
+    // --------------
+    // Runtime Fields
+    // --------------
 
     /**
-     * Notifies ParticleSystemManagerImpl that this system needs an updated ParticleSystem
+     * Reference to the entity this component is attached to
      */
-    private void requestUpdate() {
-        if (ownerEntity != null) {
-            ownerEntity.send(new ParticleSystemUpdateEvent());
-        }
-    }
+    public EntityRef ownerEntity;
 
-    // GENERATOR LIST ACCESS
+    /**
+     * This emitter's particle pool.
+     */
+    public ParticlePool particlePool;
 
-    public void addGenerator(final EntityRef generator) {
-        generators.add(generator);
-        requestUpdate();
-    }
+    /**
+     * Maps Generator component -> Function that processes that Generator
+     */
+    public final Map<Component, GeneratorFunction> generatorFunctionMap = new LinkedHashMap<>();
 
-    public boolean removeGenerator(final EntityRef generator) {
-        boolean removed = generators.remove(generator);
-        requestUpdate();
-        return removed;
-    }
+    /**
+     * Maps Affector component -> Function that processes that Affector
+     */
+    public final Map<Component, AffectorFunction> affectorFunctionMap = new LinkedHashMap<>();
 
-    public EntityRef removeGenerator(final int generatorIndex) {
-        EntityRef generator = generators.remove(generatorIndex);
-        requestUpdate();
-        return generator;
-    }
+    /**
+     * This emitter's location component, for efficient getting during particle emission.
+     */
+    public LocationComponent locationComponent;
 
-    public EntityRef getGenerator(int index) {
-        return generators.get(index);
-    }
+    /**
+     * Seconds remaining until next emission
+     */
+    public float nextEmission;
 
-    public List<EntityRef> getGenerators() {
-        return generators;
-    }
+    /**
+     * Individual particle offset to start calculating particle collisions from.
+     * Allows checking only some particles each update since it's a heavy operation.
+     */
+    public int collisionUpdateIteration;
 }

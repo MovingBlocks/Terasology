@@ -29,13 +29,20 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.module.sandbox.API;
 import org.terasology.particles.components.ParticleEmitterComponent;
-import org.terasology.particles.components.ParticleSystemComponent;
 import org.terasology.particles.events.ParticleSystemUpdateEvent;
 import org.terasology.particles.functions.affectors.AffectorFunction;
+import org.terasology.particles.functions.affectors.VelocityAffectorFunction;
+import org.terasology.particles.functions.generators.ColorRangeGeneratorFunction;
+import org.terasology.particles.functions.generators.EnergyRangeGeneratorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
-import org.terasology.particles.rendering.ParticleRenderer;
+import org.terasology.particles.functions.generators.PositionRangeGeneratorFunction;
+import org.terasology.particles.functions.generators.ScaleRangeGeneratorFunction;
+import org.terasology.particles.functions.generators.TextureOffsetGeneratorFunction;
+import org.terasology.particles.functions.generators.VelocityRangeGeneratorFunction;
+import org.terasology.particles.rendering.ParticleRenderingData;
 import org.terasology.particles.updating.ParticleUpdater;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -62,42 +69,39 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
 
 
-    @ReceiveEvent(components = {ParticleSystemComponent.class})
-    public void onSystemActivated(OnActivatedComponent event, EntityRef entity, ParticleSystemComponent particleSystemComponent) {
-        particleSystemComponent.ownerEntity = entity;
-
-        if (particleSystemComponent.isEmitter) {
-            particleSystemComponent.addEmitter(entity, false);
-        }
-
-        particleUpdater.register(entity);
-
-        particleUpdater.updateStateData(entity, registeredAffectorFunctions, registeredGeneratorFunctions);
-    }
-
-    @ReceiveEvent(components = {ParticleSystemComponent.class})
-    public void onSystemDeactivated(BeforeDeactivateComponent event, EntityRef entity, ParticleSystemComponent particleSystemComponent) {
-        particleUpdater.dispose(entity);
-    }
-
-    @ReceiveEvent(components = {ParticleSystemComponent.class})
-    public void onSystemChanged(ParticleSystemUpdateEvent event, EntityRef entity, ParticleSystemComponent particleSystemComponent) {
-        particleUpdater.updateStateData(entity, registeredAffectorFunctions, registeredGeneratorFunctions);
-    }
-
     @ReceiveEvent(components = {ParticleEmitterComponent.class})
     public void onEmitterActivated(OnActivatedComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
         particleEmitterComponent.ownerEntity = entity;
+        particleEmitterComponent.locationComponent = entity.getComponent(LocationComponent.class);
+        if (particleEmitterComponent.particlePool == null) {
+            particleEmitterComponent.particlePool = new ParticlePool(particleEmitterComponent.maxParticles);
+        }
+        particleUpdater.register(entity);
+        particleUpdater.configureEmitter(particleEmitterComponent, registeredAffectorFunctions, registeredGeneratorFunctions);
     }
 
     @ReceiveEvent(components = {ParticleEmitterComponent.class})
-    public void onEmitterChanged(ParticleSystemUpdateEvent event, EntityRef entity) {
-        particleUpdater.updateStateData(entity.getOwner(), registeredAffectorFunctions, registeredGeneratorFunctions);
+    public void onEmitterChanged(ParticleSystemUpdateEvent event, EntityRef entity, ParticleEmitterComponent emitter) {
+        particleUpdater.configureEmitter(emitter, registeredAffectorFunctions, registeredGeneratorFunctions);
+    }
+
+    @ReceiveEvent(components = {ParticleEmitterComponent.class})
+    public void onEmitterDeactivated(BeforeDeactivateComponent event, EntityRef entity, ParticleEmitterComponent particleEmitterComponent) {
+        particleUpdater.dispose(entity);
     }
 
 
     public void initialise() {
         particleUpdater = ParticleUpdater.create(physics);
+
+        registerGeneratorFunction(new EnergyRangeGeneratorFunction());
+        registerGeneratorFunction(new VelocityRangeGeneratorFunction());
+        registerGeneratorFunction(new ColorRangeGeneratorFunction());
+        registerGeneratorFunction(new PositionRangeGeneratorFunction());
+        registerGeneratorFunction(new ScaleRangeGeneratorFunction());
+        registerGeneratorFunction(new TextureOffsetGeneratorFunction());
+
+        registerAffectorFunction(new VelocityAffectorFunction());
     }
 
     @Override
@@ -113,6 +117,17 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
     }
 
     @Override
+    public Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent) {
+        return particleUpdater.getParticleEmitters().stream()
+                .filter(p -> p.ownerEntity.hasComponent(particleDataComponent))
+                .map(particleEmitterComponent ->
+                        new ParticleRenderingData<>(
+                                particleEmitterComponent.ownerEntity.getComponent(particleDataComponent),
+                                particleEmitterComponent.particlePool
+                        ));
+    }
+
+    @Override
     public void registerGeneratorFunction(GeneratorFunction generatorFunction) {
         Preconditions.checkArgument(!registeredGeneratorFunctions.containsKey(generatorFunction.getComponentClass()),
                 "Tried to register an GeneratorFunction for %s twice", generatorFunction
@@ -120,11 +135,6 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
 
         logger.info("Registering GeneratorFunction for Component class {}", generatorFunction.getComponentClass());
         registeredGeneratorFunctions.put(generatorFunction.getComponentClass(), generatorFunction);
-    }
-
-    @Override
-    public Stream<ParticleSystem> getStateDataForRenderer(Class<? extends ParticleRenderer> renderer) {
-        return particleUpdater.getStateDataForRenderer(renderer);
     }
 
     @Override

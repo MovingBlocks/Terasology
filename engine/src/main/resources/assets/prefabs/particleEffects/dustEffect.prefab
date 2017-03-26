@@ -1,14 +1,21 @@
 {
     "location": {},
-    "particleEmitter": {
-        "particleSpawnsLeft": 64,
-        "destroyEntityWhenDead": true
+    "particleDataSprite": {
+        "texture": "engine:fx_smoke"
     },
-    "particleSystem": {
-        "texture": "engine:fx_smoke",
-        "isEmitter": true,
+    "energyRangeGenerator": {
+        "minEnergy": 1,
+        "maxEnergy": 3
+    },
+    "velocityRangeGenerator": {
+        "minVelocity": [-0.1, -0.1, -0.1],
+        "maxVelocity": [0.1, 0.25, 0.1]
+    },
+    "velocityAffector": {},
+    "particleEmitter": {
         "lifeTime": 4,
-        "particlePoolSize": 8,
+        "particleSpawnsLeft": 8,
+        "maxParticles": 8,
         "destroyEntityWhenDead": true
     },
     "Network": {}

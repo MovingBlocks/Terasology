@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components;
+package org.terasology.particles.components.affectors;
 
-import org.terasology.math.geom.Vector2f;
-import org.terasology.network.Replicate;
+import org.terasology.entitySystem.Component;
 
 /**
  *
  */
-public class BlockBreakEffectComponent extends ParticleEmitterComponent {
-
-    @Replicate
-    public boolean randBlockTexDisplacement;
-
-    @Replicate
-    public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
-
-    public BlockBreakEffectComponent() {
-        super();
-    }
+public class VelocityAffectorComponent implements Component {
 
 }
