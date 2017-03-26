@@ -38,6 +38,8 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber {
     private static final Logger logger = Logger.getLogger("SetInputTextureFromFBO");
 
+    // depthStencilRboId is a possible FBO attachment but is not covered by a case here
+    // as it wouldn't work with the glBindTexture(TEXTURE_2D, ...) call.
     public enum FboTexturesTypes {
         ColorTexture,
         DepthStencilTexture,
@@ -179,7 +181,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     protected class Task implements RenderPipelineTask {
         private final int textureSlot;
         private final Material material;
-        private final String materialParameter;
+        private final String shaderParameterName;
         private int textureId;
 
         /**
@@ -188,13 +190,13 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
          * @param textureSlot an integer indirectly identifying a texture unit on the GPU (textureUnit = GL_TEXTURE0 + textureSlot).
          * @param textureId the opengl id of a texture, usually obtained via glGenTextures().
          * @param materialURN an URN identifying a material.
-         * @param materialParameter the name of the variable in the shader program used to sample the texture.
+         * @param shaderParameterName the name of the variable in the shader program used to sample the texture.
          */
-        private Task(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
+        private Task(int textureSlot, int textureId, ResourceUrn materialURN, String shaderParameterName) {
             this.textureSlot = textureSlot;
             this.textureId = textureId;
             this.material = getMaterial(materialURN);
-            this.materialParameter = materialParameter;
+            this.shaderParameterName = shaderParameterName;
         }
 
         /**
@@ -215,13 +217,13 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         public void execute() {
             glActiveTexture(GL_TEXTURE0 + textureSlot);
             glBindTexture(GL_TEXTURE_2D, textureId);
-            material.setInt(materialParameter, textureSlot, true);
+            material.setInt(shaderParameterName, textureSlot, true);
         }
 
         @Override
         public String toString() {
             return String.format("%30s: slot %s, texture %s, material %s, parameter %s", this.getClass().getSimpleName(),
-                    textureSlot, textureId, material.getUrn().toString(), materialParameter);
+                    textureSlot, textureId, material.getUrn().toString(), shaderParameterName);
         }
     }
 }
