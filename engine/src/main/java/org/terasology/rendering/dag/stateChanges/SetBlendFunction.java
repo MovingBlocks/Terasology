@@ -21,7 +21,22 @@ import org.terasology.rendering.dag.StateChange;
 
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA_SATURATE;
+import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 
 /**
  * This StateChange generates the tasks that change and reset the blend function factors.
