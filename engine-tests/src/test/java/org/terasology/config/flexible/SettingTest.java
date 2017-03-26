@@ -30,6 +30,8 @@ import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
 public class SettingTest {
+    private static final SimpleUri SETTING_ID = new SimpleUri("engine-tests:TestSetting");
+
     public static class SetValue {
         private Setting<Integer> setting;
 
@@ -37,7 +39,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting"),
+            setting = new SettingImpl<>(SETTING_ID,
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventResult = -1;
@@ -69,7 +71,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting"),
+            setting = new SettingImpl<>(SETTING_ID,
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventCallCount = 0;
@@ -94,12 +96,12 @@ public class SettingTest {
 
             Random random = new FastRandom();
 
-            final int n = 50;
+            final int MAX_SET_VALUE_COUNT = 50;
             int expectedEventCallCount = 0;
 
-            for (int i = 0; i < n; i++) {
-                int r = random.nextInt(-50, 150);
-                expectedEventCallCount += setting.setValue(r) ? 1 : 0;
+            for (int i = 0; i < MAX_SET_VALUE_COUNT; i++) {
+                int randomInt = random.nextInt(-50, 150);
+                expectedEventCallCount += setting.setValue(randomInt) ? 1 : 0;
             }
 
             assertEquals(expectedEventCallCount, eventCallCount);
@@ -107,38 +109,36 @@ public class SettingTest {
 
         @Test
         public void testSubscribe() {
-            final int n = 10;
+            final int SUBSCRIBER_COUNT = 10;
 
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < SUBSCRIBER_COUNT; i++) {
                 setting.subscribe(propertyChangeEvent -> eventCallCount++);
             }
 
             setting.setValue(30);
 
-            assertEquals(n, eventCallCount);
+            assertEquals(SUBSCRIBER_COUNT, eventCallCount);
         }
 
         @Test
         public void testUnsubscribe() {
-            int n = 10;
+            int subscriberCount = 10;
 
-            PropertyChangeListener[] listeners = new PropertyChangeListener[n];
+            PropertyChangeListener[] listeners = new PropertyChangeListener[subscriberCount];
 
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < subscriberCount; i++) {
                 listeners[i] = propertyChangeEvent -> eventCallCount++;
                 setting.subscribe(listeners[i]);
             }
 
-            int halfN = n / 2;
-
-            for (int i = 0; i < new FastRandom().nextInt(halfN); i++) {
+            for (int i = 0; i < new FastRandom().nextInt(subscriberCount / 2); i++) {
                 setting.unsubscribe(listeners[i]);
-                n--;
+                subscriberCount--;
             }
 
             setting.setValue(30);
 
-            assertEquals(n, eventCallCount);
+            assertEquals(subscriberCount, eventCallCount);
         }
     }
 }
