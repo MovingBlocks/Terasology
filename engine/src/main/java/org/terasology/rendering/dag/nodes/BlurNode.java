@@ -71,14 +71,14 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
         this.inputFboUrn = inputFboConfig.getName();
         this.outputFboUrn = outputFboConfig.getName();
 
+        setupConditions();
+
         requiresFBO(inputFboConfig, fboManager);
         requiresFBO(outputFboConfig, fboManager);
         addDesiredStateChange(new BindFBO(outputFboUrn, fboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, fboManager));
         update(); // Cheeky way to initialise inputFbo, outputFbo
         fboManager.subscribe(this);
-
-        setupConditions();
 
         addDesiredStateChange(new EnableMaterial("engine:prog.blur"));
         this.blurMaterial = getMaterial(new ResourceUrn("engine:prog.blur"));
