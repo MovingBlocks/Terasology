@@ -70,6 +70,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     private Camera playerCamera;
     private Material chunkShader;
+    private FBO readOnlyGBufferFbo;
+    private FBO refractiveReflectiveFbo;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -81,7 +83,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
-        update();
+        update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
@@ -135,8 +137,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void update() {
-        FBO readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-        FBO refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
 
         readOnlyGBufferFbo.attachDepthBufferTo(refractiveReflectiveFbo);
     }

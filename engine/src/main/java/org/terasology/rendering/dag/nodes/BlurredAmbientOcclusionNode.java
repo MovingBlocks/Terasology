@@ -67,6 +67,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private Config config;
 
     private Material ssaoBlurredMaterial;
+    private FBO ssaoBlurredFbo;
     private float outputFboWidth;
     private float outputFboHeight;
 
@@ -87,7 +88,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
+        update(); // Cheeky way to initialise ssaoBlurredFbo, outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new SetInputTextureFromFBO(TEXTURE_SLOT_0,
@@ -114,8 +115,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     @Override
     public void update() {
-        FBO ssaoBlurredFBO = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
-        outputFboWidth = ssaoBlurredFBO.width();
-        outputFboHeight = ssaoBlurredFBO.height();
+        ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
+        outputFboWidth = ssaoBlurredFbo.width();
+        outputFboHeight = ssaoBlurredFbo.height();
     }
 }
