@@ -93,7 +93,7 @@ public class BlockManagerImpl extends BlockManager {
         if (knownBlockMappings.size() >= MAX_ID) {
             nextId = UNKNOWN_ID;
         } else if (knownBlockMappings.size() > 0) {
-            nextId = (short) knownBlockMappings.size();
+            nextId = knownBlockMappings.values().stream().max(Short::compareTo).orElse((short) 0)+1;
         }
         registeredBlockInfo.set(new RegisteredState());
 
