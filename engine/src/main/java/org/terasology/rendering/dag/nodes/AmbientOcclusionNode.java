@@ -67,6 +67,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private Config config;
 
     private Material ssaoMaterial;
+    private FBO ssaoFbo;
     private float outputFboWidth;
     private float outputFboHeight;
 
@@ -86,9 +87,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
-
+        update(); // Cheeky way to initialise ssaoFbo, outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
-        update(); // initializing ssaoBufferWidth/ssaoBufferHeight
 
         // TODO: check for input textures brought in by the material
     }
@@ -114,8 +114,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     @Override
     public void update() {
-        FBO ssaoFBO = displayResolutionDependentFBOs.get(SSAO_FBO);
-        outputFboWidth = ssaoFBO.width();
-        outputFboHeight = ssaoFBO.height();
+        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
+        outputFboWidth = ssaoFbo.width();
+        outputFboHeight = ssaoFbo.height();
     }
 }

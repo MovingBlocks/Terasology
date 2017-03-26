@@ -35,7 +35,6 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
  */
 public class SetInputTexture implements StateChange {
-
     private final int textureSlot;
     private final int textureId;
     private final ResourceUrn materialURN;
@@ -123,7 +122,6 @@ public class SetInputTexture implements StateChange {
      * inheriting from StateChange.
      */
     private class SetInputTextureTask implements RenderPipelineTask {
-
         private final int textureSlot;
         private final int textureId;
         private final Material material;

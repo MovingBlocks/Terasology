@@ -62,7 +62,6 @@ public class BufferClearingNode extends AbstractNode {
             requiresFBO(fboConfig, fboManager);
             addDesiredStateChange(new BindFBO(fboConfig.getName(), fboManager));
             this.clearingMask = aClearingMask;
-
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
         }

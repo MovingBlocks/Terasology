@@ -68,5 +68,4 @@ public class BloomBlurNode extends BlurNode {
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
     }
-
 }
