@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,10 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -71,7 +70,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -85,8 +83,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
@@ -126,7 +123,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 

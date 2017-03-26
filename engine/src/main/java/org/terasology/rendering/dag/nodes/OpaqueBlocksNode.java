@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -29,11 +28,10 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
@@ -68,7 +66,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
-    private FBO sceneOpaqueFbo;
 
     /**
      * Initialises this node. -Must- be called once after instantiation.
@@ -82,8 +79,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
@@ -127,7 +123,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        sceneOpaqueFbo.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {

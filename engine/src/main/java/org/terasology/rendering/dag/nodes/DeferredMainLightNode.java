@@ -24,18 +24,20 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.logic.LightComponent;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -52,7 +54,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Eventually the content of the light accumulation buffer is combined with other buffers to correctly
  * light up the 3d scene.
  */
-public class DeferredMainLightNode extends AbstractNode {
+public class DeferredMainLightNode extends AbstractNode implements FBOManagerSubscriber {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
 
     @In
@@ -67,7 +69,7 @@ public class DeferredMainLightNode extends AbstractNode {
     private LightComponent mainLightComponent = new LightComponent();
     private Camera playerCamera;
     private Material lightGeometryMaterial;
-    private FBO sceneOpaqueFbo;
+    private FBO readOnlyGBufferFbo;
 
     /**
      * Initializes an instance of this node.
@@ -76,8 +78,6 @@ public class DeferredMainLightNode extends AbstractNode {
      */
     @Override
     public void initialise() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-
         playerCamera = worldRenderer.getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
@@ -87,6 +87,10 @@ public class DeferredMainLightNode extends AbstractNode {
 
         addDesiredStateChange(new EnableBlending());
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise readOnlyGBufferFbo
+        displayResolutionDependentFBOs.subscribe(this);
 
         initMainDirectionalLight();
     }
@@ -110,8 +114,7 @@ public class DeferredMainLightNode extends AbstractNode {
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it - I think.
 
-        sceneOpaqueFbo.bind(); // TODO: remove and replace with a state change
-        sceneOpaqueFbo.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
+        readOnlyGBufferFbo.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
@@ -130,8 +133,13 @@ public class DeferredMainLightNode extends AbstractNode {
 
         lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
-        sceneOpaqueFbo.setRenderBufferMask(true, true, true);
+        readOnlyGBufferFbo.setRenderBufferMask(true, true, true);
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

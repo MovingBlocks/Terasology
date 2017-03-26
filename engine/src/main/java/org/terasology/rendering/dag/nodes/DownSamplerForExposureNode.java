@@ -33,7 +33,6 @@ import org.terasology.rendering.opengl.FBOConfig;
  * encode the average brightness of the rendering, which in turn is used to tweak the exposure parameter later nodes use.
  */
 public class DownSamplerForExposureNode extends DownSamplerNode {
-
     public static final FBOConfig FBO_16X16_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.16x16px"), 16, 16, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_8X8_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.8x8px"), 8, 8, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_4X4_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.4x4px"), 4, 4, FBO.Type.DEFAULT);

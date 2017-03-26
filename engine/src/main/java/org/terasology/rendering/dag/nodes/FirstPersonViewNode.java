@@ -26,10 +26,9 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
-import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -55,7 +54,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
     private SetWireframe wireframeStateChange;
-    private FBO sceneOpaqueFbo;
 
     @Override
     public void initialise() {
@@ -68,8 +66,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
@@ -92,8 +89,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     @Override
     public void process() {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
-
-            sceneOpaqueFbo.bind(); // TODO: to be removed - will eventually be bound with a state change
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();

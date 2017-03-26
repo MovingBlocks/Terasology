@@ -31,7 +31,6 @@ import org.terasology.rendering.dag.stateChanges.EnableBlending;
 
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -70,7 +69,6 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background
