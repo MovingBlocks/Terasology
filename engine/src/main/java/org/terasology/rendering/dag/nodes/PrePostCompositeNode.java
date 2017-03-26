@@ -21,7 +21,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -57,7 +56,6 @@ public class PrePostCompositeNode extends AbstractNode {
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // TODO: bind input textures from ShaderParametersCombine class
     }

@@ -22,7 +22,6 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -60,7 +59,6 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
      */
     @Override
     public void initialise() {
-        addDesiredStateChange(new SetViewportToSizeOf(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise writeOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
