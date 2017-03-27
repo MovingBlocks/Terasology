@@ -73,6 +73,10 @@ public class NetworkConfig {
         return serverMOTD;
     }
 
+    public void setServerMOTD(String serverMOTD) {
+        this.serverMOTD = serverMOTD;
+    }
+
     public void addServerInfo(ServerInfo serverInfo) {
         servers.add(serverInfo);
     }
