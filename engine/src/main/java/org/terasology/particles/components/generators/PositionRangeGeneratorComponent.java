@@ -17,22 +17,24 @@ package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 
 /**
- * Created by Linus on 7-3-2015.
+ *
  */
+@API
 public class PositionRangeGeneratorComponent implements Component {
 
-    public Vector3f minCoords;
-    public Vector3f maxCoords;
+    public Vector3f minPosition;
+    public Vector3f maxPosition;
 
-    public PositionRangeGeneratorComponent(final Vector3f minCoords, final Vector3f maxCoords) {
-        this.minCoords = new Vector3f(minCoords);
-        this.maxCoords = new Vector3f(maxCoords);
+    public PositionRangeGeneratorComponent(final Vector3f minPosition, final Vector3f maxPosition) {
+        this.minPosition = new Vector3f(minPosition);
+        this.maxPosition = new Vector3f(maxPosition);
     }
 
     public PositionRangeGeneratorComponent() {
-        minCoords = new Vector3f();
-        maxCoords = new Vector3f();
+        minPosition = new Vector3f();
+        maxPosition = new Vector3f();
     }
 }

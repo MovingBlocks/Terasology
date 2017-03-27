@@ -32,6 +32,10 @@ public class TextureOffsetGeneratorFunction extends GeneratorFunction<TextureOff
 
     @Override
     public void onEmission(TextureOffsetGeneratorComponent component, ParticleData particleData, Random random) {
+        if (component.validOffsets.size() == 0) {
+            return;
+        }
+        
         final int randomOffsetIndex = random.nextInt(component.validOffsets.size());
         final Vector2f randomOffset = component.validOffsets.get(randomOffsetIndex);
         particleData.textureOffset.set(randomOffset.getX(), randomOffset.getY());

@@ -16,10 +16,13 @@
 package org.terasology.particles.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 
 /**
- * Used internally by ParticleEmitterComponent and ParticleSystemComponent to notify ParticleSystemManager that they need an updated state data.
+ * Fired to notify the ParticleSystemManager that a system needs to be reconfigured.
+ * For use when adding/removing Generators or Affectors.
  */
+@API
 public class ParticleSystemUpdateEvent implements Event {
 
 }

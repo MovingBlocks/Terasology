@@ -17,10 +17,12 @@ package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.module.sandbox.API;
 
 /**
- * Created by Linus on 7-3-2015.
+ *
  */
+@API
 public class ColorRangeGeneratorComponent implements Component {
 
     public Vector4f minColorComponents;

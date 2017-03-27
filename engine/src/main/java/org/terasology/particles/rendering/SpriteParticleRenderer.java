@@ -19,8 +19,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.ParticlePool;
+import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -41,15 +43,18 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * Default ParticleRenderer for particle systems.
+ * ParticleRenderer for basic sprite particle systems.
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class DisplayListParticleRenderer extends ParticleRenderer {
+public class SpriteParticleRenderer implements RenderSystem {
 
-    protected static final String PARTICLE_MATERIAL_URI = "engine:prog.newParticle";
+    protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
 
     @In
     WorldRenderer worldRenderer;
+
+    @In
+    ParticleSystemManager particleSystemManager;
 
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
@@ -138,7 +143,7 @@ public class DisplayListParticleRenderer extends ParticleRenderer {
         material.enable();
         Vector3f camPos = worldRenderer.getActiveCamera().getPosition();
 
-        getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
+        particleSystemManager.getParticleEmittersByDataComponent(ParticleDataSpriteComponent.class).forEach(p -> drawParticles(material, p, camPos));
     }
 
     @Override

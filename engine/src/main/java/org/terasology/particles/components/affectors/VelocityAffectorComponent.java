@@ -16,10 +16,12 @@
 package org.terasology.particles.components.affectors;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 
 /**
  *
  */
+@API
 public class VelocityAffectorComponent implements Component {
 
 }

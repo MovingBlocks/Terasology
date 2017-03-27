@@ -16,11 +16,13 @@
 package org.terasology.particles.rendering;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 import org.terasology.particles.ParticlePool;
 
 /**
  *
  */
+@API
 public final class ParticleRenderingData<E extends Component> {
     public final E particleData;
     public final ParticlePool particlePool;

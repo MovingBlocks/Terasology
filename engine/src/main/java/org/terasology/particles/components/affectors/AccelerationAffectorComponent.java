@@ -13,24 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.components;
+package org.terasology.particles.components.affectors;
 
-import org.terasology.math.geom.Vector2f;
+import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.Replicate;
 
 /**
  *
  */
-public class BlockBreakEffectComponent extends ParticleEmitterComponent {
+@API
+public class AccelerationAffectorComponent implements Component {
 
     @Replicate
-    public boolean randBlockTexDisplacement;
+    public Vector3f acceleration;
 
-    @Replicate
-    public Vector2f randBlockTexDisplacementScale = new Vector2f(0.25f, 0.25f);
-
-    public BlockBreakEffectComponent() {
-        super();
+    public AccelerationAffectorComponent() {
+        this.acceleration = new Vector3f();
     }
 
+    public AccelerationAffectorComponent(Vector3f acceleration) {
+        this.acceleration = acceleration;
+    }
 }

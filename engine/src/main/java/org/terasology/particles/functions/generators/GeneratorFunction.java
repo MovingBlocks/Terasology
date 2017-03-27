@@ -16,6 +16,7 @@
 package org.terasology.particles.functions.generators;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.functions.ParticleSystemFunction;
@@ -24,6 +25,7 @@ import org.terasology.utilities.random.Random;
 /**
  * A generator function is called on a particle's data when it is created to set its fields.
  */
+@API
 public abstract class GeneratorFunction<T extends Component> extends ParticleSystemFunction<T> {
     public GeneratorFunction(Class<T> component, ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
         super(component, dataMask, dataMasks);

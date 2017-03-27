@@ -18,6 +18,7 @@ package org.terasology.particles.components;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.module.sandbox.API;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
@@ -26,8 +27,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Represents a particle emitter. A particle emitter must be added to a ParticleSystemComponent to produce particles.
+ * Represents a particle emitter. A particle emitter will emit particles when enabled.
+ *
+ * Generator components can be attached to the emitter entity to configure the properties of newly emitted particles.
+ *
+ * Affector components can be attached to the emitter entity to update the fields of particles each frame, Ex.) Forces, Size change.
+ *
+ * It is up to the content-creator to attach a Particle Data component to the emitter entity and
+ * then provide a renderer that renders that particle data.
+ * See ParticleDataSpriteComponent and SpriteParticleRenderer for an example.
  */
+@API
 public class ParticleEmitterComponent implements Component {
     public static final int INFINITE_PARTICLE_SPAWNS = -1;
     public static final int INDEFINITE_EMITTER_LIFETIME = -1;

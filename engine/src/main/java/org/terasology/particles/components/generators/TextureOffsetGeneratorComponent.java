@@ -18,6 +18,7 @@ package org.terasology.particles.components.generators;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import java.util.function.Function;
 /**
  * Generator used to choose a particle's textureOffset (from a tile-map texture)
  */
+@API
 public class TextureOffsetGeneratorComponent implements Component {
     public List<Vector2f> validOffsets;
 

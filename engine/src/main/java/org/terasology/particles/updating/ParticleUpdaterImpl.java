@@ -17,6 +17,7 @@ package org.terasology.particles.updating;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
@@ -95,8 +96,8 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     public void update(final float delta) {
         movingAvgDelta = TeraMath.lerp(movingAvgDelta, delta, 0.05f);
 
-        for (ParticleEmitterComponent particleSystem : registeredParticleSystems) {
-            updateParticleSystem(particleSystem, delta); // Update particle system.
+        for (ParticleEmitterComponent registeredParticleSystem : ImmutableList.copyOf(registeredParticleSystems)) {
+            updateParticleSystem(registeredParticleSystem, delta);
         }
     }
 

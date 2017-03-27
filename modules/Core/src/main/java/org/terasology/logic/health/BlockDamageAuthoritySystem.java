@@ -29,8 +29,8 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.particles.components.BlockBreakEffectComponent;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
+import org.terasology.particles.components.generators.TextureOffsetGeneratorComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.utilities.Assets;
@@ -121,10 +121,10 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
             return;
         }
 
-        EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
+        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        BlockBreakEffectComponent particleSystem = builder.getComponent(BlockBreakEffectComponent.class);
         ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
+        TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
 
         spriteComponent.texture = terrainTexture.get();
 
@@ -133,26 +133,23 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
         Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
         Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
-        spriteComponent.textureOffset.set(new org.lwjgl.util.vector.Vector2f(offset.x, offset.y));
 
-        if (particleSystem.randBlockTexDisplacement) {
-            final float relTileSize = worldAtlas.getRelativeTileSize();
-            Vector2f particleTexSize = new Vector2f(
-                    relTileSize * particleSystem.randBlockTexDisplacementScale.y,
-                    relTileSize * particleSystem.randBlockTexDisplacementScale.y);
+        final float relTileSize = worldAtlas.getRelativeTileSize();
+        Vector2f particleTexSize = new Vector2f(
+                relTileSize * 0.25f,
+                relTileSize * 0.25f);
 
-            spriteComponent.textureSize.x *= particleSystem.randBlockTexDisplacementScale.x;
-            spriteComponent.textureSize.y *= particleSystem.randBlockTexDisplacementScale.y;
+        spriteComponent.textureSize.x *= 0.25f;
+        spriteComponent.textureSize.y *= 0.25f;
 
-            spriteComponent.textureOffset.set(
-                    spriteComponent.textureOffset.x + random.nextFloat() * (tileSize - particleTexSize.x),
-                    spriteComponent.textureOffset.y + random.nextFloat() * (tileSize - particleTexSize.y));
-        }
+        textureOffsetGeneratorComponent.validOffsets.add(new Vector2f(
+                offset.x + random.nextFloat() * (tileSize - particleTexSize.x),
+                offset.y + random.nextFloat() * (tileSize - particleTexSize.y)));
 
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
-            EntityBuilder dustBuilder = entityManager.newBuilder("engine:dustEffect");
+            EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
             dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location);
             dustBuilder.build();
         }
@@ -208,12 +205,10 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     public void beforeDamagedEnsureHealthPresent(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComponent) {
         if (!blockEntity.hasComponent(HealthComponent.class)) {
             Block type = blockComponent.getBlock();
-            if (blockComponent != null) {
-                if (type.isDestructible()) {
-                    HealthComponent healthComponent = new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f);
-                    healthComponent.destroyEntityOnNoHealth = true;
-                    blockEntity.addComponent(healthComponent);
-                }
+            if (type.isDestructible()) {
+                HealthComponent healthComponent = new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f);
+                healthComponent.destroyEntityOnNoHealth = true;
+                blockEntity.addComponent(healthComponent);
             }
         }
     }

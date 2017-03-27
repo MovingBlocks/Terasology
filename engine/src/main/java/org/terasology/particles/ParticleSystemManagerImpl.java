@@ -33,6 +33,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.module.sandbox.API;
 import org.terasology.particles.components.ParticleEmitterComponent;
 import org.terasology.particles.events.ParticleSystemUpdateEvent;
+import org.terasology.particles.functions.affectors.AccelerationAffectorFunction;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.affectors.VelocityAffectorFunction;
 import org.terasology.particles.functions.generators.ColorRangeGeneratorFunction;
@@ -102,6 +103,7 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         registerGeneratorFunction(new TextureOffsetGeneratorFunction());
 
         registerAffectorFunction(new VelocityAffectorFunction());
+        registerAffectorFunction(new AccelerationAffectorFunction());
     }
 
     @Override

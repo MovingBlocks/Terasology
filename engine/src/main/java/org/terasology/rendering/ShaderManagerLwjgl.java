@@ -36,13 +36,10 @@ import org.terasology.rendering.shader.ShaderParametersBlock;
 import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersToneMapping;
-import org.terasology.rendering.shader.ShaderParametersHdr;
 import org.terasology.rendering.shader.ShaderParametersInitialPost;
 import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
 import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
 import org.terasology.rendering.shader.ShaderParametersLightShafts;
-import org.terasology.rendering.shader.ShaderParametersNewParticle;
 import org.terasology.rendering.shader.ShaderParametersOcDistortion;
 import org.terasology.rendering.shader.ShaderParametersParticle;
 import org.terasology.rendering.shader.ShaderParametersPost;
@@ -51,6 +48,7 @@ import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.shader.ShaderParametersShadowMap;
 import org.terasology.rendering.shader.ShaderParametersSky;
 import org.terasology.rendering.shader.ShaderParametersSobel;
+import org.terasology.rendering.shader.ShaderParametersToneMapping;
 import org.terasology.utilities.Assets;
 
 import java.util.Optional;
@@ -132,7 +130,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
         prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("newParticle", new ShaderParametersNewParticle());
     }
 
     @Override

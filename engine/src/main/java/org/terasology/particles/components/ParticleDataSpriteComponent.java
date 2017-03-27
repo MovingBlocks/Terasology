@@ -15,13 +15,15 @@
  */
 package org.terasology.particles.components;
 
-import org.lwjgl.util.vector.Vector2f;
 import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
  *
  */
+@API
 public class ParticleDataSpriteComponent implements Component {
     /**
      * This system's particle texture
@@ -32,9 +34,4 @@ public class ParticleDataSpriteComponent implements Component {
      * This system's particle texture size, in percents x: [0.0, 1.0], y: [0.0, 1.0]
      */
     public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
-
-    /**
-     * This system's particle texture offset, in percents x: [0.0, 1.0], y: [0.0, 1.0]
-     */
-    public Vector2f textureOffset = new Vector2f(1.0f, 1.0f);
 }

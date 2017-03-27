@@ -17,11 +17,13 @@ package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 
 /**
  * Generator for a particle's velocity.
  * Upon generation sets particle velocity at random between minVelocity and maxVelocity.
  */
+@API
 public class VelocityRangeGeneratorComponent implements Component {
     public Vector3f minVelocity;
     public Vector3f maxVelocity;

@@ -35,9 +35,9 @@ public final class PositionRangeGeneratorFunction extends GeneratorFunction<Posi
                            final Random random
     ) {
         particleData.position.set(
-                random.nextFloat(component.minCoords.x(), component.maxCoords.x()),
-                random.nextFloat(component.minCoords.y(), component.maxCoords.y()),
-                random.nextFloat(component.minCoords.z(), component.maxCoords.z())
+                random.nextFloat(component.minPosition.x(), component.maxPosition.x()),
+                random.nextFloat(component.minPosition.y(), component.maxPosition.y()),
+                random.nextFloat(component.minPosition.z(), component.maxPosition.z())
         );
     }
 }

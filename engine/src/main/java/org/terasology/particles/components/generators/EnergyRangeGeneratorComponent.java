@@ -16,10 +16,12 @@
 package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 
 /**
- * Created by Linus on 7-3-2015.
+ *
  */
+@API
 public class EnergyRangeGeneratorComponent implements Component {
     public float minEnergy = 100.0f;
     public float maxEnergy = 100.0f;

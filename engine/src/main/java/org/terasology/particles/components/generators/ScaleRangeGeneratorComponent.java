@@ -17,10 +17,12 @@ package org.terasology.particles.components.generators;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.sandbox.API;
 
 /**
- * Created by Linus on 10-3-2015.
+ *
  */
+@API
 public class ScaleRangeGeneratorComponent implements Component {
     public Vector3f minScale;
     public Vector3f maxScale;
