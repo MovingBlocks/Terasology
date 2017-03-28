@@ -22,7 +22,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -111,33 +110,6 @@ public class BlockCommands extends BaseComponentSystem {
         blockItemFactory = new BlockItemFactory(entityManager);
         blockExplorer = new BlockExplorer(assetManager);
         targetSystem = new TargetSystem(blockRegistry, physics);
-    }
-
-    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
-            "after the commands, e.g.: \"startsWith engine: core:\" will list all items from the engine and core module",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listItems(@CommandParam(value = "startsWith",  required = false) String[] startsWith) {
-
-        List<String> stringItems = Lists.newArrayList();
-
-        for (Prefab prefab : prefabManager.listPrefabs()) {
-            if (!uriStartsWithAnyString(prefab.getName(), startsWith)) {
-                continue;
-            }
-            stringItems.add(prefab.getName());
-        }
-
-        Collections.sort(stringItems);
-
-        StringBuilder items = new StringBuilder();
-        for (String item : stringItems) {
-            if (!items.toString().isEmpty()) {
-                items.append(Console.NEW_LINE);
-            }
-            items.append(item);
-        }
-
-        return items.toString();
     }
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
@@ -382,7 +354,7 @@ public class BlockCommands extends BaseComponentSystem {
      * @param startsWithArray array of possible word to match at the beginning of {@code uri}
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */
-    private boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
+    public static boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
         if (startsWithArray == null || startsWithArray.length == 0) {
             return true;
         }

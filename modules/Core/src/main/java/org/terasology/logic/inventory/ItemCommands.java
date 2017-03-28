@@ -17,13 +17,16 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
@@ -32,6 +35,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 @RegisterSystem
@@ -48,6 +53,9 @@ public class ItemCommands extends BaseComponentSystem {
 
     @In
     private AssetManager assetManager;
+
+    @In
+    private PrefabManager prefabManager;
 
 
     @Command(shortDescription = "Adds an item or block to your inventory",
@@ -101,4 +109,55 @@ public class ItemCommands extends BaseComponentSystem {
         return "Could not find an item or block matching \"" + itemPrefabName + "\"";
     }
 
+    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
+            "after the commands, e.g.: \"listItems engine: core:\" will list all items from the engine and core module",
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String listItems(@CommandParam(value = "startsWith", required = false) String[] startsWith) {
+
+        List<String> stringItems = Lists.newArrayList();
+
+        for (Prefab prefab : prefabManager.listPrefabs()) {
+            if (!BlockCommands.uriStartsWithAnyString(prefab.getName(), startsWith)) {
+                continue;
+            }
+            stringItems.add(prefab.getName());
+        }
+
+        Collections.sort(stringItems);
+
+        StringBuilder items = new StringBuilder();
+        for (String item : stringItems) {
+            if (!items.toString().isEmpty()) {
+                items.append(Console.NEW_LINE);
+            }
+            items.append(item);
+        }
+
+        return items.toString();
+    }
+
+    @Command(shortDescription = "Gives multiple stacks of items matching a search",
+            helpText = "Adds all items that match the search parameter into your inventory",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bulkGiveItem(
+            @Sender EntityRef sender,
+            @CommandParam("searched") String searched,
+            @CommandParam(value = "quantity", required = false) Integer quantityParam) {
+        List<String> items = Lists.newArrayList();
+        for (String item : listItems(null).split("\n")) {
+            if(item.contains(searched.toLowerCase())) {
+                items.add(item);
+            }
+        }
+
+        String result = "Found " + items.size() + " item matches when searching for '" + searched + "'.";
+        if (items.size() > 0) {
+            result += "\nItems:";
+            for (String item : items) {
+                result += "\n" + item + "\n";
+                give(sender, item, quantityParam, null);
+            }
+        }
+        return result;
+    }
 }
