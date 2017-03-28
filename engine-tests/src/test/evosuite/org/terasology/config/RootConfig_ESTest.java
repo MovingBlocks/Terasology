@@ -60,70 +60,70 @@ public class RootConfig_ESTest{
   }*/
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testRootConfigGetSoundVolume()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       AudioConfig audioConfig0 = rootConfig0.getAudio();
       assertEquals(0.0F, audioConfig0.getSoundVolume(), 0.01F);
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testRootConfigGetUpstreamBandwidth()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       NetworkConfig networkConfig0 = rootConfig0.getNetwork();
       assertEquals(0, networkConfig0.getUpstreamBandwidth());
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testRootConfigIsVolumeFog()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       RenderingConfig renderingConfig0 = rootConfig0.getRendering();
       assertFalse(renderingConfig0.isVolumetricFog());
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testRootConfigIsMouseYAxisInverted()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       InputConfig inputConfig0 = rootConfig0.getInput();
       assertFalse(inputConfig0.isMouseYAxisInverted());
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testRootConfigGetSecurity()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       SecurityConfig securityConfig0 = rootConfig0.getSecurity();
       assertNotNull(securityConfig0);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testRootConfigGetModuleConfigs()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       Map<SimpleUri, Map<String, JsonElement>> map0 = rootConfig0.getModuleConfigs();
       assertEquals(0, map0.size());
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testRootConfigGetMaxSecondsBetweenSaves()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       SystemConfig systemConfig0 = rootConfig0.getSystem();
       assertEquals(0, systemConfig0.getMaxSecondsBetweenSaves());
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testRootConfigGetWorldGeneration()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       WorldGenerationConfig worldGenerationConfig0 = rootConfig0.getWorldGeneration();
       assertNull(worldGenerationConfig0.getWorldTitle());
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testRootConfigGetNuiEditor()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       NUIEditorConfig nUIEditorConfig0 = rootConfig0.getNuiEditor();
       assertFalse(nUIEditorConfig0.isDisableIcons());
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testRootConfigGetDefaultModSelection()  throws Throwable  {
       RootConfig rootConfig0 = new RootConfig();
       ModuleConfig moduleConfig0 = rootConfig0.getDefaultModSelection();
       assertEquals("", moduleConfig0.getDefaultGameplayModuleName());

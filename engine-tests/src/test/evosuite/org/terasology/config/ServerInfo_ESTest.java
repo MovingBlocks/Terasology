@@ -30,7 +30,7 @@ import org.terasology.config.ServerInfo;
 public class ServerInfo_ESTest{
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testServerInfoGetPort1()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       int int0 = serverInfo0.getPort();
       assertEquals(0, int0);
@@ -38,7 +38,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testServerInfoSetOwner1()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo("[9?yv6(}>v4&-MsQXB", "[9?yv6(}>v4&-MsQXB", 0);
       serverInfo0.setOwner("jYTT");
       serverInfo0.getOwner();
@@ -47,7 +47,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testServerInfoSetOwner2()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.setOwner("");
       serverInfo0.getOwner();
@@ -55,14 +55,14 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testServerInfoGetAddress()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.getAddress();
       assertTrue(serverInfo0.isActive());
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testServerInfoConstructor()  throws Throwable  {
       ServerInfo serverInfo0 = null;
       try {
         serverInfo0 = new ServerInfo("2OV,+t;AAJxz[4&(Z", "", 0);
@@ -77,21 +77,21 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testServerInfoSetPort1()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.setPort(1059);
       assertEquals(1059, serverInfo0.getPort());
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testServerInfoIsActive1()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.setAddress("X+FhN[m]Y");
       assertTrue(serverInfo0.isActive());
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testServerInfoSetName()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.setName("6YrA");
       serverInfo0.getName();
@@ -99,7 +99,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testServerInfoSetPort2()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       // Undeclared exception!
       try { 
@@ -115,7 +115,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testServerInfoSetNegativePort()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       // Undeclared exception!
       try { 
@@ -131,7 +131,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testServerInfoSetAdressEmpty()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       // Undeclared exception!
       try { 
@@ -147,7 +147,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testServerInfoSetAddressNull()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       // Undeclared exception!
       try { 
@@ -163,7 +163,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testServerInfoSetNameEmpty()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       // Undeclared exception!
       try { 
@@ -179,7 +179,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testServerInfoSetNameNull()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo("^wW;{w:oPDDLBY[K", "^wW;{w:oPDDLBY[K", 65535);
       // Undeclared exception!
       try { 
@@ -195,14 +195,14 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testServerInfoIsActive2()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       boolean boolean0 = serverInfo0.isActive();
       assertTrue(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testServerInfoGetPort2()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo("[9?yv6(}>v4&-MsQXB", "[9?yv6(}>v4&-MsQXB", 0);
       serverInfo0.getOwner();
       assertEquals(0, serverInfo0.getPort());
@@ -210,21 +210,21 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testServerInfoIsActive3()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       serverInfo0.getName();
       assertTrue(serverInfo0.isActive());
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testServerInfoToString()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       String string0 = serverInfo0.toString();
       assertEquals("ServerInfo [name=null, address=null, port=0, owner=null, active=true]", string0);
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testServerInfoGetPort3()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo("Oq)*yx", "Oq)*yx", 210);
       int int0 = serverInfo0.getPort();
       assertEquals(210, int0);
@@ -232,7 +232,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testServerInfoGetPort4()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo("Oq)*yx", "Oq)*yx", 210);
       serverInfo0.getAddress();
       assertTrue(serverInfo0.isActive());
@@ -240,7 +240,7 @@ public class ServerInfo_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
+  public void testServerInfoIsActive4()  throws Throwable  {
       ServerInfo serverInfo0 = new ServerInfo();
       assertTrue(serverInfo0.isActive());
       

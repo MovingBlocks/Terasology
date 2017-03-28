@@ -44,7 +44,7 @@ import org.terasology.input.UnknownInput;
 public class BindsConfig_ESTest {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testBindsConfigIsBound()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri("", "2J");
       Input[] inputArray0 = new Input[9];
@@ -56,9 +56,9 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testBindsConfigSetBinds1()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
-      SimpleUri simpleUri0 = new SimpleUri(",U# VSj#Azsnz>%S");
+      SimpleUri simpleUri0 = new SimpleUri("hdbaskjhdbks");
       Input[] inputArray0 = new Input[2];
       bindsConfig0.setBinds(simpleUri0, inputArray0);
       // Undeclared exception!
@@ -74,7 +74,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testBindsConfigSetBinds2()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri();
       HashSet<Input> hashSet0 = new HashSet<Input>();
@@ -93,7 +93,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testBindsConfigSetBinds3()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri();
       // Undeclared exception!
@@ -110,7 +110,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testBindsConfigSetBinds4()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       // Undeclared exception!
       try { 
@@ -126,7 +126,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testBindsConfigCreateDefault()  throws Throwable  {
       ContextImpl contextImpl0 = new ContextImpl();
       // Undeclared exception!
       try { 
@@ -142,7 +142,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testBindsConfigSerialize1()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri();
       BindsConfig.Handler bindsConfig_Handler0 = new BindsConfig.Handler();
@@ -163,7 +163,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testBindsConfigSerialize2()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       BindsConfig.Handler bindsConfig_Handler0 = new BindsConfig.Handler();
       Class<Character> class0 = Character.TYPE;
@@ -172,7 +172,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testBindsConfigDeserialize()  throws Throwable  {
       BindsConfig.Handler bindsConfig_Handler0 = new BindsConfig.Handler();
       JsonObject jsonObject0 = new JsonObject();
       Class<Long> class0 = Long.TYPE;
@@ -191,7 +191,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testBindsConfigSetBinds5()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       Input[] inputArray0 = new Input[5];
       bindsConfig0.setBinds((SimpleUri) null, inputArray0);
@@ -200,7 +200,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testUnkownInput()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri();
       HashSet<Input> hashSet0 = new HashSet<Input>();
@@ -213,7 +213,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testBindsConfigHasBinds1()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri("", "2J");
       boolean boolean0 = bindsConfig0.hasBinds(simpleUri0);
@@ -221,7 +221,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testBindsConfigHasBinds2()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       SimpleUri simpleUri0 = new SimpleUri();
       Input[] inputArray0 = new Input[10];
@@ -231,7 +231,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testBindsConfigUpdateForChangedMods()  throws Throwable  {
       BindsConfig.Handler bindsConfig_Handler0 = new BindsConfig.Handler();
       JsonObject jsonObject0 = new JsonObject();
       Class<Byte> class0 = Byte.TYPE;
@@ -251,7 +251,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testBindsConfigKeyboardKeyFunction()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       Keyboard.Key keyboard_Key0 = Keyboard.Key.FUNCTION;
       boolean boolean0 = bindsConfig0.isBound(keyboard_Key0);
@@ -259,7 +259,7 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testBindsConfigApplyBinds()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       InputSystem inputSystem0 = new InputSystem();
       // Undeclared exception!
@@ -276,14 +276,14 @@ public class BindsConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testBindsConfigGetBinds()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       List<Input> list0 = bindsConfig0.getBinds((SimpleUri) null);
       assertTrue(list0.isEmpty());
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testBindsConfigSetBinds()  throws Throwable  {
       BindsConfig bindsConfig0 = new BindsConfig();
       bindsConfig0.setBinds(bindsConfig0);
   }

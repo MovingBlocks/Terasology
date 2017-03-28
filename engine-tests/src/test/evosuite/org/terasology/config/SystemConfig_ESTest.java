@@ -31,7 +31,7 @@ import org.terasology.config.SystemConfig;
 public class SystemConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testSystemConfigIsWriteSaveGamesEnabled1()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setWriteSaveGamesEnabled(true);
       boolean boolean0 = systemConfig0.isWriteSaveGamesEnabled();
@@ -39,7 +39,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testSystemConfigIsMonitoringEnabled1()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setMonitoringEnabled(true);
       boolean boolean0 = systemConfig0.isMonitoringEnabled();
@@ -47,7 +47,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testSystemConfigIsDebugEnabled1()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setDebugEnabled(true);
       boolean boolean0 = systemConfig0.isDebugEnabled();
@@ -55,7 +55,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testSystemConfigGetMaxUnloadedChunksPercentageTillSave()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setMaxUnloadedChunksPercentageTillSave(2745);
       int int0 = systemConfig0.getMaxUnloadedChunksPercentageTillSave();
@@ -63,15 +63,15 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testSystemConfigGetMaxUnloadedCHunksPercentageTillSave()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
-      systemConfig0.setMaxUnloadedChunksPercentageTillSave((-800));
+      systemConfig0.setMaxUnloadedChunksPercentageTillSave((800));
       int int0 = systemConfig0.getMaxUnloadedChunksPercentageTillSave();
-      assertEquals((-800), int0);
+      assertEquals((800), int0);
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testSystemConfigSetMaxThreads()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setMaxThreads(1);
       int int0 = systemConfig0.getMaxThreads();
@@ -79,7 +79,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testSystemConfigSetMaxSecondsBetweenSaves()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setMaxSecondsBetweenSaves(1);
       int int0 = systemConfig0.getMaxSecondsBetweenSaves();
@@ -87,15 +87,15 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testSystemConfigGetMaxSecondsBetweenSaves()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
-      systemConfig0.setMaxSecondsBetweenSaves((-642));
+      systemConfig0.setMaxSecondsBetweenSaves((642));
       int int0 = systemConfig0.getMaxSecondsBetweenSaves();
-      assertEquals((-642), int0);
+      assertEquals((642), int0);
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testSystemConfigSetDayNightLengthInMs()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setDayNightLengthInMs(215L);
       long long0 = systemConfig0.getDayNightLengthInMs();
@@ -103,7 +103,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testSystemConfigSetDayNightLengthInMsNegative()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setDayNightLengthInMs((-117L));
       long long0 = systemConfig0.getDayNightLengthInMs();
@@ -111,7 +111,7 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testSystemConfigSetLocaleNull()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       // Undeclared exception!
       try { 
@@ -127,23 +127,14 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
-      SystemConfig systemConfig0 = new SystemConfig();
-      Locale locale0 = systemConfig0.getLocale();
-      systemConfig0.setLocale(locale0);
-      assertEquals("en", locale0.toString());
-      assertEquals("eng", locale0.getISO3Language());
-  }
-
-  @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testSystemConfigIsWriteSaveGamesEnabled2()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       boolean boolean0 = systemConfig0.isWriteSaveGamesEnabled();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testSystemConfigSetMaxThreadsNegative()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       systemConfig0.setMaxThreads((-1));
       int int0 = systemConfig0.getMaxThreads();
@@ -151,50 +142,42 @@ public class SystemConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testSystemConfigIsMonitoringEnabled2()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       boolean boolean0 = systemConfig0.isMonitoringEnabled();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testSystemConfigGetMaxThreads()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       int int0 = systemConfig0.getMaxThreads();
       assertEquals(0, int0);
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
-      SystemConfig systemConfig0 = new SystemConfig();
-      systemConfig0.getLocale();
-      Locale locale0 = systemConfig0.getLocale();
-      assertEquals("en", locale0.toString());
-  }
-
-  @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testSystemConfigIsDebugEnabled2()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       boolean boolean0 = systemConfig0.isDebugEnabled();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testSystemConfigGetMaxSecondsBetweenSavesDefault()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       int int0 = systemConfig0.getMaxSecondsBetweenSaves();
       assertEquals(0, int0);
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testSystemConfigGetMaxUnloadedChunksPercentageTillSaveDefault()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       int int0 = systemConfig0.getMaxUnloadedChunksPercentageTillSave();
       assertEquals(0, int0);
   }
 
   @Test(timeout = 4000)
-  public void test20()  throws Throwable  {
+  public void testSystemConfigGetDayNightLengthInMsDefault()  throws Throwable  {
       SystemConfig systemConfig0 = new SystemConfig();
       long long0 = systemConfig0.getDayNightLengthInMs();
       assertEquals(0L, long0);

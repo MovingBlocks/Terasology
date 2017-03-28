@@ -31,7 +31,7 @@ import org.terasology.config.ControllerConfig;
 public class ControllerConfig_ESTest {
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testControllerConfigIsInvertZ()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertTrue(controllerConfig_ControllerInfo0.isInvertZ());
@@ -44,33 +44,33 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testControllerConfigIsInvertY()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("_ioc@%3R$#F 1f");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertTrue(controllerConfig_ControllerInfo0.isInvertY());
       
       controllerConfig_ControllerInfo0.setInvertY(false);
       assertFalse(controllerConfig_ControllerInfo0.isInvertY());
       
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("_ioc@%3R$#F 1f");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("");
       assertFalse(controllerConfig_ControllerInfo1.isInvertY());
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testControllerConfigIsInvertX()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("_ioc@%3R$#F 1f");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertTrue(controllerConfig_ControllerInfo0.isInvertX());
       
       controllerConfig_ControllerInfo0.setInvertX(false);
       assertFalse(controllerConfig_ControllerInfo0.isInvertX());
       
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("_ioc@%3R$#F 1f");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("");
       assertEquals(0.08F, controllerConfig_ControllerInfo1.getRotationDeadZone(), 0.01F);
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone1()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("x");
       controllerConfig_ControllerInfo0.setRotationDeadZone((-279.62115F));
@@ -81,18 +81,18 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone2()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("CY=I8e\"noB3!an8");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertEquals(0.08F, controllerConfig_ControllerInfo0.getMovementDeadZone(), 0.01F);
       
       controllerConfig_ControllerInfo0.setMovementDeadZone(0.0F);
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("CY=I8e\"noB3!an8");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("");
       assertEquals(0.08F, controllerConfig_ControllerInfo1.getRotationDeadZone(), 0.01F);
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone3()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       controllerConfig_ControllerInfo0.setMovementDeadZone((-1310.0144F));
@@ -103,7 +103,7 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone4()  throws Throwable  {
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = new ControllerConfig.ControllerInfo();
       boolean boolean0 = controllerConfig_ControllerInfo0.isInvertZ();
       assertTrue(controllerConfig_ControllerInfo0.isInvertY());
@@ -114,7 +114,7 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone5()  throws Throwable  {
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = new ControllerConfig.ControllerInfo();
       boolean boolean0 = controllerConfig_ControllerInfo0.isInvertY();
       assertEquals(0.08F, controllerConfig_ControllerInfo0.getMovementDeadZone(), 0.01F);
@@ -125,7 +125,7 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone6()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
       ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       float float0 = controllerConfig_ControllerInfo0.getMovementDeadZone();
@@ -137,20 +137,20 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone7()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("mWiPoc<M98q+>0~$V-");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertEquals(0.08F, controllerConfig_ControllerInfo0.getRotationDeadZone(), 0.01F);
       
       controllerConfig_ControllerInfo0.setRotationDeadZone(0.0F);
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("mWiPoc<M98q+>0~$V-");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo1 = controllerConfig0.getController("");
       assertEquals(0.08F, controllerConfig_ControllerInfo1.getMovementDeadZone(), 0.01F);
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone8()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("mWiPoc<M98q+>0~$V-");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       boolean boolean0 = controllerConfig_ControllerInfo0.isInvertX();
       assertEquals(0.08F, controllerConfig_ControllerInfo0.getMovementDeadZone(), 0.01F);
       assertTrue(boolean0);
@@ -160,9 +160,9 @@ public class ControllerConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testControllerConfigGetRotationDeadZone9()  throws Throwable  {
       ControllerConfig controllerConfig0 = new ControllerConfig();
-      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("mWiPoc<M98q+>0~$V-");
+      ControllerConfig.ControllerInfo controllerConfig_ControllerInfo0 = controllerConfig0.getController("");
       assertNotNull(controllerConfig_ControllerInfo0);
       
       float float0 = controllerConfig_ControllerInfo0.getRotationDeadZone();

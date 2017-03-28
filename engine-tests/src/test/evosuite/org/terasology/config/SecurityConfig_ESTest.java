@@ -42,7 +42,7 @@ import org.terasology.identity.PublicIdentityCertificate;
 public class SecurityConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
+  public void testSecurityConfigSerialize()  throws Throwable  {
       SecurityConfig.Handler securityConfig_Handler0 = new SecurityConfig.Handler();
       Class<Character> class0 = Character.TYPE;
       SecurityConfig securityConfig0 = new SecurityConfig();
@@ -60,14 +60,14 @@ public class SecurityConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
+  public void testSecurityConfigGetIdentity()  throws Throwable  {
       SecurityConfig securityConfig0 = new SecurityConfig();
       ClientIdentity clientIdentity0 = securityConfig0.getIdentity((PublicIdentityCertificate) null);
       assertNull(clientIdentity0);
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
+  public void testSecurityConfigDeserialize()  throws Throwable  {
       SecurityConfig.Handler securityConfig_Handler0 = new SecurityConfig.Handler();
       JsonObject jsonObject0 = new JsonObject();
       jsonObject0.addProperty("serverPrivateCertificate", "serverPrivateCertificate");
@@ -85,9 +85,9 @@ public class SecurityConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
+  public void testSecurityConfigPublicIdentityCertificate()  throws Throwable  {
       SecurityConfig securityConfig0 = new SecurityConfig();
-      PublicIdentityCertificate publicIdentityCertificate0 = new PublicIdentityCertificate("Xr3G0P@fjcmg:", (BigInteger) null, (BigInteger) null, (BigInteger) null);
+      PublicIdentityCertificate publicIdentityCertificate0 = new PublicIdentityCertificate("", (BigInteger) null, (BigInteger) null, (BigInteger) null);
       // Undeclared exception!
       try { 
         securityConfig0.getIdentity(publicIdentityCertificate0);
@@ -102,7 +102,7 @@ public class SecurityConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
+  public void testSecurityConfigGetServerPublicCertificate()  throws Throwable  {
       SecurityConfig.Handler securityConfig_Handler0 = new SecurityConfig.Handler();
       JsonObject jsonObject0 = new JsonObject();
       SecurityConfig securityConfig0 = securityConfig_Handler0.deserialize(jsonObject0, (Type) null, (JsonDeserializationContext) null);

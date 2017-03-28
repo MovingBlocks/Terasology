@@ -33,7 +33,7 @@ import org.terasology.context.Context;
 public class InputConfig_ESTest {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
+  public void testInputConfigIsMouseYAxisInverted1()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       inputConfig0.setMouseYAxisInverted(true);
       boolean boolean0 = inputConfig0.isMouseYAxisInverted();
@@ -41,7 +41,7 @@ public class InputConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
+  public void testInputConfigSetMouseSensitivity()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       inputConfig0.setMouseSensitivity(1842.5F);
       float float0 = inputConfig0.getMouseSensitivity();
@@ -49,22 +49,14 @@ public class InputConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      InputConfig inputConfig0 = new InputConfig();
-      inputConfig0.setMouseSensitivity((-335.4677F));
-      float float0 = inputConfig0.getMouseSensitivity();
-      assertEquals((-335.4677F), float0, 0.01F);
-  }
-
-  @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
+  public void testInputConfigIsMouseYAxisInverted2()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       boolean boolean0 = inputConfig0.isMouseYAxisInverted();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
+  public void testInputConfigReset()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       // Undeclared exception!
       try { 
@@ -80,21 +72,21 @@ public class InputConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
+  public void testInputConfigGetMouseSensitivity()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       float float0 = inputConfig0.getMouseSensitivity();
       assertEquals(0.0F, float0, 0.01F);
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
+  public void testInputConfigGetControllers()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       ControllerConfig controllerConfig0 = inputConfig0.getControllers();
       assertNotNull(controllerConfig0);
   }
 
   @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
+  public void testInputConfigGetBinds()  throws Throwable  {
       InputConfig inputConfig0 = new InputConfig();
       BindsConfig bindsConfig0 = inputConfig0.getBinds();
       assertNotNull(bindsConfig0);

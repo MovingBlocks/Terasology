@@ -31,7 +31,7 @@ import org.terasology.engine.SimpleUri;
 public class WorldGenerationConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
+  public void testWorldGenerationConfigSetWorldTitle()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       worldGenerationConfig0.setWorldTitle("ZL{yXXa$");
       String string0 = worldGenerationConfig0.getWorldTitle();
@@ -39,7 +39,7 @@ public class WorldGenerationConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
+  public void testWorldGenerationConfigSetDefaultSeedSpecialChar()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       worldGenerationConfig0.setDefaultSeed("*I");
       String string0 = worldGenerationConfig0.getDefaultSeed();
@@ -47,7 +47,7 @@ public class WorldGenerationConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
+  public void testWorldGenerationConfigSetDefaultSeed()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       worldGenerationConfig0.setDefaultSeed("");
       String string0 = worldGenerationConfig0.getDefaultSeed();
@@ -55,21 +55,21 @@ public class WorldGenerationConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
+  public void testWorldGenerationConfigGetDefaultSeed()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       String string0 = worldGenerationConfig0.getDefaultSeed();
       assertNull(string0);
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
+  public void testWorldGenerationConfigGetWorldTitle()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       String string0 = worldGenerationConfig0.getWorldTitle();
       assertNull(string0);
   }
 
   @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
+  public void testWorldGenerationConfigSetWorldTitleEmptyName()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       worldGenerationConfig0.setWorldTitle("");
       String string0 = worldGenerationConfig0.getWorldTitle();
@@ -77,14 +77,14 @@ public class WorldGenerationConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
+  public void test6WorldGenerationConfigGetDefaultGenerator()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       SimpleUri simpleUri0 = worldGenerationConfig0.getDefaultGenerator();
       assertFalse(simpleUri0.isValid());
   }
 
   @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
+  public void testWorldGenerationConfigGetDefaultGeneratorNull()  throws Throwable  {
       WorldGenerationConfig worldGenerationConfig0 = new WorldGenerationConfig();
       worldGenerationConfig0.setDefaultGenerator((SimpleUri) null);
       SimpleUri simpleUri0 = worldGenerationConfig0.getDefaultGenerator();

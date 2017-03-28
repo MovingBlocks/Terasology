@@ -29,22 +29,16 @@ import org.terasology.config.PermissionConfig;
 public class PermissionConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
+  public void testPermissionConfigSetOneTimeAuthorizationKey()  throws Throwable  {
       PermissionConfig permissionConfig0 = new PermissionConfig();
       permissionConfig0.setOneTimeAuthorizationKey("");
       String string0 = permissionConfig0.getOneTimeAuthorizationKey();
       assertEquals("", string0);
   }
-  /*
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      PermissionConfig permissionConfig0 = new PermissionConfig();
-      String string0 = permissionConfig0.getOneTimeAuthorizationKey();
-      assertEquals("AAAA-AAAA-AAAA-AAAA-AAAA", string0);
-  }*/
+
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
+  public void testPermissionConfigSetOneTimeAuthorizationKeyNull()  throws Throwable  {
       PermissionConfig permissionConfig0 = new PermissionConfig();
       permissionConfig0.setOneTimeAuthorizationKey((String) null);
       String string0 = permissionConfig0.getOneTimeAuthorizationKey();

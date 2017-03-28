@@ -30,7 +30,7 @@ import org.terasology.config.RenderingDebugConfig;
 public class RenderingDebugConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testRenderingDebugConfigIsRenderSkeletons1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       RenderingDebugConfig.DebugRenderingStage renderingDebugConfig_DebugRenderingStage0 = RenderingDebugConfig.DebugRenderingStage.LIGHT_SHAFTS;
       renderingDebugConfig0.setStage(renderingDebugConfig_DebugRenderingStage0);
@@ -39,7 +39,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testRenderingDebugConfigIsHudHidden1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setHudHidden(true);
       boolean boolean0 = renderingDebugConfig0.isHudHidden();
@@ -47,7 +47,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testRenderingDebugConfigIsFirstPersonElementsHidden1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setFirstPersonElementsHidden(true);
       boolean boolean0 = renderingDebugConfig0.isFirstPersonElementsHidden();
@@ -55,7 +55,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testRenderingDebugConfigRenderingDebugConfig_DebugRenderingStage1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       RenderingDebugConfig.DebugRenderingStage renderingDebugConfig_DebugRenderingStage0 = RenderingDebugConfig.DebugRenderingStage.OPAQUE_COLOR;
       renderingDebugConfig0.setStage(renderingDebugConfig_DebugRenderingStage0);
@@ -64,7 +64,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testRenderingDebugConfigRenderingDebugConfig_DebugRenderingStage0()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       RenderingDebugConfig.DebugRenderingStage renderingDebugConfig_DebugRenderingStage0 = RenderingDebugConfig.DebugRenderingStage.LIGHT_SHAFTS;
       renderingDebugConfig0.setStage(renderingDebugConfig_DebugRenderingStage0);
@@ -73,7 +73,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testRenderingDebugConfigPropertyChange()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       // Undeclared exception!
       try { 
@@ -89,7 +89,7 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testRenderingDebugConfigIsRenderChunkBoundingBoxes1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setRenderChunkBoundingBoxes(true);
       boolean boolean0 = renderingDebugConfig0.isRenderChunkBoundingBoxes();
@@ -97,20 +97,20 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testRenderingDebugConfigIsRenderChunkBoundingBoxes2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isRenderChunkBoundingBoxes();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testRenderingDebugConfigGetStage()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.getStage();
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testRenderingDebugConfigIsWireframe1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setWireframe(true);
       boolean boolean0 = renderingDebugConfig0.isWireframe();
@@ -118,14 +118,14 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testRenderingDebugConfigIsRenderSkeletons2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isRenderSkeletons();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testRenderingDebugConfigCycleStage()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       // Undeclared exception!
       try { 
@@ -141,14 +141,14 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testRenderingDebugConfigIsWireframe2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isWireframe();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testRenderingDebugConfigIsEnabled1()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setEnabled(true);
       boolean boolean0 = renderingDebugConfig0.isEnabled();
@@ -156,14 +156,14 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test14()  throws Throwable  {
+  public void testRenderingDebugConfigIsHudHidden2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isHudHidden();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test15()  throws Throwable  {
+  public void testRenderingDebugConfigIsRenderSkeletons3()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       renderingDebugConfig0.setRenderSkeletons(true);
       boolean boolean0 = renderingDebugConfig0.isRenderSkeletons();
@@ -171,28 +171,28 @@ public class RenderingDebugConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test16()  throws Throwable  {
+  public void testRenderingDebugConfigIsFirstPersonElementsHidden2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isFirstPersonElementsHidden();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test17()  throws Throwable  {
+  public void testRenderingDebugConfigIsEnabled2()  throws Throwable  {
       RenderingDebugConfig renderingDebugConfig0 = new RenderingDebugConfig();
       boolean boolean0 = renderingDebugConfig0.isEnabled();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testRenderingDebugConfigGetDefineName()  throws Throwable  {
       RenderingDebugConfig.DebugRenderingStage renderingDebugConfig_DebugRenderingStage0 = RenderingDebugConfig.DebugRenderingStage.SOBEL;
       String string0 = renderingDebugConfig_DebugRenderingStage0.getDefineName();
       assertEquals("DEBUG_STAGE_SOBEL", string0);
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testRenderingDebugConfig()  throws Throwable  {
       RenderingDebugConfig.DebugRenderingStage renderingDebugConfig_DebugRenderingStage0 = RenderingDebugConfig.DebugRenderingStage.LIGHT_SHAFTS;
       int int0 = renderingDebugConfig_DebugRenderingStage0.getIndex();
       assertEquals(13, int0);

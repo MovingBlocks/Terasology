@@ -31,7 +31,7 @@ import org.terasology.config.ServerInfo;
 public class NetworkConfig_ESTest{
 
   @Test(timeout = 4000)
-  public void test00()  throws Throwable  {
+  public void testNetworkConfigGetUpstreamBandwidth()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.setUpstreamBandwidth(19);
       int int0 = networkConfig0.getUpstreamBandwidth();
@@ -39,15 +39,15 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testNetworkConfigGetServerPort1()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
-      networkConfig0.setServerPort((-1971));
+      networkConfig0.setServerPort((1971));
       int int0 = networkConfig0.getServerPort();
-      assertEquals((-1971), int0);
+      assertEquals((1971), int0);
   }
 
   @Test(timeout = 4000)
-  public void test02()  throws Throwable  {
+  public void testNetworkConfigGetMasterServer1()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.setMasterServer("");
       String string0 = networkConfig0.getMasterServer();
@@ -55,7 +55,7 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test03()  throws Throwable  {
+  public void testNetworkConfigGetMasterServerGetServerPort()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       int int0 = networkConfig0.getServerPort();
       assertEquals("meta.terasology.org", networkConfig0.getMasterServer());
@@ -63,35 +63,35 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test04()  throws Throwable  {
+  public void testNetworkConfigRemoveServerInfo()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.removeServerInfo((ServerInfo) null);
       assertEquals("meta.terasology.org", networkConfig0.getMasterServer());
   }
 
   @Test(timeout = 4000)
-  public void test05()  throws Throwable  {
+  public void testNetworkConfigAddServerInfo()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.addServerInfo((ServerInfo) null);
       assertEquals("meta.terasology.org", networkConfig0.getMasterServer());
   }
 
   @Test(timeout = 4000)
-  public void test06()  throws Throwable  {
+  public void testNetworkConfigGetMasterServer2()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       String string0 = networkConfig0.getMasterServer();
       assertEquals("meta.terasology.org", string0);
   }
 
   @Test(timeout = 4000)
-  public void test07()  throws Throwable  {
+  public void testNetworkConfigGetMasterServer3()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.getServerInfos();
       assertEquals("meta.terasology.org", networkConfig0.getMasterServer());
   }
 
   @Test(timeout = 4000)
-  public void test08()  throws Throwable  {
+  public void testNetworkConfigGetServerPort2()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.setServerPort(19);
       int int0 = networkConfig0.getServerPort();
@@ -99,14 +99,14 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test09()  throws Throwable  {
+  public void testNetworkConfigClear()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.clear();
       assertEquals("meta.terasology.org", networkConfig0.getMasterServer());
   }
 
   @Test(timeout = 4000)
-  public void test10()  throws Throwable  {
+  public void testNetworkConfigGetUpstramBandwidth()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       int int0 = networkConfig0.getUpstreamBandwidth();
       assertEquals(0, int0);
@@ -114,7 +114,7 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test11()  throws Throwable  {
+  public void testNetworkConfigSetMasterServerNull()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.setMasterServer((String) null);
       String string0 = networkConfig0.getMasterServer();
@@ -122,7 +122,7 @@ public class NetworkConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test12()  throws Throwable  {
+  public void testNetworkConfigGetUpstramBandwidthNegative()  throws Throwable  {
       NetworkConfig networkConfig0 = new NetworkConfig();
       networkConfig0.setUpstreamBandwidth((-973));
       int int0 = networkConfig0.getUpstreamBandwidth();

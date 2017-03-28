@@ -32,7 +32,7 @@ public class PlayerConfig_ESTest{
 
 
   @Test(timeout = 4000)
-  public void test01()  throws Throwable  {
+  public void testPlayerConfigSetNameNull()  throws Throwable  {
       PlayerConfig playerConfig0 = new PlayerConfig();
       playerConfig0.setName((String) null);
       String string0 = playerConfig0.getName();
@@ -41,7 +41,7 @@ public class PlayerConfig_ESTest{
 
 
   @Test(timeout = 4000)
-  public void test13()  throws Throwable  {
+  public void testPlayerConfigSetEyeHeightNull()  throws Throwable  {
       PlayerConfig playerConfig0 = new PlayerConfig();
       // Undeclared exception!
       try { 
@@ -58,7 +58,7 @@ public class PlayerConfig_ESTest{
 
 
   @Test(timeout = 4000)
-  public void test18()  throws Throwable  {
+  public void testPlayerConfigSetName()  throws Throwable  {
       PlayerConfig playerConfig0 = new PlayerConfig();
       playerConfig0.setName("");
       String string0 = playerConfig0.getName();
@@ -66,7 +66,7 @@ public class PlayerConfig_ESTest{
   }
 
   @Test(timeout = 4000)
-  public void test19()  throws Throwable  {
+  public void testPlayerConfigSetHasEnteredUsername()  throws Throwable  {
       PlayerConfig playerConfig0 = new PlayerConfig();
       playerConfig0.setHasEnteredUsername(true);
       boolean boolean0 = playerConfig0.hasEnteredUsername();

@@ -73,7 +73,7 @@ public class ClientIdentity_ESTest {
   }*/
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
+  public void testClientIdentityGetPLayerPublicCertificate()  throws Throwable  {
       ClientIdentity clientIdentity0 = new ClientIdentity((PublicIdentityCertificate) null, (PrivateIdentityCertificate) null);
       PublicIdentityCertificate publicIdentityCertificate0 = clientIdentity0.getPlayerPublicCertificate();
       assertNull(publicIdentityCertificate0);

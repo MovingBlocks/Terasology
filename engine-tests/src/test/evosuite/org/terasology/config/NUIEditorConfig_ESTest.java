@@ -30,7 +30,7 @@ import org.terasology.config.NUIEditorConfig;
 public class NUIEditorConfig_ESTest {
 
   @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
+  public void testNUIEditorConfigIsDisableIcons1()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       nUIEditorConfig0.setDisableIcons(true);
       boolean boolean0 = nUIEditorConfig0.isDisableIcons();
@@ -38,7 +38,7 @@ public class NUIEditorConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
+  public void testNUIEditorConfigSetDisableAutosave()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       nUIEditorConfig0.setDisableAutosave(true);
       boolean boolean0 = nUIEditorConfig0.isDisableAutosave();
@@ -46,28 +46,28 @@ public class NUIEditorConfig_ESTest {
   }
 
   @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
+  public void testNUIEditorConfigSetAlternativeLocale()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       nUIEditorConfig0.setAlternativeLocale((Locale) null);
       assertFalse(nUIEditorConfig0.isDisableAutosave());
   }
 
   @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
+  public void testNUIEditorConfigIsDisableIcons2()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       boolean boolean0 = nUIEditorConfig0.isDisableIcons();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
+  public void testNUIEditorConfigIsDisableAutosave()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       boolean boolean0 = nUIEditorConfig0.isDisableAutosave();
       assertFalse(boolean0);
   }
 
   @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
+  public void testNUIEditorConfigGetAlternativeLocale()  throws Throwable  {
       NUIEditorConfig nUIEditorConfig0 = new NUIEditorConfig();
       Locale locale0 = nUIEditorConfig0.getAlternativeLocale();
       assertNull(locale0);
