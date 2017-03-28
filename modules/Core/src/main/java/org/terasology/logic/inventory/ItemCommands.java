@@ -78,10 +78,15 @@ public class ItemCommands extends BaseComponentSystem {
         if (matches.size() == 1) {
             Prefab prefab = assetManager.getAsset(matches.iterator().next(), Prefab.class).orElse(null);
             if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
-                EntityRef item = entityManager.create(prefab);
                 EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-                if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) { //TODO Give specified quantity of item (int itemAmount)
-                    item.destroy();
+
+                for (int quantityLeft = itemAmount; quantityLeft > 0; quantityLeft--) {
+                    EntityRef item = entityManager.create(prefab);
+                    if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
+                        item.destroy();
+                        itemAmount -= quantityLeft;
+                        break;
+                    }
                 }
 
                 return "You received "
