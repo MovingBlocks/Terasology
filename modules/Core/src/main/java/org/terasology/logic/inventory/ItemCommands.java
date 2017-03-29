@@ -148,6 +148,11 @@ public class ItemCommands extends BaseComponentSystem {
             @Sender EntityRef sender,
             @CommandParam("searched") String searched,
             @CommandParam(value = "quantity", required = false) Integer quantityParam) {
+
+        if (quantityParam != null && quantityParam < 1) {
+            return "Here, have these zero (0) items just like you wanted";
+        }
+
         List<String> items = Lists.newArrayList();
         for (String item : listItems(null).split("\n")) {
             if(item.contains(searched.toLowerCase())) {
