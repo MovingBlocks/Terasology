@@ -53,6 +53,11 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
+    public String getMOTD() {
+        return info.getMOTD();
+    }
+
+    @Override
     public List<WorldInfo> getWorldInfoList() {
         List<WorldInfo> result = Lists.newArrayList();
 
