@@ -16,7 +16,8 @@
 package org.terasology.rendering.nui.widgets;
 
 import org.terasology.rendering.FontColor;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
