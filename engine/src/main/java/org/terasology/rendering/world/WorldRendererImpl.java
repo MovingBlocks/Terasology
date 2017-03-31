@@ -623,4 +623,8 @@ public final class WorldRendererImpl implements WorldRenderer {
     public RenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
     }
+
+    public void recompileShaders() {
+        shaderManager.recompileAllShaders();
+    }
 }
