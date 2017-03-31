@@ -59,7 +59,11 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 /**
+ * Start Coding On Occlusion Query
  */
+
+
+
 public final class WorldRendererImpl implements WorldRenderer {
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
