@@ -195,7 +195,8 @@ Contributors
  [elwe74](https://github.com/elwe74),
  [ianbrobin](https://github.com/ianbrobin),
  [gianluca-nitti](https://github.com/gianluca-nitti),
- [ar0ne](https://github.com/ar0ne)
+ [ar0ne](https://github.com/ar0ne),
+ [Vizaxo](https://github.com/Vizaxo)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
