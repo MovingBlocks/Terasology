@@ -233,7 +233,11 @@ public class BlockCommands extends BaseComponentSystem {
             @CommandParam("searched") String searched,
             @CommandParam(value = "quantity", required = false) Integer quantityParam,
             @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
-        int quantity = quantityParam != null ? quantityParam : 16;
+
+        if (quantityParam != null && quantityParam < 1) {
+            return "Here, have these zero (0) blocks just like you wanted";
+        }
+
         String searchLowercase = searched.toLowerCase();
         List<String> blocks = findBlockMatches(searchLowercase);
         String result = "Found " + blocks.size() + " block matches when searching for '" + searched + "'.";
