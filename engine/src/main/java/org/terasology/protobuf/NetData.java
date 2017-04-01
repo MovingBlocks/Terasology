@@ -14882,6 +14882,15 @@ public final class NetData {
      */
     com.google.protobuf.ByteString
         getMOTDBytes();
+
+    /**
+     * <code>optional int32 onlinePlayersAmount = 20;</code>
+     */
+    boolean hasOnlinePlayersAmount();
+    /**
+     * <code>optional int32 onlinePlayersAmount = 20;</code>
+     */
+    int getOnlinePlayersAmount();
   }
   /**
    * Protobuf type {@code ServerInfoMessage}
@@ -15093,6 +15102,11 @@ public final class NetData {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000010;
               mOTD_ = bs;
+              break;
+            }
+            case 160: {
+              bitField0_ |= 0x00000020;
+              onlinePlayersAmount_ = input.readInt32();
               break;
             }
           }
@@ -15649,6 +15663,21 @@ public final class NetData {
       }
     }
 
+    public static final int ONLINEPLAYERSAMOUNT_FIELD_NUMBER = 20;
+    private int onlinePlayersAmount_;
+    /**
+     * <code>optional int32 onlinePlayersAmount = 20;</code>
+     */
+    public boolean hasOnlinePlayersAmount() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int32 onlinePlayersAmount = 20;</code>
+     */
+    public int getOnlinePlayersAmount() {
+      return onlinePlayersAmount_;
+    }
+
     private void initFields() {
       module_ = java.util.Collections.emptyList();
       blockId_ = java.util.Collections.emptyList();
@@ -15666,6 +15695,7 @@ public final class NetData {
       time_ = 0L;
       reflectionHeight_ = 0F;
       mOTD_ = "";
+      onlinePlayersAmount_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -15770,6 +15800,9 @@ public final class NetData {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBytes(19, getMOTDBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt32(20, onlinePlayersAmount_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -15894,6 +15927,10 @@ public final class NetData {
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(19, getMOTDBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(20, onlinePlayersAmount_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -16066,6 +16103,8 @@ public final class NetData {
         bitField0_ = (bitField0_ & ~0x00004000);
         mOTD_ = "";
         bitField0_ = (bitField0_ & ~0x00008000);
+        onlinePlayersAmount_ = 0;
+        bitField0_ = (bitField0_ & ~0x00010000);
         return this;
       }
 
@@ -16185,6 +16224,10 @@ public final class NetData {
           to_bitField0_ |= 0x00000010;
         }
         result.mOTD_ = mOTD_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.onlinePlayersAmount_ = onlinePlayersAmount_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -16395,6 +16438,9 @@ public final class NetData {
           bitField0_ |= 0x00008000;
           mOTD_ = other.mOTD_;
           onChanged();
+        }
+        if (other.hasOnlinePlayersAmount()) {
+          setOnlinePlayersAmount(other.getOnlinePlayersAmount());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -18270,6 +18316,38 @@ public final class NetData {
   }
   bitField0_ |= 0x00008000;
         mOTD_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int onlinePlayersAmount_ ;
+      /**
+       * <code>optional int32 onlinePlayersAmount = 20;</code>
+       */
+      public boolean hasOnlinePlayersAmount() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      /**
+       * <code>optional int32 onlinePlayersAmount = 20;</code>
+       */
+      public int getOnlinePlayersAmount() {
+        return onlinePlayersAmount_;
+      }
+      /**
+       * <code>optional int32 onlinePlayersAmount = 20;</code>
+       */
+      public Builder setOnlinePlayersAmount(int value) {
+        bitField0_ |= 0x00010000;
+        onlinePlayersAmount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 onlinePlayersAmount = 20;</code>
+       */
+      public Builder clearOnlinePlayersAmount() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        onlinePlayersAmount_ = 0;
         onChanged();
         return this;
       }
@@ -25386,7 +25464,7 @@ public final class NetData {
       "\022\031\n\021viewDistanceLevel\030\003 \001(\021\022\025\n\005color\030\004 \001" +
       "(\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Color\022\014\n\004rgba\030\001" +
       " \001(\r\"2\n\023JoinCompleteMessage\022\020\n\010clientId\030" +
-      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\224\003\n\021ServerInfoMessage\022\033",
+      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\261\003\n\021ServerInfoMessage\022\033",
       "\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007blockId\030\002" +
       " \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tcomponent" +
       "\030\004 \003(\0132\022.SerializationInfo\022!\n\005event\030\005 \003(" +
@@ -25396,27 +25474,28 @@ public final class NetData {
       "\022\030\n\014biomeShortId\030\n \003(\021B\002\020\001\022\017\n\007biomeId\030\013 " +
       "\003(\t\022\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001(\t\022\014" +
       "\n\004time\030\021 \001(\003\022\030\n\020reflectionHeight\030\022 \001(\002\022\014" +
-      "\n\004MOTD\030\023 \001(\t*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005",
-      "title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021" +
-      "SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 " +
-      "\001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014" +
-      "*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010moduleId\030\001 " +
-      "\001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n" +
-      "\rModuleRequest\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200" +
-      "\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007v" +
-      "ersion\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(" +
-      "\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006module\030\001 \001" +
-      "(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendError\022\017\n\007mess",
-      "age\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMess" +
-      "age\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010bl" +
-      "ockPos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N" +
-      "\n\023UpdateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r." +
-      "PackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/" +
-      "\n\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210" +
-      "\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(" +
-      "\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockP" +
-      "os\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027or" +
-      "g.terasology.protobufB\007NetDataH\001"
+      "\n\004MOTD\030\023 \001(\t\022\033\n\023onlinePlayersAmount\030\024 \001(",
+      "\005*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005title\030\001 \001(\t" +
+      "\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Serializati" +
+      "onInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfiel" +
+      "dName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002" +
+      "\"@\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t\022\025\n\rmodu" +
+      "leVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n\rModuleRequ" +
+      "est\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"W\n\020Modu" +
+      "leDataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007version\030\002 \001(" +
+      "\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(\t*\t\010\210\'\020\200\200\200\200" +
+      "\002\"\'\n\nModuleData\022\016\n\006module\030\001 \001(\014*\t\010\210\'\020\200\200\200",
+      "\200\002\"-\n\017ModuleSendError\022\017\n\007message\030\001 \001(\t*\t" +
+      "\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006enti" +
+      "ty\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 \001(" +
+      "\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEnt" +
+      "ityMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedEntit" +
+      "y\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEnt" +
+      "ityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014" +
+      "EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005event\030" +
+      "\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132\r." +
+      "Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasolog",
+      "y.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -25532,7 +25611,7 @@ public final class NetData {
     internal_static_ServerInfoMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ServerInfoMessage_descriptor,
-        new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "Version", "GameName", "Time", "ReflectionHeight", "MOTD", });
+        new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "Version", "GameName", "Time", "ReflectionHeight", "MOTD", "OnlinePlayersAmount", });
     internal_static_WorldInfo_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_WorldInfo_fieldAccessorTable = new

@@ -87,6 +87,12 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
+    public int getOnlinePlayersAmount()
+    {
+        return info.getOnlinePlayersAmount();
+    }
+
+    @Override
     public List<NameVersion> getModuleList() {
         List<NameVersion> result = Lists.newArrayList();
 

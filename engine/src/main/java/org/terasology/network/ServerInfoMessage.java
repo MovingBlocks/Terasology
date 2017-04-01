@@ -64,4 +64,8 @@ public interface ServerInfoMessage {
      */
     float getReflectionHeight();
 
+    /**
+     * Get amount of online players from server
+     */
+    int getOnlinePlayersAmount();
 }
