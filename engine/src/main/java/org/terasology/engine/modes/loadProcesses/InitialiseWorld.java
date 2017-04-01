@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,11 +70,14 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     private GameManifest gameManifest;
     private Context context;
+    private boolean isQuickLoad;
 
-    public InitialiseWorld(GameManifest gameManifest, Context context) {
+    public InitialiseWorld(GameManifest gameManifest, Context context, boolean isQuickLoad) {
         this.gameManifest = gameManifest;
         this.context = context;
+        this.isQuickLoad = isQuickLoad;
     }
+
 
     @Override
     public String getMessage() {
@@ -115,7 +118,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
-        Path savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        Path savePath = isQuickLoad ? PathManager.getInstance().getSavePath(gameManifest.getTitle()).resolve(gameManifest.getTitle() + " Quick Save") : PathManager.getInstance().getSavePath(gameManifest.getTitle());
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled
@@ -156,7 +159,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         context.put(LocalPlayer.class, new LocalPlayer());
         context.put(Camera.class, worldRenderer.getActiveCamera());
-
+        storageManager.requestSaving();
         return true;
     }
 

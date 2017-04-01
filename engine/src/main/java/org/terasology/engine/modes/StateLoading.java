@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ public class StateLoading implements GameState {
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
+    private boolean isQuickLoad = false; //default
 
     private NUIManager nuiManager;
 
@@ -100,6 +101,13 @@ public class StateLoading implements GameState {
         this.netMode = netMode;
     }
 
+    public StateLoading(GameManifest gameManifest, NetworkMode netMode, boolean isQuickLoad) {
+        Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
+
+        this.gameManifest = gameManifest;
+        this.netMode = netMode;
+        this.isQuickLoad = isQuickLoad;
+    }
     /**
      * Constructor for client of multiplayer game
      *
@@ -183,7 +191,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterInputSystem(context));
         loadProcesses.add(new RegisterSystems(context, netMode));
         loadProcesses.add(new InitialiseCommandSystem(context));
-        loadProcesses.add(new InitialiseWorld(gameManifest, context));
+        loadProcesses.add(new InitialiseWorld(gameManifest, context, isQuickLoad));
         loadProcesses.add(new EnsureSaveGameConsistency(context));
         loadProcesses.add(new InitialisePhysics(context));
         loadProcesses.add(new InitialiseSystems(context));
@@ -228,6 +236,10 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(false);
     }
+    @Override
+    public void dispose(boolean saveRequested) {
+    }
+
 
     @Override
     public void handleInput(float delta) {

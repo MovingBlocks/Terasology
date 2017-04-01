@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,4 +205,5 @@ public class ServerCommands extends BaseComponentSystem {
     public void purgeWorld() {
         chunkProvider.purgeWorld();
     }
+
 }

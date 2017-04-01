@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.sun.nio.zipfs.ZipFileSystemProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -30,7 +31,10 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -70,6 +74,7 @@ public class SaveTransaction extends AbstractTask {
     private final Lock worldDirectoryWriteLock;
     private final EngineEntityManager privateEntityManager;
     private final EntitySetDeltaRecorder deltaToSave;
+    private final StorageManager storageManager;
     private volatile SaveTransactionResult result;
 
     // Unprocessed data to save:
@@ -93,12 +98,13 @@ public class SaveTransaction extends AbstractTask {
     private final SaveTransactionHelper saveTransactionHelper;
 
 
-    public SaveTransaction(EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
+    public SaveTransaction(StorageManager storageManager, EngineEntityManager privateEntityManager, EntitySetDeltaRecorder deltaToSave,
                            Map<String, EntityData.PlayerStore> unloadedPlayers,
                            Map<String, PlayerStoreBuilder> loadedPlayers, GlobalStoreBuilder globalStoreBuilder,
                            Map<Vector3i, CompressedChunkBuilder> unloadedChunks, Map<Vector3i, ChunkImpl> loadedChunks,
                            GameManifest gameManifest, boolean storeChunksInZips,
                            StoragePathProvider storagePathProvider, Lock worldDirectoryWriteLock) {
+        this.storageManager = storageManager;
         this.privateEntityManager = privateEntityManager;
         this.deltaToSave = deltaToSave;
         this.unloadedPlayers = unloadedPlayers;
@@ -138,6 +144,8 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
+            GameManifest latestManifest = getLatestGameManifest();
+            storageManager.setSavePath(PathManager.getInstance().getSavePath(latestManifest.getTitle()));
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);
@@ -431,5 +439,19 @@ public class SaveTransaction extends AbstractTask {
             worldDirectoryWriteLock.unlock();
         }
     }
+    private static GameManifest getLatestGameManifest() {
+        GameInfo latestGame = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        for (GameInfo savedGame : savedGames) {
+            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
+                latestGame = savedGame;
+            }
+        }
 
+        if (latestGame == null) {
+            return null;
+        }
+
+        return latestGame.getManifest();
+    }
 }

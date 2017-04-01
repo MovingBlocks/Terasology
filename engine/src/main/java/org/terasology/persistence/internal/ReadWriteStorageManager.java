@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     /**
      * This lock should be hold during read and write operation in the world directory. Currently it is being hold
-     * during reads of chunks or players as they are crruently the only data that needs to be loaded during the game.
+     * during reads of chunks or players as they are currently the only data that needs to be loaded during the game.
      * <br><br>
      * This lock ensures that reading threads can properly finish reading even when for example the ZIP file with the
      * chunks got replaced with a newer version. Chunks that are getting saved get loaded from memory. It can however
@@ -244,7 +244,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     }
 
     private SaveTransaction createSaveTransaction() {
-        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(privateEntityManager,
+        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(this, privateEntityManager,
                 entitySetDeltaRecorder, isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock);
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);

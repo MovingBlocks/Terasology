@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,6 +133,10 @@ public class StateMainMenu implements GameState {
         nuiManager.clear();
 
         entityManager.clear();
+    }
+
+    @Override
+    public void dispose(boolean saveRequested) {
     }
 
     private void playBackgroundMusic() {

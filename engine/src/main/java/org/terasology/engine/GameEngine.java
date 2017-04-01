@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,8 @@ public interface GameEngine {
      * @param newState
      */
     void changeState(GameState newState);
+
+    void changeState(GameState newState, boolean saveRequested);
 
     void subscribeToStateChange(StateChangeSubscriber subscriber);
 

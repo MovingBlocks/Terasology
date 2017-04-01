@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.terasology.engine.modes;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
@@ -55,8 +53,6 @@ import java.util.Collections;
  * @version 0.1
  */
 public class StateIngame implements GameState {
-
-    private static final Logger logger = LoggerFactory.getLogger(StateIngame.class);
 
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;
@@ -116,6 +112,52 @@ public class StateIngame implements GameState {
 
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
+            storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
+        }
+
+        networkSystem.shutdown();
+        // TODO: Shutdown background threads
+        eventSystem.process();
+        GameThread.processWaitingProcesses();
+        nuiManager.clear();
+
+        context.get(AudioManager.class).stopAllSounds();
+
+        if (worldRenderer != null) {
+            worldRenderer.dispose();
+            worldRenderer = null;
+        }
+        componentSystemManager.shutdown();
+
+        context.get(PhysicsEngine.class).dispose();
+
+        entityManager.clear();
+
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
+
+        ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
+        context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
+        if (oldEnvironment != null) {
+            oldEnvironment.close();
+        }
+        context.get(Console.class).dispose();
+        GameThread.clearWaitingProcesses();
+
+        /*
+         * Clear the binding as otherwise the complete ingame state would be
+         * referenced.
+         */
+        nuiManager.getHUD().clearVisibleBinding();
+    }
+    @Override
+    public void dispose(boolean saveRequested) {
+        ChunkProvider chunkProvider = context.get(ChunkProvider.class);
+        chunkProvider.dispose();
+
+        if (saveRequested) {
             storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
 

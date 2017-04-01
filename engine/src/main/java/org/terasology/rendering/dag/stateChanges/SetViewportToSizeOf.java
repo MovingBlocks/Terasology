@@ -69,9 +69,9 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SetViewportToSizeOf))
+        if (!(obj instanceof SetViewportToSizeOf)) {
             return false;
-
+        }
         SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
 
         FBO fbo = getFbo();

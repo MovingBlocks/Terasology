@@ -16,6 +16,16 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.game.GameManifest;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.permission.PermissionManager;
+import org.terasology.network.NetworkMode;
+import org.terasology.persistence.StorageManager;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -24,8 +34,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.binds.general.LoadButton;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.general.SaveButton;
 import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
@@ -34,12 +46,21 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
 
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(GameProvider.class);
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private StorageManager storageManager;
 
     @Override
     public void initialise() {
@@ -64,6 +85,31 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
+    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true,
+            requiredPermission = PermissionManager.SERVER_MANAGEMENT_PERMISSION)
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onSave(SaveButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            GameManifest latestManifest = getLatestGameManifest();
+            storageManager.setSavePath(PathManager.getInstance().getSavePath(latestManifest.getTitle()).resolve(latestManifest.getTitle() + " Quick Save"));
+            storageManager.requestSaving();
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onLoad(LoadButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            GameManifest quickSaveGameManifest = getQuickSaveGameManifest();
+            if (quickSaveGameManifest != null) {
+                boolean saveRequested = false; //quick load shouldn't cause the game to save
+                boolean isQuickLoad = true;
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(quickSaveGameManifest, NetworkMode.NONE, isQuickLoad), saveRequested);
+            }
+            event.consume();
+        }
+    }
+
     @ReceiveEvent(components = {ClientComponent.class})
     public void onDeath(DeathEvent event, EntityRef entity) {
         if (entity.getComponent(ClientComponent.class).local) {
@@ -84,4 +130,30 @@ public class MenuControlSystem extends BaseComponentSystem {
         event.consume();
     }
 
+    private static GameManifest getLatestGameManifest() {
+        GameInfo latestGame = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        for (GameInfo savedGame : savedGames) {
+            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
+                latestGame = savedGame;
+            }
+        }
+
+        if (latestGame == null) {
+            return null;
+        }
+
+        return latestGame.getManifest();
+    }
+
+    private static GameManifest getQuickSaveGameManifest() {
+        GameManifest latestManifest = getLatestGameManifest();
+        try {
+            String title = latestManifest.getTitle();
+            return GameManifest.load(PathManager.getInstance().getSavePath(title).resolve(title + " Quick Save" + System.getProperty("file.separator") + "manifest.json"));
+        } catch (IOException e) {
+            logger.error("Failed to find Quick Load Save.", e);
+            return null;
+        }
+    }
 }
