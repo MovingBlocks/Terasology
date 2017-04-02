@@ -29,6 +29,7 @@ import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.UpdateExposureNode;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -549,6 +550,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
+        // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
+        // TODO: Call ResetDefaultInstance() for every StateChange after it is a method of StateChange.
+        SetViewportToSizeOf.ResetDefaultInstance();
     }
 
     @Override
