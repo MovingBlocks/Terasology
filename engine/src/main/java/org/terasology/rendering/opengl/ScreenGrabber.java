@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import org.terasology.context.Context;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,7 +36,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -45,6 +48,7 @@ public class ScreenGrabber {
     private ThreadManager threadManager;
     private float currentExposure;
     private boolean isTakingScreenshot;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     /**
      * @param context
@@ -92,14 +96,21 @@ public class ScreenGrabber {
      * If no screenshot data is available an error is logged and the method returns doing nothing.
      */
     public void saveScreenshot() {
-        final ByteBuffer buffer = FINAL.getColorBufferRawData();
+        // Since ScreenGrabber is initialized before DisplayResolutionDependentFBOs (because the latter contains a reference to the former)
+        // on first call on saveScreenshot() displayResolutionDependentFBOs will be null.
+        if (displayResolutionDependentFBOs == null)
+            displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+
+        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+
+        final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();
         if (buffer == null) {
             logger.error("No screenshot data available. No screenshot will be saved.");
             return;
         }
 
-        int width = FINAL.width();
-        int height = FINAL.height();
+        int width = sceneFinalFbo.width();
+        int height = sceneFinalFbo.height();
 
         Runnable task = () -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");

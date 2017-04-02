@@ -29,7 +29,6 @@ import static org.lwjgl.opengl.GL11.GL_LINE;
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
-
     private static SetWireframe defaultInstance = new SetWireframe(false);
     private static SetWireframeTask enablingTask;
     private static SetWireframeTask disablingTask;
@@ -72,11 +71,6 @@ public final class SetWireframe implements StateChange {
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
     }
 
     @Override

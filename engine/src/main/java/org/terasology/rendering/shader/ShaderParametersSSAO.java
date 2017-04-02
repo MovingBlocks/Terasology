@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.terasology.rendering.shader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
@@ -41,13 +40,13 @@ import java.nio.FloatBuffer;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  */
 public class ShaderParametersSSAO extends ShaderParametersBase {
-
     public static final int SSAO_KERNEL_ELEMENTS = 32;
     public static final int SSAO_NOISE_SIZE = 4;
 
@@ -92,17 +91,19 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        FBO scene = CoreRegistry.get(DisplayResolutionDependentFBOs.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         int texId = 0;
 
         // TODO: move to node
-        if (scene != null) {
+        if (sceneOpaqueFbo != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            scene.bindDepthTexture();
+            sceneOpaqueFbo.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            scene.bindNormalsTexture();
+            sceneOpaqueFbo.bindNormalsTexture();
             program.setInt("texNormals", texId++, true);
         }
 

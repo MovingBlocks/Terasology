@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.network;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.assets.material.Material;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.terasology.entitySystem.Component;
 
 /**
- * Shader parameters for the Block shader program.
- *
+ * PingSubscriberComponent, only on the server system, will be added to a client entity when this client subscribe.
+ * Server will only send ping information to the clients subscribed.
+ * <p>
+ * It can be used to stock the ping information of users in future.
  */
-public class ShaderParametersDefault extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-
-        // TODO: verify this is still relevant
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, 0);
-    }
+public class PingSubscriberComponent implements Component {
 }

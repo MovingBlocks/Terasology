@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ public abstract class AbstractNode implements Node {
     private NodeTask task;
     private boolean enabled = true;
 
-    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
+    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         ResourceUrn fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
-            fboUsages.put(fboName, frameBuffersManager);
+            fboUsages.put(fboName, fboManager);
         } else {
             logger.warn("FBO " + fboName + " is already requested.");
-            return frameBuffersManager.get(fboName);
+            return fboManager.get(fboName);
         }
 
-        return frameBuffersManager.request(fboConfig);
+        return fboManager.request(fboConfig);
     }
 
     @Override

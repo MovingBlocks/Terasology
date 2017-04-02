@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
  */
 public class SetInputTexture implements StateChange {
-
     private final int textureSlot;
     private final int textureId;
     private final ResourceUrn materialURN;
@@ -96,7 +95,7 @@ public class SetInputTexture implements StateChange {
                 && this.materialURN.equals(((SetInputTexture) other).materialURN)
                 && this.materialParameter.equals(((SetInputTexture) other).materialParameter);
     }
-    
+
     /**
      * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot.
      * Also disconnects the texture from the shader program.
@@ -112,11 +111,6 @@ public class SetInputTexture implements StateChange {
         return defaultInstance;
     }
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
     /**
      * Instances of this class bind a texture to a texture unit. The integer identifying
      * the texture unit is then passed to a shader program using the material/parameter
@@ -128,7 +122,6 @@ public class SetInputTexture implements StateChange {
      * inheriting from StateChange.
      */
     private class SetInputTextureTask implements RenderPipelineTask {
-
         private final int textureSlot;
         private final int textureId;
         private final Material material;
@@ -155,4 +148,3 @@ public class SetInputTexture implements StateChange {
         }
     }
 }
-

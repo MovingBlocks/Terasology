@@ -23,15 +23,16 @@ import org.terasology.registry.In;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode {
-
+public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
     @In
@@ -43,19 +44,28 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    private FBO sceneFinalFbo;
 
     @Override
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise sceneFinalFbo
+        displayResolutionDependentFBOs.subscribe(this);
+
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        FINAL.bindTexture();
+        sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
     }
 }

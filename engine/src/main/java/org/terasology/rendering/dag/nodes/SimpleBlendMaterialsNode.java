@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -50,7 +50,6 @@ import org.terasology.rendering.world.WorldRenderer;
  * semi-transparent objects are handled here, after nodes relying on the depth buffer have done their job.
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
-
     @In
     private WorldRenderer worldRenderer;
 
@@ -69,8 +68,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

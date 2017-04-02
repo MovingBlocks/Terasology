@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.network.events;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.assets.material.Material;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.ServerEvent;
 
 /**
- * Shader parameters for the Block shader program.
- *
+ * The client unSubscribes ping.
  */
-public class ShaderParametersDefault extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-
-        // TODO: verify this is still relevant
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, 0);
-    }
+@ServerEvent
+public class UnSubscribePingEvent implements Event {
 }

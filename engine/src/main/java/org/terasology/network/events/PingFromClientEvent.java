@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.network.events;
 
-import org.terasology.rendering.assets.material.Material;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.ServerEvent;
 
 /**
- * Shader parameters for the Shadow Map shader program.
- *
+ * This event handles the ping from one client to the server.
  */
-public class ShaderParametersShadowMap extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-    }
+@ServerEvent
+public class PingFromClientEvent implements Event {
 }
