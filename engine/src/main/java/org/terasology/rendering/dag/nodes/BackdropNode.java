@@ -32,6 +32,7 @@ import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetRenderBufferMask;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
@@ -90,6 +91,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetRenderBufferMask(READONLY_GBUFFER, displayResolutionDependentFBOs, true, false, false));
         update(); // Cheeky way to initialise readOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
 
@@ -126,11 +128,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        readOnlyGBufferFBO.setRenderBufferMask(true, false, false);
-
         glCallList(skySphere); // Draws the skysphere
-
-        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
 
         PerformanceMonitor.endActivity();
     }

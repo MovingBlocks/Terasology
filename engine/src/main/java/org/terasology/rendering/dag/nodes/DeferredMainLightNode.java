@@ -29,6 +29,7 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.SetRenderBufferMask;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
@@ -89,6 +90,7 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetRenderBufferMask(READONLY_GBUFFER, displayResolutionDependentFBOs, false, false, true));
         update(); // Cheeky way to initialise readOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
 
@@ -114,8 +116,6 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it - I think.
 
-        readOnlyGBufferFbo.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
-
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
         lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
@@ -132,8 +132,6 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
         renderFullscreenQuad(); // renders the light.
 
         lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-
-        readOnlyGBufferFbo.setRenderBufferMask(true, true, true);
 
         PerformanceMonitor.endActivity();
     }

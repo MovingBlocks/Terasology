@@ -37,6 +37,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetRenderBufferMask;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
@@ -99,6 +100,7 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
         addDesiredStateChange(new DisableDepthTest());
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetRenderBufferMask(READONLY_GBUFFER, displayResolutionDependentFBOs, false, false, true));
         update(); // Cheeky way to initialise readOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
 
@@ -137,8 +139,6 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
-
-        readOnlyGBufferFBO.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -182,8 +182,6 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
                 }
             }
         }
-
-        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
 
         PerformanceMonitor.endActivity();
     }

@@ -90,7 +90,6 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        writeOnlyGBufferFbo.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
