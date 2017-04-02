@@ -35,17 +35,16 @@ public class DoDestroyEvent implements Event {
     }
 
     public String getInstigatorString() {
-        if (instigator == null) {
-            return "Unknown";
-        }
         if (instigator.getParentPrefab() != null) {
             String instigatorString = instigator.getParentPrefab().getName();
-            instigatorString = instigatorString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
-            instigatorString = instigatorString.replaceAll("([A-Z])", " $1");
+            //getParentPrefab.getName() returns a ResourceUrn String such as "engine:player"
+            //The following calls change the damage type to be more readable
+            //For instance, "engine:player" becomes "Player"
+            instigatorString = instigatorString.replaceAll(".*:(.*)", "$1");
             instigatorString = Character.toUpperCase(instigatorString.charAt(0)) + instigatorString.substring(1);
             return instigatorString;
         } else {
-            return "Unknown";
+            return null;
         }
     }
 
@@ -59,7 +58,10 @@ public class DoDestroyEvent implements Event {
 
     public String getDamageTypeString() {
         String damageTypeString = damageType.getName();
-        damageTypeString = damageTypeString.replaceAll("[A-Za-z]*:([A-Za-z]*)", "$1");
+        //Similarly, damageType.getName() returns a ResourceUrn String such as "engine:directDamage"
+        //The following calls change the damage type to be more readable
+        //For instance, "engine:directDamage" becomes "Direct Damage"
+        damageTypeString = damageTypeString.replaceAll(".*:(.*)", "$1");
         damageTypeString = damageTypeString.replaceAll("([A-Z])", " $1");
         damageTypeString = Character.toUpperCase(damageTypeString.charAt(0)) + damageTypeString.substring(1);
         return damageTypeString;

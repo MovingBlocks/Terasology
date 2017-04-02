@@ -28,9 +28,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.events.KeyDownEvent;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -41,12 +39,10 @@ import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.Assets;
 
 /**
+ * This system controls the in-game menus such as the Pause screen, Death screen, the HUDs and the player overlay on the client.
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class MenuControlSystem extends BaseComponentSystem {
-
-    private String lastDamage = "Unknown";
-    private String lastInstigator = "Unknown";
 
     @In
     private NUIManager nuiManager;
@@ -77,22 +73,14 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
-    //Get the type of the most recent damage for the character
-    @ReceiveEvent(components = {CharacterComponent.class}, priority = EventPriority.PRIORITY_HIGH)
-    public void destructionDone(DoDestroyEvent event, EntityRef entity) {
-        lastDamage = event.getDamageTypeString();
-        lastInstigator = event.getInstigatorString();
-    }
-
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_HIGH)
-    public void loadDeathDetails(DeathEvent event, EntityRef entity) {
-        ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(lastInstigator, lastDamage);
-    }
-
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDeath(DeathEvent event, EntityRef entity) {
-        if (entity.getComponent(ClientComponent.class).local) {
+        ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
+        if (clientComponent.local) {
             nuiManager.pushScreen("engine:deathScreen");
+            if (event.lastDamageType != null && event.lastInstigator != null) {
+                ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.lastInstigator, event.lastDamageType);
+            }
         }
     }
 
@@ -108,5 +96,4 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
         event.consume();
     }
-
 }

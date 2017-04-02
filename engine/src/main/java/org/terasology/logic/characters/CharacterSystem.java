@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
@@ -73,10 +74,21 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private Time time;
 
+    @In
+    private TranslationSystem translationSystem;
+
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DoDestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        character.controller.send(new DeathEvent());
+        DeathEvent deathEvent = new DeathEvent();
+        //Store the details of the death in the event for display on the death screen
+        deathEvent.lastDamageType = event.getDamageTypeString();
+        if (event.getInstigatorString() != null) {
+            deathEvent.lastInstigator = event.getInstigatorString();
+        } else {
+            deathEvent.lastInstigator = translationSystem.translate("${engine:menu#unknown}");
+        }
+        character.controller.send(deathEvent);
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
