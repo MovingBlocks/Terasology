@@ -24,7 +24,10 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * TODO: Add javadocs
+ * This StateChange generates the tasks that set and reset render masks.
+ *
+ * The rendering pipeline can either write to the Color buffer, the DepthStencil buffer
+ * or the Light buffer, all of which can be toggled independently of each other.
  */
 public final class SetRenderBufferMask implements FBOManagerSubscriber, StateChange {
     private ResourceUrn fboName;
@@ -37,6 +40,15 @@ public final class SetRenderBufferMask implements FBOManagerSubscriber, StateCha
     private SetRenderBufferMask defaultInstance;
     private SetRenderBufferMaskTask task;
 
+    /**
+     * Creates an instance of this class with the given parameters.
+     *
+     * @param fboName A ResourceUrn identifying the FBO whose render masks have to be modified.
+     * @param fboManager The FBOManager responsible for managing the given FBO.
+     * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
+     * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
+     * @param renderToLightBuffer A boolean indicating whether the Light buffer of the given FBO should be written to.
+     */
     public SetRenderBufferMask(ResourceUrn fboName, BaseFBOsManager fboManager, boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer) {
         this.fboName = fboName;
         this.fboManager = fboManager;
@@ -46,6 +58,12 @@ public final class SetRenderBufferMask implements FBOManagerSubscriber, StateCha
         this.renderToLightBuffer = renderToLightBuffer;
     }
 
+    /**
+     * Creates the default instance of this class for the given FBO, resetting all masks to true.
+     *
+     * @param fboName A ResourceUrn identifying the FBO whose render masks have to be modified.
+     * @param fboManager The FBOManager responsible for managing the given FBO.
+     */
     private SetRenderBufferMask(ResourceUrn fboName, BaseFBOsManager fboManager) {
         this.fboName = fboName;
         this.fboManager = fboManager;
