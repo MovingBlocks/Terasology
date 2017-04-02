@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.openvr;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -30,6 +31,8 @@ public class OpenVRInput implements EngineSubsystem {
     private OpenVRProvider vrProvider;
 
     private OpenVRControllers controllerDevice;
+
+    Config config;
 
     /**
      * Get the name of this subsystem.
@@ -65,6 +68,10 @@ public class OpenVRInput implements EngineSubsystem {
      */
     @Override
     public void postInitialise(Context rootContext) {
+        config = context.get(Config.class);
+        if (!config.getRendering().isVrSupport()) {
+            return;
+        }
         this.context = rootContext;
         InputSystem inputSystem = context.get(InputSystem.class);
         if (inputSystem == null) {
