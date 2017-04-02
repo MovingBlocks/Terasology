@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.config.Config;
@@ -27,6 +28,8 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
@@ -45,6 +48,8 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private FBO sceneFinalFbo;
+    private int displayWidth;
+    private int displayHeight;
 
     @Override
     public void initialise() {
@@ -60,6 +65,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
         sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
+        glViewport(0, 0, displayWidth, displayHeight); // TODO: Convert to a StateChange
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }
@@ -67,5 +73,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     @Override
     public void update() {
         sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        displayWidth = Display.getWidth();
+        displayHeight = Display.getHeight();
     }
 }
