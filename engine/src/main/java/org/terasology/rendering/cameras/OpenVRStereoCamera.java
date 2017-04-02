@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,22 @@ package org.terasology.rendering.cameras;
 
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.RenderingConfig;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
+import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Camera which can be used to render stereoscopic images of the scene for VR.
- *
  */
-public class OpenVRStereoCamera extends Camera {
+public class OpenVRStereoCamera extends SubmersibleCamera {
 
     private Matrix4f projectionMatrixLeftEye = new Matrix4f();
     private Matrix4f projectionMatrixRightEye = new Matrix4f();
@@ -60,7 +61,8 @@ public class OpenVRStereoCamera extends Camera {
     private Matrix4f viewTranslationRightEye = new Matrix4f();
     private OpenVRProvider vrProvider;
 
-    public OpenVRStereoCamera(OpenVRProvider provider) {
+    public OpenVRStereoCamera(OpenVRProvider provider, WorldProvider worldProvider, RenderingConfig renderingConfig) {
+        super(worldProvider, renderingConfig);
         vrProvider = provider;
         // OpenVR's projection matrix is such that this is approximately true.
         zFar = 400.0f;

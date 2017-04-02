@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetInputTextureTask;
 
 import java.util.Objects;
+
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 
 /**
  * This StateChange generates the tasks that set and reset input textures.
@@ -29,7 +35,6 @@ import java.util.Objects;
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
  */
 public class SetInputTexture implements StateChange {
-
     private final int textureSlot;
     private final int textureId;
     private final ResourceUrn materialURN;
@@ -90,7 +95,7 @@ public class SetInputTexture implements StateChange {
                 && this.materialURN.equals(((SetInputTexture) other).materialURN)
                 && this.materialParameter.equals(((SetInputTexture) other).materialParameter);
     }
-    
+
     /**
      * Returns a StateChange instance useful to disconnect the given texture from its assigned texture slot.
      * Also disconnects the texture from the shader program.
@@ -106,9 +111,40 @@ public class SetInputTexture implements StateChange {
         return defaultInstance;
     }
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
+    /**
+     * Instances of this class bind a texture to a texture unit. The integer identifying
+     * the texture unit is then passed to a shader program using the material/parameter
+     * pair provided on construction. See the source of the execute() method for the
+     * nitty gritty details.
+     *
+     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+     * Modules or other parts of the engine should take advantage of them through classes
+     * inheriting from StateChange.
+     */
+    private class SetInputTextureTask implements RenderPipelineTask {
+        private final int textureSlot;
+        private final int textureId;
+        private final Material material;
+        private final String materialParameter;
+
+        private SetInputTextureTask(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
+            this.textureSlot = textureSlot;
+            this.textureId = textureId;
+            this.material = getMaterial(materialURN);
+            this.materialParameter = materialParameter;
+        }
+
+        @Override
+        public void execute() {
+            glActiveTexture(GL_TEXTURE0 + textureSlot);
+            glBindTexture(GL_TEXTURE_2D, textureId);
+            material.setInt(materialParameter, textureSlot, true);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: slot %s, texture %s, material %s, parameter %s", this.getClass().getSimpleName(),
+                    textureSlot, textureId, material.getUrn().toString(), materialParameter);
+        }
     }
 }
-

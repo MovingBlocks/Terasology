@@ -19,7 +19,6 @@ import java.util.Objects;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetCameraReflectedModeTask;
 
 /**
  * Instances of this state change generate the tasks that set or reset the reflected flag of a given camera.
@@ -30,10 +29,8 @@ import org.terasology.rendering.dag.tasks.SetCameraReflectedModeTask;
 public class ReflectedCamera implements StateChange {
 
     private ReflectedCamera defaultInstance;
-
     private Camera camera;
     private boolean reflected;
-
     private RenderPipelineTask task;
 
     /**
@@ -85,12 +82,39 @@ public class ReflectedCamera implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         return String.format("%30s: %s for %s", this.getClass().getSimpleName(), reflected ? "true" : "false", camera.toString());
+    }
+
+    /**
+     * Instances of this task set and unset the reflected flag of a camera.
+     *
+     * A reflected camera is helpful to render a reflected scene, which can then be used to render reflective surfaces.
+     */
+    private class SetCameraReflectedModeTask implements RenderPipelineTask {
+
+        private Camera camera;
+        private boolean reflected;
+
+        /**
+         * Constructs an instance of this class, setting or resetting the reflected flag on the given camera.
+         *
+         * @param camera an instance implementing the Camera interface
+         * @param reflected a boolean determining if the camera should be set to reflected or not.
+         */
+        private SetCameraReflectedModeTask(Camera camera, boolean reflected) {
+            this.camera = camera;
+            this.reflected = reflected;
+        }
+
+        @Override
+        public void execute() {
+            camera.setReflected(reflected);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s for %s", this.getClass().getSimpleName(), reflected ? "true" : "false", camera.toString());
+        }
     }
 }

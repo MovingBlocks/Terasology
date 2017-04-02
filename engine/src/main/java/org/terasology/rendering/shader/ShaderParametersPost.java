@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.ToneMappingNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
@@ -38,13 +37,13 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  */
 public class ShaderParametersPost extends ShaderParametersBase {
-
     private Random rand = new FastRandom();
 
     @Range(min = 0.0f, max = 1.0f)
@@ -85,7 +84,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        FBO sceneCombined = displayResolutionDependentFBOs.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        FBO sceneCombined = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         if (sceneCombined != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -121,5 +120,4 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
         }
     }
-
 }

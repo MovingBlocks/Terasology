@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,11 @@
  */
 package org.terasology.rendering.world;
 
+import org.terasology.rendering.dag.Node;
+import org.terasology.rendering.dag.NodeFactory;
+import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.RenderTaskListGenerator;
 import org.terasology.rendering.dag.nodes.AmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.ApplyDeferredLightingNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
@@ -25,7 +30,6 @@ import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.LateBlurNode;
 import org.terasology.rendering.dag.nodes.UpdateExposureNode;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -35,18 +39,13 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
-import org.terasology.rendering.dag.Node;
-import org.terasology.rendering.dag.NodeFactory;
-import org.terasology.rendering.dag.RenderGraph;
-import org.terasology.rendering.dag.RenderPipelineTask;
-import org.terasology.rendering.dag.RenderTaskListGenerator;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.nodes.BackdropNode;
 import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
@@ -92,13 +91,13 @@ import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.*;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
 import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -109,7 +108,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
  *
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
- *
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
@@ -120,7 +118,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final Camera playerCamera;
+    private final SubmersibleCamera playerCamera;
 
     // TODO: @In
     private final OpenVRProvider vrProvider;
@@ -175,17 +173,16 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
+                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
-
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
@@ -200,7 +197,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         context.put(ScreenGrabber.class, new ScreenGrabber(context));
 
         immutableFBOs = new ImmutableFBOs();
-        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context);
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context.get(Config.class).getRendering(), context.get(ScreenGrabber.class));
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);
@@ -244,13 +241,15 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
 
         // sky rendering
-        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(new ResourceUrn("engine:sceneReflectiveRefractive"), FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
+        FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
+        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
+
         BufferClearingNode readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
-        readBufferClearingNode.initialise(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs,
+        readBufferClearingNode.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs,
                 GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
 
@@ -260,7 +259,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE, ONE_16TH_SCALE, FBO.Type.DEFAULT);
         HazeNode hazeIntermediateNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
-        hazeIntermediateNode.initialise(READ_ONLY_GBUFFER.getConfig(), hazeIntermediateConfig, aLabel);
+        hazeIntermediateNode.initialise(sceneOpaqueFboConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -327,7 +326,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo16pixels = nodeFactory.createInstance(DownSamplerForExposureNode.class, DELAY_INIT);
-        exposureDownSamplerTo16pixels.initialise(READ_ONLY_GBUFFER.getConfig(), displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        exposureDownSamplerTo16pixels.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";
@@ -558,23 +557,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public boolean isHeadUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
-
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
-    }
-
-    @Override
     public float getTimeSmoothedMainLightIntensity() {
         return timeSmoothedMainLightIntensity;
     }
@@ -627,7 +609,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public Camera getActiveCamera() {
+    public SubmersibleCamera getActiveCamera() {
         return playerCamera;
     }
 
@@ -640,5 +622,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public RenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
+    }
+
+    public void recompileShaders() {
+        shaderManager.recompileAllShaders();
     }
 }

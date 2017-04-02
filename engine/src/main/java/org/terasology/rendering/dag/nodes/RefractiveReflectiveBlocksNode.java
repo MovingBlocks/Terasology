@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,13 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
 
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -71,6 +70,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     private Camera playerCamera;
     private Material chunkShader;
+    private FBO readOnlyGBufferFbo;
+    private FBO refractiveReflectiveFbo;
 
     /**
      * Initialises the node. -Must- be called once after instantiation.
@@ -82,6 +83,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
@@ -135,7 +137,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void update() {
-        // TODO: renames, maybe?
-        READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE));
+        readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+
+        readOnlyGBufferFbo.attachDepthBufferTo(refractiveReflectiveFbo);
     }
 }

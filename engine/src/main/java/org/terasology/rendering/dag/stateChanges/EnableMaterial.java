@@ -16,17 +16,18 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.DisableMaterialTask;
-import org.terasology.rendering.dag.tasks.EnableMaterialTask;
 import org.terasology.utilities.Assets;
 
 /**
  * TODO: Add javadocs
  */
 public final class EnableMaterial implements StateChange {
+
     private static final String DEFAULT_MATERIAL_NAME = "DEFAULT";
     private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_NAME);
 
@@ -69,11 +70,6 @@ public final class EnableMaterial implements StateChange {
         return (obj instanceof EnableMaterial) && materialName.equals(((EnableMaterial) obj).getMaterialName());
     }
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
     private static Material getMaterial(String assetId) {
         return Assets.getMaterial(assetId).orElseThrow(() ->
                 new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
@@ -82,5 +78,39 @@ public final class EnableMaterial implements StateChange {
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
+    }
+
+    private class DisableMaterialTask implements RenderPipelineTask {
+        private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
+
+        @Override
+        public void execute() {
+            shaderManager.disableShader();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: program 0", this.getClass().getSimpleName());
+        }
+    }
+
+    private class EnableMaterialTask implements RenderPipelineTask {
+        private Material material;
+        private String materialName;
+
+        private EnableMaterialTask(Material material, String materialName) {
+            this.material = material;
+            this.materialName = materialName;
+        }
+
+        @Override
+        public void execute() {
+            material.enable();
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  *
  */
 public class ShaderParametersToneMapping extends ShaderParametersBase {
-
     @Range(min = 0.0f, max = 10.0f)
     private float exposureBias = 1.0f;
     @Range(min = 0.0f, max = 100.0f)
@@ -49,5 +48,4 @@ public class ShaderParametersToneMapping extends ShaderParametersBase {
         program.setFloat("exposure", screenGrabber.getExposure() * exposureBias, true);
         program.setFloat("whitePoint", whitePoint, true);
     }
-
 }

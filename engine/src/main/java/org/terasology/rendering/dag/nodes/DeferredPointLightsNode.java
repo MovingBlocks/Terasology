@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
@@ -38,9 +39,17 @@ import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.logic.LightComponent;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -51,8 +60,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Data from the light accumulation buffer is eventually combined with the
  * content of other buffers to correctly light up the scene.
  */
-public class DeferredPointLightsNode extends AbstractNode {
-
+public class DeferredPointLightsNode extends AbstractNode implements FBOManagerSubscriber {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;
 
@@ -67,6 +75,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
     private Material lightGeometryMaterial;
     private Camera playerCamera;
+    private FBO readOnlyGBufferFBO;
 
     /**
      * Initializes an instance of this node.
@@ -89,6 +98,10 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         addDesiredStateChange(new DisableDepthTest());
 
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise readOnlyGBufferFbo
+        displayResolutionDependentFBOs.subscribe(this);
+
         initLightSphereDisplayList();
     }
 
@@ -102,7 +115,6 @@ public class DeferredPointLightsNode extends AbstractNode {
     }
 
     private boolean lightIsRenderable(LightComponent lightComponent, Vector3f lightPositionRelativeToCamera) {
-
         // if lightRenderingDistance is 0.0, the light is always considered, no matter the distance.
         boolean lightIsRenderable = lightComponent.lightRenderingDistance == 0.0f
                 || lightPositionRelativeToCamera.lengthSquared() < (lightComponent.lightRenderingDistance * lightComponent.lightRenderingDistance);
@@ -125,9 +137,8 @@ public class DeferredPointLightsNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
-        
-        READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light buffer
+
+        readOnlyGBufferFBO.setRenderBufferMask(false, false, true); // Only write to the light buffer
 
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -172,9 +183,13 @@ public class DeferredPointLightsNode extends AbstractNode {
             }
         }
 
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
+        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: eventually remove - used for safety for the time being
 
         PerformanceMonitor.endActivity();
     }
 
+    @Override
+    public void update() {
+        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
+    }
 }

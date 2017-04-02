@@ -265,6 +265,22 @@ public class JoinGameScreen extends CoreScreenLayer {
             port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
         }
 
+        UILabel onlinePlayers = find("onlinePlayers", UILabel.class);
+        onlinePlayers.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        return getOnlinePlayersText(info);
+                    } else {
+                        return translationSystem.translate("${engine:menu#join-server-requested}");
+                    }
+                }
+                return null;
+            }
+        });
+
         UILabel modules = find("modules", UILabel.class);
         modules.bindText(new ReadOnlyBinding<String>() {
             @Override
@@ -396,6 +412,17 @@ public class JoinGameScreen extends CoreScreenLayer {
                 float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
                 codedWorldInfo.add(String.format("%s (%.2f days)", wi.getTitle(), timeInDays));
             }
+            return Joiner.on('\n').join(codedWorldInfo);
+        } catch (ExecutionException | InterruptedException e) {
+            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+        }
+    }
+
+    private String getOnlinePlayersText(Future<ServerInfoMessage> info) {
+        try {
+            List<String> codedWorldInfo = new ArrayList<>();
+            ServerInfoMessage serverInfoMessage = info.get();
+            codedWorldInfo.add(String.format("%d", serverInfoMessage.getOnlinePlayersAmount()));
             return Joiner.on('\n').join(codedWorldInfo);
         } catch (ExecutionException | InterruptedException e) {
             return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);

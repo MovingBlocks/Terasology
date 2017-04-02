@@ -31,9 +31,9 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
-import static org.terasology.rendering.opengl.ScalingFactors.*;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * An instance of this class generates a high pass image out of the color content of the GBUFFER and stores
@@ -73,7 +73,7 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL.toString()));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READ_ONLY_GBUFFER.getName(), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)

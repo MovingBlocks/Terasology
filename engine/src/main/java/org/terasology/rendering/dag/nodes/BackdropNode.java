@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,25 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Renders the backdrop.
@@ -47,8 +54,7 @@ import org.terasology.rendering.world.WorldRenderer;
  *
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
-public class BackdropNode extends AbstractNode implements WireframeCapable {
-
+public class BackdropNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
@@ -57,12 +63,16 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private Config config;
 
     @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
+    @In
     private WorldRenderer worldRenderer;
 
 
     private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
+    private FBO readOnlyGBufferFBO;
 
     /**
      * This method must be called once shortly after instantiation to fully initialize the node
@@ -79,10 +89,10 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise readOnlyGBufferFbo
+        displayResolutionDependentFBOs.subscribe(this);
 
-        // We do not call requireFBO as we can count this default buffer is there.
-        //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
@@ -115,12 +125,12 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);
+
+        readOnlyGBufferFBO.setRenderBufferMask(true, false, false);
 
         glCallList(skySphere); // Draws the skysphere
 
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
+        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
 
         PerformanceMonitor.endActivity();
     }
@@ -134,5 +144,10 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         glNewList(skySphere, GL11.GL_COMPILE);
         sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
+    }
+
+    @Override
+    public void update() {
+        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

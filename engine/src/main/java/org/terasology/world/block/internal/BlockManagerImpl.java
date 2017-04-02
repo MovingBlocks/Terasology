@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -69,7 +70,7 @@ public class BlockManagerImpl extends BlockManager {
     private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
     private boolean generateNewIds;
-    private int nextId = 1;
+    private AtomicInteger nextId = new AtomicInteger(1);
 
     // Cache this for performance reasons because a lookup by BlockURI happens the first time a block is set when getting the previous block.
     // This causes performance problems eventually down the line when it then uses the ResourceUrn's hashcode to do a lookup into the block map.
@@ -80,8 +81,8 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     public BlockManagerImpl(WorldAtlas atlas,
-                            AssetManager assetManager,
-                            boolean generateNewIds) {
+            AssetManager assetManager,
+            boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(atlas);
@@ -91,9 +92,9 @@ public class BlockManagerImpl extends BlockManager {
                            Map<String, Short> knownBlockMappings) {
 
         if (knownBlockMappings.size() >= MAX_ID) {
-            nextId = UNKNOWN_ID;
+            nextId.set(UNKNOWN_ID);
         } else if (knownBlockMappings.size() > 0) {
-            nextId = (short) knownBlockMappings.size();
+            nextId.set(knownBlockMappings.values().stream().max(Short::compareTo).orElse((short) 0) + 1);
         }
         registeredBlockInfo.set(new RegisteredState());
 
@@ -128,10 +129,10 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     private short getNextId() {
-        if (nextId > MAX_ID) {
+        if (nextId.get() > MAX_ID) {
             return UNKNOWN_ID;
         }
-        return (short) nextId++;
+        return (short) nextId.getAndIncrement();
     }
 
     private Block getAirBlock() {

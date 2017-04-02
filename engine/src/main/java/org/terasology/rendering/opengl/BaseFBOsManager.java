@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ public interface BaseFBOsManager {
     FBO request(FBOConfig fboConfig);
 
     FBO get(ResourceUrn fboName);
+
+    FBOConfig getFboConfig(ResourceUrn fboName);
 
     boolean bindFboColorTexture(ResourceUrn fboName);
 

@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.dag.tasks.MarkerTask;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +43,41 @@ import java.util.Map;
  *
  */
 public final class RenderTaskListGenerator {
+
+    /**
+     * Instances of this class are intended to be inserted in the Render Task List.
+     *
+     * If the content of the task list is printed out by the logger, instances of this class
+     * visually separate the tasks releated to a node from those of the previous one.
+     */
+    private class MarkerTask implements RenderPipelineTask {
+
+        private String message;
+
+        /**
+         * Instantiate a MarkerTask.
+         *
+         * @param message A string used by the toString() method.
+         */
+        private MarkerTask(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public void execute() { }
+
+        /**
+         * Returns a string description of the instance.
+         *
+         * @return A string in the form: "----- <message>",
+         *         where <message> is the string passed to the constructor.
+         */
+        public String toString() {
+            return String.format("----- %s", message);
+        }
+
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(RenderTaskListGenerator.class);
     private List<RenderPipelineTask> taskList;
     private List<Node> nodeList;

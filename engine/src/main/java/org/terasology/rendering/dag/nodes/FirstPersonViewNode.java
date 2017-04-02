@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,19 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.SetDepthFunction;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
  */
 public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
-
     @In
     private WorldRenderer worldRenderer;
 
@@ -47,6 +47,9 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
 
     @In
     private ComponentSystemManager componentSystemManager;
+
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
@@ -63,7 +66,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
@@ -86,8 +89,6 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     @Override
     public void process() {
             PerformanceMonitor.startActivity("rendering/firstPersonView");
-
-            READ_ONLY_GBUFFER.bind(); // TODO: to be removed - will eventually be bound with a state change
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();
