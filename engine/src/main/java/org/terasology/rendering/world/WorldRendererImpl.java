@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,13 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OpenVRStereoCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.NodeFactory;
 import org.terasology.rendering.dag.RenderGraph;
@@ -109,7 +109,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
  *
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
- *
  */
 public final class WorldRendererImpl implements WorldRenderer {
 
@@ -120,13 +119,13 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final WorldProvider worldProvider;
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
-    private final Camera playerCamera;
+    private final SubmersibleCamera playerCamera;
 
     /*
     * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
     * It's not, so for now, we use this factor to adjust for the disparity.
      */
-    private final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
+    private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
 
     // TODO: @In
     private final OpenVRProvider vrProvider;
@@ -181,7 +180,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             // vrSupport, we fall back on rendering to the main display. The reason for init failure can be read from
             // the log.
             if (vrProvider.init()) {
-                playerCamera = new OpenVRStereoCamera(vrProvider);
+                playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
                 /*
                 * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
                 * such that the ground plane of the rendering system and the ground plane of the room the VR user is
@@ -191,14 +190,13 @@ public final class WorldRendererImpl implements WorldRenderer {
                         GROUND_PLANE_HEIGHT_DISPARITY  - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(renderingConfig.getCameraSettings());
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
             currentRenderingStage = RenderingStage.MONO;
         }
-
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         LocalPlayerSystem localPlayerSystem = context.get(LocalPlayerSystem.class);
         localPlayerSystem.setPlayerCamera(playerCamera);
@@ -571,23 +569,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public boolean isHeadUnderWater() {
-        // TODO: Making this as a subscribable value especially for node "ChunksRefractiveReflectiveNode",
-        // TODO: glDisable and glEnable state changes on that node will be dynamically added/removed based on this value.
-        Vector3f cameraPosition = new Vector3f(playerCamera.getPosition());
-
-        // Compensate for waves
-        if (renderingConfig.isAnimateWater()) {
-            cameraPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPosition, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(cameraPosition)) {
-            return worldProvider.getBlock(cameraPosition).isLiquid();
-        }
-        return false;
-    }
-
-    @Override
     public float getTimeSmoothedMainLightIntensity() {
         return timeSmoothedMainLightIntensity;
     }
@@ -640,7 +621,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     @Override
-    public Camera getActiveCamera() {
+    public SubmersibleCamera getActiveCamera() {
         return playerCamera;
     }
 

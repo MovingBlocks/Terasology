@@ -27,10 +27,10 @@ public interface ControllerListener {
     int RIGHT_CONTROLLER = 1;
     int EAXIS_TRIGGER = 1;
     int EAXIS_TOUCHPAD = 0;
-    long BUTTON_TOUCHPAD = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Touchpad);
-    long BUTTON_TRIGGER = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Trigger);
-    long BUTTON_APP_MENU = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_ApplicationMenu);
-    long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
+    long TOUCHPAD_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Touchpad);
+    long TRIGGER_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Trigger);
+    long APP_MENU_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_ApplicationMenu);
+    long GRIP_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
     /**

@@ -65,6 +65,9 @@ public class UIStyleFragment {
     @SerializedName("text-shadow-color")
     private Color textShadowColor;
 
+    @SerializedName("hint-text-color")
+    private Color hintTextColor;
+
     @SerializedName("text-align-horizontal")
     private HorizontalAlign textAlignmentH;
     @SerializedName("text-align-vertical")
@@ -99,6 +102,9 @@ public class UIStyleFragment {
         }
         if (textShadowColor != null) {
             style.setTextShadowColor(textShadowColor);
+        }
+        if (hintTextColor != null) {
+            style.setHintTextColor(hintTextColor);
         }
         if (textAlignmentH != null) {
             style.setHorizontalTextAlignment(textAlignmentH);
@@ -200,6 +206,14 @@ public class UIStyleFragment {
 
     public void setTextShadowColor(Color textShadowColor) {
         this.textShadowColor = textShadowColor;
+    }
+
+    public Color getHintTextColor() {
+        return hintTextColor;
+    }
+
+    public void setHintTextColor(Color hintTextColor) {
+        this.hintTextColor = hintTextColor;
     }
 
     public HorizontalAlign getTextAlignmentH() {

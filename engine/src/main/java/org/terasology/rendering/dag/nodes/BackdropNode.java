@@ -32,13 +32,20 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * TODO: Diagram of this node
+ * Renders the backdrop.
+ *
+ * In this implementation the backdrop consists of a spherical mesh (a skysphere)
+ * on which two sky textures are projected, one for the day and one for the night.
+ * The two textures cross-fade as the day turns to night and viceversa.
+ *
+ * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
 
@@ -57,9 +64,15 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
 
+    /**
+     * This method must be called once shortly after instantiation to fully initialize the node
+     * and make it ready for rendering.
+     */
     @Override
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThroughNormalized(playerCamera));
+
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
@@ -96,18 +109,18 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         }
     }
 
+    /**
+     * Renders the backdrop of the scene - in this implementation: the skysphere.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
         READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
-
-        playerCamera.lookThroughNormalized();
         READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);
 
         glCallList(skySphere); // Draws the skysphere
 
         READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
-        playerCamera.lookThrough();
 
         PerformanceMonitor.endActivity();
     }

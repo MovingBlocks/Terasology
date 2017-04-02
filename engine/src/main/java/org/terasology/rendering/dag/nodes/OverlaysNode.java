@@ -27,6 +27,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.world.WorldRenderer;
@@ -66,6 +67,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        addDesiredStateChange(new LookThrough(playerCamera));
         addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
     }
@@ -104,8 +106,6 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/overlays");
-
-        playerCamera.lookThrough(); // TODO: remove. Placed here to make the dependency explicit.
 
         READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
 

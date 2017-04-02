@@ -254,12 +254,4 @@ public abstract class Camera {
     public boolean hasInSight(AABB aabb) {
         return viewFrustum.intersects(aabb);
     }
-
-    /**
-     * Used to determine whether a camera is tracked by some external tracking system. Used for VR/AR devices.
-     * @return true if the camera is tracked by an external system, false if it isn't.
-     */
-    public boolean isTracked() {
-        return false;
-    }
 }
