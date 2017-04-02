@@ -73,10 +73,9 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = {ClientComponent.class})
     public void onDeath(DeathEvent event, EntityRef entity) {
-        ClientComponent clientComponent = entity.getComponent(ClientComponent.class);
-        if (clientComponent.local) {
+        if (entity.getComponent(ClientComponent.class).local) {
             nuiManager.pushScreen("engine:deathScreen");
             if (event.lastDamageType != null && event.lastInstigator != null) {
                 ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.lastInstigator, event.lastDamageType);
@@ -96,4 +95,5 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
         event.consume();
     }
+
 }

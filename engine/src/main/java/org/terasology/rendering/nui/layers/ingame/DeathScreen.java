@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
- * This screen is displayed every time a player dies.
+ * This screen is displayed when a player dies.
  */
 public class DeathScreen extends CoreScreenLayer {
     private UILabel deathDetails;
