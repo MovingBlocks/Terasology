@@ -217,7 +217,41 @@ public final class WorldRendererImpl implements WorldRenderer {
         NodeFactory nodeFactory = new NodeFactory(context);
         RenderGraph renderGraph = new RenderGraph();
 
+        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
+
         // ShadowMap generation
+        addShadowMapNodes(renderGraph,nodeFactory);
+        // (i.e. water) reflection generation
+        addWaterReflectionNodes(renderGraph,nodeFactory);
+        // sky rendering
+        addSkyNodes(renderGraph,nodeFactory,sceneOpaqueFboConfig);
+
+        // world rendering
+        addWorldNodes(renderGraph,nodeFactory);
+
+        // TODO: remove this, including associated method in the RenderSystem interface
+        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
+        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
+        // lighting
+        addLightingNodes(renderGraph,nodeFactory);
+
+        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
+
+        // 3d-based decorations (versus purely 2d, post-production effects)
+        add3dDecorationNodes(renderGraph,nodeFactory);
+
+        
+        // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
+        // and then it's 2D post-processing all the way to the image shown on the display.
+        addPostProcessingNodes(renderGraph,nodeFactory,sceneOpaqueFboConfig);
+
+        renderTaskListGenerator = new RenderTaskListGenerator();
+        List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+        renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
+    }
+
+    private void addShadowMapNodes(RenderGraph renderGraph, NodeFactory nodeFactory) {
         FBOConfig shadowMapConfig =
                 new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
         BufferClearingNode shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
@@ -226,8 +260,9 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
+    }
 
-        // (i.e. water) reflection generation
+    private void addWaterReflectionNodes(RenderGraph renderGraph, NodeFactory nodeFactory) {
         FBOConfig reflectedBufferConfig =
                 new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
         BufferClearingNode reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
@@ -239,14 +274,53 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
+    }
+    
+    private void add3dDecorationNodes(RenderGraph renderGraph, NodeFactory nodeFactory) {
+        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
+        renderGraph.addNode(outlineNode, "outlineNode");
 
-        // sky rendering
+        Node ambientOcclusionNode = nodeFactory.createInstance(AmbientOcclusionNode.class);
+        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
+
+        Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
+        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
+    }
+
+    private void addLightingNodes(RenderGraph renderGraph, NodeFactory nodeFactory) {
+        Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
+        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
+
+        Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
+        renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
+
+        Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
+        renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
+
+        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
+        renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+    }
+
+    private void addWorldNodes(RenderGraph renderGraph, NodeFactory nodeFactory) {
+        Node opaqueObjectsNode = nodeFactory.createInstance(OpaqueObjectsNode.class);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
+
+        Node opaqueBlocksNode = nodeFactory.createInstance(OpaqueBlocksNode.class);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
+
+        Node alphaRejectBlocksNode = nodeFactory.createInstance(AlphaRejectBlocksNode.class);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
+
+        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+    }
+
+    private void addSkyNodes(RenderGraph renderGraph, NodeFactory nodeFactory,FBOConfig sceneOpaqueFboConfig) {
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         reflectedRefractedClearingNode.initialise(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
 
         BufferClearingNode readBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         readBufferClearingNode.initialise(sceneOpaqueFboConfig, displayResolutionDependentFBOs,
@@ -267,50 +341,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         HazeNode hazeFinalNode = nodeFactory.createInstance(HazeNode.class, DELAY_INIT);
         hazeFinalNode.initialise(hazeIntermediateConfig, hazeFinalConfig, aLabel);
         renderGraph.addNode(hazeFinalNode, aLabel);
+    }
 
-        // world rendering
-        Node opaqueObjectsNode = nodeFactory.createInstance(OpaqueObjectsNode.class);
-        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
 
-        Node opaqueBlocksNode = nodeFactory.createInstance(OpaqueBlocksNode.class);
-        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
 
-        Node alphaRejectBlocksNode = nodeFactory.createInstance(AlphaRejectBlocksNode.class);
-        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
-
-        Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
-        renderGraph.addNode(overlaysNode, "overlaysNode");
-
-        // TODO: remove this, including associated method in the RenderSystem interface
-        Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
-
-        // lighting
-        Node deferredPointLightsNode = nodeFactory.createInstance(DeferredPointLightsNode.class);
-        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
-
-        Node deferredMainLightNode = nodeFactory.createInstance(DeferredMainLightNode.class);
-        renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
-
-        Node applyDeferredLightingNode = nodeFactory.createInstance(ApplyDeferredLightingNode.class);
-        renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
-
-        Node chunksRefractiveReflectiveNode = nodeFactory.createInstance(RefractiveReflectiveBlocksNode.class);
-        renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
-        // TODO: consider having a none-rendering node for FBO.attachDepthBufferTo() methods
-
-        // 3d-based decorations (versus purely 2d, post-production effects)
-        Node outlineNode = nodeFactory.createInstance(OutlineNode.class);
-        renderGraph.addNode(outlineNode, "outlineNode");
-
-        Node ambientOcclusionNode = nodeFactory.createInstance(AmbientOcclusionNode.class);
-        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
-
-        Node blurredAmbientOcclusionNode = nodeFactory.createInstance(BlurredAmbientOcclusionNode.class);
-        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
-
-        // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
-        // and then it's 2D post-processing all the way to the image shown on the display.
+    private void addPostProcessingNodes(RenderGraph renderGraph, NodeFactory nodeFactory,FBOConfig sceneOpaqueFboConfig) {
+        String aLabel;
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
 
@@ -401,11 +437,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node copyImageToScreenNode = nodeFactory.createInstance(CopyImageToScreenNode.class);
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
-
-        renderTaskListGenerator = new RenderTaskListGenerator();
-        List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-        renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
+
 
     @Override
     public float getSecondsSinceLastFrame() {
