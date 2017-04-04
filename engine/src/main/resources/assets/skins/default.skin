@@ -95,9 +95,6 @@
                 "right": 12
             }
         },
-        "UIRadialRing":{
-            "background": "engine:radialMenu"
-        },
         "UILoadBar": {
             "background": "engine:area",
             "background-border": {

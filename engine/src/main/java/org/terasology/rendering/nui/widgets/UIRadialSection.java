@@ -22,17 +22,21 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * One radial section of the Radial Ring
+ */
 public class UIRadialSection extends CoreWidget {
 
-    private Rect2i drawRegion;
     private Rect2i infoRegion;
+    private Rect2i innerRegion;
     private Rect2i sectionRegion;
-    private TextureRegion sectionTexture;
-    private TextureRegion selectedTexture;
+    private TextureRegion sectionTexture = Assets.getTextureRegion("engine:radialUnit").get();
+    private TextureRegion selectedTexture = Assets.getTextureRegion("engine:radialUnitSelected").get();
     private Boolean isSelected = false;
     private List<ActivateEventListener> listeners;
 
@@ -41,36 +45,38 @@ public class UIRadialSection extends CoreWidget {
     @LayoutConfig
     private String text;
     @LayoutConfig
-    private UIWidget info;
-    @LayoutConfig
-    private int submenu = -1;
+    private UIWidget widget;
 
+    /**
+     * Draws the widget
+     * @param canvas The canvas to draw on.
+     */
     public void onDraw(Canvas canvas) {
         canvas.getRegion();
         canvas.drawTexture(sectionTexture, sectionRegion);
 
-        if (icon != null) {
-            //canvas.drawTexture(icon, sectionRegion);
+         if (icon != null) {
+            canvas.drawTexture(icon, innerRegion);
         }
 
         if (text != null) {
-            //canvas.drawText(text, sectionRegion);
+            canvas.drawText(text, innerRegion);
         }
         if (isSelected) {
             canvas.drawTexture(selectedTexture, sectionRegion);
-            canvas.drawWidget(info, infoRegion);
+            canvas.drawWidget(widget, infoRegion);
         }
-    }
-
-    public int getSubmenu() {
-        return submenu;
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return drawRegion == null ? Vector2i.zero() : drawRegion.size();
+        return sectionRegion == null ? Vector2i.zero() : sectionRegion.size();
     }
 
+    /**
+     * Add a listener to this section. It will be fired when the section is activated
+     * @param listener The listener to add
+     */
     public void addListener(ActivateEventListener listener) {
         if (listeners == null) {
             listeners = new ArrayList<>();
@@ -78,6 +84,19 @@ public class UIRadialSection extends CoreWidget {
         listeners.add(listener);
     }
 
+    /**
+     * Removes a listener from the section.
+     * @param listener
+     */
+    public void removeListener(ActivateEventListener listener) {
+        if (listeners != null) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
+     * Activates the section, triggering all listeners.
+     */
     public void activateSection() {
         if (listeners != null) {
             for (ActivateEventListener listener : listeners) {
@@ -86,37 +105,30 @@ public class UIRadialSection extends CoreWidget {
         }
     }
 
-    public void removeListener(ActivateEventListener listener) {
-        if (listeners != null) {
-            listeners.remove(listener);
-        }
-    }
-
-    public void setSectionTexture(TextureRegion newTexture) {
-        sectionTexture = newTexture;
-    }
-
-    public void setSelectedTexture(TextureRegion newTexture) {
-        selectedTexture = newTexture;
-    }
-
-    public void setDrawRegion(Rect2i newRegion) {
-        drawRegion = newRegion;
-    }
-
-    public void setInfoRegion(Rect2i newRegion) {
-        infoRegion = newRegion;
-    }
-
+    /**
+     * Sets the selected state of the section
+     */
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
 
-    public boolean getIsSubmenu() {
-        return submenu != -1;
+    /**
+     * Sets the region in which to draw the info widget
+     */
+    public void setInfoRegion(Rect2i newRegion) {
+        infoRegion = newRegion;
     }
 
-    public void setCenter(Rect2i region) {
+    /**
+     * Sets the draw region of the widget itself
+     */
+    public void setDrawRegion(Rect2i region) {
         sectionRegion = region;
+    }
+    /**
+     * Sets the draw region of the items inside the widget.
+     */
+    public void setInnerRegion(Rect2i region) {
+        innerRegion = region;
     }
 }
