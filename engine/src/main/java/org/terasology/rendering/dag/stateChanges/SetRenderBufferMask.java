@@ -26,8 +26,10 @@ import org.terasology.rendering.dag.StateChange;
 /**
  * This StateChange generates the tasks that set and reset render masks.
  *
- * The rendering pipeline can either write to the Color buffer, the DepthStencil buffer
- * or the Light buffer, all of which can be toggled independently of each other.
+ * Every FBO can either allow or forbid OpenGL from writing to its Color buffer, DepthStencil buffer and Light buffer.
+ * This StateChange modifies the FBO to mask or unmask these three buffers, independent of each other.
+ * Note that this StateChange assumes the given FBO has the required attachments, and trying to unmask the
+ * depth buffer or light buffer for a normal FBO with default configuration -might- lead to undefined behaviour.
  */
 public final class SetRenderBufferMask implements FBOManagerSubscriber, StateChange {
     private ResourceUrn fboName;
