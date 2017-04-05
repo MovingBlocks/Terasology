@@ -65,7 +65,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
         sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
-        glViewport(0, 0, displayWidth, displayHeight); // TODO: Convert to a StateChange
+        // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
+        // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
+        // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
+        glViewport(0, 0, displayWidth, displayHeight);
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
     }

@@ -96,9 +96,8 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         return fboManager.get(fboName);
     }
 
-    public static void ResetDefaultInstance() {
-        // TODO: Make this a method of StateChange, and override it here.
-        // TODO: Maybe rename this to dispose() ?
+    public static void disposeDefaultInstance() {
+        // TODO: Make a generic dispose() method for StateChange, and override it here.
         defaultInstance = null;
     }
 

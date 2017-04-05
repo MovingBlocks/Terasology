@@ -118,8 +118,4 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         fboLookup.put(WRITEONLY_GBUFFER, fbo);
         notifySubscribers();
     }
-
-    public FBO.Dimensions getFullScale() {
-        return fullScale;
-    }
 }
