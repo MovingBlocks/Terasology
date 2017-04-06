@@ -551,8 +551,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.dispose();
         worldProvider.dispose();
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
-        // TODO: Call disposeDefaultInstance() for every StateChange after it is a method of StateChange.
-        SetViewportToSizeOf.disposeDefaultInstance();
+            SetViewportToSizeOf.disposeDefaultInstance();
     }
 
     @Override
