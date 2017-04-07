@@ -29,7 +29,7 @@ import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetRenderBufferMask;
+import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
@@ -90,7 +90,7 @@ public class DeferredMainLightNode extends AbstractNode implements FBOManagerSub
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetRenderBufferMask(READONLY_GBUFFER, displayResolutionDependentFBOs, false, false, true));
+        addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise readOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
 

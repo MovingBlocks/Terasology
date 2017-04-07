@@ -37,7 +37,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetRenderBufferMask;
+import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.logic.LightComponent;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
@@ -100,7 +100,7 @@ public class DeferredPointLightsNode extends AbstractNode implements FBOManagerS
         addDesiredStateChange(new DisableDepthTest());
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetRenderBufferMask(READONLY_GBUFFER, displayResolutionDependentFBOs, false, false, true));
+        addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise readOnlyGBufferFbo
         displayResolutionDependentFBOs.subscribe(this);
 
