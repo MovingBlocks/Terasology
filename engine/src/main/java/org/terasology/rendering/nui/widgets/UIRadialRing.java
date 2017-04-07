@@ -39,7 +39,6 @@ public class UIRadialRing extends CoreWidget {
     @LayoutConfig
     private UIRadialSection[] sections = {};
 
-    private static final double CIRCLE_TO_SQUARE = 0.707106781;
     private int selectedTab = -1;
     private boolean hasInitialised;
     private int radius;
@@ -84,7 +83,6 @@ public class UIRadialRing extends CoreWidget {
             hasInitialised = true;
             initialise(canvas);
         }
-        canvas.drawTexture(Assets.getTexture("engine:flag_en").get(), canvas.getRegion());
         canvas.addInteractionRegion(baseInteractionListener);
         for (UIRadialSection section : sections) {
             canvas.drawWidget(section);
@@ -92,6 +90,7 @@ public class UIRadialRing extends CoreWidget {
     }
 
     private void initialise(Canvas canvas) {
+        final double CIRCLE_TO_SQUARE = 0.707106781;
         Rect2i region = canvas.getRegion();
 
         int sectionWidth = region.width() / 4;

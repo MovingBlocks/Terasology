@@ -22,6 +22,8 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
@@ -41,30 +43,33 @@ public class UIRadialSection extends CoreWidget {
     private List<ActivateEventListener> listeners;
 
     @LayoutConfig
-    private TextureRegion icon;
+    private Binding<TextureRegion> icon = new DefaultBinding<>();
     @LayoutConfig
-    private String text;
+    private Binding<String> text = new DefaultBinding<>();
     @LayoutConfig
-    private UIWidget widget;
+    private Binding<UIWidget> widget = new DefaultBinding<>();
 
     /**
      * Draws the widget
+     *
      * @param canvas The canvas to draw on.
      */
     public void onDraw(Canvas canvas) {
         canvas.getRegion();
         canvas.drawTexture(sectionTexture, sectionRegion);
 
-         if (icon != null) {
-            canvas.drawTexture(icon, innerRegion);
+        if (icon.get() != null) {
+            canvas.drawTexture(icon.get(), innerRegion);
         }
 
-        if (text != null) {
-            canvas.drawText(text, innerRegion);
+        if (text.get() != null) {
+            canvas.drawText(text.get(), innerRegion);
         }
         if (isSelected) {
             canvas.drawTexture(selectedTexture, sectionRegion);
-            canvas.drawWidget(widget, infoRegion);
+            if (widget.get() != null) {
+                canvas.drawWidget(widget.get(), infoRegion);
+            }
         }
     }
 
@@ -75,6 +80,7 @@ public class UIRadialSection extends CoreWidget {
 
     /**
      * Add a listener to this section. It will be fired when the section is activated
+     *
      * @param listener The listener to add
      */
     public void addListener(ActivateEventListener listener) {
@@ -86,6 +92,7 @@ public class UIRadialSection extends CoreWidget {
 
     /**
      * Removes a listener from the section.
+     *
      * @param listener
      */
     public void removeListener(ActivateEventListener listener) {
@@ -113,6 +120,39 @@ public class UIRadialSection extends CoreWidget {
     }
 
     /**
+     * Sets info widget
+     */
+    public void setInfoWidget(UIWidget infoWidget) {
+        widget.set(infoWidget);
+    }
+
+    public void setInfoWidget(Binding<UIWidget> infoWidget) {
+        widget = infoWidget;
+    }
+
+    /**
+     * Set icon texture
+     */
+    public void setIcon(TextureRegion newIcon) {
+        icon.set(newIcon);
+    }
+
+    public void setIcon(Binding<TextureRegion> newIcon) {
+        icon = newIcon;
+    }
+
+    /**
+     * Set section text
+     */
+    public void setText(String newText) {
+        text.set(newText);
+    }
+
+    public void setText(Binding<String> newText) {
+        text = newText;
+    }
+
+    /**
      * Sets the region in which to draw the info widget
      */
     public void setInfoRegion(Rect2i newRegion) {
@@ -125,6 +165,7 @@ public class UIRadialSection extends CoreWidget {
     public void setDrawRegion(Rect2i region) {
         sectionRegion = region;
     }
+
     /**
      * Sets the draw region of the items inside the widget.
      */
