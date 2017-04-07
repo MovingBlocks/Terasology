@@ -64,6 +64,7 @@ public class WidgetSelectionScreen extends CoreScreenLayer {
 
     @Override
     public void initialise() {
+
         availableWidgets = find("availableWidgets", UIDropdownScrollable.class);
 
         // Populate the widget list.

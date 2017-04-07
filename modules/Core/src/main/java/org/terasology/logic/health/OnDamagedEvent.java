@@ -32,9 +32,7 @@ public class OnDamagedEvent extends HealthChangedEvent {
         this.damageType = damageType;
     }
 
-    public int getDamageAmount() {
-        return fullAmount;
-    }
+    public int getDamageAmount(){ return fullAmount; }
 
     public Prefab getType() {
         return damageType;

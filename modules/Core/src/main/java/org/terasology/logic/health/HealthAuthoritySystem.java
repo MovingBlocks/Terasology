@@ -166,7 +166,8 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         if (characterMovementComponent != null) {
             ghost = (characterMovementComponent.mode == MovementMode.GHOSTING);
         }
-        if ((health != null) && !ghost) {
+        if ((health != null) && !ghost)
+        {
             int damagedAmount = health.currentHealth - Math.max(health.currentHealth - damageAmount, 0);
             health.currentHealth -= damagedAmount;
             health.nextRegenTick = time.getGameTimeInMs() + TeraMath.floorToInt(health.waitBeforeRegen * 1000);
@@ -180,7 +181,8 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
 
     @ReceiveEvent
     public void onDamage(DoDamageEvent event, EntityRef entity) {
-        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getDirectCause());
+            checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getDirectCause());
+
     }
 
     private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
@@ -225,11 +227,15 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     @ReceiveEvent(components = {HealthComponent.class})
     public void onLand(VerticalCollisionEvent event, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
+        HealthCommands hcomm = new HealthCommands();
 
-        if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
-            int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
-            if (damage > 0) {
-                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL);
+        if(hcomm.damageStop)
+        {
+            if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
+                int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
+                if (damage > 0) {
+                    checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL);
+                }
             }
         }
     }
