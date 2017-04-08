@@ -22,11 +22,8 @@ import java.util.Set;
 /**
  * TODO: Add javadocs
  */
-public interface Node {
-
+public interface Node extends RenderPipelineTask {
     void initialise();
-
-    void process();
 
     // TODO: invoked when Node is removed from RenderGraph
     void dispose();
@@ -34,10 +31,7 @@ public interface Node {
     Set<StateChange> getDesiredStateChanges();
     Set<StateChange> getDesiredStateResets();
 
-    RenderPipelineTask generateTask();
-
     boolean isEnabled();
 
     void setEnabled(boolean enabled);
-
 }

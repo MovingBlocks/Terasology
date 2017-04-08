@@ -18,10 +18,8 @@ package org.terasology.rendering.dag;
 /**
  * TODO: Add javadocs
  */
-public interface StateChange {
+public interface StateChange extends RenderPipelineTask {
     StateChange getDefaultInstance();
-
-    RenderPipelineTask generateTask();
 
     default boolean isTheDefaultInstance()  {
         return this.equals(getDefaultInstance());
