@@ -28,6 +28,8 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * TODO: Add javadocs
  */
 public final class EnableMaterial implements StateChange {
+    private static final ResourceUrn DEFAULT_MATERIAL_URN = new ResourceUrn("engine:prog.default");
+
     private static EnableMaterial defaultInstance = new EnableMaterial();
 
     private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
@@ -41,7 +43,7 @@ public final class EnableMaterial implements StateChange {
     }
 
     private EnableMaterial() {
-        this.materialUrn = null;
+        this.materialUrn = DEFAULT_MATERIAL_URN;
         this.material = null;
     }
 
@@ -57,16 +59,12 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof EnableMaterial) && materialUrn != null && materialUrn.equals(((EnableMaterial) obj).materialUrn);
-    }
-
-    private String materialInformation() {
-        return materialUrn == null? "No Material": materialUrn.toString();
+        return (obj instanceof EnableMaterial) && materialUrn.equals(((EnableMaterial) obj).materialUrn);
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), materialInformation());
+        return String.format("%30s: %s", this.getClass().getSimpleName(), materialUrn.toString());
     }
 
     @Override
