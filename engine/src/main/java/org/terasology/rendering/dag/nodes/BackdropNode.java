@@ -32,6 +32,7 @@ import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
@@ -54,7 +55,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  *
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
-public class BackdropNode extends AbstractNode implements WireframeCapable, FBOManagerSubscriber {
+public class BackdropNode extends AbstractNode implements WireframeCapable {
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
@@ -72,7 +73,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
     private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
-    private FBO readOnlyGBufferFBO;
 
     /**
      * This method must be called once shortly after instantiation to fully initialize the node
@@ -90,8 +90,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise readOnlyGBufferFbo
-        displayResolutionDependentFBOs.subscribe(this);
+        addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
 
@@ -126,11 +125,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        readOnlyGBufferFBO.setRenderBufferMask(true, false, false);
-
         glCallList(skySphere); // Draws the skysphere
-
-        readOnlyGBufferFBO.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
 
         PerformanceMonitor.endActivity();
     }
@@ -144,10 +139,5 @@ public class BackdropNode extends AbstractNode implements WireframeCapable, FBOM
         glNewList(skySphere, GL11.GL_COMPILE);
         sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
-    }
-
-    @Override
-    public void update() {
-        readOnlyGBufferFBO = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
     }
 }

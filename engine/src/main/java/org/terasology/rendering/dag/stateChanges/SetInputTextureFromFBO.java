@@ -59,7 +59,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     private Task task;
 
     /**
-     * Constructs and returns an instance of this class, according to the parameters provided.
+     * Constructs an instance of this class, according to the parameters provided.
      *
      * Instances of this class can be added to the list of desired state changes of a node, to set an FBO-attached
      * texture as input to the enabled material.
