@@ -32,6 +32,8 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  */
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
+    // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
+    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
     private static BindFBO defaultInstance = new BindFBO();
 
     private ResourceUrn fboName;
@@ -48,8 +50,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     private BindFBO() {
-        this.fboName = null;
-        this.fboManager = null;
+        this.fboName = DEFAULT_FRAME_BUFFER_URN;
         this.fboId = DEFAULT_FRAME_BUFFER_ID;
     }
 
@@ -69,7 +70,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof BindFBO) && fboName != null && fboName.equals(((BindFBO) obj).getFboName());
+        return (obj instanceof BindFBO) && fboName.equals(((BindFBO) obj).getFboName());
     }
 
     @Override
