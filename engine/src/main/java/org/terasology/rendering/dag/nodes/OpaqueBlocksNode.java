@@ -48,7 +48,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * In a typical world this is the majority of the world's landscape.
  */
 public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
+    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     @In
     private WorldRenderer worldRenderer;
@@ -81,8 +81,8 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
-        chunkShader = getMaterial(CHUNK_SHADER);
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        chunkShader = getMaterial(CHUNK_MATERIAL);
     }
 
     public void enableWireframe() {

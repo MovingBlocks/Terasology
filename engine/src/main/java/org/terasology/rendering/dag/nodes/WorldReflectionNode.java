@@ -102,7 +102,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
 
         // we must get this here because in process we activate/deactivate a specific shader feature.
         // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.

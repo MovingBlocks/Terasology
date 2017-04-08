@@ -16,10 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
-import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
  * Instances of this class disable OpenGL's depth test, allowing the processing of fragments
@@ -32,10 +29,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
  */
 public final class DisableDepthTest extends SetStateParameter {
     private static final int PARAMETER = GL_DEPTH_TEST;
-    private static final String PARAMETER_NAME = "GL_DEPTH_TEST";
     private static StateChange defaultInstance = new DisableDepthTest(true);
-    private static RenderPipelineTask enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
-    private static RenderPipelineTask disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -53,21 +47,11 @@ public final class DisableDepthTest extends SetStateParameter {
     }
 
     private DisableDepthTest(boolean enabled) {
-        super(GL_DEPTH_TEST, enabled);
+        super(PARAMETER, enabled);
     }
 
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    protected RenderPipelineTask getDisablingTask() {
-        return disablingTask;
-    }
-
-    @Override
-    protected RenderPipelineTask getEnablingTask() {
-        return enablingTask;
     }
 }

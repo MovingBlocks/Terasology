@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.StateChange;
  * -before- any instance of LookThrough and LookThroughNormalized.
  */
 public class ReflectedCamera implements StateChange {
-
     private ReflectedCamera defaultInstance;
     private Camera camera;
     private boolean reflected;
@@ -40,23 +39,15 @@ public class ReflectedCamera implements StateChange {
      */
     public ReflectedCamera(Camera camera) {
         this(camera, true);
-        defaultInstance = new ReflectedCamera(camera, false);
     }
 
     private ReflectedCamera(Camera camera, boolean reflected) {
         this.camera = camera;
         this.reflected = reflected;
-    }
 
-    /**
-     * @return a RenderPipelineTask configured to set or reset the reflection flag of the camera given on construction.
-     */
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetCameraReflectedModeTask(camera, reflected);
+        if (reflected == false) {
+            this.defaultInstance = this;
         }
-        return task;
     }
 
     @Override
@@ -67,7 +58,7 @@ public class ReflectedCamera implements StateChange {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof ReflectedCamera) && this.camera == ((ReflectedCamera) obj).camera
-                                                     && (this.reflected == ((ReflectedCamera) obj).reflected);
+                                                && (this.reflected == ((ReflectedCamera) obj).reflected);
     }
 
     /**
@@ -78,43 +69,21 @@ public class ReflectedCamera implements StateChange {
      */
     @Override
     public StateChange getDefaultInstance() {
+        if (defaultInstance == null)
+            defaultInstance = new ReflectedCamera(camera, false);
         return defaultInstance;
+    }
+
+    private String getStatus() {
+        return reflected? "True": "False";
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s for %s", this.getClass().getSimpleName(), reflected ? "true" : "false", camera.toString());
+        return String.format("%30s: %s for %s", this.getClass().getSimpleName(), getStatus(), camera.toString());
     }
 
-    /**
-     * Instances of this task set and unset the reflected flag of a camera.
-     *
-     * A reflected camera is helpful to render a reflected scene, which can then be used to render reflective surfaces.
-     */
-    private class SetCameraReflectedModeTask implements RenderPipelineTask {
-
-        private Camera camera;
-        private boolean reflected;
-
-        /**
-         * Constructs an instance of this class, setting or resetting the reflected flag on the given camera.
-         *
-         * @param camera an instance implementing the Camera interface
-         * @param reflected a boolean determining if the camera should be set to reflected or not.
-         */
-        private SetCameraReflectedModeTask(Camera camera, boolean reflected) {
-            this.camera = camera;
-            this.reflected = reflected;
-        }
-
-        @Override
-        public void execute() {
-            camera.setReflected(reflected);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s for %s", this.getClass().getSimpleName(), reflected ? "true" : "false", camera.toString());
-        }
+    public void process() {
+        camera.setReflected(reflected);
     }
 }

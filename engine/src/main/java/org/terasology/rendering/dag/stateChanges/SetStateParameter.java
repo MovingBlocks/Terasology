@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 import java.util.Objects;
+
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * Base for classes wanting to affect the OpenGL state via glEnable/glDisable directives.
@@ -48,37 +50,24 @@ abstract class SetStateParameter implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).isEnabled() && this.glParameter == ((SetStateParameter) obj).glParameter;
+        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).enabled && this.glParameter == ((SetStateParameter) obj).glParameter;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (enabled) {
-            return getEnablingTask();
-        } else {
-            return getDisablingTask();
-        }
-    }
-
-    protected abstract RenderPipelineTask getDisablingTask();
-
-    protected abstract RenderPipelineTask getEnablingTask();
-
-    public String getStatus() {
-        String status = "disabled";
-        if (enabled) {
-            status = "enabled";
-        }
-
-        return status;
+    private String getStatus() {
+        return enabled? "Enabled": "Disabled";
     }
 
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
+    }
+
+    @Override
+    public void process() {
+        if (enabled) {
+            glEnable(glParameter);
+        } else {
+            glDisable(glParameter);
+        }
     }
 }

@@ -43,6 +43,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  */
 public class PrePostCompositeNode extends AbstractNode {
     private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:fbo.reflectiveRefractive");
+    private static final ResourceUrn PRE_POST_MATERIAL = new ResourceUrn("engine:prog.prePostComposite");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -54,7 +55,7 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void initialise() {
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
+        addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // TODO: bind input textures from ShaderParametersCombine class

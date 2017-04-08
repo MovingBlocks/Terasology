@@ -54,6 +54,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  */
 public class BackdropReflectionNode extends AbstractNode {
     public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
+    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;
     private static final int STACKS = 128;
@@ -88,7 +89,7 @@ public class BackdropReflectionNode extends AbstractNode {
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
-        addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
     }
 
     /**
