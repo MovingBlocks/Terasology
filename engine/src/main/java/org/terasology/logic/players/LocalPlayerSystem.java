@@ -162,23 +162,32 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRot;
+        Quat4f viewRotation;
         switch (characterMovementComponent.mode) {
             case WALKING:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
-                viewRot.rotate(relMove, relMove);
+                if (!config.getRendering().isVrSupport()) {
+                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
+                    playerCamera.setOrientation(viewRotation);
+                }
+                playerCamera.getOrientation().rotate(relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
                 relMove.y += relativeMovement.y;
                 break;
             default:
-                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
-                viewRot.rotate(relMove, relMove);
+                if (!config.getRendering().isVrSupport()) {
+                    viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, TeraMath.DEG_TO_RAD * lookPitch, 0);
+                    playerCamera.setOrientation(viewRotation);
+                }
+                playerCamera.getOrientation().rotate(relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
-        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
+        // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
+        if (!Float.isNaN(relMove.getX()) && !Float.isNaN(relMove.getY()) && !Float.isNaN(relMove.getZ())) {
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
+        }
         jump = false;
     }
 

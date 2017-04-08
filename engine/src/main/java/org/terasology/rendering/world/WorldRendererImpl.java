@@ -120,6 +120,12 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final ShaderManager shaderManager;
     private final SubmersibleCamera playerCamera;
 
+    /*
+    * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
+    * It's not, so for now, we use this factor to adjust for the disparity.
+     */
+    private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
+
     // TODO: @In
     private final OpenVRProvider vrProvider;
 
@@ -174,6 +180,13 @@ public final class WorldRendererImpl implements WorldRenderer {
             // the log.
             if (vrProvider.init()) {
                 playerCamera = new OpenVRStereoCamera(vrProvider, worldProvider, renderingConfig);
+                /*
+                * The origin of OpenVR's coordinate system lies on the ground of the user. We have to move this origin
+                * such that the ground plane of the rendering system and the ground plane of the room the VR user is
+                * in match.
+                 */
+                vrProvider.getState().setGroundPlaneYOffset(
+                        GROUND_PLANE_HEIGHT_DISPARITY  - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
@@ -622,5 +635,9 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public RenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
+    }
+
+    public void recompileShaders() {
+        shaderManager.recompileAllShaders();
     }
 }

@@ -28,6 +28,8 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,6 +45,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
+    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
     // TODO: make these configurable options
 
     @In
@@ -125,6 +128,15 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
                 GL11.glFinish();
                 break;
         }
+
+        // Bind the default FBO. The DAG does not recognize that this node has
+        // bound a different FBO, so as far as it is concerned, FBO 0 is still
+        // bound. As a result, without the below line, the image is only copied
+        // to the HMD - not to the screen as we would like. To get around this,
+        // we bind the default FBO here at the end.  This is a bit brittle
+        // because it assumes that FBO 0 is bound before this node is run.
+        // TODO: break this node into two different nodes that use addDesiredStateChange(BindFBO...))
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
     @Override

@@ -44,6 +44,15 @@ public class TargetSystem {
         this.physics = physics;
     }
 
+    /**
+     * Gets the position of the block that is currently targeted. If there is currently no target, this will return
+     * a null reference (isTargetAvailable() would have returned false in this case).
+     * @return the target block position in world coordinates, a vector of 3 integers.
+     */
+    public Vector3i getTargetBlockPosition() {
+        return targetBlockPos;
+    }
+
     public boolean isTargetAvailable() {
         return target.exists() || targetBlockPos != null;
     }

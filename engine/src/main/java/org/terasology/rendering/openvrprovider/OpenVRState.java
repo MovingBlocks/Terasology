@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ public class OpenVRState {
     // In the head frame
     private Matrix4f[] eyePoses = new Matrix4f[2];
     private Matrix4f[] projectionMatrices = new Matrix4f[2];
+    private float groundPlaneYOffset = 0.0f;
 
     // In the tracking system intertial frame
     private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
@@ -64,6 +65,14 @@ public class OpenVRState {
     }
 
     /**
+     * Removes a controller listener.
+     * @param listener - An object implementing the ControllerListener interface.
+     */
+    public void removeControllerListener(ControllerListener listener) {
+        controllerListeners.remove(listener);
+    }
+
+    /**
      * Get the pose of an eye.
      * @param eyeIndex - An integer specifying the eye: 0 for the left eye, 1 for the right eye.
      * @return the pose, as a Matrix4f
@@ -85,6 +94,12 @@ public class OpenVRState {
 
     void setHeadPose(HmdMatrix34_t inputPose) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, headPose);
+        headPose = new Matrix4f(
+                                1,0,0,0,
+                                0,1,0,0,
+                                0,0,1,0,
+                                0,groundPlaneYOffset,0,1
+                        ).mul(headPose);
     }
 
     void setEyePoseWRTHead(HmdMatrix34_t inputPose, int nIndex) {
@@ -93,6 +108,12 @@ public class OpenVRState {
 
     void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
+        controllerPose[nIndex] = new Matrix4f(
+                1,0,0,0,
+                0,1,0,0,
+                0,0,1,0,
+                0,groundPlaneYOffset,0,1
+        ).mul(controllerPose[nIndex]);
         for (ControllerListener listener : controllerListeners) {
             listener.poseChanged(controllerPose[nIndex], nIndex);
         }
@@ -120,6 +141,15 @@ public class OpenVRState {
                 }
             }
         }
+    }
+
+    /**
+     * Set the offset of the default head pose from the ground (along the y axis). This is useful if there is some
+     * built-in "rest" camera position (i.e. some games will default to the height of a standing player).
+     * @param inputOffset - the height (in meters) by which to raise the camera.
+     */
+    public void setGroundPlaneYOffset(float inputOffset) {
+        groundPlaneYOffset = inputOffset;
     }
 
     void setProjectionMatrix(
