@@ -59,7 +59,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode {
-    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
+    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
@@ -91,9 +91,9 @@ public class WorldReflectionNode extends ConditionDependentNode {
         requiresCondition(() -> renderingConfig.isReflectiveWater());
         renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
 
-        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));

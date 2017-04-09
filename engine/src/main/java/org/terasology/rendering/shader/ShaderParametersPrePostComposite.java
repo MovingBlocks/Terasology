@@ -79,7 +79,7 @@ public class ShaderParametersPrePostComposite extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        FBO sceneReflectiveRefractive = displayResolutionDependentFBOs.get(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE);
+        FBO sceneReflectiveRefractive = displayResolutionDependentFBOs.get(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO);
 
         if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -134,7 +134,7 @@ public class ShaderParametersPrePostComposite extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE);
+            displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE_FBO);
             program.setInt("texSceneSkyBand", texId++, true);
 
             Vector4f skyInscatteringSettingsFrag = new Vector4f();

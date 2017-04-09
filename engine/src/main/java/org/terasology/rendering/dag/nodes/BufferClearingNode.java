@@ -42,19 +42,19 @@ public class BufferClearingNode extends AbstractNode {
      *
      * @param fboConfig an FBOConfig object characterizing the FBO to act upon, if necessary prompting its creation.
      * @param fboManager an instance implementing the BaseFBOsManager interface, used to retrieve and bind the FBO.
-     * @param aClearingMask a glClear(int)-compatible mask, selecting which FBO-attached buffers to clear,
+     * @param clearingMask a glClear(int)-compatible mask, selecting which FBO-attached buffers to clear,
      *                      i.e. "GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT". This argument can't be zero.
      *                      Non GL_*_BIT values will be accepted but might eventually generate an opengl error.
      * @throws IllegalArgumentException if fboConfig, fboManager are null and if clearingMask is zero.
      */
-    public BufferClearingNode(FBOConfig fboConfig, BaseFBOsManager fboManager, int aClearingMask) {
+    public BufferClearingNode(FBOConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
 
-        boolean argumentsAreValid = validateArguments(fboConfig, fboManager, aClearingMask);
+        boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
 
         if (argumentsAreValid) {
             requiresFBO(fboConfig, fboManager);
             addDesiredStateChange(new BindFBO(fboConfig.getName(), fboManager));
-            this.clearingMask = aClearingMask;
+            this.clearingMask = clearingMask;
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
         }
@@ -71,7 +71,7 @@ public class BufferClearingNode extends AbstractNode {
         glClear(clearingMask);
     }
 
-    private boolean validateArguments(FBOConfig anFboConfig, BaseFBOsManager anFboManager, int aClearingMask) {
+    private boolean validateArguments(FBOConfig anFboConfig, BaseFBOsManager anFboManager, int clearingMask) {
         boolean argumentsAreValid = true;
 
         if (anFboConfig == null) {
@@ -84,7 +84,7 @@ public class BufferClearingNode extends AbstractNode {
             logger.warn("Illegal argument: fboManager shouldn't be null.");
         }
 
-        if (aClearingMask == 0) {
+        if (clearingMask == 0) {
             argumentsAreValid = false;
             logger.warn("Illegal argument: clearingMask can't be 0.");
         }

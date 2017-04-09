@@ -53,7 +53,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public class BackdropReflectionNode extends AbstractNode {
-    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
+    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
     private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;
@@ -76,9 +76,9 @@ public class BackdropReflectionNode extends AbstractNode {
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();
 
-        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
         addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));

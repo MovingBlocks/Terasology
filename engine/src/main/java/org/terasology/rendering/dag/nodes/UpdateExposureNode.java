@@ -64,7 +64,7 @@ public class UpdateExposureNode extends AbstractNode {
 
     private RenderingConfig renderingConfig;
     private FBO downSampledScene;
-    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
+    private PBO writeOnlyPbo;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
                                 // This data is then used in the context of eye adaptation.
 
     public UpdateExposureNode(Context context) {
@@ -73,7 +73,7 @@ public class UpdateExposureNode extends AbstractNode {
 
         renderingConfig = context.get(Config.class).getRendering();
         downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
-        writeOnlyPBO = new PBO(1, 1);
+        writeOnlyPbo = new PBO(1, 1);
     }
 
     /**
@@ -88,8 +88,8 @@ public class UpdateExposureNode extends AbstractNode {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            writeOnlyPBO.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
-            ByteBuffer pixels = writeOnlyPBO.readBackPixels();
+            writeOnlyPbo.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            ByteBuffer pixels = writeOnlyPbo.readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");

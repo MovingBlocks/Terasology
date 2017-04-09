@@ -56,15 +56,15 @@ import org.terasology.world.chunks.RenderableChunk;
  * camera partially spoils the effect showing its limits.
  */
 public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
-    private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE_FBO = new ResourceUrn("engine:sceneReflectiveRefractive");
+    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
 
     @SuppressWarnings("FieldCanBeLocal")
     private FBO readOnlyGBufferFbo;
@@ -79,13 +79,13 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE_FBO, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER));
-        chunkShader = getMaterial(CHUNK_SHADER);
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     /**
@@ -107,8 +107,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         final Vector3f cameraPosition = playerCamera.getPosition();
 
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-        chunkShader.setFloat("clip", 0.0f, true);
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+        chunkMaterial.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksAlphaBlend.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaBlend.poll();
@@ -117,7 +117,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(REFRACTIVE, chunkPosition, cameraPosition);
 
             } else {
@@ -125,7 +125,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             }
         }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
@@ -136,7 +136,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     @Override
     public void update() {
         readOnlyGBufferFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE);
+        refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE_FBO);
 
         readOnlyGBufferFbo.attachDepthBufferTo(refractiveReflectiveFbo);
     }

@@ -82,7 +82,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE);
+                displayResolutionDependentFBOs.bindFboColorTexture(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:
@@ -122,7 +122,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case SKY_BAND:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE);
+                displayResolutionDependentFBOs.bindFboColorTexture(HazeNode.FINAL_HAZE_FBO);
                 program.setInt("texDebug", texId++, true);
                 break;
             case LIGHT_SHAFTS:

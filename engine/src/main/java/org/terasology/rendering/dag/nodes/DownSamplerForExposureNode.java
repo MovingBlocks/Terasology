@@ -42,8 +42,8 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
 
     public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                                         FBOConfig outputFboConfig, BaseFBOsManager outputFboManager,
-                                                        String aLabel) {
-        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager, aLabel);
+                                                        String performanceMonitorLabel) {
+        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager, performanceMonitorLabel);
     }
 
     /**
