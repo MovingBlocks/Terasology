@@ -69,6 +69,9 @@ public class UpdateExposureNode extends AbstractNode {
                                 // This data is then used in the context of eye adaptation.
 
     public UpdateExposureNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+        screenGrabber = context.get(ScreenGrabber.class);
+
         renderingConfig = context.get(Config.class).getRendering();
         downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
         writeOnlyPBO = new PBO(1, 1);
