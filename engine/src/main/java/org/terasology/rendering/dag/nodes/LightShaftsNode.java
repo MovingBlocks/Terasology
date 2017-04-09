@@ -43,6 +43,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  */
 public class LightShaftsNode extends ConditionDependentNode {
     public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
+    public static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
     public LightShaftsNode(Context context) {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
@@ -55,7 +56,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         addDesiredStateChange(new BindFBO(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.lightShafts"));
+        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL));
 
         // TODO: move content of ShaderParametersLightShafts to this class
     }

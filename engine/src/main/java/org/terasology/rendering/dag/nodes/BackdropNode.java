@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
@@ -54,6 +55,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
+    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
@@ -79,7 +81,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
         // set by the latest glClear statement.

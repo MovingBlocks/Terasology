@@ -35,6 +35,8 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * a blurred version of it in the color buffer attached to the output FBO.
  */
 public class BlurNode extends ConditionDependentNode implements FBOManagerSubscriber {
+    private static final ResourceUrn BLUR_MATERIAL = new ResourceUrn("engine:prog.blur");
+
     protected float blurRadius;
 
     private Material blurMaterial;
@@ -73,8 +75,8 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
         update(); // Cheeky way to initialise inputFbo, outputFbo
         fboManager.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.blur"));
-        this.blurMaterial = getMaterial(new ResourceUrn("engine:prog.blur"));
+        addDesiredStateChange(new EnableMaterial(BLUR_MATERIAL));
+        this.blurMaterial = getMaterial(BLUR_MATERIAL);
     }
 
     /**

@@ -39,7 +39,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
 public class OutlineNode extends ConditionDependentNode {
-    public static final ResourceUrn OUTLINE = new ResourceUrn("engine:outline");
+    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:outline");
+    public static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
 
@@ -50,10 +51,10 @@ public class OutlineNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 
-        requiresFBO(new FBOConfig(OUTLINE, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(OUTLINE, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(OUTLINE_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.sobel"));
+        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL));
 
         // TODO: Here make Material-based texture bindings explicit, using StateChanges.
         // TODO: See for example the ApplyDeferredLightingNode as an example of setting input textures

@@ -63,8 +63,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         renderingDebugConfig.subscribe(RenderingDebugConfig.ENABLED, this);
 
-        enablePostMaterial = new EnableMaterial(POST_MATERIAL.toString());
-        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL.toString());
+        enablePostMaterial = new EnableMaterial(POST_MATERIAL);
+        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL);
 
         if (!renderingDebugConfig.isEnabled()) {
             addDesiredStateChange(enablePostMaterial);

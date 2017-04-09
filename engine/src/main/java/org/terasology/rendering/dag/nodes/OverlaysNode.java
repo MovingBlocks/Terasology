@@ -63,7 +63,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
     }
 
     /**

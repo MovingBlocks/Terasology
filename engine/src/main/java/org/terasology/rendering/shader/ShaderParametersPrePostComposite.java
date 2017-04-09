@@ -118,7 +118,7 @@ public class ShaderParametersPrePostComposite extends ShaderParametersBase {
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isOutline()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.bindFboColorTexture(OutlineNode.OUTLINE);
+            displayResolutionDependentFBOs.bindFboColorTexture(OutlineNode.OUTLINE_FBO);
             program.setInt("texEdges", texId++, true);
 
             program.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);

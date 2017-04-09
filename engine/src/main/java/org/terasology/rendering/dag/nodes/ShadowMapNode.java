@@ -56,7 +56,8 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends ConditionDependentNode {
-    public static final ResourceUrn SHADOW_MAP = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP_MATERIAL = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private static final float STEP_SIZE = 50f;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
@@ -81,7 +82,7 @@ public class ShadowMapNode extends ConditionDependentNode {
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);
 
-        requiresFBO(new FBOConfig(SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
 
         texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
@@ -89,9 +90,9 @@ public class ShadowMapNode extends ConditionDependentNode {
         requiresCondition(() -> renderingConfig.isDynamicShadows());
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
-        addDesiredStateChange(new BindFBO(SHADOW_MAP, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial("engine:prog.shadowMap"));
+        addDesiredStateChange(new BindFBO(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
     }
 
     private float calculateTexelSize(int shadowMapResolution) {

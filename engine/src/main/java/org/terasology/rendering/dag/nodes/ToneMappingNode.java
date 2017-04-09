@@ -38,16 +38,17 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * This node stores its output in the this.TONE_MAPPED_FBO.
  */
 public class ToneMappingNode extends AbstractNode {
-    public static final ResourceUrn TONE_MAPPED_FBO = new ResourceUrn("engine:fbo.toneMapping");
+    public static final ResourceUrn TONE_MAPPING_FBO = new ResourceUrn("engine:fbo.toneMapping");
+    public static final ResourceUrn TONE_MAPPING_MATERIAL = new ResourceUrn("engine:prog.toneMapping");
 
     public ToneMappingNode(Context context) {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-        requiresFBO(new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
+        requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.toneMapping"));
+        addDesiredStateChange(new EnableMaterial(TONE_MAPPING_MATERIAL));
 
         // TODO: bind input textures from ShaderParametersCombine class
     }
