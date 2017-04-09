@@ -37,7 +37,7 @@ public class TargetSystem {
     private EntityRef prevTarget = EntityRef.NULL;
 
     private Vector3i targetBlockPos;
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
 
     public TargetSystem(BlockEntityRegistry blockRegistry, Physics physics) {
         this.blockRegistry = blockRegistry;
