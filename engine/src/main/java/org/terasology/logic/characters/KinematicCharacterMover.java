@@ -673,7 +673,13 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
-                endVelocity.y = -0.5f * endVelocity.y;
+                if (input.isFirstRun()) {
+                    Vector3f hitVelocity = new Vector3f(state.getVelocity());
+                    hitVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                    logger.debug("Hit at " + hitVelocity);
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), hitVelocity));
+                }
+                endVelocity.y = -0.0f * endVelocity.y;
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
@@ -698,10 +704,14 @@ public class KinematicCharacterMover implements CharacterMover {
 
             state.setGrounded(false);
         }
-        state.getVelocity().set(endVelocity);
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-            entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
+              Vector3f hitVelocity = new Vector3f(state.getVelocity());
+              hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
+              hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
+              logger.debug("Hit at " + hitVelocity);
+              entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
         }
+        state.getVelocity().set(endVelocity);
         if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
