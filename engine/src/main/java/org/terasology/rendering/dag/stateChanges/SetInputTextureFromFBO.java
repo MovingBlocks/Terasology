@@ -52,7 +52,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     private FBO inputFbo;
     private FboTexturesTypes textureType;
     private BaseFBOsManager fboManager;
-    private ResourceUrn materialURN;
+    private ResourceUrn materialUrn;
     private String parameterName;
 
     private SetInputTextureFromFBO defaultInstance;
@@ -68,24 +68,24 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
      * @param fboUrn an URN identifying an FBO.
      * @param textureType one of the types available through the FboTextureType enum.
      * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
-     * @param materialURN an URN identifying a Material instance.
+     * @param materialUrn an URN identifying a Material instance.
      * @param parameterName the name of a variable in the shader program used to sample the texture.
      */
     public SetInputTextureFromFBO(int textureSlot, ResourceUrn fboUrn, FboTexturesTypes textureType, BaseFBOsManager fboManager,
-                                  ResourceUrn materialURN, String parameterName) {
+                                  ResourceUrn materialUrn, String parameterName) {
         this.textureSlot = textureSlot;
         this.textureType = textureType;
         this.fboUrn = fboUrn;
         this.inputFbo = fboManager.get(fboUrn);
         this.fboManager = fboManager;
 
-        this.materialURN = materialURN;
+        this.materialUrn = materialUrn;
         this.parameterName = parameterName;
     }
 
-    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialURN, String parameterName) {
+    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialUrn, String parameterName) {
         this.textureSlot = textureSlot;
-        this.materialURN = materialURN;
+        this.materialUrn = materialUrn;
         this.parameterName = parameterName;
 
         defaultInstance = this;
@@ -95,10 +95,10 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     public RenderPipelineTask generateTask() {
         if (task == null) {
             if (inputFbo != null) {
-                task = new Task(this.textureSlot, fetchTextureId(), this.materialURN, this.parameterName);
+                task = new Task(this.textureSlot, fetchTextureId(), this.materialUrn, this.parameterName);
                 fboManager.subscribe(this);
             } else {
-                task = new Task(this.textureSlot, 0, this.materialURN, this.parameterName);
+                task = new Task(this.textureSlot, 0, this.materialUrn, this.parameterName);
             }
         }
 
@@ -108,7 +108,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetInputTextureFromFBO(this.textureSlot, materialURN, this.parameterName);
+            defaultInstance = new SetInputTextureFromFBO(this.textureSlot, materialUrn, this.parameterName);
         }
         return defaultInstance;
     }
@@ -151,16 +151,16 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     public String toString() {
         if (this != defaultInstance) {
             return String.format("%30s: slot %s, fbo %s, textureType %s, fboManager %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
-                    textureSlot, fboUrn.toString(), textureType.name(), fboManager.toString(), materialURN.toString(), parameterName);
+                    textureSlot, fboUrn.toString(), textureType.name(), fboManager.toString(), materialUrn.toString(), parameterName);
         } else {
             return String.format("%30s: slot %s, textureId 0, material %s, parameter '%s'", this.getClass().getSimpleName(),
-                    textureSlot, materialURN.toString(), parameterName);
+                    textureSlot, materialUrn.toString(), parameterName);
         }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(textureSlot, fboUrn, textureType, fboManager, materialURN, parameterName);
+        return Objects.hash(textureSlot, fboUrn, textureType, fboManager, materialUrn, parameterName);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
                 && this.fboUrn == ((SetInputTextureFromFBO) other).fboUrn
                 && this.textureType == ((SetInputTextureFromFBO) other).textureType
                 && this.fboManager == ((SetInputTextureFromFBO) other).fboManager
-                && this.materialURN.equals(((SetInputTextureFromFBO) other).materialURN)
+                && this.materialUrn.equals(((SetInputTextureFromFBO) other).materialUrn)
                 && this.parameterName.equals(((SetInputTextureFromFBO) other).parameterName);
     }
 
@@ -189,13 +189,13 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
          *
          * @param textureSlot an integer indirectly identifying a texture unit on the GPU (textureUnit = GL_TEXTURE0 + textureSlot).
          * @param textureId the opengl id of a texture, usually obtained via glGenTextures().
-         * @param materialURN an URN identifying a material.
+         * @param materialUrn an URN identifying a material.
          * @param shaderParameterName the name of the variable in the shader program used to sample the texture.
          */
-        private Task(int textureSlot, int textureId, ResourceUrn materialURN, String shaderParameterName) {
+        private Task(int textureSlot, int textureId, ResourceUrn materialUrn, String shaderParameterName) {
             this.textureSlot = textureSlot;
             this.textureId = textureId;
-            this.material = getMaterial(materialURN);
+            this.material = getMaterial(materialUrn);
             this.shaderParameterName = shaderParameterName;
         }
 
