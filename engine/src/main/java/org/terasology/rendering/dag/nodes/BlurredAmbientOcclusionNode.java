@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -57,26 +58,16 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
     private static final int TEXTURE_SLOT_0 = 0;
 
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
     private Material ssaoBlurredMaterial;
-    private FBO ssaoBlurredFbo;
     private float outputFboWidth;
     private float outputFboHeight;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
+    public BlurredAmbientOcclusionNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        Config config = context.get(Config.class);
+
         RenderingConfig renderingConfig = config.getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
@@ -115,7 +106,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     @Override
     public void update() {
-        ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
+        FBO ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
         outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }

@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
@@ -60,27 +61,17 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
 
-    @In
-    private Config config;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
     private WorldRenderer worldRenderer;
 
-
-    private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
+    public BackdropNode(Context context) {
+        Config config = context.get(Config.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        worldRenderer = context.get(WorldRenderer.class);
+
+        Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
 
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);

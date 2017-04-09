@@ -18,9 +18,9 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
@@ -54,30 +54,21 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
 public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
-    @In
-    private Config config;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
-    /**
-     * Initialises the node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public AlphaRejectBlocksNode(Context context) {
+        Config config = context.get(Config.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        renderQueues = context.get(RenderQueuesHelper.class);
+
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         playerCamera = worldRenderer.getActiveCamera();

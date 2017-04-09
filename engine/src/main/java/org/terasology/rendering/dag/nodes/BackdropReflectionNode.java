@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
@@ -58,27 +59,20 @@ public class BackdropReflectionNode extends AbstractNode {
     private static final int SLICES = 16;
     private static final int STACKS = 128;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    private Camera playerCamera;
     private int skySphere = -1;
 
     /**
-     * Node initialization.
-     *
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
      * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
      * on possible FBO configurations.
      *
      * This method also requests the material using the "sky" shaders (vertex, fragment) to be enabled.
      */
-    @Override
-    public void initialise() {
-        this.playerCamera = worldRenderer.getActiveCamera();
+    public BackdropReflectionNode(Context context) {
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
+        Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera));
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();

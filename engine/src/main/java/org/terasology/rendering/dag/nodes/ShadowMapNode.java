@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -61,30 +62,22 @@ public class ShadowMapNode extends ConditionDependentNode {
     private static final float STEP_SIZE = 50f;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
-    @In
-    private RenderableWorld renderableWorld;
-
-    @In
-    private RenderQueuesHelper renderQueues;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
+    private RenderQueuesHelper renderQueues;
     private BackdropProvider backdropProvider;
-
-    @In
-    private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
     private float texelSize;
 
-    @Override
-    public void initialise() {
+    public ShadowMapNode(Context context) {
+        worldRenderer = context.get(WorldRenderer.class);
+        renderQueues = context.get(RenderQueuesHelper.class);
+        backdropProvider = context.get(BackdropProvider.class);
+        Config config = context.get(Config.class);
+        RenderableWorld renderableWorld = context.get(RenderableWorld.class);
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+
         this.playerCamera = worldRenderer.getActiveCamera();
         this.renderingConfig = config.getRendering();
         renderableWorld.setShadowMapCamera(shadowMapCamera);

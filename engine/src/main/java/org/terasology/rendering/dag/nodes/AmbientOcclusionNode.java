@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
 
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
+
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
@@ -57,26 +57,16 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
 
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
     private Material ssaoMaterial;
-    private FBO ssaoFbo;
     private float outputFboWidth;
     private float outputFboHeight;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
+    public AmbientOcclusionNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        Config config = context.get(Config.class);
+
         RenderingConfig renderingConfig = config.getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
@@ -114,7 +104,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     @Override
     public void update() {
-        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
+        FBO ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }

@@ -227,29 +227,25 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderGraph() {
-        // FIXME: init pipeline without specifying them as a field in this class
-        NodeFactory nodeFactory = new NodeFactory(context);
         RenderGraph renderGraph = new RenderGraph();
 
         // ShadowMap generation
-        FBOConfig shadowMapConfig =
-                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
-        BufferClearingNode shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
-        shadowMapClearingNode.initialise(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
+        FBOConfig shadowMapConfig = new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
+        BufferClearingNode shadowMapClearingNode = new BufferClearingNode(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
 
-        shadowMapNode = nodeFactory.createInstance(ShadowMapNode.class);
+        shadowMapNode = new ShadowMapNode(context);
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
 
         // (i.e. water) reflection generation
-        FBOConfig reflectedBufferConfig =
-                new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
-        BufferClearingNode reflectedBufferClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
-        reflectedBufferClearingNode.initialise(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
+        BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode"); // TODO: verify this is necessary
 
-        Node reflectedBackdropNode = nodeFactory.createInstance(BackdropReflectionNode.class);
+        Node reflectedBackdropNode = new BackdropReflectionNode(context);
         renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
+
+        // VAMPCAT : I've only reached here so far.
 
         Node worldReflectionNode = nodeFactory.createInstance(WorldReflectionNode.class);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");

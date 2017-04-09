@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import jopenvr.JOpenVRLibrary;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
@@ -45,22 +46,10 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
     // TODO: make these configurable options
 
-    @In
     private OpenVRProvider vrProvider;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
-    @In
-    private ScreenGrabber screenGrabber;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
@@ -69,11 +58,15 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
     private FBO finalFbo;
 
     /**
-     * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
+     * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
-    @Override
-    public void initialise() {
+    public CopyImageToHMDNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        vrProvider = context.get(OpenVRProvider.class);
+        Config config = context.get(Config.class);
+
         renderingConfig = config.getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
                 && vrProvider.isInitialized()));

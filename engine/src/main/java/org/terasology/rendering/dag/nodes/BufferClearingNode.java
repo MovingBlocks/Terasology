@@ -36,14 +36,7 @@ public class BufferClearingNode extends AbstractNode {
     private int clearingMask;
 
     /**
-     * Throws a RuntimeException if invoked. Use initialise(Object data) instead.
-     */
-    public void initialise() {
-        throw new RuntimeException("Please do not use initialise(). For this class use initialise(Object initialData) instead.");
-    }
-
-    /**
-     * Initialises the node by requesting the creation (if necessary) of the FBO to be cleared
+     * Constructs the node by requesting the creation (if necessary) of the FBO to be cleared
      * and by requesting for this FBO to be bound by the time process() gets executed. Also
      * stores the clearing mask, for use in process().
      *
@@ -54,7 +47,7 @@ public class BufferClearingNode extends AbstractNode {
      *                      Non GL_*_BIT values will be accepted but might eventually generate an opengl error.
      * @throws IllegalArgumentException if fboConfig, fboManager are null and if clearingMask is zero.
      */
-    public void initialise(FBOConfig fboConfig, BaseFBOsManager fboManager, int aClearingMask) {
+    public BufferClearingNode(FBOConfig fboConfig, BaseFBOsManager fboManager, int aClearingMask) {
 
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, aClearingMask);
 
