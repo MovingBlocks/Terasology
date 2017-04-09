@@ -24,7 +24,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
