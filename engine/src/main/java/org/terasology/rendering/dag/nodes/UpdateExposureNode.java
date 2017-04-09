@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -59,16 +60,7 @@ public class UpdateExposureNode extends AbstractNode {
     @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
-    @In
-    private ImmutableFBOs immutableFBOs;
-
-    @In
-    private Config config;
-
-    @In
     private BackdropProvider backdropProvider;
-
-    @In
     private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
@@ -76,14 +68,9 @@ public class UpdateExposureNode extends AbstractNode {
     private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
                                 // This data is then used in the context of eye adaptation.
 
-    /**
-     * Initializes an UpdateExposureNode instance.This method must be called once shortly after instantiation
-     * to fully initialize the node and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        renderingConfig = config.getRendering();
-        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, immutableFBOs);
+    public UpdateExposureNode(Context context) {
+        renderingConfig = context.get(Config.class).getRendering();
+        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
         writeOnlyPBO = new PBO(1, 1);
     }
 

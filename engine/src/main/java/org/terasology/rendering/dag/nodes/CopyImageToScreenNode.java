@@ -17,10 +17,9 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.config.Config;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -38,21 +37,16 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private FBO sceneFinalFbo;
     private int displayWidth;
     private int displayHeight;
 
-    @Override
-    public void initialise() {
+    public CopyImageToScreenNode(Context context) {
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise sceneFinalFbo

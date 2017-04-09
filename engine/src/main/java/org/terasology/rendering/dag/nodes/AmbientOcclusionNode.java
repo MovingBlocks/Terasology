@@ -63,11 +63,13 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private float outputFboWidth;
     private float outputFboHeight;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private FBO ssaoFbo;
+
     public AmbientOcclusionNode(Context context) {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        Config config = context.get(Config.class);
 
-        RenderingConfig renderingConfig = config.getRendering();
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
@@ -104,7 +106,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     @Override
     public void update() {
-        FBO ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
+        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }

@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -44,34 +45,24 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
-    @In
     private ComponentSystemManager componentSystemManager;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private SetWireframe wireframeStateChange;
 
-    /**
-     * Initialises the node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public OverlaysNode(Context context) {
+        componentSystemManager = context.get(ComponentSystemManager.class);
+        worldRenderer = context.get(WorldRenderer.class);
+
         wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL.toString()));
     }

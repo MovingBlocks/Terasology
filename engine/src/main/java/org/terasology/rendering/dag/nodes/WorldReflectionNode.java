@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -62,24 +63,15 @@ public class WorldReflectionNode extends ConditionDependentNode {
     public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
-    @In
     private RenderQueuesHelper renderQueues;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private Material chunkShader;
     private RenderingConfig renderingConfig;
 
     /**
-     * Node initialization.
+     * Constructs an instance of this class.
      *
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
      * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
@@ -87,13 +79,16 @@ public class WorldReflectionNode extends ConditionDependentNode {
      *
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
      */
-    @Override
-    public void initialise() {
+    public WorldReflectionNode(Context context) {
+        renderQueues = context.get(RenderQueuesHelper.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        renderingConfig = config.getRendering();
+        renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> renderingConfig.isReflectiveWater());
         renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
 

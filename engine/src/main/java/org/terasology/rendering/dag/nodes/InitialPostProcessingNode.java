@@ -16,8 +16,8 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -36,15 +36,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 public class InitialPostProcessingNode extends AbstractNode {
     public static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public InitialPostProcessingNode(Context context) {
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
         // TODO: see if we could write this straight into a GBUFFER - notice this FBO is used in ShaderParametersHdr
         requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(INITIAL_POST_FBO, displayResolutionDependentFBOs));

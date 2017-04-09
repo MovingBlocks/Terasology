@@ -16,9 +16,9 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -55,27 +55,17 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class DeferredMainLightNode extends AbstractNode {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
 
-    @In
     private BackdropProvider backdropProvider;
-
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private LightComponent mainLightComponent = new LightComponent();
     private Camera playerCamera;
     private Material lightGeometryMaterial;
 
-    /**
-     * Initializes an instance of this node.
-     *
-     * This method -must- be called once for this node to be fully operational.
-     */
-    @Override
-    public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
+    public DeferredMainLightNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
+        playerCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);

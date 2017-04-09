@@ -64,6 +64,9 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private float outputFboWidth;
     private float outputFboHeight;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private FBO ssaoBlurredFbo;
+
     public BlurredAmbientOcclusionNode(Context context) {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         Config config = context.get(Config.class);
@@ -106,7 +109,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     @Override
     public void update() {
-        FBO ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
+        ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
         outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }

@@ -67,7 +67,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private SetWireframe wireframeStateChange;
 
     public BackdropNode(Context context) {
-        Config config = context.get(Config.class);
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
 
@@ -77,7 +76,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));

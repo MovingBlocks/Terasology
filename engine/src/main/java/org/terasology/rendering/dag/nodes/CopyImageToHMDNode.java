@@ -28,10 +28,8 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
@@ -65,9 +63,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
         vrProvider = context.get(OpenVRProvider.class);
-        Config config = context.get(Config.class);
 
-        renderingConfig = config.getRendering();
+        renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> (renderingConfig.isVrSupport()
                 && vrProvider.isInitialized()));
         requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,

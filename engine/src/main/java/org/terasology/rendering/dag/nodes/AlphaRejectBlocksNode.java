@@ -62,19 +62,18 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private SetWireframe wireframeStateChange;
 
     public AlphaRejectBlocksNode(Context context) {
-        Config config = context.get(Config.class);
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
         renderQueues = context.get(RenderQueuesHelper.class);
 
         wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
+        // TODO: VAMPCAT: Check if RenderingConfig class is available straight from the context
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);

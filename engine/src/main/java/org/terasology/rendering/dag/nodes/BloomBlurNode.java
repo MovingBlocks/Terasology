@@ -59,8 +59,7 @@ public class BloomBlurNode extends BlurNode {
      */
     @Override
     protected void setupConditions(Context context) {
-        Config config = context.get(Config.class);
-        RenderingConfig renderingConfig = config.getRendering();
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
     }

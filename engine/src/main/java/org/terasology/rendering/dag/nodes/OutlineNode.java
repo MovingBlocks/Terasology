@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.ConditionDependentNode;
@@ -42,20 +43,12 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 public class OutlineNode extends ConditionDependentNode {
     public static final ResourceUrn OUTLINE = new ResourceUrn("engine:outline");
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
     private RenderingConfig renderingConfig;
 
-    @Override
-    public void initialise() {
-        renderingConfig = config.getRendering();
+    public OutlineNode(Context context) {
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
+        renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 

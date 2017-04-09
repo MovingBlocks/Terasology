@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -39,6 +40,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.generation.World;
 
 /**
  * This node renders refractive/reflective blocks, i.e. water blocks.
@@ -59,25 +61,23 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     public static final ResourceUrn REFRACTIVE_REFLECTIVE = new ResourceUrn("engine:sceneReflectiveRefractive");
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
-    @In
     private RenderQueuesHelper renderQueues;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Camera playerCamera;
     private Material chunkShader;
+
+    @SuppressWarnings("FieldCanBeLocal")
     private FBO readOnlyGBufferFbo;
+    @SuppressWarnings("FieldCanBeLocal")
     private FBO refractiveReflectiveFbo;
 
-    /**
-     * Initialises the node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public RefractiveReflectiveBlocksNode(Context context) {
+        renderQueues = context.get(RenderQueuesHelper.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 

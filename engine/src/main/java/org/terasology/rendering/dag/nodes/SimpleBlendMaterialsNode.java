@@ -15,7 +15,9 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
@@ -50,25 +52,15 @@ import org.terasology.rendering.world.WorldRenderer;
  * semi-transparent objects are handled here, after nodes relying on the depth buffer have done their job.
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private ComponentSystemManager componentSystemManager;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public SimpleBlendMaterialsNode(Context context) {
+        componentSystemManager = context.get(ComponentSystemManager.class);
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        Camera playerCamera = worldRenderer.getActiveCamera();
+        Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

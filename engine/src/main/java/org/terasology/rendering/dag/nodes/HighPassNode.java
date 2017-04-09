@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -47,21 +47,12 @@ public class HighPassNode extends ConditionDependentNode {
     @Range(min = 0.0f, max = 5.0f)
     private float highPassThreshold = 0.05f;
 
-    @In
-    private Config config;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     private Material highPass;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        RenderingConfig renderingConfig = config.getRendering();
+    public HighPassNode(Context context) {
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
 

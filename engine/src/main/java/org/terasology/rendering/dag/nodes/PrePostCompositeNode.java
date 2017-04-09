@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
@@ -44,15 +45,11 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class PrePostCompositeNode extends AbstractNode {
     private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:fbo.reflectiveRefractive");
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
+    public PrePostCompositeNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));

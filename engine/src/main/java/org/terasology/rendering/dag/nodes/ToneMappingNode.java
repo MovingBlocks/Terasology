@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
@@ -40,15 +41,9 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 public class ToneMappingNode extends AbstractNode {
     public static final ResourceUrn TONE_MAPPED_FBO = new ResourceUrn("engine:fbo.toneMapping");
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public ToneMappingNode(Context context) {
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
         requiresFBO(new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
