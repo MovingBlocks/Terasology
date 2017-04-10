@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,17 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Light Shafts shader program.
  *
  */
 public class ShaderParametersLightShafts extends ShaderParametersBase {
-
     @Range(min = 0.0f, max = 10.0f)
     private float density = 1.0f;
     @Range(min = 0.0f, max = 0.01f)
@@ -47,21 +47,23 @@ public class ShaderParametersLightShafts extends ShaderParametersBase {
     public void applyParameters(Material program) {
         super.applyParameters(program);
 
-        // TODO: obtain once in superclass and monitor from there?
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
-        FBO scene = displayResolutionDependentFBOs.get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         int texId = 0;
 
         // TODO: - move into node
         // TODO: - many null checks are happening in these shader parameter classes. I feel they are unnecessary
         // TODO:   as those objects should never be null. If they are I'd be happy receiving an NPE and debugging as needed.
-        if (scene != null) {
+        if (sceneOpaqueFbo != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            scene.bindTexture();
+            sceneOpaqueFbo.bindTexture();
             program.setInt("texScene", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            scene.bindDepthTexture();
+            sceneOpaqueFbo.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
         }
 
@@ -70,9 +72,6 @@ public class ShaderParametersLightShafts extends ShaderParametersBase {
         program.setFloat("exposure", exposure, true);
         program.setFloat("weight", weight, true);
         program.setFloat("decay", decay, true);
-
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
 
         // TODO: eliminate null check?
         if (worldRenderer != null) {

@@ -37,6 +37,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
+import org.terasology.engine.subsystem.openvr.OpenVRInput;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -371,7 +372,8 @@ public final class Terasology {
             builder.add(audio)
                     .add(new LwjglGraphics())
                     .add(new LwjglTimer())
-                    .add(new LwjglInput());
+                    .add(new LwjglInput())
+                    .add(new OpenVRInput());
         }
         builder.add(new HibernationSubsystem());
     }

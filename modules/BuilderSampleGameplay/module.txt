@@ -1,6 +1,6 @@
 {
     "id" : "BuilderSampleGameplay",
-    "version" : "1.3.1-SNAPSHOT",
+    "version" : "1.4.1-SNAPSHOT",
     "author" : "",
     "displayName" : "Builder Sample Gameplay",
     "description" : "The last item you pick up is what you can build with. No restrictions, build to your heart's content.  Also uses 64x64 pixel block tiles.",

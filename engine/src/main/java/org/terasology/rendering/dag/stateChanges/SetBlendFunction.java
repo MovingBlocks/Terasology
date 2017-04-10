@@ -18,11 +18,25 @@ package org.terasology.rendering.dag.stateChanges;
 import com.google.common.collect.ImmutableMap;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetBlendFunctionTask;
 
 import java.util.Objects;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA_SATURATE;
+import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 
 /**
  * This StateChange generates the tasks that change and reset the blend function factors.
@@ -100,13 +114,45 @@ public class SetBlendFunction implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         return String.format("%30s: %s, %s", this.getClass().getSimpleName(), OGL_TO_STRING.get(sourceFactor), OGL_TO_STRING.get(destinationFactor));
     }
 
+    /**
+     * Instances of this class change the factors used for blending.
+     *
+     * See glBlendFunc for more information.
+     *
+     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
+     * Modules or other parts of the engine should take advantage of them through classes
+     * inheriting from StateChange.
+     */
+    private class SetBlendFunctionTask implements RenderPipelineTask {
+        private int sourceFactor;
+        private int destinationFactor;
+
+        /**
+         * Constructs an instance of SetBlendFunction initialised with the given blend function factors.
+         *
+         * @param sourceFactor An integer representing one of the possible blend factors known to OpenGL,
+         *                      i.e. GL_ONE, GL_SRC_COLOR, etc...
+         * @param destinationFactor An integer representing one of the possible blend factors known to OpenGL,
+         *                      i.e. GL_ZERO, GL_DST_COLOR, etc...
+         */
+        private SetBlendFunctionTask(int sourceFactor, int destinationFactor) {
+            this.sourceFactor = sourceFactor;
+            this.destinationFactor = destinationFactor;
+        }
+
+        @Override
+        public void execute() {
+            glBlendFunc(sourceFactor, destinationFactor);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s, %s", this.getClass().getSimpleName(), SetBlendFunction.OGL_TO_STRING.get(sourceFactor),
+                    SetBlendFunction.OGL_TO_STRING.get(destinationFactor));
+        }
+    }
 }

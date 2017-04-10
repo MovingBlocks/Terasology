@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,12 @@ import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.WRITE_ONLY_GBUFFER;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
  * An instance of this class takes advantage of the content of a number of previously filled buffers
@@ -56,8 +55,7 @@ public class PrePostCompositeNode extends AbstractNode {
     public void initialise() {
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial("engine:prog.prePostComposite"));
-        addDesiredStateChange(new BindFBO(WRITE_ONLY_GBUFFER));
-        addDesiredStateChange(new SetViewportToSizeOf(WRITE_ONLY_GBUFFER));
+        addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
         // TODO: bind input textures from ShaderParametersCombine class
     }
@@ -74,9 +72,6 @@ public class PrePostCompositeNode extends AbstractNode {
 
         // TODO: review - the following line is necessary, but at this stage it's unclear why.
         displayResolutionDependentFBOs.swapReadWriteBuffers();
-
-        // The following line doesn't seem to have an effect: for the time being I keep it here for safety.
-        // READ_ONLY_GBUFFER.attachDepthBufferTo(displayResolutionDependentFBOs.get(REFLECTIVE_REFRACTIVE_FBO));
 
         PerformanceMonitor.endActivity();
     }

@@ -18,7 +18,8 @@ package org.terasology.rendering.dag.stateChanges;
 import com.google.common.base.Objects;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetDepthMaskTask;
+
+import static org.lwjgl.opengl.GL11.glDepthMask;
 
 /**
  * Instances of this class disable writing to the depth buffer.
@@ -28,6 +29,7 @@ import org.terasology.rendering.dag.tasks.SetDepthMaskTask;
  * should it be the object's distance from the near plane or should it be the first thing behind it?
  */
 public final class DisableDepthWriting implements StateChange {
+
     private static StateChange defaultInstance = new DisableDepthWriting(true);
     private static RenderPipelineTask enablingTask;
     private static RenderPipelineTask disablingTask;
@@ -68,11 +70,6 @@ public final class DisableDepthWriting implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).isEnabled();
     }
@@ -100,4 +97,25 @@ public final class DisableDepthWriting implements StateChange {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
     }
 
+    private final class SetDepthMaskTask implements RenderPipelineTask {
+        private boolean enabled;
+
+        private SetDepthMaskTask(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        @Override
+        public void execute() {
+            glDepthMask(enabled);
+        }
+
+        @Override
+        public String toString() {
+            String status = "disabled";
+            if (enabled) {
+                status = "enabled";
+            }
+            return String.format("%30s: %s", this.getClass().getSimpleName(), status);
+        }
+    }
 }

@@ -33,6 +33,8 @@ public interface ServerInfoMessage {
      */
     String getGameName();
 
+    String getMOTD();
+
     List<WorldInfo> getWorldInfoList();
 
     /**
@@ -62,4 +64,8 @@ public interface ServerInfoMessage {
      */
     float getReflectionHeight();
 
+    /**
+     * Get amount of online players from server
+     */
+    int getOnlinePlayersAmount();
 }

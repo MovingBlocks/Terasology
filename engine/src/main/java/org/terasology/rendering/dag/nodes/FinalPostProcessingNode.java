@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -34,6 +33,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
@@ -82,8 +82,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             addDesiredStateChange(enableDebugMaterial);
         }
 
-        addDesiredStateChange(new BindFBO(FINAL.getName(), displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(FINAL.getName(), displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(FINAL_BUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
@@ -38,6 +39,8 @@ public class ClientCommands extends BaseComponentSystem {
     @In
     private WorldProvider worldProvider;
 
+    @In
+    private NetworkSystem networkSystem;
 
     /**
      * Displays debug information on the target entity for the target the camera is pointing at

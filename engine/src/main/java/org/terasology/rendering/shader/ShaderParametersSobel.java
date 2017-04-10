@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.nui.properties.Range;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
-
     @Range(min = 0.0f, max = 16.0f)
     float pixelOffsetX = 1.0f;
     @Range(min = 0.0f, max = 16.0f)
@@ -39,22 +39,22 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         super.applyParameters(program);
 
         // TODO: obtain once in superclass? The super class could then have the monitoring functionality.
-        FBO scene = CoreRegistry.get(DisplayResolutionDependentFBOs.class).get(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName()); // TODO: switch from CoreRegistry to Context.
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
+
+        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
 
         // TODO: move to node
-        if (scene != null) {
-
+        if (sceneOpaqueFbo != null) {
             // TODO: group these recurring three lines into a method binding a texture from disk or an FBO-bound buffer
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            scene.bindDepthTexture();
+            sceneOpaqueFbo.bindDepthTexture();
             program.setInt("texDepth", 0);
 
-            program.setFloat("texelWidth", 1.0f / scene.width());
-            program.setFloat("texelHeight", 1.0f / scene.height());
+            program.setFloat("texelWidth", 1.0f / sceneOpaqueFbo.width());
+            program.setFloat("texelHeight", 1.0f / sceneOpaqueFbo.height());
         }
 
         program.setFloat("pixelOffsetX", pixelOffsetX);
         program.setFloat("pixelOffsetY", pixelOffsetY);
     }
-
 }

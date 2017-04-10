@@ -34,7 +34,10 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 
 /**
@@ -50,7 +53,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public class BackdropReflectionNode extends AbstractNode {
-
     public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;

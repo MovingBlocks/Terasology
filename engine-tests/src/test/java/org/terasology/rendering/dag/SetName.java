@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package org.terasology.rendering.dag;
-
 
 import com.google.common.base.Objects;
 
@@ -52,11 +51,6 @@ public class SetName implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), name);
     }
@@ -65,4 +59,3 @@ public class SetName implements StateChange {
         return name;
     }
 }
-

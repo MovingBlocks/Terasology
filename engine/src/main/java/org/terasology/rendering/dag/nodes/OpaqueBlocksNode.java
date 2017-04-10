@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -29,17 +28,18 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
 /**
@@ -48,7 +48,6 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * In a typical world this is the majority of the world's landscape.
  */
 public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
-
     private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
 
     @In
@@ -60,6 +59,9 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     @In
     private RenderQueuesHelper renderQueues;
 
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
     private Camera playerCamera;
     private Material chunkShader;
     private SetWireframe wireframeStateChange;
@@ -70,14 +72,15 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
-
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = config.getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+
         addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
         chunkShader = getMaterial(CHUNK_SHADER);
     }
@@ -120,7 +123,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
         chunkShader.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {

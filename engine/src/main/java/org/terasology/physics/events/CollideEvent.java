@@ -18,16 +18,31 @@ package org.terasology.physics.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Vector3f;
 
 /**
  */
 public class CollideEvent implements Event {
     private EntityRef otherEntity;
+    private Vector3f entityContactPoint;
+    private Vector3f otherEntityContactPoint;
+    private float penetration;
+    private Vector3f normal;
 
-    public CollideEvent(EntityRef other) {
-        otherEntity = other;
+
+    public CollideEvent(EntityRef other, Vector3f entityContactPoint, Vector3f otherEntityContactPoint, float penetration, Vector3f normal) {
+        this.otherEntity = other;
+        this.normal = normal;
+        this.entityContactPoint = entityContactPoint;
+        this.otherEntityContactPoint = otherEntityContactPoint;
+        this.penetration = penetration;
     }
 
+    public  Vector3f getNormal(){return  normal;}
+    public  Vector3f getEntityContactPoint(){return  entityContactPoint;}
+    public  Vector3f getOtherEntityContactPoint(){return otherEntityContactPoint;}
+    public  float getPenetration(){return  penetration;}
     public EntityRef getOtherEntity() {
         return otherEntity;
     }

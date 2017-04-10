@@ -285,6 +285,15 @@
                                     },
                                     {
                                         "type": "UILabel",
+                                        "text": "${engine:menu#online-players}:"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "onlinePlayers",
+                                        "text": ""
+                                    },
+                                    {
+                                        "type": "UILabel",
                                         "text": "${engine:menu#game-worlds}: "
                                     },
                                     {

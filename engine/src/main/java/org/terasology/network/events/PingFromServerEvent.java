@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.tasks;
+package org.terasology.network.events;
 
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.network.OwnerEvent;
 
 /**
- * TODO: Add javadocs
+ * This event handles the ping from the server to all clients.
  */
-public final class DisableMaterialTask implements RenderPipelineTask {
-
-    private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
-
-    @Override
-    public void execute() {
-        shaderManager.disableShader();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%30s: program 0", this.getClass().getSimpleName());
-    }
+@OwnerEvent
+public class PingFromServerEvent implements Event {
 }

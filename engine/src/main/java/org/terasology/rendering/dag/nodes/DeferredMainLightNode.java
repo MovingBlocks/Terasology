@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,20 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
+import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.logic.LightComponent;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 // TODO: have this node and the shadowmap node handle multiple directional lights
 
@@ -59,6 +61,9 @@ public class DeferredMainLightNode extends AbstractNode {
     @In
     private WorldRenderer worldRenderer;
 
+    @In
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
     private LightComponent mainLightComponent = new LightComponent();
     private Camera playerCamera;
     private Material lightGeometryMaterial;
@@ -79,6 +84,9 @@ public class DeferredMainLightNode extends AbstractNode {
 
         addDesiredStateChange(new EnableBlending());
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         initMainDirectionalLight();
     }
@@ -102,9 +110,6 @@ public class DeferredMainLightNode extends AbstractNode {
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it - I think.
 
-        READ_ONLY_GBUFFER.bind(); // TODO: remove and replace with a state change
-        READ_ONLY_GBUFFER.setRenderBufferMask(false, false, true); // Only write to the light accumulation buffer
-
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
         lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
@@ -121,8 +126,6 @@ public class DeferredMainLightNode extends AbstractNode {
         renderFullscreenQuad(); // renders the light.
 
         lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
-
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true);
 
         PerformanceMonitor.endActivity();
     }

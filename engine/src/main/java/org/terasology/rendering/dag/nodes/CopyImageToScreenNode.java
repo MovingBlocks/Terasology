@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.config.Config;
@@ -23,15 +24,18 @@ import org.terasology.registry.In;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.FINAL;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode {
-
+public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
     @In
@@ -43,19 +47,36 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
+    private FBO sceneFinalFbo;
+    private int displayWidth;
+    private int displayHeight;
 
     @Override
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
         addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
+        update(); // Cheeky way to initialise sceneFinalFbo
+        displayResolutionDependentFBOs.subscribe(this);
+
         addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        FINAL.bindTexture();
+        sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
+        // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
+        // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
+        // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
+        glViewport(0, 0, displayWidth, displayHeight);
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        displayWidth = Display.getWidth();
+        displayHeight = Display.getHeight();
     }
 }

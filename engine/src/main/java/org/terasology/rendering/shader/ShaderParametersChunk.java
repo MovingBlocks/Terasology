@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.RenderingConfig;
 import org.terasology.rendering.dag.nodes.WorldReflectionNode;
-import org.terasology.rendering.opengl.DefaultDynamicFBOs;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.utilities.Assets;
 import org.terasology.config.Config;
@@ -32,6 +31,7 @@ import org.terasology.rendering.nui.properties.Range;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Chunk shader program.
@@ -129,7 +129,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(DefaultDynamicFBOs.READ_ONLY_GBUFFER.getName());
+        displayResolutionDependentFBOs.bindFboColorTexture(READONLY_GBUFFER);
         program.setInt("texSceneOpaque", texId++, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame
