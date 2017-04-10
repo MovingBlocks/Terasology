@@ -24,86 +24,68 @@ package org.terasology;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.beans.PropertyChangeListener;
-import org.evosuite.runtime.EvoRunner;
-import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 import org.terasology.config.AudioConfig;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
-public class AudioConfig_ESTest extends AudioConfig_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
-  public void test0()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.setDisableSound(true);
-      boolean boolean0 = audioConfig0.isDisableSound();
-      assertTrue(boolean0);
-  }
+public class AudioConfig_ESTest{
 
-  @Test(timeout = 4000)
-  public void test1()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.setSoundVolume(1.0F);
-      float float0 = audioConfig0.getSoundVolume();
-      assertEquals(1.0F, float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigDisableSound1()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.setDisableSound(true);
+        boolean boolean0 = audioConfig0.isDisableSound();
+        assertTrue(boolean0);
+    }
 
-  @Test(timeout = 4000)
-  public void test2()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.setMusicVolume(2415.0F);
-      float float0 = audioConfig0.getMusicVolume();
-      assertEquals(2415.0F, float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigSetSoundVolume()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.setSoundVolume(1.0F);
+        float float0 = audioConfig0.getSoundVolume();
+        assertEquals(1.0F, float0, 0.01F);
+    }
 
-  @Test(timeout = 4000)
-  public void test3()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.setMusicVolume((-1022.3F));
-      float float0 = audioConfig0.getMusicVolume();
-      assertEquals((-1022.3F), float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigSetMusicVolume()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.setMusicVolume(2476.09F);
+        float float0 = audioConfig0.getMusicVolume();
+        assertEquals(2476.09F, float0, 0.01F);
+    }
 
-  @Test(timeout = 4000)
-  public void test4()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      boolean boolean0 = audioConfig0.isDisableSound();
-      assertFalse(boolean0);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigDisableSound2()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        boolean boolean0 = audioConfig0.isDisableSound();
+        assertFalse(boolean0);
+    }
 
-  @Test(timeout = 4000)
-  public void test5()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      float float0 = audioConfig0.getSoundVolume();
-      assertEquals(0.0F, float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigGetSoundVolume()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        float float0 = audioConfig0.getSoundVolume();
+        assertEquals(0.0F, float0, 0.01F);
+    }
 
-  @Test(timeout = 4000)
-  public void test6()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.setSoundVolume((-1022.3F));
-      float float0 = audioConfig0.getSoundVolume();
-      assertEquals((-1022.3F), float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigGetMusicVolume()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        float float0 = audioConfig0.getMusicVolume();
+        assertEquals(0.0F, float0, 0.01F);
+    }
 
-  @Test(timeout = 4000)
-  public void test7()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      float float0 = audioConfig0.getMusicVolume();
-      assertEquals(0.0F, float0, 0.01F);
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigUnsubscribe()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.unsubscribe((PropertyChangeListener) null);
+        assertEquals(0.0F, audioConfig0.getSoundVolume(), 0.01F);
+    }
 
-  @Test(timeout = 4000)
-  public void test8()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.unsubscribe((PropertyChangeListener) null);
-      assertFalse(audioConfig0.isDisableSound());
-  }
-
-  @Test(timeout = 4000)
-  public void test9()  throws Throwable  {
-      AudioConfig audioConfig0 = new AudioConfig();
-      audioConfig0.subscribe((PropertyChangeListener) null);
-      assertFalse(audioConfig0.isDisableSound());
-  }
+    @Test(timeout = 4000)
+    public void testAudioConfigSubscribe()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.subscribe((PropertyChangeListener) null);
+        assertEquals(0.0F, audioConfig0.getMusicVolume(), 0.01F);
+    }
 }
