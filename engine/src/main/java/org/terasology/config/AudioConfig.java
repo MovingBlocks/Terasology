@@ -39,6 +39,8 @@ public class AudioConfig {
      * @param soundVolume Sets the sound volume offering both the new as well as prior value if needed
      */
     public void setSoundVolume(float soundVolume) {
+        if(soundVolume > 100) soundVolume = 100;
+        if(soundVolume < 0) soundVolume = 0;
         float oldValue = this.soundVolume;
         this.soundVolume = soundVolume;
         propertyChangeSupport.firePropertyChange(SOUND_VOLUME, oldValue, soundVolume);
@@ -55,6 +57,8 @@ public class AudioConfig {
      * @param musicVolume Sets the music volume offering both the new as well as prior value if needed
      */
     public void setMusicVolume(float musicVolume) {
+        if(musicVolume > 100) musicVolume = 100;
+        if(musicVolume < 0) musicVolume = 0;
         float oldValue = this.musicVolume;
         this.musicVolume = musicVolume;
         propertyChangeSupport.firePropertyChange(MUSIC_VOLUME, oldValue, musicVolume);

@@ -51,7 +51,15 @@ public class AudioConfig_ESTest{
         AudioConfig audioConfig0 = new AudioConfig();
         audioConfig0.setMusicVolume(2476.09F);
         float float0 = audioConfig0.getMusicVolume();
-        assertEquals(2476.09F, float0, 0.01F);
+        assertEquals(100F, float0, 0.01F);
+    }
+
+    @Test(timeout = 4000)
+    public void testAudioConfigSetMusicVolumeNegative()  throws Throwable  {
+        AudioConfig audioConfig0 = new AudioConfig();
+        audioConfig0.setMusicVolume((-1022.3F));
+        float float0 = audioConfig0.getMusicVolume();
+        assertEquals((0.0F), float0, 0.01F);
     }
 
     @Test(timeout = 4000)
