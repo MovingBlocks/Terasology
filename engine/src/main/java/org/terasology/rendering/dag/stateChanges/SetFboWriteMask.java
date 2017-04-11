@@ -20,7 +20,6 @@ import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 /**
@@ -36,15 +35,15 @@ import org.terasology.rendering.dag.StateChange;
  * investigated.
  */
 public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange {
-    private ResourceUrn fboName;
+    private SetFboWriteMask defaultInstance;
+
     private BaseFBOsManager fboManager;
+    private ResourceUrn fboName;
+    private FBO fbo;
 
     private boolean renderToColorBuffer;
     private boolean renderToDepthBuffer;
     private boolean renderToLightBuffer;
-
-    private SetFboWriteMask defaultInstance;
-    private SetFboWriteMaskTask task;
 
     /**
      * Creates an instance of this class with the given parameters.
@@ -62,6 +61,10 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
 
         this.fboName = fboName;
         this.fboManager = fboManager;
+
+        // Cheeky way to initialise fbo
+        update();
+        fboManager.subscribe(this);
     }
 
     /**
@@ -78,6 +81,11 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         this.fboName = fboName;
         this.fboManager = fboManager;
 
+        // Cheeky way to initialise fbo
+        update();
+        fboManager.subscribe(this);
+
+
         defaultInstance = this;
     }
 
@@ -90,15 +98,6 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         if (defaultInstance == null)
             defaultInstance = new SetFboWriteMask(fboName, fboManager);
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetFboWriteMaskTask(fboManager.get(fboName), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
-            fboManager.subscribe(this);
-        }
-        return task;
     }
 
     @Override
@@ -117,7 +116,7 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
 
     @Override
     public void update() {
-        task.setFbo(fboManager.get(fboName));
+        fbo = fboManager.get(fboName);
     }
 
     @Override
@@ -125,32 +124,8 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fboName, renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 
-    private final class SetFboWriteMaskTask implements RenderPipelineTask {
-        private FBO fbo;
-        private boolean renderToColorBuffer;
-        private boolean renderToDepthBuffer;
-        private boolean renderToLightBuffer;
-
-        private SetFboWriteMaskTask(FBO fbo, boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer) {
-            this.fbo = fbo;
-
-            this.renderToColorBuffer = renderToColorBuffer;
-            this.renderToDepthBuffer = renderToDepthBuffer;
-            this.renderToLightBuffer = renderToLightBuffer;
-        }
-
-        @Override
-        public void execute() {
-            fbo.setRenderBufferMask(renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
-        }
-
-        private void setFbo(FBO fbo) {
-            this.fbo = fbo;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fboName, renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
-        }
+    @Override
+    public void process() {
+        fbo.setRenderBufferMask(renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 }

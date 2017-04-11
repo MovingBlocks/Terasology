@@ -91,7 +91,7 @@ import static org.terasology.rendering.dag.NodeFactory.DELAY_INIT;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.*;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO;
-import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPED_FBO;
+import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPING_FBO;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
@@ -233,7 +233,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         // ShadowMap generation
         FBOConfig shadowMapConfig =
-                new FBOConfig(ShadowMapNode.SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer();
+                new FBOConfig(ShadowMapNode.SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer();
         BufferClearingNode shadowMapClearingNode = nodeFactory.createInstance(BufferClearingNode.class, DELAY_INIT);
         shadowMapClearingNode.initialise(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
@@ -393,7 +393,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(one8thScaleBlurredBloom, aLabel);
 
         // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects - TODO: place next line closer to ToneMappingNode eventually.
-        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR);
+        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR);
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO, HALF_SCALE, FBO.Type.DEFAULT);
 
@@ -538,7 +538,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
         //glDepthFunc(GL_LESS);
 
-        renderPipelineTaskList.forEach(RenderPipelineTask::execute);
+        renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
         // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
         LwjglGraphics.initOpenGLParams();

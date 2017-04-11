@@ -16,30 +16,35 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.utilities.Assets;
+
+import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 
 /**
  * TODO: Add javadocs
  */
 public final class EnableMaterial implements StateChange {
+    private static final ResourceUrn DEFAULT_MATERIAL_URN = new ResourceUrn("engine:prog.default");
 
-    private static final String DEFAULT_MATERIAL_NAME = "DEFAULT";
-    private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_NAME);
+    private static EnableMaterial defaultInstance = new EnableMaterial();
 
-    private RenderPipelineTask task;
-    private String materialName;
+    private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
 
-    public EnableMaterial(String materialName) {
-        this.materialName = materialName;
+    private ResourceUrn materialUrn;
+    private Material material;
+
+    public EnableMaterial(ResourceUrn materialUrn) {
+        this.materialUrn = materialUrn;
+        this.material = getMaterial(materialUrn);
     }
 
-    public String getMaterialName() {
-        return materialName;
+    private EnableMaterial() {
+        this.materialUrn = DEFAULT_MATERIAL_URN;
+        this.material = null;
     }
 
     @Override
@@ -48,69 +53,26 @@ public final class EnableMaterial implements StateChange {
     }
 
     @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            if (materialName.equals(DEFAULT_MATERIAL_NAME)) {
-                task = new DisableMaterialTask();
-            } else {
-                Material shader = getMaterial(materialName);
-                task = new EnableMaterialTask(shader, materialName);
-            }
-        }
-        return task;
-    }
-
-    @Override
     public int hashCode() {
-        return Objects.hashCode(materialName);
+        return Objects.hashCode(materialUrn);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof EnableMaterial) && materialName.equals(((EnableMaterial) obj).getMaterialName());
-    }
-
-    private static Material getMaterial(String assetId) {
-        return Assets.getMaterial(assetId).orElseThrow(() ->
-                new RuntimeException("Failed to resolve required asset: '" + assetId + "'"));
+        return (obj instanceof EnableMaterial) && materialUrn.equals(((EnableMaterial) obj).materialUrn);
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
+        return String.format("%30s: %s", this.getClass().getSimpleName(), materialUrn.toString());
     }
 
-    private class DisableMaterialTask implements RenderPipelineTask {
-        private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
-
-        @Override
-        public void execute() {
+    @Override
+    public void process() {
+        if (material == null) {
             shaderManager.disableShader();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: program 0", this.getClass().getSimpleName());
-        }
-    }
-
-    private class EnableMaterialTask implements RenderPipelineTask {
-        private Material material;
-        private String materialName;
-
-        private EnableMaterialTask(Material material, String materialName) {
-            this.material = material;
-            this.materialName = materialName;
-        }
-
-        @Override
-        public void execute() {
+        } else {
             material.enable();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), materialName);
         }
     }
 }

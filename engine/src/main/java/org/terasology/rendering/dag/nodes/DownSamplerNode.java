@@ -81,7 +81,7 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
 
         setupConditions();
 
-        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL));
         downSampler = getMaterial(DOWN_SAMPLER_MATERIAL);
 
         this.performanceMonitorLabel = aLabel;

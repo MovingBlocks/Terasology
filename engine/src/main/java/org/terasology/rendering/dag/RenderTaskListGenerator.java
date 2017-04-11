@@ -123,14 +123,14 @@ public final class RenderTaskListGenerator {
                     // for a state change to be necessary there can't be an identical one already persisting
                     if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
                         // no persistent state change of this subType found: the state change is necessary (not redundant)
-                        taskList.add(currentStateChange.generateTask());
+                        taskList.add(currentStateChange);
                         persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
 
                     } // else: the state change is redundant - we don't generate a task for it
                 }
 
                 // task executing the node.process() method
-                taskList.add(node.generateTask());
+                taskList.add(node);
 
                 // generating tasks for the desired state resets
                 nextEnabledNode = findNextEnabledNode(orderedNodes, currentIndex + 1);
@@ -146,7 +146,7 @@ public final class RenderTaskListGenerator {
 
                             // A reset state change is necessary only if an identical state change isn't already persisting.
                             if (persistentStateChange == null || !currentStateReset.equals(persistentStateChange)) {
-                                taskList.add(currentStateReset.generateTask());
+                                taskList.add(currentStateReset);
 
                                 // This makes sure that the reset state change persists so that future state changes
                                 // which are identical to the reset state change are not added.
@@ -159,7 +159,7 @@ public final class RenderTaskListGenerator {
                     // there are no enabled nodes after this one: we must generate all the tasks necessary
                     // to reset the effects of any persisting state change.
                     for (StateChange currentStateReset : node.getDesiredStateResets()) {
-                        taskList.add(currentStateReset.generateTask());
+                        taskList.add(currentStateReset);
                         persistentStateChanges.remove(currentStateReset.getClass());
                     }
                 }
@@ -253,7 +253,7 @@ public final class RenderTaskListGenerator {
         }
 
         @Override
-        public void execute() { }
+        public void process() { }
 
         /**
          * Returns a string description of the instance.

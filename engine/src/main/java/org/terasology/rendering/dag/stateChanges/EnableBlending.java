@@ -16,10 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
-import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
  * Instances of this class enable OpenGL's blending, i.e. to render transparent objects or to make
@@ -29,11 +26,7 @@ import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
  * used by the blending process.
  */
 public final class EnableBlending extends SetStateParameter {
-    private static final int PARAMETER = GL_BLEND;
-    private static final String PARAMETER_NAME = "GL_BLEND";
     private static StateChange defaultInstance = new EnableBlending(false);
-    private static RenderPipelineTask enablingTask;
-    private static RenderPipelineTask disablingTask;
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -55,22 +48,10 @@ public final class EnableBlending extends SetStateParameter {
 
     private EnableBlending(boolean enabled) {
         super(GL_BLEND, enabled);
-        disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
-        enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
     }
 
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    protected RenderPipelineTask getDisablingTask() {
-        return disablingTask;
-    }
-
-    @Override
-    protected RenderPipelineTask getEnablingTask() {
-        return enablingTask;
     }
 }

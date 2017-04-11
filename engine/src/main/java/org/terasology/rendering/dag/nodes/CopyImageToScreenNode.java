@@ -36,7 +36,7 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_E
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
     @In
     private WorldRenderer worldRenderer;
@@ -54,11 +54,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     @Override
     public void initialise() {
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
-        addDesiredStateChange(new BindFBO(DEFAULT_FRAME_BUFFER_URN, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise sceneFinalFbo
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
     }
 
     @Override

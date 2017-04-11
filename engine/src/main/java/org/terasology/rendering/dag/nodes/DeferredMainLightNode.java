@@ -77,7 +77,7 @@ public class DeferredMainLightNode extends AbstractNode {
     public void initialise() {
         playerCamera = worldRenderer.getActiveCamera();
 
-        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
 
         addDesiredStateChange(new DisableDepthTest());

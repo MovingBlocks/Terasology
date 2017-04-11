@@ -52,7 +52,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
 public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
+    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     @In
     private Config config;
@@ -85,8 +85,8 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
-        chunkShader = getMaterial(CHUNK_SHADER);
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        chunkShader = getMaterial(CHUNK_MATERIAL);
     }
 
     public void enableWireframe() {

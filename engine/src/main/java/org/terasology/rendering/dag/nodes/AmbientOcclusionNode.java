@@ -81,7 +81,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL));
         ssaoMaterial = getMaterial(SSAO_MATERIAL);
 
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);

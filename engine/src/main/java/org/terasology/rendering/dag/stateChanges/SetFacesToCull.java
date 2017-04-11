@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
@@ -30,12 +29,12 @@ import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
  * TODO: Add javadocs
  */
 public final class SetFacesToCull implements StateChange {
-
-    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
     private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL_BACK, "GL_BACK",
             GL_FRONT, "GL_FRONT",
             GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
-    private SetFacesToCullTask task;
+
+    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
+
     private int mode;
 
     public SetFacesToCull(int mode) {
@@ -53,15 +52,6 @@ public final class SetFacesToCull implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetFacesToCullTask(mode);
-        }
-
-        return task;
     }
 
     @Override
@@ -83,22 +73,8 @@ public final class SetFacesToCull implements StateChange {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getModeName(mode));
     }
 
-
-    private final class SetFacesToCullTask implements RenderPipelineTask {
-        private int mode;
-
-        private SetFacesToCullTask(int mode) {
-            this.mode = mode;
-        }
-
-        @Override
-        public void execute() {
-            GL11.glCullFace(mode);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
-        }
+    @Override
+    public void process() {
+        GL11.glCullFace(mode);
     }
 }

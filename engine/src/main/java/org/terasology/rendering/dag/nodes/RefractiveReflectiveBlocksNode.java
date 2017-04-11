@@ -86,7 +86,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
+        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER));
         chunkShader = getMaterial(CHUNK_SHADER);
     }
 

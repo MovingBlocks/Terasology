@@ -45,7 +45,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 
     @In
@@ -95,7 +95,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
         update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
     }
 
     /**

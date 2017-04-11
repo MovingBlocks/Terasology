@@ -70,7 +70,7 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));
 
         highPass = getMaterial(HIGH_PASS_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, ColorTexture,

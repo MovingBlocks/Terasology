@@ -19,5 +19,5 @@ package org.terasology.rendering.dag;
  * TODO: Add javadocs
  */
 public interface RenderPipelineTask {
-    void execute();
+    void process();
 }

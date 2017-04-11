@@ -35,6 +35,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  */
 public class InitialPostProcessingNode extends AbstractNode {
     public static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
+    public static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
 
     @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -50,7 +51,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         addDesiredStateChange(new BindFBO(INITIAL_POST_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(INITIAL_POST_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.initialPost"));
+        addDesiredStateChange(new EnableMaterial(INITIAL_POST_MATERIAL));
 
         // TODO: move content of ShaderParametersInitialPost to this class
     }

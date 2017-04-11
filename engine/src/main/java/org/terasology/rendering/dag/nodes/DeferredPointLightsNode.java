@@ -85,7 +85,7 @@ public class DeferredPointLightsNode extends AbstractNode {
         addDesiredStateChange(new LookThrough(playerCamera));
 
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
 
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));

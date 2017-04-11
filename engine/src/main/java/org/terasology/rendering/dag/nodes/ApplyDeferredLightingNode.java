@@ -57,7 +57,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void initialise() {
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(
