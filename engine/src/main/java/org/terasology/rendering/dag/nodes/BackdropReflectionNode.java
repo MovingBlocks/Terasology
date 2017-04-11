@@ -69,13 +69,12 @@ public class BackdropReflectionNode extends AbstractNode {
      * This method also requests the material using the "sky" shaders (vertex, fragment) to be enabled.
      */
     public BackdropReflectionNode(Context context) {
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera));
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));

@@ -43,7 +43,6 @@ public class ToneMappingNode extends AbstractNode {
 
     public ToneMappingNode(Context context) {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPING_FBO, displayResolutionDependentFBOs));

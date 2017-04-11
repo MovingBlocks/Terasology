@@ -66,7 +66,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
     private WorldRenderer worldRenderer;
 
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
     private RenderingConfig renderingConfig;
 
     /**
@@ -81,7 +81,6 @@ public class WorldReflectionNode extends ConditionDependentNode {
     public WorldReflectionNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
         worldRenderer = context.get(WorldRenderer.class);
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
@@ -91,6 +90,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
         requiresCondition(() -> renderingConfig.isReflectiveWater());
         renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
@@ -100,7 +100,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
 
         // we must get this here because in process we activate/deactivate a specific shader feature.
         // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
-        chunkShader = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     /**
@@ -121,8 +121,8 @@ public class WorldReflectionNode extends ConditionDependentNode {
 
         final Vector3f cameraPosition = playerCamera.getPosition();
 
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        chunkShader.setFloat("clip", playerCamera.getClipHeight(), true);
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        chunkMaterial.setFloat("clip", playerCamera.getClipHeight(), true);
 
         while (renderQueues.chunksOpaqueReflection.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaqueReflection.poll();
@@ -131,7 +131,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
             } else {
@@ -139,7 +139,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
             }
         }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

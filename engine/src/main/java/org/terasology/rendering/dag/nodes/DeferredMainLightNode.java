@@ -63,7 +63,6 @@ public class DeferredMainLightNode extends AbstractNode {
 
     public DeferredMainLightNode(Context context) {
         backdropProvider = context.get(BackdropProvider.class);
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         playerCamera = context.get(WorldRenderer.class).getActiveCamera();
 
@@ -75,6 +74,7 @@ public class DeferredMainLightNode extends AbstractNode {
         addDesiredStateChange(new EnableBlending());
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
 

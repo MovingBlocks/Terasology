@@ -47,11 +47,11 @@ public class LightShaftsNode extends ConditionDependentNode {
 
     public LightShaftsNode(Context context) {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));

@@ -66,7 +66,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private SetWireframe wireframeStateChange;
 
     public BackdropNode(Context context) {
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
 
         Camera playerCamera = worldRenderer.getActiveCamera();
@@ -78,6 +77,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
 

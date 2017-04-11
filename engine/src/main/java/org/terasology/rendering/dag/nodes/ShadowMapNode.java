@@ -74,15 +74,10 @@ public class ShadowMapNode extends ConditionDependentNode {
         worldRenderer = context.get(WorldRenderer.class);
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
-        Config config = context.get(Config.class);
-        RenderableWorld renderableWorld = context.get(RenderableWorld.class);
-        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
 
         this.playerCamera = worldRenderer.getActiveCamera();
-        this.renderingConfig = config.getRendering();
-        renderableWorld.setShadowMapCamera(shadowMapCamera);
-
-        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        this.renderingConfig = context.get(Config.class).getRendering();
+        context.get(RenderableWorld.class).setShadowMapCamera(shadowMapCamera);
 
         texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
@@ -90,6 +85,8 @@ public class ShadowMapNode extends ConditionDependentNode {
         requiresCondition(() -> renderingConfig.isDynamicShadows());
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));

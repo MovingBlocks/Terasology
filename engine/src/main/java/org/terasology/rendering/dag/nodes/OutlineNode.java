@@ -45,12 +45,11 @@ public class OutlineNode extends ConditionDependentNode {
     private RenderingConfig renderingConfig;
 
     public OutlineNode(Context context) {
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(OUTLINE_FBO, displayResolutionDependentFBOs));
 

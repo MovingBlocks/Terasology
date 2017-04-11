@@ -58,7 +58,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
 
     public AlphaRejectBlocksNode(Context context) {
@@ -66,8 +66,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         renderQueues = context.get(RenderQueuesHelper.class);
 
         wireframeStateChange = new SetWireframe(true);
-        // TODO: VAMPCAT: Check if RenderingConfig class is available straight from the context
-        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig =  context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         playerCamera = worldRenderer.getActiveCamera();
@@ -76,7 +75,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
-        chunkShader = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     public void enableWireframe() {
@@ -113,8 +112,8 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        chunkShader.setFloat("clip", 0.0f, true);
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        chunkMaterial.setFloat("clip", 0.0f, true);
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         while (renderQueues.chunksAlphaReject.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaReject.poll();
@@ -123,7 +122,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(ALPHA_REJECT, chunkPosition, cameraPosition);
 
             } else {
@@ -131,7 +130,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
             }
         }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

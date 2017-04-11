@@ -67,9 +67,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     public BlurredAmbientOcclusionNode(Context context) {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        Config config = context.get(Config.class);
 
-        RenderingConfig renderingConfig = config.getRendering();
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 

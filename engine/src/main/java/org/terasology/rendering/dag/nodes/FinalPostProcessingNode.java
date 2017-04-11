@@ -58,7 +58,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
     public FinalPostProcessingNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
         screenGrabber = context.get(ScreenGrabber.class);
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         renderingDebugConfig.subscribe(RenderingDebugConfig.ENABLED, this);
@@ -72,6 +71,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             addDesiredStateChange(enableDebugMaterial);
         }
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(FINAL_BUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
     }
