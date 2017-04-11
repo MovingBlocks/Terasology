@@ -129,12 +129,18 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (!onItemUseEvent.isConsumed()) {
             // It would seem to make more sense to just call getTargetBlock() and get the entity here, but that causes
             // a NPE up in the EntityRef.
+            EntityRef targetEntity = targetSystem.getTarget();
+            if (targetEntity.exists()) {
+                targetEntity.send(new AttackEvent(character, event.getItem()));
+                return;
+            }
+
             Vector3i position = targetSystem.getTargetBlockPosition();
             if (position == null) {
                 return;
             }
-            EntityRef targetEntity = blockRegistry.getBlockEntityAt(position);
-            targetEntity.send(new AttackEvent(character, event.getItem()));
+            EntityRef targetBlockEntity = blockRegistry.getBlockEntityAt(position);
+            targetBlockEntity.send(new AttackEvent(character, event.getItem()));
         }
     }
 
