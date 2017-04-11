@@ -295,6 +295,9 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node overlaysNode = nodeFactory.createInstance(OverlaysNode.class);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
+        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
+        renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
+
         // TODO: remove this, including associated method in the RenderSystem interface
         Node firstPersonViewNode = nodeFactory.createInstance(FirstPersonViewNode.class);
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
@@ -327,9 +330,6 @@ public final class WorldRendererImpl implements WorldRenderer {
         // and then it's 2D post-processing all the way to the image shown on the display.
         Node prePostCompositeNode = nodeFactory.createInstance(PrePostCompositeNode.class);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
-
-        Node simpleBlendMaterialsNode = nodeFactory.createInstance(SimpleBlendMaterialsNode.class);
-        renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
 
         // Post-Processing proper: tone mapping, light shafts, bloom and blur passes
         Node lightShaftsNode = nodeFactory.createInstance(LightShaftsNode.class);
