@@ -69,7 +69,6 @@ public class DeferredPointLightsNode extends AbstractNode {
 
     public DeferredPointLightsNode(Context context) {
         entityManager = context.get(EntityManager.class);
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
@@ -85,6 +84,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         addDesiredStateChange(new DisableDepthTest());
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
 

@@ -66,8 +66,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private FBO ssaoBlurredFbo;
 
     public BlurredAmbientOcclusionNode(Context context) {
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
@@ -75,6 +73,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL));
         ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL);
 
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));

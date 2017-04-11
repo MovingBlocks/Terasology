@@ -44,19 +44,17 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private ComponentSystemManager componentSystemManager;
     private WorldRenderer worldRenderer;
 
-    private Camera playerCamera;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
     public OpaqueObjectsNode(Context context) {
         componentSystemManager = context.get(ComponentSystemManager.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        playerCamera = worldRenderer.getActiveCamera();
+        worldRenderer = context.get(WorldRenderer.class);
+        Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));

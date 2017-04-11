@@ -63,7 +63,6 @@ public class DeferredMainLightNode extends AbstractNode {
 
     public DeferredMainLightNode(Context context) {
         backdropProvider = context.get(BackdropProvider.class);
-
         playerCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));

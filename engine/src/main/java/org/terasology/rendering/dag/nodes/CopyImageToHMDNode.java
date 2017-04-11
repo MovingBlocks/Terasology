@@ -51,7 +51,6 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
     private WorldRenderer worldRenderer;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private RenderingConfig renderingConfig;
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
     private FBO finalFbo;
@@ -61,17 +60,17 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
      * information for the vrProvider to use.
      */
     public CopyImageToHMDNode(Context context) {
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
-        vrProvider = context.get(OpenVRProvider.class);
 
-        renderingConfig = context.get(Config.class).getRendering();
-        requiresCondition(() -> (renderingConfig.isVrSupport()
-                && vrProvider.isInitialized()));
-        requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        vrProvider = context.get(OpenVRProvider.class);
+        requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
+
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
+        displayResolutionDependentFBOs.subscribe(this);
+
         if (vrProvider != null) {
             vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
@@ -82,9 +81,6 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
         }
-
-        update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
-        displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
     }

@@ -71,10 +71,10 @@ public class ShadowMapNode extends ConditionDependentNode {
     private float texelSize;
 
     public ShadowMapNode(Context context) {
-        worldRenderer = context.get(WorldRenderer.class);
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
 
+        worldRenderer = context.get(WorldRenderer.class);
         this.playerCamera = worldRenderer.getActiveCamera();
         this.renderingConfig = context.get(Config.class).getRendering();
         context.get(RenderableWorld.class).setShadowMapCamera(shadowMapCamera);

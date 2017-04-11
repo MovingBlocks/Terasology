@@ -62,13 +62,13 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private SetWireframe wireframeStateChange;
 
     public AlphaRejectBlocksNode(Context context) {
-        worldRenderer = context.get(WorldRenderer.class);
         renderQueues = context.get(RenderQueuesHelper.class);
 
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig =  context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 

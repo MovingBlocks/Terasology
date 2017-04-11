@@ -60,12 +60,12 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
     public OpaqueBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 

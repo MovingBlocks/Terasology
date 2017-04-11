@@ -49,7 +49,6 @@ public class PrePostCompositeNode extends AbstractNode {
 
     public PrePostCompositeNode(Context context) {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));

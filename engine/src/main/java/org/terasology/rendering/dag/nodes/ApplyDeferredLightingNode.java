@@ -49,7 +49,6 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
     public ApplyDeferredLightingNode(Context context) {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));

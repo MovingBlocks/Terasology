@@ -47,7 +47,6 @@ public class LightShaftsNode extends ConditionDependentNode {
 
     public LightShaftsNode(Context context) {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
-
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 

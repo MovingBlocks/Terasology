@@ -45,11 +45,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     private int displayHeight;
 
     public CopyImageToScreenNode(Context context) {
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(DEFAULT_FBO, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise sceneFinalFbo
         displayResolutionDependentFBOs.subscribe(this);

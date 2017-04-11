@@ -51,11 +51,10 @@ public class HighPassNode extends ConditionDependentNode {
 
     public HighPassNode(Context context) {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(HIGH_PASS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));

@@ -80,8 +80,8 @@ public class WorldReflectionNode extends ConditionDependentNode {
      */
     public WorldReflectionNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(playerCamera));

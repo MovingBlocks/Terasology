@@ -73,12 +73,12 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     public RefractiveReflectiveBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        worldRenderer = context.get(WorldRenderer.class);
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(REFRACTIVE_REFLECTIVE_FBO, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo

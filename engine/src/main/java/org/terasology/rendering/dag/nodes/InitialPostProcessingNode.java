@@ -39,7 +39,6 @@ public class InitialPostProcessingNode extends AbstractNode {
 
     public InitialPostProcessingNode(Context context) {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-
         // TODO: see if we could write this straight into a GBUFFER - notice this FBO is used in ShaderParametersHdr
         requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(INITIAL_POST_FBO, displayResolutionDependentFBOs));

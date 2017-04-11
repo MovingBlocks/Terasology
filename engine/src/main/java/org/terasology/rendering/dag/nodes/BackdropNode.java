@@ -67,7 +67,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
 
     public BackdropNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
-
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
 
