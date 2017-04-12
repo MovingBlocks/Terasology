@@ -36,13 +36,13 @@ public class RenderTaskListGeneratorTest {
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim()); // Strictly speaking we don't need
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim()); // We just do it to avoid attracting
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim()); // too much attention to it.
+        assertEquals("BravoNode",   taskList.get(4).toString().trim()); // too much attention to it.
         assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(6).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(7).toString().trim());
+        assertEquals("CharlieNode", taskList.get(6).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(7).toString().trim());
     }
 
     @Test
@@ -57,16 +57,16 @@ public class RenderTaskListGeneratorTest {
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim());
+        assertEquals("BravoNode",   taskList.get(4).toString().trim());
         assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(6).toString().trim());
+        assertEquals("CharlieNode", taskList.get(6).toString().trim());
         assertEquals("----- DeltaNode",        taskList.get(7).toString().trim());
-        assertEquals("SetNameTask: delta",     taskList.get(8).toString().trim());
-        assertEquals("DeltaNode: process()",   taskList.get(9).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(10).toString().trim());
+        assertEquals("SetName: delta",     taskList.get(8).toString().trim());
+        assertEquals("DeltaNode",   taskList.get(9).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(10).toString().trim());
     }
 
     @Test
@@ -82,19 +82,19 @@ public class RenderTaskListGeneratorTest {
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(5).toString().trim());
+        assertEquals("BravoNode",   taskList.get(4).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(5).toString().trim());
         assertEquals("----- EchoNode",         taskList.get(6).toString().trim());
-        assertEquals("EchoNode: process()",    taskList.get(7).toString().trim());
+        assertEquals("EchoNode",    taskList.get(7).toString().trim());
         assertEquals("----- CharlieNode",      taskList.get(8).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(9).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(10).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(9).toString().trim());
+        assertEquals("CharlieNode", taskList.get(10).toString().trim());
         assertEquals("----- DeltaNode",        taskList.get(11).toString().trim());
-        assertEquals("SetNameTask: delta",     taskList.get(12).toString().trim());
-        assertEquals("DeltaNode: process()",   taskList.get(13).toString().trim());
+        assertEquals("SetName: delta",     taskList.get(12).toString().trim());
+        assertEquals("DeltaNode",   taskList.get(13).toString().trim());
 
     }
 
