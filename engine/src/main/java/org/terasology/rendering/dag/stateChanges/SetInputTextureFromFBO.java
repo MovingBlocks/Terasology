@@ -17,7 +17,6 @@ package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -36,8 +35,6 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * This state change implementation sets a texture attached to an FBO as the input for a material.
  */
 public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber {
-    private static final Logger logger = Logger.getLogger("SetInputTextureFromFBO");
-
     // depthStencilRboId is a possible FBO attachment but is not covered by a case here
     // as it wouldn't work with the glBindTexture(TEXTURE_2D, ...) call.
     public enum FboTexturesTypes {
@@ -47,6 +44,10 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         LightAccumulationTexture,
     }
 
+    private static final Logger logger = Logger.getLogger("SetInputTextureFromFBO");
+
+    private SetInputTextureFromFBO defaultInstance;
+
     private int textureSlot;
     private ResourceUrn fboUrn;
     private FBO inputFbo;
@@ -54,9 +55,8 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     private BaseFBOsManager fboManager;
     private ResourceUrn materialUrn;
     private String parameterName;
-
-    private SetInputTextureFromFBO defaultInstance;
-    private Task task;
+    private Material material;
+    private int textureId;
 
     /**
      * Constructs an instance of this class, according to the parameters provided.
@@ -76,33 +76,26 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         this.textureSlot = textureSlot;
         this.textureType = textureType;
         this.fboUrn = fboUrn;
-        this.inputFbo = fboManager.get(fboUrn);
         this.fboManager = fboManager;
-
         this.materialUrn = materialUrn;
         this.parameterName = parameterName;
+
+        this.inputFbo = fboManager.get(fboUrn);
+        this.material = getMaterial(materialUrn);
+
+        // Cheeky way to initialise textureId
+        update();
+        fboManager.subscribe(this);
     }
 
-    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialUrn, String parameterName) {
+    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialURN, String parameterName) {
         this.textureSlot = textureSlot;
-        this.materialUrn = materialUrn;
+        this.materialUrn = materialURN;
         this.parameterName = parameterName;
+
+        this.material = getMaterial(materialUrn);
 
         defaultInstance = this;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            if (inputFbo != null) {
-                task = new Task(this.textureSlot, fetchTextureId(), this.materialUrn, this.parameterName);
-                fboManager.subscribe(this);
-            } else {
-                task = new Task(this.textureSlot, 0, this.materialUrn, this.parameterName);
-            }
-        }
-
-        return task;
     }
 
     @Override
@@ -144,7 +137,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     @Override
     public void update() {
         inputFbo = fboManager.get(fboUrn);
-        task.setTextureId(fetchTextureId());
+        textureId = fetchTextureId();
     }
 
     @Override
@@ -175,55 +168,14 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     }
 
     /**
-     * Instances of this class do the actual work of activating a given texture unit,
-     * binding the appropriate texture to it and configuring a material to use it as input.
+     * Activates the texture unit GL_TEXTURE0 + textureSlot, binds the GL_TEXTURE_2D identified by textureId to it
+     * and sets the material provided on construction to sample the texture via the parameterName also provided on
+     * construction.
      */
-    protected class Task implements RenderPipelineTask {
-        private final int textureSlot;
-        private final Material material;
-        private final String shaderParameterName;
-        private int textureId;
-
-        /**
-         * Constructs an instance of this inner class, according to the given parameters.
-         *
-         * @param textureSlot an integer indirectly identifying a texture unit on the GPU (textureUnit = GL_TEXTURE0 + textureSlot).
-         * @param textureId the opengl id of a texture, usually obtained via glGenTextures().
-         * @param materialUrn an URN identifying a material.
-         * @param shaderParameterName the name of the variable in the shader program used to sample the texture.
-         */
-        private Task(int textureSlot, int textureId, ResourceUrn materialUrn, String shaderParameterName) {
-            this.textureSlot = textureSlot;
-            this.textureId = textureId;
-            this.material = getMaterial(materialUrn);
-            this.shaderParameterName = shaderParameterName;
-        }
-
-        /**
-         * This method is used when FBOs have changed and the id of the texture attached to one needs refreshing.
-         *
-         * @param textureId an integer identifying a texture buffer on the GPU, originally obtained via glGenTextures().
-         */
-        protected void setTextureId(int textureId) {
-            this.textureId = textureId;
-        }
-
-        /**
-         * Activates the texture unit GL_TEXTURE0 + textureSlot, binds the GL_TEXTURE_2D identified by textureId to it
-         * and sets the material provided on construction to sample the texture via the parameterName also provided on
-         * construction.
-         */
-        @Override
-        public void execute() {
-            glActiveTexture(GL_TEXTURE0 + textureSlot);
-            glBindTexture(GL_TEXTURE_2D, textureId);
-            material.setInt(shaderParameterName, textureSlot, true);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: slot %s, texture %s, material %s, parameter %s", this.getClass().getSimpleName(),
-                    textureSlot, textureId, material.getUrn().toString(), shaderParameterName);
-        }
+    @Override
+    public void process() {
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        material.setInt(parameterName, textureSlot, true);
     }
 }

@@ -16,7 +16,6 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 import static org.lwjgl.opengl.GL11.glDepthMask;
@@ -29,10 +28,7 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
  * should it be the object's distance from the near plane or should it be the first thing behind it?
  */
 public final class DisableDepthWriting implements StateChange {
-
     private static StateChange defaultInstance = new DisableDepthWriting(true);
-    private static RenderPipelineTask enablingTask;
-    private static RenderPipelineTask disablingTask;
 
     private final boolean enabled;
 
@@ -51,8 +47,6 @@ public final class DisableDepthWriting implements StateChange {
 
     private DisableDepthWriting(boolean enabled) {
         this.enabled = enabled;
-        enablingTask = new SetDepthMaskTask(true);
-        disablingTask = new SetDepthMaskTask(false);
     }
 
     @Override
@@ -61,17 +55,8 @@ public final class DisableDepthWriting implements StateChange {
     }
 
     @Override
-    public RenderPipelineTask generateTask() {
-        if (enabled) {
-            return enablingTask;
-        } else {
-            return disablingTask;
-        }
-    }
-
-    @Override
     public boolean equals(Object obj) {
-        return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).isEnabled();
+        return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).enabled;
     }
 
     @Override
@@ -79,17 +64,8 @@ public final class DisableDepthWriting implements StateChange {
         return Objects.hashCode(enabled);
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public String getStatus() {
-        String status = "disabled";
-        if (enabled) {
-            status = "enabled";
-        }
-
-        return status;
+    private String getStatus() {
+        return enabled? "Enabled": "Disabled";
     }
 
     @Override
@@ -97,25 +73,8 @@ public final class DisableDepthWriting implements StateChange {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
     }
 
-    private final class SetDepthMaskTask implements RenderPipelineTask {
-        private boolean enabled;
-
-        private SetDepthMaskTask(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        @Override
-        public void execute() {
-            glDepthMask(enabled);
-        }
-
-        @Override
-        public String toString() {
-            String status = "disabled";
-            if (enabled) {
-                status = "enabled";
-            }
-            return String.format("%30s: %s", this.getClass().getSimpleName(), status);
-        }
+    @Override
+    public void process() {
+        glDepthMask(enabled);
     }
 }

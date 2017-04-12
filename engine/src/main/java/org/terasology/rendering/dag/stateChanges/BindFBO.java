@@ -19,34 +19,40 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 
 /**
- * TODO: Add javadocs
+ * Binds the given FBO to the GL_FRAMEBUFFER target, making it the read framebuffer target as well as
+ * the draw framebuffer target.
+ *
+ * This is useful for operations such as off-screen rendering.
  */
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
-
     private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
     private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
 
-    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FRAME_BUFFER_URN);
+    private static BindFBO defaultInstance = new BindFBO();
 
-    private BindFBOTask task;
-    private BaseFBOsManager fboManager;
     private ResourceUrn fboName;
+    private BaseFBOsManager fboManager;
+    private int fboId;
 
     public BindFBO(ResourceUrn fboName, BaseFBOsManager fboManager) {
-        this.fboManager = fboManager;
         this.fboName = fboName;
+        this.fboManager = fboManager;
+
+        // Cheeky way to initialise fboId
+        update();
+        fboManager.subscribe(this);
     }
 
-    private BindFBO(ResourceUrn fboName) {
-        this.fboName = fboName;
+    private BindFBO() {
+        this.fboName = DEFAULT_FRAME_BUFFER_URN;
+        this.fboId = DEFAULT_FRAME_BUFFER_ID;
     }
 
     public ResourceUrn getFboName() {
@@ -56,24 +62,6 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            // Subscription is only needed if fboID is different than default frame buffer id.
-            if (!fboName.equals(DEFAULT_FRAME_BUFFER_URN)) {
-                task = new BindFBOTask(fboManager.get(fboName).fboId, fboName);
-                fboManager.subscribe(this);
-            } else {
-                task = new BindFBOTask(DEFAULT_FRAME_BUFFER_ID, DEFAULT_FRAME_BUFFER_URN);
-            }
-        } else {
-            if (!fboName.equals(DEFAULT_FRAME_BUFFER_URN)) {
-                update();
-            }
-        }
-        return task;
     }
 
     @Override
@@ -88,36 +76,16 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        task.setFboId(fboManager.get(fboName).fboId);
+        fboId  = fboManager.get(fboName).fboId;
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: %s", this.getClass().getSimpleName(), fboName);
+        return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 
-    private final class BindFBOTask implements RenderPipelineTask {
-
-        private int fboId;
-        private final ResourceUrn fboName;
-
-        private BindFBOTask(int fboId, ResourceUrn fboName) {
-            this.fboId = fboId;
-            this.fboName = fboName;
-        }
-
-        @Override
-        public void execute() {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-        }
-
-        private void setFboId(int fboId) {
-            this.fboId = fboId;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
-        }
+    @Override
+    public void process() {
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
     }
 }
