@@ -53,6 +53,7 @@ public final class ExternalApiWhitelist {
             .add("com.google.common.math")
             .add("com.google.common.primitives")
             .add("com.google.common.util.concurrent")
+            .add("com.google.gson")
             .add("gnu.trove")
             .add("gnu.trove.decorator")
             .add("gnu.trove.function")
