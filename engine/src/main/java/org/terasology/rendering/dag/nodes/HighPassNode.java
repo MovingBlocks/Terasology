@@ -50,6 +50,8 @@ public class HighPassNode extends ConditionDependentNode {
     private Material highPass;
 
     public HighPassNode(Context context) {
+        super(context);
+
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);

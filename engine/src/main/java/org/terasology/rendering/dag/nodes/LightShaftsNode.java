@@ -46,6 +46,8 @@ public class LightShaftsNode extends ConditionDependentNode {
     public static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
     public LightShaftsNode(Context context) {
+        super(context);
+
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);

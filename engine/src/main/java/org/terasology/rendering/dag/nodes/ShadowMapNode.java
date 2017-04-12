@@ -71,6 +71,8 @@ public class ShadowMapNode extends ConditionDependentNode {
     private float texelSize;
 
     public ShadowMapNode(Context context) {
+        super(context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
 

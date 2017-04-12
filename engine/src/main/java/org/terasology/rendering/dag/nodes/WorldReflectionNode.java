@@ -79,6 +79,8 @@ public class WorldReflectionNode extends ConditionDependentNode {
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
      */
     public WorldReflectionNode(Context context) {
+        super(context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
 
         worldRenderer = context.get(WorldRenderer.class);

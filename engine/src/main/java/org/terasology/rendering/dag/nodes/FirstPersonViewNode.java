@@ -47,6 +47,8 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
     private SetWireframe wireframeStateChange;
 
     public FirstPersonViewNode(Context context) {
+        super(context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
 
         worldRenderer = context.get(WorldRenderer.class);

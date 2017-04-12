@@ -67,6 +67,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private FBO ssaoFbo;
 
     public AmbientOcclusionNode(Context context) {
+        super(context);
+
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);

@@ -45,6 +45,8 @@ public class OutlineNode extends ConditionDependentNode {
     private RenderingConfig renderingConfig;
 
     public OutlineNode(Context context) {
+        super(context);
+
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());

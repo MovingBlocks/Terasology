@@ -45,6 +45,8 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
     private int displayHeight;
 
     public CopyImageToScreenNode(Context context) {
+        super(context);
+
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 

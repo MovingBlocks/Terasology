@@ -59,6 +59,8 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
     public DownSamplerNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                             FBOConfig outputFboConfig, BaseFBOsManager outputFboManager,
                                             String label) {
+        super(context);
+
         this.outputFboManager = outputFboManager;
         this.outputFboUrn = outputFboConfig.getName();
 

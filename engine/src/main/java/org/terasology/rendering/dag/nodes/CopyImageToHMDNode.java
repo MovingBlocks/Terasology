@@ -60,6 +60,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
      * information for the vrProvider to use.
      */
     public CopyImageToHMDNode(Context context) {
+        super(context);
+
         worldRenderer = context.get(WorldRenderer.class);
 
         vrProvider = context.get(OpenVRProvider.class);
