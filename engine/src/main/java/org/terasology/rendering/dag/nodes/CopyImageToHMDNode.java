@@ -62,18 +62,18 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
     public CopyImageToHMDNode(Context context) {
         super(context);
 
-        worldRenderer = context.get(WorldRenderer.class);
-
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
-        displayResolutionDependentFBOs.subscribe(this);
+        if (this.isEnabled()) {
+            worldRenderer = context.get(WorldRenderer.class);
 
-        if (vrProvider != null) {
+            displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+            requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
+            displayResolutionDependentFBOs.subscribe(this);
+
             vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
@@ -82,9 +82,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
             vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
-        }
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        }
     }
 
     /**
