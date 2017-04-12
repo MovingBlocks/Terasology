@@ -31,9 +31,9 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  * This is useful for operations such as off-screen rendering.
  */
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
-    private static final Integer DEFAULT_FRAME_BUFFER_ID = 0;
+    private static final Integer DEFAULT_FBO_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
-    private static final ResourceUrn DEFAULT_FRAME_BUFFER_URN = new ResourceUrn("engine:display");
+    private static final ResourceUrn DEFAULT_FBO = new ResourceUrn("engine:display");
 
     private static BindFBO defaultInstance = new BindFBO();
 
@@ -51,8 +51,8 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
     }
 
     private BindFBO() {
-        this.fboName = DEFAULT_FRAME_BUFFER_URN;
-        this.fboId = DEFAULT_FRAME_BUFFER_ID;
+        this.fboName = DEFAULT_FBO;
+        this.fboId = DEFAULT_FBO_ID;
     }
 
     public ResourceUrn getFboName() {
