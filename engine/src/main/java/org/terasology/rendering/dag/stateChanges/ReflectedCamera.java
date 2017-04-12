@@ -68,8 +68,9 @@ public class ReflectedCamera implements StateChange {
      */
     @Override
     public StateChange getDefaultInstance() {
-        if (defaultInstance == null)
+        if (defaultInstance == null) {
             defaultInstance = new ReflectedCamera(camera, false);
+        }
         return defaultInstance;
     }
 
