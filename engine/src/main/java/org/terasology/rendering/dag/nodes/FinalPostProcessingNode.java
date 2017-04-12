@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -48,33 +48,22 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
     private static final ResourceUrn POST_MATERIAL = new ResourceUrn("engine:prog.post");
     private static final ResourceUrn DEBUG_MATERIAL = new ResourceUrn("engine:prog.debug");
 
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
     private ScreenGrabber screenGrabber;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private RenderingDebugConfig renderingDebugConfig;
     private EnableMaterial enablePostMaterial;
     private EnableMaterial enableDebugMaterial;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        renderingDebugConfig = config.getRendering().getDebug();
+    public FinalPostProcessingNode(Context context) {
+        worldRenderer = context.get(WorldRenderer.class);
+        screenGrabber = context.get(ScreenGrabber.class);
+
+        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         renderingDebugConfig.subscribe(RenderingDebugConfig.ENABLED, this);
 
-        enablePostMaterial = new EnableMaterial(POST_MATERIAL.toString());
-        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL.toString());
+        enablePostMaterial = new EnableMaterial(POST_MATERIAL);
+        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL);
 
         if (!renderingDebugConfig.isEnabled()) {
             addDesiredStateChange(enablePostMaterial);
@@ -82,6 +71,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             addDesiredStateChange(enableDebugMaterial);
         }
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(FINAL_BUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
     }

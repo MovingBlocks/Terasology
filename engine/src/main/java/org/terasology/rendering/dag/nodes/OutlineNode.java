@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,14 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
@@ -40,29 +39,23 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
 public class OutlineNode extends ConditionDependentNode {
-    public static final ResourceUrn OUTLINE = new ResourceUrn("engine:outline");
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
+    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:outline");
+    public static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
 
-    @Override
-    public void initialise() {
-        renderingConfig = config.getRendering();
+    public OutlineNode(Context context) {
+        super(context);
+
+        renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 
-        requiresFBO(new FBOConfig(OUTLINE, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(OUTLINE, displayResolutionDependentFBOs));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(OUTLINE_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.sobel"));
+        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL));
 
         // TODO: Here make Material-based texture bindings explicit, using StateChanges.
         // TODO: See for example the ApplyDeferredLightingNode as an example of setting input textures

@@ -18,13 +18,13 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
@@ -62,30 +62,19 @@ public class DeferredPointLightsNode extends AbstractNode {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private EntityManager entityManager;
 
     private Material lightGeometryMaterial;
     private Camera playerCamera;
 
-    /**
-     * Initializes an instance of this node.
-     *
-     * This method -must- be called once for this node to be fully operational.
-     */
-    @Override
-    public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
+    public DeferredPointLightsNode(Context context) {
+        entityManager = context.get(EntityManager.class);
+
+        playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
 
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
@@ -95,6 +84,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         addDesiredStateChange(new DisableDepthTest());
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
 

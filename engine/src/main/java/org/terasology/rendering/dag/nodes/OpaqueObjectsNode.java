@@ -17,10 +17,10 @@ package org.terasology.rendering.dag.nodes;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
@@ -41,35 +41,23 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * take advantage of the RenderSystem.renderOpaque() method, which is called in process().
  */
 public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable {
-    @In
     private ComponentSystemManager componentSystemManager;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    private Camera playerCamera;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
-    /**
-     * Initialises this node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public OpaqueObjectsNode(Context context) {
+        componentSystemManager = context.get(ComponentSystemManager.class);
+
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        playerCamera = worldRenderer.getActiveCamera();
+        worldRenderer = context.get(WorldRenderer.class);
+        Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
     }
 
     public void enableWireframe() {

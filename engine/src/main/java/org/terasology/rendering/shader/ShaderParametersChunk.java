@@ -125,7 +125,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureEffects", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(WorldReflectionNode.REFLECTED);
+        displayResolutionDependentFBOs.bindFboColorTexture(WorldReflectionNode.REFLECTED_FBO);
         program.setInt("textureWaterReflection", texId++, true);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);

@@ -29,9 +29,9 @@ public class RenderTaskListGeneratorTest {
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new CharlieNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
@@ -49,10 +49,10 @@ public class RenderTaskListGeneratorTest {
     public void testReducePersistingStateChanges() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
-        orderedNodes.add(initialiseNode(new DeltaNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new CharlieNode());
+        orderedNodes.add(new DeltaNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
@@ -73,11 +73,11 @@ public class RenderTaskListGeneratorTest {
     public void testReducePersistingStateChangesEcho() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new EchoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
-        orderedNodes.add(initialiseNode(new DeltaNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new EchoNode());
+        orderedNodes.add(new CharlieNode());
+        orderedNodes.add(new DeltaNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
@@ -98,69 +98,52 @@ public class RenderTaskListGeneratorTest {
 
     }
 
-    private Node initialiseNode(Node node) {
-        node.initialise();
-        return node;
-    }
-
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class AlphaNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public AlphaNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class BravoNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public BravoNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class CharlieNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public CharlieNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class DeltaNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public DeltaNode() {
             addDesiredStateChange(new SetName("delta"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class EchoNode extends AbstractNode {
-        @Override
-        public void initialise() {
-
-        }
+        public EchoNode() { }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     // TODO: Add new tests with varying state changes

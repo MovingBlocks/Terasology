@@ -16,8 +16,8 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -45,19 +45,13 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
 
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    /**
-     * Initializes an instance of this node.
-     *
-     * This method -must- be called once for this node to be fully operational.
-     */
-    @Override
-    public void initialise() {
+    public ApplyDeferredLightingNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(

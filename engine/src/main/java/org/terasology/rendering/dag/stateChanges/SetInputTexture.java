@@ -37,7 +37,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 public class SetInputTexture implements StateChange {
     private final int textureSlot;
     private final int textureId;
-    private final ResourceUrn materialURN;
+    private final ResourceUrn materialUrn;
     private final String materialParameter;
 
     private SetInputTexture defaultInstance;
@@ -50,20 +50,20 @@ public class SetInputTexture implements StateChange {
      *
      * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureId an integer representing the opengl name of a texture. This is usually the return value of glGenTexture().
-     * @param materialURN a ResourceURN object uniquely identifying a Material asset.
+     * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
      * @param materialParameter a String representing the variable within the shader holding the texture.
      */
-    public SetInputTexture(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
+    public SetInputTexture(int textureSlot, int textureId, ResourceUrn materialUrn, String materialParameter) {
         this.textureSlot = textureSlot;
         this.textureId = textureId;
-        this.materialURN = materialURN;
+        this.materialUrn = materialUrn;
         this.materialParameter = materialParameter;
     }
 
-    private SetInputTexture(int textureSlot, ResourceUrn materialURN, String materialParameter) {
+    private SetInputTexture(int textureSlot, ResourceUrn materialUrn, String materialParameter) {
         this.textureSlot = textureSlot;
         this.textureId = 0;
-        this.materialURN = materialURN;
+        this.materialUrn = materialUrn;
         this.materialParameter = materialParameter;
 
         defaultInstance = this;
@@ -77,14 +77,14 @@ public class SetInputTexture implements StateChange {
     @Override
     public RenderPipelineTask generateTask() {
         if (task == null) {
-            task = new SetInputTextureTask(textureSlot, textureId, materialURN, materialParameter);
+            task = new SetInputTextureTask(textureSlot, textureId, materialUrn, materialParameter);
         }
         return task;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(textureSlot, textureId, materialURN, materialParameter);
+        return Objects.hash(textureSlot, textureId, materialUrn, materialParameter);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class SetInputTexture implements StateChange {
         return (other instanceof SetInputTexture)
                 && this.textureSlot == ((SetInputTexture) other).textureSlot
                 && this.textureId == ((SetInputTexture) other).textureId
-                && this.materialURN.equals(((SetInputTexture) other).materialURN)
+                && this.materialUrn.equals(((SetInputTexture) other).materialUrn)
                 && this.materialParameter.equals(((SetInputTexture) other).materialParameter);
     }
 
@@ -106,7 +106,7 @@ public class SetInputTexture implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetInputTexture(textureSlot, materialURN, materialParameter);
+            defaultInstance = new SetInputTexture(textureSlot, materialUrn, materialParameter);
         }
         return defaultInstance;
     }

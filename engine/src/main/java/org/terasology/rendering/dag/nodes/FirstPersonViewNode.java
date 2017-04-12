@@ -18,10 +18,10 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.WireframeCapable;
@@ -39,34 +39,29 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * TODO: explain what does this node do, really, as right now it's not clear and it's being discussed for removal.
  */
 public class FirstPersonViewNode extends ConditionDependentNode implements WireframeCapable {
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
-    @In
     private ComponentSystemManager componentSystemManager;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private WorldRenderer worldRenderer;
 
     private Camera playerCamera;
     private RenderingDebugConfig renderingDebugConfig;
     private SetWireframe wireframeStateChange;
 
-    @Override
-    public void initialise() {
+    public FirstPersonViewNode(Context context) {
+        super(context);
+
+        componentSystemManager = context.get(ComponentSystemManager.class);
+
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
 
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));

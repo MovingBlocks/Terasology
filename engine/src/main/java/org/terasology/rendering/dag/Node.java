@@ -24,8 +24,6 @@ import java.util.Set;
  */
 public interface Node {
 
-    void initialise();
-
     void process();
 
     // TODO: invoked when Node is removed from RenderGraph

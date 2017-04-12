@@ -98,8 +98,9 @@ public class ScreenGrabber {
     public void saveScreenshot() {
         // Since ScreenGrabber is initialized before DisplayResolutionDependentFBOs (because the latter contains a reference to the former)
         // on first call on saveScreenshot() displayResolutionDependentFBOs will be null.
-        if (displayResolutionDependentFBOs == null)
+        if (displayResolutionDependentFBOs == null) {
             displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+        }
 
         FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
