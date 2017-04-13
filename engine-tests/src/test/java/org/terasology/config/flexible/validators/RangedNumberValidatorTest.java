@@ -113,7 +113,7 @@ public class RangedNumberValidatorTest {
     }
 
     public static class DoubleValidator {
-        private static final double EPSILON = 0.000001d;
+        private static final double MAX_ALLOWED_ERROR = 0.000001d;
 
         private RangedNumberValidator<Double> validator;
 
@@ -130,8 +130,8 @@ public class RangedNumberValidatorTest {
             assertTrue(String.format("%d returned invalid", 83), validator.fastValidate(83d));
             assertTrue(String.format("%d returned invalid", 100), validator.fastValidate(100d));
 
-            assertFalse(validator.fastValidate(0 - EPSILON));
-            assertFalse(validator.fastValidate(100 + EPSILON));
+            assertFalse(validator.fastValidate(0 - MAX_ALLOWED_ERROR));
+            assertFalse(validator.fastValidate(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
@@ -172,7 +172,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.fastValidate(-50000d));
             assertTrue(validator.fastValidate(50d));
 
-            assertFalse(validator.fastValidate(100 + EPSILON));
+            assertFalse(validator.fastValidate(100 + MAX_ALLOWED_ERROR));
         }
 
         @Test
@@ -183,7 +183,7 @@ public class RangedNumberValidatorTest {
             assertTrue(validator.fastValidate(50000d));
             assertTrue(validator.fastValidate(50d));
 
-            assertFalse(validator.fastValidate(0 - EPSILON));
+            assertFalse(validator.fastValidate(0 - MAX_ALLOWED_ERROR));
         }
 
         @Test
