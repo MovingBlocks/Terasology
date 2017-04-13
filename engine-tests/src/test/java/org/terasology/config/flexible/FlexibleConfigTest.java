@@ -102,7 +102,6 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
 
             assertTrue(config.add(new MockSetting<Integer>(id)));
-
             assertFalse(config.add(new MockSetting<Double>(id)));
         }
     }
@@ -121,7 +120,6 @@ public class FlexibleConfigTest {
             SimpleUri id2 = new SimpleUri("engine-tests:TestSetting2");
 
             config.add(new MockSetting(id1));
-
             config.add(new MockSetting(id2));
 
             assertTrue(config.remove(id1));
