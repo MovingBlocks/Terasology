@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,60 +17,70 @@ package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-
 import org.terasology.rendering.dag.WireframeTrigger;
+import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+
 /**
- * TODO: Diagram of this node
+ * Renders the backdrop.
+ *
+ * In this implementation the backdrop consists of a spherical mesh (a skysphere)
+ * on which two sky textures are projected, one for the day and one for the night.
+ * The two textures cross-fade as the day turns to night and viceversa.
+ *
+ * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
-
+    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
 
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
 
-
-    private Camera playerCamera;
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
 
-    @Override
-    public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
+    public BackdropNode(Context context) {
+        worldRenderer = context.get(WorldRenderer.class);
+        Camera playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThroughNormalized(playerCamera));
+
         initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        // We do not call requireFBO as we can count this default buffer is there.
-        //addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER)); // TODO: enable FBO this way when default FBOs are standard FBOs.
-        addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
         // set by the latest glClear statement.
@@ -96,18 +106,14 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         }
     }
 
+    /**
+     * Renders the backdrop of the scene - in this implementation: the skysphere.
+     */
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
-        READ_ONLY_GBUFFER.bind(); // TODO: remove when we can bind this via a StateChange
-
-        playerCamera.lookThroughNormalized();
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, false, false);
 
         glCallList(skySphere); // Draws the skysphere
-
-        READ_ONLY_GBUFFER.setRenderBufferMask(true, true, true); // TODO: handle these via new StateChange to be created
-        playerCamera.lookThrough();
 
         PerformanceMonitor.endActivity();
     }

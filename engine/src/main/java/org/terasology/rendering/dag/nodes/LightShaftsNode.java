@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -43,29 +43,21 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  */
 public class LightShaftsNode extends ConditionDependentNode {
     public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
+    public static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
-    @In
-    private Config config;
+    public LightShaftsNode(Context context) {
+        super(context);
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        RenderingConfig renderingConfig = config.getRendering();
-
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
 
-        addDesiredStateChange(new EnableMaterial("engine:prog.lightShafts"));
+        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL));
 
         // TODO: move content of ShaderParametersLightShafts to this class
     }

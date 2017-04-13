@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
 
@@ -32,7 +32,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
+
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
@@ -57,38 +57,31 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
 
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
 
     private Material ssaoMaterial;
     private float outputFboWidth;
     private float outputFboHeight;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        RenderingConfig renderingConfig = config.getRendering();
+    @SuppressWarnings("FieldCanBeLocal")
+    private FBO ssaoFbo;
+
+    public AmbientOcclusionNode(Context context) {
+        super(context);
+
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL));
         ssaoMaterial = getMaterial(SSAO_MATERIAL);
 
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFBO(SSAO_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
-
+        update(); // Cheeky way to initialise ssaoFbo, outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
-        update(); // initializing ssaoBufferWidth/ssaoBufferHeight
 
         // TODO: check for input textures brought in by the material
     }
@@ -114,8 +107,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     @Override
     public void update() {
-        FBO ssaoFBO = displayResolutionDependentFBOs.get(SSAO_FBO);
-        outputFboWidth = ssaoFBO.width();
-        outputFboHeight = ssaoFBO.height();
+        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
+        outputFboWidth = ssaoFbo.width();
+        outputFboHeight = ssaoFbo.height();
     }
 }

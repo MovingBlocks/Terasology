@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
-/**
- */
 @RegisterBindButton(id = "pause", description = "${engine:menu#binding-pause}", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.ESCAPE)
 @DefaultBinding(type = InputType.CONTROLLER_BUTTON, id = ControllerId.SEVEN)  // Button 9 for PlayStation Controllers

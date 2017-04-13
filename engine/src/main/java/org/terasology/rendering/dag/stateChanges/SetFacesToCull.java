@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package org.terasology.rendering.dag.stateChanges;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.SetFacesToCullTask;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
@@ -29,6 +30,7 @@ import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
  * TODO: Add javadocs
  */
 public final class SetFacesToCull implements StateChange {
+
     private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
     private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL_BACK, "GL_BACK",
             GL_FRONT, "GL_FRONT",
@@ -72,11 +74,6 @@ public final class SetFacesToCull implements StateChange {
         return (obj instanceof SetFacesToCull) && mode == ((SetFacesToCull) obj).getMode();
     }
 
-    @Override
-    public boolean isTheDefaultInstance() {
-        return defaultInstance == this;
-    }
-
     public static String getModeName(int mode) {
         return modeNameMap.get(mode);
     }
@@ -84,5 +81,24 @@ public final class SetFacesToCull implements StateChange {
     @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), getModeName(mode));
+    }
+
+
+    private final class SetFacesToCullTask implements RenderPipelineTask {
+        private int mode;
+
+        private SetFacesToCullTask(int mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void execute() {
+            GL11.glCullFace(mode);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
+        }
     }
 }

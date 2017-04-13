@@ -25,6 +25,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
@@ -33,6 +34,7 @@ import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.PingService;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.ServerInfoService;
 import org.terasology.registry.In;
@@ -54,6 +56,7 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -220,6 +223,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             extInfo.remove(item);
             if (item != null) {
                 extInfo.put(item, infoService.requestInfo(item.getAddress(), item.getPort()));
+                refreshPing();
             }
         });
 
@@ -260,6 +264,22 @@ public class JoinGameScreen extends CoreScreenLayer {
         if (port != null) {
             port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
         }
+
+        UILabel onlinePlayers = find("onlinePlayers", UILabel.class);
+        onlinePlayers.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Future<ServerInfoMessage> info = extInfo.get(visibleList.getSelection());
+                if (info != null) {
+                    if (info.isDone()) {
+                        return getOnlinePlayersText(info);
+                    } else {
+                        return translationSystem.translate("${engine:menu#join-server-requested}");
+                    }
+                }
+                return null;
+            }
+        });
 
         UILabel modules = find("modules", UILabel.class);
         modules.bindText(new ReadOnlyBinding<String>() {
@@ -398,6 +418,17 @@ public class JoinGameScreen extends CoreScreenLayer {
         }
     }
 
+    private String getOnlinePlayersText(Future<ServerInfoMessage> info) {
+        try {
+            List<String> codedWorldInfo = new ArrayList<>();
+            ServerInfoMessage serverInfoMessage = info.get();
+            codedWorldInfo.add(String.format("%d", serverInfoMessage.getOnlinePlayersAmount()));
+            return Joiner.on('\n').join(codedWorldInfo);
+        } catch (ExecutionException | InterruptedException e) {
+            return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+        }
+    }
+
     private String getModulesText(Future<ServerInfoMessage> info) {
         try {
             ServerInfoMessage serverInfoMessage = info.get();
@@ -414,6 +445,31 @@ public class JoinGameScreen extends CoreScreenLayer {
         } catch (ExecutionException | InterruptedException e) {
             return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
         }
+    }
+
+    private void refreshPing() {
+        String address = visibleList.getSelection().getAddress();
+        int port = visibleList.getSelection().getPort();
+        UILabel ping = find("ping", UILabel.class);
+        ping.setText("Requested");
+
+        Thread getPing = new Thread(() -> {
+            PingService pingService = new PingService(address, port);
+            // we're not on the game thread, so we cannot modify GUI elements directly
+            try {
+                long responseTime = pingService.call();
+                if (visibleList.getSelection().getAddress().equals(address)) {
+                    GameThread.asynch(() -> ping.setText(responseTime + " ms."));
+                }
+            } catch (IOException e) {
+                String text = translationSystem.translate("${engine:menu#connection-failed}");
+                GameThread.asynch(() -> ping.setText(FontColor.getColored(text, Color.RED)));
+            }
+        });
+
+        // TODO: once the common thread pool is in place this could be posted there and the
+        // returned Future could be kept and cancelled as soon the selected menu entry changes
+        getPing.start();
     }
 
     public boolean onKeyEvent(NUIKeyEvent event) {

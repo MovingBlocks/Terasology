@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.terasology.rendering.shader.ShaderParametersBlock;
 import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersHdr;
+import org.terasology.rendering.shader.ShaderParametersToneMapping;
 import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
 import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
 import org.terasology.rendering.shader.ShaderParametersLightShafts;
@@ -115,10 +115,10 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
         prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersInitialPost());
         prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
-        prepareAndStoreShaderProgramInstance("highp", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("down", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("hdr", new ShaderParametersHdr());
+        prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersToneMapping());
         prepareAndStoreShaderProgramInstance("sky", new ShaderParametersSky());
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());

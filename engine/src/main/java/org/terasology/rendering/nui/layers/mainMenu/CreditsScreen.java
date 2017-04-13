@@ -77,4 +77,9 @@ public class CreditsScreen extends CoreScreenLayer {
             creditsScroll.resetScrolling();
         }
     }
+    
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
 }

@@ -729,7 +729,11 @@ public class BulletPhysics implements PhysicsEngine {
                     for (int point = 0; point < manifold.getNumContacts(); ++point) {
                         ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
                         if (manifoldPoint.getDistance() < 0) {
-                            collisionPairs.add(new PhysicsSystem.CollisionPair(entity, otherEntity));
+                            collisionPairs.add(new PhysicsSystem.CollisionPair(entity, otherEntity,
+                                    VecMath.from(manifoldPoint.positionWorldOnA),
+                                    VecMath.from(manifoldPoint.positionWorldOnB),
+                                    manifoldPoint.getDistance(),
+                                    VecMath.from(manifoldPoint.normalWorldOnB)));
                             break;
                         }
                     }

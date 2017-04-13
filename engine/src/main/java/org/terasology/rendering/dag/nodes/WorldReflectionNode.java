@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
@@ -28,6 +28,8 @@ import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.LookThrough;
+import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -57,27 +59,18 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode {
-    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
+    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
-    @In
     private RenderQueuesHelper renderQueues;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
     private RenderingConfig renderingConfig;
 
     /**
-     * Node initialization.
+     * Constructs an instance of this class.
      *
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
      * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
@@ -85,24 +78,31 @@ public class WorldReflectionNode extends ConditionDependentNode {
      *
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
      */
-    @Override
-    public void initialise() {
-        playerCamera = worldRenderer.getActiveCamera();
+    public WorldReflectionNode(Context context) {
+        super(context);
 
-        renderingConfig = config.getRendering();
+        renderQueues = context.get(RenderQueuesHelper.class);
+
+        worldRenderer = context.get(WorldRenderer.class);
+        playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
+        addDesiredStateChange(new LookThrough(playerCamera));
+
+        renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> renderingConfig.isReflectiveWater());
         renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
 
-        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
 
         // we must get this here because in process we activate/deactivate a specific shader feature.
         // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
-        chunkShader = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     /**
@@ -121,12 +121,10 @@ public class WorldReflectionNode extends ConditionDependentNode {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        playerCamera.setReflected(true);
-        playerCamera.lookThrough(); // TODO: handle this trough a state change
         final Vector3f cameraPosition = playerCamera.getPosition();
 
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        chunkShader.setFloat("clip", playerCamera.getClipHeight(), true);
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        chunkMaterial.setFloat("clip", playerCamera.getClipHeight(), true);
 
         while (renderQueues.chunksOpaqueReflection.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaqueReflection.poll();
@@ -135,7 +133,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
             } else {
@@ -143,8 +141,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
             }
         }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        playerCamera.setReflected(false);
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

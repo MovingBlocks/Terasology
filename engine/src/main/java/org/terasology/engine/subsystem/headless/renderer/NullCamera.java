@@ -15,9 +15,15 @@
  */
 package org.terasology.engine.subsystem.headless.renderer;
 
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.config.RenderingConfig;
+import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.world.WorldProvider;
 
-public final class NullCamera extends Camera {
+public final class NullCamera extends SubmersibleCamera {
+    public NullCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
+        super(worldProvider, renderingConfig);
+    }
+
     @Override
     public void updateMatrices(float fov) {
     }

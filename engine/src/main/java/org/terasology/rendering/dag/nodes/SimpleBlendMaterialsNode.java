@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,24 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableBlending;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
 
+import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
-import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * An instance of this class renders and blends semi-transparent objects into the content of the existing g-buffer.
@@ -47,21 +50,15 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  * semi-transparent objects are handled here, after nodes relying on the depth buffer have done their job.
  */
 public class SimpleBlendMaterialsNode extends AbstractNode {
-
-    @In
     private ComponentSystemManager componentSystemManager;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public SimpleBlendMaterialsNode(Context context) {
+        componentSystemManager = context.get(ComponentSystemManager.class);
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        addDesiredStateChange(new BindFBO(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(READ_ONLY_GBUFFER.getName(), displayResolutionDependentFBOs));
+        Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
+        addDesiredStateChange(new LookThrough(playerCamera));
+
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

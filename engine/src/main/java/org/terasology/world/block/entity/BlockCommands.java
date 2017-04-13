@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -62,6 +61,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Contains a series of handy game console commands associated with blocks.
+ */
 @RegisterSystem
 @Share(BlockCommands.class)
 public class BlockCommands extends BaseComponentSystem {
@@ -109,34 +111,6 @@ public class BlockCommands extends BaseComponentSystem {
         blockExplorer = new BlockExplorer(assetManager);
         targetSystem = new TargetSystem(blockRegistry, physics);
     }
-
-    @Command(shortDescription = "Lists all available items (prefabs)\nYou can filter by adding the beginning of words " +
-            "after the commands, e.g.: \"startsWith engine: core:\" will list all items from the engine and core module",
-            requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String listItems(@CommandParam(value = "startsWith",  required = false) String[] startsWith) {
-
-        List<String> stringItems = Lists.newArrayList();
-
-        for (Prefab prefab : prefabManager.listPrefabs()) {
-            if (!uriStartsWithAnyString(prefab.getName(), startsWith)) {
-                continue;
-            }
-            stringItems.add(prefab.getName());
-        }
-
-        Collections.sort(stringItems);
-
-        StringBuilder items = new StringBuilder();
-        for (String item : stringItems) {
-            if (!items.toString().isEmpty()) {
-                items.append(Console.NEW_LINE);
-            }
-            items.append(item);
-        }
-
-        return items.toString();
-    }
-
 
     @Command(shortDescription = "List all available blocks\nYou can filter by adding the beginning of words after the" +
             "commands, e.g.: \"listBlocks engine: core:\" will list all blocks from the engine and core module",
@@ -217,7 +191,6 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-
     @Command(shortDescription = "Replaces a block in front of user",
             helpText = "Replaces a block in front of the user at the specified max distance", runOnServer =  true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public void replaceBlock(
@@ -249,9 +222,7 @@ public class BlockCommands extends BaseComponentSystem {
                     }
                 }
             }
-
         }
-
     }
 
     @Command(shortDescription = "Gives multiple stacks of blocks matching a search",
@@ -262,7 +233,11 @@ public class BlockCommands extends BaseComponentSystem {
             @CommandParam("searched") String searched,
             @CommandParam(value = "quantity", required = false) Integer quantityParam,
             @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
-        int quantity = quantityParam != null ? quantityParam : 16;
+
+        if (quantityParam != null && quantityParam < 1) {
+            return "Here, have these zero (0) blocks just like you wanted";
+        }
+
         String searchLowercase = searched.toLowerCase();
         List<String> blocks = findBlockMatches(searchLowercase);
         String result = "Found " + blocks.size() + " block matches when searching for '" + searched + "'.";
@@ -297,18 +272,20 @@ public class BlockCommands extends BaseComponentSystem {
             @CommandParam("blockName") String uri,
             @CommandParam(value = "quantity", required = false) Integer quantityParam,
             @CommandParam(value = "shapeName", required = false) String shapeUriParam) {
-        int quantity = quantityParam != null ? quantityParam : 16;
         Set<ResourceUrn> matchingUris = Assets.resolveAssetUri(uri, BlockFamilyDefinition.class);
+
+        BlockFamily blockFamily = null;
+
         if (matchingUris.size() == 1) {
             Optional<BlockFamilyDefinition> def = Assets.get(matchingUris.iterator().next(), BlockFamilyDefinition.class);
             if (def.isPresent()) {
                 if (def.get().isFreeform()) {
                     if (shapeUriParam == null) {
-                        return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), new ResourceUrn("engine:cube"))), quantity, sender);
+                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), new ResourceUrn("engine:cube")));
                     } else {
                         Set<ResourceUrn> resolvedShapeUris = Assets.resolveAssetUri(shapeUriParam, BlockShape.class);
                         if (resolvedShapeUris.isEmpty()) {
-                            return  "Found block. No shape found for '" + shapeUriParam + "'";
+                            return "Found block. No shape found for '" + shapeUriParam + "'";
                         } else if (resolvedShapeUris.size() > 1) {
                             StringBuilder builder = new StringBuilder();
                             builder.append("Found block. Non-unique shape name, possible matches: ");
@@ -322,12 +299,23 @@ public class BlockCommands extends BaseComponentSystem {
 
                             return builder.toString();
                         }
-                        return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next())), quantity, sender);
+                        blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn(), resolvedShapeUris.iterator().next()));
                     }
                 } else {
-                    return giveBlock(blockManager.getBlockFamily(new BlockUri(def.get().getUrn())), quantity, sender);
+                    blockFamily = blockManager.getBlockFamily(new BlockUri(def.get().getUrn()));
                 }
             }
+
+            if (blockFamily == null) {
+                //Should never be reached
+                return "Block not found";
+            }
+
+            int defaultQuantity = blockFamily.getArchetypeBlock().isStackable() ? 16 : 1;
+            int quantity = quantityParam != null ? quantityParam : defaultQuantity;
+
+            return giveBlock(blockFamily, quantity, sender);
+
         } else if (matchingUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -349,16 +337,22 @@ public class BlockCommands extends BaseComponentSystem {
             return "Here, have these zero (0) blocks just like you wanted";
         }
 
-        EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
-        if (!item.exists()) {
-            throw new IllegalArgumentException("Unknown block or item");
-        }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 
-        GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
-        item.send(giveItemEvent);
-        if (!giveItemEvent.isHandled()) {
-            item.destroy();
+        for (int quantityLeft = quantity; quantityLeft > 0; quantityLeft--) {
+            EntityRef item = blockItemFactory.newInstance(blockFamily, 1);
+            if (!item.exists()) {
+                throw new IllegalArgumentException("Unknown block or item");
+            }
+
+            GiveItemEvent giveItemEvent = new GiveItemEvent(playerEntity);
+            item.send(giveItemEvent);
+
+            if (!giveItemEvent.isHandled()) {
+                item.destroy();
+                quantity -= quantityLeft;
+                break;
+            }
         }
 
         return "You received " + quantity + " blocks of " + blockFamily.getDisplayName();
@@ -379,7 +373,7 @@ public class BlockCommands extends BaseComponentSystem {
      * @param startsWithArray array of possible word to match at the beginning of {@code uri}
      * @return true if {@code startsWithArray} is null, empty or {@code uri} starts with one of the elements in it
      */
-    private boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
+    public static boolean uriStartsWithAnyString(String uri, String[] startsWithArray) {
         if (startsWithArray == null || startsWithArray.length == 0) {
             return true;
         }

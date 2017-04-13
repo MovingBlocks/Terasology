@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,7 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  * Shader parameters for the Post-processing shader program.
  *
  */
-public class ShaderParametersHdr extends ShaderParametersBase {
-
+public class ShaderParametersToneMapping extends ShaderParametersBase {
     @Range(min = 0.0f, max = 10.0f)
     private float exposureBias = 1.0f;
     @Range(min = 0.0f, max = 100.0f)
@@ -41,15 +40,12 @@ public class ShaderParametersHdr extends ShaderParametersBase {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
         ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
 
-        // TODO: move into a node
+        // TODO: move into a tone mapping node
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         displayResolutionDependentFBOs.bindFboColorTexture(InitialPostProcessingNode.INITIAL_POST_FBO);
-
-        // TODO: move into a material?
         program.setInt("texScene", 0, true);
-        // TODO: move to DownSampleSceneAndUpdateExposure
+
         program.setFloat("exposure", screenGrabber.getExposure() * exposureBias, true);
         program.setFloat("whitePoint", whitePoint, true);
     }
-
 }

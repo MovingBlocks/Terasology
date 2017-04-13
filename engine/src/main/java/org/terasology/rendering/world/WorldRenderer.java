@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
@@ -80,9 +81,9 @@ public interface WorldRenderer {
     /**
      * Retrieves the camera the world is being rendered from.
      *
-     * @return a Camera object
+     * @return a SubmersibleCamera object
      */
-    Camera getActiveCamera();
+    SubmersibleCamera getActiveCamera();
 
     /**
      * Retrieves the camera positioned and oriented to look down on the world from the point of view
@@ -189,17 +190,6 @@ public interface WorldRenderer {
      * @return a float value representing the time-smoothed light intensity of the main light at the camera's coordinates
      */
     float getTimeSmoothedMainLightIntensity();
-
-    /**
-     * Returns True if the head of the player is underwater. False otherwise.
-     *
-     * Implementations must take in account waves if present.
-     *
-     * @return True if the head of the player is underwater. False otherwise.
-     */
-    // TODO: while useful to the renderer, this should probably be moved somewhere closer
-    // TODO: to the camera-handling classes and perhaps renamed isCameraUnderWater()
-    boolean isHeadUnderWater();
 
     /**
      * Returns the current tick, an always progressing time value animations are based on.

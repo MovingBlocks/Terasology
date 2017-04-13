@@ -58,6 +58,16 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private final List<Color> colors = CieCamColors.L65C65;
 
+    /**
+     * Remove language x from this languagesExcluded table when it is ready for testing
+     */
+    private final Locale[] languagesExcluded =
+            {Locale.forLanguageTag("zh"), // TODO: Chinese symbols not yet available
+            Locale.forLanguageTag("hi"), // TODO: Hindi (Indian) symbols not yet available
+            Locale.forLanguageTag("ar"), // TODO: Arabic symbols not yet available, no translated entries yet
+            Locale.forLanguageTag("ko"), // TODO: Korean symbols not yet available
+            Locale.forLanguageTag("fa")}; // TODO: Farsi (Persian) symbols not yet available
+
     private UIText nametext;
     private UISlider slider;
     private UISlider heightSlider;
@@ -135,6 +145,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
             SimpleUri menuUri = new SimpleUri("engine:menu");
             TranslationProject menuProject = translationSystem.getProject(menuUri);
             List<Locale> locales = new ArrayList<>(menuProject.getAvailableLocales());
+            for (Locale languageExcluded : languagesExcluded) {
+                locales.remove(languageExcluded);
+            }
             Collections.sort(locales, ((Object o1, Object o2) -> (o1.toString().compareTo(o2.toString()))));
             language.setOptions(Lists.newArrayList(locales));
             language.setVisibleOptions(5); // Set maximum number of options visible for scrolling

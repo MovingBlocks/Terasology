@@ -242,10 +242,10 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
         for (CollisionPair pair : collisionPairs) {
             if (pair.b.exists()) {
-                pair.a.send(new CollideEvent(pair.b));
+                pair.a.send(new CollideEvent(pair.b,pair.pointA,pair.pointB,pair.distance,pair.normal));
             }
             if (pair.a.exists()) {
-                pair.b.send(new CollideEvent(pair.a));
+                pair.b.send(new CollideEvent(pair.a,pair.pointB,pair.pointA,pair.distance,new Vector3f(pair.normal).invert()));
             }
         }
     }
@@ -283,10 +283,19 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
         EntityRef a;
         EntityRef b;
+        Vector3f pointA;
+        Vector3f pointB;
+        float distance;
+        Vector3f normal;
 
-        public CollisionPair(EntityRef a, EntityRef b) {
+
+        public CollisionPair(EntityRef a, EntityRef b,Vector3f pointA, Vector3f pointb, float distance, Vector3f normal) {
             this.a = a;
             this.b = b;
+            this.pointA = pointA;
+            this.pointB = pointb;
+            this.distance = distance;
+            this.normal = normal;
         }
     }
 }
