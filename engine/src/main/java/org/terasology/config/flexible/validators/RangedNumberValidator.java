@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the {@link Number} to validate.
  */
-public class RangedNumberValidator<T extends Number & Comparable<? super T>> extends SettingValueValidator<T> {
+public class RangedNumberValidator<T extends Number & Comparable<? super T>> implements SettingValueValidator<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RangedNumberValidator.class);
     private boolean minInclusive;
     private boolean maxInclusive;
@@ -107,7 +107,7 @@ public class RangedNumberValidator<T extends Number & Comparable<? super T>> ext
      * {@inheritDoc}
      */
     @Override
-    protected void issueWarnings(T value) {
+    public void issueWarnings(T value) {
         LOGGER.warn("Value {} is not in the range {}{}, {}{}", value, minInclusive ? "[" : "(",
                 min != null ? min : "UNBOUNDED", max != null ? max : "UNBOUNDED", maxInclusive ? "]" : ")");
     }

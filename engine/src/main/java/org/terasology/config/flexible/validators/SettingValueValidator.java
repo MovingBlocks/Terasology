@@ -19,26 +19,26 @@ package org.terasology.config.flexible.validators;
  * Validates the given value and issues warnings if the value is invalid.
  * @param <T> The type of values this {@link SettingValueValidator} validates.
  */
-public abstract class SettingValueValidator<T> {
+public interface SettingValueValidator<T> {
     /**
      * Checks whether the given value is valid or not.
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
-    public abstract boolean fastValidate(T value);
+    boolean fastValidate(T value);
 
     /**
      * Issues (logs) appropriate warnings assuming that the given value is invalid.
      * @param value The value to issue warnings for.
      */
-    protected abstract void issueWarnings(T value);
+    void issueWarnings(T value);
 
     /**
      * Checks whether the given value is valid or not and issues appropriate warnings if it is invalid.
      * @param value The value to validate.
      * @return True if the value is valid, false otherwise.
      */
-    public boolean validate(T value) {
+    default boolean validate(T value) {
         boolean isValid = fastValidate(value);
 
         if (!isValid) {
