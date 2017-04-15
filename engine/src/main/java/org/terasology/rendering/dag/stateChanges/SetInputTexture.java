@@ -47,8 +47,10 @@ public class SetInputTexture implements StateChange {
      *
      * Instances of this class bind a texture to a texture unit. The integer identifying
      * the texture unit is then passed to a shader program using the material/parameter
-     * pair provided on construction. See the source of the process() method for the
-     * nitty gritty details.
+     * pair provided on construction. This allow for a texture asset to be used by a
+     * shader program as an input.
+     *
+     * See the source of the process() method for the nitty gritty details.
      *
      * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureId an integer representing the opengl name of a texture. This is usually the return value of glGenTexture().

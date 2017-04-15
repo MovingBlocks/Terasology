@@ -42,8 +42,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         this.fboManager = frameBuffersManager;
         this.fboName = fboName;
 
-        // Cheeky way to initialise fboWidth, fboHeight
-        update();
+        update(); // Cheeky way to initialise fboWidth, fboHeight
         fboManager.subscribe(this);
     }
 

@@ -28,8 +28,6 @@ import static org.lwjgl.opengl.GL11.GL_LINE;
  * TODO: Add javadocs
  */
 public final class SetWireframe implements StateChange {
-    private static final int ENABLED_MODE = GL_LINE;
-    private static final int DISABLED_MODE = GL_FILL;
 
     private static SetWireframe defaultInstance = new SetWireframe(false);
 
@@ -38,7 +36,7 @@ public final class SetWireframe implements StateChange {
 
     public SetWireframe(boolean enabled) {
         this.enabled = enabled;
-        this.mode = enabled? ENABLED_MODE: DISABLED_MODE;
+        this.mode = enabled ? GL_LINE : GL_FILL;
     }
 
     @Override
@@ -61,7 +59,7 @@ public final class SetWireframe implements StateChange {
     }
 
     private String getStatus() {
-        return enabled? "Enabled": "Disabled";
+        return enabled ? "Enabled" : "Disabled";
     }
 
     @Override

@@ -75,7 +75,7 @@ public class ReflectedCamera implements StateChange {
     }
 
     private String getStatus() {
-        return reflected? "True": "False";
+        return reflected ? "True" : "False";
     }
 
     @Override

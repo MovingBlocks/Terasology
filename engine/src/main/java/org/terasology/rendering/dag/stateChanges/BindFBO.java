@@ -25,17 +25,20 @@ import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 
 /**
- * Binds the given FBO to the GL_FRAMEBUFFER target, making it the read framebuffer target as well as
- * the draw framebuffer target.
+ * Binds the given FBO setting it as the FBO to read from and write to.
  *
- * This is useful for operations such as off-screen rendering.
+ * In practice in Terasology this is normally used only to set the FBO to write to. Using an FBO to read from
+ * is usually achieved by binding one of its attachments via the SetInputFromFBO state change.
+ *
+ * When this state change is reset opengl's default framebuffer (usually the display) is bound again.
+ * Similarly, nodes that do not take advantage of this state change will normally write to the default framebuffer.
  */
 public final class BindFBO implements FBOManagerSubscriber, StateChange {
     private static final Integer DEFAULT_FBO_ID = 0;
     // TODO: add necessary checks for ensuring generating FBO with the name "display" is not possible.
     private static final ResourceUrn DEFAULT_FBO = new ResourceUrn("engine:display");
 
-    private static BindFBO defaultInstance = new BindFBO();
+    private static BindFBO defaultInstance = new BindFBO(DEFAULT_FBO, DEFAULT_FBO_ID);
 
     private ResourceUrn fboName;
     private BaseFBOsManager fboManager;
@@ -45,14 +48,13 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
         this.fboName = fboName;
         this.fboManager = fboManager;
 
-        // Cheeky way to initialise fboId
-        update();
+        update(); // Cheeky way to initialise fboId
         fboManager.subscribe(this);
     }
 
-    private BindFBO() {
-        this.fboName = DEFAULT_FBO;
-        this.fboId = DEFAULT_FBO_ID;
+    private BindFBO(ResourceUrn fboName, int fboId) {
+        this.fboName = fboName;
+        this.fboId = fboId;
     }
 
     public ResourceUrn getFboName() {
@@ -76,7 +78,7 @@ public final class BindFBO implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void update() {
-        fboId  = fboManager.get(fboName).fboId;
+        fboId = fboManager.get(fboName).fboId;
     }
 
     @Override

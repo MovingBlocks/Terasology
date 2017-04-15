@@ -54,7 +54,7 @@ abstract class SetStateParameter implements StateChange {
     }
 
     private String getStatus() {
-        return enabled? "Enabled": "Disabled";
+        return enabled ? "Enabled" : "Disabled";
     }
 
     @Override

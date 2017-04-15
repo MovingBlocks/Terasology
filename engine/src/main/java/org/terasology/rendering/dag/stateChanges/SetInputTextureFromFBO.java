@@ -83,14 +83,13 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         this.inputFbo = fboManager.get(fboUrn);
         this.material = getMaterial(materialUrn);
 
-        // Cheeky way to initialise textureId
-        update();
+        update(); // Cheeky way to initialise textureId
         fboManager.subscribe(this);
     }
 
-    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialURN, String shaderParameterName) {
+    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
-        this.materialUrn = materialURN;
+        this.materialUrn = materialUrn;
         this.shaderParameterName = shaderParameterName;
 
         this.material = getMaterial(materialUrn);

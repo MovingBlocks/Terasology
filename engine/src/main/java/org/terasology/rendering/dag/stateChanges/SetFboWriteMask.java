@@ -62,8 +62,7 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         this.fboName = fboName;
         this.fboManager = fboManager;
 
-        // Cheeky way to initialise fbo
-        update();
+        update(); // Cheeky way to initialise fbo
         fboManager.subscribe(this);
     }
 
@@ -81,10 +80,8 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         this.fboName = fboName;
         this.fboManager = fboManager;
 
-        // Cheeky way to initialise fbo
-        update();
+        update(); // Cheeky way to initialise fbo
         fboManager.subscribe(this);
-
 
         defaultInstance = this;
     }

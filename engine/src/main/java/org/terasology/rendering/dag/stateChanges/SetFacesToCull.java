@@ -33,7 +33,7 @@ public final class SetFacesToCull implements StateChange {
             GL_FRONT, "GL_FRONT",
             GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
 
-    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
+    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK);
 
     private int mode;
 

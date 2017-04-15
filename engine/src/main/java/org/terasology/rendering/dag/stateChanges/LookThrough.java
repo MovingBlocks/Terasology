@@ -75,13 +75,13 @@ public class LookThrough implements StateChange {
         return defaultInstance;
     }
 
-    private String cameraInformation() {
-        return camera == null? "Default OpenGL Camera": camera.toString();
+    private String getCameraInformation() {
+        return camera == null ? "Default OpenGL Camera" : camera.toString();
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), cameraInformation());
+        return String.format("%30s: %s", this.getClass().getSimpleName(), getCameraInformation());
     }
 
     @Override
