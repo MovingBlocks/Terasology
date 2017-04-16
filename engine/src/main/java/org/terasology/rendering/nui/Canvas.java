@@ -117,7 +117,7 @@ public interface Canvas {
     Vector2i calculateRestrictedSize(UIWidget widget, Vector2i sizeRestrictions);
 
     /**
-     * Calcualtes the maximum size a widget can take. A dimension will be Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE) if unbounded
+     * Calculates the maximum size a widget can take. A dimension will be Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE) if unbounded
      *
      * @param widget The widget to get the maximum size of.
      * @return The maximum size of the widget.
@@ -145,7 +145,7 @@ public interface Canvas {
     void drawWidget(UIWidget element, Rect2i region);
 
     /**
-     * Draws test, using the current style.
+     * Draws text, using the current style.
      *
      * @param text
      */
