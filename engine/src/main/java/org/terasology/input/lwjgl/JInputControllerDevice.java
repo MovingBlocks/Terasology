@@ -114,6 +114,7 @@ public class JInputControllerDevice implements ControllerDevice {
 
     @Override
     public Queue<ControllerAction> getInputQueue() {
+
         Queue<ControllerAction> result = new ArrayDeque<>();
         Event event = new Event();
 
