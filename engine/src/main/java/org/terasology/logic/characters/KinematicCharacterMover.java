@@ -108,9 +108,8 @@ public class KinematicCharacterMover implements CharacterMover {
                         new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
                         characterMovementComponent.height);
             }
-
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
-                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
+                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun(), input.isCrouching());
             }
         }
         result.setTime(initial.getTime() + input.getDeltaMs());
@@ -167,12 +166,11 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param state        The current state of the character.
      */
     private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
-                           final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+                           final CharacterStateEvent oldState, EntityRef entity, boolean firstRun, boolean isCrouching) {
         //If we are ghosting or we can't move, the mode cannot be changed.
         if (!state.getMode().respondToEnvironment) {
             return;
         }
-
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
@@ -195,7 +193,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
 
-        updateMode(state, newSwimming, newDiving, newClimbing);
+        updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
 
     /**
@@ -205,7 +203,7 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param newDiving True if the character's body is fully inside liquid blocks.
      * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
      */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
+    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing, boolean isCrouching) {
         if (newDiving) {
             if (state.getMode() != MovementMode.DIVING) {
                 state.setMode(MovementMode.DIVING);
@@ -223,12 +221,15 @@ public class KinematicCharacterMover implements CharacterMover {
                 if (state.getVelocity().y > 0) {
                     state.getVelocity().y += 4;
                 }
-                state.setMode(MovementMode.WALKING);
+                state.setMode(isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
             }
         } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
             //We need to toggle the climbing mode
             state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
+        }
+        if (state.getMode() == MovementMode.WALKING || state.getMode() == MovementMode.CROUCHING){
+            state.setMode(isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
         }
     }
 
@@ -719,6 +720,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 state.setFootstepDelta(state.getFootstepDelta() - 1);
                 if (input.isFirstRun()) {
                     switch (movementComp.mode) {
+                        case CROUCHING:
                         case WALKING:
                             entity.send(new FootstepEvent());
                             break;

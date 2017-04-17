@@ -28,6 +28,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private float pitch;
     private float yaw;
     private boolean running;
+    private boolean crouching;
     private boolean jumpRequested;
     private Vector3f movementDirection = new Vector3f();
     private int sequenceNumber;
@@ -36,11 +37,12 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     protected CharacterMoveInputEvent() {
     }
 
-    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested, long delta) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean crouching, boolean jumpRequested, long delta) {
         this.delta = delta;
         this.pitch = pitch;
         this.yaw = yaw;
         this.running = running;
+        this.crouching = crouching;
         this.jumpRequested = jumpRequested;
         this.movementDirection.set(movementDirection);
         this.sequenceNumber = sequence;
@@ -51,6 +53,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         this.pitch = repeatInput.pitch;
         this.yaw = repeatInput.yaw;
         this.running = repeatInput.running;
+        this.crouching = repeatInput.crouching;
         this.jumpRequested = false;
         this.movementDirection.set(repeatInput.movementDirection);
         this.sequenceNumber = repeatInput.sequenceNumber;
@@ -79,6 +82,8 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     public boolean isRunning() {
         return running;
     }
+
+    public boolean isCrouching() { return crouching; }
 
     public boolean isJumpRequested() {
         return jumpRequested;
