@@ -66,7 +66,6 @@ public class FlexibleConfigTest {
         @Test
         public void testContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-
             config.add(new MockSetting<Integer>(id));
 
             assertTrue(config.contains(id));
@@ -75,7 +74,6 @@ public class FlexibleConfigTest {
         @Test
         public void testNotContains() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-
             config.add(new MockSetting<Integer>(id));
 
             assertFalse(config.contains(KEY_NON_EXISTENT));
@@ -129,7 +127,6 @@ public class FlexibleConfigTest {
         @Test
         public void testNonexistentRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-
             config.add(new MockSetting(id));
 
             assertFalse(config.remove(KEY_NON_EXISTENT));
@@ -138,13 +135,9 @@ public class FlexibleConfigTest {
         @Test
         public void testSubscribedRemove() throws Exception {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
-
             Setting setting = new MockSetting(id);
-
             config.add(setting);
-
-            setting.subscribe(propertyChangeEvent -> {
-            });
+            setting.subscribe(propertyChangeEvent -> {});
 
             assertFalse(config.remove(id));
         }
