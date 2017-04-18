@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,6 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.StateChange;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 // TODO: implement bobbing via multiple cameras and different steady/bobbing attachment points
 /**
@@ -36,7 +32,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  * The default instance of this class resets both matrices to identity matrices, opengl's default.
  */
 public class LookThroughNormalized implements StateChange {
-    private static LookThroughNormalized defaultInstance = new LookThroughNormalized();
+    private static StateChange defaultInstance = new LookThroughDefault();
 
     private Camera camera;
 
@@ -47,10 +43,6 @@ public class LookThroughNormalized implements StateChange {
      */
     public LookThroughNormalized(Camera camera) {
         this.camera = checkNotNull(camera);
-    }
-
-    private LookThroughNormalized() {
-        this.camera = null;
     }
 
     @Override
@@ -76,23 +68,11 @@ public class LookThroughNormalized implements StateChange {
 
     @Override
     public String toString() {
-        if (this.isTheDefaultInstance()) {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), "default opengl camera");
-        } else {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), camera.toString());
-        }
+        return String.format("%30s: %s", this.getClass().getSimpleName(), camera.toString());
     }
 
     @Override
     public void process() {
-        if (camera == null) {
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-        } else {
-            camera.lookThroughNormalized();
-        }
+        camera.lookThroughNormalized();
     }
 }
