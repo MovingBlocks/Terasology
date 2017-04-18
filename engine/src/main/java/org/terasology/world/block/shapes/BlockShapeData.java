@@ -36,6 +36,7 @@ public class BlockShapeData implements AssetData {
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
+    private BlockShapePlacement blockShapePlacement;
 
     public String getDisplayName() {
         if (displayName == null) {
@@ -120,5 +121,14 @@ public class BlockShapeData implements AssetData {
 
     public void setRollSymmetric(boolean rollSymmetric) {
         this.rollSymmetric = rollSymmetric;
+    }
+
+
+    public void setBlockShapePlacement(BlockShapePlacement blockShapePlacement) {
+        this.blockShapePlacement = blockShapePlacement;
+    }
+
+    public BlockShapePlacement getBlockShapePlacement() {
+        return blockShapePlacement;
     }
 }

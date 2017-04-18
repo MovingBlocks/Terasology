@@ -118,5 +118,10 @@
     },
     "collision": {
         "convexHull": true
+    },
+    "placement": {
+        "type": "Edge",
+        "archetype": "BottomBack",
+        "symmetry": "None"
     }
 }

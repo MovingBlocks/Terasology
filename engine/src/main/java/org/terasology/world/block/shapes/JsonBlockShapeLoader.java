@@ -52,6 +52,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  */
@@ -96,6 +97,11 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         public static final String POSITION = "position";
         public static final String EXTENTS = "extents";
         public static final String RADIUS = "radius";
+        public static final String PLACEMENT = "placement";
+        public static final String PLACEMENT_TYPE = "type";
+        public static final String PLACEMENT_SYMMETRY = "symmetry";
+        public static final String PLACEMENT_ARCHETYPE = "archetype";
+
 
         @Override
         public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -123,6 +129,18 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionShape(CUBE_SHAPE);
                 shape.setCollisionSymmetric(true);
             }
+
+            if (JSONUtils.hasObject(shapeObj,PLACEMENT) ) {
+                JsonObject placementObj = shapeObj.get(PLACEMENT).getAsJsonObject();
+                shape.setBlockShapePlacement(BlockShapePlacement.of(
+                        JSONUtils.getEnum(placementObj, PLACEMENT_TYPE, BlockShapePlacement.PlacementType.class),
+                        JSONUtils.getEnum(placementObj, PLACEMENT_SYMMETRY, BlockShapePlacement.Symmetry.class),
+                        JSONUtils.getString(placementObj, PLACEMENT_ARCHETYPE)
+                ));
+            } else {
+                shape.setBlockShapePlacement(BlockShapePlacement.defaultFor(shape));
+            }
+
             return shape;
         }
 

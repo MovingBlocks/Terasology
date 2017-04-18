@@ -24,6 +24,7 @@ import org.terasology.world.block.shapes.BlockShape;
 @RegisterBlockFamilyFactory("freeform")
 public class FreeformBlockFamilyFactory implements BlockFamilyFactory {
 
+    private BlockFamilyFactory edge = new EdgeBlockFamilyFactory();
     private BlockFamilyFactory horizontal = new HorizontalBlockFamilyFactory();
     private BlockFamilyFactory symmetric = new SymmetricBlockFamilyFactory();
 
@@ -34,10 +35,13 @@ public class FreeformBlockFamilyFactory implements BlockFamilyFactory {
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        if (shape.isCollisionYawSymmetric()) {
-            return symmetric.createBlockFamily(definition, shape, blockBuilder);
-        } else {
-            return horizontal.createBlockFamily(definition, shape, blockBuilder);
+        switch( shape.getBlockShapePlacement().getType() ) { //Fixme others...
+            case Edge:
+                return edge.createBlockFamily(definition, shape, blockBuilder);
+            case HorizontalSide:
+                return horizontal.createBlockFamily(definition, shape, blockBuilder);
+            default:
+                return symmetric.createBlockFamily(definition, shape, blockBuilder);
         }
     }
 

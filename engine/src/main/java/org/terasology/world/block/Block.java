@@ -670,7 +670,7 @@ public final class Block {
 
     @Override
     public String toString() {
-        return uri.toString();
+        return String.valueOf(uri);
     }
 
 }

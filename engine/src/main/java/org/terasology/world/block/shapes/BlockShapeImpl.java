@@ -25,12 +25,7 @@ import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Pitch;
-import org.terasology.math.Roll;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.VecMath;
-import org.terasology.math.Yaw;
+import org.terasology.math.*;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
@@ -51,8 +46,8 @@ public class BlockShapeImpl extends BlockShape {
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
-
     private Map<Rotation, CollisionShape> collisionShape = Maps.newHashMap();
+    private BlockShapePlacement blockShapePlacement;
 
     public BlockShapeImpl(ResourceUrn urn, AssetType<?, BlockShapeData> assetType, BlockShapeData data) {
         super(urn, assetType);
@@ -91,6 +86,8 @@ public class BlockShapeImpl extends BlockShape {
         yawSymmetric = data.isYawSymmetric();
         pitchSymmetric = data.isPitchSymmetric();
         rollSymmetric = data.isRollSymmetric();
+
+        blockShapePlacement = data.getBlockShapePlacement();
     }
 
     @Override
@@ -147,6 +144,11 @@ public class BlockShapeImpl extends BlockShape {
             return new ConvexHullShape(transformedVerts);
         }
         return shape;
+    }
+
+    @Override
+    public BlockShapePlacement getBlockShapePlacement() {
+        return blockShapePlacement;
     }
 }
 

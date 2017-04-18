@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import org.terasology.math.Side;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -52,6 +53,18 @@ public interface BlockFamily {
     Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
 
     /**
+     * Get the block that is appropriate for placement in the given situation
+     *
+     * @param worldProvider
+     * @param blockEntityRegistry
+     * @param location
+     * @param direction
+     * @param hitNormal
+     * @param hitPosition
+     */
+    Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry,Vector3i location, Vector3f direction, Vector3f hitNormal, Vector3f hitPosition);
+
+    /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours
      */
     Block getArchetypeBlock();
@@ -79,4 +92,5 @@ public interface BlockFamily {
      * @return Whether this block family belongs to the given category (case-insensitive)
      */
     boolean hasCategory(String category);
+
 }

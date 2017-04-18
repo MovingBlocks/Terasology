@@ -74,12 +74,6 @@ public class BlockItemSystem extends BaseComponentSystem {
             event.consume();
             return;
         }
-
-        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-        BlockFamily type = blockItem.blockFamily;
-        Side surfaceSide = Side.inDirection(event.getHitNormal());
-        Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
-
         BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (blockComponent == null) {
             // If there is no block there (i.e. it's a BlockGroup, we don't allow placing block, try somewhere else)
@@ -87,13 +81,15 @@ public class BlockItemSystem extends BaseComponentSystem {
             return;
         }
         Vector3i targetBlock = blockComponent.getPosition();
-        Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
+        Side surfaceSide = Side.inDirection(event.getHitNormal());
+        Vector3i placementPos = new Vector3i(targetBlock).add(surfaceSide.getVector3i());
 
-        Block block = type.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
+        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+        Block block = blockItem.blockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, event.getDirection(), event.getHitNormal(), event.getHitPosition() );
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
+            //FIXME replace -> blockUpdate?
             if (networkSystem.getMode().isAuthority()) {
                 PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block, event.getInstigator());
                 worldProvider.getWorldEntity().send(placeBlocks);

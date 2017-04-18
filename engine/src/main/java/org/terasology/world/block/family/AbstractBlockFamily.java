@@ -17,6 +17,13 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Sets;
+import org.terasology.math.ChunkMath;
+import org.terasology.math.Side;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
 import java.util.Locale;
@@ -60,4 +67,13 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     public String toString() {
         return "BlockFamily[" + uri.toString() + "]";
     }
+
+    @Override
+    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Vector3f direction, Vector3f hitNormal, Vector3f hitPosition) {
+        Side surfaceSide = Side.inDirection(hitNormal);
+        Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(direction, hitNormal);
+        return getBlockForPlacement(worldProvider, blockEntityRegistry, location, surfaceSide, secondaryDirection);
+    }
+
+
 }
