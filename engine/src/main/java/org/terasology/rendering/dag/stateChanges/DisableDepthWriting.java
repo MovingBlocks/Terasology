@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import com.google.common.base.Objects;
 import org.terasology.rendering.dag.StateChange;
 
 import static org.lwjgl.opengl.GL11.glDepthMask;
@@ -28,9 +27,7 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
  * should it be the object's distance from the near plane or should it be the first thing behind it?
  */
 public final class DisableDepthWriting implements StateChange {
-    private static StateChange defaultInstance = new DisableDepthWriting(true);
-
-    private final boolean enabled;
+    private static StateChange defaultInstance = new EnableDepthWriting();
 
     /** Constructs an instance of this StateChange. This can then be used in a node's initialise() method in the form:
      *
@@ -41,13 +38,7 @@ public final class DisableDepthWriting implements StateChange {
      * two task instances frame the execution of a node's process() method unless they are deemed redundant,
      * i.e. because the upstream or downstream node also disables depth buffer writing.
      */
-    public DisableDepthWriting() {
-        this(false);
-    }
-
-    private DisableDepthWriting(boolean enabled) {
-        this.enabled = enabled;
-    }
+    public DisableDepthWriting() { }
 
     @Override
     public StateChange getDefaultInstance() {
@@ -56,25 +47,16 @@ public final class DisableDepthWriting implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof DisableDepthWriting) && this.enabled == ((DisableDepthWriting) obj).enabled;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(enabled);
-    }
-
-    private String getStatus() {
-        return enabled? "Enabled": "Disabled";
+        return (obj instanceof DisableDepthWriting);
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     @Override
     public void process() {
-        glDepthMask(enabled);
+        glDepthMask(false);
     }
 }
