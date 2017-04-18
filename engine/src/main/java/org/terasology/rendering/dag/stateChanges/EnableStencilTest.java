@@ -22,10 +22,12 @@ import org.terasology.rendering.dag.StateChange;
  * Instances of this class enable OpenGL's stencil testing, potentially used in a variety
  * of advanced computer graphics tricks such as stenciled shadows.
  */
-public final class EnableStencilTest extends SetStateParameter {
+public final class EnableStencilTest extends EnableStateParameter {
     private static final int PARAMETER = GL_STENCIL_TEST;
 
-    private static StateChange defaultInstance = new EnableStencilTest(false);
+    // private static StateChange defaultInstance = new EnableStencilTest(false);
+    // TODO: vampcat: Temporary, will be removed in next commit.
+    private static StateChange defaultInstance = null;
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -39,11 +41,7 @@ public final class EnableStencilTest extends SetStateParameter {
      * i.e. because the upstream or downstream node also enables face culling.
      */
     public EnableStencilTest() {
-        this(true);
-    }
-
-    private EnableStencilTest(boolean enabled) {
-        super(PARAMETER, enabled);
+        super(PARAMETER);
     }
 
     @Override

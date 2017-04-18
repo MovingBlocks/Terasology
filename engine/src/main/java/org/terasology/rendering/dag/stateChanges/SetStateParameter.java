@@ -28,46 +28,20 @@ import static org.lwjgl.opengl.GL11.glEnable;
  * See classes EnableBlending and EnableFaceCulling as working implementations.
  */
 abstract class SetStateParameter implements StateChange {
-    private int glParameter;
-    private boolean enabled;
+    protected int glParameter;
 
     /**
      * Construct an instance of this class, provided an OpenGL constant and a boolean to enable or disable
      * the indicated mode.
      *
      * @param glParameter An integer representing one of the many OpenGL constants, i.e. GL_DEPTH_TEST
-     * @param enabled A boolean indicating if the mode given by the parameter above must be enabled (true) or disabled (false).
      */
-    SetStateParameter(int glParameter, boolean enabled) {
+    SetStateParameter(int glParameter) {
         this.glParameter = glParameter;
-        this.enabled = enabled;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, glParameter);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return (obj instanceof SetStateParameter) && this.enabled == ((SetStateParameter) obj).enabled && this.glParameter == ((SetStateParameter) obj).glParameter;
-    }
-
-    private String getStatus() {
-        return enabled ? "Enabled" : "Disabled";
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), getStatus());
-    }
-
-    @Override
-    public void process() {
-        if (enabled) {
-            glEnable(glParameter);
-        } else {
-            glDisable(glParameter);
-        }
+        return Objects.hash(glParameter);
     }
 }

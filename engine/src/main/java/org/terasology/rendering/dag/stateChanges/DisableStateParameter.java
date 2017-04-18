@@ -15,23 +15,24 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.rendering.dag.StateChange;
-
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
 
 /**
- * Instances of this enable OpenGL's depth test, which allows fragments that fail the test to be discarded.
- *
- * This StateChange is used to reset the effects of DisableDepthTest.
+ * TODO: Add javadocs
  */
-public final class EnableDepthTest extends EnableStateParameter {
-    public EnableDepthTest() {
-        super(GL_DEPTH_TEST);
+abstract class DisableStateParameter extends SetStateParameter {
+    /**
+     * Construct an instance of this class, provided an OpenGL constant and a boolean to enable or disable
+     * the indicated mode.
+     *
+     * @param glParameter An integer representing one of the many OpenGL constants, i.e. GL_DEPTH_TEST
+     */
+    DisableStateParameter(int glParameter) {
+        super(glParameter);
     }
 
     @Override
-    public StateChange getDefaultInstance() {
-        // TODO: Throw an exception, ensuring this can never be added to desiredStateChanges?
-        return this;
+    public void process() {
+        glDisable(glParameter);
     }
 }

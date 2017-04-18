@@ -24,9 +24,9 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
  *
  * This StateChange is used to reset the effects of EnableDepthWriting.
  */
-public final class DisableFaceCulling extends SetStateParameter {
+public final class DisableFaceCulling extends DisableStateParameter {
     public DisableFaceCulling() {
-        super(GL_CULL_FACE, false);
+        super(GL_CULL_FACE);
     }
 
     @Override

@@ -25,7 +25,7 @@ import org.terasology.rendering.dag.StateChange;
  * See also StateChange implementation SetBlendFunction to set the source and destination factors
  * used by the blending process.
  */
-public final class EnableBlending extends SetStateParameter {
+public final class EnableBlending extends EnableStateParameter {
     private static final int PARAMETER = GL_BLEND;
 
     private static StateChange defaultInstance = new EnableBlending(false);
@@ -49,7 +49,7 @@ public final class EnableBlending extends SetStateParameter {
     }
 
     private EnableBlending(boolean enabled) {
-        super(PARAMETER, enabled);
+        super(PARAMETER);
     }
 
     @Override

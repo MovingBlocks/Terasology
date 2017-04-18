@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.StateChange;
  * node requiring no depth testing disables it and re-enables it after the process() method has been
  * executed.
  */
-public final class DisableDepthTest extends SetStateParameter {
+public final class DisableDepthTest extends EnableStateParameter {
     private static StateChange defaultInstance = new EnableDepthTest();
 
     /**
@@ -42,7 +42,7 @@ public final class DisableDepthTest extends SetStateParameter {
      * i.e. because the upstream or downstream node also disables the depth testing.
      */
     public DisableDepthTest() {
-        super(GL_DEPTH_TEST, false);
+        super(GL_DEPTH_TEST);
     }
 
     @Override
