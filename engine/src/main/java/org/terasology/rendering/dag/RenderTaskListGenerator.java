@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -67,11 +68,6 @@ public final class RenderTaskListGenerator {
 
                 // printing out process() statement
                 logger.info(String.format("%s: process()", node.toString()));
-
-                // printing out individual state resets
-                for (StateChange desiredStateReset : node.getDesiredStateResets()) {
-                    logger.info(desiredStateReset.toString());
-                }
             }
         }
     }
@@ -95,13 +91,14 @@ public final class RenderTaskListGenerator {
 
         nodeList = orderedNodes;
         taskList.clear();
-        Node nextEnabledNode;
         StateChange persistentStateChange;
-        Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
+        Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();
+        Map<Class<?>, Boolean> persistentStateChangesRelevant = Maps.newHashMap();
+
+        List<StateChange> stateChangesToAdd = Lists.newArrayList();
 
         int enabledNodes = 0;
         int potentialTasks = 0;
-        int currentIndex = 0;
 
         for (Node node : orderedNodes) {
             if (node.isEnabled()) {
@@ -110,7 +107,7 @@ public final class RenderTaskListGenerator {
                     // Marker tasks just add a dividing line to the logger output
                     taskList.add(new MarkerTask(node.getClass().getSimpleName()));
                     enabledNodes++; // we count them only for statistical purposes
-                    potentialTasks += node.getDesiredStateChanges().size() + 1 + node.getDesiredStateResets().size();
+                    potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
                 }
 
                 // generating tasks for the desired state changes
@@ -123,49 +120,44 @@ public final class RenderTaskListGenerator {
                     // for a state change to be necessary there can't be an identical one already persisting
                     if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
                         // no persistent state change of this subType found: the state change is necessary (not redundant)
-                        taskList.add(currentStateChange);
+                        stateChangesToAdd.add(currentStateChange);
                         persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
+                    }
 
-                    } // else: the state change is redundant - we don't generate a task for it
+                    // set the state change as relevant for this iteration
+                    persistentStateChangesRelevant.put(currentStateChange.getClass(), true);
                 }
+
+                // set the state change as relevant for this iteration
+                for (Iterator<Map.Entry<Class<?>, StateChange>> iterator = persistentStateChanges.entrySet().iterator(); iterator.hasNext(); ) {
+                    Map.Entry<Class<?>, StateChange> stateChange = iterator.next();
+
+                    if (persistentStateChangesRelevant.get(stateChange.getKey())) {
+                        persistentStateChangesRelevant.put(stateChange.getKey(), false);
+                    } else {
+                        persistentStateChangesRelevant.remove(stateChange.getKey());
+                        taskList.add(stateChange.getValue().getDefaultInstance());
+                        iterator.remove();
+                    }
+                }
+
+                // Finally add all the desirable state changes for this iteration into the task list.
+                // The delay ensures that the state resets take place before new state sets, which can
+                // be necessary when dealing with State Changes like LookThrough and LookThoughNormalized
+                // that are essentially the same, but not according to the TaskListGenerator.
+                for (StateChange stateChange : stateChangesToAdd) {
+                    taskList.add(stateChange);
+                }
+                stateChangesToAdd.clear();
 
                 // task executing the node.process() method
                 taskList.add(node);
-
-                // generating tasks for the desired state resets
-                nextEnabledNode = findNextEnabledNode(orderedNodes, currentIndex + 1);
-                if (nextEnabledNode != null) {
-
-                    // if there is one enabled node after this one we must check its desired state changes,
-                    // to make sure we don't reset to default something it would set again.
-                    // For example: no point binding the display (the default FBO) if the next enabled node
-                    // will bind another FBO.
-                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
-                        if (sameClassStateChangeNotFoundInThe(nextEnabledNode, currentStateReset)) {
-                            persistentStateChange = persistentStateChanges.get(currentStateReset.getClass());
-
-                            // A reset state change is necessary only if an identical state change isn't already persisting.
-                            if (persistentStateChange == null || !currentStateReset.equals(persistentStateChange)) {
-                                taskList.add(currentStateReset);
-
-                                // This makes sure that the reset state change persists so that future state changes
-                                // which are identical to the reset state change are not added.
-                                persistentStateChanges.put(currentStateReset.getClass(), currentStateReset);
-                            }
-                        }
-                    }
-
-                } else {
-                    // there are no enabled nodes after this one: we must generate all the tasks necessary
-                    // to reset the effects of any persisting state change.
-                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
-                        taskList.add(currentStateReset);
-                        persistentStateChanges.remove(currentStateReset.getClass());
-                    }
-                }
             }
+        }
 
-            currentIndex++;
+        // Since we've reached the end of the rendering pipeline, reset all the persisting State Changes.
+        for (Map.Entry<Class<?>, StateChange> stateChangeEntry : persistentStateChanges.entrySet()) {
+            taskList.add(stateChangeEntry.getValue().getDefaultInstance());
         }
 
         long endTimeInNanoSeconds = System.nanoTime();

@@ -27,7 +27,6 @@ public interface Node extends RenderPipelineTask {
     void dispose();
 
     Set<StateChange> getDesiredStateChanges();
-    Set<StateChange> getDesiredStateResets();
 
     boolean isEnabled();
 
