@@ -28,9 +28,7 @@ import org.terasology.rendering.dag.StateChange;
  * executed.
  */
 public final class DisableDepthTest extends SetStateParameter {
-    private static final int PARAMETER = GL_DEPTH_TEST;
-
-    private static StateChange defaultInstance = new DisableDepthTest(true);
+    private static StateChange defaultInstance = new EnableDepthTest();
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -44,11 +42,7 @@ public final class DisableDepthTest extends SetStateParameter {
      * i.e. because the upstream or downstream node also disables the depth testing.
      */
     public DisableDepthTest() {
-        this(false);
-    }
-
-    private DisableDepthTest(boolean enabled) {
-        super(PARAMETER, enabled);
+        super(GL_DEPTH_TEST, false);
     }
 
     @Override
