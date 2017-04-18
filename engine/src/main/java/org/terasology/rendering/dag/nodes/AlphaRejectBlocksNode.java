@@ -18,9 +18,9 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
@@ -52,41 +52,30 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
 public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
+    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
-    @In
-    private Config config;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
     private RenderQueuesHelper renderQueues;
 
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
-    private RenderingDebugConfig renderingDebugConfig;
 
-    /**
-     * Initialises the node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public AlphaRejectBlocksNode(Context context) {
+        renderQueues = context.get(RenderQueuesHelper.class);
+
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        RenderingDebugConfig renderingDebugConfig =  context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
-        chunkShader = getMaterial(CHUNK_SHADER);
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     public void enableWireframe() {
@@ -123,8 +112,8 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        chunkShader.setFloat("clip", 0.0f, true);
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        chunkMaterial.setFloat("clip", 0.0f, true);
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         while (renderQueues.chunksAlphaReject.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksAlphaReject.poll();
@@ -133,7 +122,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(ALPHA_REJECT, chunkPosition, cameraPosition);
 
             } else {
@@ -141,7 +130,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
             }
         }
 
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -38,22 +38,16 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * This node stores its output in the this.TONE_MAPPED_FBO.
  */
 public class ToneMappingNode extends AbstractNode {
-    public static final ResourceUrn TONE_MAPPED_FBO = new ResourceUrn("engine:fbo.toneMapping");
+    public static final ResourceUrn TONE_MAPPING_FBO = new ResourceUrn("engine:fbo.toneMapping");
+    public static final ResourceUrn TONE_MAPPING_MATERIAL = new ResourceUrn("engine:prog.toneMapping");
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public ToneMappingNode(Context context) {
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        requiresFBO(new FBOConfig(TONE_MAPPED_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPED_FBO, displayResolutionDependentFBOs));
-
-        addDesiredStateChange(new EnableMaterial("engine:prog.toneMapping"));
+        addDesiredStateChange(new EnableMaterial(TONE_MAPPING_MATERIAL));
 
         // TODO: bind input textures from ShaderParametersCombine class
     }

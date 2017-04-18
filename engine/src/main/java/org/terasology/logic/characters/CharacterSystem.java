@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.binds.interaction.AttackButton;
+import org.terasology.input.cameraTarget.PlayerTargetSystem;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
 import org.terasology.logic.characters.events.AttackEvent;
@@ -44,6 +45,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
@@ -51,6 +53,7 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.In;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 
@@ -72,6 +75,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private Time time;
+
+    @In
+    private PlayerTargetSystem targetSystem;
+
+    @In
+    private BlockEntityRegistry blockRegistry;
 
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DoDestroyEvent event, EntityRef entity) {
@@ -118,16 +127,20 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
         character.send(onItemUseEvent);
         if (!onItemUseEvent.isConsumed()) {
-            EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
-            LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
-            Vector3f direction = gazeLocation.getWorldDirection();
-            Vector3f originPos = gazeLocation.getWorldPosition();
-
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
-
-            if (result.isHit()) {
-                result.getEntity().send(new AttackEvent(character, event.getItem()));
+            // It would seem to make more sense to just call getTargetBlock() and get the entity here, but that causes
+            // a NPE up in the EntityRef.
+            EntityRef targetEntity = targetSystem.getTarget();
+            if (targetEntity.exists()) {
+                targetEntity.send(new AttackEvent(character, event.getItem()));
+                return;
             }
+
+            Vector3i position = targetSystem.getTargetBlockPosition();
+            if (position == null) {
+                return;
+            }
+            EntityRef targetBlockEntity = blockRegistry.getBlockEntityAt(position);
+            targetBlockEntity.send(new AttackEvent(character, event.getItem()));
         }
     }
 

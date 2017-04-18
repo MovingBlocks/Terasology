@@ -19,9 +19,9 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
+import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
@@ -48,41 +48,31 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * In a typical world this is the majority of the world's landscape.
  */
 public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn CHUNK_SHADER = new ResourceUrn("engine:prog.chunk");
+    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
-    @In
     private RenderQueuesHelper renderQueues;
 
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     private Camera playerCamera;
-    private Material chunkShader;
+    private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
 
-    /**
-     * Initialises this node. -Must- be called once after instantiation.
-     */
-    @Override
-    public void initialise() {
+    public OpaqueBlocksNode(Context context) {
+        renderQueues = context.get(RenderQueuesHelper.class);
+
         wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = config.getRendering().getDebug();
+        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
+        worldRenderer = context.get(WorldRenderer.class);
         playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_SHADER.toString()));
-        chunkShader = getMaterial(CHUNK_SHADER);
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        chunkMaterial = getMaterial(CHUNK_MATERIAL);
     }
 
     public void enableWireframe() {
@@ -123,7 +113,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        chunkShader.setFloat("clip", 0.0f, true);
+        chunkMaterial.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaque.poll();
@@ -132,7 +122,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
                 final ChunkMesh chunkMesh = chunk.getMesh();
                 final Vector3f chunkPosition = chunk.getPosition().toVector3f();
 
-                chunkMesh.updateMaterial(chunkShader, chunkPosition, chunk.isAnimated());
+                chunkMesh.updateMaterial(chunkMaterial, chunkPosition, chunk.isAnimated());
                 numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
                 if (renderingDebugConfig.isRenderChunkBoundingBoxes()) {

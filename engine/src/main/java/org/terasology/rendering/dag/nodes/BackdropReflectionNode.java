@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -53,42 +53,34 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public class BackdropReflectionNode extends AbstractNode {
-    public static final ResourceUrn REFLECTED = new ResourceUrn("engine:sceneReflected");
+    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
+    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;
     private static final int STACKS = 128;
 
-    @In
-    private WorldRenderer worldRenderer;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    private Camera playerCamera;
     private int skySphere = -1;
 
     /**
-     * Node initialization.
-     *
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
      * This is a default, half-scale buffer inclusive of a depth buffer FBO. See FBOConfig and ScalingFactors for details
      * on possible FBO configurations.
      *
      * This method also requests the material using the "sky" shaders (vertex, fragment) to be enabled.
      */
-    @Override
-    public void initialise() {
-        this.playerCamera = worldRenderer.getActiveCamera();
+    public BackdropReflectionNode(Context context) {
+        Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(playerCamera));
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
         initSkysphere();
 
-        requiresFBO(new FBOConfig(REFLECTED, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFLECTED, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED, displayResolutionDependentFBOs));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
-        addDesiredStateChange(new EnableMaterial("engine:prog.sky"));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
     }
 
     /**

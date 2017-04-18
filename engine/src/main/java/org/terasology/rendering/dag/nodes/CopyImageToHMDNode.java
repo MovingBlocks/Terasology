@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.terasology.rendering.dag.nodes;
 
 import jopenvr.JOpenVRLibrary;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
@@ -27,8 +28,8 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
-import org.terasology.rendering.opengl.ScreenGrabber;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
@@ -43,42 +44,36 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
     private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 
-    @In
     private OpenVRProvider vrProvider;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
-    private Config config;
-
-    @In
-    private ScreenGrabber screenGrabber;
-
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private RenderingConfig renderingConfig;
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
     private FBO finalFbo;
 
     /**
-     * Perform the initialization of this node. Specifically, initialize the vrProvider and pass the frame buffer
+     * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
-    @Override
-    public void initialise() {
-        renderingConfig = config.getRendering();
-        requiresCondition(() -> (renderingConfig.isVrSupport()
-                && vrProvider.isInitialized()));
-        requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE,
-                FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        if (vrProvider != null) {
+    public CopyImageToHMDNode(Context context) {
+        super(context);
+
+        vrProvider = context.get(OpenVRProvider.class);
+        requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
+
+        if (this.isEnabled()) {
+            worldRenderer = context.get(WorldRenderer.class);
+
+            displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+            requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
+            displayResolutionDependentFBOs.subscribe(this);
+
             vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
@@ -87,12 +82,9 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
             vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
+
+            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
         }
-
-        update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
-        displayResolutionDependentFBOs.subscribe(this);
-
-        addDesiredStateChange(new EnableMaterial("engine:prog.defaultTextured"));
     }
 
     /**
@@ -125,6 +117,15 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
                 GL11.glFinish();
                 break;
         }
+
+        // Bind the default FBO. The DAG does not recognize that this node has
+        // bound a different FBO, so as far as it is concerned, FBO 0 is still
+        // bound. As a result, without the below line, the image is only copied
+        // to the HMD - not to the screen as we would like. To get around this,
+        // we bind the default FBO here at the end.  This is a bit brittle
+        // because it assumes that FBO 0 is bound before this node is run.
+        // TODO: break this node into two different nodes that use addDesiredStateChange(BindFBO...))
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
     @Override

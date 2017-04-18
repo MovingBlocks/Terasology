@@ -96,6 +96,11 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         return fboManager.get(fboName);
     }
 
+    public static void disposeDefaultInstance() {
+        // TODO: Make a generic dispose() method for StateChange, and override it here.
+        defaultInstance = null;
+    }
+
     private final class SetViewportToSizeOfTask implements RenderPipelineTask {
         private int width;
         private int height;

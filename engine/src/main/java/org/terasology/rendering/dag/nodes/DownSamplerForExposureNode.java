@@ -18,7 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.registry.In;
+import org.terasology.context.Context;
+import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
@@ -39,8 +40,11 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
     public static final FBOConfig FBO_2X2_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.2x2px"), 2, 2, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
 
-    @In
-    private Config config;
+    public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
+                                                        FBOConfig outputFboConfig, BaseFBOsManager outputFboManager,
+                                                        String label) {
+        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager, label);
+    }
 
     /**
      * This method establishes the conditions in which the downsampling will take place, by enabling or disabling the node.
@@ -48,8 +52,8 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
      * In this particular case the node is enabled if RenderingConfig.isEyeAdaptation returns true.
      */
     @Override
-    protected void setupConditions() {
-        RenderingConfig renderingConfig = config.getRendering();
+    protected void setupConditions(Context context) {
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.EYE_ADAPTATION, this);
         requiresCondition(renderingConfig::isEyeAdaptation);
     }

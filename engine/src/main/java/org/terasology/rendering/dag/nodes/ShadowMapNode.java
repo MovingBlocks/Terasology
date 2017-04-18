@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
@@ -56,40 +56,30 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends ConditionDependentNode {
-    public static final ResourceUrn SHADOW_MAP = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP_MATERIAL = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private static final float STEP_SIZE = 50f;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
-    @In
-    private RenderableWorld renderableWorld;
-
-    @In
-    private RenderQueuesHelper renderQueues;
-
-    @In
-    private Config config;
-
-    @In
     private WorldRenderer worldRenderer;
-
-    @In
+    private RenderQueuesHelper renderQueues;
     private BackdropProvider backdropProvider;
-
-    @In
-    private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
 
     private RenderingConfig renderingConfig;
     private Camera playerCamera;
     private float texelSize;
 
-    @Override
-    public void initialise() {
-        this.playerCamera = worldRenderer.getActiveCamera();
-        this.renderingConfig = config.getRendering();
-        renderableWorld.setShadowMapCamera(shadowMapCamera);
+    public ShadowMapNode(Context context) {
+        super(context);
 
-        requiresFBO(new FBOConfig(SHADOW_MAP, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        renderQueues = context.get(RenderQueuesHelper.class);
+        backdropProvider = context.get(BackdropProvider.class);
+
+        worldRenderer = context.get(WorldRenderer.class);
+        this.playerCamera = worldRenderer.getActiveCamera();
+        this.renderingConfig = context.get(Config.class).getRendering();
+        context.get(RenderableWorld.class).setShadowMapCamera(shadowMapCamera);
 
         texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
         renderingConfig.subscribe(RenderingConfig.SHADOW_MAP_RESOLUTION, this);
@@ -97,9 +87,11 @@ public class ShadowMapNode extends ConditionDependentNode {
         requiresCondition(() -> renderingConfig.isDynamicShadows());
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
-        addDesiredStateChange(new BindFBO(SHADOW_MAP, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial("engine:prog.shadowMap"));
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        addDesiredStateChange(new BindFBO(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
     }
 
     private float calculateTexelSize(int shadowMapResolution) {

@@ -27,13 +27,24 @@ public interface ControllerListener {
     int RIGHT_CONTROLLER = 1;
     int EAXIS_TRIGGER = 1;
     int EAXIS_TOUCHPAD = 0;
-    long BUTTON_TOUCHPAD = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Touchpad);
-    long BUTTON_TRIGGER = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Trigger);
-    long BUTTON_APP_MENU = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_ApplicationMenu);
-    long BUTTON_GRIP = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
+    long TOUCHPAD_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Touchpad);
+    long TRIGGER_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_SteamVR_Trigger);
+    long APP_MENU_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_ApplicationMenu);
+    long GRIP_BUTTON = (1L << JOpenVRLibrary.EVRButtonId.EVRButtonId_k_EButton_Grip);
     float TRIGGER_THRESHOLD = .25f;
 
-    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int nController);
-    // TODO: touch, axes
+    /**
+     * Override this method with a handler for whenever the state of the OpenVR controller changes.
+     * @param stateBefore - the controller state before the change.
+     * @param stateAfter - the controller state after the change.
+     * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
+     */
+    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex);
+
+    /**
+     * Override this method with a handler for whenever the pose of the OpenVR controller changes.
+     * @param pose - the pose of the controller at the point of update, a 4x4 homogenous transformation matrix.
+     * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
+     */
     public void poseChanged(Matrix4f pose, int handIndex);
 }

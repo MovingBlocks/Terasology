@@ -16,14 +16,12 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -44,26 +42,16 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  *
  * This node is integral to the deferred lighting technique.
  */
-public class ApplyDeferredLightingNode extends AbstractNode implements FBOManagerSubscriber {
+public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
 
-    @In
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
-    private FBO writeOnlyGBufferFbo;
-
-    /**
-     * Initializes an instance of this node.
-     *
-     * This method -must- be called once for this node to be fully operational.
-     */
-    @Override
-    public void initialise() {
+    public ApplyDeferredLightingNode(Context context) {
+        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise writeOnlyGBufferFbo
-        displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(
@@ -90,7 +78,6 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        writeOnlyGBufferFbo.setRenderBufferMask(true, true, true);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
@@ -98,10 +85,5 @@ public class ApplyDeferredLightingNode extends AbstractNode implements FBOManage
         displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        writeOnlyGBufferFbo = displayResolutionDependentFBOs.get(WRITEONLY_GBUFFER);
     }
 }
