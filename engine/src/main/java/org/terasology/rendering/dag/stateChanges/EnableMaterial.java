@@ -17,8 +17,6 @@ package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 
@@ -28,11 +26,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * TODO: Add javadocs
  */
 public final class EnableMaterial implements StateChange {
-    private static final ResourceUrn DEFAULT_MATERIAL_URN = new ResourceUrn("engine:prog.default");
-
-    private static EnableMaterial defaultInstance = new EnableMaterial();
-
-    private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
+    private static StateChange defaultInstance = new DisableMaterial();
 
     private ResourceUrn materialUrn;
     private Material material;
@@ -40,11 +34,6 @@ public final class EnableMaterial implements StateChange {
     public EnableMaterial(ResourceUrn materialUrn) {
         this.materialUrn = materialUrn;
         this.material = getMaterial(materialUrn);
-    }
-
-    private EnableMaterial() {
-        this.materialUrn = DEFAULT_MATERIAL_URN;
-        this.material = null;
     }
 
     @Override
@@ -69,10 +58,6 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public void process() {
-        if (material == null) {
-            shaderManager.disableShader();
-        } else {
-            material.enable();
-        }
+        material.enable();
     }
 }
