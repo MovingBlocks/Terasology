@@ -27,9 +27,7 @@ import org.terasology.rendering.dag.StateChange;
  * Also see SetFacesToCull, which allows deviation from OpenGL's default of culling only the GL_BACK faces.
  */
 public final class EnableFaceCulling extends SetStateParameter {
-    private static final int PARAMETER = GL_CULL_FACE;
-
-    private static StateChange defaultInstance = new EnableFaceCulling(false);
+    private static StateChange defaultInstance = new DisableFaceCulling();
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -45,11 +43,7 @@ public final class EnableFaceCulling extends SetStateParameter {
      * See StateChange implementation SetFacesToCull to change from OpenGL's default of culling only the GL_BACK faces.
      */
     public EnableFaceCulling() {
-        this(true);
-    }
-
-    private EnableFaceCulling(boolean enabled) {
-        super(PARAMETER, enabled);
+        super(GL_CULL_FACE, true);
     }
 
     @Override
