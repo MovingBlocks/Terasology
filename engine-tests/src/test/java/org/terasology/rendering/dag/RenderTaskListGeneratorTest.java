@@ -86,8 +86,8 @@ public class RenderTaskListGeneratorTest {
         assertEquals("AlphaNode",   taskList.get(2).toString().trim());
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
         assertEquals("BravoNode",   taskList.get(4).toString().trim());
-        assertEquals("SetName: bar",       taskList.get(5).toString().trim());
-        assertEquals("----- EchoNode",         taskList.get(6).toString().trim());
+        assertEquals("----- EchoNode",         taskList.get(5).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(6).toString().trim());
         assertEquals("EchoNode",    taskList.get(7).toString().trim());
         assertEquals("----- CharlieNode",      taskList.get(8).toString().trim());
         assertEquals("SetName: foo",       taskList.get(9).toString().trim());
@@ -95,7 +95,7 @@ public class RenderTaskListGeneratorTest {
         assertEquals("----- DeltaNode",        taskList.get(11).toString().trim());
         assertEquals("SetName: delta",     taskList.get(12).toString().trim());
         assertEquals("DeltaNode",   taskList.get(13).toString().trim());
-
+        assertEquals("SetName: bar",   taskList.get(14).toString().trim());
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
