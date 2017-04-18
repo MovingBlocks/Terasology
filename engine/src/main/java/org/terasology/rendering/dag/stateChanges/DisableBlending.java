@@ -25,30 +25,14 @@ import org.terasology.rendering.dag.StateChange;
  * See also StateChange implementation SetBlendFunction to set the source and destination factors
  * used by the blending process.
  */
-public final class EnableBlending extends EnableStateParameter {
-    private static StateChange defaultInstance = new DisableBlending();
-
-    /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
-     *
-     * addDesiredStateChange(new EnableBlending());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_BLEND mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables blending.
-     *
-     * See also StateChange implementation SetBlendFunction to set the source and destination factors
-     * used by the blending process.
-     */
-    public EnableBlending() {
+public final class DisableBlending extends DisableStateParameter {
+    public DisableBlending() {
         super(GL_BLEND);
     }
 
     @Override
     public StateChange getDefaultInstance() {
-        return defaultInstance;
+        return this;
     }
 
     @Override
