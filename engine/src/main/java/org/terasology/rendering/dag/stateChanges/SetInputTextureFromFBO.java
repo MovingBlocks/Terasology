@@ -34,7 +34,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 /**
  * This state change implementation sets a texture attached to an FBO as the input for a material.
  */
-public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber {
+public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber {
     // depthStencilRboId is a possible FBO attachment but is not covered by a case here
     // as it wouldn't work with the glBindTexture(TEXTURE_2D, ...) call.
     public enum FboTexturesTypes {
@@ -44,9 +44,9 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         LightAccumulationTexture,
     }
 
-    private static final Logger logger = Logger.getLogger("SetInputTextureFromFBO");
+    private static final Logger logger = Logger.getLogger("SetInputTextureFromFbo");
 
-    private SetInputTextureFromFBO defaultInstance;
+    private SetInputTextureFromFbo defaultInstance;
 
     private int textureSlot;
     private ResourceUrn fboUrn;
@@ -71,7 +71,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
      * @param materialUrn an URN identifying a Material instance.
      * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
      */
-    public SetInputTextureFromFBO(int textureSlot, ResourceUrn fboUrn, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+    public SetInputTextureFromFbo(int textureSlot, ResourceUrn fboUrn, FboTexturesTypes textureType, BaseFBOsManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
         this.textureType = textureType;
@@ -87,7 +87,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
         fboManager.subscribe(this);
     }
 
-    private SetInputTextureFromFBO(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
+    private SetInputTextureFromFbo(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
         this.materialUrn = materialUrn;
         this.shaderParameterName = shaderParameterName;
@@ -100,7 +100,7 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetInputTextureFromFBO(this.textureSlot, materialUrn, this.shaderParameterName);
+            defaultInstance = new SetInputTextureFromFbo(this.textureSlot, materialUrn, this.shaderParameterName);
         }
         return defaultInstance;
     }
@@ -157,13 +157,13 @@ public class SetInputTextureFromFBO implements StateChange, FBOManagerSubscriber
 
     @Override
     public boolean equals(Object other) {
-        return (other instanceof SetInputTextureFromFBO)
-                && this.textureSlot == ((SetInputTextureFromFBO) other).textureSlot
-                && this.fboUrn == ((SetInputTextureFromFBO) other).fboUrn
-                && this.textureType == ((SetInputTextureFromFBO) other).textureType
-                && this.fboManager == ((SetInputTextureFromFBO) other).fboManager
-                && this.materialUrn.equals(((SetInputTextureFromFBO) other).materialUrn)
-                && this.shaderParameterName.equals(((SetInputTextureFromFBO) other).shaderParameterName);
+        return (other instanceof SetInputTextureFromFbo)
+                && this.textureSlot == ((SetInputTextureFromFbo) other).textureSlot
+                && this.fboUrn == ((SetInputTextureFromFbo) other).fboUrn
+                && this.textureType == ((SetInputTextureFromFbo) other).textureType
+                && this.fboManager == ((SetInputTextureFromFbo) other).fboManager
+                && this.materialUrn.equals(((SetInputTextureFromFbo) other).materialUrn)
+                && this.shaderParameterName.equals(((SetInputTextureFromFbo) other).shaderParameterName);
     }
 
     /**
