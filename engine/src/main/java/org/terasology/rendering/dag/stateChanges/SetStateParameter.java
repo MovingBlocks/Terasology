@@ -44,4 +44,9 @@ abstract class SetStateParameter implements StateChange {
     public int hashCode() {
         return Objects.hash(glParameter);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%30s", this.getClass().getSimpleName());
+    }
 }

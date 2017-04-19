@@ -50,9 +50,4 @@ public final class EnableBlending extends EnableStateParameter {
     public StateChange getDefaultInstance() {
         return defaultInstance;
     }
-
-    @Override
-    public String toString() {
-        return String.format("%30s", this.getClass().getSimpleName());
-    }
 }

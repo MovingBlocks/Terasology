@@ -34,9 +34,4 @@ public final class DisableBlending extends DisableStateParameter {
     public StateChange getDefaultInstance() {
         return this;
     }
-
-    @Override
-    public String toString() {
-        return String.format("%30s", this.getClass().getSimpleName());
-    }
 }
