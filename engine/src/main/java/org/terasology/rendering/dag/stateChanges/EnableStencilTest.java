@@ -23,11 +23,7 @@ import org.terasology.rendering.dag.StateChange;
  * of advanced computer graphics tricks such as stenciled shadows.
  */
 public final class EnableStencilTest extends EnableStateParameter {
-    private static final int PARAMETER = GL_STENCIL_TEST;
-
-    // private static StateChange defaultInstance = new EnableStencilTest(false);
-    // TODO: vampcat: Temporary, will be removed in next commit.
-    private static StateChange defaultInstance = null;
+    private static StateChange defaultInstance = new DisableStencilTest();
 
     /**
      * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
@@ -41,7 +37,7 @@ public final class EnableStencilTest extends EnableStateParameter {
      * i.e. because the upstream or downstream node also enables face culling.
      */
     public EnableStencilTest() {
-        super(PARAMETER);
+        super(GL_STENCIL_TEST);
     }
 
     @Override
