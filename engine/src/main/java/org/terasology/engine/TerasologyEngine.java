@@ -168,7 +168,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new I18nSubsystem());
     }
 
-    private void initialize() {
+    public void initialize() {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
@@ -389,45 +389,56 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (!shutdownRequested) {
-            assetTypeManager.reloadChangedOnDisk();
-
-            processPendingState();
-
-            if (currentState == null) {
-                shutdown();
-                break;
-            }
-
-            Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-
-            for (EngineSubsystem subsystem : allSubsystems) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
-                    subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
-                }
-            }
-
-            while (updateCycles.hasNext()) {
-                float updateDelta = updateCycles.next(); // gameTime gets updated here!
-                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
-                    currentState.update(updateDelta);
-                }
-            }
-
-            // Waiting processes are set by modules via GameThread.a/synch() methods.
-            GameThread.processWaitingProcesses();
-
-            for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
-                    subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
-                }
-            }
-            assetTypeManager.disposedUnusedAssets();
-
-            PerformanceMonitor.rollCycle();
-            PerformanceMonitor.startActivity("Other");
-        }
+        while (tick()) { /* do nothing */ }
         PerformanceMonitor.endActivity();
+    }
+
+    /**
+     * Runs a single "tick" of the engine
+     * @return true if the loop requesting a tick should continue running
+     */
+    public boolean tick() {
+        if(shutdownRequested) {
+            return false;
+        }
+
+        assetTypeManager.reloadChangedOnDisk();
+
+        processPendingState();
+
+        if (currentState == null) {
+            shutdown();
+            return false;
+        }
+
+        Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+
+        for (EngineSubsystem subsystem : allSubsystems) {
+            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
+                subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            }
+        }
+
+        while (updateCycles.hasNext()) {
+            float updateDelta = updateCycles.next(); // gameTime gets updated here!
+            try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                currentState.update(updateDelta);
+            }
+        }
+
+        // Waiting processes are set by modules via GameThread.a/synch() methods.
+        GameThread.processWaitingProcesses();
+
+        for (EngineSubsystem subsystem : getSubsystems()) {
+            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
+                subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            }
+        }
+        assetTypeManager.disposedUnusedAssets();
+
+        PerformanceMonitor.rollCycle();
+        PerformanceMonitor.startActivity("Other");
+        return true;
     }
 
     private void cleanup() {
