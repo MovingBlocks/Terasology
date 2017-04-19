@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
@@ -58,7 +58,7 @@ public class HighPassNode extends ConditionDependentNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(HIGH_PASS_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(HIGH_PASS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));
 
         highPass = getMaterial(HIGH_PASS_MATERIAL);

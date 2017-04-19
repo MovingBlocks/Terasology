@@ -20,7 +20,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
@@ -67,7 +67,7 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         requiresFBO(inputFboConfig, inputFboManager);
         requiresFBO(outputFboConfig, outputFboManager);
 
-        addDesiredStateChange(new BindFBO(outputFboUrn, outputFboManager));
+        addDesiredStateChange(new BindFbo(outputFboUrn, outputFboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, outputFboManager));
         addDesiredStateChange(new SetInputTextureFromFBO(SLOT_0, inputFboConfig.getName(), ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));

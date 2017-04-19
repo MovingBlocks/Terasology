@@ -33,52 +33,26 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  * When this state change is reset opengl's default framebuffer (usually the display) is bound again.
  * Similarly, nodes that do not take advantage of this state change will normally write to the default framebuffer.
  */
-public final class BindFbo implements FBOManagerSubscriber, StateChange {
-    private static StateChange defaultInstance = new UnbindFbo();
-
-    private ResourceUrn fboName;
-    private BaseFBOsManager fboManager;
-    private int fboId;
-
-    public BindFbo(ResourceUrn fboName, BaseFBOsManager fboManager) {
-        this.fboName = fboName;
-        this.fboManager = fboManager;
-
-        update(); // Cheeky way to initialise fboId
-        fboManager.subscribe(this);
-    }
-
-    public ResourceUrn getFboName() {
-        return fboName;
-    }
-
+public final class UnbindFbo implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
-        return defaultInstance;
+        return this;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(fboName);
-    }
+    // TODO: Add .hashCode()
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof BindFbo) && fboName.equals(((BindFbo) obj).getFboName());
+        return (obj instanceof UnbindFbo);
     }
 
     @Override
-    public void update() {
-        fboId = fboManager.get(fboName).fboId;
-    }
-
-    @Override
-    public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
+    public String toString() {
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     @Override
     public void process() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 }

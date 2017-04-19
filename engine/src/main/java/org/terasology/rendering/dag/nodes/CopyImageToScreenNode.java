@@ -21,7 +21,6 @@ import org.terasology.context.Context;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.monitoring.PerformanceMonitor;
 
-import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;

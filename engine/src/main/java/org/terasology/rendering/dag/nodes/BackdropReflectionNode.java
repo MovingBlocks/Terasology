@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -76,7 +76,7 @@ public class BackdropReflectionNode extends AbstractNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(REFLECTED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
