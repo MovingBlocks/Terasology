@@ -37,12 +37,15 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     private ResourceUrn fboName;
     private int fboWidth;
     private int fboHeight;
+    
+    @SuppressWarnings("FieldCanBeLocal")
+    private FBO fbo;
 
     public SetViewportToSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
         this.fboManager = frameBuffersManager;
         this.fboName = fboName;
 
-        update(); // Cheeky way to initialise fboWidth, fboHeight
+        update(); // Cheeky way to initialise fbo, fboWidth, fboHeight
         fboManager.subscribe(this);
     }
 
@@ -56,25 +59,18 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFbo().width(), getFbo().height());
+        return Objects.hash(fboWidth, fboHeight);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SetViewportToSizeOf))
-            return false;
-
-        SetViewportToSizeOf other = (SetViewportToSizeOf) obj;
-
-        FBO fbo = getFbo();
-        FBO otherFbo = other.getFbo();
-
-        return fbo.width() == otherFbo.width() && fbo.height() == otherFbo.height();
+        return (obj instanceof SetViewportToSizeOf) && (this.fboWidth == ((SetViewportToSizeOf) obj).fboWidth)
+                                                    && (this.fboHeight == ((SetViewportToSizeOf) obj).fboHeight);
     }
 
     @Override
     public void update() {
-        FBO fbo = getFbo();
+        fbo = fboManager.get(fboName);
 
         fboWidth = fbo.width();
         fboHeight = fbo.height();
@@ -83,10 +79,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
         return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, fboWidth, fboHeight);
-    }
-
-    private FBO getFbo() {
-        return fboManager.get(fboName);
     }
 
     public static void disposeDefaultInstance() {

@@ -31,6 +31,8 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 
+// TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
+
 /**
  * This state change implementation sets a texture attached to an FBO as the input for a material.
  */

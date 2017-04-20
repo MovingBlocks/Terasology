@@ -86,10 +86,6 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         defaultInstance = this;
     }
 
-    public ResourceUrn getFboName() {
-        return fboName;
-    }
-
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null)
@@ -105,7 +101,7 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetFboWriteMask)
-                && fboName.equals(((SetFboWriteMask) obj).getFboName())
+                && fboName.equals(((SetFboWriteMask) obj).fboName)
                 && renderToColorBuffer == ((SetFboWriteMask) obj).renderToColorBuffer
                 && renderToDepthBuffer == ((SetFboWriteMask) obj).renderToDepthBuffer
                 && renderToLightBuffer == ((SetFboWriteMask) obj).renderToLightBuffer;

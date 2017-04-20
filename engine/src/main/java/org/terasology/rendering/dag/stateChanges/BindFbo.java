@@ -48,10 +48,6 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
         fboManager.subscribe(this);
     }
 
-    public ResourceUrn getFboName() {
-        return fboName;
-    }
-
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
@@ -64,7 +60,7 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof BindFbo) && fboName.equals(((BindFbo) obj).getFboName());
+        return (obj instanceof BindFbo) && fboName.equals(((BindFbo) obj).fboName);
     }
 
     @Override
@@ -79,6 +75,7 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
 
     @Override
     public void process() {
+        // TODO: change the target argument to GL_DRAW_FRAMEBUFFER when we switch to OpenGL 3.0 and beyond.
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
     }
 }
