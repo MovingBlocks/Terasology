@@ -65,6 +65,7 @@
     "connection-failed": "connection-failed",
     "could-not-connect-to-server": "could-not-connect-to-server",
     "crash-reporter": "crash-reporter",
+    "non-native-jvm-warn": "non-native-jvm-warn",
     "credits": "credits",
     "create-game": "create-game",
     "create-game-title": "create-game-title",

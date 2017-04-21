@@ -231,6 +231,9 @@ public class TerasologyEngine implements GameEngine {
         logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
         logger.info("Max. Memory: {} MiB", Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE);
         logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
+        if (NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE) {
+            logger.warn("Running on a 32-bit JVM on a 64-bit system. This may limit performance.");
+        }
     }
 
     /**

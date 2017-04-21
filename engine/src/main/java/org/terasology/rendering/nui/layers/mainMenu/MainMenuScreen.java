@@ -19,6 +19,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.LoggingContext;
+import org.terasology.engine.NonNativeJVMDetector;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -41,6 +42,9 @@ public class MainMenuScreen extends CoreScreenLayer {
 
         UILabel versionLabel = find("version", UILabel.class);
         versionLabel.setText(TerasologyVersion.getInstance().getHumanVersion());
+
+        UILabel jvmWarningLabel = find("nonNativeJvmWarning", UILabel.class);
+        jvmWarningLabel.setVisible(NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE);
 
         SelectGameScreen selectScreen = getManager().createScreen(SelectGameScreen.ASSET_URI, SelectGameScreen.class);
 
