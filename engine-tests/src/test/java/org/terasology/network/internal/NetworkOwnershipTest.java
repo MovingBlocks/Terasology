@@ -57,6 +57,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         context.put(ModuleManager.class, moduleManager);
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime, context);
+        networkSystem.setStateContext(context);
         context.put(NetworkSystem.class, networkSystem);
 
         EntitySystemSetupUtil.addReflectionBasedLibraries(context);
