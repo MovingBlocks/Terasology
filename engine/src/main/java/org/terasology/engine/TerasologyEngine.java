@@ -53,6 +53,7 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -414,6 +415,7 @@ public class TerasologyEngine implements GameEngine {
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
         CoreRegistry.setContext(currentState.getContext());
+        rootContext.get(NetworkSystem.class).setStateContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
             try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {

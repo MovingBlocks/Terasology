@@ -117,7 +117,6 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
 
-        context.get(NetworkSystem.class).setStateContext(context);
         this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
