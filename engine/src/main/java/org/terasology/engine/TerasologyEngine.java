@@ -399,7 +399,7 @@ public class TerasologyEngine implements GameEngine {
      * @return true if the loop requesting a tick should continue running
      */
     public boolean tick() {
-        if(shutdownRequested) {
+        if (shutdownRequested) {
             return false;
         }
 
