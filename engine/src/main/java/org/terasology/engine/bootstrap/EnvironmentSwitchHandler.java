@@ -153,11 +153,6 @@ public final class EnvironmentSwitchHandler {
     }
 
 
-    public void handleSwitchToEmptyEnivronment(Context context) {
-        ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
-        cheapAssetManagerUpdate(context, environment);
-    }
-
     private void unregisterPrefabFormats(ModuleAwareAssetTypeManager assetTypeManager) {
         if (registeredPrefabFormat != null) {
             assetTypeManager.removeCoreFormat(Prefab.class, registeredPrefabFormat);
