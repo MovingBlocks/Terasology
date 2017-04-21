@@ -166,6 +166,11 @@ public class StateMainMenu implements GameState {
     }
 
     @Override
+    public Context getContext() {
+        return context;
+    }
+
+    @Override
     public boolean isHibernationAllowed() {
         return true;
     }

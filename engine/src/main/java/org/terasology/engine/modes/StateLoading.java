@@ -59,6 +59,7 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -116,6 +117,7 @@ public class StateLoading implements GameState {
         this.context = engine.createChildContext();
         CoreRegistry.setContext(context);
 
+        context.get(NetworkSystem.class).setStateContext(context);
         this.nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
@@ -267,5 +269,10 @@ public class StateLoading implements GameState {
     @Override
     public String getLoggingPhase() {
         return gameManifest.getTitle();
+    }
+
+    @Override
+    public Context getContext() {
+        return context;
     }
 }

@@ -175,4 +175,9 @@ public class StateHeadlessSetup implements GameState {
     public String getLoggingPhase() {
         return LoggingContext.INIT_PHASE;
     }
+
+    @Override
+    public Context getContext() {
+        return context;
+    }
 }

@@ -145,6 +145,7 @@ public class TerasologyEngine implements GameEngine {
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
 
         this.rootContext = new ContextImpl();
+        rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
         /*
          * We can't load the engine without core registry yet.
@@ -412,6 +413,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+        CoreRegistry.setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
             try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
@@ -441,7 +443,7 @@ public class TerasologyEngine implements GameEngine {
         return true;
     }
 
-    private void cleanup() {
+    public void cleanup() {
         logger.info("Shutting down Terasology...");
         changeStatus(StandardGameStatus.SHUTTING_DOWN);
 

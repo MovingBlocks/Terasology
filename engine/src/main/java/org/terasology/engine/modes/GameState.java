@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes;
 
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 
 /**
@@ -48,4 +49,6 @@ public interface GameState {
      * @return identifies the target for logging events
      */
     String getLoggingPhase();
+
+    Context getContext();
 }
