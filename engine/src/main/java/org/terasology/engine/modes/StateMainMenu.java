@@ -16,6 +16,7 @@
 package org.terasology.engine.modes;
 
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.StreamingSound;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -57,6 +58,8 @@ public class StateMainMenu implements GameState {
     private InputSystem inputSystem;
 
     private String messageOnLoad = "";
+    private boolean isAlive;
+    private StreamingSound backgroundMusic;
 
     public StateMainMenu() {
     }
@@ -68,6 +71,7 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void init(GameEngine gameEngine) {
+        isAlive = true;
         context = gameEngine.createChildContext();
         CoreRegistry.setContext(context);
 
@@ -115,17 +119,18 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.initialise();
 
-        playBackgroundMusic();
-
         //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
+
+        playBackgroundMusic();
     }
 
     @Override
     public void dispose() {
+        isAlive=false;
         eventSystem.process();
 
         componentSystemManager.shutdown();
@@ -136,7 +141,13 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get());
+        if (backgroundMusic == null)
+            backgroundMusic = Assets.getMusic("engine:MenuTheme").get();
+
+        context.get(AudioManager.class).playMusic(backgroundMusic,() -> {
+            if(isAlive)
+                playBackgroundMusic();
+        });
     }
 
     private void stopBackgroundMusic() {
