@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -51,6 +52,7 @@ import org.terasology.registry.Share;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.utilities.Assets;
 
 /**
  * Behavior tree system
@@ -164,5 +166,47 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
                 interpreter.start(tree.getRoot());
             }
         }
+    }
+
+    /**
+     * Causes entity to start the behavior given
+     * <p>
+     * Creates and adds a BehaviorComponent if the entity doesn't already have one.
+     * @param entity the Entity which should start the behavior
+     * @param uri URI of the behavior tree to start
+     * @see #startBehavior(EntityRef, BehaviorTree)
+     */
+    public void startBehavior(EntityRef entity, String uri) {
+        startBehavior(entity, Assets.get(uri, BehaviorTree.class).get());
+    }
+
+    /**
+     * @see #startBehavior(EntityRef, String)
+     */
+    public void startBehavior(EntityRef entity, BehaviorTree tree) {
+        BehaviorComponent behaviorComponent = getBehaviorComponent(entity);
+        behaviorComponent.tree = tree;
+        entity.addOrSaveComponent(behaviorComponent);
+
+        // if we don't already have an interpreter, we just need to add the entity
+        Interpreter interpreter = getInterpreter(entity);
+        if (interpreter == null) {
+            addEntity(entity, behaviorComponent);
+            return;
+        }
+
+        interpreter.start(tree.getRoot());
+    }
+
+    private BehaviorComponent getBehaviorComponent(EntityRef entity) {
+        BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+        if (null == behaviorComponent) {
+            behaviorComponent = new BehaviorComponent();
+        }
+        return behaviorComponent;
+    }
+
+    public Interpreter getInterpreter(EntityRef entity) {
+        return entityInterpreters.get(entity);
     }
 }
