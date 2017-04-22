@@ -91,7 +91,20 @@ public final class RenderTaskListGenerator {
 
         nodeList = orderedNodes;
         taskList.clear();
-        StateChange persistentStateChange;
+
+        /* While examining the StateChanges for each Node, we follow the following approach:
+                - Add all StateChanges for first Node to the list and mark them as relevant
+                - For the remaining Nodes, examine the StateChanges.
+                    ~ If the exact same StateChange was requested by last Node, just mark the same
+                        StateChange as relevant and move on.
+                    ~ If a StateChange of same type but having a different value was requested by last Node,
+                        replace the old one with a new StateChange and mark it as relevant.
+                - Remove all the StateChanges that are no longer relevant (requested by older Nodes, no longer
+                    required by the current Node).
+                - For the remaining StateChanges, add them to the final TaskList.
+                - Mark all the StateChanges as irrelevant, so that they can be removed by next Node if they
+                    are not explicitly requested there.
+        */
         Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();
         Map<Class<?>, Boolean> persistentStateChangesRelevant = Maps.newHashMap();
 
@@ -102,7 +115,6 @@ public final class RenderTaskListGenerator {
 
         for (Node node : orderedNodes) {
             if (node.isEnabled()) {
-
                 if (logger.isInfoEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
                     taskList.add(new MarkerTask(node.getClass().getSimpleName()));
@@ -110,33 +122,34 @@ public final class RenderTaskListGenerator {
                     potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
                 }
 
-                // generating tasks for the desired state changes
+                // Examine the StateChanges requested by current Node, and insert/update them in persistentStateChanges.
                 for (StateChange currentStateChange : node.getDesiredStateChanges()) {
+                    StateChange persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
 
-                    // State changes persist beyond the node that request them if following nodes
-                    // require the exact same change.
-                    persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
-
-                    // for a state change to be necessary there can't be an identical one already persisting
-                    if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
-                        // no persistent state change of this subType found: the state change is necessary (not redundant)
+                    // This exact StateChange was not requested (or was requested with a different value by the last Node),
+                    // so this StateChange is required and we insert it (or replace the old StateChange with it).
+                    if (!currentStateChange.equals(persistentStateChange)) {
                         stateChangesToAdd.add(currentStateChange);
                         persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
                     }
+                    // Else: The exact same StateChange is already persisting, so don't add it again.
 
-                    // set the state change as relevant for this iteration
+                    // Mark the StateChange as relevant for this iteration.
                     persistentStateChangesRelevant.put(currentStateChange.getClass(), true);
                 }
 
-                // set the state change as relevant for this iteration
-                for (Iterator<Map.Entry<Class<?>, StateChange>> iterator = persistentStateChanges.entrySet().iterator(); iterator.hasNext(); ) {
-                    Map.Entry<Class<?>, StateChange> stateChange = iterator.next();
+                // Iterate through all StateChanges
+                Iterator<Map.Entry<Class<?>, StateChange>> iterator = persistentStateChanges.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Class<?>, StateChange> entry = iterator.next();
 
-                    if (persistentStateChangesRelevant.get(stateChange.getKey())) {
-                        persistentStateChangesRelevant.put(stateChange.getKey(), false);
+                    if (persistentStateChangesRelevant.get(entry.getKey())) {
+                        // This StateChange is relevant, so mark it as irrelevant for next Node and move on.
+                        persistentStateChangesRelevant.put(entry.getKey(), false);
                     } else {
-                        persistentStateChangesRelevant.remove(stateChange.getKey());
-                        taskList.add(stateChange.getValue().getDefaultInstance());
+                        // This StateChange is irrelevant, so add its reset task to the TaskList and remove it from persistentStateChanges.
+                        persistentStateChangesRelevant.remove(entry.getKey());
+                        taskList.add(entry.getValue().getDefaultInstance());
                         iterator.remove();
                     }
                 }
@@ -145,12 +158,10 @@ public final class RenderTaskListGenerator {
                 // The delay ensures that the state resets take place before new state sets, which can
                 // be necessary when dealing with State Changes like LookThrough and LookThoughNormalized
                 // that are essentially the same, but not according to the TaskListGenerator.
-                for (StateChange stateChange : stateChangesToAdd) {
-                    taskList.add(stateChange);
-                }
+                taskList.addAll(stateChangesToAdd);
                 stateChangesToAdd.clear();
 
-                // task executing the node.process() method
+                // Now that all the StateChanges required by the Node have been added, we can finally add the Node to the TaskList.
                 taskList.add(node);
             }
         }

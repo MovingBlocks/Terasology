@@ -31,7 +31,6 @@ public final class EnableDepthTest extends EnableStateParameter {
 
     @Override
     public StateChange getDefaultInstance() {
-        // TODO: Throw an exception, ensuring this can never be added to desiredStateChanges?
         return this;
     }
 }

@@ -23,6 +23,7 @@ import org.terasology.rendering.dag.StateChange;
  * TODO: Add javadocs
  */
 public final class DisableMaterial implements StateChange {
+    // TODO: Switch from CoreRegistry to Context
     private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
 
     @Override

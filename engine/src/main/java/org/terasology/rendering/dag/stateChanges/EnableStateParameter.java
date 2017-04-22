@@ -32,6 +32,11 @@ abstract class EnableStateParameter extends SetStateParameter {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof EnableStateParameter) && (this.glParameter == ((EnableStateParameter) obj).glParameter);
+    }
+
+    @Override
     public void process() {
         glEnable(glParameter);
     }
