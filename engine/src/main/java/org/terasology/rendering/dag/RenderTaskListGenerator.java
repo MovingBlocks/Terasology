@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,34 +186,6 @@ public final class RenderTaskListGenerator {
         }
 
         return taskList;
-    }
-
-    private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
-
-        for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {
-            if (stateChange.getClass() == stateChangeReset.getClass()) {
-                return false; // we did find it! And yes, returning false is correct, see method name.
-
-                // note: we don't worry about the details of the two state changes (i.e. if they are value-identical)
-                // as this is something that will be checked while iterating over next node's desired state changes,
-                // in the first part of method generateTaskList.
-            }
-        }
-
-        return true; // we didn't find a state change of the same class
-
-    }
-
-    private Node findNextEnabledNode(List<Node> orderedNodeList, int startIndex) {
-
-        for (int index = startIndex; index < orderedNodeList.size(); index++) {
-            Node currentNode = orderedNodeList.get(index);
-            if (currentNode.isEnabled()) {
-                return currentNode;
-            }
-        }
-
-        return null;
     }
 
     private void logList(List<?> list) {
