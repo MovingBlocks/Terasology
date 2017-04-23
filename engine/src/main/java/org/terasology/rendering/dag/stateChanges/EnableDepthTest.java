@@ -20,9 +20,14 @@ import org.terasology.rendering.dag.StateChange;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 
 /**
- * Instances of this enable OpenGL's depth test, which allows fragments that fail the test to be discarded.
+ * Enables depth testing in OpenGL pipeline.
+ * This allows the processing of fragments that are hidden behind another fragment, and would normally fail the test and therefore be discarded.
  *
- * This StateChange is used to reset the effects of DisableDepthTest.
+ * OpenGL Default: DisableDepthTest
+ * Terasology Default: EnableDepthTest
+ *
+ * Type: Set
+ * Corresponding Reset: EnableDepthTest
  */
 public final class EnableDepthTest extends EnableStateParameter {
     public EnableDepthTest() {

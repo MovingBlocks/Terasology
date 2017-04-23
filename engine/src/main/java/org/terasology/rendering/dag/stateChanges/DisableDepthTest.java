@@ -19,13 +19,13 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this class disable OpenGL's depth test, allowing the processing of fragments
- * that would normally fail the test and would therefore be discarded.
+ * Disables depth testing in OpenGL pipeline.
  *
- * Notice that by default OpenGL has depth testing disabled but in Terasology's defaults it is enabled,
- * as depth testing is used by many nodes. It's important then to use this StateChange so that each
- * node requiring no depth testing disables it and re-enables it after the process() method has been
- * executed.
+ * OpenGL Default: DisableDepthTest
+ * Terasology Default: EnableDepthTest
+ *
+ * Type: Reset
+ * Corresponding Set: DisableDepthTest
  */
 public final class DisableDepthTest extends DisableStateParameter {
     private static StateChange defaultInstance = new EnableDepthTest();

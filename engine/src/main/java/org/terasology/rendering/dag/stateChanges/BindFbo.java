@@ -32,6 +32,9 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  *
  * When this state change is reset opengl's default framebuffer (usually the display) is bound again.
  * Similarly, nodes that do not take advantage of this state change will normally write to the default framebuffer.
+ *
+ * Type: Set
+ * Corresponding Reset: UnbindFbo
  */
 public final class BindFbo implements FBOManagerSubscriber, StateChange {
     private static StateChange defaultInstance = new UnbindFbo();

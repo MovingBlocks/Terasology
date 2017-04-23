@@ -19,11 +19,16 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this class enable OpenGL's blending, i.e. to render transparent objects or to make
- * a composite of different images.
+ * Enables blending in the OpenGL pipeline.
+ * Can be used to render transparent objects or to make a composite of different images.
  *
- * See also StateChange implementation SetBlendFunction to set the source and destination factors
- * used by the blending process.
+ * Note that SetBlendFunction can be used to set the source and destination factors used by the blending process.
+ *
+ * OpenGL Default: DisableBlending
+ * Terasology Default: DisableBlending
+ *
+ * Type: Set
+ * Corresponding Reset: DisableBlending
  */
 public final class EnableBlending extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableBlending();
