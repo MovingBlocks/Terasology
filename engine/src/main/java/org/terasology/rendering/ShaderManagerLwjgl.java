@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.shader.ShaderParametersEmpty;
 import org.terasology.rendering.shader.ShaderParametersPrePostComposite;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
@@ -48,7 +49,6 @@ import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.shader.ShaderParametersInitialPost;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.shader.ShaderParametersShadowMap;
-import org.terasology.rendering.shader.ShaderParametersSky;
 import org.terasology.rendering.shader.ShaderParametersSobel;
 
 import java.util.Optional;
@@ -119,7 +119,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersToneMapping());
-        prepareAndStoreShaderProgramInstance("sky", new ShaderParametersSky());
+        prepareAndStoreShaderProgramInstance("sky", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
         prepareAndStoreShaderProgramInstance("block", new ShaderParametersBlock());
