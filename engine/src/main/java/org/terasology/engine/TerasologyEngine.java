@@ -435,7 +435,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(StandardGameStatus.SHUTTING_DOWN);
 
         if (currentState != null) {
-            currentState.dispose();
+            currentState.dispose(true);
             currentState = null;
         }
 
