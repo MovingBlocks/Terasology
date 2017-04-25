@@ -19,10 +19,18 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
+import org.terasology.math.geom.Vector3d;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 
@@ -34,9 +42,13 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
+import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.glCallList;
@@ -61,11 +73,44 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private static final int RADIUS = 1024;
 
     private WorldRenderer worldRenderer;
+    private BackdropProvider backdropProvider;
+    private RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
 
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
 
+    private Material skyMaterial;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 1.0f, max = 8192.0f)
+    private float sunExponent = 512.0f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 1.0f, max = 8192.0f)
+    private float moonExponent = 256.0f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 10.0f)
+    private float skyDaylightBrightness = 0.6f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 10.0f)
+    private float skyNightBrightness = 1.0f;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3d zenithColor;
+    @SuppressWarnings("FieldCanBeLocal")
+    private SubmersibleCamera activeCamera;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraDir;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraPosition;
+
     public BackdropNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+        renderingConfig = context.get(Config.class).getRendering();
+        worldProvider = context.get(WorldProvider.class);
+
         worldRenderer = context.get(WorldRenderer.class);
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(playerCamera));
@@ -90,6 +135,12 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         //       due to vertex ordering the polygons we do see are the GL_BACK ones.
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+
+        skyMaterial = getMaterial(SKY_MATERIAL);
+
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:sky90").get().getId(), SKY_MATERIAL, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:sky180").get().getId(), SKY_MATERIAL, "texSky180"));
     }
 
     public void enableWireframe() {
@@ -113,6 +164,39 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
+        // Common Parameters
+        skyMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+
+        skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        skyMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
+        skyMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
+
+        activeCamera = worldRenderer.getActiveCamera();
+
+        cameraDir = activeCamera.getViewingDirection();
+        cameraPosition = activeCamera.getPosition();
+
+        skyMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
+        skyMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
+        skyMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
+        skyMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+
+        sunDirection = backdropProvider.getSunDirection(false);
+        skyMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
+
+        skyMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+        // Specific Parameters
+        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
+
+        zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
+
+        skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
+        skyMaterial.setFloat("turbidity", backdropProvider.getTurbidity(), true);
+        skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
+
+        skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
+
         glCallList(skySphere); // Draws the skysphere
 
         PerformanceMonitor.endActivity();
@@ -127,5 +211,26 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         glNewList(skySphere, GL11.GL_COMPILE);
         sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
+    }
+
+    public static Vector3d getAllWeatherZenith(float thetaSunAngle, float turbidity) {
+        float thetaSun = (float) Math.acos(thetaSunAngle);
+        Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
+        Vector4f cx2 = new Vector4f(0.00394f, -0.03202f, 0.06377f, -0.02903f);
+        Vector4f cx3 = new Vector4f(0.25886f, 0.06052f, -0.21196f, 0.11693f);
+        Vector4f cy1 = new Vector4f(0.0f, 0.00317f, -0.00610f, 0.00275f);
+        Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
+        Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
+
+        float t2 = turbidity * turbidity;
+        float chi = (4.0f / 9.0f - turbidity / 120.0f) * ((float) Math.PI - 2.0f * thetaSun);
+
+        Vector4f theta = new Vector4f(1, thetaSun, thetaSun * thetaSun, thetaSun * thetaSun * thetaSun);
+
+        float why = (4.0453f * turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * turbidity + 2.4192f;
+        float x = t2 * cx1.dot(theta) + turbidity * cx2.dot(theta) + cx3.dot(theta);
+        float y = t2 * cy1.dot(theta) + turbidity * cy2.dot(theta) + cy3.dot(theta);
+
+        return new Vector3d(why, x, y);
     }
 }
