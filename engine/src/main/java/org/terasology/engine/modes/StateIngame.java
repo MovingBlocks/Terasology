@@ -143,6 +143,7 @@ public class StateIngame implements GameState {
 
         ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
         context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
         if (oldEnvironment != null) {
             oldEnvironment.close();
         }
