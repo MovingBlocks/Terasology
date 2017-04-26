@@ -44,7 +44,6 @@ import org.terasology.rendering.shader.ShaderParametersLightShafts;
 import org.terasology.rendering.shader.ShaderParametersOcDistortion;
 import org.terasology.rendering.shader.ShaderParametersParticle;
 import org.terasology.rendering.shader.ShaderParametersPost;
-import org.terasology.rendering.shader.ShaderParametersInitialPost;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.shader.ShaderParametersShadowMap;
 import org.terasology.rendering.shader.ShaderParametersSobel;
@@ -111,7 +110,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersSSAO());
         prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersLightShafts());
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
-        prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersInitialPost());
+        prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
         prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("blur", new ShaderParametersEmpty());
@@ -125,7 +124,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
-        prepareAndStoreShaderProgramInstance("simple", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersEmpty());
     }
 
