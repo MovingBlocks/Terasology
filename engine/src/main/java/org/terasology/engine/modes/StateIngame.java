@@ -110,7 +110,7 @@ public class StateIngame implements GameState {
     }
 
     @Override
-    public void dispose() {
+    public void dispose(boolean shuttingDown) {
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 
@@ -143,7 +143,9 @@ public class StateIngame implements GameState {
 
         ModuleEnvironment oldEnvironment = context.get(ModuleManager.class).getEnvironment();
         context.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
-        context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
+        if (!shuttingDown) {
+            context.get(EnvironmentSwitchHandler.class).handleSwitchToEmptyEnivronment(context);
+        }
         if (oldEnvironment != null) {
             oldEnvironment.close();
         }

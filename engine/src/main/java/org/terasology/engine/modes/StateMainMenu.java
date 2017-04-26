@@ -125,7 +125,7 @@ public class StateMainMenu implements GameState {
     }
 
     @Override
-    public void dispose() {
+    public void dispose(boolean shuttingDown) {
         eventSystem.process();
 
         componentSystemManager.shutdown();
