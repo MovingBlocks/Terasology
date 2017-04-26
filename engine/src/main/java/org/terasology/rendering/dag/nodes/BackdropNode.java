@@ -26,10 +26,8 @@ import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
@@ -95,12 +93,11 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @Range(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 
+    private SubmersibleCamera activeCamera;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3d zenithColor;
-    @SuppressWarnings("FieldCanBeLocal")
-    private SubmersibleCamera activeCamera;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f cameraDir;
     @SuppressWarnings("FieldCanBeLocal")
@@ -112,10 +109,10 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         worldProvider = context.get(WorldProvider.class);
 
         worldRenderer = context.get(WorldRenderer.class);
-        Camera playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new LookThroughNormalized(playerCamera));
+        activeCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThroughNormalized(activeCamera));
 
-        initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
+        initSkysphere(activeCamera.getzFar() < RADIUS ? activeCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
@@ -164,14 +161,13 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        // Common Parameters
+        // Common Shader Parameters
+
         skyMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
 
         skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
         skyMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
         skyMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        activeCamera = worldRenderer.getActiveCamera();
 
         cameraDir = activeCamera.getViewingDirection();
         cameraPosition = activeCamera.getPosition();
@@ -186,7 +182,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
 
         skyMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
-        // Specific Parameters
+        // Specific Shader Parameters
+
         skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
 
         zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
@@ -196,6 +193,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
 
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
+
+        // Actual Node Processing
 
         glCallList(skySphere); // Draws the skysphere
 
