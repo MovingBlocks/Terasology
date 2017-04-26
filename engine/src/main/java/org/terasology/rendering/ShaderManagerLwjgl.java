@@ -37,8 +37,7 @@ import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersDebug;
-import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersInitialPost;
+import org.terasology.rendering.shader.ShaderParametersToneMapping;
 import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
 import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
 import org.terasology.rendering.shader.ShaderParametersLightShafts;
@@ -106,8 +105,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     @Override
     public void initShaders() {
-        defaultShaderProgram = prepareAndStoreShaderProgramInstance("default", new ShaderParametersDefault());
-        defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured", new ShaderParametersDefault());
+        defaultShaderProgram = prepareAndStoreShaderProgramInstance("default", new ShaderParametersEmpty());
+        defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured", new ShaderParametersEmpty());
 
         // TODO: Find a better way to do this
         prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
@@ -116,9 +115,9 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
         prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersInitialPost());
         prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
-        prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersEmpty());
+        prepareAndStoreShaderProgramInstance("blur", new ShaderParametersEmpty());
+        prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersToneMapping());
         prepareAndStoreShaderProgramInstance("sky", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
@@ -128,8 +127,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
-        prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
+        prepareAndStoreShaderProgramInstance("simple", new ShaderParametersEmpty());
+        prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersEmpty());
     }
 
     @Override
