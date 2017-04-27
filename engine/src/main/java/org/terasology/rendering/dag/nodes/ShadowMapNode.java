@@ -22,9 +22,11 @@ import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -36,6 +38,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
@@ -62,12 +65,21 @@ public class ShadowMapNode extends ConditionDependentNode {
     private static final float STEP_SIZE = 50f;
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
-    private WorldRenderer worldRenderer;
-    private RenderQueuesHelper renderQueues;
     private BackdropProvider backdropProvider;
-
+    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
-    private Camera playerCamera;
+    private WorldProvider worldProvider;
+    private RenderQueuesHelper renderQueues;
+
+    private Material shadowMapMaterial;
+
+    private SubmersibleCamera activeCamera;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraDir;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraPosition;
     private float texelSize;
 
     public ShadowMapNode(Context context) {
@@ -75,10 +87,11 @@ public class ShadowMapNode extends ConditionDependentNode {
 
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
-
+        renderingConfig = context.get(Config.class).getRendering();
         worldRenderer = context.get(WorldRenderer.class);
-        this.playerCamera = worldRenderer.getActiveCamera();
-        this.renderingConfig = context.get(Config.class).getRendering();
+
+        activeCamera = worldRenderer.getActiveCamera();
+
         context.get(RenderableWorld.class).setShadowMapCamera(shadowMapCamera);
 
         texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
@@ -92,6 +105,8 @@ public class ShadowMapNode extends ConditionDependentNode {
         addDesiredStateChange(new BindFBO(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
+
+        shadowMapMaterial = getMaterial(SHADOW_MAP_MATERIAL);
     }
 
     private float calculateTexelSize(int shadowMapResolution) {
@@ -136,6 +151,30 @@ public class ShadowMapNode extends ConditionDependentNode {
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
+
+            // Common Shader Parameters
+
+            shadowMapMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+
+            shadowMapMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+            shadowMapMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
+            shadowMapMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
+
+            cameraDir = activeCamera.getViewingDirection();
+            cameraPosition = activeCamera.getPosition();
+
+            shadowMapMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
+            shadowMapMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
+            shadowMapMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
+            shadowMapMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+
+            sunDirection = backdropProvider.getSunDirection(false);
+            shadowMapMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
+
+            shadowMapMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+            // Actual Node Processing
+
             positionShadowMapCamera(); // TODO: extract these calculation into a separate node.
 
             int numberOfRenderedTriangles = 0;
@@ -169,7 +208,7 @@ public class ShadowMapNode extends ConditionDependentNode {
 
     private void positionShadowMapCamera() {
         // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude
-        Vector3f mainLightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z); // world-space coordinates
+        Vector3f mainLightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z); // world-space coordinates
 
         // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
         // That's why we first convert it to the previous frame's light-space coordinates and then back to world-space.
