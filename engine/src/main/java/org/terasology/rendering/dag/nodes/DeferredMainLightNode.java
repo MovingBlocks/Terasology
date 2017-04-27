@@ -167,6 +167,19 @@ public class DeferredMainLightNode extends AbstractNode {
 
         // Specific Shader Parameters
 
+        // TODO: This is necessary right now because activateFeature removes all material parameters.
+        // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
+        lightGeometryMaterial.setInt("texSceneOpaqueDepth", 0, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueNormals", 1, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueLightBuffer", 2, true);
+        if (renderingConfig.isDynamicShadows()) {
+            lightGeometryMaterial.setInt("texSceneShadowMap", 3, true);
+
+            if (renderingConfig.isCloudShadows()) {
+                lightGeometryMaterial.setInt("texSceneClouds", 4, true);
+            }
+        }
+
         if (renderingConfig.isDynamicShadows()) {
             lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
             lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
