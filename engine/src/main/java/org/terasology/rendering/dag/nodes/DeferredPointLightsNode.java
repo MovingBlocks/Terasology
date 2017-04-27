@@ -18,6 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,7 +29,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
@@ -38,9 +42,14 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
+import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_ONE;
@@ -49,6 +58,10 @@ import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
+import static org.terasology.rendering.dag.nodes.ShadowMapNode.SHADOW_MAP_FBO;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.LightAccumulationTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
@@ -63,15 +76,36 @@ public class DeferredPointLightsNode extends AbstractNode {
     private static int lightSphereDisplayList = -1;
 
     private EntityManager entityManager;
+    private BackdropProvider backdropProvider;
+    private WorldRenderer worldRenderer;
+    private RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
 
     private Material lightGeometryMaterial;
-    private Camera playerCamera;
+
+    private SubmersibleCamera activeCamera;
+    private Camera lightCamera;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraDir;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraPosition;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f activeCameraToLightSpace = new Vector3f();
 
     public DeferredPointLightsNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+        renderingConfig = context.get(Config.class).getRendering();
+        worldProvider = context.get(WorldProvider.class);
+        worldRenderer = context.get(WorldRenderer.class);
+        entityManager = context.get(EntityManager.class);
         entityManager = context.get(EntityManager.class);
 
-        playerCamera = context.get(WorldRenderer.class).getActiveCamera();
-        addDesiredStateChange(new LookThrough(playerCamera));
+        activeCamera = worldRenderer.getActiveCamera();
+        lightCamera = worldRenderer.getLightCamera();
+
+        addDesiredStateChange(new LookThrough(activeCamera));
 
         lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
         addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
@@ -89,6 +123,19 @@ public class DeferredPointLightsNode extends AbstractNode {
         addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         initLightSphereDisplayList();
+
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueLightBuffer"));
+        if (renderingConfig.isDynamicShadows()) {
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, SHADOW_MAP_FBO, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
+
+            if (renderingConfig.isCloudShadows()) {
+                addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:perlinNoiseTileable").get().getId(), LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
+            }
+        }
     }
 
     private void initLightSphereDisplayList() {
@@ -107,7 +154,7 @@ public class DeferredPointLightsNode extends AbstractNode {
         // above: rendering distance must be higher than distance from the camera or the light is ignored
 
         // No matter what, we ignore lights that are not in the camera frustrum
-        lightIsRenderable &= playerCamera.getViewFrustum().intersects(lightPositionRelativeToCamera, lightComponent.lightAttenuationRange);
+        lightIsRenderable &= activeCamera.getViewFrustum().intersects(lightPositionRelativeToCamera, lightComponent.lightAttenuationRange);
         // TODO: (above) what about lights just off-frame? They might light up in-frame surfaces.
 
         return lightIsRenderable;
@@ -124,6 +171,39 @@ public class DeferredPointLightsNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
 
+        // Common Shader Parameters
+
+        lightGeometryMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+
+        lightGeometryMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        lightGeometryMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
+        lightGeometryMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
+
+        cameraDir = activeCamera.getViewingDirection();
+        cameraPosition = activeCamera.getPosition();
+
+        lightGeometryMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
+        lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
+        lightGeometryMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
+        lightGeometryMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+
+        sunDirection = backdropProvider.getSunDirection(false);
+        lightGeometryMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
+
+        lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+        // Specific Shader Parameters
+
+        if (renderingConfig.isDynamicShadows()) {
+            lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
+            lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+
+            activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
+            lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
+        }
+
+        // Actual Node Processing
+
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
 
@@ -132,12 +212,12 @@ public class DeferredPointLightsNode extends AbstractNode {
                 final Vector3f lightPositionInTeraCoords = locationComponent.getWorldPosition();
 
                 Vector3f lightPositionRelativeToCamera = new Vector3f();
-                lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, playerCamera.getPosition());
+                lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, activeCamera.getPosition());
 
                 if (lightIsRenderable(lightComponent, lightPositionRelativeToCamera)) {
                     lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
 
-                    lightGeometryMaterial.setCamera(playerCamera);
+                    lightGeometryMaterial.setCamera(activeCamera);
 
                     // setting shader parameters regarding the light's properties
                     lightGeometryMaterial.setFloat3("lightColorDiffuse",
@@ -151,7 +231,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
                     // setting shader parameters for the light position in camera space
                     Vector3f lightPositionInViewSpace = new Vector3f(lightPositionRelativeToCamera);
-                    playerCamera.getViewMatrix().transformPoint(lightPositionInViewSpace);
+                    activeCamera.getViewMatrix().transformPoint(lightPositionInViewSpace);
                     lightGeometryMaterial.setFloat3("lightViewPos", lightPositionInViewSpace.x, lightPositionInViewSpace.y, lightPositionInViewSpace.z, true);
 
                     // set the size and location of the sphere to be rendered via shader parameters
