@@ -24,7 +24,6 @@ import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.shader.ShaderParametersEmpty;
-import org.terasology.rendering.shader.ShaderParametersPrePostComposite;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
@@ -106,7 +105,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersEmpty());
-        prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
+        prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("blur", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersEmpty());

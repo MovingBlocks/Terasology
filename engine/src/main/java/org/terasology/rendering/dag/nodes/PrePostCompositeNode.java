@@ -16,16 +16,34 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
+
+import static org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode.SSAO_BLURRED_FBO;
+import static org.terasology.rendering.dag.nodes.HazeNode.FINAL_HAZE_FBO;
+import static org.terasology.rendering.dag.nodes.OutlineNode.OUTLINE_FBO;
+import static org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.LightAccumulationTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
@@ -42,18 +60,79 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * [2] Currently not working: the code is there but it is never enabled.
  */
 public class PrePostCompositeNode extends AbstractNode {
-    private static final ResourceUrn REFLECTIVE_REFRACTIVE_FBO = new ResourceUrn("engine:fbo.reflectiveRefractive");
     private static final ResourceUrn PRE_POST_MATERIAL = new ResourceUrn("engine:prog.prePostComposite");
 
-    DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private BackdropProvider backdropProvider;
+    private WorldRenderer worldRenderer;
+    private RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
+    private Material prePostMaterial;
+
+    private SubmersibleCamera activeCamera;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraDir;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraPosition;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector4f skyInscatteringSettingsFrag = new Vector4f();
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.001f, max = 0.005f)
+    private float outlineDepthThreshold = 0.001f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 1.0f)
+    private float outlineThickness = 0.65f;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 1.0f)
+    private float skyInscatteringLength = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 1.0f)
+    private float skyInscatteringStrength = 0.25f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 1.0f)
+    private float skyInscatteringThreshold = 0.8f;
 
     public PrePostCompositeNode(Context context) {
+        renderingConfig = context.get(Config.class).getRendering();
+        backdropProvider = context.get(BackdropProvider.class);
+        worldProvider = context.get(WorldProvider.class);
+        worldRenderer = context.get(WorldRenderer.class);
+
+        activeCamera = worldRenderer.getActiveCamera();
+
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(REFLECTIVE_REFRACTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL));
         addDesiredStateChange(new BindFBO(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
-        // TODO: bind input textures from ShaderParametersCombine class
+        prePostMaterial = getMaterial(PRE_POST_MATERIAL);
+
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueLightBuffer"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractive"));
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isLocalReflections()) {
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractiveNormals"));
+        }
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isSsao()) {
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, SSAO_BLURRED_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao"));
+        }
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isOutline()) {
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, OUTLINE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges"));
+        }
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isInscattering()) {
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand"));
+        }
     }
 
     /**
@@ -63,6 +142,55 @@ public class PrePostCompositeNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
+
+        // Common Shader Parameters
+
+        prePostMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+
+        prePostMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        prePostMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
+        prePostMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
+
+        cameraDir = activeCamera.getViewingDirection();
+        cameraPosition = activeCamera.getPosition();
+
+        prePostMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
+        prePostMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
+        prePostMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
+        prePostMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+
+        sunDirection = backdropProvider.getSunDirection(false);
+        prePostMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
+
+        prePostMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+        // Specific Shader Parameters
+
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isLocalReflections()) {
+            prePostMaterial.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+            prePostMaterial.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+        }
+
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isOutline()) {
+            prePostMaterial.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
+            prePostMaterial.setFloat("outlineThickness", outlineThickness, true);
+        }
+
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isVolumetricFog()) {
+            prePostMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+            //TODO: Other parameters and volumetric fog test case is needed
+        }
+
+        // TODO: monitor the property subscribing to it
+        if (renderingConfig.isInscattering()) {
+            skyInscatteringSettingsFrag.set(0, skyInscatteringStrength, skyInscatteringLength, skyInscatteringThreshold);
+            prePostMaterial.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
+        }
+
+        // Actual Node Processing
 
         renderFullscreenQuad();
 

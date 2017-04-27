@@ -80,7 +80,6 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
     private Vector3f cameraDir;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f cameraPosition;
-    @SuppressWarnings("FieldCanBeLocal")
 
     public OutlineNode(Context context) {
         super(context);
