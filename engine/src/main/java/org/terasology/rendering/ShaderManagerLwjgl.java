@@ -38,7 +38,6 @@ import org.terasology.rendering.shader.ShaderParameters;
 import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersToneMapping;
-import org.terasology.rendering.shader.ShaderParametersOcDistortion;
 import org.terasology.rendering.shader.ShaderParametersParticle;
 import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
@@ -117,7 +116,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
         prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersShadowMap());
         prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
-        prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersEmpty());
