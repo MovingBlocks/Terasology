@@ -43,7 +43,6 @@ import org.terasology.rendering.shader.ShaderParametersParticle;
 import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.shader.ShaderParametersShadowMap;
-import org.terasology.rendering.shader.ShaderParametersSobel;
 
 import java.util.Optional;
 import java.util.Set;
@@ -106,7 +105,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
         prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersSSAO());
         prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersEmpty());
-        prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
+        prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
         prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersEmpty());
