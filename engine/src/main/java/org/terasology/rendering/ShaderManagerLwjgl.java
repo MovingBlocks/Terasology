@@ -34,7 +34,6 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.shader.ShaderParameters;
-import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.shader.ShaderParametersSSAO;
@@ -108,7 +107,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("sky", new ShaderParametersEmpty());
-        prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
+        prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());

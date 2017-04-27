@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering;
 
-import org.terasology.utilities.Assets;
+import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.rendering.shader.ShaderParametersChunk;
 
 /**
  */
@@ -72,25 +70,22 @@ public final class RenderHelper {
     public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
         float height = 0.0f;
 
-        GLSLMaterial chunkMaterial = (GLSLMaterial) Assets.getMaterial("engine:prog.chunk").get();
-        ShaderParametersChunk chunkParameters = (ShaderParametersChunk) chunkMaterial.getShaderParameters();
-
-        float size = chunkParameters.waveSize;
-        float intens = chunkParameters.waveIntens;
-        float timeFactor = chunkParameters.waveSpeed;
+        float size = RefractiveReflectiveBlocksNode.waveSize;
+        float intens = RefractiveReflectiveBlocksNode.waveIntens;
+        float timeFactor = RefractiveReflectiveBlocksNode.waveSpeed;
 
         for (int i = 0; i < OCEAN_OCTAVES; ++i) {
             height += (smoothTriangleWave(timeToTick(days,
                     timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * size + position.z * OCEAN_WAVE_DIRECTIONS[i].y * size) * 2.0 - 1.0) * intens;
 
-            size *= chunkParameters.waveSizeFalloff;
-            intens *= chunkParameters.waveIntensFalloff;
-            timeFactor *= chunkParameters.waveSpeedFalloff;
+            size *= RefractiveReflectiveBlocksNode.waveSizeFalloff;
+            intens *= RefractiveReflectiveBlocksNode.waveIntensFalloff;
+            timeFactor *= RefractiveReflectiveBlocksNode.waveSpeedFalloff;
         }
 
         height /= OCEAN_OCTAVES;
 
-        return height + chunkParameters.waterOffsetY;
+        return height + RefractiveReflectiveBlocksNode.waterOffsetY;
     }
 
 }
