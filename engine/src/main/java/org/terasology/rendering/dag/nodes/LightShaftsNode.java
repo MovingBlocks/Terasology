@@ -24,12 +24,10 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -41,7 +39,6 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.F
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
@@ -58,13 +55,11 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
-    public static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
+    static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
+    private static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
-    private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
+    private SubmersibleCamera activeCamera;
 
     private Material lightShaftsMaterial;
 
@@ -81,13 +76,8 @@ public class LightShaftsNode extends ConditionDependentNode {
     @Range(min = 0.0f, max = 0.99f)
     private float decay = 0.95f;
 
-    private SubmersibleCamera activeCamera;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector4f sunPositionWorldSpace4 = new Vector4f();
     @SuppressWarnings("FieldCanBeLocal")
@@ -97,12 +87,9 @@ public class LightShaftsNode extends ConditionDependentNode {
         super(context);
 
         backdropProvider = context.get(BackdropProvider.class);
-        worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
-        activeCamera = worldRenderer.getActiveCamera();
-
-        renderingConfig = context.get(Config.class).getRendering();
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
         requiresCondition(renderingConfig::isLightShafts);
 
@@ -117,7 +104,7 @@ public class LightShaftsNode extends ConditionDependentNode {
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texDepth"));
     }
 
     /**
@@ -129,34 +116,14 @@ public class LightShaftsNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/lightShafts");
 
-        // Common Shader Parameters
-
-        lightShaftsMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        lightShaftsMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        lightShaftsMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        lightShaftsMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        lightShaftsMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        lightShaftsMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        lightShaftsMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        lightShaftsMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        lightShaftsMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        lightShaftsMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-
-        // Specific Shader Parameters
+        // Shader Parameters
 
         lightShaftsMaterial.setFloat("density", density, true);
         lightShaftsMaterial.setFloat("exposure", exposure, true);
         lightShaftsMaterial.setFloat("weight", weight, true);
         lightShaftsMaterial.setFloat("decay", decay, true);
 
+        sunDirection = backdropProvider.getSunDirection(false);
         sunPositionWorldSpace4.set(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
         sunPositionScreenSpace.set(sunPositionWorldSpace4);
         activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);

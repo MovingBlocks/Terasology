@@ -21,7 +21,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -31,8 +30,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -50,7 +47,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  */
 public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
     public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:outline");
-    public static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
+    private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;

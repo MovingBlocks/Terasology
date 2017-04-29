@@ -19,11 +19,9 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -32,7 +30,6 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode.SSAO_BLURRED_FBO;
 import static org.terasology.rendering.dag.nodes.HazeNode.FINAL_HAZE_FBO;
@@ -62,21 +59,12 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class PrePostCompositeNode extends AbstractNode {
     private static final ResourceUrn PRE_POST_MATERIAL = new ResourceUrn("engine:prog.prePostComposite");
 
-    private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
+    private SubmersibleCamera activeCamera;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material prePostMaterial;
 
-    private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector4f skyInscatteringSettingsFrag = new Vector4f();
 
@@ -99,11 +87,8 @@ public class PrePostCompositeNode extends AbstractNode {
 
     public PrePostCompositeNode(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
-        backdropProvider = context.get(BackdropProvider.class);
-        worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
-        activeCamera = worldRenderer.getActiveCamera();
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL));
@@ -131,7 +116,7 @@ public class PrePostCompositeNode extends AbstractNode {
         }
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isInscattering()) {
-            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand"));
+            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand"));
         }
     }
 
@@ -143,28 +128,7 @@ public class PrePostCompositeNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/prePostComposite");
 
-        // Common Shader Parameters
-
-        prePostMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        prePostMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        prePostMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        prePostMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        prePostMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        prePostMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        prePostMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        prePostMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        prePostMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        prePostMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-
-        // Specific Shader Parameters
+        // Shader Parameters
 
         // TODO: monitor the property subscribing to it
         if (renderingConfig.isLocalReflections()) {
@@ -189,6 +153,8 @@ public class PrePostCompositeNode extends AbstractNode {
             skyInscatteringSettingsFrag.set(0, skyInscatteringStrength, skyInscatteringLength, skyInscatteringThreshold);
             prePostMaterial.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag, true);
         }
+
+        // TODO: We never set the "fogWorldPosition" uniform in prePostComposite_frag.glsl . Either use it, or remove it.
 
         // Actual Node Processing
 

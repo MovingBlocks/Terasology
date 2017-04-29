@@ -19,11 +19,9 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFBO;
@@ -53,13 +51,12 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO, to be used at a later stage.
  */
 public class InitialPostProcessingNode extends AbstractNode {
-    public static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
-    public static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
+    static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
+    private static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
 
-    private WorldRenderer worldRenderer;
-    private BackdropProvider backdropProvider;
     private RenderingConfig renderingConfig;
     private WorldProvider worldProvider;
+    private SubmersibleCamera activeCamera;
 
     private Material initialPostMaterial;
 
@@ -74,23 +71,13 @@ public class InitialPostProcessingNode extends AbstractNode {
     @Range(min = 0.0f, max = 1.0f)
     private float bloomFactor = 0.5f;
 
-    private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f tint;
 
     public InitialPostProcessingNode(Context context) {
-        backdropProvider = context.get(BackdropProvider.class);
         renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
-
-        activeCamera = worldRenderer.getActiveCamera();
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER - notice this FBO is used in ShaderParametersHdr
@@ -112,7 +99,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         if (renderingConfig.isLightShafts()) {
             addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts"));
         }
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:vignette").get().getId(), INITIAL_POST_MATERIAL, "texVignette"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:vignette").get().getId(), INITIAL_POST_MATERIAL, "texVignette"));
     }
 
     /**
@@ -122,28 +109,7 @@ public class InitialPostProcessingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
 
-        // Common Shader Parameters
-
-        initialPostMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        initialPostMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        initialPostMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        initialPostMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        initialPostMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        initialPostMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        initialPostMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        initialPostMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        initialPostMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        initialPostMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-
-        // Specific Shader Parameters
+        // Shader Parameters
 
         tint = worldProvider.getBlock(activeCamera.getPosition()).getTint();
         initialPostMaterial.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
