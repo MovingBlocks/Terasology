@@ -19,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3d;
@@ -46,7 +45,6 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
-import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.glCallList;
@@ -72,8 +70,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
 
     private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
-    private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
 
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
@@ -93,23 +89,16 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @Range(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 
-    private SubmersibleCamera activeCamera;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3d zenithColor;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
 
     public BackdropNode(Context context) {
         backdropProvider = context.get(BackdropProvider.class);
-        renderingConfig = context.get(Config.class).getRendering();
-        worldProvider = context.get(WorldProvider.class);
 
         worldRenderer = context.get(WorldRenderer.class);
-        activeCamera = worldRenderer.getActiveCamera();
+        SubmersibleCamera activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThroughNormalized(activeCamera));
 
         initSkysphere(activeCamera.getzFar() < RADIUS ? activeCamera.getzFar() : RADIUS);
@@ -161,36 +150,15 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        // Common Shader Parameters
-
-        skyMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        skyMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        skyMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        skyMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        skyMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        skyMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        skyMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
+        // Shader Parameters
 
         sunDirection = backdropProvider.getSunDirection(false);
-        skyMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        skyMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-
-        // Specific Shader Parameters
-
-        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
-
         zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
+        skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
 
         skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
         skyMaterial.setFloat("turbidity", backdropProvider.getTurbidity(), true);
-        skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
+        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
 
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
 
