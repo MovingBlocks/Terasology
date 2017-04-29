@@ -179,8 +179,13 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     }
 
     private String validateScreen() {
-        if (nametext != null && Strings.isNullOrEmpty(nametext.getText())) {
-            return translationSystem.translate("${engine:menu#missing-name-message}");
+        if (nametext != null) {
+            if (Strings.isNullOrEmpty(nametext.getText()) || nametext.getText().trim().length() == 0) {
+                return translationSystem.translate("${engine:menu#missing-name-message}");
+            }
+            if (nametext.getText().trim().length() > 100) {
+                return translationSystem.translate("${engine:menu#validation-username-max-length}");
+            }
         }
         return null;
     }
@@ -255,7 +260,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         Float eyeHeight = getEyeHeight();
         config.getPlayer().setEyeHeight(eyeHeight);
         if (nametext != null) {
-            config.getPlayer().setName(nametext.getText());
+            config.getPlayer().setName(nametext.getText().trim());
+            config.getPlayer().setHasEnteredUsername(true);
         }
         if (!config.getSystem().getLocale().equals(language.getSelection())) {
             config.getSystem().setLocale(language.getSelection());
