@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.terasology.assets.ResourceUrn;
@@ -73,7 +74,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @In
     private AssetManager assetManager;
 
-    private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
+    private ConcurrentHashMap<EntityRef, Interpreter> entityInterpreters = new ConcurrentHashMap<EntityRef, Interpreter>();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
     @Override
