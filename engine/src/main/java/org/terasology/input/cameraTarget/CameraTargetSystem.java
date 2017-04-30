@@ -17,6 +17,8 @@
 package org.terasology.input.cameraTarget;
 
 import com.google.common.base.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -59,8 +61,9 @@ public class CameraTargetSystem extends BaseComponentSystem {
     private Vector3i targetBlockPos;
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
     private float focalDistance;
+    private static final Logger logger = LoggerFactory.getLogger(CameraTargetSystem.class);
 
     @Override
     public void initialise() {
