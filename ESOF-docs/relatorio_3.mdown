@@ -1,0 +1,132 @@
+# ESOF
+# RELATÓRIO 3 - *Architectural Design*
+## Terasology
+
+#### Introdução
+
+Neste relatório iremos abordar o tema de *Architecture Design* em engenharia de *software*, e identificar
+os vários aspectos de organização que o sistema deste projecto engloba.
+
+*Architectural design* consiste na organização de um sistema de *software*, criando estruturas e documentação
+para essas estruturas. Cada estrutura é composta por elementos de *software*, as relações entre esses elementos e 
+propriedades entre os mesmos.
+
+#### *Architectural Design* do Terasology
+
+Alguns dos principais objectivos da arquitetura do terasology são:
+* Uma forte componente para supote de [*modding*](https://en.wikipedia.org/wiki/Mod_(video_gaming)), existindo um número de
+razões para tal:
+ * Evitar conflitos.
+ * Permitir a introdução de novas funcionalidades fora da *engine* (não havendo necessidade de alterar o ficheiro .jar).
+ * Permite *modding* sem codificação em java.
+ * Codificar em modulos de maneira a que seja fácil de usar, poderoso e fácil de conectar a sistemas existentes.
+ * Resiliente a erros e mudança. Um erro ocurrido num *mod* não deverá interrumper o funcionamento do jogo. Se um *mod*
+ for atualizado com componentes alterados, se exitirem *saves* não deveram sufrer roturas.
+ * Ser rasoavelmente seguro.
+ 
+* Separação entre as preocupações da *engine* e da lógica do jogo/*assets*. A *engine* deve-se preocupar com as *core features* 
+como *rendering*, som e *world support*. A lógica do jogo vem através dos modulos, o que significa que qualquer modulo pode ser 
+alterado para alcançar um objectivo diferente no jogo.
+
+#### Modelo de vistas 4 + 1
+
+Iremos usar o modelo de vistas 4 + 1, para descrever a organização deste projecto.
+
+* Vista Lógica
+* Vista de Implementação
+* Vista do Processo
+* Vista de *Deployment*
+* Vista de Casos de Utilização (foi entregue no 2º relatório)
+
+#### Vista Lógica
+##### Diagrama de *packages*
+Mostra as abstrações-chave no sistema como
+objetos ou classes de objetos, ou seus *packages*.
+
+![Packages Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/packages.PNG)
+
+O *package* principal no Terasology é o *Engine* e todas as *facades* e *modules* dependem dele.
+O *core engine* está focado em recursos como: *Entity System*, *Renderimg*, *Physics*, etc.
+
+A maior peça de arquitetura da *engine* é a *Entity System* que é o motor de quase tudo no Terasology.
+
+Os outros *packages* são PC Facades e Core Module.
+
+A *engine* por si só não é executável. Precisa de ser executada num determinado contexto - *"facades"* (front-ends) fornecem 
+esse contexto. A mais basica de todas é a *"PC Facade"* que executa o jogo como uma aplicação nos diversos sitemas operativos.
+
+*"Mods"* são modificações feitas a um jogo pelo utilizador, os *modules* são um pouco mais fundamentais. *Modules* são
+*containers* para código e *assets* que podem ser usados por *game types*, *mods* ou outros conceitos de alto nível.
+
+*Modules* tem acesso a uma parte limitada da *engine* através da *Modding API*. 
+
+#### Vista de Implementação
+##### Diagrama de componentes
+Mostra os componentes de *software* e as dependências entre eles.
+
+![Component Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/vista_implementacao.PNG)
+
+O *Entity System* é no Terasology o *core framework* para a lógica de jogo, sendo quase tudo no jogo uma *entity*.
+Este sistema foi escolhido pois fornece flexibilidade e suporte para extensão, e permite suporte para *mods* sem necessidade
+de escrita de código.
+
+A a maior parte das *Entity System* são definidas como interfaces sendo depois implementadas como um conjunto de classes.
+
+No *core* da *Entity System* temos *entities* ("objetos", que podemos identificar no jogo), uma *entity* por si só não faz nada,
+é apenas um contentor lógico para um ou mais *Components* (fornecem *data* e comportamento através da sua interação com *Systems*).
+
+Um *Component* é um conjunto de dados, com a intensão de ser usado para fornecer comportamentos, que pode ser ligado a uma 
+*entity*. Tipicamente um *component* é um objecto em Java com um conjunto de valores e funcionalidade minimal. Podem 
+existir metodos relacionados a dados, mas não deveram conter nenhuma lógica de jogo, isto deverá ser fornecido por *Systems*.
+
+Uma *entity* só pode ter no máximo um *Component* de um determinado tipo.
+
+*ComponentSystems*, ou *Systems*, fornecem comportamento as *entities*. Isto é feito de duas maneira:
+* Processando *entities* com um conjunto de *components* em resposta a uma chamada de um método.
+* Resposta a *entity events* mandados a *entities*
+
+Este sistema de *Entities* compostas por *Components* com *Systems* a fornecerem comportamento permitem flexibilidade
+e extensibilidade. Frequentemente novos comportamentos podem ser introduzidos através de novos *components* e *systems*.
+Um comportamento pode ser mudado removedo um *system* e colocar outro no seu lugar. E *entities* podem ser criadas através 
+de *components* existentes, sem escrever código.
+
+*Events* são um mecanismo usado que permite que *systems* interajam entre eles. *Events* são mandados as *entities*.
+A vantagem de usar *events* entre *systems* em vez de chamada a métodos, é que, desconecta *systems* e permite adicionar novos *systems* no futuro que reajam 
+ao mesmo *event*.
+
+#### Vista do Processo
+
+#### Vista de *Deployment*
+##### Diagrama de *Deployment*
+Mostra *harware nodes*, relações de comunicação e *software artifacts* implementados neles.
+
+![Deployment Diagram](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/deployment_diagram.PNG)
+
+Este diagrama mostra as relações de comunicação entre *harware*, e *software* implementados neles.
+
+Como já tinhamos descrito no relatório anterior além do modo de *single plyer* também é posivél a ligação a outros Pc's, para 
+jogar em rede, podendo ser qualque um dos despositivos ligados à rede o servidor local.
+
+Também é possível jogar o terasology no PC do utilizador através do web browser.
+
+
+#### Conclusão
+
+
+##### Referências
+[Wikipédia](https://en.wikipedia.org/wiki/4%2B1_architectural_view_model)
+
+[Fórum](http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/)
+ criado para o fim deste projecto pelo Organizador de Projectos do Terasology
+
+Slides das aulas teóricas
+
+#### Lista dos contribuidores 
+
+#####Grupo 6
+* Francisco Veiga
+* Paulo Peixoto (0 horas)
+* Vasco Pereira (0 horas)
+* Filipe Galvão (0 horas)
+
+###### FEUP 2016 MIEIC

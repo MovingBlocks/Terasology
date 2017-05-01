@@ -1,0 +1,108 @@
+# ESOF
+# RELATÓRIO 1
+## Terasology
+
+## Descrição do Projecto
+O Terasology é um jogo de sobrevivência e descoberta, de *open source* com influências de Minecraft, Dwarf Fortress, e 
+Dungeon Keeper.
+Este projecto foi inicializado por [Benjamin "begla" Glatzel](https://github.com/begla) com o objetivo de 
+investigar e testar técnicas procedimentais de geração de terreno e 
+técnicas de renderização eficientes em Java usando o 
+[LWJGL](https://en.wikipedia.org/wiki/Lightweight_Java_Game_Library) (Lightweight Java Game Library) como base.
+O motor utiliza uma técnica de renderização tendo como base o voxel (unidade de volume baseada em pixel) que faz
+abordagem baseada em bloco que é vista, por exemplo, no Minecraft.
+
+Contudo, com o crescimento da equipa de participantes, o projecto evoluiu para um verdadeiro jogo de descoberta e sobrevivência, enfrentando potenciais perigos que vão aparecendo com o desenrolar do jogo.
+
+Os criadores de Terasology são uma mistura deversificada de *software developers*, testadores de jogos,
+artistas gráficos e músicos. 
+
+Sobre o Terasology podemos encontrar informações, como lançamentos e correções de *bugs*, 
+em várias redes sociais como [Community Portal](http://forum.terasology.org/), 
+[Facebook Page](https://www.facebook.com/Terasology/timeline/), [Twiter](https://twitter.com/Terasology), 
+[G+](https://plus.google.com/103835217961917018533/posts), ou [Reddit](https://www.reddit.com/r/Terasology).
+
+Terasology está licenciado sob a [Licença Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) e está disponível em forma de código fonte no [GitHub](https://github.com/MovingBlocks/Terasology).
+
+## Processo Utilizado
+
+O Terasology conta com uma equipa de desenvolvimento, todos voluntários sem remuneração.
+
+Nas palavras de [Cervator](https://github.com/Cervator):
+>Our project isn't super structured though as we're all unpaid volunteers often
+with RL commitments keeping us from spending too much time coding.
+
+A equipa pode ser dividida em áreas, estando cada um dos elementos responsável por uma área diferente,
+havendo elementos da equipa que contribuem em diferentes áreas do projeto. Uma área pode também conter vários
+elementos da equipa.
+A equipa é gerida pelo Organizador de Projectos [Cervator](https://github.com/Cervator).
+
+A equipa não tem um processo de desenvolvimento determinado, mas podem-se identificar algumas 
+caracteristicas semelhantes as caracteristicas dos metodos *Agile*. Caracteristicas estas, que 
+consistem num grupo de métodos de desenvolvimento de *software* em que as soluções evoluem através da 
+colaboração entre a auto-organização e multifuncionabilidade das equipas, promovendo o planeamento adaptativo,
+o desenvolvimento evolutivo, melhoria contínua, e incentiva a respostas rápidas e flexiveis a alterações.
+Todas estas caracteristicas, de certa forma, são encontradas neste projecto.
+
+Também é de se notar que este projecto tem algumas caracteristicas semelhantes com Agile XP Programing visto, 
+que, segue os quatro valores fundamentais da XP programing:
+
+* Comunicação
+* Simplicidade
+* Comentários
+* Coragem
+
+### Comunicação
+
+Visto que a colaboração é remota e, por vezes, os colaboradores não se conhecem pessoalmente, a comunicação entre os elementos é feita através de foruns e redes sociais bem como por email. Notando-se por isso, uma forte componente comunicativa entre elementos, como no caso do forum.
+
+### Simplicidade
+
+Como o projecto é *open source*, verifica-se a simplicidade do código desenvolvido pelos colaboradores, 
+mantendo a uniformidade do mesmo, código comentado e organização do repositório.
+
+
+### Comentários
+
+O Terasology dispões de um [forum](http://forum.movingblocks.org/) onde podem ser discutidos os novos tópicos de
+desenvolvimento, assim como uma página no [github](https://github.com/MovingBlocks/Terasology/wiki/Community-Suggestions) 
+onde os colaboradores podem dar sugestões de funcionabilidades a incorporar no jogo, 
+e por fim uma página onde os utilizadores e os colaboradores podem expor problemas com as 
+diferentes versões, como por exemplo *bugs*.
+
+### Coragem
+
+Os *software developers* quando desenvolvem programas em ambiente *open source* têm maior à-vontade de comunicação e de 
+receber comentários ao seu código, o que facilita a aceitação por parte dos colaboradores possíveis e necessárias 
+alterações ao seu código.
+
+
+É de se notar que este projecto não só segue os quatro valores do XP Programing, mas também algumas das suas práticas,
+como por exemplo: 
+* *Small Releases* - *Pre Alpha-Releases*
+* *Simple Design* - Este projecto mantem um *design* e uma interface de utilizador simples
+* *Test-driven Development* - São feitos alguns testes a partes de funcionalidades
+* *Refactoring* - É de se notar a não duplicidade do código
+* *Collective Code Ownership* - Neste projecto qualquer *developer* pode trabalhar em qualquer parte da base de código
+
+
+## Análise Crítica
+
+A decisão do processo  a utilizar no desenvolvimento de um projeto de software tem uma grande importância no futuro e crescimento sustentável do próprio projeto, pois tem de ter em conta vários objetivos e limitações tais como o âmbito, o tempo, o orçamento e a qualidade. Tendo em conta todas as características e problemas inerentes ao desenvolvimento do Terasology e à composição do grupo de colaboradores o modo ágil de desenvolvimento é de facto o mais correto.
+
+As vantagens que mais saltam à vista na utilização deste método e que se manifestam como aspetos positivos neste projeto, são o facto de controlar o impacto dos riscos, a flexibilidade no desenvolvimento, a simplicidade e o método do desenvolvimento de código.
+
+O planeamento segundo o método ágil é extremamente flexível, permitindo a adição de novas funcionalidades  à lista de afazeres com regularidade e tratamento de issues e bugs com bastante frequência. O Terasology procura manter-se em constante desenvolvimento, como tal têm várias milestones, já em desenvimento, sem prazo de finalização devido à forma volátil como é constituída a equipa. A não existência de prazos de entrega suporta este planeamento muito flexível e faz com que seja possível a correção de bugs e issues sem grandes contrapartidas. 
+
+O design do projeto procura manter-se simples, tanto que os developers mais ativos procuram manter uma lista de issues atualizada que permita a novos colaboradores lançarem-se no projeto e a conhecer o código e o formato ao desenvolver soluções para estes problemas mais simples. Isto também diminui o risco inerente à inexpriência destes novos elementos pois trabalham com uma pequena parte do projeto. Tendo isto em conta a o desenvolvimento de código também segue um plano simples pois os objetivos são primeiramente traçados pelos elementos da equipa com mais experiência e só depois se passa para uma fase de programação, possivelmente por colaboradores interessados a juntarem-se à equipa. Os commits são feitos muito regularmente para diminuir o risco e colmatar  a pouca comunicação entre os elementos da equipa
+
+
+
+#### Lista dos contribuidores 
+#####Grupo 6
+* Francisco Veiga (4 horas)
+* Paulo Peixoto (2 horas)
+* Vasco Pereira (1 hora)
+* Filipe Galvão (0 horas)
+
+###### FEUP 2016 MIEIC

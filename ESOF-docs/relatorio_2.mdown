@@ -1,0 +1,242 @@
+# ESOF
+# RELATÓRIO 2 - Engenharia de Requisitos
+## Terasology
+
+## Requisitos do Projecto
+
+#### Introdução
+
+Este relatório tem em vista analisar como é feita a Gestão de Requisitos do projeto Terasology.
+A Engenharia de Requisitos é um processo que engloba todas as actividades de definição, decomentação e manutenção de
+requisitos. Este processo é composto por quatro actividades:
+* Identificação de Requisitos
+* Análise de Requisitos
+* Especificação de Requisitos
+* Validação de requisitos
+
+Este processo deve ser precedido de um estudos de viabilidade que, a partir das restrições do projecto, determinam 
+se o mesmo é viável e se deve seguir para a identificação de requisitos.
+No *waterfall model*, a engenharia de requisitos é feita na primeira fase do processo de desenvolvimento. Outros métodos
+de desenvolvimento de software como o XP e Scrum assumem que a engenharia de requisitos continua ao longo do ciclo de 
+vida do sofware.
+
+#### Estudos de Viabilidade
+
+Os Estudos de Viabilidade pretendem avaliar se do ponto de vista tecnológico e organizacional se o projecto é viável.
+
+Tendo em conta que o projecto Terasology, é *open source* e sem fim lucrativos, e pelas palavras do Organizador
+de Projectos,
+
+> This makes following traditional processes from a work setting difficult. Methodologies like Waterfall, XP, Scrum, and 
+any kind of structured planning with objectives, deadlines, and so on is nearly impossible to apply. In agile terms the 
+"focus factor" for us as an overall team is exceedingly low, probably in the single digits (0-9%). We simply never know who 
+will be available, when, for how long.
+
+o que significa existirem poucas restrições neste projecto, visto não haver um plano estruturado.
+
+Apesar de este projecto não seguir nenhuma metedologia, dissemos no primeiro relatório, que este projecto tinha algumas 
+características semelhantes às dos métodos usados em *Agile*, faremos uma analogia semelhante neste relatório ao tópico
+Engenharia de Requisitos, tendo em conta que neste método a engenharia de requisitos continua ao longo do ciclo de vida 
+do software.
+
+Podemos avaliar a viabilidade do projecto através da interação dos *stakeholders* (utilizadores e colaboradores)
+com o mesmo. Podemos afirmar que o objetivo de investigar e testar técnicas procedimentais de geração de terreno e
+técnicas de renderização eficientes em Java são evidentes, pois existem *Alpha-Releases*, apesar de o jogo 
+ainda não estar em produção, esse é o objectivo, o que significa que o sistema está a contribuir para os objectivos do projecto.
+
+Da mesma forma, podemos afirmar que os objectivos podem ser implementados visto existirem poucas restrições (tecnológicas 
+temporais, organizacionais etc), não havendo por isso um processo formal, deste modo os organizadores do projecto
+não interferem com os colaboradores que querem trabalhar no projecto, sendo possível, por exemplo, para um colaborador 
+apresentar uma nova *feature* sem antes a ter mencionado (introduzida por Pull Request).
+
+Do ponto de vista tecnológico é possível a integração com outros sistemas já que a linguagem utilizada é JAVA.
+Estudados estes aspectos o Terasology indica ser um projecto viável, podendo passar a verificar como é feita a 
+Identificação de Requesitos.
+
+## Processo de Engenharia de Requisitos
+
+#### Identificação de Requisitos
+
+O processo de identificação de requisitos num projeto é uma parte importante do seu desenvolvimento. Esta realidade verifica-se de forma mais acentuada num projeto com as características do Terasology em que o futuro passa por acrescentar funcionalidades novas e integrar novas realidades no jogo.
+
+Os requisitos no Terasology surgem de forma pouco estruturada. Não existe um cliente estabelecido portanto as sugestões surgem através de contribuidores atuais do projeto, novos contribuidores que se queiram juntar à equipa, ou até mesmo de jogadores.
+O primeiro passo é a apresentação ou identificação do requisito, qualquer membro da comunidade pode apresentar a sua ideia no forum de sugestões do Terasology. Depois disso, quando alguém despertar interesse nessa sugestão, é feito um desenho inicial e são escritas notas técnicas e mais detalhes sobre como implementar.
+
+Estando concluída esta parte pode dizer-se que o requisito está completamente identificado, detalhado e pronto a ser implementado por um contribuidor. No entanto, esta fase inicial pode ser completamente ignorada caso um desenvolvedor se mostre muito entusiasmado com uma ideia própria e parta imediatamente para a escrita de código de forma a implementar a sua ideia.
+
+
+#### Análise de Requisitos e Negociação
+
+Após a identificação dos requisitos do sistema, segue-se as sua análise e posteriormente as negociações.
+
+##### Atividades envolvidas:
+
+Algumas actividades envolvidas na análise de requisitos podemos enumerar:
+
+Classificação:
+Podemos classificar em "modulos" alguns requisitos, para facilitar o entendimento global do funcionamento do sistema.
+A modularidade no Terasology é definida por todos os participantes e incorporada pelo *Project Leader* se estiver presente,
+ou então por algum colaborador que esteja mais à-vontade nesse modulo.
+
+Resolução de conflitos:
+O surgimento de conflitos nesta fase é passível de acontecer, dado existirem várias fontes de informação sobre os requisitos, 
+em relação ao mesmo projecto. No Terasology destaca-se como principal conflito a ser gerido: o tempo. Como os participantes
+são voluntários, não existem *deadlines* estabelecidas. Os colaboradores terão que, à medida do que podem participar, 
+apresentar a suas ideias nos foruns onde são discutidas e aceites as que reunirem as melhores condições.
+Salienta-se que a troca de informação pela internet cria por vezes confusões de interpretação e 
+consequentemente uma demora na sua resolução, que no caso de ser presencial ou via *voice over IP* ou outro método de comunicação
+seria mais fácil de resolver.
+
+Estabelecer prioridades:
+A principal prioridade neste caso prende-se com o tempo. O *Project Leader* tenta definir como prioridade resolver *bugs*
+do jogo. No entanto, nem sempre consegue convencer os restantes colaboradores a participarem de forma activa na resolução.
+
+Confirmação:
+A confirmação e a plenitude da consistência dos requisitos, não é passível de ser presente a um *stakeholder* em particular.
+Neste caso em concreto, esta consistência é verificada por todos os colaboradores que avaliam os elementos que incorporam os
+requisitos.
+
+##### Negociação:
+O criador como responsável do jogo Terasology tem o papel preponderante nas negociações, contudo, a partilha de informação e as 
+tomadas de posição cabem no fundo a todos, visto que estamos na presença de um projecto *open source*, logo todas as opiniões 
+são sempre valiosas, contribuindo para acrescentar, esclarecer algo mais ao desenvolvimento do projecto.
+
+#### Especificação de Requisitos
+
+A especificação de requisitos neste projecto é feita de forma informal, não existe um documento de especificação 
+de requisitos no entanto há outras vias de documentação e comunicação entre *stakeholders* do projecto.
+
+##### Especificação de requisitos do usuário
+
+A especificação de requisitos dos usuários, neste projecto é realizada através de um *issue tracker* que se encontra no 
+GitHub e que serve para identificar problemas ou indicar possíveis melhorias ao sistema, existe também um fórum de sugestões
+para partilhar novas ideias e muitos outros fóruns de assuntos derivados que cobrem desde a implementação até a manutenção.
+
+##### Especificação de requisitos do sistema
+
+A especificação de requisitos do sistema, além das mencionadas anteriormente, conta também com um fórum módulo, fórum *art*
+e *core projects* fórum. A configuração ideal nesta especificação seria, alguém fazer uma sugestão no fórum de sugestões, algum
+colaborador pegar nessa ideia para um *design* inicial, e escreve notas técnicas e mais detalhes sobre como implementá-lo. 
+Alguém começa a codificá-lo, pode ser a mesma pessoa e muitas vezes este é o ponto onde o processo realmente começa 
+(saltando a fase sugestão porque uma pessoa mostrou-se animada para fazer algo específico). Uma vez realizada esta tarefa
+pega-se no conceito e move-se para o fórum do módulo e verifica-se o enquadramento com algum módulo (a maior parte dos conceitos encaixam-se
+nesta categoria), ou move-se para o fórum de *Art* para verificar se acrescenta valor ao jogo em vez de código, ou move-se para o fórum
+de projectos básicos caso seja para a arquitetura de suporte do jogo, motor de jogo ou outra funcionalidade a nível de biblioteca
+(não conteúdo). O recurso torna-se suficientemente completo para ser colocada em uso. 
+
+Os módulos todos ficam situados nos seus próprios
+repositórios no GitHub, os colaboradores muitas vezes colocam diretamente no repositório sem efectuarem pedidos de *Pull Request*.
+As características do motor jogo que atingem a fase de *Pull Request* são analisadas e fundidas ao projecto. 
+O novo recurso é liberado na próxima versão do jogo.
+
+##### Especificação de *design* da aplicação
+
+A especificação de *design* da aplicação são documentos já existentes contam com uma
+[Wiki](https://github.com/MovingBlocks/Terasology/wiki)
+onde constão promenores mais técnicos acerca da sua implementação e arquitectura. 
+
+Como por exemplo:
+* *Contributing*
+* *Modding Guide*
+* *Programming*
+* *Art*
+* *Architecture*
+
+A partir deste documento, um elemento que entre para a equipa de desenvolvimento no meio do projeto deverá ser 
+capaz de "se situar" quando precisar de começar a codificar, compreendendo a forma como a implementação, 
+em um nível global, está a ser feita, mas sem conhecer necessariamente os detalhes de implementação aprofundados.
+
+##### Diagrama de casos de utilização do Terasology
+![Use cases Terasology](https://github.com/frankpunx/Terasology/blob/master/ESOF-docs/useCases.png.PNG)
+
+#### Validação de Requisitos
+
+Nesta fase do processo pretende-se demonstrar que o documento de requisitos elaborado define de forma exacta 
+o sistema que o cliente pretende.
+Esse passo é extremamente importante, porque permite evitar o aparecimento de custos económicos/financeiros 
+para a empresa, que poderão ser muito elevados de corrigir a posteriori.
+À semelhança do que sucede na análise dos requisitos, pretende-se encontrar problemas/conflitos na especificação. 
+Porém ao contrário das fases anteriores, esta fase lida com uma especificação completa dos requisitos.
+Para tornar a validação mais eficaz, existe um conjunto de técnicas empregues, entre os quais podemos destacar nomeadamente:
+
+* Revisões dos Requisitos
+
+* Prototipicação
+
+* Geração de Casos Teste
+
+* Análise de Consistência Automática
+
+Relativamente ao projecto Terasology, dado ser um projecto *open source*, em que os participantes 
+são todos voluntários sem remuneração e o projecto em si não tem qualquer fim lucrativo, 
+podemos afirmar que o processo de validação em relação às técnicas formais:
+
+Revisões dos Requisitos: 
+As revisões são feitas um pouco por cada elemento que contribui para o projecto através dos *foruns* disponíveis, 
+apresentam ideias novas a acrescentar ao desenvolvimento do jogo, desde modulos sobre *design até ao motor do jogo.
+
+Prototipação:
+A utilização desta técnica não é patente neste projecto, visto que o desenvolvimento do jogo resultou 
+da evolução de técnicas de criação de terreno, o que se pode concluir que o que está a ser desenvolvido 
+não é algo que se possa conceber com um protótipo. Os colaboradores lançam ideias que posteriormente são 
+aceites e juntas, onde as mesmas vão modelando o próprio jogo.
+
+Geração de Casos Teste: 
+Cada requisito deve ser passível de testes, no entanto, como não existe formalismo de requisitos a especificar, 
+o modo de realizar testes acontece quando um colaborador faz um *pull request* e um outro colaborador familiarizado
+com o conteúdo, elabora testes sobre esse conteúdo e verifica se está de acordo com o que é pretendido para o jogo. 
+Caso exista nesse momento apenas um colaborador a desenvolver e a realizar *pull requests*, neste caso 
+o *Project Leader* faz os testes necessários, na eventualidade de estar disponível.
+
+Análise de Consistência Automática: 
+O jogo Terasology na sua concepção não utiliza quaisquer tipo de modelos de teste que possa de forma automática
+avaliar a consistência dos modelos, dado estes não existirem formalmente.
+
+Pode-se concluir que em geral tópico da validação dos requisitos é de extrema importância no desenvolvimento 
+da Engenharia de Requisitos, pois permite evitar potenciais erros que poderiam por em causa retornos financeiros 
+importantes para a empresa, bem como evitar perante o cliente, utilizadores e outros *stakeholders* discordâncias 
+que possam afectar de forma grave a competência da empresa e a sua imagem externa. Neste caso em concreto, 
+a falta deste formalismo não afecta de forma grave o desenvolvimento do projecto, contudo a sua aplicação 
+com algum rigor poderia trazer vantagens importante para o sucesso do projecto.
+
+#### Gestão de Requisitos
+
+O Terasology possui duas características muito especiais que servem para explicar a sua gestão de requisitos. São elas o facto de estar em constante evolução (com a adição de modos de jogo, por exemplo) e de não ter deadlines estabelecidas. Isto traduz-se numa grande flexibilidade neste aspeto o que torna possível a adição de qualquer tipo de requisito em qualquer fase do desenvolvimento do projeto. 
+
+Existem também requisitos que são mais voláteis do que outros (como por exemplo requisitos que surjam com uma nova lei ou protocolo), neste caso a equipa do Terasology teria de tomar uma atitude diferente e mais ativa na sua resolução mas tal ainda não se verificou.
+
+#### Conclusão
+
+Foram analisados ao longo deste trabalho os vários aspectos de um processo que engloba as actividades mais 
+relevantes para a definição, documentação e manutenção dos requisitos de engenharia de software.
+A engenharia de requisitos é uma fase importante para o desenvolvimento de software, que pela relevância 
+que apresenta é transversal nos modelos mais relevantes que hoje conhecemos.
+É de considerar, que a engenharia de requisitos apresenta maior ou menor ênfase consoante o(s) modelo(s) de software utilizado(s), 
+o que por este facto, poderá permitir uma maior ou menor gestão de tempo disponível para esta fase, mediante
+a possibilidade ou não de ajustar possíveis erros de análise numa fase de desenvolvimento do projecto mais avançada.
+No nosso caso em concreto, o Terasology pela falta de formalismo do projecto, quer em termos de modelo(s) ou 
+de *Requirements Documentation*, apresenta-se como um sistema com metodoligias um pouco aleatórias, i. é, não toma 
+em consideração *standards* de desenvolvimeto de software presentes na literatura mundial. 
+Como apreciação final sobre o projecto, poderemos considerar que qualquer projecto, independente do sistema 
+que se pretenda desenvolver e implementar, deveria ter presente sempre a engenharia de requisitos como algo fundamental, para que, 
+a início do projecto se possa realçar de imediato factores importantes para estabelecer uma base, que torne de certa forma o projecto 
+em algo que seja minimamente visível ou que apresente no horizonte pontos claros de viabilidade, bem potenciais 
+custos inerentes, dado que os recursos a gerir são escassos inclusivé na Engenharia de Software.
+
+##### Referências
+[Wikipédia](https://pt.wikipedia.org/wiki/Engenharia_de_requisitos)
+
+[Fórum](http://forum.terasology.org/threads/development-methodology-and-hi-students-from-porto.1387/)
+ criado para o fim deste projecto pelo Organizador de Projectos do Terasology
+
+Slides das aulas teóricas
+
+#### Lista dos contribuidores 
+
+#####Grupo 6
+* Francisco Veiga (5 horas)
+* Paulo Peixoto (2 Horas)
+* Vasco Pereira (3 horas)
+* Filipe Galvão (1 hora)
+
+###### FEUP 2016 MIEIC
