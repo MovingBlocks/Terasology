@@ -21,16 +21,20 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
 
 /**
- *
+ * Class made CommandSubsystem
  */
 public class CommandSubsystem implements EngineSubsystem {
+
     @Override
     public String getName() {
         return "Command";
     }
-
+   
     @Override
+    /**
+     * @parameters set up GameEngine engine, Context rootContext.
+     */
     public void initialise(GameEngine engine, Context rootContext) {
         rootContext.put(ParameterAdapterManager.class, ParameterAdapterManager.createCore());
+   }
     }
-}

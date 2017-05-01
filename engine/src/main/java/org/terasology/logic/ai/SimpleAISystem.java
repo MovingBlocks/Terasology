@@ -33,12 +33,14 @@ import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
-
-/**
- */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-
+/**
+ * This class Set up the local environment for player.
+ * This class tells player about time he spend while playing.
+ * Size of the world.
+ * Player is near to another player or not.
+ */
     @In
     private WorldProvider worldProvider;
     @In
@@ -95,6 +97,10 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
             entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));
         }
     }
+    /**
+     * This method help player to Jump.
+     * @parameters HorizontalCollisionEvent event, EntityRef entity.
+     */
 
     @ReceiveEvent(components = {SimpleAIComponent.class})
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
@@ -105,3 +111,4 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
         }
     }
 }
+
