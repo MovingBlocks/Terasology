@@ -132,7 +132,7 @@
     "module-status-activegameplay": "Aktives Gameplay",
     "module-status-available": "Verfügbar",
     "module-status-dependency": "Abhängigkeiten",
-    "module-status-error": "Inkompatibel oder unaufgeklärte Abhängigkeiten ",
+    "module-status-error": "Inkompatible oder unaufgeklärte Abhängigkeiten",
     "module-status-notpresent": "Nicht präsent",
     "module-version-available": "Im Netz",
     "module-version-installed": "Installiert",
