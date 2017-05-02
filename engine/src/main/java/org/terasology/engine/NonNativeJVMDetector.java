@@ -46,11 +46,10 @@ public final class NonNativeJVMDetector {
 
     private static boolean posixSystemIs64() throws IOException, InterruptedException {
         Process unameProc = new ProcessBuilder("uname", "-m").start();
-        BufferedReader unameStdout = new BufferedReader(new InputStreamReader(unameProc.getInputStream()));
         unameProc.waitFor();
-        boolean result = unameStdout.readLine().endsWith("64");
-        unameStdout.close();
-        return result;
+        try (BufferedReader unameStdout = new BufferedReader(new InputStreamReader(unameProc.getInputStream()))) {
+            return unameStdout.readLine().endsWith("64");
+        }
     }
 
     private static boolean jvmIs64() {
