@@ -30,7 +30,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
 /**
- * This StateChange generates the tasks that set and reset input textures.
+ * Sets the input textures.
  *
  * Input textures are assigned to a texture unit and this is then communicated to the shader.
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.

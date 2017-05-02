@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.GL_NEVER;
 import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
 
 /**
- * This StateChange generates the task that changes and resets the depth function during rendering.
+ * Sets the depth function during rendering.
  *
  * Notice that the function is reset to GL_LEQUAL (Terasology's default) rather than GL_LESS (OpenGL's default).
  */

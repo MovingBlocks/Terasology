@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
- * This StateChange resets the ModelView and Projection matrices to identity matrices, opengl's default.
+ * This StateChange resets the ModelView and Projection matrices to identity matrices, OpenGL's default.
  *
  * This StateChange is used to reset the effects of LookThrough or LookThroughNormalized.
  */

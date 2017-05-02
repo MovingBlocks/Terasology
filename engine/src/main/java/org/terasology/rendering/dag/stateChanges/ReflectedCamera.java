@@ -21,7 +21,7 @@ import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this state change generate the tasks that set or reset the reflected flag of a given camera.
+ * Sets or resets the reflected flag of a given camera.
  *
  * Warning: instances of this class -must- be added to the list of desired state changes in a node
  * -before- any instance of LookThrough and LookThroughNormalized.

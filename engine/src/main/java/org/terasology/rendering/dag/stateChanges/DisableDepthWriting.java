@@ -20,7 +20,7 @@ import org.terasology.rendering.dag.StateChange;
 import static org.lwjgl.opengl.GL11.glDepthMask;
 
 /**
- * Instances of this class disable writing to the depth buffer.
+ * Disables OpenGL's writing to the depth buffer.
  *
  * This can be useful when rendering semi-transparent objects, as the meaning of the depth value of a fragment
  * associated with a semi-transparent object is ambiguous and therefore has to be chosen arbitrarily:

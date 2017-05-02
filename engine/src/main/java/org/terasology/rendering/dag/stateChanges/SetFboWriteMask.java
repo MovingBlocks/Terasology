@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this class generate task setting and resetting an FBO's write mask.
+ * Sets an FBO's write mask.
  *
  * A write mask is useful to render to an FBO leaving some of its attachments untouched.
  *

@@ -34,7 +34,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
 /**
- * This state change implementation sets a texture attached to an FBO as the input for a material.
+ * Sets a texture attached to an FBO as the input for a material.
  */
 public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber {
     // depthStencilRboId is a possible FBO attachment but is not covered by a case here

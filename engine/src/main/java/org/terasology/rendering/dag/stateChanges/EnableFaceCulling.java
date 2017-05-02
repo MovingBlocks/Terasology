@@ -19,7 +19,10 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this class enable OpenGL's Face Culling, i.e. to render only the inside faces of the skysphere.
+ * Enables OpenGL's Face Culling.
+ *
+ * This can be used to discard the fragments that face away from the camera, and can be used to improve
+ * the performance in certain situations like rendering only the inside faces of the skysphere.
  *
  * Notice that Terasology by default enables face culling. However, the rendering engine disables it again
  * every frame to be consistent with OpenGL's defaults. This is debatable and might change in the future.

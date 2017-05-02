@@ -19,8 +19,9 @@ import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
 import org.terasology.rendering.dag.StateChange;
 
 /**
- * Instances of this class enable OpenGL's stencil testing, potentially used in a variety
- * of advanced computer graphics tricks such as stenciled shadows.
+ * Enables OpenGL's stencil testing.
+ *
+ * This can potentially be used in a variety of advanced computer graphics tricks such as stenciled shadows.
  */
 public final class EnableStencilTest extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableStencilTest();

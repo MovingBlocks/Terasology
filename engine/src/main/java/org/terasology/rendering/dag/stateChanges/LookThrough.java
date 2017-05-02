@@ -23,13 +23,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 // TODO: implement bobbing via multiple cameras and different steady/bobbing attachment points
 /**
- * Instances of this class set the ModelView and Projection matrices
- * so that the scene can be rendered from a given camera.
+ * Set the ModelView and Projection matrices so that the scene can be rendered from a given camera.
  *
  * Differently from the LookThroughNormalized state change, a normal player camera bobs up and down
  * when the player moves and bobbing is enabled.
  *
- * The default instance of this class resets both matrices to identity matrices, opengl's default.
+ * The default instance of this class resets both matrices to identity matrices, OpenGL's default.
  */
 public class LookThrough implements StateChange {
     private static StateChange defaultInstance = new LookThroughDefault();
