@@ -85,7 +85,7 @@
     "drop-item": "Drop Item",
     "edit-server": "Edit",
     "edit-server-title": "Add/Edit Dock",
-    "enter-username-message": "Welcome, mate, to Terasology's multiplayer!\nWould you like to use a special name?",
+    "enter-username-message": "Welcome, mate, to Terasology's multiplayer!\nWould you like to update your username?",
     "enum-editor-prompt": "Decide a value for th' node:",
     "enum-editor-title": "Enum Node Editor",
     "error-downloading-server-list": "Problem fetching town goods!",
