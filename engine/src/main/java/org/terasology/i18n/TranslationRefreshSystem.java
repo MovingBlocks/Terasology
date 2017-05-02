@@ -19,8 +19,10 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.In;
 
-//the translation system is only refreshed as EngineSubsystem but not when the module environment is loaded
-//this system allows the translation system to load the module assets
+/**
+ * This system refreshes the translation system during the initialization, reloading the i18n files from the module environment.
+ * The translation system by it's own is not refreshed, as it is an EngineSubsystem.
+ */
 @RegisterSystem
 public class TranslationRefreshSystem extends BaseComponentSystem {
 
@@ -29,6 +31,7 @@ public class TranslationRefreshSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
+        //TODO See https://github.com/MovingBlocks/Terasology/issues/2433 for further translation support.
         translationSystem.refresh();
     }
 }
