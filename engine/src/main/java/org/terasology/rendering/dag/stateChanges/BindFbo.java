@@ -25,16 +25,13 @@ import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 
 /**
- * Binds the given FBO setting it as the FBO to read from and write to.
+ * Binds the given FBO, setting it as the FBO to read from and write to.
  *
  * In practice in Terasology this is normally used only to set the FBO to write to. Using an FBO to read from
  * is usually achieved by binding one of its attachments via the SetInputFromFBO state change.
  *
- * When this state change is reset opengl's default framebuffer (usually the display) is bound again.
+ * When this state change is reset OpenGL's default framebuffer (usually the display) is bound again.
  * Similarly, nodes that do not take advantage of this state change will normally write to the default framebuffer.
- *
- * Type: Set
- * Corresponding Reset: UnbindFbo
  */
 public final class BindFbo implements FBOManagerSubscriber, StateChange {
     private static StateChange defaultInstance = new UnbindFbo();
@@ -80,5 +77,29 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
     public void process() {
         // TODO: change the target argument to GL_DRAW_FRAMEBUFFER when we switch to OpenGL 3.0 and beyond.
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+    }
+
+    private static final class UnbindFbo implements StateChange {
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+
+        // TODO: Add .hashCode()
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof UnbindFbo);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s", this.getClass().getSimpleName());
+        }
+
+        @Override
+        public void process() {
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        }
     }
 }

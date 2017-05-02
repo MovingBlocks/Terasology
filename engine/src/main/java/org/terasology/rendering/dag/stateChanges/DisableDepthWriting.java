@@ -38,6 +38,7 @@ public final class DisableDepthWriting implements StateChange {
      * two task instances frame the execution of a node's process() method unless they are deemed redundant,
      * i.e. because the upstream or downstream node also disables depth buffer writing.
      */
+    // TODO: Remove this method?
     public DisableDepthWriting() { }
 
     @Override
@@ -58,5 +59,27 @@ public final class DisableDepthWriting implements StateChange {
     @Override
     public void process() {
         glDepthMask(false);
+    }
+
+    private static final class EnableDepthWriting implements StateChange {
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof EnableDepthWriting);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s", this.getClass().getSimpleName());
+        }
+
+        @Override
+        public void process() {
+            glDepthMask(true);
+        }
     }
 }

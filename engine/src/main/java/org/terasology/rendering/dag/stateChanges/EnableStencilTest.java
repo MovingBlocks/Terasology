@@ -44,4 +44,15 @@ public final class EnableStencilTest extends EnableStateParameter {
     public StateChange getDefaultInstance() {
         return defaultInstance;
     }
+
+    private static final class DisableStencilTest extends DisableStateParameter {
+        DisableStencilTest() {
+            super(GL_STENCIL_TEST);
+        }
+
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+    }
 }

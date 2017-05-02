@@ -27,7 +27,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  *
  * This StateChange is used to reset the effects of LookThrough or LookThroughNormalized.
  */
-public class LookThroughDefault implements StateChange {
+class LookThroughDefault implements StateChange {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof LookThroughDefault);

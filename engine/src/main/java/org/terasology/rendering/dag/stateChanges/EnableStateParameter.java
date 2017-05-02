@@ -15,25 +15,35 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
+import org.terasology.rendering.dag.StateChange;
+
+import java.util.Objects;
+
 import static org.lwjgl.opengl.GL11.glEnable;
 
 /**
  * TODO: Add javadocs
  */
-abstract class EnableStateParameter extends SetStateParameter {
-    /**
-     * Construct an instance of this class, provided an OpenGL constant and a boolean to enable or disable
-     * the indicated mode.
-     *
-     * @param glParameter An integer representing one of the many OpenGL constants, i.e. GL_DEPTH_TEST
-     */
+abstract class EnableStateParameter implements StateChange {
+    private int glParameter;
+
     EnableStateParameter(int glParameter) {
-        super(glParameter);
+        this.glParameter = glParameter;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(glParameter);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof EnableStateParameter) && (this.glParameter == ((EnableStateParameter) obj).glParameter);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     @Override

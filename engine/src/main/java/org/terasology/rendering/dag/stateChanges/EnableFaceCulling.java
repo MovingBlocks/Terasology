@@ -50,4 +50,15 @@ public final class EnableFaceCulling extends EnableStateParameter {
     public StateChange getDefaultInstance() {
         return defaultInstance;
     }
+
+    private static final class DisableFaceCulling extends DisableStateParameter {
+        DisableFaceCulling() {
+            super(GL_CULL_FACE);
+        }
+
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+    }
 }

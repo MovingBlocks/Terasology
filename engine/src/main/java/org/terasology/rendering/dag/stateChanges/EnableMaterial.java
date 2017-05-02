@@ -17,6 +17,8 @@ package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 
@@ -59,5 +61,30 @@ public final class EnableMaterial implements StateChange {
     @Override
     public void process() {
         material.enable();
+    }
+
+    private static final class DisableMaterial implements StateChange {
+        // TODO: Switch from CoreRegistry to Context
+        private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
+
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof DisableMaterial);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s", this.getClass().getSimpleName());
+        }
+
+        @Override
+        public void process() {
+            shaderManager.disableShader();
+        }
     }
 }

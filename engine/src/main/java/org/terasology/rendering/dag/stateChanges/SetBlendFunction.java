@@ -43,7 +43,7 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
  * The OpenGL defaults are: source factor GL_ONE, destination factor GL_ZERO.
  */
 public class SetBlendFunction implements StateChange {
-    public static final ImmutableMap<Integer, String> OGL_TO_STRING =
+    private static final ImmutableMap<Integer, String> OGL_TO_STRING =
             ImmutableMap.<Integer, String>builder()
                 .put(GL_ZERO, "GL_ZERO")
                 .put(GL_ONE, "GL_ONE")

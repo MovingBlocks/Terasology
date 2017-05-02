@@ -17,12 +17,14 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Instances of this class are responsible for generating the the list of tasks
@@ -67,7 +69,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s: process()", node.toString()));
+                logger.info(String.format("%s", node.toString()));
             }
         }
     }
@@ -92,21 +94,8 @@ public final class RenderTaskListGenerator {
         nodeList = orderedNodes;
         taskList.clear();
 
-        /* While examining the StateChanges for each Node, we follow the following approach:
-                - Add all StateChanges for first Node to the list and mark them as relevant
-                - For the remaining Nodes, examine the StateChanges.
-                    ~ If the exact same StateChange was requested by last Node, just mark the same
-                        StateChange as relevant and move on.
-                    ~ If a StateChange of same type but having a different value was requested by last Node,
-                        replace the old one with a new StateChange and mark it as relevant.
-                - Remove all the StateChanges that are no longer relevant (requested by older Nodes, no longer
-                    required by the current Node).
-                - For the remaining StateChanges, add them to the final TaskList.
-                - Mark all the StateChanges as irrelevant, so that they can be removed by next Node if they
-                    are not explicitly requested there.
-        */
         Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();
-        Map<Class<?>, Boolean> persistentStateChangesRelevant = Maps.newHashMap();
+        Set<Class<?>> requestedStateChanges = Sets.newHashSet();
 
         List<StateChange> stateChangesToAdd = Lists.newArrayList();
 
@@ -122,36 +111,42 @@ public final class RenderTaskListGenerator {
                     potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
                 }
 
-                // Examine the StateChanges requested by current Node, and insert/update them in persistentStateChanges.
                 for (StateChange currentStateChange : node.getDesiredStateChanges()) {
+                    // A persistentStateChange is one that persists across the processing of two or more consecutive nodes.
+                    // For instance, if consecutive nodes A and B request the exact same StateChange, the StateChange will
+                    // take place during the processing of node A and will be reset to the default only after the processing of node B.
                     StateChange persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
 
-                    // This exact StateChange was not requested (or was requested with a different value by the last Node),
-                    // so this StateChange is required and we insert it (or replace the old StateChange with it).
+                    // currentStateChange is different from persistentStateChange in two circumstances:
+                    // 1. The previous node did not request a StateChange of the class of currentStateChange
+                    // 2. The previous node requested a StateChange of the same class as currentStateChange, but with a different value
+                    // Either way, currentStateChange is added to the list of things to do during rendering and is persisted to the next node.
                     if (!currentStateChange.equals(persistentStateChange)) {
                         stateChangesToAdd.add(currentStateChange);
                         persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
                     }
                     // Else: The exact same StateChange is already persisting, so don't add it again.
 
-                    // Mark the StateChange as relevant for this iteration.
-                    persistentStateChangesRelevant.put(currentStateChange.getClass(), true);
+                    // A requestedStateChange is one that was requested by the current Node. This property, along with the
+                    // persistentStateChange, determines when the reset StateChange corresponding to a StateChange is added.
+                    requestedStateChanges.add(currentStateChange.getClass());
                 }
 
-                // Iterate through all StateChanges
+                // Reset all the persistentStateChanges that are not requestedStateChanges.
                 Iterator<Map.Entry<Class<?>, StateChange>> iterator = persistentStateChanges.entrySet().iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<Class<?>, StateChange> entry = iterator.next();
+                    Class<?> key = entry.getKey();
 
-                    if (persistentStateChangesRelevant.get(entry.getKey())) {
-                        // This StateChange is relevant, so mark it as irrelevant for next Node and move on.
-                        persistentStateChangesRelevant.put(entry.getKey(), false);
-                    } else {
-                        // This StateChange is irrelevant, so add its reset task to the TaskList and remove it from persistentStateChanges.
-                        persistentStateChangesRelevant.remove(entry.getKey());
+                    if (!requestedStateChanges.contains(key)) {
+                        // This StateChange was not requested by the current Node, so we reset it.
+                        requestedStateChanges.remove(key);
                         taskList.add(entry.getValue().getDefaultInstance());
                         iterator.remove();
                     }
+                    // Else: The StateChange was requested by the current Node, so do nothing.
+
+                    requestedStateChanges.remove(key);
                 }
 
                 // Finally add all the desirable state changes for this iteration into the task list.
@@ -161,7 +156,7 @@ public final class RenderTaskListGenerator {
                 taskList.addAll(stateChangesToAdd);
                 stateChangesToAdd.clear();
 
-                // Now that all the StateChanges required by the Node have been added, we can finally add the Node to the TaskList.
+                // Now that all the StateChanges requested by the Node have been added, we can finally schedule the node itself for processing.
                 taskList.add(node);
             }
         }

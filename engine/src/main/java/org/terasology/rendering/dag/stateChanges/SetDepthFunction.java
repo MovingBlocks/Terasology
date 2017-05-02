@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
  * Notice that the function is reset to GL_LEQUAL (Terasology's default) rather than GL_LESS (OpenGL's default).
  */
 public class SetDepthFunction implements StateChange {
-    public static final ImmutableMap<Integer, String> OGL_TO_STRING =
+    private static final ImmutableMap<Integer, String> OGL_TO_STRING =
             ImmutableMap.<Integer, String>builder()
                     .put(GL_NEVER, "GL_NEVER")
                     .put(GL_LESS, "GL_LESS")
