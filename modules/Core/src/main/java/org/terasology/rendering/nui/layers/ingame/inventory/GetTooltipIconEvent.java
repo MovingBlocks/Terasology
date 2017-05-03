@@ -19,7 +19,10 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.TextureRegion;
 
-
+/*
+ *  This event is sent from the WorldlyTooltip module while setting the icon,
+ *  whenever the hit-entity does not have a BlockComponent.
+ */
 public class GetTooltipIconEvent implements Event {
     private TextureRegion icon = null;
 

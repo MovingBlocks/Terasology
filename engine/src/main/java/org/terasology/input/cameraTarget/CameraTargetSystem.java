@@ -66,8 +66,6 @@ public class CameraTargetSystem extends BaseComponentSystem {
     private float focalDistance;
     private boolean isBlock;
 
-    private static final Logger logger = LoggerFactory.getLogger(CameraTargetSystem.class);
-
     @Override
     public void initialise() {
         super.initialise();
@@ -134,11 +132,8 @@ public class CameraTargetSystem extends BaseComponentSystem {
             oldTarget.send(new CameraOutEvent());
             newTarget.send(new CameraOverEvent());
             localPlayer.getCharacterEntity().send(new CameraTargetChangedEvent(oldTarget, newTarget));
-            if (isTargetAvailable() && !newTarget.hasComponent(BlockComponent.class)) {
-                isBlock = false;
-            } else {
-                isBlock = true;
-            }
+            // Set isBlock to false if the hit-entity does not have a BlockComponent
+            isBlock = !(isTargetAvailable() && !newTarget.hasComponent(BlockComponent.class));
         }
         target = newTarget;
         targetBlockPos = newBlockPos;
