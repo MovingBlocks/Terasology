@@ -15,17 +15,7 @@
  */
 package org.terasology.logic.behavior;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -34,6 +24,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -50,8 +41,15 @@ import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Behavior tree system
@@ -60,7 +58,6 @@ import com.google.common.collect.Maps;
  * is loaded and an interpreter is started.
  * <br><br>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
- *
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(BehaviorSystem.class)
@@ -74,6 +71,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @In
     private AssetManager assetManager;
 
+    /*
+     * Using a ConcurrentHashMap in place of a regular Map because the UpdateBehaviorEvent-handlers can remove the entityInterpreter
+     * while it is being iterated over in the update loop
+     */
     private ConcurrentHashMap<EntityRef, Interpreter> entityInterpreters = new ConcurrentHashMap<EntityRef, Interpreter>();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
@@ -93,6 +94,11 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @ReceiveEvent
     public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
+    }
+
+    @ReceiveEvent
+    public void onBehaviorChanged(OnChangedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        updateEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
@@ -164,6 +170,15 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             if (tree != null) {
                 interpreter.start(tree.getRoot());
             }
+        }
+    }
+
+    private void updateEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        Interpreter interpreter = new Interpreter(new Actor(entityRef));
+        BehaviorTree tree = behaviorComponent.tree;
+        entityInterpreters.put(entityRef, interpreter);
+        if (tree != null) {
+            interpreter.start(tree.getRoot());
         }
     }
 }
