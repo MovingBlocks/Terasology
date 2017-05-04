@@ -75,7 +75,8 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
 
     /*
-     * A hash map that maps entity to their interpreters
+     * A hash map that maps entity to their interpreters. Behavior tree processing
+     * can trigger a behavior tree switch and thus map can change during iteration.
      * These are stored in a List for iteration in the update method,
      * so that a ConcurrentModificationException is avoided.
      */
