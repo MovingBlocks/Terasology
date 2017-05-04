@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -47,6 +48,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -71,11 +73,17 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @In
     private AssetManager assetManager;
 
+
     /*
-     * Using a ConcurrentHashMap in place of a regular Map because the UpdateBehaviorEvent-handlers can remove the entityInterpreter
-     * while it is being iterated over in the update loop
+     * A hash map that maps entity to their interpreters
+     * These are stored in a List for iteration in the update method,
+     * so that a ConcurrentModificationException is avoided.
      */
-    private ConcurrentHashMap<EntityRef, Interpreter> entityInterpreters = new ConcurrentHashMap<EntityRef, Interpreter>();
+    private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
+    /*
+     * A list that contains the entityInterpreters before they get modified inside the update method
+     */
+    private List<Interpreter> cachedInterpreters = Lists.newArrayList();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
     @Override
@@ -93,24 +101,30 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @ReceiveEvent
     public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        cachedInterpreters = Lists.newArrayList();
         addEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
     public void onBehaviorChanged(OnChangedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        cachedInterpreters = Lists.newArrayList();
         updateEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
     public void onBehaviorDeactivated(BeforeDeactivateComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         if (behaviorComponent.tree != null) {
+            cachedInterpreters = Lists.newArrayList();
             entityInterpreters.remove(entityRef);
         }
     }
 
     @Override
     public void update(float delta) {
-        for (Interpreter interpreter : entityInterpreters.values()) {
+        if (cachedInterpreters.isEmpty()) {
+            cachedInterpreters.addAll(entityInterpreters.values());
+        }
+        for (Interpreter interpreter : cachedInterpreters) {
             interpreter.tick(delta);
         }
     }
