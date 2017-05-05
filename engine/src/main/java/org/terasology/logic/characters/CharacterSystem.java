@@ -45,7 +45,6 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
@@ -127,20 +126,16 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         OnItemUseEvent onItemUseEvent = new OnItemUseEvent();
         character.send(onItemUseEvent);
         if (!onItemUseEvent.isConsumed()) {
-            // It would seem to make more sense to just call getTargetBlock() and get the entity here, but that causes
-            // a NPE up in the EntityRef.
-            EntityRef targetEntity = targetSystem.getTarget();
-            if (targetEntity.exists()) {
-                targetEntity.send(new AttackEvent(character, event.getItem()));
-                return;
-            }
+            EntityRef gazeEntity = GazeAuthoritySystem.getGazeEntityForCharacter(character);
+            LocationComponent gazeLocation = gazeEntity.getComponent(LocationComponent.class);
+            Vector3f direction = gazeLocation.getWorldDirection();
+            Vector3f originPos = gazeLocation.getWorldPosition();
 
-            Vector3i position = targetSystem.getTargetBlockPosition();
-            if (position == null) {
-                return;
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, Sets.newHashSet(character), DEFAULTPHYSICSFILTER);
+
+            if (result.isHit()) {
+                result.getEntity().send(new AttackEvent(character, event.getItem()));
             }
-            EntityRef targetBlockEntity = blockRegistry.getBlockEntityAt(position);
-            targetBlockEntity.send(new AttackEvent(character, event.getItem()));
         }
     }
 
