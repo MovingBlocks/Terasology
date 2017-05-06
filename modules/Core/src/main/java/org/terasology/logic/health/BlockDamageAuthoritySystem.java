@@ -27,17 +27,26 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.particles.components.ParticleDataSpriteComponent;
+import org.terasology.particles.components.generators.TextureOffsetGeneratorComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.sounds.BlockSounds;
+import org.terasology.world.block.tiles.WorldAtlas;
+
+import java.util.Optional;
 
 /**
  * This system is responsible for giving blocks health when they are attacked and damaging them instead of destroying them.
@@ -51,6 +60,12 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
 
     @In
     private AudioManager audioManager;
+
+    @In
+    private WorldAtlas worldAtlas;
+
+    @In
+    private BlockManager blockManager;
 
     private Random random = new FastRandom();
 
@@ -101,13 +116,40 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     }
 
     private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location, EntityRef entityRef) {
-        EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
+        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
+        if (!terrainTexture.isPresent() || !terrainTexture.get().isLoaded()) {
+            return;
+        }
+
+        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        builder.getComponent(BlockParticleEffectComponent.class).blockType = family.getURI().toString();
+        ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
+        TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
+
+        spriteComponent.texture = terrainTexture.get();
+
+        final float tileSize = worldAtlas.getRelativeTileSize();
+        spriteComponent.textureSize.set(tileSize, tileSize);
+
+        Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
+        Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
+
+        final float relTileSize = worldAtlas.getRelativeTileSize();
+        Vector2f particleTexSize = new Vector2f(
+                relTileSize * 0.25f,
+                relTileSize * 0.25f);
+
+        spriteComponent.textureSize.x *= 0.25f;
+        spriteComponent.textureSize.y *= 0.25f;
+
+        textureOffsetGeneratorComponent.validOffsets.add(new Vector2f(
+                offset.x + random.nextFloat() * (tileSize - particleTexSize.x),
+                offset.y + random.nextFloat() * (tileSize - particleTexSize.y)));
+
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
-            EntityBuilder dustBuilder = entityManager.newBuilder("engine:dustEffect");
+            EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
             dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location);
             dustBuilder.build();
         }
@@ -163,12 +205,10 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     public void beforeDamagedEnsureHealthPresent(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComponent) {
         if (!blockEntity.hasComponent(HealthComponent.class)) {
             Block type = blockComponent.getBlock();
-            if (blockComponent != null) {
-                if (type.isDestructible()) {
-                    HealthComponent healthComponent = new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f);
-                    healthComponent.destroyEntityOnNoHealth = true;
-                    blockEntity.addComponent(healthComponent);
-                }
+            if (type.isDestructible()) {
+                HealthComponent healthComponent = new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f);
+                healthComponent.destroyEntityOnNoHealth = true;
+                blockEntity.addComponent(healthComponent);
             }
         }
     }

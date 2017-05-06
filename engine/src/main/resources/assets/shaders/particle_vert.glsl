@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,67 @@
  * limitations under the License.
  */
 
-varying vec4 vertexViewPos;
-varying vec3 normal;
+uniform vec3 position;
+uniform vec3 scale;
+uniform vec4 color;
+
+
+mat4 undoRotation(in mat4 matrix) {
+	mat4 noRotation = mat4(matrix);
+
+	for(int row = 0; row < 3; row++) {
+		for(int column = 0; column < 3; column++) {
+			noRotation[row][column] = (row == column) ? 1 : 0;
+		}
+	}
+
+	return noRotation;
+}
+
+mat4 objectTranslationMatrix() {
+    return mat4(
+        vec4(1.0,  0.0, 0.0, 0.0),
+        vec4(0.0,  1.0, 0.0, 0.0),
+        vec4(0.0,  0.0, 1.0, 0.0),
+        vec4(position,       1.0)
+    );
+}
+
+mat4 objectScaleMatrix() {
+    return mat4(
+        vec4(scale.x, 0.0,     0.0,     0.0),
+        vec4(0.0,     scale.y, 0.0,     0.0),
+        vec4(0.0,     0.0,     scale.z, 0.0),
+        vec4(0.0,     0.0,     0.0,     1.0)
+    );
+}
+
+mat4 objectRotationMatrix() {
+    mat4 rotation = transpose(gl_ModelViewMatrix);
+    rotation[0][3] = rotation[1][3] = rotation[2][3] = 0.0;
+    rotation[3] = vec4(0.0, 0.0, 0.0, 1.0);
+    return rotation;
+}
+
+mat4 objectTransformMatrix() {
+    return objectTranslationMatrix() * objectRotationMatrix() * objectScaleMatrix();
+}
+
+
+vec4 applyScale(in vec4 vertex) {
+    return vec4(
+        vertex.x * scale.x,
+        vertex.y * scale.y,
+        vertex.z * scale.z,
+        vertex.w
+    );
+}
 
 void main()
 {
-	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
+    gl_Position = objectTransformMatrix() * gl_Vertex;
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Position;
 
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	normal = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
-
+    gl_FrontColor = color;
     gl_TexCoord[0] = gl_MultiTexCoord0;
 }

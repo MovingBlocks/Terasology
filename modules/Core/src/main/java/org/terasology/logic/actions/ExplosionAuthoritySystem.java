@@ -16,7 +16,6 @@
 package org.terasology.logic.actions;
 
 import com.google.common.collect.Lists;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -35,6 +34,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
@@ -107,7 +107,7 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
     }
 
     void doExplosion(ExplosionActionComponent explosionComp, Vector3f origin, EntityRef instigatingBlockEntity) {
-        EntityBuilder builder = entityManager.newBuilder("engine:smokeExplosion");
+        EntityBuilder builder = entityManager.newBuilder("core:smokeExplosion");
         builder.getComponent(LocationComponent.class).setWorldPosition(origin);
         EntityRef smokeEntity = builder.build();
 

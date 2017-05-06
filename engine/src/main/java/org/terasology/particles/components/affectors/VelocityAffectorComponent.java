@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.particles.components.affectors;
 
-import org.terasology.rendering.assets.material.Material;
+import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 
 /**
- * Shader parameters for the Particle shader program.
  *
  */
-public class ShaderParametersParticle extends ShaderParametersBase {
-
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-    }
+@API
+public class VelocityAffectorComponent implements Component {
 
 }

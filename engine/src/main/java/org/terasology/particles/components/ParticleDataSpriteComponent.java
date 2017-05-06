@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.particles.components;
 
-@API package org.terasology.logic.particles;
-
+import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.module.sandbox.API;
+import org.terasology.rendering.assets.texture.Texture;
+
+/**
+ *
+ */
+@API
+public class ParticleDataSpriteComponent implements Component {
+    /**
+     * This system's particle texture
+     */
+    public Texture texture;
+
+    /**
+     * This system's particle texture size, in percents x: [0.0, 1.0], y: [0.0, 1.0]
+     */
+    public Vector2f textureSize = new Vector2f(1.0f, 1.0f);
+}

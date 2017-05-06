@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2016 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.particles.events;
 
-import org.terasology.rendering.assets.material.Material;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 
 /**
- * Shader parameters for the Particle shader program.
- *
+ * Fired to notify the ParticleSystemManager that a system needs to be reconfigured.
+ * For use when adding/removing Generators or Affectors.
  */
-public class ShaderParametersParticle extends ShaderParametersBase {
-
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-    }
+@API
+public class ParticleSystemUpdateEvent implements Event {
 
 }
