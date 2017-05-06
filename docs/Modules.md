@@ -122,6 +122,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WorkstationCrafting](https://github.com/Terasology/WorkstationCrafting) - an extension to Workstation focused on crafting more advanced recipe-based stuff
 * [WorkstationInGameHelp](https://github.com/Terasology/WorkstationInGameHelp) - bridging module to bring in-game help to workstation screens
 * [WorldlyTooltip](https://github.com/Terasology/WorldlyTooltip) - a little tooltip that shows you what you're looking at (hold `alt` for debug details)
+* [WorldlyTooltipAPI](https://github.com/Terasology/WorldlyTooltipAPI) - API module for WorldlyTooltip for better dependency management
 
 Some of the modules in action:
 
