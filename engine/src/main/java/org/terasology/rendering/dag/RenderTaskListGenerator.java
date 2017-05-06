@@ -99,6 +99,12 @@ public final class RenderTaskListGenerator {
 
         List<StateChange> stateChangesToAdd = Lists.newArrayList();
 
+        // The following variables have been declared here to make the code clearer.
+        // P.S. manu3d made me do it!
+        StateChange persistentStateChange;
+        Iterator<Map.Entry<Class<?>, StateChange>> iterator;
+        Map.Entry<Class<?>, StateChange> entry;
+
         int enabledNodes = 0;
         int potentialTasks = 0;
 
@@ -115,7 +121,7 @@ public final class RenderTaskListGenerator {
                     // A persistentStateChange is one that persists across the processing of two or more consecutive nodes.
                     // For instance, if consecutive nodes A and B request the exact same StateChange, the StateChange will
                     // take place during the processing of node A and will be reset to the default only after the processing of node B.
-                    StateChange persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
+                    persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
 
                     // currentStateChange is different from persistentStateChange in two circumstances:
                     // 1. The previous node did not request a StateChange of the class of currentStateChange
@@ -133,15 +139,16 @@ public final class RenderTaskListGenerator {
                 }
 
                 // Reset all the persistentStateChanges that are not requestedStateChanges.
-                Iterator<Map.Entry<Class<?>, StateChange>> iterator = persistentStateChanges.entrySet().iterator();
+                iterator = persistentStateChanges.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<Class<?>, StateChange> entry = iterator.next();
+                    entry = iterator.next();
                     Class<?> key = entry.getKey();
+                    StateChange stateChangeAgainstKey = entry.getValue();
 
                     if (!requestedStateChanges.contains(key)) {
                         // This StateChange was not requested by the current Node, so we reset it.
                         requestedStateChanges.remove(key);
-                        taskList.add(entry.getValue().getDefaultInstance());
+                        taskList.add(stateChangeAgainstKey.getDefaultInstance());
                         iterator.remove();
                     }
                     // Else: The StateChange was requested by the current Node, so do nothing.

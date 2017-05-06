@@ -21,13 +21,13 @@ import org.terasology.rendering.dag.StateChange;
 /**
  * Enables OpenGL's Face Culling.
  *
- * This can be used to discard the fragments that face away from the camera, and can be used to improve
- * the performance in certain situations like rendering only the inside faces of the skysphere.
+ * Face Culling is used to discard triangles facing a particular direction, reducing the total number of triangles
+ * to be processed. In normal circumstances the GL_BACK triangles are culled, but in some circumstances, i.e. inside
+ * a mesh such as the skysphere, the triangles facing the camera are the GL_BACK ones and the GL_FRONT triangles need
+ * to be culled instead. Use SetFacesToCull to set which triangles gets culled - by default GL_BACK.
  *
  * Notice that Terasology by default enables face culling. However, the rendering engine disables it again
  * every frame to be consistent with OpenGL's defaults. This is debatable and might change in the future.
- *
- * Also see SetFacesToCull, which allows deviation from OpenGL's default of culling only the GL_BACK faces.
  */
 public final class EnableFaceCulling extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableFaceCulling();

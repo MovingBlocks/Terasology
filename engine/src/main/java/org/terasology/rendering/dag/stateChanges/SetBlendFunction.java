@@ -38,9 +38,12 @@ import static org.lwjgl.opengl.GL11.GL_ZERO;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 
 /**
- * Changes the blend function factors used by OpenGL.
+ * Sets the blend function factors used by OpenGL.
  *
  * The OpenGL defaults are: source factor GL_ONE, destination factor GL_ZERO.
+ *
+ * See https://www.khronos.org/opengl/wiki/Blending for details.
+ * Also see http://www.andersriggelsen.dk/glblendfunc.php to experiment with different factors.
  */
 public class SetBlendFunction implements StateChange {
     private static final ImmutableMap<Integer, String> OGL_TO_STRING =
