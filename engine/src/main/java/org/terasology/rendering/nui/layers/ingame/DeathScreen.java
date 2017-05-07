@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
- * This screen is displayed when a player dies.
+ * This screen is displayed when the player dies.
  */
 public class DeathScreen extends CoreScreenLayer {
     private UILabel deathDetails;
@@ -50,8 +50,12 @@ public class DeathScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "exitGame", widget -> CoreRegistry.get(GameEngine.class).shutdown());
     }
 
-    public void setDeathDetails(String instigator, String damageType) {
-        deathDetails.setText(String.format("%s killed you with %s.", instigator, damageType));
+    public void setDeathDetails(String instigatorName, String damageTypeName) {
+        if (instigatorName != null) {
+            deathDetails.setText(String.format("%s killed you with %s.", instigatorName, damageTypeName));
+        } else {
+            deathDetails.setText(String.format("You died to %s.", damageTypeName));
+        }
     }
 
     @Override

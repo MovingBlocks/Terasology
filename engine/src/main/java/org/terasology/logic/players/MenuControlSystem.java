@@ -18,7 +18,6 @@ package org.terasology.logic.players;
 
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -73,8 +72,8 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onDeath(DeathEvent event, EntityRef entity) {
         if (entity.getComponent(ClientComponent.class).local) {
             nuiManager.pushScreen("engine:deathScreen");
-            if (event.lastDamageType != null && event.lastInstigator != null) {
-                ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.lastInstigator, event.lastDamageType);
+            if (event.damageTypeName != null) {
+                ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.instigatorName, event.damageTypeName);
             }
         }
     }

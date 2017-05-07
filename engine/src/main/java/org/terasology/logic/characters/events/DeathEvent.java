@@ -24,6 +24,6 @@ import org.terasology.network.OwnerEvent;
  */
 @OwnerEvent
 public class DeathEvent implements Event {
-    public String lastDamageType;
-    public String lastInstigator;
+    public String damageTypeName;
+    public String instigatorName;
 }

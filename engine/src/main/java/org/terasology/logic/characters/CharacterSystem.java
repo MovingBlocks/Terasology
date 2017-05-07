@@ -24,11 +24,11 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.events.ActivationRequestDenied;
@@ -74,24 +74,64 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private Time time;
 
-    @In
-    private TranslationSystem translationSystem;
-
     @ReceiveEvent(components = {CharacterComponent.class})
     public void onDeath(DoDestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         DeathEvent deathEvent = new DeathEvent();
         //Store the details of the death in the event for display on the death screen
-        deathEvent.lastDamageType = event.getDamageTypeString();
-        if (event.getInstigatorString() != null) {
-            deathEvent.lastInstigator = event.getInstigatorString();
-        } else {
-            deathEvent.lastInstigator = translationSystem.translate("${engine:menu#unknown}");
-        }
+        deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
+        deathEvent.instigatorName = getInstigatorName(event.getInstigator());
         character.controller.send(deathEvent);
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
+    }
+
+    public String getInstigatorName(EntityRef instigator) {
+        if (instigator.hasComponent(CharacterComponent.class)) {
+            EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
+            EntityRef instigatorClientInfo = instigatorClient.getComponent(ClientComponent.class).clientInfo;
+            DisplayNameComponent displayNameComponent = instigatorClientInfo.getComponent(DisplayNameComponent.class);
+            return displayNameComponent.name;
+        } else if (instigator.getParentPrefab() != null) {
+            //A DisplayName can be specified in the entity prefab
+            //Otherwise, the game will attempt to generate one from the name of that prefab
+            Prefab parentPrefab = instigator.getParentPrefab();
+            if (parentPrefab.hasComponent(DisplayNameComponent.class)) {
+                DisplayNameComponent displayNameComponent = parentPrefab.getComponent(DisplayNameComponent.class);
+                return displayNameComponent.name;
+            } else {
+                String instigatorName = parentPrefab.getName();
+                //getParentPrefab.getName() returns a ResourceUrn String such as "engine:player"
+                //The following calls change the damage type to be more readable
+                //For instance, "engine:player" becomes "Player"
+                instigatorName = instigatorName.replaceAll(".*:(.*)", "$1");
+                instigatorName = Character.toUpperCase(instigatorName.charAt(0)) + instigatorName.substring(1);
+                return instigatorName;
+            }
+        } else {
+            return null;
+        }
+
+    }
+
+    public String getDamageTypeName(Prefab damageType) {
+        //A DisplayName can be specified in the damage type prefab
+        //Otherwise, the game will attempt to generate one from the name of that prefab
+        if (damageType.hasComponent(DisplayNameComponent.class)) {
+            DisplayNameComponent displayNameComponent = damageType.getComponent(DisplayNameComponent.class);
+            return displayNameComponent.name;
+        } else {
+            logger.info(String.format("%s is missing a readable DisplayName", damageType.getName()));
+            String damageTypeName = damageType.getName();
+            //damageType.getName() returns a ResourceUrn String such as "engine:directDamage"
+            //The following calls change the damage type to be more readable
+            //For instance, "engine:directDamage" becomes "Direct Damage"
+            damageTypeName = damageTypeName.replaceAll(".*:(.*)", "$1");
+            damageTypeName = damageTypeName.replaceAll("([A-Z])", " $1");
+            damageTypeName = Character.toUpperCase(damageTypeName.charAt(0)) + damageTypeName.substring(1);
+            return damageTypeName;
+        }
     }
 
 
