@@ -29,18 +29,6 @@ import static org.lwjgl.opengl.GL11.glDepthMask;
 public final class DisableDepthWriting implements StateChange {
     private static StateChange defaultInstance = new EnableDepthWriting();
 
-    /** Constructs an instance of this StateChange. This can then be used in a node's initialise() method in the form:
-     *
-     * addDesiredStateChange(new DisableDepthWriting());
-     *
-     * This triggers the inclusion of a SetDepthMaskTask(false) instance and a SetDepthMaskTask(true) instance
-     * in the rendering task list, each instance disabling/enabling writing to the depth buffer respectively. The
-     * two task instances frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also disables depth buffer writing.
-     */
-    // TODO: Remove this method?
-    public DisableDepthWriting() { }
-
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
