@@ -362,6 +362,7 @@ public class UIText extends CoreWidget {
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
                     setText(before + event.getKeyCharacter() + after);
                     setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                    eventHandled = true;
                 }
             } else {
                 String fullText = text.get();
