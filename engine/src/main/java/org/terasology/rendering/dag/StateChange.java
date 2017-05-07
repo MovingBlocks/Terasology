@@ -16,7 +16,14 @@
 package org.terasology.rendering.dag;
 
 /**
- * TODO: Add javadocs
+ * A StateChange denotes a change in the OpenGL state, that is required by a particular Node.
+ *
+ * Any of the concrete classes extending the StateChange interface can be used in a node's initialise() method in the form:
+ * addDesiredStateChange(new StateChangeImplementation());
+ *
+ * This triggers the inclusion of an StateSet and a StateReset instance in the rendering task list.
+ * These two task instances frame the execution of a node's process() method unless they are deemed redundant
+ * by the RenderTaskListGenerator because the upstream or downstream node also requires the exact same StateChange.
  */
 public interface StateChange extends RenderPipelineTask {
     StateChange getDefaultInstance();

@@ -29,22 +29,6 @@ import org.terasology.rendering.dag.StateChange;
 public final class EnableBlending extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableBlending();
 
-    // TODO: Do we really need to add such a description for every single StateChange?
-    // TODO: IMHO, we can just add the common parts to StateChange interface, and add class-specific info as needed.
-    /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
-     *
-     * addDesiredStateChange(new EnableBlending());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_BLEND mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables blending.
-     *
-     * See also StateChange implementation SetBlendFunction to set the source and destination factors
-     * used by the blending process.
-     */
     public EnableBlending() {
         super(GL_BLEND);
     }
