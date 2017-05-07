@@ -23,7 +23,7 @@ import org.terasology.logic.behavior.tree.ParallelNode;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.Task;
 
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -35,8 +35,8 @@ public class ParallelTest {
         Interpreter interpreter = new Interpreter(null);
         ParallelNode parallel = new ParallelNode(ParallelNode.Policy.RequireAll, ParallelNode.Policy.RequireOne);
 
-        Node one = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.SUCCESS));
-        Node two = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.RUNNING, Status.SUCCESS));
+        Node one = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.SUCCESS));
+        Node two = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.RUNNING, Status.SUCCESS));
         parallel.children().add(one);
         parallel.children().add(two);
 
@@ -53,8 +53,8 @@ public class ParallelTest {
     public void testSuccessRequireOne() {
         Interpreter interpreter = new Interpreter(null);
         ParallelNode parallel = new ParallelNode(ParallelNode.Policy.RequireOne, ParallelNode.Policy.RequireAll);
-        Node one = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.SUCCESS));
-        Node two = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.RUNNING));
+        Node one = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.SUCCESS));
+        Node two = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.RUNNING));
         parallel.children().add(one);
         parallel.children().add(two);
 
@@ -69,8 +69,8 @@ public class ParallelTest {
     public void testFailureRequireAll() {
         Interpreter interpreter = new Interpreter(null);
         ParallelNode parallel = new ParallelNode(ParallelNode.Policy.RequireOne, ParallelNode.Policy.RequireAll);
-        Node one = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.FAILURE));
-        Node two = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.RUNNING, Status.FAILURE));
+        Node one = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.FAILURE));
+        Node two = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.RUNNING, Status.FAILURE));
         parallel.children().add(one);
         parallel.children().add(two);
 
@@ -87,8 +87,8 @@ public class ParallelTest {
     public void testFailureRequireOne() {
         Interpreter interpreter = new Interpreter(null);
         ParallelNode parallel = new ParallelNode(ParallelNode.Policy.RequireAll, ParallelNode.Policy.RequireOne);
-        Node one = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.FAILURE));
-        Node two = create(spy -> when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.RUNNING));
+        Node one = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.FAILURE));
+        Node two = create(spy -> when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.RUNNING));
         parallel.children().add(one);
         parallel.children().add(two);
 

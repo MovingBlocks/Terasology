@@ -22,12 +22,11 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.Task;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-
 
 /**
  */
@@ -125,7 +124,7 @@ public class InterpreterTest {
         Interpreter interpreter = new Interpreter(null);
         interpreter.start(node, null);
         interpreter.tick(0);
-        verify(task).update(anyInt());
+        verify(task).update(anyFloat());
     }
 
     @Test
