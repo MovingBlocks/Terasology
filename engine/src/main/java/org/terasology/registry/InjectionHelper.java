@@ -102,12 +102,11 @@ public final class InjectionHelper {
         }
     }
 
-
     public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
         SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
             @Override
             public <T> Optional<T> get(Class<T> x) {
-                return Optional.of(context.get(x));
+                return Optional.ofNullable(context.get(x));
             }
         });
         return simpleClassFactory.instantiateClass(clazz).get();
