@@ -184,6 +184,14 @@ public class UIText extends CoreWidget {
      */
     @Override
     public void onDraw(Canvas canvas) {
+        lastWidth = canvas.size().x;
+        if (isEnabled()) {
+            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        }
+        drawAll(canvas, canvas.size().x);
+    }
+
+    protected void drawAll(Canvas canvas, int multilineWidth) {
         if (text.get() == null) {
             text.set("");
         }
@@ -194,20 +202,14 @@ public class UIText extends CoreWidget {
         if (isShowingHintText) {
             setCursorPosition(0);
             if (!text.get().equals(hintText) && text.get().endsWith(hintText)) {
-                text.set(text.get().substring(0, text.get().length()-hintText.length()));
+                text.set(text.get().substring(0, text.get().length() - hintText.length()));
                 setCursorPosition(text.get().length());
                 isShowingHintText = false;
             }
         }
         lastFont = canvas.getCurrentStyle().getFont();
-        lastWidth = canvas.size().x;
-        if (isEnabled()) {
-            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
-        }
         correctCursor();
-
-        int widthForDraw = (multiline) ? canvas.size().x : lastFont.getWidth(getText());
-
+        int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(getText());
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
             if (isShowingHintText && !readOnly) {
