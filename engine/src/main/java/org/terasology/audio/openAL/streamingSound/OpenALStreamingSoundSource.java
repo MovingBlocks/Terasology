@@ -23,22 +23,13 @@ import org.terasology.audio.openAL.SoundSource;
 
 import java.nio.IntBuffer;
 
-import static org.lwjgl.openal.AL10.AL_BUFFER;
-import static org.lwjgl.openal.AL10.AL_BUFFERS_PROCESSED;
-import static org.lwjgl.openal.AL10.AL_PLAYING;
-import static org.lwjgl.openal.AL10.AL_SOURCE_STATE;
-import static org.lwjgl.openal.AL10.alGetSourcei;
-import static org.lwjgl.openal.AL10.alSourcePlay;
-import static org.lwjgl.openal.AL10.alSourceQueueBuffers;
-import static org.lwjgl.openal.AL10.alSourceRewind;
-import static org.lwjgl.openal.AL10.alSourceStop;
-import static org.lwjgl.openal.AL10.alSourceUnqueueBuffers;
-import static org.lwjgl.openal.AL10.alSourcei;
+import static org.lwjgl.openal.AL10.*;
 
 public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingSound> {
 
     private OpenALStreamingSound audio;
-    
+    private boolean loop;
+
     public OpenALStreamingSoundSource(SoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> owningPool) {
         super(owningPool);
     }
@@ -53,20 +44,17 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
     @Override
     public boolean isLooping() {
-        return false;
+        return loop;
     }
-    
+
     @Override
     public OpenALStreamingSound getAudio() {
         return audio;
     }
 
     @Override
-    // TODO: Implement looping support for streaming sounds
     public OpenALStreamingSoundSource setLooping(boolean looping) {
-        if (looping) {
-            throw new UnsupportedOperationException("Looping is unsupported on streaming sounds!");
-        }
+        this.loop = looping;
 
         return this;
     }
@@ -85,6 +73,10 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
             } else {
                 stop(); // we aren't playing anymore, because stream seems to end
             }
+
+            if (!isPlaying() && isLooping()) {
+                play();
+            }
         }
 
         super.update(delta);
@@ -95,6 +87,8 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
         // Start playing if playback for stopped by end of buffers
         if (isPlaying() && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
             alSourcePlay(this.getSourceId());
+        } else if (isLooping()) {
+            play();
         }
     }
 

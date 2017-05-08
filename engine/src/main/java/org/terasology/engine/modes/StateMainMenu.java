@@ -44,9 +44,6 @@ import org.terasology.utilities.Assets;
 
 /**
  * The class implements the main game menu.
- * <br><br>
- *
- * @version 0.3
  */
 public class StateMainMenu implements GameState {
     private Context context;
@@ -64,7 +61,6 @@ public class StateMainMenu implements GameState {
     public StateMainMenu(String showMessageOnLoad) {
         messageOnLoad = showMessageOnLoad;
     }
-
 
     @Override
     public void init(GameEngine gameEngine) {
@@ -117,7 +113,6 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
@@ -136,7 +131,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get());
+        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get(), 1.0f, true, null);
     }
 
     private void stopBackgroundMusic() {
