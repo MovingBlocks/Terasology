@@ -108,4 +108,12 @@ public class NullAudioManager implements AudioManager {
     public AssetFactory<StreamingSound, StreamingSoundData> getStreamingSoundFactory() {
         return NullStreamingSound::new;
     }
+
+    @Override
+    public void loopMusic(StreamingSound music) {
+    }
+
+    @Override
+    public void loopMusic(StreamingSound music, float volume) {
+    }
 }

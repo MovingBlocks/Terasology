@@ -120,10 +120,10 @@ public class OpenALManager implements AudioManager {
         AL.destroy();
     }
 
-
     @Override
     public void stopAllSounds() {
         pools.values().forEach(SoundPool::stopAll);
+        notifyEndListeners(true);
     }
 
     @Override
@@ -236,6 +236,21 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
+    public void loopMusic(StreamingSound music) {
+        loopMusic(music, 1.0f);
+    }
+
+    @Override
+    public void loopMusic(StreamingSound music, float volume) {
+        AudioEndListener loopingEndListener = interrupted -> {
+            if (!interrupted) {
+                loopMusic(music, volume);
+            }
+        };
+        playMusic(music, volume, loopingEndListener);
+    }
+
+    @Override
     public void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity) {
 
         AL10.alListener3f(AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
@@ -245,7 +260,7 @@ public class OpenALManager implements AudioManager {
         Vector3f dir = orientation.rotate(Direction.FORWARD.getVector3f(), new Vector3f());
         Vector3f up = orientation.rotate(Direction.UP.getVector3f(), new Vector3f());
 
-        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{dir.x, dir.y, dir.z, up.x, up.y, up.z});
+        FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[] {dir.x, dir.y, dir.z, up.x, up.y, up.z});
         listenerOri.flip();
         AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
 
@@ -262,6 +277,10 @@ public class OpenALManager implements AudioManager {
         for (SoundPool<?, ?> pool : pools.values()) {
             pool.update(delta);
         }
+        notifyEndListeners(false);
+    }
+
+    private void notifyEndListeners(boolean interrupted) {
         Iterator<Map.Entry<SoundSource<?>, AudioEndListener>> iterator = endListeners.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<SoundSource<?>, AudioEndListener> entry = iterator.next();
@@ -269,7 +288,7 @@ public class OpenALManager implements AudioManager {
                 iterator.remove();
 
                 try {
-                    entry.getValue().onAudioEnd();
+                    entry.getValue().onAudioEnd(interrupted);
                 } catch (Exception e) {
                     logger.error("onAudioEnd() notification failed for {}", entry.getValue(), e);
                 }
@@ -299,4 +318,5 @@ public class OpenALManager implements AudioManager {
             pool.purge(sound);
         }
     }
+
 }
