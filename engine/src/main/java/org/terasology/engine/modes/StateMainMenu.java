@@ -57,6 +57,7 @@ public class StateMainMenu implements GameState {
     private InputSystem inputSystem;
 
     private String messageOnLoad = "";
+    private boolean replayBackgroundMusic;
 
     public StateMainMenu() {
     }
@@ -64,7 +65,6 @@ public class StateMainMenu implements GameState {
     public StateMainMenu(String showMessageOnLoad) {
         messageOnLoad = showMessageOnLoad;
     }
-
 
     @Override
     public void init(GameEngine gameEngine) {
@@ -115,6 +115,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.initialise();
 
+        replayBackgroundMusic = true;
         playBackgroundMusic();
 
         //guiManager.openWindow("main");
@@ -136,10 +137,15 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get());
+        context.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme").get(), () -> {
+            if (replayBackgroundMusic) {
+                playBackgroundMusic();
+            }
+        });
     }
 
     private void stopBackgroundMusic() {
+        replayBackgroundMusic = false;
         context.get(AudioManager.class).stopAllSounds();
     }
 
