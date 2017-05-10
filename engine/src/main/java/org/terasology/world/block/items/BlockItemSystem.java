@@ -88,9 +88,25 @@ public class BlockItemSystem extends BaseComponentSystem {
         }
         Vector3i targetBlock = blockComponent.getPosition();
         Vector3i placementPos = new Vector3i(targetBlock);
+        Vector3i climbablePlacementPos = new Vector3i(targetBlock);
+
         placementPos.add(surfaceSide.getVector3i());
 
         Block block = type.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
+
+        if (blockComponent.getBlock().isClimbable()) {
+            while (blockComponent.getBlock().getBlockFamily().getURI() == block.getBlockFamily().getURI()) {
+                climbablePlacementPos.add(Vector3i.down());
+                block = worldProvider.getBlock(climbablePlacementPos);
+            }
+            if (block.isReplacementAllowed()) {
+                PlaceBlocks placeBlocks = new PlaceBlocks(climbablePlacementPos, blockComponent.getBlock(), event.getInstigator());
+                worldProvider.getWorldEntity().send(placeBlocks);
+                event.getInstigator().send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
+                event.consume();
+            }
+            return;
+        }
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
