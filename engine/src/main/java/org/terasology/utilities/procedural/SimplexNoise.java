@@ -37,7 +37,7 @@ import org.terasology.utilities.random.FastRandom;
  * <br><br>
  * msteiger: Introduced seed value
  */
-public class SimplexNoise extends AbstractNoise implements Noise2D, Noise3D {
+public class SimplexNoise extends AbstractNoise implements Noise {
 
     private static Grad[] grad3 = {
             new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),

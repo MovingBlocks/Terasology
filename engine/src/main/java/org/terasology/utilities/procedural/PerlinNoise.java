@@ -22,7 +22,7 @@ import org.terasology.utilities.random.FastRandom;
  * Improved Perlin noise based on the reference implementation by Ken Perlin.
  *
  */
-public class PerlinNoise extends AbstractNoise implements Noise2D, Noise3D {
+public class PerlinNoise extends AbstractNoise implements Noise {
 
     private final int[] noisePermutations;
 
