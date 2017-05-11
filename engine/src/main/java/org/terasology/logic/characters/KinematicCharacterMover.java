@@ -18,6 +18,7 @@ package org.terasology.logic.characters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.input.binds.movement.CrouchModeButton;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
@@ -195,7 +196,7 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
 
-        updateMode(state, newSwimming, newDiving, newClimbing);
+        updateMode(entity, state, newSwimming, newDiving, newClimbing);
     }
 
     /**
@@ -205,13 +206,18 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param newDiving True if the character's body is fully inside liquid blocks.
      * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
      */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
+    static void updateMode(EntityRef entity, CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
         if (newDiving) {
             if (state.getMode() != MovementMode.DIVING) {
                 state.setMode(MovementMode.DIVING);
             }
         } else if (newSwimming) {
             if (state.getMode() != MovementMode.SWIMMING) {
+                if (state.getMode() == MovementMode.CROUCHING) {
+                    logger.info("sent");
+                    CrouchModeButton event = new CrouchModeButton();
+                    entity.getOwner().send(event);
+                }
                 state.setMode(MovementMode.SWIMMING);
             }
             state.getVelocity().y += 0.02;
