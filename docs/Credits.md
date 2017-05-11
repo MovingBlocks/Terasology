@@ -197,7 +197,9 @@ Contributors
  [gianluca-nitti](https://github.com/gianluca-nitti),
  [ar0ne](https://github.com/ar0ne),
  [Vizaxo](https://github.com/Vizaxo),
- [theobisproject](https://github.com/theobisproject)
+ [theobisproject](https://github.com/theobisproject),
+ [omomthings](https://github.com/omomthings),
+ [njd5475](https://github.com/njd5475)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
