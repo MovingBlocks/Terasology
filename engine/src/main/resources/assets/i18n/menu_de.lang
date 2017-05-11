@@ -140,7 +140,7 @@
     "motion-blur": "Bewegungsunschärfe",
     "mouse-sensitivity": "Mausempfindlichkeit",
     "movement-dead-zone": "Achsenbewegung \"Toter-Winkel\"",
-    "music-volume": "Melodienlautstärke",
+    "music-volume": "Melodie-Lautstärke",
     "new-binding": "Neue Belegung",
     "next-toolbar-item": "Nächster Gegenstand der Werkzeugleiste",
     "none": "keine",
@@ -160,7 +160,7 @@
     "online-players": "Spielende Spieler",
     "open-inventory": "Inventar öffnen",
     "outline": "Kubus-Rahmen anzeigen",
-    "parallax-mapping": "3D-Texturen",
+    "parallax-mapping": "Parallax Mapping",
     "parsing-content": "Entpacke Inhalt ...",
     "particle-effect-limit": "Begrenzung der Partikel",
     "ping": "Latenz",
@@ -208,7 +208,7 @@
     "shadows-off": "Aus",
     "shadows-on": "An",
     "shadows-pcr": "An (PCR)",
-    "sound-volume": "Geräuschlautstärke",
+    "sound-volume": "Geräusch-Lautstärke",
     "ssao": "SSAO-Rendering",
     "start-game": "Auf in's Abenteuer!",
     "start-singleplayer-game": "Einzelspieler",
@@ -248,5 +248,5 @@
     "widget-selection-prompt": "Bitte wähle ein Widget aus:",
     "widget-selection-title": "Widget-Auswahl",
     "world-config-preview": "Details ...",
-    "world-seed": "Seed"
+    "world-seed": "Unikale Weltensaat (Seed)"
 }
