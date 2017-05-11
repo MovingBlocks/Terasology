@@ -52,8 +52,10 @@ public class SetDepthFunction implements StateChange {
     private int depthFunction;
 
     /**
-     * Constructs an instance of SetDepthFunction initialised with the given
-     * depth function.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));
      *
      * @param depthFunction An integer representing one of the possible depth function known to OpenGL,
      *                      i.e. GL_LEQUAL, GL_ALWAYS, etc...

@@ -40,6 +40,12 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
     private BaseFBOsManager fboManager;
     private int fboId;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new BindFbo("engine:sceneOpaque", displayResolutionDependentFBOManager));
+     */
     public BindFbo(ResourceUrn fboName, BaseFBOsManager fboManager) {
         this.fboName = fboName;
         this.fboManager = fboManager;

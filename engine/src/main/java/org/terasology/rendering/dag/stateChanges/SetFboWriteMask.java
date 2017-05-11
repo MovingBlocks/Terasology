@@ -46,7 +46,10 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
     private boolean renderToLightBuffer;
 
     /**
-     * Creates an instance of this class with the given parameters.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetFboWriteMask(true, false, false, "engine:sceneOpaque", displayResolutionDependentFBOManager));
      *
      * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
      * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.

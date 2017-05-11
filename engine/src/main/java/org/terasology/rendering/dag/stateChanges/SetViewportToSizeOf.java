@@ -41,6 +41,15 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     @SuppressWarnings("FieldCanBeLocal")
     private FBO fbo;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetViewportToSizeOf("engine:sceneOpaque", displayResolutionDependentFboManager);
+     *
+     * @param fboName a URN identifying an FBO.
+     * @param frameBuffersManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     */
     public SetViewportToSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
         this.fboManager = frameBuffersManager;
         this.fboName = fboName;

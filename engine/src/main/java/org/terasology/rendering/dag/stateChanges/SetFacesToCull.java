@@ -37,6 +37,15 @@ public final class SetFacesToCull implements StateChange {
 
     private int mode;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+     *
+     * @param mode An integer representing one of the possible modes known to OpenGL,
+     *                      i.e. GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.
+     */
     public SetFacesToCull(int mode) {
         if (mode == GL_BACK || mode == GL_FRONT || mode == GL_FRONT_AND_BACK) {
             this.mode = mode;

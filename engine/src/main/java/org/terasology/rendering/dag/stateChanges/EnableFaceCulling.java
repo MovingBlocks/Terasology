@@ -28,22 +28,17 @@ import org.terasology.rendering.dag.StateChange;
  *
  * Notice that Terasology by default enables face culling. However, the rendering engine disables it again
  * every frame to be consistent with OpenGL's defaults. This is debatable and might change in the future.
+ *
+ * See StateChange implementation SetFacesToCull to change from OpenGL's default of culling only the GL_BACK faces.
  */
 public final class EnableFaceCulling extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableFaceCulling();
 
     /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
+     * The constructor, to be used in the initialise method of a node.
      *
-     * addDesiredStateChange(new EnableFaceCulling());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_CULL_FACE mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables face culling.
-     *
-     * See StateChange implementation SetFacesToCull to change from OpenGL's default of culling only the GL_BACK faces.
+     * Sample use:
+     *      addDesiredStateChange(new EnableFaceCulling());
      */
     public EnableFaceCulling() {
         super(GL_CULL_FACE);

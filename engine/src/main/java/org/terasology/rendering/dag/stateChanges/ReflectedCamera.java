@@ -32,7 +32,10 @@ public class ReflectedCamera implements StateChange {
     private boolean reflected;
 
     /**
-     * Constructs an instance of this class initialized with a given Camera instance.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new ReflectedCamera(activeCamera));
      *
      * @param camera An instance implementing the Camera interface.
      */

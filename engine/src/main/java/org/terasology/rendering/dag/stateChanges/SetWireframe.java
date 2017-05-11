@@ -34,6 +34,14 @@ public final class SetWireframe implements StateChange {
     private boolean enabled;
     private int mode;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetWireframe(true);
+     *
+     * @param enabled a boolean indicating whether the Wireframe should be enabled
+     */
     public SetWireframe(boolean enabled) {
         this.enabled = enabled;
         this.mode = enabled ? GL_LINE : GL_FILL;

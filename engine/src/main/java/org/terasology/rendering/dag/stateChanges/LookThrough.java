@@ -36,7 +36,10 @@ public class LookThrough implements StateChange {
     private Camera camera;
 
     /**
-     * Constructs an instance of this class initialised with the given camera.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new LookThrough(activeCamera));
      *
      * @param camera An instance implementing the Camera interface.
      */

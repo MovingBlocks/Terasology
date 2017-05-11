@@ -27,15 +27,10 @@ public final class EnableStencilTest extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableStencilTest();
 
     /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
+     * The constructor, to be used in the initialise method of a node.
      *
-     * addDesiredStateChange(new EnableStencilTest());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_CULL_FACE mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables face culling.
+     * Sample use:
+     *      addDesiredStateChange(new EnableStencilTest());
      */
     public EnableStencilTest() {
         super(GL_STENCIL_TEST);

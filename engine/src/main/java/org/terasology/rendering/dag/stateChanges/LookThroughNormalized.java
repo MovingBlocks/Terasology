@@ -36,7 +36,10 @@ public class LookThroughNormalized implements StateChange {
     private Camera camera;
 
     /**
-     * Constructs an instance of this class initialised with the given camera.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new LookThroughNormalized(activeCamera));
      *
      * @param camera An instance implementing the Camera interface.
      */
@@ -56,7 +59,7 @@ public class LookThroughNormalized implements StateChange {
 
     /**
      * Returns an instance of this class configured to generate a task resetting the ModelView and
-     * Projection matrices back to opengl's default (identity matrices).
+     * Projection matrices back to OpenGL's default (identity matrices).
      *
      * @return the default instance of the LookThroughNormalized class
      */

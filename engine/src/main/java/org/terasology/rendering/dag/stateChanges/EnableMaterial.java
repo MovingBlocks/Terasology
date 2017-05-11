@@ -33,6 +33,12 @@ public final class EnableMaterial implements StateChange {
     private ResourceUrn materialUrn;
     private Material material;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new EnableMaterial("engine:prog.chunk"));
+     */
     public EnableMaterial(ResourceUrn materialUrn) {
         this.materialUrn = materialUrn;
         this.material = getMaterial(materialUrn);

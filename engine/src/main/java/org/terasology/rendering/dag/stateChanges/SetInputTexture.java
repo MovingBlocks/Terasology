@@ -45,12 +45,14 @@ public class SetInputTexture implements StateChange {
     private SetInputTexture defaultInstance;
 
     /**
-     * Constructs an instance of SetInputTexture initialized with the given objects.
+     * The constructor, to be used in the initialise method of a node.
      *
-     * Instances of this class bind a texture to a texture unit. The integer identifying
-     * the texture unit is then passed to a shader program using the material/parameter
-     * pair provided on construction. This allow for a texture asset to be used by a
-     * shader program as an input.
+     * Sample use:
+     *      addDesiredStateChange(new SetInputTexture(0, water.getId(), "engine:prog.chunk", "textureWater"));
+     *
+     * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
+     * passed to a shader program using the material/parameter pair provided on construction. This allow for a
+     * texture asset to be used by a shader program as an input.
      *
      * See the source of the process() method for the nitty gritty details.
      *

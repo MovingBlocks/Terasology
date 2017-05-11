@@ -29,6 +29,12 @@ import org.terasology.rendering.dag.StateChange;
 public final class EnableBlending extends EnableStateParameter {
     private static StateChange defaultInstance = new DisableBlending();
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new EnableBlending());
+     */
     public EnableBlending() {
         super(GL_BLEND);
     }

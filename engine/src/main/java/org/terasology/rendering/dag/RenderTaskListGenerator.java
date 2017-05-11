@@ -104,6 +104,8 @@ public final class RenderTaskListGenerator {
         StateChange persistentStateChange;
         Iterator<Map.Entry<Class<?>, StateChange>> iterator;
         Map.Entry<Class<?>, StateChange> entry;
+        Class<?> key;
+        StateChange stateChange;
 
         int enabledNodes = 0;
         int potentialTasks = 0;
@@ -133,7 +135,7 @@ public final class RenderTaskListGenerator {
                     }
                     // Else: The exact same StateChange is already persisting, so don't add it again.
 
-                    // A requestedStateChange is one that was requested by the current Node. This property, along with the
+                    // A requestedStateChange is one that was requested by the current Node. This property, along with
                     // persistentStateChange, determines when the reset StateChange corresponding to a StateChange is added.
                     requestedStateChanges.add(currentStateChange.getClass());
                 }
@@ -142,13 +144,13 @@ public final class RenderTaskListGenerator {
                 iterator = persistentStateChanges.entrySet().iterator();
                 while (iterator.hasNext()) {
                     entry = iterator.next();
-                    Class<?> key = entry.getKey();
-                    StateChange stateChangeAgainstKey = entry.getValue();
+                    key = entry.getKey();
+                    stateChange = entry.getValue();
 
                     if (!requestedStateChanges.contains(key)) {
                         // This StateChange was not requested by the current Node, so we reset it.
                         requestedStateChanges.remove(key);
-                        taskList.add(stateChangeAgainstKey.getDefaultInstance());
+                        taskList.add(stateChange.getDefaultInstance());
                         iterator.remove();
                     }
                     // Else: The StateChange was requested by the current Node, so do nothing.

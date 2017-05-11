@@ -70,7 +70,10 @@ public class SetBlendFunction implements StateChange {
     private int destinationFactor;
 
     /**
-     * Constructs an instance of SetBlendFunction initialised with the given blend function factors.
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetBlendFunction(GL_SRC_COLOR, GL_ONE_MINUS_DST_COLOR));
      *
      * @param sourceFactor An integer representing one of the possible blend factors known to OpenGL,
      *                      i.e. GL_ONE, GL_SRC_COLOR, etc...

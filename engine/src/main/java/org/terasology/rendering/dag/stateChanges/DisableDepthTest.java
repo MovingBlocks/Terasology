@@ -28,15 +28,10 @@ public final class DisableDepthTest extends DisableStateParameter {
     private static StateChange defaultInstance = new EnableDepthTest();
 
     /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
+     * The constructor, to be used in the initialise method of a node.
      *
-     * addDesiredStateChange(new DisableDepthTest());
-     *
-     * This trigger the inclusion of a DisableStateParameterTask instance and an EnableStateParameterTask instance
-     * in the rendering task list, each instance disabling/enabling respectively the GL_DEPTH_TEST mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also disables the depth testing.
+     * Sample use:
+     *      addDesiredStateChange(new DisableDepthTest());
      */
     public DisableDepthTest() {
         super(GL_DEPTH_TEST);
