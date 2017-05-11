@@ -87,6 +87,14 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //entity.removeComponent(CharacterMovementComponent.class);
     }
 
+    /**
+     * Extracts the name from an entity.
+     * If the entity is a character, then the display name from the {@link ClientComponent#clientInfo} is used.
+     * Otherwise the entity itself is checked for a {@link DisplayNameComponent}.
+     * In the last case, the prefab name of the entity is used, e.g. "engine:player" will be parsed to "Player".
+     * @param instigator The entity for which an instigator name is needed.
+     * @return The instigator name.
+     */
     public String getInstigatorName(EntityRef instigator) {
         if (instigator.hasComponent(CharacterComponent.class)) {
             EntityRef instigatorClient = instigator.getComponent(CharacterComponent.class).controller;
@@ -115,6 +123,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     }
 
+    /**
+     * Extracts the damage type name from a prefab. If the prefab has a {@link DisplayNameComponent}, it will be used.
+     * Otherwise the damage type name is parsed, e.g. "engine:directDamage" will become "Direct Damage".
+     * @param damageType The damage type prefab.
+     * @return A readable name for the damage type.
+     */
     public String getDamageTypeName(Prefab damageType) {
         //A DisplayName can be specified in the damage type prefab
         //Otherwise, the game will attempt to generate one from the name of that prefab
@@ -133,7 +147,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return damageTypeName;
         }
     }
-
 
     @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.CLIENT)
     public void onAttackRequest(AttackButton event, EntityRef entity, CharacterHeldItemComponent characterHeldItemComponent) {
@@ -201,8 +214,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // Add the cooldown time for the next use of this item.
         if (itemComponent != null) {
             // Send out this event so other systems can alter the cooldown time.
-            AffectItemUseCooldownTimeEvent affectItemUseCooldownTimeEvent
-                    = new AffectItemUseCooldownTimeEvent(itemComponent.cooldownTime);
+            AffectItemUseCooldownTimeEvent affectItemUseCooldownTimeEvent = new AffectItemUseCooldownTimeEvent(itemComponent.cooldownTime);
             entity.send(affectItemUseCooldownTimeEvent);
             characterHeldItemComponent.nextItemUseTime += affectItemUseCooldownTimeEvent.getResultValue();
         } else {
@@ -387,6 +399,5 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         float epsilon = 0.00001f;
         return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
     }
-
 
 }
