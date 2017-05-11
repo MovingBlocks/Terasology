@@ -17,19 +17,20 @@ package org.terasology.input.events;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
+import org.terasology.input.InputModified;
 import org.terasology.input.Keyboard;
 
 public final class KeyUpEvent extends KeyEvent {
 
-    private static KeyUpEvent event = new KeyUpEvent(Keyboard.Key.NONE, '\0', 0);
+    private static KeyUpEvent event = new KeyUpEvent(Keyboard.Key.NONE, '\0', 0, InputModified.Modifier.NONE);
 
-    private KeyUpEvent(Input key, char keyChar, float delta) {
-        super(key, keyChar, ButtonState.UP, delta);
+    private KeyUpEvent(Input key, char keyChar, float delta, InputModified.Modifier mod) {
+        super(key, keyChar, ButtonState.UP, delta, mod);
     }
 
-    public static KeyUpEvent create(Input key, char keyChar, float delta) {
+    public static KeyUpEvent create(Input key, char keyChar, float delta, InputModified.Modifier mod) {
         event.reset(delta);
-        event.setKey(key, keyChar);
+        event.setKey(key, keyChar, mod);
         return event;
     }
 }

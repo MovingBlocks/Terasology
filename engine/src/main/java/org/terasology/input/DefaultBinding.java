@@ -29,4 +29,6 @@ public @interface DefaultBinding {
     InputType type();
 
     int id();
+
+    InputModified.Modifier mod() default InputModified.Modifier.NONE;
 }

@@ -17,7 +17,10 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
 import org.terasology.audio.StaticSound;
 import org.terasology.input.Input;
+import org.terasology.input.InputModified;
+import org.terasology.input.InputModifiedImpl;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -46,6 +49,10 @@ public class UIInputBind extends CoreWidget {
     private Binding<Input> input = new DefaultBinding<>();
     private Binding<StaticSound> clickSound = new DefaultBinding<>();
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
+
+    private boolean readAlt = false; // Priorities in order alt > ctrl > shift if multiple pressed
+    private boolean readCtrl = false;
+    private boolean readShift = false;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -119,12 +126,45 @@ public class UIInputBind extends CoreWidget {
 
     @Override
     public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isUp() && (event.getKey() == Keyboard.Key.LEFT_ALT || event.getKey() == Keyboard.Key.RIGHT_ALT)) {
+            readAlt = false;
+        }
+        else if (event.isUp() && (event.getKey() == Keyboard.Key.LEFT_CTRL || event.getKey() == Keyboard.Key.RIGHT_CTRL)) {
+            readCtrl = false;
+        }
+        else if (event.isUp() && (event.getKey() == Keyboard.Key.LEFT_SHIFT || event.getKey() == Keyboard.Key.RIGHT_SHIFT)) {
+            readShift = false;
+        }
         if (event.isDown()) {
+            if (event.getKey() == Keyboard.Key.LEFT_ALT || event.getKey() == Keyboard.Key.RIGHT_ALT) {
+                readAlt = true;
+                return false;
+            }
+            if (event.getKey() == Keyboard.Key.LEFT_CTRL || event.getKey() == Keyboard.Key.RIGHT_CTRL) {
+                readCtrl = true;
+                return false;
+            }
+            if (event.getKey() == Keyboard.Key.LEFT_SHIFT || event.getKey() == Keyboard.Key.RIGHT_SHIFT) {
+                readShift = true;
+                return false;
+            }
             if (capturingInput) {
-                setNewInput(InputType.KEY.getInput(event.getKey().getId()));
+                if (readAlt) {
+                    setNewInput(new InputModifiedImpl(InputType.KEY.getInput(event.getKey().getId()), InputModified.Modifier.ALT));
+                }
+                else if (readCtrl) {
+                    setNewInput(new InputModifiedImpl(InputType.KEY.getInput(event.getKey().getId()), InputModified.Modifier.CTRL));
+                }
+                else if (readShift) {
+                    setNewInput(new InputModifiedImpl(InputType.KEY.getInput(event.getKey().getId()), InputModified.Modifier.SHIFT));
+                }
+                else {
+                    setNewInput(InputType.KEY.getInput(event.getKey().getId()));
+                }
                 capturingInput = false;
                 return true;
             }
+
         }
         return false;
     }

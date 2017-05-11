@@ -17,18 +17,21 @@ package org.terasology.input.events;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
+import org.terasology.input.InputModified;
 
 public class KeyEvent extends ButtonEvent {
 
     private Input input;
     private char keyChar;
     private ButtonState state;
+    private InputModified.Modifier mod;
 
-    public KeyEvent(Input input, char keyChar, ButtonState state, float delta) {
+    public KeyEvent(Input input, char keyChar, ButtonState state, float delta, InputModified.Modifier mod) {
         super(delta);
         this.input = input;
         this.keyChar = keyChar;
         this.state = state;
+        this.mod = mod;
     }
 
     public Input getKey() {
@@ -48,9 +51,12 @@ public class KeyEvent extends ButtonEvent {
         return keyChar;
     }
 
-    protected void setKey(Input newInput, char newKeyChar) {
+    public InputModified.Modifier getModifier() { return mod; }
+
+    protected void setKey(Input newInput, char newKeyChar, InputModified.Modifier mod) {
         this.input = newInput;
         this.keyChar = newKeyChar;
+        this.mod = mod;
     }
 
     public void reset() {

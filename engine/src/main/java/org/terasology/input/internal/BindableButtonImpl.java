@@ -180,7 +180,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
             }
         } else if (!activeInputs.isEmpty()) {
-            activeInputs.remove(input);
+            activeInputs.removeIf(i -> i.getDisplayName().equals(input.getDisplayName()));
             if (activeInputs.isEmpty() && mode.isActivatedOnRelease()) {
                 if (!keyConsumed) {
                     keyConsumed = triggerOnRelease(delta, target);
