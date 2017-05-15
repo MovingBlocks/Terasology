@@ -16,10 +16,10 @@
 package org.terasology.logic.players;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -110,7 +110,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private InputSystem inputSystem;
 
-    private BindsConfig bindsConfig;
+    @In
+    private BindsManager bindsManager;
+    
     private float bobFactor;
     private float lastStepDelta;
 
@@ -248,7 +250,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * This cancels the simulated repeated key stroke for the forward input button.
      */
     private void stopAutoMove() {
-        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
         if (forwardKey != null) {
             inputSystem.cancelSimulatedKeyStroke(forwardKey);
@@ -263,8 +265,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      */
     private void startAutoMove() {
         isAutoMove = false;
-        bindsConfig = config.getInput().getBinds();
-        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
         if (forwardKey != null) {
             isAutoMove = true;

@@ -21,6 +21,7 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
@@ -40,6 +41,9 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @In
     private Config config;
+    
+    @In
+    private BindsManager bindsManager;
 
     @In
     private ModuleManager moduleManager;
@@ -60,13 +64,13 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        defaultBinds = BindsConfig.createDefault(context);
+        defaultBinds = bindsManager.createDefault(context);
 
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));
         WidgetUtil.trySubscribe(this, "ok", button -> {
             Input newInput = bindButton.getNewInput();
-            currBinds = config.getInput().getBinds();
+            currBinds = bindsManager.getBindsConfig();
             if (currBinds.isBound(newInput) && !newInput.equals(bindButton.getInput())) {
                 ConfirmChangePopup popup = getManager().pushScreen(ConfirmChangePopup.ASSET_URI, ConfirmChangePopup.class);
                 popup.setButtonData(bindButton);
@@ -80,7 +84,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     public void setBindingData(SimpleUri uri, RegisterBindButton bind, int index) {
         find("title", UILabel.class).setText(translationSystem.translate(bind.description()));
-        BindsConfig bindConfig = config.getInput().getBinds();
+        BindsConfig bindConfig = bindsManager.getBindsConfig();
         bindButton.bindInput(new InputConfigBinding(bindConfig, uri, index));
         List<Input> defaults = defaultBinds.getBinds(uri);
         find("default-binding", UILabel.class).setText(
@@ -91,7 +95,6 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        BindsConfig bindConfig = config.getInput().getBinds();
-        bindConfig.applyBinds(inputSystem, moduleManager);
+        bindsManager.applyBinds(inputSystem, moduleManager);
     }
 }

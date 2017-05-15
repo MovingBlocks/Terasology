@@ -25,6 +25,7 @@ import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Input;
@@ -69,6 +70,9 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @In
     private Config config;
+    
+    @In
+    private BindsManager bindsManager;
 
     @In
     private ModuleManager moduleManager;
@@ -149,7 +153,10 @@ public class InputSettingsScreen extends CoreScreenLayer {
         ScrollableArea area = find("area", ScrollableArea.class);
         area.setContent(mainLayout);
 
-        WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
+        WidgetUtil.trySubscribe(this, "reset", button -> {
+            config.getInput().reset(context);
+            bindsManager.getBindsConfig().setBinds(bindsManager.createDefault(context));
+        });
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }
 
@@ -238,7 +245,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
-        BindsConfig bindConfig = config.getInput().getBinds();
+        BindsConfig bindConfig = bindsManager.getBindsConfig();
         List<Input> binds = bindConfig.getBinds(uri);
         UIButton primaryInputBind = new UIButton();
         primaryInputBind.bindText(new BindingText(binds, 0));
@@ -260,7 +267,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        config.getInput().getBinds().applyBinds(inputSystem, moduleManager);
+        bindsManager.applyBinds(inputSystem, moduleManager);
     }
 
     @Override

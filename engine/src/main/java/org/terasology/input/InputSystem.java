@@ -20,20 +20,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.device.ControllerAction;
 import org.terasology.input.device.KeyboardAction;
-import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.KeyboardDevice;
+import org.terasology.input.device.MouseAction;
 import org.terasology.input.device.MouseDevice;
 import org.terasology.input.device.nulldevices.NullControllerDevice;
 import org.terasology.input.device.nulldevices.NullKeyboardDevice;
@@ -78,6 +78,9 @@ public class InputSystem extends BaseComponentSystem {
 
     @In
     private Config config;
+    
+    @In
+    private BindsManager bindsManager;
 
     @In
     private DisplayDevice display;
@@ -148,8 +151,7 @@ public class InputSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        BindsConfig bindsConfig = config.getInput().getBinds();
-        bindsConfig.applyBinds(this, moduleManager);
+        bindsManager.applyBinds(this, moduleManager);
     }
 
     public BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
