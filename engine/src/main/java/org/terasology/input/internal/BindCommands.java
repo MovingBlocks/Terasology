@@ -16,10 +16,10 @@
 package org.terasology.input.internal;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
@@ -32,13 +32,13 @@ import org.terasology.registry.In;
 public class BindCommands extends BaseComponentSystem {
 
     @In
-    private InputSystem inputSystem;
+    private BindsManager bindsManager;
 
     @Command(shortDescription = "Maps a key to a function", requiredPermission = PermissionManager.NO_PERMISSION)
     public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {
         Input keyInput = Keyboard.Key.find(key);
         if (keyInput != null) {
-            inputSystem.linkBindButtonToKey(keyInput.getId(), new SimpleUri(bind));
+            bindsManager.linkBindButtonToKey(keyInput.getId(), new SimpleUri(bind));
             StringBuilder builder = new StringBuilder();
             builder.append("Mapped ").append(keyInput.getDisplayName()).append(" to action ");
             builder.append(bind);
@@ -50,9 +50,9 @@ public class BindCommands extends BaseComponentSystem {
     @Command(shortDescription = "Switches to typical key binds for AZERTY",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String azerty() {
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.Z, new SimpleUri("engine:forwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.S, new SimpleUri("engine:backwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.Q, new SimpleUri("engine:left"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.Z, new SimpleUri("engine:forwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.S, new SimpleUri("engine:backwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.Q, new SimpleUri("engine:left"));
 
         return "Changed key bindings to AZERTY keyboard layout.";
     }
@@ -60,12 +60,12 @@ public class BindCommands extends BaseComponentSystem {
     @Command(shortDescription = "Switches to typical keybinds for DVORAK",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String dvorak() {
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:left"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:right"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:left"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:right"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
 
         return "Changed key bindings to DVORAK keyboard layout.";
     }
@@ -73,12 +73,12 @@ public class BindCommands extends BaseComponentSystem {
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout",
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String neo() {
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.U, new SimpleUri("engine:left"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.L, new SimpleUri("engine:useItem"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.G, new SimpleUri("engine:inventory"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.U, new SimpleUri("engine:left"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.L, new SimpleUri("engine:useItem"));
+        bindsManager.linkBindButtonToKey(Keyboard.KeyId.G, new SimpleUri("engine:inventory"));
 
         return "Changed key bindings to NEO 2 keyboard layout.";
     }

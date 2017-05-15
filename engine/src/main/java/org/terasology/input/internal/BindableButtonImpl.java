@@ -138,16 +138,8 @@ public class BindableButtonImpl implements BindableButton {
         subscribers.remove(subscriber);
     }
 
-    /**
-     * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
-     * state, so that the overall state of the bind can be tracked.
-     *
-     * @param pressed            Is the changing
-     * @param delta              The length of the current frame
-     * @param target             The current camera target
-     * @param initialKeyConsumed Has the changing button's event already been consumed
-     * @return Whether the button's event has been consumed
-     */
+    
+    @Override
     public boolean updateBindState(Input input,
                                    boolean pressed,
                                    float delta,
@@ -201,6 +193,7 @@ public class BindableButtonImpl implements BindableButton {
         return keyConsumed;
     }
 
+    @Override
     public void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
         long activateTime = this.time.getGameTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
