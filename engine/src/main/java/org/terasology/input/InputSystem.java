@@ -98,8 +98,6 @@ public class InputSystem extends BaseComponentSystem {
 
     private Queue<KeyboardAction> simulatedKeys = Queues.newArrayDeque();
 
-    private boolean capturingMouse = true;
-
     public void setMouseDevice(MouseDevice mouseDevice) {
         this.mouse = mouseDevice;
     }
@@ -151,16 +149,8 @@ public class InputSystem extends BaseComponentSystem {
         processBindAxis(delta);
     }
 
-    public boolean isCapturingMouse() {
-        return capturingMouse && display.hasFocus();
-    }
-
-    public void setCapturingMouse(boolean capturingMouse) {
-        this.capturingMouse = capturingMouse;
-    }
-
     private void processMouseInput(float delta) {
-        if (!isCapturingMouse()) {
+        if (!display.hasFocus()) {
             return;
         }
 
