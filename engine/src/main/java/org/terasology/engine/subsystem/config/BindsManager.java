@@ -23,7 +23,7 @@ public interface BindsManager {
     
     BindsConfig createDefault(Context context);
     
-    void updateForChangedMods(Context context);
+    void updateForChangedModules(Context context);
     
     void applyBinds(InputSystem inputSystem, ModuleManager moduleManager);
     

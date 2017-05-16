@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -98,7 +99,7 @@ public final class BindsConfig {
      * @param inputs
      */
 
-    public void setBinds(SimpleUri bindUri, Input... inputs) {
+    public void setBinds(SimpleUri bindUri, Input ... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
 
@@ -115,8 +116,6 @@ public final class BindsConfig {
         }
         data.replaceValues(bindUri, uniqueInputs);
     }
-
-    
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
 
@@ -154,8 +153,6 @@ public final class BindsConfig {
             return result;
         }
     }
-
-
 
     public Collection<Input> values() {
         return data.values();

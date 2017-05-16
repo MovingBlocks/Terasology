@@ -19,7 +19,6 @@ import org.terasology.input.ControllerInput;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
-import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
@@ -37,15 +36,14 @@ import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
-private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
-    private BindsConfig binds = new BindsConfig();
+    private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
+    private BindsConfig bindsConfig = new BindsConfig();
     private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
     private List<BindableButton> buttonBinds = Lists.newArrayList();
     private Context context;
@@ -59,6 +57,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
     private Map<Input, BindableRealAxis> controllerAxisBinds = Maps.newHashMap();
     private BindableButton mouseWheelUpBind;
     private BindableButton mouseWheelDownBind;
+
     @Override
     public BindableButton getMouseWheelUpBind() {
         return mouseWheelUpBind;
@@ -100,39 +99,24 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
     }
 
     @Override
-    public List<BindableButton> getButtonBinds(){
+    public List<BindableButton> getButtonBinds() {
         return buttonBinds;
     }
-    
+
     @Override
     public void preInitialise(Context context) {
         this.context = context;
         loadBindsConfig();
         context.put(BindsManager.class, this);
     }
-    
+
     /**
      * @return A new BindsConfig, with inputs set from the DefaultBinding annotations on bind classes
      */
     @Override
     public BindsConfig createDefault(Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
         BindsConfig config = new BindsConfig();
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        FromModule filter = new FromModule(environment, moduleId);
-                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
-                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        addButtonDefaultsFor(moduleId, buttons,config);
-                        addAxisDefaultsFor(moduleId, axes,config);
-                    }
-                }
-            }
-        }
+        updateDefaultBinds(context, config);
         return config;
     }
 
@@ -140,7 +124,11 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
      * Updates a config with any binds that it may be missing, through reflection over RegisterBindButton annotations
      */
     @Override
-    public void updateForChangedMods(Context context) {
+    public void updateForChangedModules(Context context) {
+        updateDefaultBinds(context, bindsConfig);
+    }
+
+    private void updateDefaultBinds(Context context, BindsConfig config) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
@@ -151,67 +139,60 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
                         FromModule filter = new FromModule(environment, moduleId);
                         Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
                         Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        updateButtonInputsFor(moduleId, buttons);
-                        updateAxisInputsFor(moduleId, axes);
+                        addButtonDefaultsFor(moduleId, buttons, config);
+                        addAxisDefaultsFor(moduleId, axes, config);
                     }
                 }
             }
         }
     }
 
-    private void updateButtonInputsFor(Name moduleId, Iterable<Class<?>> classes) {
+    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfig config) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
                 RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
                 SimpleUri bindUri = new SimpleUri(moduleId, info.id());
-                if (!binds.hasBinds(bindUri)) {
-                    addBind(moduleId, buttonEvent, info.id(),binds);
+                if (!config.hasBinds(bindUri)) {
+                    addDefaultBindings(bindUri, buttonEvent, config);
+                } else {
+                    logger.warn("Binding {} is already registered, can't add {}", bindUri, buttonEvent);
                 }
             }
         }
     }
 
-    private void updateAxisInputsFor(Name moduleId, Iterable<Class<?>> classes) {
+    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfig config) {
         for (Class<?> axisEvent : classes) {
             if (AxisEvent.class.isAssignableFrom(axisEvent)) {
                 RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
                 SimpleUri bindUri = new SimpleUri(moduleId, info.id());
-                if (!binds.hasBinds(bindUri)) {
-                    addBind(moduleId, axisEvent, info.id(),binds);
+                if (!config.hasBinds(bindUri)) {
+                    addDefaultBindings(bindUri, axisEvent, config);
+                } else {
+                    logger.warn("Binding {} is already registered, can't add {}", bindUri, axisEvent);
                 }
             }
         }
     }
 
-    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes,BindsConfig config) {
-        for (Class<?> buttonEvent : classes) {
-            if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
-                addBind(moduleId, buttonEvent, info.id(),config);
-            }
-        }
+    private void addDefaultBindings(SimpleUri bindUri, Class<?> event, BindsConfig config) {
+        List<Input> defaultInputs = fetchDefaultBindings(event, config);
+        config.setBinds(bindUri, defaultInputs);
     }
 
-    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes,BindsConfig config) {
-        for (Class<?> axisEvent : classes) {
-            if (AxisEvent.class.isAssignableFrom(axisEvent)) {
-                RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
-                addBind(moduleId, axisEvent, info.id(),config);
-            }
-        }
-    }
-
-    private void addBind(Name moduleName, Class<?> event, String id,BindsConfig config) {
+    private List<Input> fetchDefaultBindings(Class<?> event, BindsConfig config) {
         List<Input> defaultInputs = Lists.newArrayList();
+        Collection<Input> values = config.values();
         for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
             DefaultBinding defaultBinding = (DefaultBinding) annotation;
             Input input = defaultBinding.type().getInput(defaultBinding.id());
-            if (!config.values().contains(input)) {
+            if (!values.contains(input)) {
                 defaultInputs.add(input);
+            } else {
+                logger.warn("Input {} is already registered, can not use it for event {}", input, event);
             }
         }
-        SimpleUri bindUri = new SimpleUri(moduleName, id);
-        config.setBinds(bindUri, defaultInputs);
+        return defaultInputs;
     }
 
     @Override
@@ -252,7 +233,6 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
         }
     }
 
-    
     private void registerRealAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
         for (Class<?> registerBindClass : classes) {
             RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
@@ -263,7 +243,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
                     BindAxisEvent instance = (BindAxisEvent) registerBindClass.newInstance();
                     BindableAxis bindAxis = registerRealBindAxis(id.toString(), instance);
                     bindAxis.setSendEventMode(info.eventMode());
-                    for (Input input : binds.getBinds(id)) {
+                    for (Input input : bindsConfig.getBinds(id)) {
                         linkAxisToInput(input, id);
                     }
                     logger.debug("Registered axis bind: {}", id);
@@ -280,7 +260,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
         BindableRealAxis bindInfo = axisLookup.get(bindId.toString());
         controllerAxisBinds.put(input, bindInfo);
     }
-    
+
     @Override
     public void linkBindButtonToKey(int key, SimpleUri bindId) {
         BindableButton bindInfo = buttonLookup.get(bindId);
@@ -304,7 +284,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
         BindableButton bindInfo = buttonLookup.get(bindId);
         controllerBinds.put(button, bindInfo);
     }
-    
+
     private void linkBindButtonToInput(Input input, SimpleUri bindId) {
         switch (input.getType()) {
             case KEY:
@@ -324,12 +304,12 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
                 break;
         }
     }
-    
+
     private BindableButton getBindButton(SimpleUri bindId) {
         return buttonLookup.get(bindId);
     }
-    
-    public void clearBinds() {
+
+    private void clearBinds() {
         buttonLookup.clear();
         buttonBinds.clear();
         axisLookup.clear();
@@ -341,58 +321,20 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
         mouseWheelUpBind = null;
         mouseWheelDownBind = null;
     }
-    
-    /**
-     * Enumerates all active input bindings for a given binding.
-     * @param bindId the ID
-     * @return a list of keyboard/mouse inputs that trigger the binding.
-     */
-    public List<Input> getInputsForBindButton(SimpleUri bindId) {
-        List<Input> inputs = new ArrayList<>();
-        for (Entry<Integer, BindableButton> entry : keyBinds.entrySet()) {
-            if (entry.getValue().getId().equals(bindId)) {
-                inputs.add(InputType.KEY.getInput(entry.getKey()));
-            }
-        }
 
-        for (Entry<MouseInput, BindableButton> entry : mouseButtonBinds.entrySet()) {
-            if (entry.getValue().getId().equals(bindId)) {
-                inputs.add(entry.getKey());
-            }
-        }
-
-        if (mouseWheelUpBind.getId().equals(bindId)) {
-            inputs.add(MouseInput.WHEEL_UP);
-        }
-
-        if (mouseWheelDownBind.getId().equals(bindId)) {
-            inputs.add(MouseInput.WHEEL_DOWN);
-        }
-
-        return inputs;
-    }
-
-    public BindableAxis registerBindAxis(String id, BindableButton positiveButton, BindableButton negativeButton) {
-        return registerBindAxis(id, new BindAxisEvent(), positiveButton, negativeButton);
-    }
-
-    public BindableAxis registerBindAxis(String id, BindAxisEvent event, SimpleUri positiveButtonId, SimpleUri negativeButtonId) {
-        return registerBindAxis(id, event, getBindButton(positiveButtonId), getBindButton(negativeButtonId));
-    }
-
-    public BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
+    private BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
         BindableAxisImpl axis = new BindableAxisImpl(id, event, positiveButton, negativeButton);
         axisBinds.add(axis);
         return axis;
     }
 
-    public BindableAxis registerRealBindAxis(String id, BindAxisEvent event) {
+    private BindableAxis registerRealBindAxis(String id, BindAxisEvent event) {
         BindableRealAxis axis = new BindableRealAxis(id.toString(), event);
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;
     }
-    
+
     private void registerButtonBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
         for (Class<?> registerBindClass : classes) {
             RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
@@ -403,8 +345,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    binds.getBinds(bindUri).stream().filter(input -> input != null).forEach(input ->
-                            linkBindButtonToInput(input, bindUri));
+                    bindsConfig.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
 
                     logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -415,7 +356,7 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
             }
         }
     }
-    
+
     private BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
         BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event, context.get(Time.class));
         buttonLookup.put(bindId, bind);
@@ -425,11 +366,11 @@ private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.clas
 
     @Override
     public BindsConfig getBindsConfig() {
-        return binds;
+        return bindsConfig;
     }
 
     private void loadBindsConfig() {
-     // TODO separate save logic when moving to flexible config
+        // TODO separate save logic when moving to flexible config
         logger.warn("Binds loading is not implemented yet");
     }
 
