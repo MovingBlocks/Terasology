@@ -23,7 +23,7 @@ import org.terasology.logic.behavior.tree.SequenceNode;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.Task;
 
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +36,7 @@ public class SequenceTest {
         final Task[] spies = new Task[2];
         Interpreter interpreter = new Interpreter(null);
         Node one = create(spy -> {
-            when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.FAILURE);
+            when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.FAILURE);
             spies[0] = spy;
         });
         Node two = create(spy -> spies[1] = spy);
@@ -58,11 +58,11 @@ public class SequenceTest {
         final Task[] spies = new Task[2];
         Interpreter interpreter = new Interpreter(null);
         Node one = create(spy -> {
-            when(spy.update(anyInt())).thenReturn(Status.RUNNING, Status.SUCCESS);
+            when(spy.update(anyFloat())).thenReturn(Status.RUNNING, Status.SUCCESS);
             spies[0] = spy;
         });
         Node two = create(spy -> {
-            when(spy.update(anyInt())).thenReturn(Status.RUNNING);
+            when(spy.update(anyFloat())).thenReturn(Status.RUNNING);
             spies[1] = spy;
         });
         SequenceNode node = new SequenceNode();
@@ -84,7 +84,7 @@ public class SequenceTest {
     @Test
     public void testOneChildPassThrough() {
         final Task[] spies = new Task[1];
-        Status[] stats = new Status[]{Status.SUCCESS, Status.FAILURE};
+        Status[] stats = new Status[] {Status.SUCCESS, Status.FAILURE};
         for (final Status status : stats) {
             Interpreter interpreter = new Interpreter(null);
             Node mock = create(spy -> {
