@@ -34,14 +34,13 @@ import org.terasology.rendering.nui.widgets.UILabel;
 
 import java.util.List;
 
-
 public class ChangeBindingPopup extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:changeBindingPopup");
 
     @In
     private Config config;
-    
+
     @In
     private BindsManager bindsManager;
 
@@ -64,7 +63,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        defaultBinds = bindsManager.createDefault(context);
+        defaultBinds = bindsManager.getDefault();
 
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));

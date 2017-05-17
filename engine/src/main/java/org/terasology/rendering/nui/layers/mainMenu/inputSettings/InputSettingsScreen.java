@@ -70,7 +70,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @In
     private Config config;
-    
+
     @In
     private BindsManager bindsManager;
 
@@ -155,7 +155,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
             config.getInput().reset(context);
-            bindsManager.getBindsConfig().setBinds(bindsManager.createDefault(context));
+            bindsManager.getBindsConfig().setBinds(bindsManager.getDefault());
         });
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }
@@ -180,7 +180,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
                     }
                 }
             }
-
 
             List<ExtensionBind> extensionBindList = Lists.newArrayList();
             for (Map.Entry<SimpleUri, RegisterBindButton> bind : inputsById.entrySet()) {
@@ -332,6 +331,5 @@ public class InputSettingsScreen extends CoreScreenLayer {
             return Objects.hash(uri, bind.description());
         }
     }
-
 
 }

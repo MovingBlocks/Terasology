@@ -44,6 +44,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
     private BindsConfig bindsConfig = new BindsConfig();
+    private BindsConfig defaultBindsConfig = new BindsConfig();
     private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
     private List<BindableButton> buttonBinds = Lists.newArrayList();
     private Context context;
@@ -110,21 +111,20 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         context.put(BindsManager.class, this);
     }
 
-    /**
-     * @return A new BindsConfig, with inputs set from the DefaultBinding annotations on bind classes
-     */
     @Override
-    public BindsConfig createDefault(Context context) {
-        BindsConfig config = new BindsConfig();
-        updateDefaultBinds(context, config);
-        return config;
+    public BindsConfig getDefault() {
+        BindsConfig copy = new BindsConfig();
+        //SimpleUri and Input are immutable, no need for a deep copy
+        copy.setBinds(defaultBindsConfig);
+        return copy;
     }
 
-    /**
-     * Updates a config with any binds that it may be missing, through reflection over RegisterBindButton annotations
-     */
     @Override
-    public void updateForChangedModules(Context context) {
+    public void updateForAllModules(Context context) {
+        //default bindings are overridden
+        defaultBindsConfig = new BindsConfig();
+        updateDefaultBinds(context, defaultBindsConfig);
+        //actual bindings may be actualized
         updateDefaultBinds(context, bindsConfig);
     }
 
@@ -136,6 +136,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                        logger.info("Module: {}", moduleId);
                         FromModule filter = new FromModule(environment, moduleId);
                         Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
                         Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
