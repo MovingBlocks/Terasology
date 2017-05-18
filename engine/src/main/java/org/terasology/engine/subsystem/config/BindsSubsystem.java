@@ -18,7 +18,6 @@ import org.terasology.input.BindableButton;
 import org.terasology.input.ControllerInput;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
 import org.terasology.input.MouseInput;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
@@ -120,7 +119,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public void updateForAllModules(Context context) {
+    public void updateDefaultBinds() {
         //default bindings are overridden
         defaultBindsConfig = new BindsConfig();
         updateDefaultBinds(context, defaultBindsConfig);
@@ -197,15 +196,53 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public void applyBinds(InputSystem inputSystem, ModuleManager moduleManager) {
+    public void registerBinds() {
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        ModuleEnvironment environment = moduleManager.getEnvironment();
         clearBinds();
-        ModuleEnvironment env = moduleManager.getEnvironment();
-        registerButtonBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindButton.class));
-        registerAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindAxis.class));
-        registerRealAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterRealBindAxis.class));
+        registerButtonBinds(environment);
+        registerAxisBinds(environment);
+        registerRealAxisBinds(environment);
     }
 
-    private void registerAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
+    private void clearBinds() {
+        buttonLookup.clear();
+        buttonBinds.clear();
+        axisLookup.clear();
+        axisBinds.clear();
+        keyBinds.clear();
+        controllerBinds.clear();
+        controllerAxisBinds.clear();
+        mouseButtonBinds.clear();
+        mouseWheelUpBind = null;
+        mouseWheelDownBind = null;
+    }
+
+    private void registerButtonBinds(ModuleEnvironment environment) {
+        Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindButton.class);
+        for (Class<?> registerBindClass : classes) {
+            RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
+            SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
+            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
+                try {
+                    BindableButton bindButton = registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
+                    bindButton.setMode(info.mode());
+                    bindButton.setRepeating(info.repeating());
+
+                    bindsConfig.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
+
+                    logger.debug("Registered button bind: {}", bindUri);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.error("Failed to register button bind \"{}\"", e);
+                }
+            } else {
+                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
+            }
+        }
+    }
+
+    private void registerAxisBinds(ModuleEnvironment environment) {
+        Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterBindAxis info = registerBindClass.getAnnotation(RegisterBindAxis.class);
             Name moduleId = environment.getModuleProviding(registerBindClass);
@@ -234,7 +271,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
     }
 
-    private void registerRealAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
+    private void registerRealAxisBinds(ModuleEnvironment environment) {
+        Iterable<Class<?>> classes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class);
         for (Class<?> registerBindClass : classes) {
             RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
             Name moduleId = environment.getModuleProviding(registerBindClass);
@@ -310,19 +348,6 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         return buttonLookup.get(bindId);
     }
 
-    private void clearBinds() {
-        buttonLookup.clear();
-        buttonBinds.clear();
-        axisLookup.clear();
-        axisBinds.clear();
-        keyBinds.clear();
-        controllerBinds.clear();
-        controllerAxisBinds.clear();
-        mouseButtonBinds.clear();
-        mouseWheelUpBind = null;
-        mouseWheelDownBind = null;
-    }
-
     private BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
         BindableAxisImpl axis = new BindableAxisImpl(id, event, positiveButton, negativeButton);
         axisBinds.add(axis);
@@ -334,28 +359,6 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;
-    }
-
-    private void registerButtonBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class<?> registerBindClass : classes) {
-            RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
-            SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
-            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
-                try {
-                    BindableButton bindButton = registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
-                    bindButton.setMode(info.mode());
-                    bindButton.setRepeating(info.repeating());
-
-                    bindsConfig.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
-
-                    logger.debug("Registered button bind: {}", bindUri);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("Failed to register button bind \"{}\"", e);
-                }
-            } else {
-                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
-            }
-        }
     }
 
     private BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
@@ -370,7 +373,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         return bindsConfig;
     }
 
-    private void loadBindsConfig() {
+    @Override
+    public void loadBindsConfig() {
         // TODO separate save logic when moving to flexible config
         logger.warn("Binds loading is not implemented yet");
     }

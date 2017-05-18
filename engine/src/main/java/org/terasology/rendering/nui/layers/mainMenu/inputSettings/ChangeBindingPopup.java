@@ -24,7 +24,6 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -46,9 +45,6 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @In
     private ModuleManager moduleManager;
-
-    @In
-    private InputSystem inputSystem;
 
     @In
     private TranslationSystem translationSystem;
@@ -94,6 +90,6 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        bindsManager.applyBinds(inputSystem, moduleManager);
+        bindsManager.registerBinds();
     }
 }

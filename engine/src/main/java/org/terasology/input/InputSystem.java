@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.engine.Time;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -69,7 +68,7 @@ public class InputSystem extends BaseComponentSystem {
 
     @In
     private Config config;
-    
+
     @In
     private BindsManager bindsManager;
 
@@ -85,14 +84,9 @@ public class InputSystem extends BaseComponentSystem {
     @In
     private CameraTargetSystem targetSystem;
 
-    @In
-    private ModuleManager moduleManager;
-
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
     private ControllerDevice controllers = new NullControllerDevice();
-
-    
 
     private Logger logger = LoggerFactory.getLogger(InputSystem.class);
 
@@ -124,22 +118,8 @@ public class InputSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        bindsManager.applyBinds(this, moduleManager);
+        bindsManager.registerBinds();
     }
-
-
-
-    
-
-    
-
-    
-
-
-
-    
-
-    
 
     public void update(float delta) {
         processMouseInput(delta);
@@ -200,8 +180,7 @@ public class InputSystem extends BaseComponentSystem {
                                     targetSystem.getTargetBlockPosition(),
                                     targetSystem.getHitPosition(),
                                     targetSystem.getHitNormal(),
-                                    consumed
-                            );
+                                    consumed);
                         }
                     }
                     break;
@@ -222,8 +201,7 @@ public class InputSystem extends BaseComponentSystem {
                                         targetSystem.getTargetBlockPosition(),
                                         targetSystem.getHitPosition(),
                                         targetSystem.getHitNormal(),
-                                        consumed
-                                );
+                                        consumed);
                                 bind.updateBindState(
                                         action.getInput(),
                                         false,
@@ -233,8 +211,7 @@ public class InputSystem extends BaseComponentSystem {
                                         targetSystem.getTargetBlockPosition(),
                                         targetSystem.getHitPosition(),
                                         targetSystem.getHitNormal(),
-                                        consumed
-                                );
+                                        consumed);
                             }
                         }
                     }
@@ -272,8 +249,7 @@ public class InputSystem extends BaseComponentSystem {
                             targetSystem.getTargetBlockPosition(),
                             targetSystem.getHitPosition(),
                             targetSystem.getHitNormal(),
-                            consumed
-                    );
+                            consumed);
                 }
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
                 BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
@@ -288,7 +264,6 @@ public class InputSystem extends BaseComponentSystem {
             }
         }
     }
-
 
     /**
      * Simulated key strokes: To simulate input from a keyboard, we simply have to extract the Input associated to the action
@@ -335,8 +310,7 @@ public class InputSystem extends BaseComponentSystem {
                         targetSystem.getTargetBlockPosition(),
                         targetSystem.getHitPosition(),
                         targetSystem.getHitNormal(),
-                        consumed
-                );
+                        consumed);
             }
         }
     }
@@ -423,7 +397,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private EntityRef[] getInputEntities() {
-        return new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+        return new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
     /**
@@ -435,4 +409,3 @@ public class InputSystem extends BaseComponentSystem {
         controllers.getInputQueue();
     }
 }
-

@@ -81,7 +81,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     private void updateInputConfig() {
         BindsManager bindsManager = context.get(BindsManager.class);
-        bindsManager.updateForAllModules(context);
+        bindsManager.updateDefaultBinds();
         bindsManager.saveBindsConfig();
     }
 }
