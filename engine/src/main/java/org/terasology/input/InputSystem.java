@@ -219,7 +219,7 @@ public class InputSystem extends BaseComponentSystem {
         bind.updateBindState(
                 input,
                 pressed,
-                delta, getInputEntities(),
+                delta, inputEntities,
                 targetSystem.getTarget(),
                 targetSystem.getTargetBlockPosition(),
                 targetSystem.getHitPosition(),
@@ -272,14 +272,14 @@ public class InputSystem extends BaseComponentSystem {
 
     private void processBindAxis(float delta) {
         for (AbstractBindableAxis axis : bindsManager.getAxisBinds()) {
-            axis.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
+            axis.update(inputEntities, delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
                     targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
     private void processBindRepeats(float delta) {
         for (BindableButton button : bindsManager.getButtonBinds()) {
-            button.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
+            button.update(inputEntities, delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
                     targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
@@ -330,13 +330,9 @@ public class InputSystem extends BaseComponentSystem {
         return send(mouseWheelEvent);
     }
 
-    private EntityRef[] getInputEntities() {
-        return inputEntities;
-    }
-
     private boolean send(InputEvent event) {
         setupTarget(event);
-        for (EntityRef entity : getInputEntities()) {
+        for (EntityRef entity : inputEntities) {
             entity.send(event);
             if (event.isConsumed()) {
                 break;
