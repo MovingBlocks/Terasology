@@ -111,7 +111,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public BindsConfig getDefault() {
+    public BindsConfig getDefaultBindsConfig() {
         BindsConfig copy = new BindsConfig();
         //SimpleUri and Input are immutable, no need for a deep copy
         copy.setBinds(defaultBindsConfig);
@@ -119,7 +119,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     @Override
-    public void updateDefaultBinds() {
+    public void updateConfigWithDefaultBinds() {
         //default bindings are overridden
         defaultBindsConfig = new BindsConfig();
         updateDefaultBinds(context, defaultBindsConfig);

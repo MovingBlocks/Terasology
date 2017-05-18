@@ -155,7 +155,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
             config.getInput().reset(context);
-            bindsManager.getBindsConfig().setBinds(bindsManager.getDefault());
+            bindsManager.getBindsConfig().setBinds(bindsManager.getDefaultBindsConfig());
         });
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }

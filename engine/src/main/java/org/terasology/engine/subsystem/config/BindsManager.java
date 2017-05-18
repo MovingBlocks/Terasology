@@ -42,20 +42,20 @@ public interface BindsManager {
     /**
      * The default bindings. This reflects the current status from {@link #updateDefaultBinds(Context)}.
      * @return Returns the default bindings. Changes to this config modify the actual instance 
-     * but become invalid the next time {@link #updateDefaultBinds()} is called.
+     * but become invalid the next time {@link #updateConfigWithDefaultBinds()} is called.
      */
-    BindsConfig getDefault();
+    BindsConfig getDefaultBindsConfig();
 
     /**
      * Updates the bindings with their defaults from the current {@link ModuleEnvironment}.
-     * After this call {@link #getDefault()} contains all values for events with 
+     * After this call {@link #getDefaultBindsConfig()} contains all values for events with 
      * {@link RegisterBindButton}, {@link RegisterBindAxis} and {@link RegisterRealBindAxis} which contain one ore more {@link DefaultBinding}.
      * 
      * {@link #getBindsConfig()} will only be enhanced with missing values.
      * 
      * @param context
      */
-    void updateDefaultBinds();
+    void updateConfigWithDefaultBinds();
 
     /**
      * Registers all binds from the current {@link ModuleEnvironment}.

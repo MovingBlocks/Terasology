@@ -59,7 +59,7 @@ public class ChangeBindingPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        defaultBinds = bindsManager.getDefault();
+        defaultBinds = bindsManager.getDefaultBindsConfig();
 
         bindButton = find("new-binding", UIInputBind.class);
         WidgetUtil.trySubscribe(this, "remove", button -> bindButton.setNewInput(null));
