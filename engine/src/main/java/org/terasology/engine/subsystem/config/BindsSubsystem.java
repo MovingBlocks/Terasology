@@ -3,13 +3,19 @@ package org.terasology.engine.subsystem.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
@@ -34,10 +40,16 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
@@ -135,7 +147,6 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                 ResolutionResult result = resolver.resolve(moduleId);
                 if (result.isSuccess()) {
                     try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        logger.info("Module: {}", moduleId);
                         FromModule filter = new FromModule(environment, moduleId);
                         Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
                         Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
@@ -154,8 +165,6 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                 SimpleUri bindUri = new SimpleUri(moduleId, info.id());
                 if (!config.hasBinds(bindUri)) {
                     addDefaultBindings(bindUri, buttonEvent, config);
-                } else {
-                    logger.warn("Binding {} is already registered, can't add {}", bindUri, buttonEvent);
                 }
             }
         }
@@ -168,8 +177,6 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                 SimpleUri bindUri = new SimpleUri(moduleId, info.id());
                 if (!config.hasBinds(bindUri)) {
                     addDefaultBindings(bindUri, axisEvent, config);
-                } else {
-                    logger.warn("Binding {} is already registered, can't add {}", bindUri, axisEvent);
                 }
             }
         }
@@ -375,13 +382,43 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     @Override
     public void loadBindsConfig() {
-        // TODO separate save logic when moving to flexible config
-        logger.warn("Binds loading is not implemented yet");
+        Optional<JsonObject> configJson = loadFileToJson(getConfigPath());
+        if (configJson.isPresent()) {
+            bindsConfig = Config.createGson().fromJson(configJson.get(), BindsConfig.class);
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        saveBindsConfig();
     }
 
     @Override
     public void saveBindsConfig() {
-        // TODO separate save logic when moving to flexible config
-        logger.warn("Binds saving is not implemented yet");
+        //TODO replace with flexible config
+        Path bindsConfiPath = getConfigPath();
+        try (BufferedWriter writer = Files.newBufferedWriter(bindsConfiPath, TerasologyConstants.CHARSET)) {
+            Config.createGson().toJson(bindsConfig, writer);
+        } catch (IOException e) {
+            logger.error("Failed to save config", e);
+        }
+    }
+
+    private Path getConfigPath() {
+        return PathManager.getInstance().getHomePath().resolve("bindsConfig.cfg");
+    }
+
+    private Optional<JsonObject> loadFileToJson(Path configPath) {
+        if (Files.isRegularFile(configPath)) {
+            try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
+                JsonElement userConfig = new JsonParser().parse(reader);
+                if (userConfig.isJsonObject()) {
+                    return Optional.of(userConfig.getAsJsonObject());
+                }
+            } catch (IOException e) {
+                logger.error("Failed to load config file {}");
+            }
+        }
+        return Optional.empty();
     }
 }

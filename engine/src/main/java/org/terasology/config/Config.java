@@ -196,7 +196,7 @@ public final class Config {
         return PathManager.getInstance().getHomePath().resolve("config.cfg");
     }
 
-    protected static Gson createGson() {
+    public static Gson createGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(Name.class, new NameTypeAdapter())
                 .registerTypeAdapter(Version.class, new VersionTypeAdapter())
