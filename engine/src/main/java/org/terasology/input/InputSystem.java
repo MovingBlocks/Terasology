@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
-import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -76,9 +75,6 @@ public class InputSystem extends BaseComponentSystem {
     private DisplayDevice display;
 
     @In
-    private Time time;
-
-    @In
     private LocalPlayer localPlayer;
 
     @In
@@ -91,6 +87,8 @@ public class InputSystem extends BaseComponentSystem {
     private Logger logger = LoggerFactory.getLogger(InputSystem.class);
 
     private Queue<KeyboardAction> simulatedKeys = Queues.newArrayDeque();
+
+    private EntityRef[] inputEntities;
 
     public void setMouseDevice(MouseDevice mouseDevice) {
         this.mouse = mouseDevice;
@@ -122,6 +120,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     public void update(float delta) {
+        updateInputEntities();
         processMouseInput(delta);
         processKeyboardInput(delta);
         processControllerInput(delta);
@@ -165,22 +164,13 @@ public class InputSystem extends BaseComponentSystem {
             switch (action.getInput().getType()) {
                 case MOUSE_BUTTON:
                     int id = action.getInput().getId();
-                    if (id != -1) {
+                    if (id != MouseInput.NONE.getId()) {
                         MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
                         boolean consumed = sendMouseEvent(button, action.getState().isDown(), action.getMousePosition(), delta);
 
                         BindableButton bind = bindsManager.getMouseButtonBinds().get(button);
                         if (bind != null) {
-                            bind.updateBindState(
-                                    action.getInput(),
-                                    action.getState().isDown(),
-                                    delta,
-                                    getInputEntities(),
-                                    targetSystem.getTarget(),
-                                    targetSystem.getTargetBlockPosition(),
-                                    targetSystem.getHitPosition(),
-                                    targetSystem.getHitNormal(),
-                                    consumed);
+                            updateBindState(bind, action.getInput(), action.getState().isDown(), delta, consumed);
                         }
                     }
                     break;
@@ -192,26 +182,8 @@ public class InputSystem extends BaseComponentSystem {
                         BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() : bindsManager.getMouseWheelDownBind();
                         if (bind != null) {
                             for (int i = 0; i < action.getTurns(); ++i) {
-                                bind.updateBindState(
-                                        action.getInput(),
-                                        true,
-                                        delta,
-                                        getInputEntities(),
-                                        targetSystem.getTarget(),
-                                        targetSystem.getTargetBlockPosition(),
-                                        targetSystem.getHitPosition(),
-                                        targetSystem.getHitNormal(),
-                                        consumed);
-                                bind.updateBindState(
-                                        action.getInput(),
-                                        false,
-                                        delta,
-                                        getInputEntities(),
-                                        targetSystem.getTarget(),
-                                        targetSystem.getTargetBlockPosition(),
-                                        targetSystem.getHitPosition(),
-                                        targetSystem.getHitNormal(),
-                                        consumed);
+                                updateBindState(bind, action.getInput(), true, delta, consumed);
+                                updateBindState(bind, action.getInput(), false, delta, consumed);
                             }
                         }
                     }
@@ -241,15 +213,8 @@ public class InputSystem extends BaseComponentSystem {
             if (input.getType() == InputType.CONTROLLER_BUTTON) {
                 BindableButton bind = bindsManager.getControllerBinds().get(input);
                 if (bind != null) {
-                    bind.updateBindState(
-                            input,
-                            (action.getState() == ButtonState.DOWN),
-                            delta, getInputEntities(),
-                            targetSystem.getTarget(),
-                            targetSystem.getTargetBlockPosition(),
-                            targetSystem.getHitPosition(),
-                            targetSystem.getHitNormal(),
-                            consumed);
+                    boolean pressed = action.getState() == ButtonState.DOWN;
+                    updateBindState(bind, input, pressed, delta, consumed);
                 }
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
                 BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
@@ -263,6 +228,18 @@ public class InputSystem extends BaseComponentSystem {
                 }
             }
         }
+    }
+
+    private void updateBindState(BindableButton bind, Input input, boolean pressed, float delta, boolean consumed) {
+        bind.updateBindState(
+                input,
+                pressed,
+                delta, getInputEntities(),
+                targetSystem.getTarget(),
+                targetSystem.getTargetBlockPosition(),
+                targetSystem.getHitPosition(),
+                targetSystem.getHitNormal(),
+                consumed);
     }
 
     /**
@@ -302,15 +279,8 @@ public class InputSystem extends BaseComponentSystem {
             // Update bind
             BindableButton bind = bindsManager.getKeyBinds().get(action.getInput().getId());
             if (bind != null && action.getState() != ButtonState.REPEAT) {
-                bind.updateBindState(
-                        action.getInput(),
-                        (action.getState() == ButtonState.DOWN),
-                        delta, getInputEntities(),
-                        targetSystem.getTarget(),
-                        targetSystem.getTargetBlockPosition(),
-                        targetSystem.getHitPosition(),
-                        targetSystem.getHitNormal(),
-                        consumed);
+                boolean pressed = action.getState() == ButtonState.DOWN;
+                updateBindState(bind, action.getInput(), pressed, delta, consumed);
             }
         }
     }
@@ -344,15 +314,8 @@ public class InputSystem extends BaseComponentSystem {
             default:
                 return false;
         }
-        setupTarget(event);
-        for (EntityRef entity : getInputEntities()) {
-            entity.send(event);
-            if (event.isConsumed()) {
-                break;
-            }
-        }
 
-        boolean consumed = event.isConsumed();
+        boolean consumed = send(event);
         event.reset();
         return consumed;
     }
@@ -372,6 +335,17 @@ public class InputSystem extends BaseComponentSystem {
                 event = (buttonDown) ? MouseDownButtonEvent.create(button, position, delta) : MouseUpButtonEvent.create(button, position, delta);
                 break;
         }
+        boolean consumed = send(event);
+        event.reset();
+        return consumed;
+    }
+
+    private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
+        return send(mouseWheelEvent);
+    }
+
+    private boolean send(InputEvent event) {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
             entity.send(event);
@@ -379,25 +353,15 @@ public class InputSystem extends BaseComponentSystem {
                 break;
             }
         }
-        boolean consumed = event.isConsumed();
-        event.reset();
-        return consumed;
-    }
-
-    private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
-        setupTarget(mouseWheelEvent);
-        for (EntityRef entity : getInputEntities()) {
-            entity.send(mouseWheelEvent);
-            if (mouseWheelEvent.isConsumed()) {
-                break;
-            }
-        }
-        return mouseWheelEvent.isConsumed();
+        return event.isConsumed();
     }
 
     private EntityRef[] getInputEntities() {
-        return new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+        return inputEntities;
+    }
+
+    private void updateInputEntities() {
+        inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
     /**
