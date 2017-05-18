@@ -41,12 +41,11 @@ import org.terasology.input.events.KeyUpEvent;
 import org.terasology.input.events.LeftMouseDownButtonEvent;
 import org.terasology.input.events.LeftMouseUpButtonEvent;
 import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseAxisEvent.MouseAxis;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseDownButtonEvent;
 import org.terasology.input.events.MouseUpButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.input.internal.AbstractBindableAxis;
@@ -128,6 +127,10 @@ public class InputSystem extends BaseComponentSystem {
         processBindAxis(delta);
     }
 
+    private void updateInputEntities() {
+        inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+    }
+
     private void processMouseInput(float delta) {
         if (!display.hasFocus()) {
             return;
@@ -136,27 +139,15 @@ public class InputSystem extends BaseComponentSystem {
         Vector2i deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
-            MouseAxisEvent event = new MouseXAxisEvent(deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
-            setupTarget(event);
-            for (EntityRef entity : getInputEntities()) {
-                entity.send(event);
-                if (event.isConsumed()) {
-                    break;
-                }
-            }
+            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.X, deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
+            send(event);
         }
 
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
             int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
-            MouseAxisEvent event = new MouseYAxisEvent(yMovement * config.getInput().getMouseSensitivity(), delta);
-            setupTarget(event);
-            for (EntityRef entity : getInputEntities()) {
-                entity.send(event);
-                if (event.isConsumed()) {
-                    break;
-                }
-            }
+            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.Y, yMovement * config.getInput().getMouseSensitivity(), delta);
+            send(event);
         }
 
         //process mouse clicks
@@ -191,12 +182,6 @@ public class InputSystem extends BaseComponentSystem {
                 default:
                     break;
             }
-        }
-    }
-
-    private void setupTarget(InputEvent event) {
-        if (targetSystem.isTargetAvailable()) {
-            event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
     }
 
@@ -345,6 +330,10 @@ public class InputSystem extends BaseComponentSystem {
         return send(mouseWheelEvent);
     }
 
+    private EntityRef[] getInputEntities() {
+        return inputEntities;
+    }
+
     private boolean send(InputEvent event) {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
@@ -356,12 +345,10 @@ public class InputSystem extends BaseComponentSystem {
         return event.isConsumed();
     }
 
-    private EntityRef[] getInputEntities() {
-        return inputEntities;
-    }
-
-    private void updateInputEntities() {
-        inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+    private void setupTarget(InputEvent event) {
+        if (targetSystem.isTargetAvailable()) {
+            event.setTargetInfo(targetSystem.getTarget(), targetSystem.getTargetBlockPosition(), targetSystem.getHitPosition(), targetSystem.getHitNormal());
+        }
     }
 
     /**

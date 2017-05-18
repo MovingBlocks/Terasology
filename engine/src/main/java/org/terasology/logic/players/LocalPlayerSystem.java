@@ -45,8 +45,8 @@ import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseAxisEvent.MouseAxis;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -112,7 +112,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @In
     private BindsManager bindsManager;
-    
+
     private float bobFactor;
     private float lastStepDelta;
 
@@ -137,7 +137,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private int inputSequenceNumber = 1;
 
     private AABB aabb;
-
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -297,14 +296,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
-    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        lookYawDelta = event.getValue();
-        event.consume();
-    }
-
-    @ReceiveEvent(components = CharacterComponent.class)
-    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        lookPitchDelta = event.getValue();
+    public void onMouseX(MouseAxisEvent event, EntityRef entity) {
+        MouseAxis axis = event.getMouseAxis();
+        if (axis == MouseAxis.X) {
+            lookYawDelta = event.getValue();
+        } else if (axis == MouseAxis.Y) {
+            lookPitchDelta = event.getValue();
+        }
         event.consume();
     }
 
