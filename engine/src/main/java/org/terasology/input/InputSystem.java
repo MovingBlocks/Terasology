@@ -139,14 +139,16 @@ public class InputSystem extends BaseComponentSystem {
         Vector2i deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
-            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.X, deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
+            float xValue = deltaMouse.x * config.getInput().getMouseSensitivity();
+            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.X, xValue, delta);
             send(event);
         }
 
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
             int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
-            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.Y, yMovement * config.getInput().getMouseSensitivity(), delta);
+            float yValue = yMovement * config.getInput().getMouseSensitivity();
+            MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.Y, yValue, delta);
             send(event);
         }
 
@@ -154,33 +156,39 @@ public class InputSystem extends BaseComponentSystem {
         for (MouseAction action : mouse.getInputQueue()) {
             switch (action.getInput().getType()) {
                 case MOUSE_BUTTON:
-                    int id = action.getInput().getId();
-                    if (id != MouseInput.NONE.getId()) {
-                        MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
-                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), action.getMousePosition(), delta);
-
-                        BindableButton bind = bindsManager.getMouseButtonBinds().get(button);
-                        if (bind != null) {
-                            updateBindState(bind, action.getInput(), action.getState().isDown(), delta, consumed);
-                        }
-                    }
+                    processMouseButtonInput(delta, action);
                     break;
                 case MOUSE_WHEEL:
-                    int dir = action.getInput().getId();
-                    if (dir != 0 && action.getTurns() != 0) {
-                        boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
-
-                        BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() : bindsManager.getMouseWheelDownBind();
-                        if (bind != null) {
-                            for (int i = 0; i < action.getTurns(); ++i) {
-                                updateBindState(bind, action.getInput(), true, delta, consumed);
-                                updateBindState(bind, action.getInput(), false, delta, consumed);
-                            }
-                        }
-                    }
+                    processMouseWheelInput(delta, action);
                     break;
                 default:
                     break;
+            }
+        }
+    }
+
+    private void processMouseButtonInput(float delta, MouseAction action) {
+        int id = action.getInput().getId();
+        if (id != MouseInput.NONE.getId()) {
+            MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
+            boolean consumed = sendMouseEvent(button, action.getState().isDown(), action.getMousePosition(), delta);
+            BindableButton bind = bindsManager.getMouseButtonBinds().get(button);
+            if (bind != null) {
+                updateBindState(bind, action.getInput(), action.getState().isDown(), delta, consumed);
+            }
+        }
+    }
+
+    private void processMouseWheelInput(float delta, MouseAction action) {
+        int dir = action.getInput().getId();
+        if (dir != 0 && action.getTurns() != 0) {
+            boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
+            BindableButton bind = (dir == 1) ? bindsManager.getMouseWheelUpBind() : bindsManager.getMouseWheelDownBind();
+            if (bind != null) {
+                for (int i = 0; i < action.getTurns(); ++i) {
+                    updateBindState(bind, action.getInput(), true, delta, consumed);
+                    updateBindState(bind, action.getInput(), false, delta, consumed);
+                }
             }
         }
     }
@@ -193,25 +201,32 @@ public class InputSystem extends BaseComponentSystem {
             // TODO: send event to entity system
             boolean consumed = false;
 
-            // Update button bind
             Input input = action.getInput();
             if (input.getType() == InputType.CONTROLLER_BUTTON) {
-                BindableButton bind = bindsManager.getControllerBinds().get(input);
-                if (bind != null) {
-                    boolean pressed = action.getState() == ButtonState.DOWN;
-                    updateBindState(bind, input, pressed, delta, consumed);
-                }
+                processControllerButtonInput(delta, action, consumed, input);
             } else if (input.getType() == InputType.CONTROLLER_AXIS) {
-                BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
-                if (axis != null) {
-                    ControllerInfo info = config.getInput().getControllers().getController(action.getController());
-                    boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
-                    boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
-                    boolean isZ = action.getInput().getId() == ControllerId.Z_AXIS;
-                    float f = (isX && info.isInvertX() || isY && info.isInvertY() || isZ && info.isInvertZ()) ? -1 : 1;
-                    axis.setTargetValue(action.getAxisValue() * f);
-                }
+                processControllerAxisInput(action, input);
             }
+        }
+    }
+
+    private void processControllerButtonInput(float delta, ControllerAction action, boolean consumed, Input input) {
+        BindableButton bind = bindsManager.getControllerBinds().get(input);
+        if (bind != null) {
+            boolean pressed = action.getState() == ButtonState.DOWN;
+            updateBindState(bind, input, pressed, delta, consumed);
+        }
+    }
+
+    private void processControllerAxisInput(ControllerAction action, Input input) {
+        BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
+        if (axis != null) {
+            ControllerInfo info = config.getInput().getControllers().getController(action.getController());
+            boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
+            boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
+            boolean isZ = action.getInput().getId() == ControllerId.Z_AXIS;
+            float f = (isX && info.isInvertX() || isY && info.isInvertY() || isZ && info.isInvertZ()) ? -1 : 1;
+            axis.setTargetValue(action.getAxisValue() * f);
         }
     }
 
