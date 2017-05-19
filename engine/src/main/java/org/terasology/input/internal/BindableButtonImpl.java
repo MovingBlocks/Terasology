@@ -18,7 +18,6 @@ package org.terasology.input.internal;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.ActivateMode;
 import org.terasology.input.BindButtonEvent;
@@ -53,19 +52,17 @@ public class BindableButtonImpl implements BindableButton {
     private long lastActivateTime;
 
     private boolean consumedActivation;
-    private Time time;
 
     /**
-     * Creates the button. Package-private, as should be created through the InputSystem
-     *
-     * @param id
-     * @param event
+     * 
+     * @param id The id of the binding
+     * @param displayName Readable name of the binding
+     * @param event The event to send when the binding is updated
      */
-    public BindableButtonImpl(SimpleUri id, String displayName, BindButtonEvent event, Time time) {
+    public BindableButtonImpl(SimpleUri id, String displayName, BindButtonEvent event) {
         this.id = id;
         this.displayName = displayName;
         this.buttonEvent = event;
-        this.time = time;
     }
 
     @Override
@@ -138,7 +135,6 @@ public class BindableButtonImpl implements BindableButton {
         subscribers.remove(subscriber);
     }
 
-    
     @Override
     public boolean updateBindState(Input input,
                                    boolean pressed,
@@ -148,13 +144,14 @@ public class BindableButtonImpl implements BindableButton {
                                    Vector3i targetBlockPos,
                                    Vector3f hitPosition,
                                    Vector3f hitNormal,
-                                   boolean initialKeyConsumed) {
+                                   boolean initialKeyConsumed,
+                                   long gameTimeInMs) {
         boolean keyConsumed = initialKeyConsumed;
         if (pressed) {
             boolean previouslyEmpty = activeInputs.isEmpty();
             activeInputs.add(input);
             if (previouslyEmpty && mode.isActivatedOnPress()) {
-                lastActivateTime = time.getGameTimeInMs();
+                lastActivateTime = gameTimeInMs;
                 consumedActivation = keyConsumed;
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
@@ -194,8 +191,14 @@ public class BindableButtonImpl implements BindableButton {
     }
 
     @Override
-    public void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
-        long activateTime = this.time.getGameTimeInMs();
+    public void update(EntityRef[] inputEntities,
+                       float delta,
+                       EntityRef target,
+                       Vector3i targetBlockPos,
+                       Vector3f hitPosition,
+                       Vector3f hitNormal,
+                       long gameTimeInMs) {
+        long activateTime = gameTimeInMs;
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
             lastActivateTime = activateTime;
             if (!consumedActivation) {

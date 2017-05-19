@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
+import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -69,6 +70,9 @@ public class InputSystem extends BaseComponentSystem {
 
     @In
     private BindsManager bindsManager;
+
+    @In
+    private Time time;
 
     @In
     private DisplayDevice display;
@@ -239,7 +243,8 @@ public class InputSystem extends BaseComponentSystem {
                 targetSystem.getTargetBlockPosition(),
                 targetSystem.getHitPosition(),
                 targetSystem.getHitNormal(),
-                consumed);
+                consumed,
+                time.getGameTimeInMs());
     }
 
     /**
@@ -294,8 +299,13 @@ public class InputSystem extends BaseComponentSystem {
 
     private void processBindRepeats(float delta) {
         for (BindableButton button : bindsManager.getButtonBinds()) {
-            button.update(inputEntities, delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
-                    targetSystem.getHitPosition(), targetSystem.getHitNormal());
+            button.update(inputEntities,
+                    delta,
+                    targetSystem.getTarget(),
+                    targetSystem.getTargetBlockPosition(),
+                    targetSystem.getHitPosition(),
+                    targetSystem.getHitNormal(),
+                    time.getGameTimeInMs());
         }
     }
 

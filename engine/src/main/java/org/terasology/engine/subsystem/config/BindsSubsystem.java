@@ -13,7 +13,6 @@ import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -369,7 +368,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     }
 
     private BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
-        BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event, context.get(Time.class));
+        BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event);
         buttonLookup.put(bindId, bind);
         buttonBinds.add(bind);
         return bind;
