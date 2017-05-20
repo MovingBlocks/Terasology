@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
+import org.terasology.logic.characters.events.OnEnterBiomeEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
@@ -35,6 +36,7 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
 import java.math.RoundingMode;
@@ -53,7 +55,6 @@ import java.math.RoundingMode;
  * <br><br>
  * TODO: Refactor to allow additional movement modes.
  * TODO: Detect entry and exit from water while ghosting.
- *
  */
 public class KinematicCharacterMover implements CharacterMover {
 
@@ -88,10 +89,46 @@ public class KinematicCharacterMover implements CharacterMover {
     private float steppedUpDist;
     private WorldProvider worldProvider;
     private PhysicsEngine physics;
+    private Biome oldBiome = null;
 
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
         physics = physicsEngine;
+    }
+
+    /**
+     * Updates a character's movement mode and changes his vertical velocity accordingly.
+     *
+     * @param state       The current state of the character.
+     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
+     * @param newDiving   True if the character's body is fully inside liquid blocks.
+     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
+     */
+    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
+        if (newDiving) {
+            if (state.getMode() != MovementMode.DIVING) {
+                state.setMode(MovementMode.DIVING);
+            }
+        } else if (newSwimming) {
+            if (state.getMode() != MovementMode.SWIMMING) {
+                state.setMode(MovementMode.SWIMMING);
+            }
+            state.getVelocity().y += 0.02;
+        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
+            if (newClimbing) {
+                state.setMode(MovementMode.CLIMBING);
+                state.getVelocity().y = 0;
+            } else {
+                if (state.getVelocity().y > 0) {
+                    state.getVelocity().y += 4;
+                }
+                state.setMode(MovementMode.WALKING);
+            }
+        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
+            //We need to toggle the climbing mode
+            state.getVelocity().y = 0;
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        }
     }
 
     @Override
@@ -134,6 +171,11 @@ public class KinematicCharacterMover implements CharacterMover {
         // TODO: This will only work for tall mobs/players and single block mobs
         // is this a different position than previously
         if (!oldPosition.equals(newPosition)) {
+            Biome newBiome = worldProvider.getBiome(newPosition);
+            if (newBiome != oldBiome) {
+                entity.send(new OnEnterBiomeEvent(oldPosition, newPosition, oldBiome, newBiome));
+                oldBiome = newBiome;
+            }
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
             Vector3i currentPosition = new Vector3i(oldPosition);
@@ -196,40 +238,6 @@ public class KinematicCharacterMover implements CharacterMover {
         }
 
         updateMode(state, newSwimming, newDiving, newClimbing);
-    }
-
-    /**
-     * Updates a character's movement mode and changes his vertical velocity accordingly.
-     * @param state The current state of the character.
-     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
-     * @param newDiving True if the character's body is fully inside liquid blocks.
-     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
-     */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
-        if (newDiving) {
-            if (state.getMode() != MovementMode.DIVING) {
-                state.setMode(MovementMode.DIVING);
-            }
-        } else if (newSwimming) {
-            if (state.getMode() != MovementMode.SWIMMING) {
-                state.setMode(MovementMode.SWIMMING);
-            }
-            state.getVelocity().y += 0.02;
-        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
-            if (newClimbing) {
-                state.setMode(MovementMode.CLIMBING);
-                state.getVelocity().y = 0;
-            } else {
-                if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 4;
-                }
-                state.setMode(MovementMode.WALKING);
-            }
-        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
-            //We need to toggle the climbing mode
-            state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
-        }
     }
 
     private Vector3i findClimbable(CharacterMovementComponent movementComp, Vector3f worldPos, boolean swimming, boolean diving) {
@@ -705,11 +713,11 @@ public class KinematicCharacterMover implements CharacterMover {
             state.setGrounded(false);
         }
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-              Vector3f hitVelocity = new Vector3f(state.getVelocity());
-              hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
-              hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
-              logger.debug("Hit at " + hitVelocity);
-              entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
+            Vector3f hitVelocity = new Vector3f(state.getVelocity());
+            hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
+            hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
+            logger.debug("Hit at " + hitVelocity);
+            entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
         }
         state.getVelocity().set(endVelocity);
         if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
