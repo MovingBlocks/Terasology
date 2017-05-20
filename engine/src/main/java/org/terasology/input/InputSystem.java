@@ -18,8 +18,8 @@ package org.terasology.input;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
+import org.terasology.config.InputDeviceConfig;
 import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
@@ -66,7 +66,7 @@ import java.util.Queue;
 public class InputSystem extends BaseComponentSystem {
 
     @In
-    private Config config;
+    private InputDeviceConfig inputDeviceConfig;
 
     @In
     private BindsManager bindsManager;
@@ -143,15 +143,15 @@ public class InputSystem extends BaseComponentSystem {
         Vector2i deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
-            float xValue = deltaMouse.x * config.getInput().getMouseSensitivity();
+            float xValue = deltaMouse.x * inputDeviceConfig.getMouseSensitivity();
             MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.X, xValue, delta);
             send(event);
         }
 
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
-            int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
-            float yValue = yMovement * config.getInput().getMouseSensitivity();
+            int yMovement = inputDeviceConfig.isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
+            float yValue = yMovement * inputDeviceConfig.getMouseSensitivity();
             MouseAxisEvent event = MouseAxisEvent.create(MouseAxis.Y, yValue, delta);
             send(event);
         }
@@ -225,7 +225,7 @@ public class InputSystem extends BaseComponentSystem {
     private void processControllerAxisInput(ControllerAction action, Input input) {
         BindableRealAxis axis = bindsManager.getControllerAxisBinds().get(input);
         if (axis != null) {
-            ControllerInfo info = config.getInput().getControllers().getController(action.getController());
+            ControllerInfo info = inputDeviceConfig.getController(action.getController());
             boolean isX = action.getInput().getId() == ControllerId.X_AXIS;
             boolean isY = action.getInput().getId() == ControllerId.Y_AXIS;
             boolean isZ = action.getInput().getId() == ControllerId.Z_AXIS;

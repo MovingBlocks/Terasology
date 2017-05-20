@@ -29,8 +29,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.naming.Name;
@@ -42,7 +40,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -50,7 +47,6 @@ import java.util.Set;
  *
  */
 public final class BindsConfig {
-    private static final Logger logger = LoggerFactory.getLogger(BindsConfig.class);
 
     private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
 
