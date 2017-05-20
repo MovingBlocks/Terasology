@@ -20,6 +20,7 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 
 /**
+ * This event is sent to the player whenever the player enters a new Biome.
  */
 public class OnEnterBiomeEvent implements Event {
     private Vector3i oldPosition;
