@@ -89,7 +89,6 @@ public class KinematicCharacterMover implements CharacterMover {
     private float steppedUpDist;
     private WorldProvider worldProvider;
     private PhysicsEngine physics;
-    private Biome oldBiome = null;
 
     public KinematicCharacterMover(WorldProvider wp, PhysicsEngine physicsEngine) {
         this.worldProvider = wp;
@@ -171,10 +170,11 @@ public class KinematicCharacterMover implements CharacterMover {
         // TODO: This will only work for tall mobs/players and single block mobs
         // is this a different position than previously
         if (!oldPosition.equals(newPosition)) {
+            Biome oldBiome = worldProvider.getBiome(oldPosition);
             Biome newBiome = worldProvider.getBiome(newPosition);
-            if (newBiome != oldBiome) {
+            if (oldBiome != newBiome) {
+                logger.info("newBiome: " + newBiome);
                 entity.send(new OnEnterBiomeEvent(oldPosition, newPosition, oldBiome, newBiome));
-                oldBiome = newBiome;
             }
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
