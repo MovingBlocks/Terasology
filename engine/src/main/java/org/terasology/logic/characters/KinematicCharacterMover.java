@@ -173,7 +173,6 @@ public class KinematicCharacterMover implements CharacterMover {
             Biome oldBiome = worldProvider.getBiome(oldPosition);
             Biome newBiome = worldProvider.getBiome(newPosition);
             if (oldBiome != newBiome) {
-                logger.info("newBiome: " + newBiome);
                 entity.send(new OnEnterBiomeEvent(oldPosition, newPosition, oldBiome, newBiome));
             }
             // get the old position's blocks
