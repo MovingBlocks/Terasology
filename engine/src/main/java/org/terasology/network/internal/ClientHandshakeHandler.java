@@ -24,7 +24,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ClientIdentity;
+import org.terasology.identity.ClientIdentity;
 import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.identity.IdentityConstants;

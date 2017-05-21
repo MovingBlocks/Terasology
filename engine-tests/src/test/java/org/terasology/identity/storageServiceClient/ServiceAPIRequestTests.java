@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RequestTests {
+public class ServiceAPIRequestTests {
 
     static class DummySerializableObject {
         private String fieldA;
@@ -47,7 +47,7 @@ public class RequestTests {
     }
 
     @Test
-    public void testRequest() throws IOException {
+    public void testRequest() throws IOException, StorageServiceException {
         Gson gson = new Gson();
         HttpURLConnection mockedConn = mock(HttpURLConnection.class);
         ByteArrayOutputStream receivedRequest = new ByteArrayOutputStream();
@@ -55,9 +55,10 @@ public class RequestTests {
 
         when(mockedConn.getOutputStream()).thenReturn(receivedRequest);
         when(mockedConn.getInputStream()).thenReturn(response);
+        when(mockedConn.getResponseCode()).thenReturn(200);
 
         DummySerializableObject reqData = new DummySerializableObject("request", 0);
-        DummySerializableObject resData = Request.request(mockedConn, HttpMethod.GET, reqData, DummySerializableObject.class);
+        DummySerializableObject resData = ServiceAPIRequest.request(mockedConn, HttpMethod.GET, reqData, DummySerializableObject.class);
         assertEquals(gson.toJson(reqData), receivedRequest.toString());
         assertEquals(new DummySerializableObject("response", 1), resData);
     }

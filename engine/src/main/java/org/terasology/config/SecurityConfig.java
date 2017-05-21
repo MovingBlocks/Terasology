@@ -24,11 +24,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 
 import java.lang.reflect.Type;
 import java.security.SecurityPermission;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -63,6 +65,10 @@ public class SecurityConfig {
 
     public ClientIdentity getIdentity(PublicIdentityCertificate serverCertificate) {
         return clientCertificates.get(serverCertificate);
+    }
+
+    public Map<PublicIdentityCertificate, ClientIdentity> getAllIdentities() {
+        return Collections.unmodifiableMap(clientCertificates);
     }
 
     public void addIdentity(PublicIdentityCertificate serverCertificate, ClientIdentity identity) {

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.identity;
 
-import org.terasology.identity.PrivateIdentityCertificate;
-import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.config.SecurityConfig;
 
 public class ClientIdentity {
 

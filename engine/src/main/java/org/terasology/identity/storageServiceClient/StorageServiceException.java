@@ -15,11 +15,13 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-/**
- * Http methods; only the relevant ones for now but can easily be extended with the other standard ones.
- */
-enum HttpMethod {
-    GET,
-    POST,
-    DELETE
+class StorageServiceException extends Exception {
+
+    StorageServiceException(String message) {
+        super("The server answered with this error message: " + message);
+    }
+
+    StorageServiceException() {
+        super("The server answer could not be parsed");
+    }
 }
