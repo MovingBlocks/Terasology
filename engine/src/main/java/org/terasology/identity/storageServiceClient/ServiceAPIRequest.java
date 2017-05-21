@@ -53,13 +53,19 @@ final class ServiceAPIRequest {
 
     public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection conn, HttpMethod method, REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
+        conn.setRequestMethod(method.name());
         conn.setUseCaches(false);
         conn.setDoOutput(true);
-        conn.setRequestMethod(method.name());
         conn.setRequestProperty("Content-Type", "application/json");
         if (data != null) {
-            try (OutputStream request = conn.getOutputStream()) {
-                request.write(gson.toJson(data).getBytes());
+            if (method == HttpMethod.GET) {
+                //TODO: this is a hack to get around HttpURLConnection not allowing payload on GET requests
+                //TODO: probably it's better to always use the header for sending the token
+                conn.setRequestProperty("Session-Token", data.toString());
+            } else {
+                try (OutputStream request = conn.getOutputStream()) {
+                    request.write(gson.toJson(data).getBytes());
+                }
             }
         }
         conn.connect();
@@ -67,7 +73,11 @@ final class ServiceAPIRequest {
             parseError(conn);
         }
         try (InputStream response = conn.getInputStream()) {
-            return gson.fromJson(new InputStreamReader(response), responseClass);
+            if (responseClass != null) {
+                return gson.fromJson(new InputStreamReader(response), responseClass);
+            } else {
+                return null;
+            }
         }
     }
 

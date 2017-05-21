@@ -65,7 +65,9 @@ public final class StorageServiceWorker {
                 try {
                     sessionInstance = new APISession(config.getServiceUrl(), config.getSessionToken());
                     loginName = sessionInstance.getLoginName();
+                    syncIdentities();
                 } catch (Exception e) {
+                    sessionInstance = null;
                     logger.warn("Authentication from stored token and URL failed", e);
                 }
             }).start();
@@ -85,7 +87,9 @@ public final class StorageServiceWorker {
                 loginName = sessionInstance.getLoginName();
                 config.setServiceURL(serviceURL);
                 config.setSessionToken(sessionInstance.getSessionToken());
+                syncIdentities();
             } catch (Exception e) {
+                sessionInstance = null;
                 logger.warn("Login failed", e);
             }
         }).start();
@@ -130,7 +134,9 @@ public final class StorageServiceWorker {
                 MapDifference<PublicIdentityCertificate, ClientIdentity> diff = Maps.difference(local, remote);
                 //upload the "only local" ones
                 for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnLeft().entrySet()) {
-                    sessionInstance.putIdentity(entry.getKey(), entry.getValue());
+                    if (entry.getValue().getPlayerPrivateCertificate() != null) { //TODO: find out why sometimes it's null
+                        sessionInstance.putIdentity(entry.getKey(), entry.getValue());
+                    }
                 }
                 //download the "only remote" ones
                 for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnRight().entrySet()) {

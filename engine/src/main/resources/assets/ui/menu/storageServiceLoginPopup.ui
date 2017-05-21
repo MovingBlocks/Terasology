@@ -1,0 +1,111 @@
+{
+  "type": "storageServiceLoginPopup",
+  "skin": "popup",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UIBox",
+        "layoutInfo": {
+          "width": 500,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-vertical-center": {}
+        },
+        "content": {
+          "type": "ColumnLayout",
+          "columns": 1,
+          "verticalSpacing": 8,
+          "contents": [
+            {
+              "type": "UILabel",
+              "text": "${engine:menu#storage-service-popup-title}",
+              "family": "title"
+            },
+            {
+              "type": "UISpace",
+              "size": [1, 16]
+            },
+            {
+              "type": "RowLayout",
+              "contents": [
+                {
+                  "type": "UILabel",
+                  "text": "${engine:menu#storage-service-popup-url}: ",
+                  "family": "option-grid",
+                  "layoutInfo": {
+                    "relativeWidth": 0.3
+                  }
+                },
+                {
+                  "type": "UIText",
+                  "id": "url"
+                }
+              ]
+            },
+            {
+              "type": "RowLayout",
+              "contents": [
+                {
+                  "type": "UILabel",
+                  "text": "${engine:menu#storage-service-popup-login}: ",
+                  "family": "option-grid",
+                  "layoutInfo": {
+                    "relativeWidth": 0.3
+                  }
+                },
+                {
+                  "type": "UIText",
+                  "id": "login"
+                }
+              ]
+            },
+            {
+              "type": "RowLayout",
+              "contents": [
+                {
+                  "type": "UILabel",
+                  "text": "${engine:menu#storage-service-popup-password}: ",
+                  "family": "option-grid",
+                  "layoutInfo": {
+                    "relativeWidth": 0.3
+                  }
+                },
+                {
+                  "type": "UIText",
+                  "id": "password"
+                }
+              ]
+            },
+            {
+              "type": "UILabel",
+              "visible": false,
+              "id": "existing-identities-warning",
+              "text": "${engine:menu#storage-service-popup-warning}"
+            },
+            {
+              "type": "UISpace",
+              "size": [1, 16]
+            },
+            {
+              "type": "RowLayout",
+              "horizontalSpacing": 16,
+              "contents": [
+                {
+                  "type": "UIButton",
+                  "text": "${engine:menu#dialog-ok}",
+                  "id": "ok"
+                },
+                {
+                  "type": "UIButton",
+                  "text": "${engine:menu#dialog-cancel}",
+                  "id": "cancel"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

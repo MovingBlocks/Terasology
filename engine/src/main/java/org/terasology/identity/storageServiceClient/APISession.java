@@ -33,14 +33,14 @@ final class APISession {
     private static final String ENDPOINT_CLIENT_IDENTITY = BASE_PATH + "client_identity";
 
     private final URL serviceURL;
-    private final GenericAuthenticatedRequestData session;
+    private final String sessionToken;
 
-    public APISession(URL serviceURL, String sessionToken) {
+    APISession(URL serviceURL, String sessionToken) {
         this.serviceURL = serviceURL;
-        this.session = new GenericAuthenticatedRequestData(sessionToken);
+        this.sessionToken = sessionToken;
     }
 
-    public static APISession createFromLogin(URL hostURL, String login, String password) throws IOException, StorageServiceException {
+    static APISession createFromLogin(URL hostURL, String login, String password) throws IOException, StorageServiceException {
         SessionPOSTRequestData req = new SessionPOSTRequestData(login, password);
         SessionPOSTResponseData res = ServiceAPIRequest.request(new URL(hostURL, ENDPOINT_SESSION), HttpMethod.POST, req, SessionPOSTResponseData.class);
         return new APISession(hostURL, res.token);
@@ -52,25 +52,26 @@ final class APISession {
         return ServiceAPIRequest.request(url, method, data, responseClass);
     }
 
-    public void logout() throws IOException, StorageServiceException {
-        requestEndpoint(ENDPOINT_SESSION, session.sessionToken, HttpMethod.DELETE, null, null);
+    void logout() throws IOException, StorageServiceException {
+        requestEndpoint(ENDPOINT_SESSION, sessionToken, HttpMethod.DELETE, null, null);
     }
 
-    public String getLoginName() throws IOException, StorageServiceException {
-        return requestEndpoint(ENDPOINT_SESSION, session.sessionToken, HttpMethod.GET, null, SessionGETResponseData.class).login;
+    String getLoginName() throws IOException, StorageServiceException {
+        return requestEndpoint(ENDPOINT_SESSION, sessionToken, HttpMethod.GET, null, SessionGETResponseData.class).login;
     }
 
-    public String getSessionToken() {
-        return session.sessionToken;
+    String getSessionToken() {
+        return sessionToken;
     }
 
-    public Map<PublicIdentityCertificate, ClientIdentity> getAllIdentities() throws IOException, StorageServiceException {
-        AllIdentitiesGETResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET, session, AllIdentitiesGETResponseData.class);
+    Map<PublicIdentityCertificate, ClientIdentity> getAllIdentities() throws IOException, StorageServiceException {
+        GenericAuthenticatedRequestData req = new GenericAuthenticatedRequestData(sessionToken);
+        AllIdentitiesGETResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET, req, AllIdentitiesGETResponseData.class);
         return IdentityBundle.listToMap(res.clientIdentities);
     }
 
-    public void putIdentity(PublicIdentityCertificate serverCert, ClientIdentity clientIdentity) throws IOException, StorageServiceException {
-        PutIdentityPOSTRequestData req = new PutIdentityPOSTRequestData(session, serverCert, clientIdentity);
+    void putIdentity(PublicIdentityCertificate serverCert, ClientIdentity clientIdentity) throws IOException, StorageServiceException {
+        PutIdentityPOSTRequestData req = new PutIdentityPOSTRequestData(sessionToken, serverCert, clientIdentity);
         requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.POST, req, null);
     }
 
@@ -92,10 +93,15 @@ final class APISession {
         private String login;
     }
 
-    private static class GenericAuthenticatedRequestData {
+    private static final class GenericAuthenticatedRequestData {
         private String sessionToken;
         private GenericAuthenticatedRequestData(String sessionToken) {
             this.sessionToken = sessionToken;
+        }
+        //TODO: remove
+        @Override
+        public String toString() {
+            return sessionToken;
         }
     }
 
@@ -103,11 +109,12 @@ final class APISession {
         private List<IdentityBundle> clientIdentities;
     }
 
-    private static final class PutIdentityPOSTRequestData extends GenericAuthenticatedRequestData {
+    private static final class PutIdentityPOSTRequestData {
+        private String sessionToken;
         private IdentityBundle clientIdentity;
-        private PutIdentityPOSTRequestData(GenericAuthenticatedRequestData authData, PublicIdentityCertificate server, ClientIdentity client) {
-            super(authData.sessionToken);
-            clientIdentity = new IdentityBundle(server, client);
+        private PutIdentityPOSTRequestData(String sessionToken, PublicIdentityCertificate server, ClientIdentity client) {
+            this.sessionToken = sessionToken;
+            this.clientIdentity = new IdentityBundle(server, client);
         }
     }
 }
