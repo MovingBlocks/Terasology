@@ -19,6 +19,8 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.audio.StaticSound;
@@ -72,6 +74,8 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     private org.terasology.engine.Time time;
 
     private Random random = new FastRandom();
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
 
     @Override
     public void update(float delta) {
@@ -169,6 +173,7 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         if ((health != null) && !ghost) {
             int damagedAmount = health.currentHealth - Math.max(health.currentHealth - damageAmount, 0);
             health.currentHealth -= damagedAmount;
+            logger.info(String.valueOf(damageAmount) + " damage of type " + damageType);
             health.nextRegenTick = time.getGameTimeInMs() + TeraMath.floorToInt(health.waitBeforeRegen * 1000);
             entity.saveComponent(health);
             entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));

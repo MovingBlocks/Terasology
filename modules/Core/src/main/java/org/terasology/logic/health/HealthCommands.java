@@ -18,6 +18,7 @@ package org.terasology.logic.health;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -25,6 +26,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.utilities.Assets;
 
@@ -33,6 +35,10 @@ import java.util.Optional;
 @RegisterSystem
 @Share(HealthCommands.class)
 public class HealthCommands extends BaseComponentSystem {
+
+    @In
+    private PrefabManager prefabManager;
+
     @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true,
             requiredPermission = PermissionManager.NO_PERMISSION)
     public void killCommand(@Sender EntityRef client) {
@@ -50,6 +56,19 @@ public class HealthCommands extends BaseComponentSystem {
         clientComp.character.send(new DoDamageEvent(amount, EngineDamageTypes.DIRECT.get(), clientComp.character));
 
         return "Inflicted damage of " + amount;
+    }
+
+    @Command(shortDescription = "Reduce the player's health by an amount by a specific type of damage", runOnServer = true,
+            requiredPermission = PermissionManager.CHAT_PERMISSION)
+    public String damagewithType(@Sender EntityRef client, @CommandParam("damageType") String damageType, @CommandParam("amount") int amount) {
+        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+        Prefab damageTypePrefab = prefabManager.getPrefab(damageType);
+        if (damageTypePrefab != null) {
+            clientComp.character.send(new DoDamageEvent(amount, damageTypePrefab, clientComp.character));
+            return "Inflicted " + amount + " damage of type " + damageType;
+        } else {
+            return "Specified damage type does not exist.";
+        }
     }
 
     @Command(shortDescription = "Restores your health to max", runOnServer = true,
