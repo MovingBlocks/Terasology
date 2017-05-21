@@ -59,8 +59,8 @@ public class HealthCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Reduce the player's health by an amount by a specific type of damage", runOnServer = true,
-            requiredPermission = PermissionManager.CHAT_PERMISSION)
-    public String damagewithType(@Sender EntityRef client, @CommandParam("damageType") String damageType, @CommandParam("amount") int amount) {
+            requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String damageWithType(@Sender EntityRef client, @CommandParam("damageType") String damageType, @CommandParam("amount") int amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         Prefab damageTypePrefab = prefabManager.getPrefab(damageType);
         if (damageTypePrefab != null) {
