@@ -26,7 +26,7 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -89,7 +89,7 @@ public class ShadowMapNode extends ConditionDependentNode {
 
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
     }

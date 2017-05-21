@@ -16,47 +16,27 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
-import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
- * Instances of this class enable OpenGL's blending, i.e. to render transparent objects or to make
- * a composite of different images.
+ * Enables OpenGL blending.
+ * Blending can be used to render transparent objects on top of those already rendered in a buffer or to make a composite of different images.
  *
- * See also StateChange implementation SetBlendFunction to set the source and destination factors
- * used by the blending process.
+ * See also StateChange implementation SetBlendFunction to set the source and destination factors used by the blending process.
+ *
+ * By default both OpenGL and Terasology keep blending disabled as it is a relatively expensive operation.
  */
-public final class EnableBlending extends SetStateParameter {
-    private static final int PARAMETER = GL_BLEND;
-    private static final String PARAMETER_NAME = "GL_BLEND";
-    private static StateChange defaultInstance = new EnableBlending(false);
-    private static RenderPipelineTask enablingTask;
-    private static RenderPipelineTask disablingTask;
+public final class EnableBlending extends EnableStateParameter {
+    private static StateChange defaultInstance = new DisableBlending();
 
     /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
+     * The constructor, to be used in the initialise method of a node.
      *
-     * addDesiredStateChange(new EnableBlending());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_BLEND mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables blending.
-     *
-     * See also StateChange implementation SetBlendFunction to set the source and destination factors
-     * used by the blending process.
+     * Sample use:
+     *      addDesiredStateChange(new EnableBlending());
      */
     public EnableBlending() {
-        this(true);
-    }
-
-    private EnableBlending(boolean enabled) {
-        super(GL_BLEND, enabled);
-        disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
-        enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
+        super(GL_BLEND);
     }
 
     @Override
@@ -64,13 +44,14 @@ public final class EnableBlending extends SetStateParameter {
         return defaultInstance;
     }
 
-    @Override
-    protected RenderPipelineTask getDisablingTask() {
-        return disablingTask;
-    }
+    private static final class DisableBlending extends DisableStateParameter {
+        DisableBlending() {
+            super(GL_BLEND);
+        }
 
-    @Override
-    protected RenderPipelineTask getEnablingTask() {
-        return enablingTask;
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
     }
 }

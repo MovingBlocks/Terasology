@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
@@ -30,14 +29,23 @@ import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
  * TODO: Add javadocs
  */
 public final class SetFacesToCull implements StateChange {
-
-    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK); // also specified in OpenGL documentation
     private static Map<Integer, String> modeNameMap = ImmutableMap.of(GL_BACK, "GL_BACK",
             GL_FRONT, "GL_FRONT",
             GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK");
-    private SetFacesToCullTask task;
+
+    private static SetFacesToCull defaultInstance = new SetFacesToCull(GL_BACK);
+
     private int mode;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+     *
+     * @param mode An integer representing one of the possible modes known to OpenGL,
+     *                      i.e. GL_BACK, GL_FRONT or GL_FRONT_AND_BACK.
+     */
     public SetFacesToCull(int mode) {
         if (mode == GL_BACK || mode == GL_FRONT || mode == GL_FRONT_AND_BACK) {
             this.mode = mode;
@@ -46,22 +54,9 @@ public final class SetFacesToCull implements StateChange {
         }
     }
 
-    public int getMode() {
-        return mode;
-    }
-
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetFacesToCullTask(mode);
-        }
-
-        return task;
     }
 
     @Override
@@ -71,34 +66,16 @@ public final class SetFacesToCull implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetFacesToCull) && mode == ((SetFacesToCull) obj).getMode();
-    }
-
-    public static String getModeName(int mode) {
-        return modeNameMap.get(mode);
+        return (obj instanceof SetFacesToCull) && mode == ((SetFacesToCull) obj).mode;
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), getModeName(mode));
+        return String.format("%30s: %s", this.getClass().getSimpleName(), modeNameMap.get(mode));
     }
 
-
-    private final class SetFacesToCullTask implements RenderPipelineTask {
-        private int mode;
-
-        private SetFacesToCullTask(int mode) {
-            this.mode = mode;
-        }
-
-        @Override
-        public void execute() {
-            GL11.glCullFace(mode);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), SetFacesToCull.getModeName(mode));
-        }
+    @Override
+    public void process() {
+        GL11.glCullFace(mode);
     }
 }

@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.AbstractNode;
 
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.ScreenGrabber;
@@ -72,7 +72,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFBO(FINAL_BUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(FINAL_BUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
     }
 

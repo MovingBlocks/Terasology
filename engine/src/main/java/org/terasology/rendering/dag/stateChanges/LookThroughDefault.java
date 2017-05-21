@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag.tasks;
+package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.dag.StateChange;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -23,26 +23,32 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
- * Instances of this class reset the ModelView and Projection matrices to identity matrices,
- * as per opengl default.
+ * This StateChange resets the ModelView and Projection matrices to identity matrices, OpenGL's default.
  *
- * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
- * Modules or other parts of the engine should take advantage of them through classes
- * inheriting from StateChange.
+ * This StateChange is used to reset the effects of LookThrough or LookThroughNormalized.
  */
-public class LookThroughDefaultCameraTask implements RenderPipelineTask {
+class LookThroughDefault implements StateChange {
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof LookThroughDefault);
+    }
 
     @Override
-    public void execute() {
+    public StateChange getDefaultInstance() {
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%30s", this.getClass().getSimpleName());
+    }
+
+    @Override
+    public void process() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), "default opengl camera");
     }
 }

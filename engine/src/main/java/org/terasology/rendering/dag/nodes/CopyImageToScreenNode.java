@@ -21,7 +21,6 @@ import org.terasology.context.Context;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.monitoring.PerformanceMonitor;
 
-import org.terasology.rendering.dag.stateChanges.BindFBO;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
@@ -35,7 +34,6 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_E
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    private static final ResourceUrn DEFAULT_FBO = new ResourceUrn("engine:display");
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -51,7 +49,6 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFBO(DEFAULT_FBO, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise sceneFinalFbo
         displayResolutionDependentFBOs.subscribe(this);
 

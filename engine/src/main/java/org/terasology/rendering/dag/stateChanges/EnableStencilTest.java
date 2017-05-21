@@ -16,41 +16,24 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import static org.lwjgl.opengl.GL11.GL_STENCIL_TEST;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.dag.tasks.DisableStateParameterTask;
-import org.terasology.rendering.dag.tasks.EnableStateParameterTask;
 
 /**
- * Instances of this class enable OpenGL's stencil testing, potentially used in a variety
- * of advanced computer graphics tricks such as stenciled shadows.
+ * Enables OpenGL's stencil testing.
+ *
+ * This can potentially be used in a variety of advanced computer graphics tricks such as stenciled shadows.
  */
-public final class EnableStencilTest extends SetStateParameter {
-    private static final int PARAMETER = GL_STENCIL_TEST;
-    private static final String PARAMETER_NAME = "GL_STENCIL_TEST";
-    private static StateChange defaultInstance = new EnableStencilTest(false);
-    private static RenderPipelineTask enablingTask;
-    private static RenderPipelineTask disablingTask;
+public final class EnableStencilTest extends EnableStateParameter {
+    private static StateChange defaultInstance = new DisableStencilTest();
 
     /**
-     * Constructs an instance of this StateChange. This is can be used in a node's initialise() method in
-     * the form:
+     * The constructor, to be used in the initialise method of a node.
      *
-     * addDesiredStateChange(new EnableStencilTest());
-     *
-     * This trigger the inclusion of an EnableStateParameterTask instance and a DisableStateParameterTask instance
-     * in the rendering task list, each instance enabling/disabling respectively the GL_CULL_FACE mode. The
-     * two task instance frame the execution of a node's process() method unless they are deemed redundant,
-     * i.e. because the upstream or downstream node also enables face culling.
+     * Sample use:
+     *      addDesiredStateChange(new EnableStencilTest());
      */
     public EnableStencilTest() {
-        this(true);
-    }
-
-    private EnableStencilTest(boolean enabled) {
-        super(GL_STENCIL_TEST, enabled);
-        disablingTask = new DisableStateParameterTask(PARAMETER, PARAMETER_NAME);
-        enablingTask = new EnableStateParameterTask(PARAMETER, PARAMETER_NAME);
+        super(GL_STENCIL_TEST);
     }
 
     @Override
@@ -58,13 +41,14 @@ public final class EnableStencilTest extends SetStateParameter {
         return defaultInstance;
     }
 
-    @Override
-    protected RenderPipelineTask getDisablingTask() {
-        return disablingTask;
-    }
+    private static final class DisableStencilTest extends DisableStateParameter {
+        DisableStencilTest() {
+            super(GL_STENCIL_TEST);
+        }
 
-    @Override
-    protected RenderPipelineTask getEnablingTask() {
-        return enablingTask;
+        @Override
+        public StateChange getDefaultInstance() {
+            return this;
+        }
     }
 }

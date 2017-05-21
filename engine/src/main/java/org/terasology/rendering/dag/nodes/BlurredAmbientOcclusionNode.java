@@ -22,9 +22,9 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -33,7 +33,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 
 /**
  * Instances of this node work in tandem with instances of the AmbientOcclusionNode class.
@@ -78,12 +78,12 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise ssaoBlurredFbo, outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new SetInputTextureFromFBO(TEXTURE_SLOT_0,
+        addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
                 SSAO_FBO, ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
     }
 

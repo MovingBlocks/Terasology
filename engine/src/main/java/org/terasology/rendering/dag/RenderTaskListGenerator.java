@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Instances of this class are responsible for generating the the list of tasks
@@ -66,12 +69,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s: process()", node.toString()));
-
-                // printing out individual state resets
-                for (StateChange desiredStateReset : node.getDesiredStateResets()) {
-                    logger.info(desiredStateReset.toString());
-                }
+                logger.info(String.format("%s", node.toString()));
             }
         }
     }
@@ -95,77 +93,86 @@ public final class RenderTaskListGenerator {
 
         nodeList = orderedNodes;
         taskList.clear();
-        Node nextEnabledNode;
+
+        Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();
+        Set<Class<?>> requestedStateChanges = Sets.newHashSet();
+
+        List<StateChange> stateChangesToAdd = Lists.newArrayList();
+
+        // The following variables have been declared here to make the code clearer.
+        // P.S. manu3d made me do it!
         StateChange persistentStateChange;
-        Map<Class<?>, StateChange> persistentStateChanges = Maps.newHashMap();  // assuming we can't make it a private field for the time being
+        Iterator<Map.Entry<Class<?>, StateChange>> iterator;
+        Map.Entry<Class<?>, StateChange> entry;
+        Class<?> key;
+        StateChange stateChange;
 
         int enabledNodes = 0;
         int potentialTasks = 0;
-        int currentIndex = 0;
 
         for (Node node : orderedNodes) {
             if (node.isEnabled()) {
-
                 if (logger.isInfoEnabled()) {
                     // Marker tasks just add a dividing line to the logger output
                     taskList.add(new MarkerTask(node.getClass().getSimpleName()));
                     enabledNodes++; // we count them only for statistical purposes
-                    potentialTasks += node.getDesiredStateChanges().size() + 1 + node.getDesiredStateResets().size();
+                    potentialTasks += 2 * node.getDesiredStateChanges().size() + 1;
                 }
 
-                // generating tasks for the desired state changes
                 for (StateChange currentStateChange : node.getDesiredStateChanges()) {
-
-                    // State changes persist beyond the node that request them if following nodes
-                    // require the exact same change.
+                    // A persistentStateChange is one that persists across the processing of two or more consecutive nodes.
+                    // For instance, if consecutive nodes A and B request the exact same StateChange, the StateChange will
+                    // take place during the processing of node A and will be reset to the default only after the processing of node B.
                     persistentStateChange = persistentStateChanges.get(currentStateChange.getClass());
 
-                    // for a state change to be necessary there can't be an identical one already persisting
-                    if (persistentStateChange == null || !currentStateChange.equals(persistentStateChange)) {
-                        // no persistent state change of this subType found: the state change is necessary (not redundant)
-                        taskList.add(currentStateChange.generateTask());
+                    // currentStateChange is different from persistentStateChange in two circumstances:
+                    // 1. The previous node did not request a StateChange of the class of currentStateChange
+                    // 2. The previous node requested a StateChange of the same class as currentStateChange, but with a different value
+                    // Either way, currentStateChange is added to the list of things to do during rendering and is persisted to the next node.
+                    if (!currentStateChange.equals(persistentStateChange)) {
+                        stateChangesToAdd.add(currentStateChange);
                         persistentStateChanges.put(currentStateChange.getClass(), currentStateChange);
+                    }
+                    // Else: The exact same StateChange is already persisting, so don't add it again.
 
-                    } // else: the state change is redundant - we don't generate a task for it
+                    // A requestedStateChange is one that was requested by the current Node. This property, along with
+                    // persistentStateChange, determines when the reset StateChange corresponding to a StateChange is added.
+                    requestedStateChanges.add(currentStateChange.getClass());
                 }
 
-                // task executing the node.process() method
-                taskList.add(node.generateTask());
+                // Reset all the persistentStateChanges that are not requestedStateChanges.
+                iterator = persistentStateChanges.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entry = iterator.next();
+                    key = entry.getKey();
+                    stateChange = entry.getValue();
 
-                // generating tasks for the desired state resets
-                nextEnabledNode = findNextEnabledNode(orderedNodes, currentIndex + 1);
-                if (nextEnabledNode != null) {
-
-                    // if there is one enabled node after this one we must check its desired state changes,
-                    // to make sure we don't reset to default something it would set again.
-                    // For example: no point binding the display (the default FBO) if the next enabled node
-                    // will bind another FBO.
-                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
-                        if (sameClassStateChangeNotFoundInThe(nextEnabledNode, currentStateReset)) {
-                            persistentStateChange = persistentStateChanges.get(currentStateReset.getClass());
-
-                            // A reset state change is necessary only if an identical state change isn't already persisting.
-                            if (persistentStateChange == null || !currentStateReset.equals(persistentStateChange)) {
-                                taskList.add(currentStateReset.generateTask());
-
-                                // This makes sure that the reset state change persists so that future state changes
-                                // which are identical to the reset state change are not added.
-                                persistentStateChanges.put(currentStateReset.getClass(), currentStateReset);
-                            }
-                        }
+                    if (!requestedStateChanges.contains(key)) {
+                        // This StateChange was not requested by the current Node, so we reset it.
+                        requestedStateChanges.remove(key);
+                        taskList.add(stateChange.getDefaultInstance());
+                        iterator.remove();
                     }
+                    // Else: The StateChange was requested by the current Node, so do nothing.
 
-                } else {
-                    // there are no enabled nodes after this one: we must generate all the tasks necessary
-                    // to reset the effects of any persisting state change.
-                    for (StateChange currentStateReset : node.getDesiredStateResets()) {
-                        taskList.add(currentStateReset.generateTask());
-                        persistentStateChanges.remove(currentStateReset.getClass());
-                    }
+                    requestedStateChanges.remove(key);
                 }
+
+                // Finally add all the desirable state changes for this iteration into the task list.
+                // The delay ensures that the state resets take place before new state sets, which can
+                // be necessary when dealing with State Changes like LookThrough and LookThoughNormalized
+                // that are essentially the same, but not according to the TaskListGenerator.
+                taskList.addAll(stateChangesToAdd);
+                stateChangesToAdd.clear();
+
+                // Now that all the StateChanges requested by the Node have been added, we can finally schedule the node itself for processing.
+                taskList.add(node);
             }
+        }
 
-            currentIndex++;
+        // Since we've reached the end of the rendering pipeline, reset all the persisting State Changes.
+        for (Map.Entry<Class<?>, StateChange> stateChangeEntry : persistentStateChanges.entrySet()) {
+            taskList.add(stateChangeEntry.getValue().getDefaultInstance());
         }
 
         long endTimeInNanoSeconds = System.nanoTime();
@@ -183,34 +190,6 @@ public final class RenderTaskListGenerator {
         }
 
         return taskList;
-    }
-
-    private boolean sameClassStateChangeNotFoundInThe(Node nextEnabledNode, StateChange stateChangeReset) {
-
-        for (StateChange stateChange : nextEnabledNode.getDesiredStateChanges()) {
-            if (stateChange.getClass() == stateChangeReset.getClass()) {
-                return false; // we did find it! And yes, returning false is correct, see method name.
-
-                // note: we don't worry about the details of the two state changes (i.e. if they are value-identical)
-                // as this is something that will be checked while iterating over next node's desired state changes,
-                // in the first part of method generateTaskList.
-            }
-        }
-
-        return true; // we didn't find a state change of the same class
-
-    }
-
-    private Node findNextEnabledNode(List<Node> orderedNodeList, int startIndex) {
-
-        for (int index = startIndex; index < orderedNodeList.size(); index++) {
-            Node currentNode = orderedNodeList.get(index);
-            if (currentNode.isEnabled()) {
-                return currentNode;
-            }
-        }
-
-        return null;
     }
 
     private void logList(List<?> list) {
@@ -253,7 +232,7 @@ public final class RenderTaskListGenerator {
         }
 
         @Override
-        public void execute() { }
+        public void process() { }
 
         /**
          * Returns a string description of the instance.

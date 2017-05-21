@@ -20,7 +20,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.BaseFBOsManager;
@@ -72,7 +72,7 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
 
         requiresFBO(inputFboConfig, fboManager);
         requiresFBO(outputFboConfig, fboManager);
-        addDesiredStateChange(new BindFBO(outputFboUrn, fboManager));
+        addDesiredStateChange(new BindFbo(outputFboUrn, fboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, fboManager));
         update(); // Cheeky way to initialise inputFbo, outputFbo
         fboManager.subscribe(this);
