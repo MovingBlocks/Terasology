@@ -229,6 +229,7 @@
     "storage-service-popup-title": "Log in to identity storage service",
     "storage-service-popup-url": "Service URL",
     "storage-service-popup-warning": "Warning: there are client identity certificates stored locally. If you login, they will be uploaded to the service.",
+    "storage-service-wait": "Working, please wait...",
     "this-language-English": "English",
     "this-language-native": "English",
     "update-module": "Update",

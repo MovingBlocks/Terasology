@@ -43,7 +43,7 @@ public class BigIntegerBase64Serializer implements JsonSerializer<BigInteger>, J
 
     @Override
     public BigInteger deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return new BigInteger(decoder.decode(json.getAsString()));
+        return new BigInteger(decoder.decode(json.getAsString().replace("\n", "")));
     }
 
     @Override

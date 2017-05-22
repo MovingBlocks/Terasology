@@ -37,18 +37,46 @@ public final class StorageServiceWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(StorageServiceWorker.class);
 
-    private IdentityStorageServiceConfig config;
+    private StorageServiceWorkerStatus status = StorageServiceWorkerStatus.LOGGED_OUT_OK;
+    private Config config;
+    private IdentityStorageServiceConfig thisConfig;
     private SecurityConfig securityConfig;
     private APISession sessionInstance;
     private String loginName;
 
     public StorageServiceWorker(Config config) {
-        this.config = config.getIdentityStorageService();
+        this.config = config;
+        this.thisConfig = config.getIdentityStorageService();
         this.securityConfig = config.getSecurity();
     }
 
-    public boolean isLoggedIn() {
-        return sessionInstance != null;
+    private void logMessage(boolean warning, String message, String... args) {
+        // TODO: log to game console too
+        if (warning) {
+            logger.warn(message, args);
+        } else {
+            logger.info(message, args);
+        }
+    }
+
+    private boolean checkStatus(StorageServiceWorkerStatus requiredStatus, String action) {
+        if (status != requiredStatus) {
+            logMessage(true, "Action \"{}\" could not be performed (requires status {}, actual is {})",
+                    action, requiredStatus.toString(), status.toString());
+        }
+        return true;
+    }
+
+    private boolean checkStatus(StorageServiceWorkerStatus altStatus1, StorageServiceWorkerStatus altStatus2, String action) {
+        if (status != altStatus1 && status != altStatus2) {
+            logMessage(true, "Action \"{}\" could not be performed (requires status {} or {}, actual is {})",
+                    action, altStatus1.toString(), altStatus2.toString(), status.toString());
+        }
+        return true;
+    }
+
+    public StorageServiceWorkerStatus getStatus() {
+        return status;
     }
 
     public String getLoginName() {
@@ -60,15 +88,22 @@ public final class StorageServiceWorker {
      * The session token is verified against the server; if it's valid, the status is switched to logged in.
      */
     public void initializeFromConfig() {
-        if (config.isSet()) {
+        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_OUT_OK, "initializeFromConfig")) {
+            return;
+        }
+        if (thisConfig.isSet()) {
+            status = StorageServiceWorkerStatus.LOGGING_IN;
             new Thread(() -> {
                 try {
-                    sessionInstance = new APISession(config.getServiceUrl(), config.getSessionToken());
+                    sessionInstance = new APISession(thisConfig.getServiceUrl(), thisConfig.getSessionToken());
                     loginName = sessionInstance.getLoginName();
+                    status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
+                    logMessage(false, "Successfully logged in using token stored in credentials");
                     syncIdentities();
                 } catch (Exception e) {
                     sessionInstance = null;
-                    logger.warn("Authentication from stored token and URL failed", e);
+                    status = StorageServiceWorkerStatus.LOGGED_OUT_ERROR;
+                    logMessage(true, "Authentication from stored token and URL failed - {}", e.getMessage());
                 }
             }).start();
         } else {
@@ -81,16 +116,24 @@ public final class StorageServiceWorker {
      * and the parameters are stored in configuration.
      */
     public void login(URL serviceURL, String login, String password) {
+        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_OUT_OK, StorageServiceWorkerStatus.LOGGED_OUT_ERROR, "login")) {
+            return;
+        }
+        status = StorageServiceWorkerStatus.LOGGING_IN;
         new Thread(() -> {
             try {
                 sessionInstance = APISession.createFromLogin(serviceURL, login, password);
                 loginName = sessionInstance.getLoginName();
-                config.setServiceURL(serviceURL);
-                config.setSessionToken(sessionInstance.getSessionToken());
+                thisConfig.setServiceURL(serviceURL);
+                thisConfig.setSessionToken(sessionInstance.getSessionToken());
+                config.save();
+                status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
+                logMessage(false, "Successfully logged in");
                 syncIdentities();
             } catch (Exception e) {
                 sessionInstance = null;
-                logger.warn("Login failed", e);
+                status = StorageServiceWorkerStatus.LOGGED_OUT_ERROR;
+                logMessage(true, "Login failed due to - {}", e.getMessage());
             }
         }).start();
     }
@@ -99,13 +142,21 @@ public final class StorageServiceWorker {
      * Destroys the current session and switches to the logged out status.
      */
     public void logout() {
+        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "logout")) {
+            return;
+        }
+        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
         new Thread(() -> {
             try {
                 sessionInstance.logout();
                 sessionInstance = null;
-                config.setSessionToken(null);
+                thisConfig.setSessionToken(null);
+                status = StorageServiceWorkerStatus.LOGGED_OUT_OK;
+                config.save();
+                logMessage(false, "Successfully logged out");
             } catch (Exception e) {
-                logger.warn("Logout failed", e);
+                status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
+                logMessage(true, "Logout failed - {} ", e.getMessage());
             }
         }).start();
     }
@@ -114,12 +165,18 @@ public final class StorageServiceWorker {
      * Uploads the specified identity certificate to the server.
      */
     public void putIdentity(PublicIdentityCertificate serverIdentity, ClientIdentity clientIdentity) {
+        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "upload identity")) {
+            return;
+        }
+        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
         new Thread(() -> {
             try {
                 sessionInstance.putIdentity(serverIdentity, clientIdentity);
+                logMessage(false, "Successfully uploaded new identity");
             } catch (Exception e) {
-                logger.warn("Failed to upload identity", e);
+                logMessage(true, "Failed to upload identity - {}", e.getMessage());
             }
+            status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
         }).start();
     }
 
@@ -127,6 +184,10 @@ public final class StorageServiceWorker {
      * Performs a full synchronization of the locally stored identity certificates with the ones stored on the service.
      */
     public void syncIdentities() {
+        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "sync identities")) {
+            return;
+        }
+        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
         new Thread(() -> {
             try {
                 Map<PublicIdentityCertificate, ClientIdentity> local = securityConfig.getAllIdentities();
@@ -142,9 +203,12 @@ public final class StorageServiceWorker {
                 for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnRight().entrySet()) {
                     securityConfig.addIdentity(entry.getKey(), entry.getValue());
                 }
+                config.save();
+                logMessage(false, "Successfully synchronized identities");
             } catch (Exception e) {
-                logger.warn("Identity certificate synchronization failed", e);
+                logMessage(true, "Failed to synchronize identities - ", e.getMessage());
             }
+            status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
         }).start();
     }
 }

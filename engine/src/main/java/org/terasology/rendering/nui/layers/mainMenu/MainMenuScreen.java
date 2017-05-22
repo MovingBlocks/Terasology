@@ -22,6 +22,7 @@ import org.terasology.engine.LoggingContext;
 import org.terasology.engine.NonNativeJVMDetector;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -46,7 +47,7 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     private UILabel storageServiceStatus;
     private UIButton storageServiceAction;
-    private boolean storageServicePreviousLoggedIn; //keep track of previous status to avoid performance drop due to updating UI when no change happened
+    private StorageServiceWorkerStatus storageServiceWorkerStatus; //keep track of previous status to avoid performance drop due to updating UI when no change happened
 
     @Override
     public void initialise() {
@@ -79,22 +80,29 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
         WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
-            if (storageService.isLoggedIn()) {
+            if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN_IDLE) {
                 storageService.logout();
-            } else {
+            } else if (storageService.getStatus() != StorageServiceWorkerStatus.LOGGED_IN_WORKING) {
                 getManager().pushScreen(StorageServiceLoginPopup.ASSET_URI, StorageServiceLoginPopup.class);
             }
         });
     }
 
     private void updateStorageServiceStatus() {
-        if (storageService.isLoggedIn()) {
+        StorageServiceWorkerStatus stat = storageService.getStatus();
+        if (stat == StorageServiceWorkerStatus.LOGGED_IN_IDLE) {
             storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-logged-in}") + storageService.getLoginName());
             storageServiceAction.setText(translationSystem.translate("${engine:menu#storage-service-log-out}"));
+            storageServiceAction.setVisible(true);
+        } else if (stat == StorageServiceWorkerStatus.LOGGED_IN_WORKING || stat == StorageServiceWorkerStatus.LOGGING_IN) {
+            storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-wait}"));
+            storageServiceAction.setVisible(false);
         } else {
             storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-logged-out}"));
             storageServiceAction.setText(translationSystem.translate("${engine:menu#storage-service-log-in}"));
+            storageServiceAction.setVisible(true);
         }
+        storageServiceWorkerStatus = stat;
     }
 
     @Override
@@ -106,9 +114,8 @@ public class MainMenuScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (storageService.isLoggedIn() != storageServicePreviousLoggedIn) {
+        if (storageService.getStatus() != storageServiceWorkerStatus) {
             updateStorageServiceStatus();
-            storageServicePreviousLoggedIn = !storageServicePreviousLoggedIn;
         }
     }
 

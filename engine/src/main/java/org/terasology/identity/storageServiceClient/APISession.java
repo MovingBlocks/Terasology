@@ -42,22 +42,22 @@ final class APISession {
 
     static APISession createFromLogin(URL hostURL, String login, String password) throws IOException, StorageServiceException {
         SessionPOSTRequestData req = new SessionPOSTRequestData(login, password);
-        SessionPOSTResponseData res = ServiceAPIRequest.request(new URL(hostURL, ENDPOINT_SESSION), HttpMethod.POST, req, SessionPOSTResponseData.class);
+        SessionPOSTResponseData res = ServiceAPIRequest.request(new URL(hostURL, ENDPOINT_SESSION), HttpMethod.POST, null, req, SessionPOSTResponseData.class);
         return new APISession(hostURL, res.token);
     }
 
     private <RES, REQ> RES requestEndpoint(String endpoint, String urlArgument, HttpMethod method, REQ data, Class<RES> responseClass)
             throws IOException, StorageServiceException {
         URL url = new URL(serviceURL, endpoint + (urlArgument == null ? "" : ("/" + urlArgument)));
-        return ServiceAPIRequest.request(url, method, data, responseClass);
+        return ServiceAPIRequest.request(url, method, sessionToken, data, responseClass);
     }
 
     void logout() throws IOException, StorageServiceException {
-        requestEndpoint(ENDPOINT_SESSION, sessionToken, HttpMethod.DELETE, null, null);
+        requestEndpoint(ENDPOINT_SESSION, null, HttpMethod.DELETE, null, null);
     }
 
     String getLoginName() throws IOException, StorageServiceException {
-        return requestEndpoint(ENDPOINT_SESSION, sessionToken, HttpMethod.GET, null, SessionGETResponseData.class).login;
+        return requestEndpoint(ENDPOINT_SESSION, null, HttpMethod.GET, null, SessionGETResponseData.class).login;
     }
 
     String getSessionToken() {
@@ -65,13 +65,12 @@ final class APISession {
     }
 
     Map<PublicIdentityCertificate, ClientIdentity> getAllIdentities() throws IOException, StorageServiceException {
-        GenericAuthenticatedRequestData req = new GenericAuthenticatedRequestData(sessionToken);
-        AllIdentitiesGETResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET, req, AllIdentitiesGETResponseData.class);
+        AllIdentitiesGETResponseData res = requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.GET, null, AllIdentitiesGETResponseData.class);
         return IdentityBundle.listToMap(res.clientIdentities);
     }
 
     void putIdentity(PublicIdentityCertificate serverCert, ClientIdentity clientIdentity) throws IOException, StorageServiceException {
-        PutIdentityPOSTRequestData req = new PutIdentityPOSTRequestData(sessionToken, serverCert, clientIdentity);
+        PutIdentityPOSTRequestData req = new PutIdentityPOSTRequestData(serverCert, clientIdentity);
         requestEndpoint(ENDPOINT_CLIENT_IDENTITY, null, HttpMethod.POST, req, null);
     }
 
@@ -93,27 +92,13 @@ final class APISession {
         private String login;
     }
 
-    private static final class GenericAuthenticatedRequestData {
-        private String sessionToken;
-        private GenericAuthenticatedRequestData(String sessionToken) {
-            this.sessionToken = sessionToken;
-        }
-        //TODO: remove
-        @Override
-        public String toString() {
-            return sessionToken;
-        }
-    }
-
     private static final class AllIdentitiesGETResponseData {
         private List<IdentityBundle> clientIdentities;
     }
 
     private static final class PutIdentityPOSTRequestData {
-        private String sessionToken;
         private IdentityBundle clientIdentity;
-        private PutIdentityPOSTRequestData(String sessionToken, PublicIdentityCertificate server, ClientIdentity client) {
-            this.sessionToken = sessionToken;
+        private PutIdentityPOSTRequestData(PublicIdentityCertificate server, ClientIdentity client) {
             this.clientIdentity = new IdentityBundle(server, client);
         }
     }

@@ -58,7 +58,7 @@ public class ServiceAPIRequestTests {
         when(mockedConn.getResponseCode()).thenReturn(200);
 
         DummySerializableObject reqData = new DummySerializableObject("request", 0);
-        DummySerializableObject resData = ServiceAPIRequest.request(mockedConn, HttpMethod.GET, reqData, DummySerializableObject.class);
+        DummySerializableObject resData = ServiceAPIRequest.request(mockedConn, HttpMethod.GET, null, reqData, DummySerializableObject.class);
         assertEquals(gson.toJson(reqData), receivedRequest.toString());
         assertEquals(new DummySerializableObject("response", 1), resData);
     }

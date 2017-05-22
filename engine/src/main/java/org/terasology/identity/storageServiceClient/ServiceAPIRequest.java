@@ -51,21 +51,18 @@ final class ServiceAPIRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection conn, HttpMethod method, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection conn, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
         conn.setRequestMethod(method.name());
         conn.setUseCaches(false);
         conn.setDoOutput(true);
         conn.setRequestProperty("Content-Type", "application/json");
+        if (sessionToken != null) {
+            conn.setRequestProperty("Session-Token", sessionToken);
+        }
         if (data != null) {
-            if (method == HttpMethod.GET) {
-                //TODO: this is a hack to get around HttpURLConnection not allowing payload on GET requests
-                //TODO: probably it's better to always use the header for sending the token
-                conn.setRequestProperty("Session-Token", data.toString());
-            } else {
-                try (OutputStream request = conn.getOutputStream()) {
-                    request.write(gson.toJson(data).getBytes());
-                }
+            try (OutputStream request = conn.getOutputStream()) {
+                request.write(gson.toJson(data).getBytes());
             }
         }
         conn.connect();
@@ -81,9 +78,9 @@ final class ServiceAPIRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(URL url, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
-        return request((HttpURLConnection) url.openConnection(), method, data, responseClass);
+        return request((HttpURLConnection) url.openConnection(), method, sessionToken, data, responseClass);
     }
 
     private static class ErrorResponseData {
