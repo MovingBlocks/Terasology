@@ -74,10 +74,14 @@ public class BindsSubsystemTest {
         when(moduleManager.getRegistry()).thenReturn(moduleRegistry);
         ModuleEnvironment environment = mock(ModuleEnvironment.class);
         when(moduleManager.loadEnvironment(any(), anyBoolean())).thenReturn(environment);
+        when(moduleManager.getEnvironment()).thenReturn(environment);
         registerBindButtonClasses = new ArrayList<>();
+        when(environment.getTypesAnnotatedWith(eq(RegisterBindButton.class))).thenReturn(registerBindButtonClasses);
         when(environment.getTypesAnnotatedWith(eq(RegisterBindButton.class), any())).thenReturn(registerBindButtonClasses);
         registerRealBindAxisClasses = new ArrayList<>();
+        when(environment.getTypesAnnotatedWith(eq(RegisterBindAxis.class))).thenReturn(registerRealBindAxisClasses);
         when(environment.getTypesAnnotatedWith(eq(RegisterBindAxis.class), any())).thenReturn(registerRealBindAxisClasses);
+        when(environment.getModuleProviding(any())).thenReturn(new Name(TEST_MODULE));
         context.put(ModuleManager.class, moduleManager);
     }
 
@@ -107,22 +111,32 @@ public class BindsSubsystemTest {
         assertThat(binds.get(0).getDisplayName(), is(Key.T.getDisplayName()));
     }
 
+    @Test
+    public void test() {
+
+        ModuleEnvironment environment = mock(ModuleEnvironment.class);
+        when(environment.getTypesAnnotatedWith(eq(RegisterBindButton.class), any())).thenReturn(registerBindButtonClasses);
+        registerBindButtonClasses.add(TestEventButton.class);
+    }
+
+    @Test
     public void testRegisterBinds() {
         registerBindButtonClasses.add(TestEventButton.class);
 
+        bindsSubsystem.updateConfigWithDefaultBinds();
         bindsSubsystem.registerBinds();
 
         BindableButton button = bindsSubsystem.getKeyBinds().get(KeyId.T);
 
         assertThat(button, is(not(nullValue())));
         assertThat(button.getId(), is(new SimpleUri(TEST_MODULE, "testEvent")));
-        assertThat(button.getDisplayName(), is(Key.T.getDisplayName()));
+        assertThat(button.getDisplayName(), is("${engine-tests:menu#theTestEvent}"));
     }
 
     //test classes, registered during tests
 
     @RegisterBindButton(id = "testEvent", description = "${engine-tests:menu#theTestEvent}", repeating = false, category = "tests")
     @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)
-    public class TestEventButton extends BindButtonEvent {
+    public static class TestEventButton extends BindButtonEvent {
     }
 }

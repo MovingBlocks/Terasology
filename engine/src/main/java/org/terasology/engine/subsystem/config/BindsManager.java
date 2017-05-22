@@ -60,7 +60,7 @@ public interface BindsManager {
     /**
      * Registers all binds from the current {@link ModuleEnvironment}.
      * This contains all events with {@link RegisterBindButton}, {@link RegisterBindAxis} and {@link RegisterRealBindAxis}.
-     * 
+     * {@link #updateConfigWithDefaultBinds()} has to be called before to initialize the config.
      */
     void registerBinds();
 
