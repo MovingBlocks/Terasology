@@ -187,7 +187,17 @@ public class InputSystemTests {
 
         assertThat(clientEntityKeyEvents.size(), is(6));
         assertThat(clientEntityKeyEvents.get(0).key, is(Key.A));
+        assertThat(clientEntityKeyEvents.get(0).buttonState, is(ButtonState.DOWN));
         assertThat(clientEntityKeyEvents.get(1).key, is(Key.A));
+        assertThat(clientEntityKeyEvents.get(1).buttonState, is(ButtonState.UP));
+        assertThat(clientEntityKeyEvents.get(2).key, is(Key.B));
+        assertThat(clientEntityKeyEvents.get(2).buttonState, is(ButtonState.DOWN));
+        assertThat(clientEntityKeyEvents.get(3).key, is(Key.B));
+        assertThat(clientEntityKeyEvents.get(3).buttonState, is(ButtonState.UP));
+        assertThat(clientEntityKeyEvents.get(4).key, is(Key.C));
+        assertThat(clientEntityKeyEvents.get(4).buttonState, is(ButtonState.DOWN));
+        assertThat(clientEntityKeyEvents.get(5).key, is(Key.C));
+        assertThat(clientEntityKeyEvents.get(5).buttonState, is(ButtonState.UP));
     }
 
     @Test
