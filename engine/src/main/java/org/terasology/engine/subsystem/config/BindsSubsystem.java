@@ -3,18 +3,14 @@ package org.terasology.engine.subsystem.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
+import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
@@ -39,22 +35,16 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Reader;
 import java.lang.annotation.Annotation;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
-    private BindsConfig bindsConfig = new BindsConfig();
-    private BindsConfig defaultBindsConfig = new BindsConfig();
+    private BindsConfiguration bindsConfiguration;
+    private BindsConfiguration defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
     private Map<SimpleUri, BindableButton> buttonLookup = Maps.newHashMap();
     private List<BindableButton> buttonBinds = Lists.newArrayList();
     private Context context;
@@ -117,7 +107,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     @Override
     public void preInitialise(Context context) {
         this.context = context;
-        loadBindsConfig();
+        bindsConfiguration = context.get(BindsConfiguration.class);
         context.put(BindsManager.class, this);
     }
 
@@ -125,20 +115,20 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
     public BindsConfig getDefaultBindsConfig() {
         BindsConfig copy = new BindsConfig();
         //SimpleUri and Input are immutable, no need for a deep copy
-        copy.setBinds(defaultBindsConfig);
+        copy.setBinds(defaultBindsConfig.getBindsConfig());
         return copy;
     }
 
     @Override
     public void updateConfigWithDefaultBinds() {
         //default bindings are overridden
-        defaultBindsConfig = new BindsConfig();
+        defaultBindsConfig = new BindsConfigAdapter(new BindsConfig());
         updateDefaultBinds(context, defaultBindsConfig);
         //actual bindings may be actualized
-        updateDefaultBinds(context, bindsConfig);
+        updateDefaultBinds(context, bindsConfiguration);
     }
 
-    private void updateDefaultBinds(Context context, BindsConfig config) {
+    private void updateDefaultBinds(Context context, BindsConfiguration config) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
@@ -157,7 +147,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
     }
 
-    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfig config) {
+    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfiguration config) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
                 RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
@@ -169,7 +159,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
     }
 
-    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfig config) {
+    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes, BindsConfiguration config) {
         for (Class<?> axisEvent : classes) {
             if (AxisEvent.class.isAssignableFrom(axisEvent)) {
                 RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
@@ -181,12 +171,12 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
     }
 
-    private void addDefaultBindings(SimpleUri bindUri, Class<?> event, BindsConfig config) {
+    private void addDefaultBindings(SimpleUri bindUri, Class<?> event, BindsConfiguration config) {
         List<Input> defaultInputs = fetchDefaultBindings(event, config);
         config.setBinds(bindUri, defaultInputs);
     }
 
-    private List<Input> fetchDefaultBindings(Class<?> event, BindsConfig config) {
+    private List<Input> fetchDefaultBindings(Class<?> event, BindsConfiguration config) {
         List<Input> defaultInputs = Lists.newArrayList();
         Collection<Input> values = config.values();
         for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
@@ -235,7 +225,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    bindsConfig.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
+                    bindsConfiguration.getBinds(bindUri).stream().filter(input -> input != null).forEach(input -> linkBindButtonToInput(input, bindUri));
 
                     logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -288,7 +278,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
                     BindAxisEvent instance = (BindAxisEvent) registerBindClass.newInstance();
                     BindableAxis bindAxis = registerRealBindAxis(id.toString(), instance);
                     bindAxis.setSendEventMode(info.eventMode());
-                    for (Input input : bindsConfig.getBinds(id)) {
+                    for (Input input : bindsConfiguration.getBinds(id)) {
                         linkAxisToInput(input, id);
                     }
                     logger.debug("Registered axis bind: {}", id);
@@ -376,15 +366,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     @Override
     public BindsConfig getBindsConfig() {
-        return bindsConfig;
-    }
-
-    @Override
-    public void loadBindsConfig() {
-        Optional<JsonObject> configJson = loadFileToJson(getConfigPath());
-        if (configJson.isPresent()) {
-            bindsConfig = Config.createGson().fromJson(configJson.get(), BindsConfig.class);
-        }
+        return bindsConfiguration.getBindsConfig();
     }
 
     @Override
@@ -394,30 +376,57 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     @Override
     public void saveBindsConfig() {
-        //TODO replace with flexible config
-        Path bindsConfiPath = getConfigPath();
-        try (BufferedWriter writer = Files.newBufferedWriter(bindsConfiPath, TerasologyConstants.CHARSET)) {
-            Config.createGson().toJson(bindsConfig, writer);
-        } catch (IOException e) {
-            logger.error("Failed to save config", e);
-        }
+        //TODO replace with flexible config when binds are no longer saved in the Config.
+        context.get(Config.class).save();
     }
 
-    private Path getConfigPath() {
-        return PathManager.getInstance().getHomePath().resolve("bindsConfig.cfg");
-    }
+    private static class BindsConfigAdapter implements BindsConfiguration {
 
-    private Optional<JsonObject> loadFileToJson(Path configPath) {
-        if (Files.isRegularFile(configPath)) {
-            try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
-                JsonElement userConfig = new JsonParser().parse(reader);
-                if (userConfig.isJsonObject()) {
-                    return Optional.of(userConfig.getAsJsonObject());
-                }
-            } catch (IOException e) {
-                logger.error("Failed to load config file {}");
-            }
+        private BindsConfig bindsConfig;
+
+        public BindsConfigAdapter(BindsConfig bindsConfig) {
+            this.bindsConfig = bindsConfig;
         }
-        return Optional.empty();
+
+        @Override
+        public boolean isBound(Input newInput) {
+            return bindsConfig.isBound(newInput);
+        }
+
+        @Override
+        public void setBinds(BindsConfig other) {
+            bindsConfig.setBinds(other);
+        }
+
+        @Override
+        public List<Input> getBinds(SimpleUri uri) {
+            return bindsConfig.getBinds(uri);
+        }
+
+        @Override
+        public boolean hasBinds(SimpleUri uri) {
+            return bindsConfig.hasBinds(uri);
+        }
+
+        @Override
+        public void setBinds(SimpleUri bindUri, Input ... inputs) {
+            bindsConfig.setBinds(bindUri, inputs);
+        }
+
+        @Override
+        public void setBinds(SimpleUri bindUri, Iterable<Input> inputs) {
+            bindsConfig.setBinds(bindUri, inputs);
+        }
+
+        @Override
+        public BindsConfig getBindsConfig() {
+            return bindsConfig;
+        }
+
+        @Override
+        public Collection<Input> values() {
+            return bindsConfig.values();
+        }
+
     }
 }

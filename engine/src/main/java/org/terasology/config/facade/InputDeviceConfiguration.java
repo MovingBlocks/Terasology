@@ -1,13 +1,14 @@
 
-package org.terasology.config;
+package org.terasology.config.facade;
 
+import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 
 /**
  * Facade for {@link Config#getInput()}
  */
-public interface InputDeviceConfig {
+public interface InputDeviceConfiguration {
     float getMouseSensitivity();
 
     void setMouseSensitivity(float mouseSensitivity);

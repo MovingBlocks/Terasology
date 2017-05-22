@@ -70,11 +70,6 @@ public interface BindsManager {
     void saveBindsConfig();
 
     /**
-     * Loads the last saved binds config.
-     */
-    void loadBindsConfig();
-
-    /**
      * All button binds, registered with {@link #registerBinds()}.
      */
     List<BindableButton> getButtonBinds();

@@ -1,13 +1,14 @@
 
-package org.terasology.config;
+package org.terasology.config.facade;
 
+import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.context.Context;
 
-public class InputDeviceConfigImpl implements InputDeviceConfig {
+public class InputDeviceConfigurationImpl implements InputDeviceConfiguration {
     private Config config;
 
-    public InputDeviceConfigImpl(Config config) {
+    public InputDeviceConfigurationImpl(Config config) {
         this.config = config;
     }
 

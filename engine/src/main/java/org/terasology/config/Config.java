@@ -74,11 +74,12 @@ public final class Config {
         return config.getPermission();
     }
 
-    /**
-     * @return Input configuration (mostly binds)
-     */
     public InputConfig getInput() {
         return config.getInput();
+    }
+
+    public BindsConfig getBinds() {
+        return config.getBinds();
     }
 
     public ModuleConfig getDefaultModSelection() {
@@ -196,7 +197,7 @@ public final class Config {
         return PathManager.getInstance().getHomePath().resolve("config.cfg");
     }
 
-    public static Gson createGson() {
+    protected static Gson createGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(Name.class, new NameTypeAdapter())
                 .registerTypeAdapter(Version.class, new VersionTypeAdapter())

@@ -16,10 +16,8 @@
 package org.terasology.input;
 
 import com.google.common.collect.Queues;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.config.ControllerConfig.ControllerInfo;
-import org.terasology.config.InputDeviceConfig;
+import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
@@ -66,7 +64,7 @@ import java.util.Queue;
 public class InputSystem extends BaseComponentSystem {
 
     @In
-    private InputDeviceConfig inputDeviceConfig;
+    private InputDeviceConfiguration inputDeviceConfig;
 
     @In
     private BindsManager bindsManager;
@@ -86,8 +84,6 @@ public class InputSystem extends BaseComponentSystem {
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
     private ControllerDevice controllers = new NullControllerDevice();
-
-    private Logger logger = LoggerFactory.getLogger(InputSystem.class);
 
     private Queue<KeyboardAction> simulatedKeys = Queues.newArrayDeque();
 
