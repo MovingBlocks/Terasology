@@ -380,7 +380,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         context.get(Config.class).save();
     }
 
-    private static class BindsConfigAdapter implements BindsConfiguration {
+    protected static class BindsConfigAdapter implements BindsConfiguration {
 
         private BindsConfig bindsConfig;
 
