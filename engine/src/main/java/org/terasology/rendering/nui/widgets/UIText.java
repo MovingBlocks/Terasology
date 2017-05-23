@@ -82,6 +82,9 @@ public class UIText extends CoreWidget {
     @LayoutConfig
     protected boolean readOnly;
 
+    @LayoutConfig
+    private boolean passwordMode;
+
     /** The position of the cursor in the text box. */
     protected int cursorPosition;
 
@@ -177,6 +180,15 @@ public class UIText extends CoreWidget {
         cursorTexture = Assets.getTexture("engine:white").get();
     }
 
+    private String buildPasswordString() {
+        int len = text.get().length();
+        StringBuilder b = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            b.append("*");
+        }
+        return b.toString();
+    }
+
     /**
      * Handles how the widget is drawn.
      *
@@ -209,13 +221,14 @@ public class UIText extends CoreWidget {
         }
         lastFont = canvas.getCurrentStyle().getFont();
         correctCursor();
-        int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(getText());
+        String textToDraw = passwordMode ? buildPasswordString() : text.get();
+        int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(textToDraw);
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
             if (isShowingHintText && !readOnly) {
-                canvas.drawTextRaw(text.get(), lastFont, canvas.getCurrentStyle().getHintTextColor(), canvas.getRegion());
+                canvas.drawTextRaw(textToDraw, lastFont, canvas.getCurrentStyle().getHintTextColor(), canvas.getRegion());
             } else {
-                canvas.drawText(text.get(), canvas.getRegion());
+                canvas.drawText(textToDraw, canvas.getRegion());
             }
             if (isFocused()) {
                 if (hasSelection()) {

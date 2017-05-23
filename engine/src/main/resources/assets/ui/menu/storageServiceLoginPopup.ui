@@ -73,7 +73,8 @@
                 },
                 {
                   "type": "UIText",
-                  "id": "password"
+                  "id": "password",
+                  "passwordMode": true
                 }
               ]
             },
