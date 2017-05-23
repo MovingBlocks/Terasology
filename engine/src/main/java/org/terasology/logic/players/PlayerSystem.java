@@ -17,6 +17,8 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -66,6 +68,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private NetworkSystem networkSystem;
 
     private List<SpawningClientInfo> clientsPreparingToSpawn = Lists.newArrayList();
+    private List<SpawningClientInfo> clientsPreparingToRespawn = Lists.newArrayList();
+
+    private static final Logger logger = LoggerFactory.getLogger(PlayerSystem.class);
 
     @Override
     public void initialise() {
@@ -73,6 +78,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @Override
     public void update(float delta) {
+
         Iterator<SpawningClientInfo> i = clientsPreparingToSpawn.iterator();
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
@@ -80,6 +86,22 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 PlayerStore playerStore = spawning.playerStore;
                 if (playerStore == null) {
                     spawnPlayer(spawning.clientEntity);
+                } else {
+                    playerStore.restoreEntities();
+                    EntityRef character = playerStore.getCharacter();
+                    restoreCharacter(spawning.clientEntity, character);
+                }
+                i.remove();
+            }
+        }
+
+        i = clientsPreparingToRespawn.iterator();
+        while (i.hasNext()) {
+            SpawningClientInfo spawning = i.next();
+            if (worldProvider.isBlockRelevant(spawning.position)) {
+                PlayerStore playerStore = spawning.playerStore;
+                if (playerStore == null) {
+                    respawnPlayer(spawning.clientEntity);
                 } else {
                     playerStore.restoreEntities();
                     EntityRef character = playerStore.getCharacter();
@@ -187,12 +209,30 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         entity.saveComponent(loc);
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
-            spawnPlayer(entity);
+            respawnPlayer(entity);
         } else {
             updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
             SpawningClientInfo info = new SpawningClientInfo(entity, spawnPosition);
-            clientsPreparingToSpawn.add(info);
+            clientsPreparingToRespawn.add(info);
         }
+    }
+
+    private void respawnPlayer(EntityRef clientEntity) {
+
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+        EntityRef playerCharacter = client.character;
+        LocationComponent location = clientEntity.getComponent(LocationComponent.class);
+        PlayerFactory playerFactory = new PlayerFactory(entityManager, worldProvider);
+        Vector3f spawnPosition = playerFactory.findSpawnPositionFromLocationComponent(location);
+        location.setWorldPosition(spawnPosition);
+        clientEntity.saveComponent(location);
+
+        logger.debug("Re-spawing player at: {}", spawnPosition);
+
+        Client clientListener = networkSystem.getOwner(clientEntity);
+        Vector3i distance = clientListener.getViewDistance().getChunkDistance();
+        updateRelevanceEntity(clientEntity, distance);
+        playerCharacter.send(new OnPlayerSpawnedEvent());
     }
 
     private void spawnPlayer(EntityRef clientEntity) {

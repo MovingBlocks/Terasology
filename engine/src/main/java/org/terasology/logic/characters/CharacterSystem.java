@@ -95,6 +95,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
         character.controller.send(deathEvent);
+        // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
+        //entity.removeComponent(CharacterComponent.class);
+        //entity.removeComponent(CharacterMovementComponent.class);
     }
 
     /**
