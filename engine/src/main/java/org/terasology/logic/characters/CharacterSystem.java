@@ -83,11 +83,13 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private BlockEntityRegistry blockRegistry;
 
-    @ReceiveEvent(components = {CharacterComponent.class})
-    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity) {
-        // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent
-        event.consume();
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+    @ReceiveEvent
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity, CharacterComponent character) {
+        if (character.controller != EntityRef.NULL) {
+            // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent
+            event.consume();
+        }
+
         DeathEvent deathEvent = new DeathEvent();
         //Store the details of the death in the event for display on the death screen
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
