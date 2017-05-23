@@ -99,14 +99,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
             if (worldProvider.isBlockRelevant(spawning.position)) {
-                PlayerStore playerStore = spawning.playerStore;
-                if (playerStore == null) {
-                    respawnPlayer(spawning.clientEntity);
-                } else {
-                    playerStore.restoreEntities();
-                    EntityRef character = playerStore.getCharacter();
-                    restoreCharacter(spawning.clientEntity, character);
-                }
+                respawnPlayer(spawning.clientEntity);
                 i.remove();
             }
         }
