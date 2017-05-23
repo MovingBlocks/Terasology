@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.Persistent;
+import org.terasology.entitySystem.PersistentPlayerComponent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -104,7 +104,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
         if (client != EntityRef.NULL) {
             for (Component c : character.iterateComponents()) {
-                if (c.getClass().isAnnotationPresent(Persistent.class)) {
+                if (c.getClass().isAnnotationPresent(PersistentPlayerComponent.class)) {
                     clientInfo.addOrSaveComponent(c);
                 }
             }
@@ -117,7 +117,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
         if (client != EntityRef.NULL) {
             for (Component c : clientInfo.iterateComponents()) {
-                if (c.getClass().isAnnotationPresent(Persistent.class)) {
+                if (c.getClass().isAnnotationPresent(PersistentPlayerComponent.class)) {
                     character.addOrSaveComponent(c);
                     clientInfo.removeComponent(c.getClass());
                 }
@@ -130,6 +130,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
      * If the entity is a character, then the display name from the {@link ClientComponent#clientInfo} is used.
      * Otherwise the entity itself is checked for a {@link DisplayNameComponent}.
      * In the last case, the prefab name of the entity is used, e.g. "engine:player" will be parsed to "Player".
+     *
      * @param instigator The entity for which an instigator name is needed.
      * @return The instigator name.
      */
@@ -164,6 +165,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     /**
      * Extracts the damage type name from a prefab. If the prefab has a {@link DisplayNameComponent}, it will be used.
      * Otherwise the damage type name is parsed, e.g. "engine:directDamage" will become "Direct Damage".
+     *
      * @param damageType The damage type prefab.
      * @return A readable name for the damage type.
      */
