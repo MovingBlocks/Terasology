@@ -25,6 +25,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
@@ -35,6 +36,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -137,6 +139,16 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         if (characterSounds.deathSounds.size() > 0) {
             StaticSound sound = random.nextItem(characterSounds.deathSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.deathVolume));
+        }
+    }
+
+    @ReceiveEvent
+    public void onPlayerDeath(DeathEvent event, EntityRef client) {
+        EntityRef character = client.getComponent(ClientComponent.class).character;
+        CharacterSoundComponent characterSounds = character.getComponent(CharacterSoundComponent.class);
+        if (characterSounds.deathSounds.size() > 0) {
+            StaticSound sound = random.nextItem(characterSounds.deathSounds);
+            character.send(new PlaySoundEvent(character, sound, characterSounds.deathVolume));
         }
     }
 
