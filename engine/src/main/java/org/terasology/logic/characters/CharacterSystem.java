@@ -40,6 +40,7 @@ import org.terasology.logic.characters.events.OnItemUseEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
@@ -83,16 +84,15 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private BlockEntityRegistry blockRegistry;
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onDeath(DoDestroyEvent event, EntityRef entity) {
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity) {
+        // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent
+        event.consume();
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         DeathEvent deathEvent = new DeathEvent();
         //Store the details of the death in the event for display on the death screen
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
         character.controller.send(deathEvent);
-        // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
-        //entity.removeComponent(CharacterComponent.class);
-        //entity.removeComponent(CharacterMovementComponent.class);
     }
 
     /**
