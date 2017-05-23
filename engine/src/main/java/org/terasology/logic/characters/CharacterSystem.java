@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Persistent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -45,6 +47,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -93,6 +96,33 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
+    }
+
+    @ReceiveEvent
+    public void backupPersistentComponents(DoDestroyEvent event, EntityRef character, CharacterComponent characterComponent) {
+        EntityRef client = characterComponent.controller;
+        EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
+        if (client != EntityRef.NULL) {
+            for (Component c : character.iterateComponents()) {
+                if (c.getClass().isAnnotationPresent(Persistent.class)) {
+                    clientInfo.addOrSaveComponent(c);
+                }
+            }
+        }
+    }
+
+    @ReceiveEvent
+    public void retrievePersistentComponents(OnPlayerSpawnedEvent event, EntityRef character, CharacterComponent characterComponent) {
+        EntityRef client = characterComponent.controller;
+        EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
+        if (client != EntityRef.NULL) {
+            for (Component c : clientInfo.iterateComponents()) {
+                if (c.getClass().isAnnotationPresent(Persistent.class)) {
+                    character.addOrSaveComponent(c);
+                    clientInfo.removeComponent(c.getClass());
+                }
+            }
+        }
     }
 
     /**
