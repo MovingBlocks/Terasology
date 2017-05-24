@@ -92,7 +92,7 @@ public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscri
                 location.getLocalRotation().set(new Vector3f(0, 1, 0), yaw);
                 entity.saveComponent(location);
             }
-            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false, false, time.getGameDeltaInMs()));
         }
     }
 
