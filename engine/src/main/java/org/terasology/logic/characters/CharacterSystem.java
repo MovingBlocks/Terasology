@@ -85,7 +85,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @ReceiveEvent
     public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity, CharacterComponent character) {
-        if (character.controller != EntityRef.NULL) {
+        if (character.controller.exists()) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent
             event.consume();
         }
