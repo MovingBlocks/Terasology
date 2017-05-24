@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.ui;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
@@ -73,9 +74,9 @@ public class ChatScreen extends CoreScreenLayer {
         getManager().setFocus(commandLine);
 
         commandLine.subscribe(widget -> {
-            String text = commandLine.getText().trim();
+            String text = commandLine.getText();
 
-            if (!text.isEmpty()) {
+            if (StringUtils.isNotBlank(text)) {
                 String command = "say";
                 List<String> params = Collections.singletonList(text);
 

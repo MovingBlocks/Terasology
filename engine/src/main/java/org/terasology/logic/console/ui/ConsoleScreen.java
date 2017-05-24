@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.ui;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
@@ -73,8 +74,8 @@ public class ConsoleScreen extends CoreScreenLayer {
             }
         });
         commandLine.subscribe(widget -> {
-            String text = commandLine.getText().trim();
-            if(!text.isEmpty()) {
+            String text = commandLine.getText();
+            if(StringUtils.isNotBlank(text)) {
                 console.execute(text, localPlayer.getClientEntity());
             }
             scrollArea.moveToBottom();
