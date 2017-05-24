@@ -95,41 +95,6 @@ public class KinematicCharacterMover implements CharacterMover {
         physics = physicsEngine;
     }
 
-    /**
-     * Updates a character's movement mode and changes his vertical velocity accordingly.
-     *
-     * @param state       The current state of the character.
-     * @param newSwimming True if the top of the character's body isn't in a liquid block but his bottom is.
-     * @param newDiving   True if the character's body is fully inside liquid blocks.
-     * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
-     */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
-        if (newDiving) {
-            if (state.getMode() != MovementMode.DIVING) {
-                state.setMode(MovementMode.DIVING);
-            }
-        } else if (newSwimming) {
-            if (state.getMode() != MovementMode.SWIMMING) {
-                state.setMode(MovementMode.SWIMMING);
-            }
-            state.getVelocity().y += 0.02;
-        } else if (state.getMode() == MovementMode.SWIMMING || state.getMode() == MovementMode.DIVING) {
-            if (newClimbing) {
-                state.setMode(MovementMode.CLIMBING);
-                state.getVelocity().y = 0;
-            } else {
-                if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 4;
-                }
-                state.setMode(MovementMode.WALKING);
-            }
-        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
-            //We need to toggle the climbing mode
-            state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
-        }
-    }
-
     @Override
     public CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity) {
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
@@ -236,7 +201,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
         updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-
+    
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.

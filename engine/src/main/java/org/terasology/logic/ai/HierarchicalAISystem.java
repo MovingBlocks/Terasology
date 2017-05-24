@@ -210,7 +210,7 @@ public class HierarchicalAISystem extends BaseComponentSystem implements
         drive.set(targetDirection);
 
         float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false, false, time.getGameDeltaInMs()));
+        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false, time.getGameDeltaInMs()));
         entity.saveComponent(location);
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");

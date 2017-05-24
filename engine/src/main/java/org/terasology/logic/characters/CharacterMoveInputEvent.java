@@ -37,6 +37,11 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     protected CharacterMoveInputEvent() {
     }
 
+    @Deprecated
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested, long delta) {
+        this(sequence, pitch, yaw, movementDirection, running, false, jumpRequested, delta);
+    }
+
     public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean crouching, boolean jumpRequested, long delta) {
         this.delta = delta;
         this.pitch = pitch;
@@ -83,7 +88,9 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         return running;
     }
 
-    public boolean isCrouching() { return crouching; }
+    public boolean isCrouching() {
+        return crouching;
+    }
 
     public boolean isJumpRequested() {
         return jumpRequested;
