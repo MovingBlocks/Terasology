@@ -117,6 +117,9 @@ dependencies {
     // Small-time 3rd party libs we've stored in our Artifactory for access
     compile group: 'ec.util', name: 'MersenneTwister', version: '20'
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
+    
+    // telemetry
+    compile group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'
 
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.2'

@@ -39,6 +39,11 @@ repositories {
             url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
         }
     }
+
+    // snowplow for telemetry
+    maven {
+        url "http://maven.snplow.com/releases"
+    }
 }
 
 dependencies {
