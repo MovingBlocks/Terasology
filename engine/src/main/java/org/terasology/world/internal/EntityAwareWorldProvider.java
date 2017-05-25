@@ -125,6 +125,23 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
+        if (GameThread.isCurrentThread()) {
+            Map<Vector3i, Block> oldTypes = super.setBlocks(blocks);
+            for (Map.Entry<Vector3i, Block> entry: oldTypes.entrySet()) {
+                Vector3i pos = entry.getKey();
+                Block oldType = entry.getValue();
+                Block newType = blocks.get(pos);
+                EntityRef blockEntity = getBlockEntityAt(pos);
+                if (oldType != null) {
+                    updateBlockEntity(blockEntity, pos, oldType, newType, false, Collections.<Class<? extends Component>>emptySet());
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     @SafeVarargs
     public final Block setBlockRetainComponent(Vector3i pos, Block type, Class<? extends Component>... components) {
         if (GameThread.isCurrentThread()) {
