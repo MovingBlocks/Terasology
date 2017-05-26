@@ -26,7 +26,6 @@ import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
-import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 
 /**
  * The configuration subsystem manages Terasology's configuration
@@ -64,10 +63,6 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         // TODO: Move to display subsystem
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
         rootContext.put(Config.class, config);
-
-        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(config);
-        storageServiceWorker.initializeFromConfig();
-        rootContext.put(StorageServiceWorker.class, storageServiceWorker);
     }
 
     private void checkServerIdentity() {

@@ -25,6 +25,7 @@ import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -76,6 +77,10 @@ public class StateMainMenu implements GameState {
 
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl(context));
+
+        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(context);
+        storageServiceWorker.initializeFromConfig();
+        context.put(StorageServiceWorker.class, storageServiceWorker);
 
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);

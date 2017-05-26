@@ -22,8 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.IdentityStorageServiceConfig;
 import org.terasology.config.SecurityConfig;
+import org.terasology.context.Context;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.CoreMessageType;
 
 import java.net.URL;
 import java.util.Map;
@@ -38,25 +41,24 @@ public final class StorageServiceWorker {
     private static final Logger logger = LoggerFactory.getLogger(StorageServiceWorker.class);
 
     private StorageServiceWorkerStatus status = StorageServiceWorkerStatus.LOGGED_OUT_OK;
+
     private Config config;
     private IdentityStorageServiceConfig thisConfig;
     private SecurityConfig securityConfig;
+    private Console console;
+
     private APISession sessionInstance;
     private String loginName;
 
-    public StorageServiceWorker(Config config) {
-        this.config = config;
-        this.thisConfig = config.getIdentityStorageService();
-        this.securityConfig = config.getSecurity();
+    public StorageServiceWorker(Context context) {
+        this.console = context.get(Console.class);
+        this.config = context.get(Config.class);
+        this.thisConfig = this.config.getIdentityStorageService();
+        this.securityConfig = this.config.getSecurity();
     }
 
-    private void logMessage(boolean warning, String message, String... args) {
-        // TODO: log to game console too
-        if (warning) {
-            logger.warn(message, args);
-        } else {
-            logger.info(message, args);
-        }
+    private void logMessage(boolean warning, String message, Object... args) {
+        console.addMessage("Identity storage service: " + String.format(message, args), warning ? CoreMessageType.ERROR : CoreMessageType.CONSOLE);
     }
 
     private boolean checkStatus(StorageServiceWorkerStatus requiredStatus, String action) {
@@ -103,7 +105,7 @@ public final class StorageServiceWorker {
                 } catch (Exception e) {
                     sessionInstance = null;
                     status = StorageServiceWorkerStatus.LOGGED_OUT_ERROR;
-                    logMessage(true, "Authentication from stored token and URL failed - {}", e.getMessage());
+                    logMessage(true, "Authentication from stored token and URL failed - %s", e.getMessage());
                 }
             }).start();
         } else {
