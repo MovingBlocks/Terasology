@@ -33,21 +33,21 @@ import java.util.Base64;
  */
 public class BigIntegerBase64Serializer implements JsonSerializer<BigInteger>, JsonDeserializer<BigInteger> {
 
-    private static Base64.Decoder decoder = Base64.getDecoder();
-    private static Base64.Encoder encoder = Base64.getEncoder();
-    private static BigIntegerBase64Serializer instance = new BigIntegerBase64Serializer();
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final BigIntegerBase64Serializer INSTANCE = new BigIntegerBase64Serializer();
 
     public static BigIntegerBase64Serializer getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     @Override
     public BigInteger deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return new BigInteger(decoder.decode(json.getAsString().replace("\n", "")));
+        return new BigInteger(DECODER.decode(json.getAsString().replace("\n", "")));
     }
 
     @Override
     public JsonElement serialize(BigInteger src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(encoder.encodeToString(src.toByteArray()));
+        return new JsonPrimitive(ENCODER.encodeToString(src.toByteArray()));
     }
 }

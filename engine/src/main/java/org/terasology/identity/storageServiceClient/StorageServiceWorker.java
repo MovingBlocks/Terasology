@@ -15,8 +15,6 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -29,7 +27,6 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 
 import java.net.URL;
-import java.util.Map;
 
 /**
  * The public interface to this package. Manages a communication session with the storage service server,
@@ -40,41 +37,41 @@ public final class StorageServiceWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(StorageServiceWorker.class);
 
-    private StorageServiceWorkerStatus status = StorageServiceWorkerStatus.LOGGED_OUT_OK;
+    StorageServiceWorkerStatus status = StorageServiceWorkerStatus.LOGGED_OUT;
+    APISession sessionInstance;
+    String loginName;
 
-    private Config config;
-    private IdentityStorageServiceConfig thisConfig;
-    private SecurityConfig securityConfig;
-    private Console console;
+    final IdentityStorageServiceConfig storageConfig;
+    final SecurityConfig securityConfig;
 
-    private APISession sessionInstance;
-    private String loginName;
+    private final Console console;
+    private final Config config;
 
     public StorageServiceWorker(Context context) {
         this.console = context.get(Console.class);
         this.config = context.get(Config.class);
-        this.thisConfig = this.config.getIdentityStorageService();
+        this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
     }
 
-    private void logMessage(boolean warning, String message, Object... args) {
+    void saveConfig() {
+        config.save();
+    }
+
+    void logMessage(boolean warning, String message, Object... args) {
         console.addMessage("Identity storage service: " + String.format(message, args), warning ? CoreMessageType.ERROR : CoreMessageType.CONSOLE);
     }
 
-    private boolean checkStatus(StorageServiceWorkerStatus requiredStatus, String action) {
+    private synchronized void performAction(Action action, StorageServiceWorkerStatus requiredStatus) {
         if (status != requiredStatus) {
-            logMessage(true, "Action \"{}\" could not be performed (requires status {}, actual is {})",
-                    action, requiredStatus.toString(), status.toString());
+            throw new RuntimeException("StorageServiceWorker is not in the required status");
         }
-        return true;
-    }
-
-    private boolean checkStatus(StorageServiceWorkerStatus altStatus1, StorageServiceWorkerStatus altStatus2, String action) {
-        if (status != altStatus1 && status != altStatus2) {
-            logMessage(true, "Action \"{}\" could not be performed (requires status {} or {}, actual is {})",
-                    action, altStatus1.toString(), altStatus2.toString(), status.toString());
-        }
-        return true;
+        status = StorageServiceWorkerStatus.WORKING;
+        logger.info("Performing action {}", action.getClass().getSimpleName());
+        new Thread(() -> {
+            action.perform(this);
+            logger.info("Completed action {}", action.getClass().getSimpleName());
+        }).start();
     }
 
     public StorageServiceWorkerStatus getStatus() {
@@ -90,27 +87,7 @@ public final class StorageServiceWorker {
      * The session token is verified against the server; if it's valid, the status is switched to logged in.
      */
     public void initializeFromConfig() {
-        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_OUT_OK, "initializeFromConfig")) {
-            return;
-        }
-        if (thisConfig.isSet()) {
-            status = StorageServiceWorkerStatus.LOGGING_IN;
-            new Thread(() -> {
-                try {
-                    sessionInstance = new APISession(thisConfig.getServiceUrl(), thisConfig.getSessionToken());
-                    loginName = sessionInstance.getLoginName();
-                    status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
-                    logMessage(false, "Successfully logged in using token stored in credentials");
-                    syncIdentities();
-                } catch (Exception e) {
-                    sessionInstance = null;
-                    status = StorageServiceWorkerStatus.LOGGED_OUT_ERROR;
-                    logMessage(true, "Authentication from stored token and URL failed - %s", e.getMessage());
-                }
-            }).start();
-        } else {
-            logger.info("No configuration data is present, staying logged out");
-        }
+        performAction(new InitializeFromTokenAction(), StorageServiceWorkerStatus.LOGGED_OUT);
     }
 
     /**
@@ -118,99 +95,27 @@ public final class StorageServiceWorker {
      * and the parameters are stored in configuration.
      */
     public void login(URL serviceURL, String login, String password) {
-        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_OUT_OK, StorageServiceWorkerStatus.LOGGED_OUT_ERROR, "login")) {
-            return;
-        }
-        status = StorageServiceWorkerStatus.LOGGING_IN;
-        new Thread(() -> {
-            try {
-                sessionInstance = APISession.createFromLogin(serviceURL, login, password);
-                loginName = sessionInstance.getLoginName();
-                thisConfig.setServiceURL(serviceURL);
-                thisConfig.setSessionToken(sessionInstance.getSessionToken());
-                config.save();
-                status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
-                logMessage(false, "Successfully logged in");
-                syncIdentities();
-            } catch (Exception e) {
-                sessionInstance = null;
-                status = StorageServiceWorkerStatus.LOGGED_OUT_ERROR;
-                logMessage(true, "Login failed due to - {}", e.getMessage());
-            }
-        }).start();
+        performAction(new LoginAction(serviceURL, login, password), StorageServiceWorkerStatus.LOGGED_OUT);
     }
 
     /**
      * Destroys the current session and switches to the logged out status.
      */
     public void logout() {
-        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "logout")) {
-            return;
-        }
-        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
-        new Thread(() -> {
-            try {
-                sessionInstance.logout();
-                sessionInstance = null;
-                thisConfig.setSessionToken(null);
-                status = StorageServiceWorkerStatus.LOGGED_OUT_OK;
-                config.save();
-                logMessage(false, "Successfully logged out");
-            } catch (Exception e) {
-                status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
-                logMessage(true, "Logout failed - {} ", e.getMessage());
-            }
-        }).start();
+        performAction(new LogoutAction(), StorageServiceWorkerStatus.LOGGED_IN);
     }
 
     /**
      * Uploads the specified identity certificate to the server.
      */
     public void putIdentity(PublicIdentityCertificate serverIdentity, ClientIdentity clientIdentity) {
-        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "upload identity")) {
-            return;
-        }
-        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
-        new Thread(() -> {
-            try {
-                sessionInstance.putIdentity(serverIdentity, clientIdentity);
-                logMessage(false, "Successfully uploaded new identity");
-            } catch (Exception e) {
-                logMessage(true, "Failed to upload identity - {}", e.getMessage());
-            }
-            status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
-        }).start();
+        performAction(new PutIdentityAction(serverIdentity, clientIdentity), StorageServiceWorkerStatus.LOGGED_IN);
     }
 
     /**
      * Performs a full synchronization of the locally stored identity certificates with the ones stored on the service.
      */
     public void syncIdentities() {
-        if (!checkStatus(StorageServiceWorkerStatus.LOGGED_IN_IDLE, "sync identities")) {
-            return;
-        }
-        status = StorageServiceWorkerStatus.LOGGED_IN_WORKING;
-        new Thread(() -> {
-            try {
-                Map<PublicIdentityCertificate, ClientIdentity> local = securityConfig.getAllIdentities();
-                Map<PublicIdentityCertificate, ClientIdentity> remote = sessionInstance.getAllIdentities();
-                MapDifference<PublicIdentityCertificate, ClientIdentity> diff = Maps.difference(local, remote);
-                //upload the "only local" ones
-                for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnLeft().entrySet()) {
-                    if (entry.getValue().getPlayerPrivateCertificate() != null) { //TODO: find out why sometimes it's null
-                        sessionInstance.putIdentity(entry.getKey(), entry.getValue());
-                    }
-                }
-                //download the "only remote" ones
-                for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnRight().entrySet()) {
-                    securityConfig.addIdentity(entry.getKey(), entry.getValue());
-                }
-                config.save();
-                logMessage(false, "Successfully synchronized identities");
-            } catch (Exception e) {
-                logMessage(true, "Failed to synchronize identities - ", e.getMessage());
-            }
-            status = StorageServiceWorkerStatus.LOGGED_IN_IDLE;
-        }).start();
+        performAction(new SyncIdentitiesAction(), StorageServiceWorkerStatus.LOGGED_IN);
     }
 }

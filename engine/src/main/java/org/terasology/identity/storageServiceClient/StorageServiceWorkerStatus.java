@@ -15,15 +15,32 @@
  */
 package org.terasology.identity.storageServiceClient;
 
+import org.terasology.i18n.TranslationSystem;
+
 public enum StorageServiceWorkerStatus {
-    // Logged out for a "good reason" (user never logged in, or manually logged out)
-    LOGGED_OUT_OK,
-    // Logged out due to an external reason (expired session token, service unreachable, etc)
-    LOGGED_OUT_ERROR,
-    // Logged in and doing nothing
-    LOGGED_IN_IDLE,
-    // Performing an operation (syncing, logging out, etc)
-    LOGGED_IN_WORKING,
-    // Performing login
-    LOGGING_IN
+    LOGGED_OUT(true, "${engine:menu#storage-service-logged-out}", "${engine:menu#storage-service-log-in}"),
+    LOGGED_IN(true, "${engine:menu#storage-service-logged-in}", "${engine:menu#storage-service-log-out}"),
+    WORKING(false, "${engine:menu#storage-service-wait}", "");
+
+    private final boolean buttonEnabled;
+    private final String statusMessageId;
+    private final String buttonMessageId;
+
+    StorageServiceWorkerStatus(boolean buttonEnabled, String statusMessageId, String buttonMessageId) {
+        this.buttonEnabled = buttonEnabled;
+        this.statusMessageId = statusMessageId;
+        this.buttonMessageId = buttonMessageId;
+    }
+
+    public boolean isButtonEnabled() {
+        return buttonEnabled;
+    }
+
+    public String getLocalizedStatusMessage(TranslationSystem translationSystem, String loginName) {
+        return String.format(translationSystem.translate(statusMessageId), loginName);
+    }
+
+    public String getLocalizedButtonMessage(TranslationSystem translationSystem) {
+        return translationSystem.translate(buttonMessageId);
+    }
 }

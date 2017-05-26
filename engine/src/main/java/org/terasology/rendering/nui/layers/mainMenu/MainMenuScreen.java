@@ -80,9 +80,9 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
         WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
-            if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN_IDLE) {
+            if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
                 storageService.logout();
-            } else if (storageService.getStatus() != StorageServiceWorkerStatus.LOGGED_IN_WORKING) {
+            } else if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_OUT) {
                 getManager().pushScreen(StorageServiceLoginPopup.ASSET_URI, StorageServiceLoginPopup.class);
             }
         });
@@ -90,18 +90,9 @@ public class MainMenuScreen extends CoreScreenLayer {
 
     private void updateStorageServiceStatus() {
         StorageServiceWorkerStatus stat = storageService.getStatus();
-        if (stat == StorageServiceWorkerStatus.LOGGED_IN_IDLE) {
-            storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-logged-in}") + storageService.getLoginName());
-            storageServiceAction.setText(translationSystem.translate("${engine:menu#storage-service-log-out}"));
-            storageServiceAction.setVisible(true);
-        } else if (stat == StorageServiceWorkerStatus.LOGGED_IN_WORKING || stat == StorageServiceWorkerStatus.LOGGING_IN) {
-            storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-wait}"));
-            storageServiceAction.setVisible(false);
-        } else {
-            storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service-logged-out}"));
-            storageServiceAction.setText(translationSystem.translate("${engine:menu#storage-service-log-in}"));
-            storageServiceAction.setVisible(true);
-        }
+        storageServiceStatus.setText(stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
+        storageServiceAction.setText(stat.getLocalizedButtonMessage(translationSystem));
+        storageServiceAction.setVisible(stat.isButtonEnabled());
         storageServiceWorkerStatus = stat;
     }
 

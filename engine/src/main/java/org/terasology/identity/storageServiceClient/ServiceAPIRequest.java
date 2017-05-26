@@ -32,7 +32,7 @@ import java.net.URL;
  */
 final class ServiceAPIRequest {
 
-    private static Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
+    private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
 
     private ServiceAPIRequest() {
     }
@@ -44,7 +44,7 @@ final class ServiceAPIRequest {
     private static void parseError(HttpURLConnection conn) throws IOException, StorageServiceException {
         try (InputStream errResponse = conn.getErrorStream()) {
             try {
-                throw new StorageServiceException(gson.fromJson(new InputStreamReader(errResponse), ErrorResponseData.class).error);
+                throw new StorageServiceException(GSON.fromJson(new InputStreamReader(errResponse), ErrorResponseData.class).error);
             } catch (RuntimeException e) {
                 throw new StorageServiceException();
             }
@@ -62,7 +62,7 @@ final class ServiceAPIRequest {
         }
         if (data != null) {
             try (OutputStream request = conn.getOutputStream()) {
-                request.write(gson.toJson(data).getBytes());
+                request.write(GSON.toJson(data).getBytes());
             }
         }
         conn.connect();
@@ -71,7 +71,7 @@ final class ServiceAPIRequest {
         }
         try (InputStream response = conn.getInputStream()) {
             if (responseClass != null) {
-                return gson.fromJson(new InputStreamReader(response), responseClass);
+                return GSON.fromJson(new InputStreamReader(response), responseClass);
             } else {
                 return null;
             }

@@ -221,7 +221,7 @@
     "start-singleplayer-game": "Singleplayer",
     "storage-service-log-in": "Login",
     "storage-service-log-out": "Logout",
-    "storage-service-logged-in": "Identity storage service: you are logged in as ",
+    "storage-service-logged-in": "Identity storage service: you are logged in as %s",
     "storage-service-logged-out": "Identity storage service: you are not logged in",
     "storage-service-popup-bad-url": "The entered URL is not valid.",
     "storage-service-popup-login": "Login",
