@@ -26,7 +26,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.AliveCharacterComponent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterTeleportEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
@@ -221,6 +223,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         location.setWorldPosition(spawnPosition);
         clientEntity.saveComponent(location);
 
+        playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
+
         logger.debug("Re-spawing player at: {}", spawnPosition);
 
         Client clientListener = networkSystem.getOwner(clientEntity);
@@ -244,6 +248,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         playerCharacter.send(new OnPlayerSpawnedEvent());
     }
 
+    @ReceiveEvent
+    public void onPlayerRespawn(OnPlayerRespawnedEvent event, EntityRef entity, PlayerCharacterComponent playerCharacterComponent) {
+        AliveCharacterComponent aliveCharacterComponent = new AliveCharacterComponent();
+        entity.addComponent(aliveCharacterComponent);
+    }
 
     private static class SpawningClientInfo {
         public EntityRef clientEntity;

@@ -96,7 +96,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
         playerStates.remove(entity);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onCharacterStateReceived(CharacterStateEvent state, EntityRef entity) {
         if (entity.equals(localPlayer.getCharacterEntity())) {
             logger.trace("Received new state, sequence number: {}, buffered input size {}", state.getSequenceNumber(), inputs.size());
@@ -123,7 +123,7 @@ public class ClientCharacterPredictionSystem extends BaseComponentSystem impleme
     }
 
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
         if (predictedState == null) {
             predictedState = createInitialState(entity);

@@ -46,6 +46,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.PlayerCharacterComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -84,9 +85,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private BlockEntityRegistry blockRegistry;
 
     @ReceiveEvent
-    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity, CharacterComponent character) {
-        if (character.controller.exists()) {
-            // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity, CharacterComponent character, AliveCharacterComponent aliveCharacterComponent) {
+        if (entity.hasComponent(PlayerCharacterComponent.class)) {
+            // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
         }
 
@@ -95,6 +96,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
         character.controller.send(deathEvent);
+
+        entity.removeComponent(AliveCharacterComponent.class);
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
