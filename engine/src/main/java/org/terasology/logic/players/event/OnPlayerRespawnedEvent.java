@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package org.terasology.logic.players.event;
 import org.terasology.entitySystem.event.Event;
 
 /**
- * This event gets sent when the player spawns.
- * <br/>
- * <b>Note:</b> that this should be used only as a one time event i.e. when
- * the player spawns for the first time in the game.
- * On every subsequent spawn a onPlayerRespawnedEvent is sent.
+ *  This event gets sent when the player respawns.<br/>
+ *  The player entity is preserved along with its components during respawn.<br/>
+ *  This event should be received and handled by systems that need to reset
+ *  some components attached to the player entity.
  */
-public class OnPlayerSpawnedEvent implements Event {
+public class OnPlayerRespawnedEvent implements Event {
 }

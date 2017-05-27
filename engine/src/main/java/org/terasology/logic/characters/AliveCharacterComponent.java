@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.players.event;
+package org.terasology.logic.characters;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.Component;
 
 /**
- * This event gets sent when the player spawns.
- * <br/>
- * <b>Note:</b> that this should be used only as a one time event i.e. when
- * the player spawns for the first time in the game.
- * On every subsequent spawn a onPlayerRespawnedEvent is sent.
+ * This is only attached to the <b>alive character</b> entities. <br/>
+ * Used to differentiate between alive and dead character entities.
+ * Meaningful for character entities that can remain in a dead state or respawn after a while.
  */
-public class OnPlayerSpawnedEvent implements Event {
+public class AliveCharacterComponent implements Component {
 }
