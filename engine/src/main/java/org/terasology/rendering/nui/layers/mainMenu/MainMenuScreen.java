@@ -27,8 +27,8 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
+import org.terasology.rendering.nui.layers.mainMenu.settings.PlayerSettingsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
@@ -46,7 +46,6 @@ public class MainMenuScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private UILabel storageServiceStatus;
-    private UIButton storageServiceAction;
     private StorageServiceWorkerStatus storageServiceWorkerStatus; //keep track of previous status to avoid performance drop due to updating UI when no change happened
 
     @Override
@@ -55,7 +54,6 @@ public class MainMenuScreen extends CoreScreenLayer {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
         storageServiceStatus = find("storageServiceStatus", UILabel.class);
-        storageServiceAction = find("storageServiceAction", UIButton.class);
         updateStorageServiceStatus();
 
         UILabel versionLabel = find("version", UILabel.class);
@@ -79,20 +77,13 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
         WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
-        WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
-            if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
-                storageService.logout();
-            } else if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_OUT) {
-                getManager().pushScreen(StorageServiceLoginPopup.ASSET_URI, StorageServiceLoginPopup.class);
-            }
-        });
+        WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> triggerForwardAnimation(PlayerSettingsScreen.ASSET_URI));
     }
 
     private void updateStorageServiceStatus() {
         StorageServiceWorkerStatus stat = storageService.getStatus();
-        storageServiceStatus.setText(stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
-        storageServiceAction.setText(stat.getLocalizedButtonMessage(translationSystem));
-        storageServiceAction.setVisible(stat.isButtonEnabled());
+        storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service}") + ": " +
+                stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
         storageServiceWorkerStatus = stat;
     }
 

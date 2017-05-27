@@ -215,6 +215,7 @@
     "ssao": "ssao",
     "start-game": "start-game",
     "start-singleplayer-game": "start-singleplayer-game",
+    "storage-service": "storage-service",
     "storage-service-log-in": "storage-service-log-in",
     "storage-service-log-out": "storage-service-log-out",
     "storage-service-logged-in": "storage-service-logged-in",

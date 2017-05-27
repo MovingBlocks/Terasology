@@ -20,6 +20,10 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
+import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
@@ -55,6 +59,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private Config config;
     @In
     private TranslationSystem translationSystem;
+    @In
+    private StorageServiceWorker storageService;
 
     private final List<Color> colors = CieCamColors.L65C65;
 
@@ -70,10 +76,14 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private UIText nametext;
     private UISlider slider;
+    private UILabel storageServiceStatus;
+    private UIButton storageServiceAction;
     private UISlider heightSlider;
     private UISlider eyeHeightSlider;
     private UIImage img;
     private UIDropdownScrollable<Locale> language;
+
+    private StorageServiceWorkerStatus storageServiceWorkerStatus;
 
     @Override
     public void onOpened() {
@@ -100,6 +110,11 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
+        storageServiceStatus = find("storageServiceStatus", UILabel.class);
+        storageServiceAction = find("storageServiceAction", UIButton.class);
+        updateStorageServiceStatus();
+
         nametext = find("playername", UIText.class);
         if (nametext != null) {
             nametext.setTooltipDelay(0);
@@ -156,6 +171,14 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
+        WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
+            if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
+                storageService.logout();
+            } else if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_OUT) {
+                getManager().pushScreen(StorageServiceLoginPopup.ASSET_URI, StorageServiceLoginPopup.class);
+            }
+        });
+
         UIButton okButton = find("ok", UIButton.class);
         if (okButton != null) {
             okButton.subscribe(button -> {
@@ -176,6 +199,22 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
                 }
             });
         }
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (storageService.getStatus() != storageServiceWorkerStatus) {
+            updateStorageServiceStatus();
+        }
+    }
+
+    private void updateStorageServiceStatus() {
+        StorageServiceWorkerStatus stat = storageService.getStatus();
+        storageServiceStatus.setText(stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
+        storageServiceAction.setText(stat.getLocalizedButtonMessage(translationSystem));
+        storageServiceAction.setVisible(stat.isButtonEnabled());
+        storageServiceWorkerStatus = stat;
     }
 
     private String validateScreen() {

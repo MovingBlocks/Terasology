@@ -54,7 +54,8 @@
                     },
                     {
                         "type": "UIButton",
-                        "id": "storageServiceAction"
+                        "id": "storageServiceAction",
+                        "text": "${engine:menu#game-settings}"
                     }
                 ]
             },

@@ -77,6 +77,27 @@
                         },
                         {
                             "type": "UILabel",
+                            "text": "${engine:menu#storage-service}:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "id": "storageServiceStatus",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.7
+                                    }
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "id": "storageServiceAction"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
                             "text": "${engine:menu#settings-language}:"
                         },
                         {
