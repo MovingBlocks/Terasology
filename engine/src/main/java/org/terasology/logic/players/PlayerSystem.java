@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.geom.Quat4f;
@@ -225,7 +226,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         Client clientListener = networkSystem.getOwner(clientEntity);
         Vector3i distance = clientListener.getViewDistance().getChunkDistance();
         updateRelevanceEntity(clientEntity, distance);
-        playerCharacter.send(new OnPlayerSpawnedEvent());
+        playerCharacter.send(new OnPlayerRespawnedEvent());
     }
 
     private void spawnPlayer(EntityRef clientEntity) {

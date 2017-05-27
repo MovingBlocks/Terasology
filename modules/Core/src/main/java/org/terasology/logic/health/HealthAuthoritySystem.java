@@ -38,6 +38,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
@@ -294,5 +295,11 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
             entity.saveComponent(characterSounds);
 
         }
+    }
+
+    @ReceiveEvent
+    public void onRespawn(OnPlayerRespawnedEvent event, EntityRef entity, HealthComponent healthComponent) {
+        healthComponent.currentHealth = healthComponent.maxHealth;
+        entity.saveComponent(healthComponent);
     }
 }
