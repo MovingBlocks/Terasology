@@ -15,12 +15,16 @@
  */
 package org.terasology.telemetry;
 
+import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
+import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
+import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.http.ApacheHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
 import com.squareup.okhttp.OkHttpClient;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,19 +37,23 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by XIAJin on 2017/5/25.
- */
-
-@RegisterSystem // maybe authority functionality by registerSystem
+@RegisterSystem // maybe authority functionality in parameters
 public class TelemetrySystem extends BaseComponentSystem {
 
     private Emitter emitter;
 
-    private final String url = "http://localhost:8080";
+    private Tracker tracker;
+
+    private final String appId = "terasology";
+
+    private final String url = "http://localhost:80";
+
+    private final DevicePlatform platform = DevicePlatform.Desktop;
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetrySystem.class);
 
@@ -80,6 +88,7 @@ public class TelemetrySystem extends BaseComponentSystem {
             }
         };
 
+        // initialise emitter
         emitter = BatchEmitter.builder()
                 .httpClientAdapter(adapter) // Required
                 .threadCount(20) // Default is 50
@@ -87,5 +96,38 @@ public class TelemetrySystem extends BaseComponentSystem {
                 .bufferSize(1)
                 .build();
 
+        // Name space to identify the tracker
+        String namespace = "org.terasology.telemetry.Telemetry";
+
+        // initialise tracker
+        tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
+                .platform(platform)
+                .build();
+    }
+
+    @Override
+    public void preBegin() {
+        oSTrack();
+    }
+
+    private void oSTrack() {
+
+        String SCHEMA_OS = "iglu:org.terasology/os/jsonschema/1-0-0";
+
+        Map<String, String> osData = new HashMap<String,String>();
+
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        String osArchitecture = System.getProperty("os.arch");
+        osData.put("osName", osName);
+        osData.put("osVersion", osVersion);
+        osData.put("osArchitecture", osArchitecture);
+
+        SelfDescribingJson osJson = new SelfDescribingJson(SCHEMA_OS, osData);
+        Unstructured osEvent = Unstructured.builder()
+                .eventData(osJson)
+                .build();
+
+        tracker.track(osEvent);
     }
 }

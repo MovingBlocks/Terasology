@@ -119,7 +119,9 @@ dependencies {
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
     
     // telemetry
-    compile group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'
+    compile (group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'){
+        exclude group:'org.slf4j',module:'slf4j-simple'
+    }
 
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.2'
