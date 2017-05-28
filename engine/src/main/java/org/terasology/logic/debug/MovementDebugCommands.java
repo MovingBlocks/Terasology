@@ -266,9 +266,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
             GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
             if (gazeMountPointComponent != null) {
                 float prevHeight = gazeMountPointComponent.translate.y;
-                Location.removeChild(client, gazeMountPointComponent.gazeEntity);
                 gazeMountPointComponent.translate.y = amount;
-                Location.attachChild(client, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                clientComp.character.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
             return "";
