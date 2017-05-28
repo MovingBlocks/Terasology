@@ -223,8 +223,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         location.setWorldPosition(spawnPosition);
         clientEntity.saveComponent(location);
 
-        AliveCharacterComponent aliveCharacterComponent = new AliveCharacterComponent();
-        playerCharacter.addComponent(aliveCharacterComponent);
+        playerCharacter.addComponent(new AliveCharacterComponent());
         playerCharacter.send(new CharacterTeleportEvent(spawnPosition));
 
         logger.debug("Re-spawing player at: {}", spawnPosition);
