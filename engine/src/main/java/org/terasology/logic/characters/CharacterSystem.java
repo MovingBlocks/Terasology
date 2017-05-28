@@ -90,6 +90,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (entity.hasComponent(PlayerCharacterComponent.class)) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
+            // PlayerDeathEvent only sent to the client for the player entity.
             PlayerDeathEvent playerDeathEvent = new PlayerDeathEvent();
             //Store the details of the death in the event for display on the death screen
             playerDeathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
@@ -97,8 +98,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             character.controller.send(playerDeathEvent);
         }
 
+        // DeathEvent sent to client for any character entity.
         DeathEvent deathEvent = new DeathEvent();
-        //Store the details of the death in the event for display on the death screen
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
         character.controller.send(deathEvent);
