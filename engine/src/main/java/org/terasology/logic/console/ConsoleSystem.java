@@ -51,7 +51,6 @@ public class ConsoleSystem extends BaseComponentSystem {
                 overlay.setVisible(true);
             }
         });
-        overlay.setVisible(true);
     }
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)

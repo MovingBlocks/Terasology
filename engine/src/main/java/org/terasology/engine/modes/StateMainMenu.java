@@ -78,10 +78,6 @@ public class StateMainMenu implements GameState {
         eventSystem = context.get(EventSystem.class);
         context.put(Console.class, new ConsoleImpl(context));
 
-        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(context);
-        storageServiceWorker.initializeFromConfig();
-        context.put(StorageServiceWorker.class, storageServiceWorker);
-
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
 
@@ -120,6 +116,10 @@ public class StateMainMenu implements GameState {
         componentSystemManager.initialise();
 
         playBackgroundMusic();
+
+        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(context);
+        storageServiceWorker.initializeFromConfig();
+        context.put(StorageServiceWorker.class, storageServiceWorker);
 
         //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
