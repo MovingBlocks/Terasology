@@ -86,7 +86,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterMovementSystemUtility = new CharacterMovementSystemUtility(physics);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
         physics.getCharacterCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
@@ -94,7 +94,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterStates.put(entity, stateBuffer);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         physics.removeCharacterCollider(entity);
         characterStates.remove(entity);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
- * This event is sent to the client entity when the character dies.
+ * This event is sent to the client entity when the player dies.
  */
 @OwnerEvent
-public class DeathEvent implements Event {
+public class PlayerDeathEvent implements Event {
     public String damageTypeName;
     public String instigatorName;
 }

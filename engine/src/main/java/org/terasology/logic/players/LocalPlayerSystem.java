@@ -231,8 +231,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // To check if a valid key has been assigned, either primary or secondary and return it
     private Input getValidKey(List<Input> inputs) {
-        for(Input input: inputs) {
-            if(input != null) {
+        for (Input input : inputs) {
+            if (input != null) {
                 return input;
             }
         }
@@ -246,7 +246,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void stopAutoMove() {
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             inputSystem.cancelSimulatedKeyStroke(forwardKey);
             isAutoMove = false;
         }
@@ -262,7 +262,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         bindsConfig = config.getInput().getBinds();
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             isAutoMove = true;
             inputSystem.simulateSingleKeyStroke(forwardKey);
             inputSystem.simulateRepeatedKeyStroke(forwardKey);
@@ -328,7 +328,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = event.getValue();
-        if(relativeMovement.z == 0f && isAutoMove) {
+        if (relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
         }
         event.consume();

@@ -37,6 +37,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -89,6 +90,11 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         if (entity.hasComponent(PlayerCharacterComponent.class)) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
+            PlayerDeathEvent playerDeathEvent = new PlayerDeathEvent();
+            //Store the details of the death in the event for display on the death screen
+            playerDeathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
+            playerDeathEvent.instigatorName = getInstigatorName(event.getInstigator());
+            character.controller.send(playerDeathEvent);
         }
 
         DeathEvent deathEvent = new DeathEvent();
