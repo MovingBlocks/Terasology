@@ -59,7 +59,7 @@ public final class StorageServiceWorker {
     }
 
     void logMessage(boolean warning, String message, Object... args) {
-        console.addMessage("Identity storage service: " + String.format(message, args), warning ? CoreMessageType.ERROR : CoreMessageType.CONSOLE);
+        console.addMessage("Identity storage service: " + String.format(message, args), CoreMessageType.NOTIFICATION);
     }
 
     private synchronized void performAction(Action action, StorageServiceWorkerStatus requiredStatus) {
