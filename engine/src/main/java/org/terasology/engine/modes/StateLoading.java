@@ -44,6 +44,7 @@ import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
+import org.terasology.engine.modes.loadProcesses.PostWorldGenerationSystems;
 import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
@@ -168,6 +169,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new SetupRemotePlayer(context));
         loadProcesses.add(new AwaitCharacterSpawn(context));
         loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(new PostWorldGenerationSystems(context));
     }
 
     private void initHost() {
@@ -210,6 +212,7 @@ public class StateLoading implements GameState {
             loadProcesses.add(new AwaitCharacterSpawn(context));
         }
         loadProcesses.add(new PrepareWorld(context));
+        loadProcesses.add(new PostWorldGenerationSystems(context));
     }
 
     private void popStep() {
