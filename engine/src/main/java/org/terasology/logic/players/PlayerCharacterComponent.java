@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.players;
 
-package org.terasology.logic.characters.events;
-
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.OwnerEvent;
+import org.terasology.entitySystem.Component;
 
 /**
- * This event is sent to the client entity when the character dies.
+ * This is only attached to the player entities. <br/>
+ * Used to differentiate between player characters and other character entities.
  */
-@OwnerEvent
-public class DeathEvent implements Event {
-    public String damageTypeName;
-    public String instigatorName;
+public class PlayerCharacterComponent implements Component {
 }

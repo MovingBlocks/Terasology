@@ -30,9 +30,12 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
+import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -83,7 +86,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterMovementSystemUtility = new CharacterMovementSystemUtility(physics);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onCreate(final OnActivatedComponent event, final EntityRef entity) {
         physics.getCharacterCollider(entity);
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
@@ -91,7 +94,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterStates.put(entity, stateBuffer);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onDestroy(final BeforeDeactivateComponent event, final EntityRef entity) {
         physics.removeCharacterCollider(entity);
         characterStates.remove(entity);
@@ -113,7 +116,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         characterMovementSystemUtility.setToState(character, newState);
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
         CharacterCollider characterCollider = physics.getCharacterCollider(entity);
         if (characterCollider.isPending()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.logic.characters.events;
+package org.terasology.logic.players.event;
 
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.OwnerEvent;
 
 /**
- * This event is sent to the client entity when the character dies.
+ *  This event gets sent when the player respawns.<br/>
+ *  The player entity is preserved along with its components during respawn.<br/>
+ *  This event should be received and handled by systems that need to reset
+ *  some components attached to the player entity.
  */
-@OwnerEvent
-public class DeathEvent implements Event {
-    public String damageTypeName;
-    public String instigatorName;
+public class OnPlayerRespawnedEvent implements Event {
 }

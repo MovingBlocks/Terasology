@@ -69,11 +69,8 @@ public class PlayerFactory {
 
         EntityBuilder builder = entityManager.newBuilder("engine:player");
 
-        float extraSpace = 0.5f;  // spawn a little bit above the ground
-        float entityHeight = getHeightOf(builder) + extraSpace;
-
         LocationComponent location = controller.getComponent(LocationComponent.class);
-        Vector3f spawnPosition = findSpawnPos(location.getWorldPosition(), entityHeight).get(); // TODO: Handle Optional being empty
+        Vector3f spawnPosition = findSpawnPositionFromLocationComponent(location);
         location.setWorldPosition(spawnPosition);
         controller.saveComponent(location);
 
@@ -98,6 +95,13 @@ public class PlayerFactory {
         Location.attachChild(player, controller, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
         return player;
+    }
+
+    public Vector3f findSpawnPositionFromLocationComponent(LocationComponent locationComponent) {
+        EntityBuilder builder = entityManager.newBuilder("engine:player");
+        float extraSpace = 0.5f;  // spawn a little bit above the ground
+        float entityHeight = getHeightOf(builder) + extraSpace;
+        return findSpawnPos(locationComponent.getWorldPosition(), entityHeight).get(); // TODO: Handle Optional being empty
     }
 
     private float getHeightOf(ComponentContainer prefab) {
