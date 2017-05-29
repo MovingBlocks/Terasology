@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.PersistentPlayerComponent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -45,6 +47,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -95,11 +98,39 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //entity.removeComponent(CharacterMovementComponent.class);
     }
 
+    @ReceiveEvent
+    public void backupPersistentComponents(DoDestroyEvent event, EntityRef character, CharacterComponent characterComponent) {
+        EntityRef client = characterComponent.controller;
+        EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
+        if (client != EntityRef.NULL) {
+            for (Component c : character.iterateComponents()) {
+                if (c.getClass().isAnnotationPresent(PersistentPlayerComponent.class)) {
+                    clientInfo.addOrSaveComponent(c);
+                }
+            }
+        }
+    }
+
+    @ReceiveEvent
+    public void retrievePersistentComponents(OnPlayerSpawnedEvent event, EntityRef character, CharacterComponent characterComponent) {
+        EntityRef client = characterComponent.controller;
+        EntityRef clientInfo = client.getComponent(ClientComponent.class).clientInfo;
+        if (client != EntityRef.NULL) {
+            for (Component c : clientInfo.iterateComponents()) {
+                if (c.getClass().isAnnotationPresent(PersistentPlayerComponent.class)) {
+                    character.addOrSaveComponent(c);
+                    clientInfo.removeComponent(c.getClass());
+                }
+            }
+        }
+    }
+
     /**
      * Extracts the name from an entity.
      * If the entity is a character, then the display name from the {@link ClientComponent#clientInfo} is used.
      * Otherwise the entity itself is checked for a {@link DisplayNameComponent}.
      * In the last case, the prefab name of the entity is used, e.g. "engine:player" will be parsed to "Player".
+     *
      * @param instigator The entity for which an instigator name is needed.
      * @return The instigator name.
      */
@@ -134,6 +165,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     /**
      * Extracts the damage type name from a prefab. If the prefab has a {@link DisplayNameComponent}, it will be used.
      * Otherwise the damage type name is parsed, e.g. "engine:directDamage" will become "Direct Damage".
+     *
      * @param damageType The damage type prefab.
      * @return A readable name for the damage type.
      */
