@@ -1,0 +1,74 @@
+{
+    "type": "identityConflictPopup",
+    "skin": "messageBox",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "text": "${engine:menu#warning}",
+                            "family": "title"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "Message",
+                            "id": "message"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [
+                                1,
+                                16
+                            ]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 4,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#storage-service-conflict-keep-local}",
+                                    "id": "keepLocal"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#storage-service-conflict-keep-remote}",
+                                    "id": "keepRemote"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#storage-service-conflict-ignore}",
+                                    "id": "ignore"
+                                }
+                            ],
+                            "layoutInfo": {
+                                "width": 200,
+                                "position-right": {}
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -29,6 +29,7 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
@@ -87,6 +88,9 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private TranslationSystem translationSystem;
+
+    @In
+    private StorageServiceWorker storageServiceWorker;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -155,6 +159,11 @@ public class JoinGameScreen extends CoreScreenLayer {
         super.onOpened();
 
         infoService = new ServerInfoService();
+
+        if (storageServiceWorker.hasConflictingIdentities()) {
+            IdentityConflictPopup conflictPopup = getManager().pushScreen(IdentityConflictPopup.ASSET_URI, IdentityConflictPopup.class);
+            conflictPopup.startInteractiveConflictSolving();
+        }
 
         if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);

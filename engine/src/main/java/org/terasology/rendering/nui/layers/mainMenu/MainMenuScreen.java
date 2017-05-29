@@ -72,7 +72,15 @@ public class MainMenuScreen extends CoreScreenLayer {
             selectScreen.setLoadingAsServer(true);
             triggerForwardAnimation(selectScreen);
         });
-        WidgetUtil.trySubscribe(this, "join", button -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
+        WidgetUtil.trySubscribe(this, "join", button -> {
+            if (storageService.getStatus() == StorageServiceWorkerStatus.WORKING) {
+                ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
+                confirmPopup.setMessage(translationSystem.translate("${engine:menu#warning}"), translationSystem.translate("${engine:menu#storage-service-working}"));
+                confirmPopup.setOkHandler(() -> triggerForwardAnimation(JoinGameScreen.ASSET_URI));
+            } else {
+                triggerForwardAnimation(JoinGameScreen.ASSET_URI);
+            }
+        });
         WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());

@@ -17,6 +17,8 @@ package org.terasology.identity;
 
 import org.terasology.config.SecurityConfig;
 
+import java.util.Objects;
+
 public class ClientIdentity {
 
 
@@ -47,5 +49,22 @@ public class ClientIdentity {
             System.getSecurityManager().checkPermission(SecurityConfig.PRIVATE_CERTIFICATE_ACCESS_PERMISSION);
         }
         return playerPrivateCertificate;
+    }
+
+    @Override
+    public int hashCode() {
+        return playerPrivateCertificate.hashCode() ^ playerPrivateCertificate.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ClientIdentity) {
+            ClientIdentity other = (ClientIdentity) obj;
+            return Objects.equals(playerPublicCertificate, other.playerPublicCertificate) && Objects.equals(playerPrivateCertificate, other.playerPrivateCertificate);
+        }
+        return false;
     }
 }

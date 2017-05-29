@@ -18,25 +18,29 @@ package org.terasology.identity.storageServiceClient;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PublicIdentityCertificate;
 
+import java.util.Map;
+
 /**
  */
 final class PutIdentityAction extends Action {
 
-    private final PublicIdentityCertificate serverIdentity;
-    private final ClientIdentity clientIdentity;
+    private final Map<PublicIdentityCertificate, ClientIdentity> identities;
 
-    PutIdentityAction(PublicIdentityCertificate serverIdentity, ClientIdentity clientIdentity) {
-        this.serverIdentity = serverIdentity;
-        this.clientIdentity = clientIdentity;
+    PutIdentityAction(Map<PublicIdentityCertificate, ClientIdentity> identities) {
+        this.identities = identities;
     }
 
     @Override
     void perform(StorageServiceWorker worker) {
         try {
-            worker.sessionInstance.putIdentity(serverIdentity, clientIdentity);
-            worker.logMessage(false, "Successfully uploaded new identity");
+            for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: identities.entrySet()) {
+                worker.sessionInstance.putIdentity(entry.getKey(), entry.getValue());
+            }
+            if (!identities.isEmpty()) {
+                worker.logMessage(false, "Successfully uploaded new identities");
+            }
         } catch (Exception e) {
-            worker.logMessage(true, "Failed to upload identity - %s", e.getMessage());
+            worker.logMessage(true, "Failed to upload identities - %s", e.getMessage());
         }
         worker.status = StorageServiceWorkerStatus.LOGGED_IN;
     }

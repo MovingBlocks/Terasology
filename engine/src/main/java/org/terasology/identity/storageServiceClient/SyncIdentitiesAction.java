@@ -29,21 +29,35 @@ final class SyncIdentitiesAction extends Action {
     @Override
     void perform(StorageServiceWorker worker) {
         try {
+            if (worker.hasConflictingIdentities()) {
+                throw new Exception("Conflicts were detected during the latest synchronization. " +
+                        "It's not possible to start a new synchronization until the conflicts are solved.");
+            }
             Map<PublicIdentityCertificate, ClientIdentity> local = worker.securityConfig.getAllIdentities();
             Map<PublicIdentityCertificate, ClientIdentity> remote = worker.sessionInstance.getAllIdentities();
             MapDifference<PublicIdentityCertificate, ClientIdentity> diff = Maps.difference(local, remote);
-            //upload the "only local" ones
+            //upload the "local only" ones
             for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnLeft().entrySet()) {
                 if (entry.getValue().getPlayerPrivateCertificate() != null) { //TODO: find out why sometimes it's null
                     worker.sessionInstance.putIdentity(entry.getKey(), entry.getValue());
                 }
             }
-            //download the "only remote" ones
+            //download the "remote only" ones
             for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: diff.entriesOnlyOnRight().entrySet()) {
                 worker.securityConfig.addIdentity(entry.getKey(), entry.getValue());
             }
+            //keep track of the conflicting ones for manual resolution
+            for (Map.Entry<PublicIdentityCertificate, MapDifference.ValueDifference<ClientIdentity>> entry: diff.entriesDiffering().entrySet()) {
+                worker.conflictingRemoteIdentities.put(entry.getKey(), entry.getValue().rightValue());
+            }
             worker.saveConfig();
-            worker.logMessage(false, "Successfully synchronized identities");
+            String msg = String.format("Identity synchronization completed - %d downloaded, %d uploaded, %d conflicting",
+                    diff.entriesOnlyOnLeft().size(), diff.entriesOnlyOnRight().size(), diff.entriesDiffering().size());
+            worker.logMessage(false, msg);
+            if (!diff.entriesDiffering().isEmpty()) {
+                worker.logMessage(true, "WARNING: there were conflicting identities. Please click Join Game " +
+                        "from the main menu to solve the conflicts.");
+            }
         } catch (Exception e) {
             worker.logMessage(true, "Failed to synchronize identities - ", e.getMessage());
         }
