@@ -27,10 +27,10 @@ final class LogoutAction extends Action {
             worker.storageConfig.setSessionToken(null);
             worker.status = StorageServiceWorkerStatus.LOGGED_OUT;
             worker.saveConfig();
-            worker.logMessage(false, "Successfully logged out");
+            worker.logMessage(false, "${engine:menu#storage-service-login-ok}");
         } catch (Exception e) {
             worker.status = StorageServiceWorkerStatus.LOGGED_IN;
-            worker.logMessage(true, "Logout failed - {} ", e.getMessage());
+            worker.logMessage(true, "${engine:menu#storage-service-login-fail}", e.getMessage());
         }
     }
 }

@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.config.IdentityStorageServiceConfig;
 import org.terasology.config.SecurityConfig;
 import org.terasology.context.Context;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.console.Console;
@@ -50,12 +51,14 @@ public final class StorageServiceWorker {
 
     private final Console console;
     private final Config config;
+    private final TranslationSystem translationSystem;
 
     public StorageServiceWorker(Context context) {
         this.console = context.get(Console.class);
         this.config = context.get(Config.class);
         this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
+        this.translationSystem = context.get(TranslationSystem.class);
         this.conflictingRemoteIdentities = Maps.newHashMap();
     }
 
@@ -63,8 +66,9 @@ public final class StorageServiceWorker {
         config.save();
     }
 
-    void logMessage(boolean warning, String message, Object... args) {
-        console.addMessage("Identity storage service: " + String.format(message, args), CoreMessageType.NOTIFICATION);
+    void logMessage(boolean warning, String messageId, Object... args) {
+        String localizedMessage = "Identity storage service: " + translationSystem.translate(messageId);
+        console.addMessage(String.format(localizedMessage, args), CoreMessageType.NOTIFICATION);
     }
 
     private synchronized void performAction(Action action, StorageServiceWorkerStatus requiredStatus) {

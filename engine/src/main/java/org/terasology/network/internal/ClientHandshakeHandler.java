@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.config.Config;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.identity.IdentityConstants;
 import org.terasology.identity.PrivateIdentityCertificate;
@@ -151,7 +152,10 @@ public class ClientHandshakeHandler extends SimpleChannelUpstreamHandler {
             config.save();
 
             //Try to upload the new identity to the identity storage service (if user is logged in)
-            CoreRegistry.get(StorageServiceWorker.class).putIdentity(serverCertificate, identity);
+            StorageServiceWorker storageServiceWorker = CoreRegistry.get(StorageServiceWorker.class);
+            if (storageServiceWorker != null && storageServiceWorker.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
+                storageServiceWorker.putIdentity(serverCertificate, identity);
+            }
 
             // And we're authenticated.
             ctx.getPipeline().remove(this);

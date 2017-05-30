@@ -26,15 +26,15 @@ final class InitializeFromTokenAction extends Action {
                 worker.sessionInstance = new APISession(worker.storageConfig.getServiceUrl(), worker.storageConfig.getSessionToken());
                 worker.loginName = worker.sessionInstance.getLoginName();
                 worker.status = StorageServiceWorkerStatus.LOGGED_IN;
-                worker.logMessage(false, "Successfully logged in using token stored in credentials");
+                worker.logMessage(false, "${engine:menu#storage-service-token-ok}");
                 worker.syncIdentities();
             } catch (Exception e) {
                 worker.sessionInstance = null;
                 worker.status = StorageServiceWorkerStatus.LOGGED_OUT;
-                worker.logMessage(true, "Authentication from stored token and URL failed - %s", e.getMessage());
+                worker.logMessage(true, "${engine:menu#storage-service-token-fail}", e.getMessage());
             }
         } else {
-            worker.logMessage(false, "No configuration data is present, staying logged out");
+            worker.logMessage(false, "${engine:menu#storage-service-token-not-present}");
             worker.status = StorageServiceWorkerStatus.LOGGED_OUT;
         }
     }

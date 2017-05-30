@@ -37,10 +37,10 @@ final class PutIdentityAction extends Action {
                 worker.sessionInstance.putIdentity(entry.getKey(), entry.getValue());
             }
             if (!identities.isEmpty()) {
-                worker.logMessage(false, "Successfully uploaded new identities");
+                worker.logMessage(false, "${engine:menu#storage-service-upload-ok}");
             }
         } catch (Exception e) {
-            worker.logMessage(true, "Failed to upload identities - %s", e.getMessage());
+            worker.logMessage(true, "${engine:menu#storage-service-upload-fail}", e.getMessage());
         }
         worker.status = StorageServiceWorkerStatus.LOGGED_IN;
     }

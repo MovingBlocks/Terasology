@@ -40,12 +40,12 @@ final class LoginAction extends Action {
             worker.storageConfig.setSessionToken(worker.sessionInstance.getSessionToken());
             worker.saveConfig();
             worker.status = StorageServiceWorkerStatus.LOGGED_IN;
-            worker.logMessage(false, "Successfully logged in");
+            worker.logMessage(false, "${engine:menu#storage-service-login-ok}");
             worker.syncIdentities();
         } catch (Exception e) {
             worker.sessionInstance = null;
             worker.status = StorageServiceWorkerStatus.LOGGED_OUT;
-            worker.logMessage(true, "Login failed - %s", e.getMessage());
+            worker.logMessage(true, "${engine:menu#storage-service-login-fail}", e.getMessage());
         }
     }
 }

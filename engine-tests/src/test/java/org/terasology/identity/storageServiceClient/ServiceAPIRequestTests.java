@@ -39,8 +39,9 @@ public class ServiceAPIRequestTests {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof DummySerializableObject))
+            if (!(other instanceof DummySerializableObject)) {
                 return false;
+            }
             DummySerializableObject o = (DummySerializableObject) other;
             return fieldA.equals(o.fieldA) && fieldB == o.fieldB;
         }
