@@ -1,5 +1,5 @@
 {
-    "type": "identityConflictPopup",
+    "type": "threeButtonPopup",
     "skin": "messageBox",
     "contents": {
         "type": "relativeLayout",
@@ -19,7 +19,7 @@
                     "contents": [
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#warning}",
+                            "id": "title",
                             "family": "title"
                         },
                         {
@@ -31,7 +31,6 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Message",
                             "id": "message"
                         },
                         {
@@ -47,18 +46,15 @@
                             "contents": [
                                 {
                                     "type": "UIButton",
-                                    "text": "${engine:menu#storage-service-conflict-keep-local}",
-                                    "id": "keepLocal"
+                                    "id": "leftButton"
                                 },
                                 {
                                     "type": "UIButton",
-                                    "text": "${engine:menu#storage-service-conflict-keep-remote}",
-                                    "id": "keepRemote"
+                                    "id": "centerButton"
                                 },
                                 {
                                     "type": "UIButton",
-                                    "text": "${engine:menu#storage-service-conflict-ignore}",
-                                    "id": "ignore"
+                                    "id": "rightButton"
                                 }
                             ],
                             "layoutInfo": {

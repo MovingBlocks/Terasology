@@ -46,8 +46,9 @@ final class SyncIdentitiesAction extends Action {
                     worker.securityConfig.addIdentity(entry.getKey(), entry.getValue());
                 }
                 //keep track of the conflicting ones for manual resolution
+                worker.resetConflicts();
                 for (Map.Entry<PublicIdentityCertificate, MapDifference.ValueDifference<ClientIdentity>> entry : diff.entriesDiffering().entrySet()) {
-                    worker.conflictingRemoteIdentities.put(entry.getKey(), entry.getValue().rightValue());
+                    worker.conflictingRemoteIdentities.push(new IdentityBundle(entry.getKey(), entry.getValue().rightValue()));
                 }
                 worker.saveConfig();
                 worker.logMessage(false, "${engine:menu#storage-service-sync-ok}",

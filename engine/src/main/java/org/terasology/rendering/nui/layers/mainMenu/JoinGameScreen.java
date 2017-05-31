@@ -160,13 +160,12 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         infoService = new ServerInfoService();
 
-        if (storageServiceWorker.hasConflictingIdentities()) {
-            IdentityConflictPopup conflictPopup = getManager().pushScreen(IdentityConflictPopup.ASSET_URI, IdentityConflictPopup.class);
-            conflictPopup.startInteractiveConflictSolving();
-        }
-
         if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
+        }
+
+        if (storageServiceWorker.hasConflictingIdentities()) {
+            new IdentityConflictHelper(storageServiceWorker, getManager(), translationSystem).runSolver();
         }
     }
 

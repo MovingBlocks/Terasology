@@ -15,17 +15,8 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PublicIdentityCertificate;
-
-@FunctionalInterface
-public interface IdentityConflictSolver {
-
-    enum Result {
-        KEEP_LOCAL,
-        KEEP_REMOTE,
-        IGNORE
-    }
-
-    Result solve(PublicIdentityCertificate server, ClientIdentity local, ClientIdentity remote);
+public enum IdentityConflictSolution {
+    KEEP_LOCAL,
+    KEEP_REMOTE,
+    IGNORE
 }

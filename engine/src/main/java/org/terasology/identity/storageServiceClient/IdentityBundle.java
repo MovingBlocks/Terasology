@@ -42,6 +42,14 @@ class IdentityBundle {
         this(server, client.getPlayerPublicCertificate(), client.getPlayerPrivateCertificate());
     }
 
+    public PublicIdentityCertificate getServer() {
+        return server;
+    }
+
+    public ClientIdentity getClient() {
+        return new ClientIdentity(clientPublic, clientPrivate);
+    }
+
     public static Map<PublicIdentityCertificate, ClientIdentity> listToMap(List<IdentityBundle> ls) {
         Map<PublicIdentityCertificate, ClientIdentity> result = new HashMap<>();
         for (IdentityBundle item: ls) {
