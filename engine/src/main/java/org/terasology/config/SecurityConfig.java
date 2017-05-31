@@ -29,6 +29,7 @@ import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 
 import java.lang.reflect.Type;
+import java.security.Permission;
 import java.security.SecurityPermission;
 import java.util.Collections;
 import java.util.Map;
@@ -48,17 +49,19 @@ public class SecurityConfig {
         return serverPublicCertificate;
     }
 
-    public PrivateIdentityCertificate getServerPrivateCertificate() {
+    private void checkPermission(Permission permission) {
         if (System.getSecurityManager() != null) {
-            System.getSecurityManager().checkPermission(PRIVATE_CERTIFICATE_ACCESS_PERMISSION);
+            System.getSecurityManager().checkPermission(permission);
         }
+    }
+
+    public PrivateIdentityCertificate getServerPrivateCertificate() {
+        checkPermission(PRIVATE_CERTIFICATE_ACCESS_PERMISSION);
         return serverPrivateCertificate;
     }
 
     public void setServerCredentials(PublicIdentityCertificate publicCert, PrivateIdentityCertificate privateCert) {
-        if (System.getSecurityManager() != null) {
-            System.getSecurityManager().checkPermission(CERTIFICATE_WRITE_PERMISSION);
-        }
+        checkPermission(CERTIFICATE_WRITE_PERMISSION);
         this.serverPublicCertificate = publicCert;
         this.serverPrivateCertificate = privateCert;
     }
@@ -72,10 +75,13 @@ public class SecurityConfig {
     }
 
     public void addIdentity(PublicIdentityCertificate serverCertificate, ClientIdentity identity) {
-        if (System.getSecurityManager() != null) {
-            System.getSecurityManager().checkPermission(CERTIFICATE_WRITE_PERMISSION);
-        }
+        checkPermission(CERTIFICATE_WRITE_PERMISSION);
         clientCertificates.put(serverCertificate, identity);
+    }
+
+    public void clearIdentities() {
+        checkPermission(CERTIFICATE_WRITE_PERMISSION);
+        clientCertificates.clear();
     }
 
     public static class Handler implements JsonSerializer<SecurityConfig>, JsonDeserializer<SecurityConfig> {

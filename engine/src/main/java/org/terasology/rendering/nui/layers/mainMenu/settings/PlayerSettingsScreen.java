@@ -23,6 +23,7 @@ import com.google.common.math.DoubleMath;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
+import org.terasology.rendering.nui.layers.mainMenu.ThreeButtonPopup;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
@@ -173,7 +174,12 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
-                storageService.logout();
+                ThreeButtonPopup logoutPopup = getManager().pushScreen(ThreeButtonPopup.ASSET_URI, ThreeButtonPopup.class);
+                logoutPopup.setMessage(translationSystem.translate("${engine:menu#storage-service-log-out}"),
+                        translationSystem.translate("${engine:menu#storage-service-log-out-popup}"));
+                logoutPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> storageService.logout(true));
+                logoutPopup.setCenterButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> storageService.logout(false));
+                logoutPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-cancel}"), () -> { });
             } else if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_OUT) {
                 getManager().pushScreen(StorageServiceLoginPopup.ASSET_URI, StorageServiceLoginPopup.class);
             }

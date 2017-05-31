@@ -116,9 +116,10 @@ public final class StorageServiceWorker {
 
     /**
      * Destroys the current session and switches to the logged out status.
+     * @param deleteLocalIdentities whether the locally stored identities should be deleted or not.
      */
-    public void logout() {
-        performAction(new LogoutAction(), StorageServiceWorkerStatus.LOGGED_IN);
+    public void logout(boolean deleteLocalIdentities) {
+        performAction(new LogoutAction(deleteLocalIdentities), StorageServiceWorkerStatus.LOGGED_IN);
     }
 
     private void putIdentities(Map<PublicIdentityCertificate, ClientIdentity> identities) {
@@ -145,30 +146,6 @@ public final class StorageServiceWorker {
     public boolean hasConflictingIdentities() {
         return !conflictingRemoteIdentities.isEmpty();
     }
-
-    /*@Deprecated
-    public void solveConflicts(IdentityConflictSolver solver) {
-        Map<PublicIdentityCertificate, ClientIdentity> toUpload = Maps.newHashMap();
-        for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: conflictingRemoteIdentities.entrySet()) {
-            PublicIdentityCertificate server = entry.getKey();
-            ClientIdentity remote = entry.getValue();
-            ClientIdentity local = securityConfig.getIdentity(server);
-            switch (solver.solve(server, local, remote)) {
-                case KEEP_LOCAL: //save for upload (remote will be overwritten)
-                    toUpload.put(server, local);
-                    break;
-                case KEEP_REMOTE: //store the remote identity locally, overwriting the local one
-                    securityConfig.addIdentity(server, remote);
-                    break;
-                case IGNORE:
-                    //do nothing, keep remote on remote and local on local
-            }
-        }
-        //reset conflicts
-        conflictingRemoteIdentities.clear();
-        //perform uploads (asynchronously)
-        putIdentities(toUpload);
-    }*/
 
     /**
      * @return details about one synchronization conflict.
