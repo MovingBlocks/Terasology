@@ -30,7 +30,8 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 
 import java.net.URL;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 
 /**
@@ -45,7 +46,7 @@ public final class StorageServiceWorker {
     StorageServiceWorkerStatus status = StorageServiceWorkerStatus.LOGGED_OUT;
     APISession sessionInstance;
     String loginName;
-    Stack<IdentityBundle> conflictingRemoteIdentities;
+    Deque<IdentityBundle> conflictingRemoteIdentities;
 
     final IdentityStorageServiceConfig storageConfig;
     final SecurityConfig securityConfig;
@@ -61,11 +62,11 @@ public final class StorageServiceWorker {
         this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
         this.translationSystem = context.get(TranslationSystem.class);
-        this.conflictingRemoteIdentities = new Stack<>();
+        this.conflictingRemoteIdentities = new ArrayDeque<>();
     }
 
     void resetConflicts() {
-        this.conflictingRemoteIdentities = new Stack<>();
+        this.conflictingRemoteIdentities = new ArrayDeque<>();
         this.conflictSolutionsToUpload = Maps.newHashMap();
     }
 
@@ -151,7 +152,7 @@ public final class StorageServiceWorker {
      * @return details about one synchronization conflict.
      */
     public IdentityConflict getNextConflict() {
-        IdentityBundle entry = conflictingRemoteIdentities.peek();
+        IdentityBundle entry = conflictingRemoteIdentities.peekFirst();
         return new IdentityConflict(entry.getServer(), securityConfig.getIdentity(entry.getServer()), entry.getClient());
     }
 
@@ -160,7 +161,7 @@ public final class StorageServiceWorker {
      * If there are no more conflicts and some of the solved conflicts must keep the local version, the uploads are performed asynchronously.
      */
     public void solveNextConflict(IdentityConflictSolution solution) {
-        IdentityBundle entry = conflictingRemoteIdentities.pop();
+        IdentityBundle entry = conflictingRemoteIdentities.removeFirst();
         PublicIdentityCertificate server = entry.getServer();
         ClientIdentity remote = entry.getClient();
         ClientIdentity local = securityConfig.getIdentity(server);

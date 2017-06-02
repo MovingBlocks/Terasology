@@ -15,16 +15,14 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-import org.terasology.i18n.TranslationSystem;
-
 public enum StorageServiceWorkerStatus {
     LOGGED_OUT(true, "${engine:menu#storage-service-logged-out}", "${engine:menu#storage-service-log-in}"),
     LOGGED_IN(true, "${engine:menu#storage-service-logged-in}", "${engine:menu#storage-service-log-out}"),
     WORKING(false, "${engine:menu#storage-service-wait}", "");
 
+    final String statusMessageId;
+    final String buttonMessageId;
     private final boolean buttonEnabled;
-    private final String statusMessageId;
-    private final String buttonMessageId;
 
     StorageServiceWorkerStatus(boolean buttonEnabled, String statusMessageId, String buttonMessageId) {
         this.buttonEnabled = buttonEnabled;
@@ -34,13 +32,5 @@ public enum StorageServiceWorkerStatus {
 
     public boolean isButtonEnabled() {
         return buttonEnabled;
-    }
-
-    public String getLocalizedStatusMessage(TranslationSystem translationSystem, String loginName) {
-        return String.format(translationSystem.translate(statusMessageId), loginName);
-    }
-
-    public String getLocalizedButtonMessage(TranslationSystem translationSystem) {
-        return translationSystem.translate(buttonMessageId);
     }
 }

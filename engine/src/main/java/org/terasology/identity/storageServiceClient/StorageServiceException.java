@@ -15,7 +15,7 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-class StorageServiceException extends Exception {
+public class StorageServiceException extends Exception {
 
     StorageServiceException(String message) {
         super("The server answered with this error message: " + message);

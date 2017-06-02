@@ -112,6 +112,6 @@ public class PrivateIdentityCertificate {
 
     @Override
     public int hashCode() {
-        return modulus.hashCode() ^ exponent.hashCode();
+        return Objects.hash(modulus.hashCode(), exponent.hashCode());
     }
 }

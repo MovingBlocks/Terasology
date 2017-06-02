@@ -181,12 +181,9 @@ public class UIText extends CoreWidget {
     }
 
     private String buildPasswordString() {
-        int len = text.get().length();
-        StringBuilder b = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            b.append("*");
-        }
-        return b.toString();
+        char[] arr = new char[text.get().length()];
+        Arrays.fill(arr, '*');
+        return String.valueOf(arr);
     }
 
     /**

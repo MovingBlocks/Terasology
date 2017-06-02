@@ -17,10 +17,10 @@ package org.terasology.identity.storageServiceClient;
 
 /**
  */
-final class InitializeFromTokenAction extends Action {
+final class InitializeFromTokenAction implements Action {
 
     @Override
-    void perform(StorageServiceWorker worker) {
+    public void perform(StorageServiceWorker worker) {
         if (worker.storageConfig.isSet()) {
             try {
                 worker.sessionInstance = new APISession(worker.storageConfig.getServiceUrl(), worker.storageConfig.getSessionToken());

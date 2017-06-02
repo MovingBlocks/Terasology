@@ -19,7 +19,7 @@ import java.net.URL;
 
 /**
  */
-final class LoginAction extends Action {
+final class LoginAction implements Action {
 
     private final URL serviceURL;
     private final String login;
@@ -32,7 +32,7 @@ final class LoginAction extends Action {
     }
 
     @Override
-    void perform(StorageServiceWorker worker) {
+    public void perform(StorageServiceWorker worker) {
         try {
             worker.sessionInstance = APISession.createFromLogin(serviceURL, login, password);
             worker.loginName = worker.sessionInstance.getLoginName();

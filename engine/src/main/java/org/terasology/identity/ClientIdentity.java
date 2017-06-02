@@ -53,7 +53,7 @@ public class ClientIdentity {
 
     @Override
     public int hashCode() {
-        return playerPrivateCertificate.hashCode() ^ playerPrivateCertificate.hashCode();
+        return Objects.hash(playerPublicCertificate, playerPrivateCertificate);
     }
 
     @Override

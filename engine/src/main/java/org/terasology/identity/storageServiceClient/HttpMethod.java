@@ -15,11 +15,14 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-/**
- * Http methods; only the relevant ones for now but can easily be extended with the other standard ones.
- */
-enum HttpMethod {
+public enum HttpMethod {
     GET,
+    HEAD,
     POST,
-    DELETE
+    PUT,
+    DELETE,
+    CONNECT,
+    OPTIONS,
+    TRACE,
+    PATCH
 }

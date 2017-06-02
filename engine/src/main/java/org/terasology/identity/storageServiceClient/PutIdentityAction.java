@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  */
-final class PutIdentityAction extends Action {
+final class PutIdentityAction implements Action {
 
     private final Map<PublicIdentityCertificate, ClientIdentity> identities;
 
@@ -31,7 +31,7 @@ final class PutIdentityAction extends Action {
     }
 
     @Override
-    void perform(StorageServiceWorker worker) {
+    public void perform(StorageServiceWorker worker) {
         try {
             for (Map.Entry<PublicIdentityCertificate, ClientIdentity> entry: identities.entrySet()) {
                 worker.sessionInstance.putIdentity(entry.getKey(), entry.getValue());

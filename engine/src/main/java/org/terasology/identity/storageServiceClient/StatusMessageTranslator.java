@@ -15,10 +15,18 @@
  */
 package org.terasology.identity.storageServiceClient;
 
-/**
- * Represents an interaction that can be made with the storage service server.
- */
-interface Action {
+import org.terasology.i18n.TranslationSystem;
 
-    void perform(StorageServiceWorker worker);
+public final class StatusMessageTranslator {
+
+    private StatusMessageTranslator() {
+    }
+
+    public static String getLocalizedStatusMessage(StorageServiceWorkerStatus status, TranslationSystem translationSystem, String loginName) {
+        return String.format(translationSystem.translate(status.statusMessageId), loginName);
+    }
+
+    public static String getLocalizedButtonMessage(StorageServiceWorkerStatus status, TranslationSystem translationSystem) {
+        return translationSystem.translate(status.buttonMessageId);
+    }
 }

@@ -18,6 +18,7 @@ package org.terasology.identity.storageServiceClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,11 +31,11 @@ import java.net.URL;
 /**
  * Utility class to perform requests to the service API.
  */
-final class ServiceAPIRequest {
+final class ServiceApiRequest {
 
     private static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance()).create();
 
-    private ServiceAPIRequest() {
+    private ServiceApiRequest() {
     }
 
     private static boolean isSuccessful(int code) {
@@ -45,7 +46,7 @@ final class ServiceAPIRequest {
         try (InputStream errResponse = conn.getErrorStream()) {
             try {
                 throw new StorageServiceException(GSON.fromJson(new InputStreamReader(errResponse), ErrorResponseData.class).error);
-            } catch (RuntimeException e) {
+            } catch (JsonSyntaxException e) {
                 throw new StorageServiceException();
             }
         }

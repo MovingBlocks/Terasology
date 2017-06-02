@@ -19,14 +19,16 @@ package org.terasology.identity.storageServiceClient;
 import com.google.gson.Gson;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ServiceAPIRequestTests {
+public class ServiceApiRequestTests {
 
     static class DummySerializableObject {
         private String fieldA;
@@ -59,7 +61,7 @@ public class ServiceAPIRequestTests {
         when(mockedConn.getResponseCode()).thenReturn(200);
 
         DummySerializableObject reqData = new DummySerializableObject("request", 0);
-        DummySerializableObject resData = ServiceAPIRequest.request(mockedConn, HttpMethod.GET, null, reqData, DummySerializableObject.class);
+        DummySerializableObject resData = ServiceApiRequest.request(mockedConn, HttpMethod.GET, null, reqData, DummySerializableObject.class);
         assertEquals(gson.toJson(reqData), receivedRequest.toString());
         assertEquals(new DummySerializableObject("response", 1), resData);
     }

@@ -32,6 +32,8 @@ import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
+import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
+
 /**
  */
 public class MainMenuScreen extends CoreScreenLayer {
@@ -91,7 +93,7 @@ public class MainMenuScreen extends CoreScreenLayer {
     private void updateStorageServiceStatus() {
         StorageServiceWorkerStatus stat = storageService.getStatus();
         storageServiceStatus.setText(translationSystem.translate("${engine:menu#storage-service}") + ": " +
-                stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
+                getLocalizedStatusMessage(stat, translationSystem, storageService.getLoginName()));
         storageServiceWorkerStatus = stat;
     }
 

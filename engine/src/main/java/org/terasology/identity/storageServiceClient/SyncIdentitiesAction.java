@@ -24,10 +24,10 @@ import java.util.Map;
 
 /**
  */
-final class SyncIdentitiesAction extends Action {
+final class SyncIdentitiesAction implements Action {
 
     @Override
-    void perform(StorageServiceWorker worker) {
+    public void perform(StorageServiceWorker worker) {
         if (worker.hasConflictingIdentities()) {
             worker.logMessage(true, "${engine:menu#storage-service-sync-previous-conflicts}");
         } else {
@@ -48,7 +48,7 @@ final class SyncIdentitiesAction extends Action {
                 //keep track of the conflicting ones for manual resolution
                 worker.resetConflicts();
                 for (Map.Entry<PublicIdentityCertificate, MapDifference.ValueDifference<ClientIdentity>> entry : diff.entriesDiffering().entrySet()) {
-                    worker.conflictingRemoteIdentities.push(new IdentityBundle(entry.getKey(), entry.getValue().rightValue()));
+                    worker.conflictingRemoteIdentities.addLast(new IdentityBundle(entry.getKey(), entry.getValue().rightValue()));
                 }
                 worker.saveConfig();
                 worker.logMessage(false, "${engine:menu#storage-service-sync-ok}",

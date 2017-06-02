@@ -17,7 +17,7 @@ package org.terasology.identity.storageServiceClient;
 
 /**
  */
-final class LogoutAction extends Action {
+final class LogoutAction implements Action {
 
     private boolean deleteLocalIdentities;
 
@@ -26,12 +26,13 @@ final class LogoutAction extends Action {
     }
 
     @Override
-    void perform(StorageServiceWorker worker) {
+    public void perform(StorageServiceWorker worker) {
         try {
             worker.sessionInstance.logout();
             worker.sessionInstance = null;
             worker.storageConfig.setSessionToken(null);
             worker.status = StorageServiceWorkerStatus.LOGGED_OUT;
+            worker.resetConflicts();
             if (deleteLocalIdentities) {
                 worker.securityConfig.clearIdentities();
             }

@@ -52,6 +52,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Collections;
 
+import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedButtonMessage;
+import static org.terasology.identity.storageServiceClient.StatusMessageTranslator.getLocalizedStatusMessage;
+
 public class PlayerSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:PlayerMenuScreen");
@@ -217,8 +220,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     private void updateStorageServiceStatus() {
         StorageServiceWorkerStatus stat = storageService.getStatus();
-        storageServiceStatus.setText(stat.getLocalizedStatusMessage(translationSystem, storageService.getLoginName()));
-        storageServiceAction.setText(stat.getLocalizedButtonMessage(translationSystem));
+        storageServiceStatus.setText(getLocalizedStatusMessage(stat, translationSystem, storageService.getLoginName()));
+        storageServiceAction.setText(getLocalizedButtonMessage(stat, translationSystem));
         storageServiceAction.setVisible(stat.isButtonEnabled());
         storageServiceWorkerStatus = stat;
     }
