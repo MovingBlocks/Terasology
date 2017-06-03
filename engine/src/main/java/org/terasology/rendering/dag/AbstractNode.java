@@ -36,9 +36,7 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-    private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private NodeTask task;
     private boolean enabled = true;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
@@ -71,26 +69,14 @@ public abstract class AbstractNode implements Node {
                     stateChange.getClass().getSimpleName(), this.toString());
         }
         desiredStateChanges.add(stateChange);
-        desiredStateResets.add(stateChange.getDefaultInstance());
     }
 
     protected void removeDesiredStateChange(StateChange stateChange) {
         desiredStateChanges.remove(stateChange);
-        desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
-    }
-    public Set<StateChange> getDesiredStateResets() {
-        return desiredStateResets;
-    }
-
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new NodeTask(this);
-        }
-        return task;
     }
 
     @Override

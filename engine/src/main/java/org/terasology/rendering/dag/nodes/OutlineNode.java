@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
 import org.terasology.rendering.nui.properties.Range;
@@ -75,7 +75,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(OUTLINE_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(OUTLINE_FBO, displayResolutionDependentFBOs));
 
         update(); // Cheeky way to initialise sceneOpaqueFboWidth, sceneOpaqueFboHeight
         displayResolutionDependentFBOs.subscribe(this);

@@ -13,43 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.dag;
+package org.terasology.rendering.dag.stateChanges;
 
-import com.google.common.base.Objects;
+import org.terasology.rendering.dag.StateChange;
 
-public class SetName implements StateChange {
-    private static SetName defaultInstance = new SetName("bar");
+import java.util.Objects;
 
-    private String name;
+import static org.lwjgl.opengl.GL11.glEnable;
 
-    SetName(String name) {
-        this.name = name;
-    }
+/**
+ * TODO: Add javadocs
+ */
+abstract class EnableStateParameter implements StateChange {
+    private int glParameter;
 
-    @Override
-    public StateChange getDefaultInstance() {
-        return defaultInstance;
+    EnableStateParameter(int glParameter) {
+        this.glParameter = glParameter;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name);
+        return Objects.hash(glParameter);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetName) && name.equals(((SetName) obj).getName());
+        return (obj instanceof EnableStateParameter) && (this.glParameter == ((EnableStateParameter) obj).glParameter);
     }
 
     @Override
     public String toString() {
-        return String.format("%30s: %s", this.getClass().getSimpleName(), name);
-    }
-
-    public String getName() {
-        return name;
+        return String.format("%30s", this.getClass().getSimpleName());
     }
 
     @Override
-    public void process() { }
+    public void process() {
+        glEnable(glParameter);
+    }
 }

@@ -124,7 +124,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
         // to the HMD - not to the screen as we would like. To get around this,
         // we bind the default FBO here at the end.  This is a bit brittle
         // because it assumes that FBO 0 is bound before this node is run.
-        // TODO: break this node into two different nodes that use addDesiredStateChange(BindFBO...))
+        // TODO: break this node into two different nodes that use addDesiredStateChange(BindFbo...))
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
