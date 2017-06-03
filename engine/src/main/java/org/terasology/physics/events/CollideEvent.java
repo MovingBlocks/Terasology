@@ -17,13 +17,12 @@
 package org.terasology.physics.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.math.VecMath;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.math.geom.Vector3f;
 
 /**
  */
-public class CollideEvent implements Event {
+public class CollideEvent extends AbstractConsumableEvent {
     private EntityRef otherEntity;
     private Vector3f entityContactPoint;
     private Vector3f otherEntityContactPoint;
