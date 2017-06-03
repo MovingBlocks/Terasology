@@ -19,6 +19,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AdvancedBehaviors](https://github.com/Terasology/AdvancedBehaviors) - adds behavior trees and logic for NPCs!
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
+* [Anatomy](https://github.com/Terasology/Anatomy) - an anatomical system meant to provide an alternative to typical HP only systems
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
@@ -57,7 +58,9 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [GooeysQuests](https://github.com/Terasology/GooeysQuests) - spawn our mascot Gooey (console: `spawnPrefab gooey`) then `e` click to interact for commands and quests!
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
+* [Inferno](https://github.com/Terasology/Inferno) - live on in an underworld after death!
 * [InGameHelp](https://github.com/Terasology/InGameHelp) - system for showing help in-game, default key `P`
+* [InGameHelpAPI](https://github.com/Terasology/InGameHelpAPI) - separate API module for IGH to allow support but not forced activation for the help system
 * [IRLCorp](https://github.com/Terasology/IRLCorp) - Industrialized Reduction of Labor Corporation - Helping workmen everywhere
 * [ItemRendering](https://github.com/Terasology/ItemRendering) - a library for displaying "holographic" items in the world
 * [JoshariasSurvival](https://github.com/Terasology/JoshariasSurvival) - formerly known as TerraTech - gameplay template for a machine-centric survival style
@@ -66,6 +69,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
+* [Lost](https://github.com/Terasology/Lost) - gameplay template for a survival / exploration focused setting
 * [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [ManualLabor](https://github.com/Terasology/ManualLabor) - tools and logic for manual labor (digging, chopping, etc)
@@ -97,6 +101,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press `E` to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Seasons](https://github.com/Terasology/Seasons) - adds seasons to the game
+* [SegmentedPaths](https://github.com/Terasology/SegmentedPaths) - utility module for structured paths
 * [ShatteredPlanes](https://github.com/Terasology/ShatteredPlanes) - a world generator focused on canyons, sky islands, and other somewhat radical terrain features
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [SimpleFarming](https://github.com/Terasology/SimpleFarming) - easy to understand growing of foods
@@ -119,6 +124,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
 * [WildAnimals](https://github.com/Terasology/WildAnimals) - a module containing animals, initially a deer you can spawn in-world via console with `spawnPrefab deer` then watch wander idly
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
+* [WoodAndStoneCraftingJournal](https://github.com/Terasology/WoodAndStoneCraftingJournal) - a Journal bridging module for WoodCrafting and StoneCrafting (no direct relation with the WoodAndStone module)
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
 * [WorkstationCrafting](https://github.com/Terasology/WorkstationCrafting) - an extension to Workstation focused on crafting more advanced recipe-based stuff
 * [WorkstationInGameHelp](https://github.com/Terasology/WorkstationInGameHelp) - bridging module to bring in-game help to workstation screens
