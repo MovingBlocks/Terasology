@@ -23,24 +23,21 @@ import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.http.ApacheHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
-import com.snowplowanalytics.snowplow.tracker.http.OkHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
-import com.squareup.okhttp.OkHttpClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import org.lwjgl.opengl.GL11;
 
 @RegisterSystem // maybe authority functionality in parameters
 public class TelemetrySystem extends BaseComponentSystem {
@@ -103,29 +100,56 @@ public class TelemetrySystem extends BaseComponentSystem {
         tracker = new Tracker.TrackerBuilder(emitter, namespace, appId)
                 .platform(platform)
                 .build();
+
+        systemContextTrack();
     }
 
-    @Override
-    public void preBegin() {
-        oSTrack();
-    }
+    private void systemContextTrack() {
 
-    private void oSTrack() {
+        String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
 
-        String SCHEMA_OS = "iglu:org.terasology/os/jsonschema/1-0-0";
-
-        Map<String, String> osData = new HashMap<String,String>();
+        Map<String, Object> systemContext = new HashMap<String,Object>();
 
         String osName = System.getProperty("os.name");
-        String osVersion = System.getProperty("os.version");
-        String osArchitecture = System.getProperty("os.arch");
-        osData.put("osName", osName);
-        osData.put("osVersion", osVersion);
-        osData.put("osArchitecture", osArchitecture);
+        systemContext.put("osName", osName);
 
-        SelfDescribingJson osJson = new SelfDescribingJson(SCHEMA_OS, osData);
+        String osVersion = System.getProperty("os.version");
+        systemContext.put("osVersion", osVersion);
+
+        String osArchitecture = System.getProperty("os.arch");
+        systemContext.put("osArchitecture", osArchitecture);
+
+        String javaVendor = System.getProperty("java.vendor");
+        systemContext.put("javaVendor",javaVendor);
+
+        String javaVersion = System.getProperty("java.version");
+        systemContext.put("javaVersion",javaVersion);
+
+        String jvmName = System.getProperty("java.vm.name");
+        systemContext.put("jvmName",jvmName);
+
+        String jvmVersion = System.getProperty("java.vm.version");
+        systemContext.put("jvmVersion",jvmName);
+
+        String openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
+        systemContext.put("openGLVendor",openGLVendor);
+
+        String openGLVersion = GL11.glGetString(GL11.GL_VERSION);
+        systemContext.put("openGLVersion",openGLVersion);
+
+        String openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
+        systemContext.put("openGLRenderer",openGLRenderer);
+
+        int processorNumbers = Runtime.getRuntime().availableProcessors();
+        systemContext.put("processorNumbers",processorNumbers);
+
+        long memoryMaxByte = Runtime.getRuntime().maxMemory();
+        int memoryMaxMb = (int)memoryMaxByte/(1024*1024);
+        systemContext.put("memoryMax",memoryMaxMb);
+
+        SelfDescribingJson systemConextData = new SelfDescribingJson(SCHEMA_OS, systemContext);
         Unstructured osEvent = Unstructured.builder()
-                .eventData(osJson)
+                .eventData(systemConextData)
                 .build();
 
         tracker.track(osEvent);
