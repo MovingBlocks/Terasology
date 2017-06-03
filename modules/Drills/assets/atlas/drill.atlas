@@ -1,0 +1,11 @@
+{
+    "texture" : "Drills:drill",
+    "textureSize" : [16, 16],
+    "grid" : {
+        "tileSize" : [16, 16],
+        "gridDimensions" : [1, 1],
+        "tileNames" : [
+            "theDrill"
+        ]
+    }
+}

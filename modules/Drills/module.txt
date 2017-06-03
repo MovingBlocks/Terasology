@@ -1,0 +1,9 @@
+{
+    "id" : "Drills",
+    "version" : "0.1.0",
+    "author" : "oitsjustjose",
+    "displayName" : "Drills",
+    "description" : "Who knows what I'm doing honestly",
+    "dependencies" : [],
+    "serverSideOnly" : false
+}
