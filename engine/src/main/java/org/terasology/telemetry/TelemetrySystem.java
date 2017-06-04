@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,12 +50,22 @@ public class TelemetrySystem extends BaseComponentSystem {
 
     private final String appId = "terasology";
 
-    private final String url = "http://localhost:80";
+    private final URL url = urlInit("http","localhost",80);
 
     private final DevicePlatform platform = DevicePlatform.Desktop;
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetrySystem.class);
 
+    private URL urlInit(String protocal, String host, int port) {
+        URL url = null;
+        try {
+            url = new URL(protocal, host, port, "");
+        } catch (MalformedURLException e) {
+            logger.error("telemetry url mal formed");
+            e.printStackTrace();
+        }
+        return url;
+    }
 
     @Override
     public void initialise() {
@@ -69,7 +81,7 @@ public class TelemetrySystem extends BaseComponentSystem {
 
         // Build the adapter
         HttpClientAdapter adapter = ApacheHttpClientAdapter.builder()
-                .url(url)
+                .url(url.toString())
                 .httpClient(client)
                 .build();
 
@@ -144,7 +156,7 @@ public class TelemetrySystem extends BaseComponentSystem {
         systemContext.put("processorNumbers",processorNumbers);
 
         long memoryMaxByte = Runtime.getRuntime().maxMemory();
-        int memoryMaxMb = (int)memoryMaxByte/(1024*1024);
+        int memoryMaxMb = (int) (memoryMaxByte/(1024*1024));
         systemContext.put("memoryMax",memoryMaxMb);
 
         SelfDescribingJson systemConextData = new SelfDescribingJson(SCHEMA_OS, systemContext);
