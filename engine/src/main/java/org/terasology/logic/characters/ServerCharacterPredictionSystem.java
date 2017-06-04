@@ -143,6 +143,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setPosition(new Vector3f(event.getTargetPosition()));
         newState.setTime(time.getGameTimeInMs());
+        stateBuffer.clear();
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
 
@@ -158,6 +159,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         newState.setVelocity(impulse.add(newState.getVelocity()));
         newState.setTime(time.getGameTimeInMs());
         newState.setGrounded(false);
+        stateBuffer.clear();
         stateBuffer.add(newState);
         characterMovementSystemUtility.setToState(entity, newState);
     }
