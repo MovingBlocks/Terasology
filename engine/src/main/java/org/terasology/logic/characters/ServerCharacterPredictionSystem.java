@@ -17,7 +17,6 @@
 package org.terasology.logic.characters;
 
 import com.google.common.collect.Maps;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -30,12 +29,9 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
@@ -101,7 +97,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         lastInputEvent.remove(entity);
     }
 
-    @ReceiveEvent
+    @ReceiveEvent(components = {AliveCharacterComponent.class})
     public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
         CharacterStateEvent lastState = stateBuffer.getLast();
@@ -136,7 +132,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onTeleport(CharacterTeleportEvent event, EntityRef entity) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
@@ -148,7 +144,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     }
 
-    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class, AliveCharacterComponent.class})
     public void onImpulse(CharacterImpulseEvent event, EntityRef entity) {
         Vector3f impulse = event.getDirection();
 
