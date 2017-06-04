@@ -29,6 +29,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import gnu.trove.set.hash.TIntHashSet;
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ import org.terasology.naming.gson.VersionTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.SetMultimapTypeAdapter;
+import org.terasology.utilities.gson.TIntHashSetTypeAdapter;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
 import java.io.BufferedReader;
@@ -115,6 +117,15 @@ public final class Config {
 
     public NUIEditorConfig getNuiEditor() {
         return config.getNuiEditor();
+    }
+
+    /**
+     * Retrieves the socket config.
+     *
+     * @return The socket config.
+     */
+    public SocketConfig getSocket() {
+        return config.getSocket();
     }
 
     public String renderConfigAsJson(Object configObject) {
@@ -190,7 +201,10 @@ public final class Config {
                 .registerTypeAdapter(Version.class, new VersionTypeAdapter())
                 .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
                 .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
+                .registerTypeAdapter(TIntHashSet.class, new TIntHashSetTypeAdapter())
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
+                .registerTypeAdapter(SocketConfig.Hosts.class, new SocketConfig.Hosts.Handler())
+                .registerTypeAdapter(SocketConfig.Ports.class, new SocketConfig.Ports.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
 
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())

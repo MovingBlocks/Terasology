@@ -39,6 +39,7 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
+    private SocketConfig socket = new SocketConfig();
 
     /**
      * Create a new, empty config
@@ -95,5 +96,14 @@ public final class RootConfig {
 
     public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {
         return moduleConfigs;
+    }
+
+    /**
+     * Retrieves the socket config.
+     *
+     * @return The socket config.
+     */
+    public SocketConfig getSocket() {
+        return socket;
     }
 }

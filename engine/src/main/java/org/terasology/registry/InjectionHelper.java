@@ -19,6 +19,8 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.module.sandbox.ModuleClassLoader;
+import org.terasology.naming.Name;
 import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
 
@@ -41,7 +43,19 @@ public final class InjectionHelper {
     public static void inject(final Object object, Context context) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
             for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-                Object value = context.get(field.getType());
+                DynamicInstanceProvider<?> provider = context.getInstanceProvider(field.getType());
+                Object value;
+
+                if (provider != null) {
+                    Name moduleId = null;
+                    if (object.getClass().getClassLoader() instanceof ModuleClassLoader) {
+                        moduleId = ((ModuleClassLoader) object.getClass().getClassLoader()).getModuleId();
+                    }
+                    value = provider.getInstanceForModule(moduleId, context);
+                } else {
+                    value = context.get(field.getType());
+                }
+
                 if (value != null) {
                     try {
                         field.setAccessible(true);
@@ -57,21 +71,7 @@ public final class InjectionHelper {
     }
 
     public static void inject(final Object object) {
-        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-                Object value = CoreRegistry.get(field.getType());
-                if (value != null) {
-                    try {
-                        field.setAccessible(true);
-                        field.set(object, value);
-                    } catch (IllegalAccessException e) {
-                        logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
-                    }
-                }
-            }
-
-            return null;
-        });
+        inject(object, CoreRegistry.asContext());
     }
 
     public static <T> void inject(final Object object, final Class<? extends Annotation> annotation, final Map<Class<? extends T>, T> source) {

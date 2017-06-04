@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
@@ -81,6 +82,7 @@ public final class ExternalApiWhitelist {
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
             .add(com.esotericsoftware.reflectasm.MethodAccess.class)
             .add(IOException.class)
+            .add(InterruptedIOException.class)
             .add(InvocationTargetException.class)
             .add(LoggerFactory.class)
             .add(Logger.class)
@@ -109,6 +111,14 @@ public final class ExternalApiWhitelist {
             .add(java.io.PipedOutputStream.class)
             .add(java.io.BufferedOutputStream.class)
             .add(java.io.DataOutputStream.class)
+            /* Some writers */
+            .add(java.io.Writer.class)
+            .add(java.io.BufferedWriter.class)
+            .add(java.io.OutputStreamWriter.class)
+            /* Some readers */
+            .add(java.io.Reader.class)
+            .add(java.io.BufferedReader.class)
+            .add(java.io.InputStreamReader.class)
             .build();
 
     private ExternalApiWhitelist() {

@@ -16,18 +16,19 @@
 package org.terasology.context;
 
 import org.terasology.module.sandbox.API;
+import org.terasology.registry.DynamicInstanceProvider;
 
 /**
  * Provides classes with the utility objects that belong to the context they are running in.
- *
+ * <p>
  * Use dependency injection or this interface to get at the objects you want to use.
- *
- *
+ * <p>
+ * <p>
  * From this class there can be multiple instances. For example we have the option of letting a client and server run
  * concurrently in one VM, by letting them work with two separate context objects.
- *
+ * <p>
  * This class is intended to replace the CoreRegistry and other static means to get utility objects.
- *
+ * <p>
  * Contexts must be thread safe!
  */
 @API
@@ -43,4 +44,15 @@ public interface Context {
      */
     <T, U extends T> void put(Class<T> type, U object);
 
+    /**
+     * Registers an object provider.
+     *
+     * @param type     The object type.
+     * @param provider The object provider.
+     * @param <T>      The base type, the type used in @In.
+     * @param <U>      The instance type, the type returned by the provider.
+     */
+    <T, U extends T> void putInstanceProvider(Class<T> type, DynamicInstanceProvider<U> provider);
+
+    <T> DynamicInstanceProvider<T> getInstanceProvider(Class<? extends T> type);
 }
