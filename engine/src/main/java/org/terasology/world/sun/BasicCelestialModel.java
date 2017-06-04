@@ -29,9 +29,21 @@ public class BasicCelestialModel implements CelestialModel {
     private static final long DUSK_TIME = 3 * DAY_LENGTH / 4;
     private static final long MIDNIGHT_TIME = 0;
 
+    /**
+     * Return the direction of the sun based on the time of the day.<br />
+     * At days=0 midnight the direction of the sun will be -90 degrees, while at
+     * days=0.5 noon it will be +90 degrees.
+     * @param days the time of day
+     * @return the direction of the sun in radians in the range [-PI;PI]
+     */
     @Override
     public float getSunPosAngle(float days) {
-        return (float) (days * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.;
+        double sunRad = (days%1.0) * 2.0 * Math.PI; // [0;2PI]
+        double shiftedBy90 = sunRad - Math.PI/2.0; // shift by -90 so midnight means moon is on top
+        if(shiftedBy90 > Math.PI) { // expected output is [-PI;PI]
+            return (float)(shiftedBy90 - 2.0*Math.PI);
+        }
+        return (float)shiftedBy90;
     }
 
     @Override
