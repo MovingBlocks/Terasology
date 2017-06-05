@@ -70,16 +70,16 @@ public final class RenderHelper {
     public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
         float height = 0.0f;
 
-        float size = RefractiveReflectiveBlocksNode.waveSize;
-        float intens = RefractiveReflectiveBlocksNode.waveIntens;
+        float waveSize = RefractiveReflectiveBlocksNode.waveSize;
+        float waveIntensity = RefractiveReflectiveBlocksNode.waveIntensity;
         float timeFactor = RefractiveReflectiveBlocksNode.waveSpeed;
 
         for (int i = 0; i < OCEAN_OCTAVES; ++i) {
             height += (smoothTriangleWave(timeToTick(days,
-                    timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * size + position.z * OCEAN_WAVE_DIRECTIONS[i].y * size) * 2.0 - 1.0) * intens;
+                    timeFactor) + position.x * OCEAN_WAVE_DIRECTIONS[i].x * waveSize + position.z * OCEAN_WAVE_DIRECTIONS[i].y * waveSize) * 2.0 - 1.0) * waveIntensity;
 
-            size *= RefractiveReflectiveBlocksNode.waveSizeFalloff;
-            intens *= RefractiveReflectiveBlocksNode.waveIntensFalloff;
+            waveSize *= RefractiveReflectiveBlocksNode.waveSizeFalloff;
+            waveIntensity *= RefractiveReflectiveBlocksNode.waveIntensityFalloff;
             timeFactor *= RefractiveReflectiveBlocksNode.waveSpeedFalloff;
         }
 

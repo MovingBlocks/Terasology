@@ -27,7 +27,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
@@ -43,7 +42,6 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
@@ -87,10 +85,10 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveIntens = 2.0f;
+    public float waveIntensity = 2.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveIntensFalloff = 0.85f;
+    public float waveIntensityFalloff = 0.85f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
     public float waveSize = 0.1f;
@@ -160,20 +158,20 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:terrain").get().getId(), CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:waterStill").get().getId(), CHUNK_MATERIAL, "textureWater"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:lavaStill").get().getId(), CHUNK_MATERIAL, "textureLava"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:waterNormal").get().getId(), CHUNK_MATERIAL, "textureWaterNormal"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:waterNormalAlt").get().getId(), CHUNK_MATERIAL, "textureWaterNormalAlt"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:effects").get().getId(), CHUNK_MATERIAL, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isNormalMapping()) {
-            addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:terrainNormal").get().getId(), CHUNK_MATERIAL, "textureAtlasNormal"));
+            addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
 
             if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:terrainHeight").get().getId(), CHUNK_MATERIAL, "textureAtlasHeight"));
+                addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
             }
         }
     }
@@ -262,12 +260,12 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isAnimateWater()) {
-            chunkMaterial.setFloat("waveIntensFalloff", waveIntensFalloff, true);
+            chunkMaterial.setFloat("waveIntensityFalloff", waveIntensityFalloff, true);
             chunkMaterial.setFloat("waveSizeFalloff", waveSizeFalloff, true);
             chunkMaterial.setFloat("waveSize", waveSize, true);
             chunkMaterial.setFloat("waveSpeedFalloff", waveSpeedFalloff, true);
             chunkMaterial.setFloat("waveSpeed", waveSpeed, true);
-            chunkMaterial.setFloat("waveIntens", waveIntens, true);
+            chunkMaterial.setFloat("waveIntensity", waveIntensity, true);
             chunkMaterial.setFloat("waterOffsetY", waterOffsetY, true);
             chunkMaterial.setFloat("waveOverallScale", waveOverallScale, true);
         }

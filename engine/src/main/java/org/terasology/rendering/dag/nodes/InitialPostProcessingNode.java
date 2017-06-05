@@ -32,17 +32,15 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.dag.nodes.BloomBlurNode.ONE_8TH_SCALE_FBO;
 import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
-import org.terasology.world.WorldProvider;
-
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
@@ -99,7 +97,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         if (renderingConfig.isLightShafts()) {
             addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts"));
         }
-        addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:vignette").get().getId(), INITIAL_POST_MATERIAL, "texVignette"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
     }
 
     /**

@@ -30,7 +30,6 @@ import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
-
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
@@ -44,7 +43,6 @@ import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.glCallList;
@@ -125,8 +123,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         skyMaterial = getMaterial(SKY_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:sky90").get().getId(), SKY_MATERIAL, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:sky180").get().getId(), SKY_MATERIAL, "texSky180"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL, "texSky180"));
     }
 
     public void enableWireframe() {

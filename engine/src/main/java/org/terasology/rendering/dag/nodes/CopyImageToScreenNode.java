@@ -18,9 +18,8 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.Display;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
-import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.monitoring.PerformanceMonitor;
-
+import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
