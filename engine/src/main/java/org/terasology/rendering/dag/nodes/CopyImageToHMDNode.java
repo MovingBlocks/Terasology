@@ -16,24 +16,23 @@
 package org.terasology.rendering.dag.nodes;
 
 import jopenvr.JOpenVRLibrary;
+import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
-import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.lwjgl.opengl.GL11;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
-import org.terasology.monitoring.PerformanceMonitor;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;

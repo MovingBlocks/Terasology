@@ -28,12 +28,12 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * Instances of this node work in tandem with instances of the AmbientOcclusionNode class.

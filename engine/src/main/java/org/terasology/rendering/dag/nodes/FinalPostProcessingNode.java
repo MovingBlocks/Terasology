@@ -21,7 +21,6 @@ import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.AbstractNode;
-
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;

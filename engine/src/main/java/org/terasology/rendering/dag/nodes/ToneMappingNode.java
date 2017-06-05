@@ -32,17 +32,15 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-
-import static org.terasology.rendering.dag.nodes.InitialPostProcessingNode.INITIAL_POST_FBO;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
+import static org.terasology.rendering.dag.nodes.InitialPostProcessingNode.INITIAL_POST_FBO;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * The exposure calculated earlier in the rendering process is used by an instance

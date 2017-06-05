@@ -39,7 +39,6 @@ import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
@@ -121,7 +120,7 @@ public class DeferredMainLightNode extends AbstractNode {
             addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
 
             if (renderingConfig.isCloudShadows()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:perlinNoiseTileable").get().getId(), LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
+                addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
             }
         }
     }
