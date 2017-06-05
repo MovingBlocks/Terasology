@@ -41,7 +41,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.glCallList;
@@ -131,8 +130,8 @@ public class BackdropReflectionNode extends AbstractNode {
         skyMaterial = getMaterial(SKY_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:sky90").get().getId(), SKY_MATERIAL, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:sky180").get().getId(), SKY_MATERIAL, "texSky180"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL, "texSky180"));
     }
 
     /**
