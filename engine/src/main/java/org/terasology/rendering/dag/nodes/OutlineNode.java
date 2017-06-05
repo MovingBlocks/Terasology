@@ -24,14 +24,14 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
@@ -85,7 +85,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         outlineMaterial = getMaterial(OUTLINE_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
     }
 
     /**
