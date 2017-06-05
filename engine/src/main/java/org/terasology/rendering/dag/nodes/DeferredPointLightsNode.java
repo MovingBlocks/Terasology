@@ -170,6 +170,8 @@ public class DeferredPointLightsNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
 
+        lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
+
         // Common Shader Parameters
 
         lightGeometryMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
@@ -193,6 +195,19 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         // Specific Shader Parameters
 
+        // TODO: This is necessary right now because activateFeature removes all material parameters.
+        // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
+        lightGeometryMaterial.setInt("texSceneOpaqueDepth", 0, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueNormals", 1, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueLightBuffer", 2, true);
+        if (renderingConfig.isDynamicShadows()) {
+            lightGeometryMaterial.setInt("texSceneShadowMap", 3, true);
+
+            if (renderingConfig.isCloudShadows()) {
+                lightGeometryMaterial.setInt("texSceneClouds", 4, true);
+            }
+        }
+
         if (renderingConfig.isDynamicShadows()) {
             lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
             lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
@@ -214,8 +229,6 @@ public class DeferredPointLightsNode extends AbstractNode {
                 lightPositionRelativeToCamera.sub(lightPositionInTeraCoords, activeCamera.getPosition());
 
                 if (lightIsRenderable(lightComponent, lightPositionRelativeToCamera)) {
-                    lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
-
                     lightGeometryMaterial.setCamera(activeCamera);
 
                     // setting shader parameters regarding the light's properties
@@ -240,11 +253,11 @@ public class DeferredPointLightsNode extends AbstractNode {
                     lightGeometryMaterial.setMatrix4("modelMatrix", modelMatrix, true);
 
                     glCallList(lightSphereDisplayList); // draws the light sphere
-
-                    lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
                 }
             }
         }
+
+        lightGeometryMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
 
         PerformanceMonitor.endActivity();
     }
