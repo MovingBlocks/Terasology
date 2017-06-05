@@ -1,0 +1,84 @@
+{
+     "type": "launchPopup",
+     "skin": "messageBox",
+     "contents": {
+         "type": "relativeLayout",
+         "contents": [
+             {
+                 "type": "UIBox",
+                 "layoutInfo": {
+                     "width": 500,
+                     "use-content-height": true,
+                     "position-horizontal-center": {},
+                     "position-vertical-center": {}
+                 },
+                 "content": {
+                     "type": "ColumnLayout",
+                     "columns": 1,
+                     "verticalSpacing": 8,
+                     "contents": [
+                         {
+                             "type": "UILabel",
+                             "text": "Title",
+                             "id": "title",
+                             "family": "title"
+                         },
+                         {
+                             "type": "UISpace",
+                             "size": [
+                                 1,
+                                 16
+                             ]
+                         },
+                         {
+                             "type": "UILabel",
+                             "text": "Message",
+                             "id": "message"
+                         },
+                         {
+                             "type": "UISpace",
+                             "size": [
+                                 1,
+                                 16
+                             ]
+                         },
+                         {
+                             "type": "RowLayout",
+                             "horizontalSpacing": 0,
+                             "contents": [
+                                 {
+                                     "type": "UILabel",
+                                     "text": "${engine:menu#disable-launch-popup}"
+                                 },
+                                 {
+                                     "type": "UICheckbox",
+                                     "id": "showLaunchPopup"
+                                 }
+                             ]
+                         },
+                         {
+                             "type": "RowLayout",
+                             "horizontalSpacing": 4,
+                             "contents": [
+                                 {
+                                     "type": "UIButton",
+                                     "text": "${engine:menu#dialog-yes}",
+                                     "id": "yes"
+                                 },
+                                 {
+                                     "type": "UIButton",
+                                     "text": "${engine:menu#dialog-no}",
+                                     "id": "no"
+                                 }
+                             ],
+                             "layoutInfo": {
+                                 "width": 200,
+                                 "position-right": {}
+                             }
+                         }
+                     ]
+                 }
+             }
+         ]
+     }
+}

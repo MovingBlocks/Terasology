@@ -16,6 +16,10 @@
 package org.terasology.engine.modes;
 
 import org.terasology.audio.AudioManager;
+import org.terasology.config.Config;
+import org.terasology.config.LaunchPopupConfig;
+import org.terasology.config.NUIEditorConfig;
+import org.terasology.config.TelemetryConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -34,11 +38,14 @@ import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.utilities.Assets;
 
@@ -55,6 +62,7 @@ public class StateMainMenu implements GameState {
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
+    private Config config;
 
     private String messageOnLoad = "";
 
@@ -120,6 +128,22 @@ public class StateMainMenu implements GameState {
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
+        }
+
+        config = context.get(Config.class);
+        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
+        LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
+        if (!launchPopupConfig.isDisableLaunchPopup()) {
+            String telemetryTitle = "Telemetry In Terasology";
+            String telemetryMessage = "Telemetry system will send metrics and errors to the server. It will help contributors improve Terasology. We guarantee that no personal information will be sent. You can see all the data being sent and enable/disable it anytime in Metric Menu. Do you want enable it?";
+            LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
+            telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
+            telemetryConfirmPopup.setYesHandler(() -> {
+                telemetryConfig.setEnableTelemetry(true);
+            });
+            telemetryConfirmPopup.setNoHandler(() -> {
+                telemetryConfig.setEnableTelemetry(false);
+            });
         }
     }
 

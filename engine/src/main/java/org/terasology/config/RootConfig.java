@@ -39,6 +39,8 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
+    private TelemetryConfig telemetryConfig = new TelemetryConfig();
+    private LaunchPopupConfig launchPopupConfig = new LaunchPopupConfig();
 
     /**
      * Create a new, empty config
@@ -91,6 +93,14 @@ public final class RootConfig {
 
     public NUIEditorConfig getNuiEditor() {
         return nuiEditor;
+    }
+
+    public TelemetryConfig getTelemetryConfig() {
+        return telemetryConfig;
+    }
+
+    public LaunchPopupConfig getLaunchPopupConfig() {
+        return launchPopupConfig;
     }
 
     public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {

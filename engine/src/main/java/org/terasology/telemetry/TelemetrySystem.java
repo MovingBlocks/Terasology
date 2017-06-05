@@ -30,6 +30,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.config.TelemetryConfig;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
@@ -40,9 +42,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
+import org.terasology.registry.In;
 
-@RegisterSystem // maybe authority functionality in parameters
+@RegisterSystem
 public class TelemetrySystem extends BaseComponentSystem {
+
+    @In
+    private Config config;
+
+    private TelemetryConfig telemetryConfig;
 
     private Emitter emitter;
 
@@ -69,6 +77,8 @@ public class TelemetrySystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
+
+        telemetryConfig = config.getTelemetryConfig();
 
         // Make a new client with custom concurrency rules
         PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
@@ -113,7 +123,9 @@ public class TelemetrySystem extends BaseComponentSystem {
                 .platform(platform)
                 .build();
 
-        systemContextTrack();
+        if (telemetryConfig.isEnableTelemetry()) {
+            systemContextTrack();
+        }
     }
 
     private void systemContextTrack() {
@@ -160,10 +172,10 @@ public class TelemetrySystem extends BaseComponentSystem {
         systemContext.put("memoryMax",memoryMaxMb);
 
         SelfDescribingJson systemConextData = new SelfDescribingJson(SCHEMA_OS, systemContext);
-        Unstructured osEvent = Unstructured.builder()
+        Unstructured systemContextEvent = Unstructured.builder()
                 .eventData(systemConextData)
                 .build();
 
-        tracker.track(osEvent);
+        tracker.track(systemContextEvent);
     }
 }
