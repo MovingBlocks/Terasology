@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -25,7 +24,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
-import org.terasology.logic.console.ui.MiniChatOverlay;
+import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -33,19 +32,17 @@ import org.terasology.rendering.nui.NUIManager;
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
 
-    private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
-
     @In
     private Console console;
 
     @In
     private NUIManager nuiManager;
 
-    private MiniChatOverlay overlay;
+    private NotificationOverlay overlay;
 
     @Override
     public void initialise() {
-        overlay = nuiManager.addOverlay(MINICHAT_UI, MiniChatOverlay.class);
+        overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
         console.subscribe((Message message) -> {
             if (!nuiManager.isOpen("engine:console")) {
                 overlay.setVisible(true);

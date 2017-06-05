@@ -83,7 +83,7 @@ public class ChatScreen extends CoreScreenLayer {
                 console.execute(new Name(command), params, localPlayer.getClientEntity());
                 commandLine.setText("");
                 scrollArea.moveToBottom();
-                MiniChatOverlay overlay = nuiManager.addOverlay("engine:minichatOverlay", MiniChatOverlay.class);
+                NotificationOverlay overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
                 overlay.setVisible(true);
                 nuiManager.closeScreen(this);
             }
