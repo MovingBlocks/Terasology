@@ -28,14 +28,14 @@ import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -55,7 +55,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
+    public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
     private static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;
@@ -103,8 +103,8 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texDepth"));
     }
 
     /**
