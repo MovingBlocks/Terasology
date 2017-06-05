@@ -27,7 +27,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -35,7 +35,7 @@ import org.terasology.rendering.opengl.FBOConfig;
 
 import static org.terasology.rendering.dag.nodes.BloomBlurNode.ONE_8TH_SCALE_FBO;
 import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
@@ -90,14 +90,14 @@ public class InitialPostProcessingNode extends AbstractNode {
         initialPostMaterial = getMaterial(INITIAL_POST_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
         // TODO: monitor config parameter by subscribing to it
         if (renderingConfig.isBloom()) {
-            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom"));
+            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom"));
         }
         // TODO: monitor config parameter by subscribing to it
         if (renderingConfig.isLightShafts()) {
-            addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts"));
+            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts"));
         }
         addDesiredStateChange(new SetInputTexture(textureSlot, Assets.getTexture("engine:vignette").get().getId(), INITIAL_POST_MATERIAL, "texVignette"));
     }

@@ -35,7 +35,7 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -49,7 +49,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
@@ -191,8 +191,8 @@ public class WorldReflectionNode extends ConditionDependentNode {
         addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:waterNormal").get().getId(), CHUNK_MATERIAL, "textureWaterNormal"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:waterNormalAlt").get().getId(), CHUNK_MATERIAL, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:effects").get().getId(), CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isNormalMapping()) {
             addDesiredStateChange(new SetInputTexture(textureSlot++, Assets.getTexture("engine:terrainNormal").get().getId(), CHUNK_MATERIAL, "textureAtlasNormal"));

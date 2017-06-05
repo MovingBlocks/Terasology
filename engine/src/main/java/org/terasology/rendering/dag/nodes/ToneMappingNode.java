@@ -27,14 +27,14 @@ import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 import static org.terasology.rendering.dag.nodes.InitialPostProcessingNode.INITIAL_POST_FBO;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 import org.terasology.rendering.opengl.ScreenGrabber;
@@ -99,7 +99,7 @@ public class ToneMappingNode extends AbstractNode {
         toneMappingMaterial = getMaterial(TONE_MAPPING_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, INITIAL_POST_FBO, ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, INITIAL_POST_FBO, ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
     }
 
     /**
