@@ -18,10 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -41,7 +38,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glEndList;
@@ -69,10 +65,7 @@ public class BackdropReflectionNode extends AbstractNode {
     private static final int SLICES = 16;
     private static final int STACKS = 128;
 
-    private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
-    private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
 
     private int skySphere = -1;
 
@@ -91,15 +84,10 @@ public class BackdropReflectionNode extends AbstractNode {
     @Range(min = 0.0f, max = 10.0f)
     private float skyNightBrightness = 1.0f;
 
-    private SubmersibleCamera activeCamera;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
     @SuppressWarnings("FieldCanBeLocal")
-    private Vector3d zenithColor;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
+    private float turbidity;
 
     /**
      * Internally requires the "engine:sceneReflected" buffer, stored in the (display) resolution-dependent FBO manager.
@@ -109,12 +97,9 @@ public class BackdropReflectionNode extends AbstractNode {
      * This method also requests the material using the "sky" shaders (vertex, fragment) to be enabled.
      */
     public BackdropReflectionNode(Context context) {
-        renderingConfig = context.get(Config.class).getRendering();
-        worldProvider = context.get(WorldProvider.class);
         backdropProvider = context.get(BackdropProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        SubmersibleCamera activeCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(activeCamera));
         addDesiredStateChange(new LookThroughNormalized(activeCamera));
         initSkysphere();
@@ -147,35 +132,18 @@ public class BackdropReflectionNode extends AbstractNode {
 
         // Common Shader Parameters
 
-        skyMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
+        sunDirection = backdropProvider.getSunDirection(false);
+        turbidity = backdropProvider.getTurbidity();
 
         skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        skyMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        skyMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        skyMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        skyMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        skyMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        skyMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        skyMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        skyMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+        skyMaterial.setFloat3("sunVec", sunDirection, true);
 
         // Specific Shader Parameters
 
-        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
-
-        zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
-
+        skyMaterial.setFloat3("zenith", getAllWeatherZenith(sunDirection.y, turbidity), true);
         skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
-        skyMaterial.setFloat("turbidity", backdropProvider.getTurbidity(), true);
-        skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
-
+        skyMaterial.setFloat("turbidity", turbidity, true);
+        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
 
         // Actual Node Processing

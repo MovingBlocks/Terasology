@@ -90,7 +90,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
     @SuppressWarnings("FieldCanBeLocal")
-    private Vector3d zenithColor;
+    private float turbidity;
 
     public BackdropNode(Context context) {
         backdropProvider = context.get(BackdropProvider.class);
@@ -148,16 +148,20 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
-        // Shader Parameters
+        // Common Shader Parameters
 
         sunDirection = backdropProvider.getSunDirection(false);
-        zenithColor = getAllWeatherZenith(sunDirection.y, backdropProvider.getTurbidity());
-        skyMaterial.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z, true);
+        turbidity = backdropProvider.getTurbidity();
 
+        skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        skyMaterial.setFloat3("sunVec", sunDirection, true);
+
+        // Shader Parameters
+
+        skyMaterial.setFloat3("zenith", getAllWeatherZenith(backdropProvider.getSunDirection(false).y, turbidity), true);
         skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
-        skyMaterial.setFloat("turbidity", backdropProvider.getTurbidity(), true);
+        skyMaterial.setFloat("turbidity", turbidity, true);
         skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
-
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
 
         // Actual Node Processing
@@ -178,7 +182,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         glEndList();
     }
 
-    public static Vector3d getAllWeatherZenith(float thetaSunAngle, float turbidity) {
+    static Vector3f getAllWeatherZenith(float thetaSunAngle, float turbidity) {
         float thetaSun = (float) Math.acos(thetaSunAngle);
         Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
         Vector4f cx2 = new Vector4f(0.00394f, -0.03202f, 0.06377f, -0.02903f);
@@ -196,6 +200,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         float x = t2 * cx1.dot(theta) + turbidity * cx2.dot(theta) + cx3.dot(theta);
         float y = t2 * cy1.dot(theta) + turbidity * cy2.dot(theta) + cy3.dot(theta);
 
-        return new Vector3d(why, x, y);
+        return new Vector3f(why, x, y);
     }
 }
