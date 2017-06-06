@@ -22,6 +22,15 @@ ext {
     templatesDir = 'templates'
 }
 
+// Prompts the user to enter a line of text
+def getUserString (String prompt) {
+    println ('\n' + (char)27 + '[1m*** ' + prompt + '\n') // Bold terminal text
+
+    def reader = new BufferedReader(new InputStreamReader(System.in)) // Note: Do not close reader, it will close System.in (Big no-no)
+
+    return reader.readLine()
+}
+
 // Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)
 // Sample command: gradlew fetchModulePortals
 tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
@@ -32,8 +41,12 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
             // TODO: This task description does not get listed under the "Rules" section on "gradlew tasks" :-(
             description = 'Fetches source for a given module to the local project, cloned from GitHub'
 
+            // Interactive Capability
+            def meta = (taskName - 'fetchModule').tokenize()
+            def meta_repo = meta[0] ?: getUserString('Enter Module Name: ')
+
             // Repo name is the dynamic part of the task name
-            def repo = (taskName - 'fetchModule')
+            def repo = meta_repo
             def parentDir = 'modules'
 
             // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
