@@ -1,9 +1,9 @@
 {
     "id" : "MODULENAME",
-    "version" : "0.1.0-SNAPSHOT",
-    "author" : "",
+    "version" : "VERSION",
+    "author" : "AUTHOR",
     "displayName" : "MODULENAME",
-    "description" : "",
+    "description" : "DESCRIPTION",
     "dependencies" : [],
     "serverSideOnly" : false
 }
