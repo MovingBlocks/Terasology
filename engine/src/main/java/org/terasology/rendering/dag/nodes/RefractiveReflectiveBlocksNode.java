@@ -83,18 +83,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     private FBO refractiveReflectiveFbo;
 
     private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f lightingSettingsFrag = new Vector4f();
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f waterSettingsFrag = new Vector4f();
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f alternativeWaterSettingsFrag = new Vector4f();
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
@@ -207,23 +195,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         // Common Shader Parameters
 
-        chunkMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        chunkMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        chunkMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        chunkMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        chunkMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        chunkMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        chunkMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
+        chunkMaterial.setFloat3("sunVec", backdropProvider.getSunDirection(false), true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
@@ -245,14 +219,11 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             }
         }
 
-        lightingSettingsFrag.set(0, 0, waterSpecExp, 0);
-        chunkMaterial.setFloat4("lightingSettingsFrag", lightingSettingsFrag, true);
+        chunkMaterial.setFloat4("lightingSettingsFrag", 0, 0, waterSpecExp, 0, true);
 
-        waterSettingsFrag.set(waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow);
-        chunkMaterial.setFloat4("waterSettingsFrag", waterSettingsFrag, true);
+        chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
 
-        alternativeWaterSettingsFrag.set(waterTint, 0, 0, 0);
-        chunkMaterial.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
+        chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isAnimateWater()) {

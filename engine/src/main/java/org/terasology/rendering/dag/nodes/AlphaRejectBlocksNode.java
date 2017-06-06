@@ -21,7 +21,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -73,71 +72,60 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private SetWireframe wireframeStateChange;
 
     private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f lightingSettingsFrag = new Vector4f();
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f waterSettingsFrag = new Vector4f();
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f alternativeWaterSettingsFrag = new Vector4f();
 
+    // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveIntensity = 2.0f;
+    private float waveIntensity = 2.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveIntensityFalloff = 0.85f;
+    private float waveIntensityFalloff = 0.85f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveSize = 0.1f;
+    private float waveSize = 0.1f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveSizeFalloff = 1.25f;
+    private float waveSizeFalloff = 1.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveSpeed = 0.1f;
+    private float waveSpeed = 0.1f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveSpeedFalloff = 0.95f;
+    private float waveSpeedFalloff = 0.95f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
-    public float waterOffsetY;
+    private float waterOffsetY = 0.0f;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveOverallScale = 1.0f;
+    private float waveOverallScale = 1.0f;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    float waterRefraction = 0.04f;
+    private float waterRefraction = 0.04f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    float waterFresnelBias = 0.01f;
+    private float waterFresnelBias = 0.01f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
-    float waterFresnelPow = 2.5f;
+    private float waterFresnelPow = 2.5f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 1.0f, max = 100.0f)
-    float waterNormalBias = 10.0f;
+    private float waterNormalBias = 10.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    float waterTint = 0.24f;
+    private float waterTint = 0.24f;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1024.0f)
-    float waterSpecExp = 200.0f;
+    private float waterSpecExp = 200.0f;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    float parallaxBias = 0.05f;
+    private float parallaxBias = 0.05f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    float parallaxScale = 0.05f;
+    private float parallaxScale = 0.05f;
 
     public AlphaRejectBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
@@ -174,7 +162,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
             addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
 
             if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
+                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
             }
         }
     }
@@ -212,23 +200,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         // Common Shader Parameters
 
-        chunkMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        chunkMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        chunkMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        chunkMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        chunkMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        chunkMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        chunkMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
+        chunkMaterial.setFloat3("sunVec", backdropProvider.getSunDirection(false), true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
@@ -250,14 +224,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
             }
         }
 
-        lightingSettingsFrag.set(0, 0, 0, waterSpecExp);
-        chunkMaterial.setFloat4("lightingSettingsFrag", lightingSettingsFrag, true);
-
-        waterSettingsFrag.set(waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow);
-        chunkMaterial.setFloat4("waterSettingsFrag", waterSettingsFrag, true);
-
-        alternativeWaterSettingsFrag.set(waterTint, 0, 0, 0);
-        chunkMaterial.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
+        chunkMaterial.setFloat4("lightingSettingsFrag", 0, 0, 0, waterSpecExp, true);
+        chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
+        chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isAnimateWater()) {
