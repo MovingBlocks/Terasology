@@ -56,6 +56,8 @@ public class StateMainMenu implements GameState {
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
+    private Console console;
+    private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
 
@@ -76,7 +78,8 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl(context));
+        console = new ConsoleImpl(context);
+        context.put(Console.class, console);
 
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
@@ -115,11 +118,9 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.initialise();
 
-        playBackgroundMusic();
+        storageServiceWorker = context.get(StorageServiceWorker.class);
 
-        StorageServiceWorker storageServiceWorker = new StorageServiceWorker(context);
-        storageServiceWorker.initializeFromConfig();
-        context.put(StorageServiceWorker.class, storageServiceWorker);
+        playBackgroundMusic();
 
         //guiManager.openWindow("main");
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
@@ -157,6 +158,8 @@ public class StateMainMenu implements GameState {
         updateUserInterface(delta);
 
         eventSystem.process();
+
+        storageServiceWorker.flushNotificationsToConsole(console);
     }
 
     @Override

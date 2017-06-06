@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * The public interface to this package. Manages a communication session with the storage service server,
@@ -51,17 +52,17 @@ public final class StorageServiceWorker {
     final IdentityStorageServiceConfig storageConfig;
     final SecurityConfig securityConfig;
 
-    private final Console console;
     private final Config config;
     private final TranslationSystem translationSystem;
+    private final Deque<ConsoleNotification> notificationBuffer;
     private Map<PublicIdentityCertificate, ClientIdentity> conflictSolutionsToUpload;
 
     public StorageServiceWorker(Context context) {
-        this.console = context.get(Console.class);
         this.config = context.get(Config.class);
         this.storageConfig = this.config.getIdentityStorageService();
         this.securityConfig = this.config.getSecurity();
         this.translationSystem = context.get(TranslationSystem.class);
+        this.notificationBuffer = new LinkedBlockingDeque<>();
         this.conflictingRemoteIdentities = new ArrayDeque<>();
     }
 
@@ -75,8 +76,7 @@ public final class StorageServiceWorker {
     }
 
     void logMessage(boolean warning, String messageId, Object... args) {
-        String localizedMessage = "Identity storage service: " + translationSystem.translate(messageId);
-        console.addMessage(String.format(localizedMessage, args), CoreMessageType.NOTIFICATION);
+        notificationBuffer.push(new ConsoleNotification(messageId, args));
     }
 
     private synchronized void performAction(Action action, StorageServiceWorkerStatus requiredStatus) {
@@ -89,6 +89,14 @@ public final class StorageServiceWorker {
             action.perform(this);
             logger.info("Completed action {}", action.getClass().getSimpleName());
         }).start();
+    }
+
+    public void flushNotificationsToConsole(Console target) {
+        while (!notificationBuffer.isEmpty()) {
+            ConsoleNotification notification = notificationBuffer.pop();
+            String message = "Identity storage service: " + String.format(translationSystem.translate(notification.messageId), notification.args);
+            target.addMessage(message, CoreMessageType.NOTIFICATION);
+        }
     }
 
     public StorageServiceWorkerStatus getStatus() {
@@ -179,6 +187,15 @@ public final class StorageServiceWorker {
         if (!hasConflictingIdentities()) {
             putIdentities(conflictSolutionsToUpload);
             resetConflicts();
+        }
+    }
+
+    private static final class ConsoleNotification {
+        private String messageId;
+        private Object[] args;
+        private ConsoleNotification(String messageId, Object[] args) {
+            this.messageId = messageId;
+            this.args = args;
         }
     }
 }
