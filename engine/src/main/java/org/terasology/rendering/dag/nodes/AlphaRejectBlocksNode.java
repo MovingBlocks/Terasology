@@ -33,7 +33,6 @@ import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -43,8 +42,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
-import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_REJECT;
 
@@ -73,53 +70,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     private SubmersibleCamera activeCamera;
 
-    // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveIntensity = 2.0f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveIntensityFalloff = 0.85f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveSize = 0.1f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveSizeFalloff = 1.25f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveSpeed = 0.1f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveSpeedFalloff = 0.95f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 5.0f)
-    private float waterOffsetY = 0.0f;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 2.0f)
-    private float waveOverallScale = 1.0f;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 1.0f)
-    private float waterRefraction = 0.04f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 0.1f)
-    private float waterFresnelBias = 0.01f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 10.0f)
-    private float waterFresnelPow = 2.5f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 1.0f, max = 100.0f)
-    private float waterNormalBias = 10.0f;
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 1.0f)
-    private float waterTint = 0.24f;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    @Range(min = 0.0f, max = 1024.0f)
-    private float waterSpecExp = 200.0f;
-
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float parallaxBias = 0.05f;
@@ -147,16 +97,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
         // TODO: monitor the renderingConfig for changes rather than check every frame
         if (renderingConfig.isNormalMapping()) {
             addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
@@ -201,7 +145,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         // Common Shader Parameters
 
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
         chunkMaterial.setFloat3("sunVec", backdropProvider.getSunDirection(false), true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
@@ -210,34 +153,14 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         // TODO: This is necessary right now because activateFeature removes all material parameters.
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
         chunkMaterial.setInt("textureAtlas", 0, true);
-        chunkMaterial.setInt("textureWater", 1, true);
+        chunkMaterial.setInt("textureEffects", 1, true);
         chunkMaterial.setInt("textureLava", 2, true);
-        chunkMaterial.setInt("textureWaterNormal", 3, true);
-        chunkMaterial.setInt("textureWaterNormalAlt", 4, true);
-        chunkMaterial.setInt("textureEffects", 5, true);
-        chunkMaterial.setInt("textureWaterReflection", 6, true);
-        chunkMaterial.setInt("texSceneOpaque", 7, true);
-
         if (renderingConfig.isNormalMapping()) {
+            chunkMaterial.setInt("textureAtlasNormal", 3, true);
             if (renderingConfig.isParallaxMapping()) {
+                chunkMaterial.setInt("textureAtlasHeight", 4, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
-        }
-
-        chunkMaterial.setFloat4("lightingSettingsFrag", 0, 0, 0, waterSpecExp, true);
-        chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
-        chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
-
-        // TODO: monitor the renderingConfig for changes rather than check every frame
-        if (renderingConfig.isAnimateWater()) {
-            chunkMaterial.setFloat("waveIntensityFalloff", waveIntensityFalloff, true);
-            chunkMaterial.setFloat("waveSizeFalloff", waveSizeFalloff, true);
-            chunkMaterial.setFloat("waveSize", waveSize, true);
-            chunkMaterial.setFloat("waveSpeedFalloff", waveSpeedFalloff, true);
-            chunkMaterial.setFloat("waveSpeed", waveSpeed, true);
-            chunkMaterial.setFloat("waveIntensity", waveIntensity, true);
-            chunkMaterial.setFloat("waterOffsetY", waterOffsetY, true);
-            chunkMaterial.setFloat("waveOverallScale", waveOverallScale, true);
         }
 
         chunkMaterial.setFloat("clip", 0.0f, true);
@@ -264,10 +187,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
             }
         }
 
-        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
+
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         PerformanceMonitor.endActivity();
     }
