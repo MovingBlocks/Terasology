@@ -20,7 +20,6 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -109,34 +108,32 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 2.0f)
-    public float waveOverallScale = 1.0f;
-
+    private float waveOverallScale = 1.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    float waterRefraction = 0.04f;
+    private float waterRefraction = 0.04f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    float waterFresnelBias = 0.01f;
+    private float waterFresnelBias = 0.01f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
-    float waterFresnelPow = 2.5f;
+    private float waterFresnelPow = 2.5f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 1.0f, max = 100.0f)
-    float waterNormalBias = 10.0f;
+    private float waterNormalBias = 10.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    float waterTint = 0.24f;
-
+    private float waterTint = 0.24f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1024.0f)
-    float waterSpecExp = 200.0f;
+    private float waterSpecExp = 200.0f;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    float parallaxBias = 0.05f;
+    private float parallaxBias = 0.05f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    float parallaxScale = 0.05f;
+    private float parallaxScale = 0.05f;
 
     public RefractiveReflectiveBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
@@ -160,11 +157,11 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
         // TODO: monitor the renderingConfig for changes rather than check every frame
@@ -172,7 +169,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
 
             if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
+                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
             }
         }
     }
@@ -205,24 +202,23 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         // TODO: This is necessary right now because activateFeature removes all material parameters.
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
         chunkMaterial.setInt("textureAtlas", 0, true);
-        chunkMaterial.setInt("textureWater", 1, true);
-        chunkMaterial.setInt("textureLava", 2, true);
-        chunkMaterial.setInt("textureWaterNormal", 3, true);
-        chunkMaterial.setInt("textureWaterNormalAlt", 4, true);
-        chunkMaterial.setInt("textureEffects", 5, true);
+        chunkMaterial.setInt("textureEffects", 1, true);
+        chunkMaterial.setInt("textureWater", 2, true);
+        chunkMaterial.setInt("textureLava", 3, true);
+        chunkMaterial.setInt("textureWaterNormal", 4, true);
+        chunkMaterial.setInt("textureWaterNormalAlt", 5, true);
         chunkMaterial.setInt("textureWaterReflection", 6, true);
         chunkMaterial.setInt("texSceneOpaque", 7, true);
-
         if (renderingConfig.isNormalMapping()) {
+            chunkMaterial.setInt("textureAtlasNormal", 8, true);
             if (renderingConfig.isParallaxMapping()) {
+                chunkMaterial.setInt("textureAtlasHeight", 9, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
         }
 
         chunkMaterial.setFloat4("lightingSettingsFrag", 0, 0, waterSpecExp, 0, true);
-
         chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
-
         chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
 
         // TODO: monitor the renderingConfig for changes rather than check every frame
@@ -236,8 +232,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             chunkMaterial.setFloat("waterOffsetY", waterOffsetY, true);
             chunkMaterial.setFloat("waveOverallScale", waveOverallScale, true);
         }
-
-        chunkMaterial.setFloat("clip", 0.0f, true);
 
         // Actual Node Processing
 
@@ -261,10 +255,10 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
             }
         }
 
-        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-
         worldRenderer.increaseTrianglesCount(numberOfRenderedTriangles);
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
+
+        chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
 
         PerformanceMonitor.endActivity();
     }
