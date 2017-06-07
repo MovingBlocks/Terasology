@@ -67,7 +67,6 @@ public class DeferredMainLightNode extends AbstractNode {
     private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
 
     private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
     private WorldProvider worldProvider;
 
@@ -77,10 +76,6 @@ public class DeferredMainLightNode extends AbstractNode {
 
     private SubmersibleCamera activeCamera;
     private Camera lightCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f cameraPosition;
     @SuppressWarnings("FieldCanBeLocal")
@@ -92,8 +87,8 @@ public class DeferredMainLightNode extends AbstractNode {
         backdropProvider = context.get(BackdropProvider.class);
         renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         lightCamera = worldRenderer.getLightCamera();
 
@@ -120,7 +115,7 @@ public class DeferredMainLightNode extends AbstractNode {
             addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
 
             if (renderingConfig.isCloudShadows()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
+                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
             }
         }
     }
@@ -145,26 +140,14 @@ public class DeferredMainLightNode extends AbstractNode {
 
         // Common Shader Parameters
 
-        lightGeometryMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
         lightGeometryMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        lightGeometryMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        lightGeometryMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        lightGeometryMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        lightGeometryMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        lightGeometryMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        lightGeometryMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
+
+        cameraPosition = activeCamera.getPosition();
+        activeCameraToLightSpace.sub(cameraPosition, lightCamera.getPosition());
+        mainLightInViewSpace = backdropProvider.getSunDirection(true);
+        activeCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
 
         // TODO: This is necessary right now because activateFeature removes all material parameters.
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
@@ -173,33 +156,29 @@ public class DeferredMainLightNode extends AbstractNode {
         lightGeometryMaterial.setInt("texSceneOpaqueLightBuffer", 2, true);
         if (renderingConfig.isDynamicShadows()) {
             lightGeometryMaterial.setInt("texSceneShadowMap", 3, true);
-
             if (renderingConfig.isCloudShadows()) {
                 lightGeometryMaterial.setInt("texSceneClouds", 4, true);
+                lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+                lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition, true);
             }
         }
 
         if (renderingConfig.isDynamicShadows()) {
             lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
             lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-
-            activeCameraToLightSpace.sub(activeCamera.getPosition(), lightCamera.getPosition());
-            lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace.x, activeCameraToLightSpace.y, activeCameraToLightSpace.z, true);
+            lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace, true);
         }
 
         // Note: no need to set a camera here: the render takes place
         // with a default opengl camera and the quad is in front of it.
 
+        lightGeometryMaterial.setFloat3("lightViewPos", mainLightInViewSpace, true);
         lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
-                mainLightComponent.lightColorDiffuse.y, mainLightComponent.lightColorDiffuse.z, true);
+            mainLightComponent.lightColorDiffuse.y, mainLightComponent.lightColorDiffuse.z, true);
         lightGeometryMaterial.setFloat3("lightColorAmbient", mainLightComponent.lightColorAmbient.x,
-                mainLightComponent.lightColorAmbient.y, mainLightComponent.lightColorAmbient.z, true);
+            mainLightComponent.lightColorAmbient.y, mainLightComponent.lightColorAmbient.z, true);
         lightGeometryMaterial.setFloat3("lightProperties", mainLightComponent.lightAmbientIntensity,
-                mainLightComponent.lightDiffuseIntensity, mainLightComponent.lightSpecularPower, true);
-
-        mainLightInViewSpace = backdropProvider.getSunDirection(true);
-        activeCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
-        lightGeometryMaterial.setFloat3("lightViewPos", mainLightInViewSpace.x, mainLightInViewSpace.y, mainLightInViewSpace.z, true);
+            mainLightComponent.lightDiffuseIntensity, mainLightComponent.lightSpecularPower, true);
 
         // Actual Node Processing
 
