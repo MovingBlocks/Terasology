@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,15 @@ public interface EntityManager {
      * @return
      */
     EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+
+    /**
+     * Creates a new EntityRef in sector-scope
+     *
+     * @return the newly created EntityRef
+     */
+    default EntityRef createSectorEntity() {
+        return null;
+    }
 
     /**
      * @param id
