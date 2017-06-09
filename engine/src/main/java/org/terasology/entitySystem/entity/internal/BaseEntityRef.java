@@ -172,6 +172,7 @@ public abstract class BaseEntityRef extends EntityRef {
         return builder.toString();
     }
 
+    @Override
     public void invalidate() {
         entityManager = null;
     }

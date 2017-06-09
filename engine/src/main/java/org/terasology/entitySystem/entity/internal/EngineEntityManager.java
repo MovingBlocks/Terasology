@@ -50,6 +50,8 @@ public interface EngineEntityManager extends LowLevelEntityManager {
 
     EntityRef createEntityWithoutLifecycleEvents(Prefab prefab);
 
+    RefStrategy getEntityRefStrategy();
+
     /**
      * Destroys an entity without sending lifecycle events.
      * <br><br>
@@ -123,6 +125,18 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      * @param subscriber
      */
     void unsubscribe(EntityChangeSubscriber subscriber);
+
+    void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component);
+
+    void notifyComponentRemoved(EntityRef changedEntity, Class<? extends Component> component);
+
+    void notifyComponentChanged(EntityRef changedEntity, Class<? extends Component> component);
+
+    void notifyComponentRemovalAndEntityDestruction(long entityId, EntityRef ref);
+
+    long createEntity();
+
+    void remove(long entityId);
 
     /**
      * Sets the event system the entity manager will use to propagate life cycle events.

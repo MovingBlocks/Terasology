@@ -16,18 +16,18 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
-import java.util.Map;
-
 /**
  */
-public interface EntityManager extends EntityPool {
+public interface EntityPool {
+
+    /**
+     * Removes all entities from the pool.
+     */
+    void clear();
 
     /**
      * Creates an EntityBuilder.
@@ -102,40 +102,49 @@ public interface EntityManager extends EntityPool {
     EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
     /**
-     * Creates a new EntityRef in sector-scope
+     * Creates an entity but doesn't send any lifecycle events.
+     * <br><br>
+     * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
-     * @return the newly created EntityRef
+     * @param components
+     * @return The newly created entity ref.
      */
-    default EntityRef createSectorEntity() {
-        return null;
-    }
+    EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components);
 
     /**
+     * Creates an entity but doesn't send any lifecycle events.
+     * <br><br>
+     * This is used by the block entity system to give an illusion of permanence to temporary block entities.
+     *
+     * @param prefab
+     * @return The newly created entity ref.
+     */
+    EntityRef createEntityWithoutLifecycleEvents(String prefab);
+
+    EntityRef createEntityWithoutLifecycleEvents(Prefab prefab);
+
+    /**
+     * Allows the creation of an entity with a given id - this is used
+     * when loading persisted entities
+     *
      * @param id
-     * @return The entity with the given id, or the null entity
+     * @param components
+     * @return The entityRef for the newly created entity
      */
-    EntityRef getEntity(long id);
+    EntityRef createEntityWithId(long id, Iterable<Component> components);
 
     /**
-     * @param other
-     * @return A new entity with a copy of each of the other entity's components
-     * @deprecated Use EntityRef.copy() instead.
-     */
-    @Deprecated
-    EntityRef copy(EntityRef other);
-
-    /**
-     * Creates a copy of the components of an entity.
+     * Creates an entity ref with the given id. This is used when loading components with references.
      *
-     * @param original
-     * @return A map of components types to components copied from the target entity.
+     * @param id
+     * @return The entityRef for the given id
      */
-    // TODO: Remove? A little dangerous due to ownership
-    Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
+    EntityRef createEntityRefWithId(long id);
 
-    /**
-     * @return An iterable over all entities
-     */
+    void destroy(long entityId);
+
+    void destroyEntityWithoutEvents(EntityRef entity);
+
     Iterable<EntityRef> getAllEntities();
 
     /**
@@ -144,34 +153,22 @@ public interface EntityManager extends EntityPool {
      */
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
-    /**
-     * @param componentClasses
-     * @return A count of entities with the provided component types
-     */
-    int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
-
-    /**
-     * @return The event system being used by the entity manager
-     */
-    EventSystem getEventSystem();
-
-    /**
-     * @return The prefab manager being used by the entity manager
-     */
-    PrefabManager getPrefabManager();
-
-    /**
-     * @return The component library being used by the entity manager
-     */
-    ComponentLibrary getComponentLibrary();
-
-    /**
-     * @return A count of currently active entities
-     */
     int getActiveEntityCount();
 
-    EntityPool getGlobalPool();
+    /**
+     * Gets an entity, if it already exists.
+     *
+     * @param id the id of the desired entity
+     * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
+     */
+    EntityRef getExistingEntity(long id);
 
-    EntityPool getSectorPool();
-
+    /**
+     * Fund out if a particular entity has a component of the given class.
+     *
+     * @param entityId the entity to check
+     * @param componentClass the class to check for
+     * @return whether the entity has the component
+     */
+    boolean hasComponent(long entityId, Class<? extends Component> componentClass);
 }

@@ -124,4 +124,10 @@ public abstract class EntityRef implements MutableComponentContainer {
     public final int hashCode() {
         return Objects.hashCode(getId());
     }
+
+    /**
+     * Invalidates this EntityRef
+     */
+    public void invalidate() {
+    }
 }
