@@ -40,7 +40,6 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.sector.EntityStore;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -65,8 +64,8 @@ public class PojoEntityManager implements EngineEntityManager {
     private long nextEntityId = 1;
     private TLongSet loadedIds = new TLongHashSet();
 
-    private EntityStore globalStore = new EntityStore();
-    private EntityStore sectorStore = new EntityStore();
+    private PojoEntityCache globalStore = new PojoEntityCache();
+    private PojoEntityCache sectorStore = new PojoEntityCache();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();

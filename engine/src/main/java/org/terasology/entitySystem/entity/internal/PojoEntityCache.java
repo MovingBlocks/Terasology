@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.sector;
+package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.collect.MapMaker;
-import org.terasology.entitySystem.entity.internal.BaseEntityRef;
-import org.terasology.entitySystem.entity.internal.ComponentTable;
+import org.terasology.entitySystem.entity.EntityCache;
+import org.terasology.entitySystem.entity.EntityRef;
 
 import java.util.Map;
 
 /**
  */
-public class EntityStore {
+public class PojoEntityCache implements EntityCache {
     private Map<Long, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable store = new ComponentTable();
+
+    public EntityRef create() {
+        //Todo: implement
+        return EntityRef.NULL;
+    }
 
     public Map<Long, BaseEntityRef> getEntityCache() {
         return entityCache;
