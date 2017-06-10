@@ -127,12 +127,16 @@ public class InputSystem extends BaseComponentSystem {
         processBindAxis(delta);
     }
 
+    public boolean isCapturingMouse() {
+        return display.hasFocus();
+    }
+
     private void updateInputEntities() {
         inputEntities = new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
     private void processMouseInput(float delta) {
-        if (!display.hasFocus()) {
+        if (!isCapturingMouse()) {
             return;
         }
 
@@ -194,7 +198,7 @@ public class InputSystem extends BaseComponentSystem {
     }
 
     private void processControllerInput(float delta) {
-        if (!display.hasFocus()) {
+        if (!isCapturingMouse()) {
             return;
         }
         for (ControllerAction action : controllers.getInputQueue()) {

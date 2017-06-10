@@ -136,7 +136,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-
     @Override
     public boolean isOpen(String screenUri) {
         return isOpen(new ResourceUrn(screenUri));
@@ -211,7 +210,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void closeAllScreens() {
-        for (UIScreenLayer screen: screens) {
+        for (UIScreenLayer screen : screens) {
             if (screen.isLowerLayerVisible()) {
                 closeScreen(screen);
             }
@@ -251,15 +250,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public <T extends CoreScreenLayer> T createScreen(String screenUri, Class<T> expectedType) {
         Set<ResourceUrn> urns = assetManager.resolve(screenUri, UIElement.class);
         switch (urns.size()) {
-        case 0:
-            logger.warn("No asset found for screen '{}'", screenUri);
-            return null;
-        case 1:
-            ResourceUrn urn = urns.iterator().next();
-            return createScreen(urn, expectedType);
-        default:
-            logger.warn("Multiple matches for screen '{}': {}", screenUri, urns);
-            return null;
+            case 0:
+                logger.warn("No asset found for screen '{}'", screenUri);
+                return null;
+            case 1:
+                ResourceUrn urn = urns.iterator().next();
+                return createScreen(urn, expectedType);
+            default:
+                logger.warn("Multiple matches for screen '{}': {}", screenUri, urns);
+                return null;
         }
     }
 
@@ -285,7 +284,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
         return null;
     }
-
 
     @Override
     public CoreScreenLayer pushScreen(ResourceUrn screenUri) {
@@ -374,15 +372,15 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public <T extends ControlWidget> T addOverlay(String overlayUri, Class<T> expectedType) {
         Set<ResourceUrn> urns = assetManager.resolve(overlayUri, UIElement.class);
         switch (urns.size()) {
-        case 0:
-            logger.warn("No asset found for overlay '{}'", overlayUri);
-            return null;
-        case 1:
-            ResourceUrn urn = urns.iterator().next();
-            return addOverlay(urn, expectedType);
-        default:
-            logger.warn("Multiple matches for overlay '{}': {}", overlayUri, urns);
-            return null;
+            case 0:
+                logger.warn("No asset found for overlay '{}'", overlayUri);
+                return null;
+            case 1:
+                ResourceUrn urn = urns.iterator().next();
+                return addOverlay(urn, expectedType);
+            default:
+                logger.warn("Multiple matches for overlay '{}': {}", overlayUri, urns);
+                return null;
         }
     }
 
@@ -496,7 +494,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             widget.update(delta);
         }
         InputSystem inputSystem = context.get(InputSystem.class);
-        inputSystem.getMouseDevice().setGrabbed(display.hasFocus() && !(this.isReleasingMouse()));
+        inputSystem.getMouseDevice().setGrabbed(inputSystem.isCapturingMouse() && !(this.isReleasingMouse()));
 
     }
 

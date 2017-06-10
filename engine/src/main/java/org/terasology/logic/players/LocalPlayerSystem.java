@@ -296,7 +296,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
-    public void onMouseX(MouseAxisEvent event, EntityRef entity) {
+    public void onMouseMove(MouseAxisEvent event, EntityRef entity) {
         MouseAxis axis = event.getMouseAxis();
         if (axis == MouseAxis.X) {
             lookYawDelta = event.getValue();
