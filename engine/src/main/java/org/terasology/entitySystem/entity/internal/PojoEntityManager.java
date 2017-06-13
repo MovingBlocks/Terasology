@@ -211,6 +211,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @SafeVarargs
     @Override
+    //Todo: implement iterating over multiple caches
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
         if (componentClasses.length == 0) {
             return getAllEntities();
@@ -258,7 +259,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public int getActiveEntityCount() {
-        return globalCache.getEntityStore().size();
+        return globalCache.getEntityStore().size() + sectorCache.getEntityStore().size();
     }
 
     @Override
@@ -353,6 +354,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    //Todo: include sector entities
     public void deactivateForStorage(EntityRef entity) {
         if (entity.exists()) {
             long entityId = entity.getId();
@@ -391,7 +393,8 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
-        return globalCache.getComponentStore().get(entityId, componentClass) != null;
+        return (globalCache.getComponentStore().get(entityId, componentClass) != null) ||
+               (sectorCache.getComponentStore().get(entityId, componentClass) != null);
     }
 
     @Override
@@ -413,11 +416,12 @@ public class PojoEntityManager implements EngineEntityManager {
      * @return An iterable over the components of the given entity
      */
     @Override
+    //Todo: implement iterating over multiple caches
     public Iterable<Component> iterateComponents(long entityId) {
         return globalCache.getComponentStore().iterateComponents(entityId);
     }
 
-
+    @Override
     public void notifyComponentRemovalAndEntityDestruction(long entityId, EntityRef ref) {
         for (Component comp : globalCache.getComponentStore().iterateComponents(entityId)) {
             notifyComponentRemoved(ref, comp.getClass());
@@ -434,6 +438,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * @return The component of that type owned by the given entity, or null if it doesn't have that component
      */
     @Override
+    //Todo: check all caches
     public <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
         return globalCache.getComponentStore().get(entityId, componentClass);
     }
@@ -447,6 +452,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * @return The added component
      */
     @Override
+    //Todo: be able to add to entities in any cache
     public <T extends Component> T addComponent(long entityId, T component) {
         Preconditions.checkNotNull(component);
         Component oldComponent = globalCache.getComponentStore().put(entityId, component);
@@ -477,6 +483,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * @param componentClass
      */
     @Override
+    //Todo: be able to remove from entities in any cache
     public <T extends Component> T removeComponent(long entityId, Class<T> componentClass) {
         T component = globalCache.getComponentStore().get(entityId, componentClass);
         if (component != null) {
@@ -498,6 +505,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * @param component
      */
     @Override
+    //Todo: be able to save components for entities in any cache
     public void saveComponent(long entityId, Component component) {
         Component oldComponent = globalCache.getComponentStore().put(entityId, component);
         if (oldComponent == null) {
