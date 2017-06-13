@@ -31,10 +31,14 @@ import java.util.Map;
 public class EntityBuilder implements MutableComponentContainer {
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
-    private EngineEntityManager manager;
+    private EntityCache cache;
 
     public EntityBuilder(EngineEntityManager manager) {
-        this.manager = manager;
+        this.cache = manager.getGlobalCache();
+    }
+
+    public EntityBuilder(EntityCache cache) {
+        this.cache = cache;
     }
 
     /**
@@ -43,11 +47,11 @@ public class EntityBuilder implements MutableComponentContainer {
      * @return The built entity.
      */
     public EntityRef build() {
-        return manager.create(components.values());
+        return cache.create(components.values());
     }
 
     public EntityRef buildWithoutLifecycleEvents() {
-        return manager.createEntityWithoutLifecycleEvents(components.values());
+        return cache.createEntityWithoutLifecycleEvents(components.values());
     }
 
     @Override

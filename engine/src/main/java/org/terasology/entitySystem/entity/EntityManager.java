@@ -169,4 +169,9 @@ public interface EntityManager {
      * @return A count of currently active entities
      */
     int getActiveEntityCount();
+
+    EntityCache getGlobalCache();
+
+    EntityCache getSectorCache();
+
 }

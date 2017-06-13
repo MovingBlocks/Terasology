@@ -15,28 +15,327 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityCache;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+
+import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
 /**
  */
 public class PojoEntityCache implements EntityCache {
-    private Map<Long, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
-    private ComponentTable store = new ComponentTable();
 
+    private PojoEntityManager entityManager;
+
+    private static final Logger logger = LoggerFactory.getLogger(PojoEntityCache.class);
+
+    private Map<Long, BaseEntityRef> entityStore = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
+    private ComponentTable componentStore = new ComponentTable();
+
+    public PojoEntityCache(PojoEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Override
     public EntityRef create() {
-        //Todo: implement
+        EntityRef entityRef = createEntityRef(entityManager.createEntity());
+        /*
+         * The entity change listener are also used to detect new entities. By adding one component we inform those
+         * listeners about the new entity.
+         */
+        entityRef.addComponent(new EntityInfoComponent());
+        return entityRef;
+    }
+
+    @Override
+    public EntityRef create(Component... components) {
+        return create(Arrays.asList(components));
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components) {
+        EntityRef entity = createEntity(components);
+
+        EventSystem eventSystem = entityManager.getEventSystem();
+        if (eventSystem != null) {
+            eventSystem.send(entity, OnAddedComponent.newInstance());
+            eventSystem.send(entity, OnActivatedComponent.newInstance());
+        }
+        for (Component component: components) {
+            entityManager.notifyComponentAdded(entity, component.getClass());
+        }
+        return entity;
+    }
+
+    @Override
+    public EntityRef create(String prefabName) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+            if (prefab == null) {
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
+                return EntityRef.NULL;
+            }
+            return create(prefab);
+        }
+        return create();
+    }
+
+    @Override
+    public EntityRef create(String prefabName, Vector3f position) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+            return create(prefab, position);
+        }
+        return create();
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.iterateComponents()) {
+            Component newComp = entityManager.getComponentLibrary().copy(component);
+            components.add(newComp);
+            if (newComp instanceof LocationComponent) {
+                LocationComponent loc = (LocationComponent) newComp;
+                loc.setWorldPosition(position);
+            }
+        }
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        return create(components);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.iterateComponents()) {
+            components.add(entityManager.getComponentLibrary().copy(component));
+        }
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        return create(components);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.iterateComponents()) {
+            Component newComp = entityManager.getComponentLibrary().copy(component);
+            components.add(newComp);
+            if (newComp instanceof LocationComponent) {
+                LocationComponent loc = (LocationComponent) newComp;
+                loc.setWorldPosition(position);
+                loc.setWorldRotation(rotation);
+            }
+        }
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        return create(components);
+    }
+
+
+    /**
+     * Destroys this entity, sending event
+     *
+     * @param entityId
+     */
+    @Override
+    public void destroy(long entityId) {
+        // Don't allow the destruction of unloaded entities.
+        if (!entityManager.idLoaded(entityId)) {
+            return;
+        }
+        EntityRef ref = createEntityRef(entityId);
+        if (entityManager.getEventSystem() != null) {
+            entityManager.getEventSystem().send(ref, BeforeDeactivateComponent.newInstance());
+            entityManager.getEventSystem().send(ref, BeforeRemoveComponent.newInstance());
+        }
+        entityManager.notifyComponentRemovalAndEntityDestruction(entityId, ref);
+        destroy(ref);
+    }
+
+    private void destroy(EntityRef ref) {
+        // Don't allow the destruction of unloaded entities.
+        long entityId = ref.getId();
+        entityStore.remove(entityId);
+        entityManager.remove(entityId);
+        if (ref instanceof PojoEntityRef) {
+            ((PojoEntityRef) ref).invalidate();
+        }
+        componentStore.remove(entityId);
+    }
+
+    private EntityRef createEntity(Iterable<Component> components) {
+        entityManager.getComponentLibrary();
+        long entityId = entityManager.createEntity();
+
+        Prefab prefab = null;
+        for (Component component : components) {
+            if (component instanceof EntityInfoComponent) {
+                EntityInfoComponent comp = (EntityInfoComponent) component;
+                prefab = comp.parentPrefab;
+                break;
+            }
+        }
+
+        Iterable<Component> finalComponents;
+        if (entityManager.getEventSystem() != null) {
+            BeforeEntityCreated event = new BeforeEntityCreated(prefab, components);
+            BaseEntityRef tempRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
+            entityManager.getEventSystem().send(tempRef, event);
+            tempRef.invalidate();
+            finalComponents = event.getResultComponents();
+        } else {
+            finalComponents = components;
+        }
+
+        for (Component c : finalComponents) {
+            componentStore.put(entityId, c);
+        }
+        return createEntityRef(entityId);
+    }
+
+    @Override
+    public EntityRef createEntityRefWithId(long id) {
+        if (entityManager.isExistingEntity(id)) {
+            return createEntityRef(id);
+        }
         return EntityRef.NULL;
     }
 
-    public Map<Long, BaseEntityRef> getEntityCache() {
-        return entityCache;
+    /**
+     * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
+     */
+    @Override
+    public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
+        EntityRef entity = createEntity(components);
+        for (Component component: components) {
+            entityManager.notifyComponentAdded(entity, component.getClass());
+        }
+        return entity;
     }
 
-    public ComponentTable getStore() {
-        return store;
+    /**
+     * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
+     */
+    @Override
+    public EntityRef createEntityWithoutLifecycleEvents(String prefabName) {
+        return createEntityWithoutLifecycleEvents(entityManager.getPrefabManager().getPrefab(prefabName));
+    }
+
+    /**
+     * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
+     */
+    @Override
+    public EntityRef createEntityWithoutLifecycleEvents(Prefab prefab) {
+        if (prefab != null) {
+            List<Component> components = Lists.newArrayList();
+            for (Component component : prefab.iterateComponents()) {
+                components.add(entityManager.getComponentLibrary().copy(component));
+            }
+            components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+
+            return createEntityWithoutLifecycleEvents(components);
+        } else {
+            return createEntityWithoutLifecycleEvents(Collections.<Component>emptyList());
+        }
+    }
+
+    /**
+     * Destroys the entity without sending any events. The entity life cycle subscriber will however be informed.
+     */
+    @Override
+    public void destroyEntityWithoutEvents(EntityRef entity) {
+        if (entity.isActive()) {
+            entityManager.notifyComponentRemovalAndEntityDestruction(entity.getId(), entity);
+            destroy(entity);
+        }
+    }
+
+    @Override
+    public EntityRef createEntityWithId(long id, Iterable<Component> components) {
+        if (!entityManager.registerId(id)) {
+            return EntityRef.NULL;
+        }
+        for (Component c : components) {
+            componentStore.put(id, c);
+        }
+        EntityRef entity = createEntityRef(id);
+        if (entityManager.getEventSystem() != null) {
+            entityManager.getEventSystem().send(entity, OnActivatedComponent.newInstance());
+        }
+        for (Component component: components) {
+            entityManager.notifyComponentAdded(entity, component.getClass());
+        }
+        return entity;
+    }
+
+    public EntityBuilder newBuilder() {
+        return new EntityBuilder(this);
+    }
+
+    @Override
+    public EntityBuilder newBuilder(String prefabName) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+            if (prefab == null) {
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
+                return new EntityBuilder(this);
+            }
+            return newBuilder(prefab);
+        }
+        return newBuilder();
+    }
+
+    @Override
+    public EntityBuilder newBuilder(Prefab prefab) {
+        EntityBuilder builder = new EntityBuilder(this);
+        if (prefab != null) {
+            for (Component component : prefab.iterateComponents()) {
+                builder.addComponent(entityManager.getComponentLibrary().copy(component));
+            }
+            builder.addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        }
+        return builder;
+    }
+
+    public Map<Long, BaseEntityRef> getEntityStore() {
+        return entityStore;
+    }
+
+    public ComponentTable getComponentStore() {
+        return componentStore;
+    }
+
+    private EntityRef createEntityRef(long entityId) {
+        if (entityId == NULL_ID) {
+            return EntityRef.NULL;
+        }
+        EntityRef existing = entityManager.getEntity(entityId);
+        if (existing != null) {
+            //Entity exists, but is not in this cache
+            return existing;
+        }
+        //Todo: look into whether RefStrategy should use manager or cache?
+        BaseEntityRef newRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
+        entityStore.put(entityId, newRef);
+        return newRef;
     }
 }
