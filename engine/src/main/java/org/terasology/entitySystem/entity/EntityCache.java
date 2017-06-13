@@ -25,6 +25,11 @@ import org.terasology.math.geom.Vector3f;
 public interface EntityCache {
 
     /**
+     * Removes all entities from the cache.
+     */
+    void clear();
+
+    /**
      * Creates an EntityBuilder.
      *
      * @return A new entity builder

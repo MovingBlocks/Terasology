@@ -57,6 +57,15 @@ public class PojoEntityCache implements EntityCache {
     }
 
     @Override
+    public void clear() {
+        //Todo: should also clear out ids from the EntityManager
+        entityStore.values().forEach(BaseEntityRef::invalidate);
+        componentStore.clear();
+        entityStore.clear();
+    }
+
+
+    @Override
     public EntityRef create() {
         EntityRef entityRef = createEntityRef(entityManager.createEntity());
         /*

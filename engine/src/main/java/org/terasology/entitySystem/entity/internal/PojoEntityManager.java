@@ -111,11 +111,10 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public void clear() {
         //Todo: implement clear in the stores
-        globalCache.getEntityStore().values().forEach(BaseEntityRef::invalidate);
-        globalCache.getComponentStore().clear();
+        globalCache.clear();
+        sectorCache.clear();
         nextEntityId = 1;
         loadedIds.clear();
-        globalCache.getEntityStore().clear();
     }
 
     public EntityRef createEntityRefWithId(long entityId) {
