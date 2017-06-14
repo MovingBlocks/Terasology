@@ -145,13 +145,15 @@ void main() {
     }
 #endif
 
+#if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
     vec3 sunVecViewAdjusted = sunVecView;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
     // Now featuring linear interpolation to make the transition smoother... :-)
     if (daylight < 0.1) {
         sunVecViewAdjusted = mix(sunVecViewAdjusted * -1.0, sunVecViewAdjusted, daylight / 0.1);
-     }
+    }
+#endif
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
