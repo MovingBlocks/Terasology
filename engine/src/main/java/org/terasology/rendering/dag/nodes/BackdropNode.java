@@ -21,7 +21,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -159,7 +158,6 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         // Shader Parameters
 
         skyMaterial.setFloat3("zenith", getAllWeatherZenith(backdropProvider.getSunDirection(false).y, turbidity), true);
-        skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
         skyMaterial.setFloat("turbidity", turbidity, true);
         skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);

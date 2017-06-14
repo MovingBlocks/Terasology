@@ -141,7 +141,6 @@ public class BackdropReflectionNode extends AbstractNode {
         // Specific Shader Parameters
 
         skyMaterial.setFloat3("zenith", getAllWeatherZenith(sunDirection.y, turbidity), true);
-        skyMaterial.setFloat("sunAngle", backdropProvider.getSunPositionAngle(), true);
         skyMaterial.setFloat("turbidity", turbidity, true);
         skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
         skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
