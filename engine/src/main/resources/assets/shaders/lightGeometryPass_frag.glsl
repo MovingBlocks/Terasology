@@ -20,7 +20,9 @@ uniform vec3 lightViewPos;
 
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
+#if defined (FEATURE_LIGHT_DIRECTIONAL)
 uniform sampler2D texSceneOpaqueLightBuffer;
+#endif
 
 uniform vec3 lightColorDiffuse = vec3(1.0, 0.0, 0.0);
 uniform vec3 lightColorAmbient = vec3(1.0, 0.0, 0.0);
@@ -43,7 +45,10 @@ uniform sampler2D texSceneClouds;
 
 #define SHADOW_MAP_BIAS 0.01
 
+#if defined (FEATURE_LIGHT_DIRECTIONAL)
 uniform sampler2D texSceneShadowMap;
+#endif
+
 uniform mat4 lightViewProjMatrix;
 
 uniform vec3 activeCameraToLightSpace;
@@ -66,8 +71,6 @@ void main() {
     float shininess = normalBuffer.a;
     vec4 depthBuffer = texture2D(texSceneOpaqueDepth, projectedPos.xy).rgba;
     float depth = depthBuffer.r * 2.0 - 1.0;
-    vec4 lightBuffer = texture2D(texSceneOpaqueLightBuffer, projectedPos.xy);
-    float sunlightIntensity = lightBuffer.y;
 
 #if defined (DYNAMIC_SHADOWS) && defined (FEATURE_LIGHT_DIRECTIONAL)
     // TODO: Uhhh... Doing this twice here :/ Frustum ray would be better!
@@ -144,6 +147,8 @@ void main() {
     vec3 color = ambTerm * lightColorAmbient;
     color *= lightColorDiffuse * lightDiffuseIntensity * lambTerm;
 #elif defined (FEATURE_LIGHT_DIRECTIONAL)
+    vec4 lightBuffer = texture2D(texSceneOpaqueLightBuffer, projectedPos.xy);
+    float sunlightIntensity = lightBuffer.y;
     vec3 color = calcSunlightColorDeferred(sunlightIntensity, lambTerm, ambTerm, lightDiffuseIntensity, lightColorAmbient, lightColorDiffuse);
 #else
     vec3 color = vec3(1.0, 0.0, 1.0);
