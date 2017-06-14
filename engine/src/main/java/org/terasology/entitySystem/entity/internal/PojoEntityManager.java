@@ -139,6 +139,7 @@ public class PojoEntityManager implements EngineEntityManager {
         return sectorCache.create();
     }
 
+    @Override
     public long createEntity() {
         if (nextEntityId == NULL_ID) {
             nextEntityId++;
@@ -588,21 +589,7 @@ public class PojoEntityManager implements EngineEntityManager {
      */
 
 
-    //Todo: check all caches
     private EntityRef createEntityRef(long entityId) {
-        if (entityId == NULL_ID) {
-            return EntityRef.NULL;
-        }
-        BaseEntityRef existing = globalCache.getEntityStore().get(entityId);
-        if (existing != null) {
-            return existing;
-        }
-        BaseEntityRef newRef = refStrategy.createRefFor(entityId, this);
-        globalCache.getEntityStore().put(entityId, newRef);
-        return newRef;
-    }
-
-    private EntityRef createSectorEntityRef(long entityId) {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
@@ -617,7 +604,7 @@ public class PojoEntityManager implements EngineEntityManager {
         }
 
         BaseEntityRef newRef = refStrategy.createRefFor(entityId, this);
-        sectorCache.getEntityStore().put(entityId, newRef);
+        globalCache.getEntityStore().put(entityId, newRef);
         return newRef;
     }
 
