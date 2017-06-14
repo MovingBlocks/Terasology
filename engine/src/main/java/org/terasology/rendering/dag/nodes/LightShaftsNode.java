@@ -37,7 +37,6 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
@@ -102,8 +101,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
     }
 
     /**
