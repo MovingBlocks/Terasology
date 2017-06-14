@@ -58,19 +58,15 @@ public class InitialPostProcessingNode extends AbstractNode {
 
     private Material initialPostMaterial;
 
-    // TODO: abberationOffsets are never assigned. Why?
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    private float aberrationOffsetX;
+    private float aberrationOffsetX = 0;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    private float aberrationOffsetY;
+    private float aberrationOffsetY = 0;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
     private float bloomFactor = 0.5f;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f tint;
 
     public InitialPostProcessingNode(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
@@ -78,7 +74,7 @@ public class InitialPostProcessingNode extends AbstractNode {
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        // TODO: see if we could write this straight into a GBUFFER - notice this FBO is used in ShaderParametersHdr
+        // TODO: see if we could write this straight into a GBUFFER
         requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(INITIAL_POST_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(INITIAL_POST_FBO, displayResolutionDependentFBOs));
@@ -109,8 +105,7 @@ public class InitialPostProcessingNode extends AbstractNode {
 
         // Shader Parameters
 
-        tint = worldProvider.getBlock(activeCamera.getPosition()).getTint();
-        initialPostMaterial.setFloat3("inLiquidTint", tint.x, tint.y, tint.z, true);
+        initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(activeCamera.getPosition()).getTint(), true);
 
         // TODO: monitor config parameter by subscribing to it
         if (renderingConfig.isBloom()) {

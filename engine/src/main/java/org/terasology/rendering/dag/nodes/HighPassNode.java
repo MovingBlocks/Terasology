@@ -45,6 +45,7 @@ public class HighPassNode extends ConditionDependentNode {
     public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL = new ResourceUrn("engine:prog.highPass");
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
     private float highPassThreshold = 0.05f;
 
