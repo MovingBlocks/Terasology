@@ -158,7 +158,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
@@ -194,7 +193,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        chunkMaterial.setFloat3("sunVec", backdropProvider.getSunDirection(false), true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
@@ -204,15 +202,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial.setInt("textureAtlas", 0, true);
         chunkMaterial.setInt("textureEffects", 1, true);
         chunkMaterial.setInt("textureWater", 2, true);
-        chunkMaterial.setInt("textureLava", 3, true);
-        chunkMaterial.setInt("textureWaterNormal", 4, true);
-        chunkMaterial.setInt("textureWaterNormalAlt", 5, true);
-        chunkMaterial.setInt("textureWaterReflection", 6, true);
-        chunkMaterial.setInt("texSceneOpaque", 7, true);
+        chunkMaterial.setInt("textureWaterNormal", 3, true);
+        chunkMaterial.setInt("textureWaterNormalAlt", 4, true);
+        chunkMaterial.setInt("textureWaterReflection", 5, true);
+        chunkMaterial.setInt("texSceneOpaque", 6, true);
         if (renderingConfig.isNormalMapping()) {
-            chunkMaterial.setInt("textureAtlasNormal", 8, true);
+            chunkMaterial.setInt("textureAtlasNormal", 7, true);
             if (renderingConfig.isParallaxMapping()) {
-                chunkMaterial.setInt("textureAtlasHeight", 9, true);
+                chunkMaterial.setInt("textureAtlasHeight", 8, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
         }
