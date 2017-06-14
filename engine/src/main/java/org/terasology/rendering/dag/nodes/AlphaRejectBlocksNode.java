@@ -62,7 +62,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     private WorldRenderer worldRenderer;
     private RenderQueuesHelper renderQueues;
     private RenderingConfig renderingConfig;
-    private BackdropProvider backdropProvider;
     private WorldProvider worldProvider;
 
     private Material chunkMaterial;
@@ -80,7 +79,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     public AlphaRejectBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
         renderingConfig = context.get(Config.class).getRendering();
-        backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
 
         wireframeStateChange = new SetWireframe(true);

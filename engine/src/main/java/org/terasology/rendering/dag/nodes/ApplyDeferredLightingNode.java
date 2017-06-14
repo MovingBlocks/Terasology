@@ -54,35 +54,12 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-    private WorldRenderer worldRenderer;
-    private BackdropProvider backdropProvider;
-    private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
-
-    private Material deferredLightingMaterial;
-
-    private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
 
     public ApplyDeferredLightingNode(Context context) {
-        backdropProvider = context.get(BackdropProvider.class);
-        renderingConfig = context.get(Config.class).getRendering();
-        worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
-
-        activeCamera = worldRenderer.getActiveCamera();
-
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         addDesiredStateChange(new BindFbo(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
-
-        deferredLightingMaterial = getMaterial(DEFERRED_LIGHTING_MATERIAL);
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
