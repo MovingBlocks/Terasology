@@ -41,11 +41,9 @@ import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -56,9 +54,7 @@ import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
-import static org.terasology.rendering.dag.nodes.ShadowMapNode.SHADOW_MAP_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.LightAccumulationTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
@@ -116,18 +112,9 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         initLightSphereDisplayList();
 
-        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueLightBuffer"));
-        if (renderingConfig.isDynamicShadows()) {
-            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
-
-            if (renderingConfig.isCloudShadows()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
-            }
-        }
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
     }
 
     private void initLightSphereDisplayList() {
@@ -173,11 +160,9 @@ public class DeferredPointLightsNode extends AbstractNode {
         // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
         lightGeometryMaterial.setInt("texSceneOpaqueDepth", 0, true);
         lightGeometryMaterial.setInt("texSceneOpaqueNormals", 1, true);
-        lightGeometryMaterial.setInt("texSceneOpaqueLightBuffer", 2, true);
+
         if (renderingConfig.isDynamicShadows()) {
-            lightGeometryMaterial.setInt("texSceneShadowMap", 3, true);
             if (renderingConfig.isCloudShadows()) {
-                lightGeometryMaterial.setInt("texSceneClouds", 4, true);
                 lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
                 lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition, true);
             }
