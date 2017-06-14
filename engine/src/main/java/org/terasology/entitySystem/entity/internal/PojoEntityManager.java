@@ -79,23 +79,6 @@ public class PojoEntityManager implements EngineEntityManager {
     public PojoEntityManager() {
     }
 
-    public boolean registerId(long entityId) {
-        if (entityId >= nextEntityId) {
-            logger.error("Prevented attempt to create entity with an invalid id.");
-            return false;
-        }
-        loadedIds.add(entityId);
-        return true;
-    }
-
-    public boolean idLoaded(long entityId) {
-        return loadedIds.contains(entityId);
-    }
-
-    public void remove(long entityId) {
-        loadedIds.remove(entityId);
-    }
-
     public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
         this.typeSerializerLibrary = serializerLibrary;
     }
@@ -109,16 +92,74 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public RefStrategy getEntityRefStrategy() {
+        return refStrategy;
+    }
+
+    @Override
+    public EntityCache getGlobalCache () {
+        return globalCache;
+    }
+
+    @Override
+    public EntityCache getSectorCache() {
+        return sectorCache;
+    }
+
+    @Override
     public void clear() {
-        //Todo: implement clear in the stores
         globalCache.clear();
         sectorCache.clear();
         nextEntityId = 1;
         loadedIds.clear();
     }
 
-    public EntityRef createEntityRefWithId(long entityId) {
-        return globalCache.createEntityRefWithId(entityId);
+    @Override
+    public EntityBuilder newBuilder() {
+        return globalCache.newBuilder();
+    }
+
+    @Override
+    public EntityBuilder newBuilder(String prefabName) {
+        return globalCache.newBuilder(prefabName);
+    }
+
+    @Override
+    public EntityBuilder newBuilder(Prefab prefab) {
+        return globalCache.newBuilder(prefab);
+    }
+
+    @Override
+    public EntityRef create() {
+        return globalCache.create();
+    }
+
+    @Override
+    public EntityRef createSectorEntity() {
+        return sectorCache.create();
+    }
+
+    public long createEntity() {
+        if (nextEntityId == NULL_ID) {
+            nextEntityId++;
+        }
+        loadedIds.add(nextEntityId);
+        return nextEntityId++;
+    }
+
+    @Override
+    public EntityRef create(Component... components) {
+        return globalCache.create(components);
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components) {
+        return globalCache.create(components);
+    }
+
+    @Override
+    public void setEntityRefStrategy(RefStrategy strategy) {
+        this.refStrategy = strategy;
     }
 
     private EntityRef createEntity(Iterable<Component> components) {
@@ -151,34 +192,33 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public void destroyEntityWithoutEvents(EntityRef entity) {
-        globalCache.destroyEntityWithoutEvents(entity);
+    public EntityRef create(String prefabName) {
+        return globalCache.create(prefabName);
     }
 
     @Override
-    public EntityRef createEntityWithId(long id, Iterable<Component> components) {
-        return globalCache.createEntityWithId(id, components);
+    public EntityRef create(Prefab prefab, Vector3f position) {
+        return globalCache.create(prefab, position);
     }
 
     @Override
-    public void destroy(long entityId) {
-        globalCache.destroy(entityId);
-    }
-
-
-    @Override
-    public void setEntityRefStrategy(RefStrategy strategy) {
-        this.refStrategy = strategy;
-    }
-
-    @Override
-    public RefStrategy getEntityRefStrategy() {
-        return refStrategy;
+    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        return globalCache.create(prefab, position, rotation);
     }
 
     @Override
     public EntityRef getEntity(long id) {
         return createEntityRef(id);
+    }
+
+    @Override
+    public EntityRef create(String prefab, Vector3f position) {
+        return globalCache.create(prefab, position);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab) {
+        return globalCache.create(prefab);
     }
 
     @Override
@@ -277,6 +317,17 @@ public class PojoEntityManager implements EngineEntityManager {
         return prefabManager;
     }
 
+
+    /*
+     * Engine features
+     */
+
+
+    @Override
+    public EntityRef createEntityRefWithId(long entityId) {
+        return globalCache.createEntityRefWithId(entityId);
+    }
+
     /**
      * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
      */
@@ -315,18 +366,15 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
-    public EntityCache getGlobalCache () {
-        return globalCache;
+    @Override
+    public void destroyEntityWithoutEvents(EntityRef entity) {
+        globalCache.destroyEntityWithoutEvents(entity);
     }
 
-    public EntityCache getSectorCache() {
-        return sectorCache;
+    @Override
+    public EntityRef createEntityWithId(long id, Iterable<Component> components) {
+        return globalCache.createEntityWithId(id, components);
     }
-
-    /*
-     * Engine features
-     */
-
 
     @Override
     public void subscribeForChanges(EntityChangeSubscriber subscriber) {
@@ -422,6 +470,13 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    //Todo: implement destroying in any cache
+    public void destroy(long entityId) {
+        globalCache.destroy(entityId);
+    }
+
+    @Override
+    //Todo: implement for any cache
     public void notifyComponentRemovalAndEntityDestruction(long entityId, EntityRef ref) {
         for (Component comp : globalCache.getComponentStore().iterateComponents(entityId)) {
             notifyComponentRemoved(ref, comp.getClass());
@@ -527,18 +582,13 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
+
     /*
      * Implementation
      */
 
-    public long createEntity() {
-        if (nextEntityId == NULL_ID) {
-            nextEntityId++;
-        }
-        loadedIds.add(nextEntityId);
-        return nextEntityId++;
-    }
 
+    //Todo: check all caches
     private EntityRef createEntityRef(long entityId) {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
@@ -550,10 +600,6 @@ public class PojoEntityManager implements EngineEntityManager {
         BaseEntityRef newRef = refStrategy.createRefFor(entityId, this);
         globalCache.getEntityStore().put(entityId, newRef);
         return newRef;
-    }
-
-    public EntityRef createSectorEntity() {
-        return sectorCache.create();
     }
 
     private EntityRef createSectorEntityRef(long entityId) {
@@ -700,48 +746,23 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
-    public EntityBuilder newBuilder() {
-        return globalCache.newBuilder();
+
+
+    public boolean registerId(long entityId) {
+        if (entityId >= nextEntityId) {
+            logger.error("Prevented attempt to create entity with an invalid id.");
+            return false;
+        }
+        loadedIds.add(entityId);
+        return true;
     }
 
-    public EntityBuilder newBuilder(String prefabName) {
-        return globalCache.newBuilder(prefabName);
+    public boolean idLoaded(long entityId) {
+        return loadedIds.contains(entityId);
     }
 
-    public EntityBuilder newBuilder(Prefab prefab) {
-        return globalCache.newBuilder(prefab);
-    }
-
-    public EntityRef create() {
-        return globalCache.create();
-    }
-
-    public EntityRef create(Component... components) {
-        return globalCache.create(components);
-    }
-
-    public EntityRef create(Iterable<Component> components) {
-        return globalCache.create(components);
-    }
-
-    public EntityRef create(String prefabName) {
-        return globalCache.create(prefabName);
-    }
-
-    public EntityRef create(Prefab prefab) {
-        return globalCache.create(prefab);
-    }
-
-    public EntityRef create(String prefab, Vector3f position) {
-        return globalCache.create(prefab, position);
-    }
-
-    public EntityRef create(Prefab prefab, Vector3f position) {
-        return globalCache.create(prefab, position);
-    }
-
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        return globalCache.create(prefab, position, rotation);
+    public void remove(long entityId) {
+        loadedIds.remove(entityId);
     }
 
 }
