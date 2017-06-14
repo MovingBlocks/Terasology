@@ -144,8 +144,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         // Common Shader Parameters
 
-        chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        chunkMaterial.setFloat3("sunVec", backdropProvider.getSunDirection(false), true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
