@@ -105,27 +105,6 @@ public class ApplyDeferredLightingNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
 
-        // Common Shader Parameters
-
-        deferredLightingMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        deferredLightingMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        deferredLightingMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        deferredLightingMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        deferredLightingMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        deferredLightingMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        deferredLightingMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        deferredLightingMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        deferredLightingMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        deferredLightingMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-
         // Actual Node Processing
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
