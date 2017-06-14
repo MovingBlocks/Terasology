@@ -16,14 +16,9 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -34,8 +29,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import static org.terasology.rendering.dag.nodes.InitialPostProcessingNode.INITIAL_POST_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -53,23 +46,11 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  */
 public class ToneMappingNode extends AbstractNode {
     public static final ResourceUrn TONE_MAPPING_FBO = new ResourceUrn("engine:fbo.toneMapping");
-    public static final ResourceUrn TONE_MAPPING_MATERIAL = new ResourceUrn("engine:prog.toneMapping");
+    private static final ResourceUrn TONE_MAPPING_MATERIAL = new ResourceUrn("engine:prog.toneMapping");
 
-    private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
-    private RenderingConfig renderingConfig;
-    private WorldProvider worldProvider;
     private ScreenGrabber screenGrabber;
 
     private Material toneMappingMaterial;
-
-    private SubmersibleCamera activeCamera;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraDir;
-    @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f cameraPosition;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
@@ -79,13 +60,7 @@ public class ToneMappingNode extends AbstractNode {
     private float whitePoint = 9f;
 
     public ToneMappingNode(Context context) {
-        renderingConfig = context.get(Config.class).getRendering();
-        backdropProvider = context.get(BackdropProvider.class);
-        worldProvider = context.get(WorldProvider.class);
-        worldRenderer = context.get(WorldRenderer.class);
         screenGrabber = context.get(ScreenGrabber.class);
-
-        activeCamera = worldRenderer.getActiveCamera();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
@@ -108,27 +83,6 @@ public class ToneMappingNode extends AbstractNode {
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/toneMapping");
-
-        // Common Shader Parameters
-
-        toneMappingMaterial.setFloat("viewingDistance", renderingConfig.getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        toneMappingMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-        toneMappingMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-        toneMappingMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-        cameraDir = activeCamera.getViewingDirection();
-        cameraPosition = activeCamera.getPosition();
-
-        toneMappingMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-        toneMappingMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-        toneMappingMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-        toneMappingMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-
-        sunDirection = backdropProvider.getSunDirection(false);
-        toneMappingMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-
-        toneMappingMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
 
         // Specific Shader Parameters
         toneMappingMaterial.setFloat("exposure", screenGrabber.getExposure() * exposureBias, true);
