@@ -47,16 +47,22 @@ import java.nio.ByteBuffer;
 public class UpdateExposureNode extends AbstractNode {
     private static final Logger logger = LoggerFactory.getLogger(UpdateExposureNode.class);
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposureNight = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 4.0f)
     private float hdrTargetLuminance = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 

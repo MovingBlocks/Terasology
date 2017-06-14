@@ -58,7 +58,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     private WorldRenderer worldRenderer;
     private RenderQueuesHelper renderQueues;
     private RenderingConfig renderingConfig;
-    private BackdropProvider backdropProvider;
     private WorldProvider worldProvider;
 
     private Material chunkMaterial;
@@ -77,7 +76,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     public OpaqueBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
         renderingConfig = context.get(Config.class).getRendering();
-        backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
 
         wireframeStateChange = new SetWireframe(true);
