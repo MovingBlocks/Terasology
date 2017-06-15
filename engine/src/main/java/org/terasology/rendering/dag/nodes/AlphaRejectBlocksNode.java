@@ -24,9 +24,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
@@ -42,6 +42,9 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_REJECT;
 
@@ -56,7 +59,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * In alpha-blending the color of a semi-transparent fragment is combined with
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
-public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable {
+public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable, PropertyChangeListener {
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private WorldRenderer worldRenderer;
@@ -69,6 +72,12 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     private SubmersibleCamera activeCamera;
 
+    private boolean isNormalMapping;
+    private boolean isParallaxMapping;
+
+    private StateChange setNormalTerrain;
+    private StateChange setHeightTerrain;
+
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float parallaxBias = 0.05f;
@@ -78,7 +87,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     public AlphaRejectBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
 
         wireframeStateChange = new SetWireframe(true);
@@ -95,16 +103,24 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
+        renderingConfig = context.get(Config.class).getRendering();
+        isNormalMapping = renderingConfig.isNormalMapping();
+        renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
+        isParallaxMapping = renderingConfig.isParallaxMapping();
+        renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
+
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        // TODO: monitor the renderingConfig for changes rather than check every frame
-        if (renderingConfig.isNormalMapping()) {
-            addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
-            if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
+        if (isNormalMapping) {
+            addDesiredStateChange(setNormalTerrain);
+
+            if (isParallaxMapping) {
+                addDesiredStateChange(setHeightTerrain);
             }
         }
     }
@@ -151,9 +167,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         chunkMaterial.setInt("textureAtlas", 0, true);
         chunkMaterial.setInt("textureEffects", 1, true);
         chunkMaterial.setInt("textureLava", 2, true);
-        if (renderingConfig.isNormalMapping()) {
+        if (isNormalMapping) {
             chunkMaterial.setInt("textureAtlasNormal", 3, true);
-            if (renderingConfig.isParallaxMapping()) {
+            if (isParallaxMapping) {
                 chunkMaterial.setInt("textureAtlasHeight", 4, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
@@ -189,5 +205,36 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         chunkMaterial.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getOldValue() != event.getNewValue()) {
+            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+                isNormalMapping = renderingConfig.isNormalMapping();
+                if (isNormalMapping) {
+                    addDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    }
+                } else {
+                    removeDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            } else {
+                isParallaxMapping = renderingConfig.isParallaxMapping();
+                if (isNormalMapping) {
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    } else {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            }
+
+            worldRenderer.requestTaskListRefresh();
+        }
     }
 }

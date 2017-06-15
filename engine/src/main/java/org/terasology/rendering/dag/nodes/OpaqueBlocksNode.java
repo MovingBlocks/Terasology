@@ -25,9 +25,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
@@ -44,6 +44,9 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
@@ -52,7 +55,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  *
  * In a typical world this is the majority of the world's landscape.
  */
-public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
+public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, PropertyChangeListener {
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private WorldRenderer worldRenderer;
@@ -66,6 +69,12 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
     private SubmersibleCamera activeCamera;
 
+    private boolean isNormalMapping;
+    private boolean isParallaxMapping;
+
+    private StateChange setNormalTerrain;
+    private StateChange setHeightTerrain;
+
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float parallaxBias = 0.05f;
@@ -75,7 +84,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
     public OpaqueBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
 
         wireframeStateChange = new SetWireframe(true);
@@ -92,16 +100,24 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
+        renderingConfig = context.get(Config.class).getRendering();
+        isNormalMapping = renderingConfig.isNormalMapping();
+        renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
+        isParallaxMapping = renderingConfig.isParallaxMapping();
+        renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
+
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        // TODO: monitor the renderingConfig for changes rather than check every frame
-        if (renderingConfig.isNormalMapping()) {
-            addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
-            if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
+        if (isNormalMapping) {
+            addDesiredStateChange(setNormalTerrain);
+
+            if (isParallaxMapping) {
+                addDesiredStateChange(setHeightTerrain);
             }
         }
     }
@@ -147,8 +163,8 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
 
         chunkMaterial.setFloat("clip", 0.0f, true);
 
-        if (renderingConfig.isNormalMapping()) {
-            if (renderingConfig.isParallaxMapping()) {
+        if (isNormalMapping) {
+            if (isParallaxMapping) {
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
         }
@@ -198,5 +214,36 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         new AABBRenderer(chunk.getAABB()).renderLocally(1f);
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getOldValue() != event.getNewValue()) {
+            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+                isNormalMapping = renderingConfig.isNormalMapping();
+                if (isNormalMapping) {
+                    addDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    }
+                } else {
+                    removeDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            } else {
+                isParallaxMapping = renderingConfig.isParallaxMapping();
+                if (isNormalMapping) {
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    } else {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            }
+
+            worldRenderer.requestTaskListRefresh();
+        }
     }
 }
