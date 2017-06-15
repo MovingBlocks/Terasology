@@ -24,6 +24,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
@@ -35,6 +36,9 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.dag.nodes.BloomBlurNode.ONE_8TH_SCALE_FBO;
 import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO;
@@ -48,15 +52,22 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * 1/8th resolution bloom and vignette onto the rendering achieved so far, stored in the gbuffer.
  * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO, to be used at a later stage.
  */
-public class InitialPostProcessingNode extends AbstractNode {
+public class InitialPostProcessingNode extends AbstractNode implements PropertyChangeListener {
     static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
     private static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
 
     private RenderingConfig renderingConfig;
     private WorldProvider worldProvider;
+    private WorldRenderer worldRenderer;
     private SubmersibleCamera activeCamera;
 
     private Material initialPostMaterial;
+
+    private boolean isBloom;
+    private boolean isLightShafts;
+
+    private StateChange setTexBloom;
+    private StateChange setTexLightShafts;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
@@ -69,9 +80,10 @@ public class InitialPostProcessingNode extends AbstractNode {
     private float bloomFactor = 0.5f;
 
     public InitialPostProcessingNode(Context context) {
-        renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+
+        worldRenderer = context.get(WorldRenderer.class);
+        activeCamera = worldRenderer.getActiveCamera();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
@@ -83,17 +95,24 @@ public class InitialPostProcessingNode extends AbstractNode {
 
         initialPostMaterial = getMaterial(INITIAL_POST_MATERIAL);
 
+        renderingConfig = context.get(Config.class).getRendering();
+        isBloom = renderingConfig.isBloom();
+        renderingConfig.subscribe(RenderingConfig.BLOOM, this);
+        isLightShafts = renderingConfig.isLightShafts();
+        renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
+
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
-        // TODO: monitor config parameter by subscribing to it
-        if (renderingConfig.isBloom()) {
-            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
+        setTexBloom = new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
+        setTexLightShafts = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
+
+        if (isBloom) {
+            addDesiredStateChange(setTexBloom);
         }
-        // TODO: monitor config parameter by subscribing to it
-        if (renderingConfig.isLightShafts()) {
-            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts"));
+        if (isLightShafts) {
+            addDesiredStateChange(setTexLightShafts);
         }
-        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
     }
 
     /**
@@ -107,8 +126,7 @@ public class InitialPostProcessingNode extends AbstractNode {
 
         initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(activeCamera.getPosition()).getTint(), true);
 
-        // TODO: monitor config parameter by subscribing to it
-        if (renderingConfig.isBloom()) {
+        if (isBloom) {
             initialPostMaterial.setFloat("bloomFactor", bloomFactor, true);
         }
 
@@ -119,5 +137,28 @@ public class InitialPostProcessingNode extends AbstractNode {
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getOldValue() != event.getNewValue()) {
+            if (event.getPropertyName().equals(RenderingConfig.BLOOM)) {
+                isBloom = renderingConfig.isBloom();
+                if (isBloom) {
+                    addDesiredStateChange(setTexBloom);
+                } else {
+                    removeDesiredStateChange(setTexBloom);
+                }
+            } else {
+                isLightShafts = renderingConfig.isLightShafts();
+                if (isLightShafts) {
+                    addDesiredStateChange(setTexLightShafts);
+                } else {
+                    removeDesiredStateChange(setTexLightShafts);
+                }
+            }
+
+            worldRenderer.requestTaskListRefresh();
+        }
     }
 }
