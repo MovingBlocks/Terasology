@@ -62,10 +62,14 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot++, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READONLY_GBUFFER, LightAccumulationTexture, displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, DepthStencilTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, NormalsTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, LightAccumulationTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
     }
 
     /**
