@@ -185,9 +185,7 @@ public class PojoEntityCache implements EntityCache {
         long entityId = ref.getId();
         entityStore.remove(entityId);
         entityManager.remove(entityId);
-        if (ref instanceof PojoEntityRef) {
-            ((PojoEntityRef) ref).invalidate();
-        }
+        ref.invalidate();
         componentStore.remove(entityId);
     }
 
