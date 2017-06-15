@@ -32,28 +32,17 @@
                          },
                          {
                              "type": "UILabel",
-                             "text": "Message",
-                             "id": "message"
+                             "text": "",
+                             "id": "message",
+                             "layoutInfo": {
+                                "text-align-horizontal": "LEFT"
+                             }
                          },
                          {
                              "type": "UISpace",
                              "size": [
                                  1,
                                  16
-                             ]
-                         },
-                         {
-                             "type": "RowLayout",
-                             "horizontalSpacing": 0,
-                             "contents": [
-                                 {
-                                     "type": "UILabel",
-                                     "text": "${engine:menu#disable-launch-popup}"
-                                 },
-                                 {
-                                     "type": "UICheckbox",
-                                     "id": "showLaunchPopup"
-                                 }
                              ]
                          },
                          {
@@ -69,12 +58,32 @@
                                      "type": "UIButton",
                                      "text": "${engine:menu#dialog-no}",
                                      "id": "no"
+                                 },
+                                 {
+                                     "type": "UIButton",
+                                     "text": "${engine:menu#dialog-option}",
+                                     "id": "option"
                                  }
+
                              ],
                              "layoutInfo": {
                                  "width": 200,
                                  "position-right": {}
                              }
+                         },
+                         {
+                              "type": "RowLayout",
+                              "horizontalSpacing": 0,
+                              "contents": [
+                                  {
+                                      "type": "UILabel",
+                                      "text": "${engine:menu#disable-launch-popup}"
+                                  },
+                                  {
+                                      "type": "UICheckbox",
+                                      "id": "showLaunchPopup"
+                                  }
+                              ]
                          }
                      ]
                  }

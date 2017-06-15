@@ -21,10 +21,11 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
- * LaunchPopup will appear when game launchs.
+ * LaunchPopup will appear when game launches.
  */
 public class LaunchPopup extends CoreScreenLayer {
 
@@ -37,6 +38,8 @@ public class LaunchPopup extends CoreScreenLayer {
 
     private Runnable noHandler;
 
+    private Runnable optionHandler;
+
     @Override
     public void initialise() {
         WidgetUtil.tryBindCheckbox(this, "showLaunchPopup", BindHelper.bindBeanProperty("disableLaunchPopup", config.getLaunchPopupConfig(), Boolean.TYPE));
@@ -48,6 +51,10 @@ public class LaunchPopup extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "no", (button) -> {
             getManager().popScreen();
             noHandler.run();
+        });
+        WidgetUtil.trySubscribe(this, "option", (button) -> {
+            getManager().popScreen();
+            optionHandler.run();
         });
     }
 
@@ -75,5 +82,14 @@ public class LaunchPopup extends CoreScreenLayer {
      */
     public void setNoHandler(Runnable runnable) {
         this.noHandler = runnable;
+    }
+
+    public void setOptionHandler(Runnable runnable) {
+        this.optionHandler = runnable;
+    }
+
+    public void setOptionButtonText(String buttonText) {
+        UIButton optionButton = find("option", UIButton.class);
+        optionButton.setText(buttonText);
     }
 }

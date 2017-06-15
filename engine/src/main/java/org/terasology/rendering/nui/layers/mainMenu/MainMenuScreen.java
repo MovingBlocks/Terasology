@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.layers.mainMenu.settings.SettingsMenuScreen;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.telemetry.TelemetryScreen;
 import org.terasology.version.TerasologyVersion;
 
 /**
@@ -61,6 +62,7 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
         WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
+        WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
     }
 
     @Override

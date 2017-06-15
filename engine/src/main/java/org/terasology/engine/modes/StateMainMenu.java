@@ -47,6 +47,7 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.telemetry.TelemetryScreen;
 import org.terasology.utilities.Assets;
 
 /**
@@ -135,7 +136,7 @@ public class StateMainMenu implements GameState {
         LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
         if (!launchPopupConfig.isDisableLaunchPopup()) {
             String telemetryTitle = "Telemetry In Terasology";
-            String telemetryMessage = "Telemetry system will send metrics and errors to the server. It will help contributors improve Terasology. We guarantee that no personal information will be sent. You can see all the data being sent and enable/disable it anytime in Metric Menu. Do you want enable it?";
+            String telemetryMessage = "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the Mac address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!";
             LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
@@ -143,6 +144,10 @@ public class StateMainMenu implements GameState {
             });
             telemetryConfirmPopup.setNoHandler(() -> {
                 telemetryConfig.setEnableTelemetry(false);
+            });
+            telemetryConfirmPopup.setOptionButtonText("Metric Menu");
+            telemetryConfirmPopup.setOptionHandler(()-> {
+                nuiManager.pushScreen(TelemetryScreen.ASSET_URI,TelemetryScreen.class);
             });
         }
     }
