@@ -26,6 +26,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
@@ -41,6 +42,9 @@ import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -63,7 +67,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  * an experimental feature. It produces initially appealing reflections but rotating the
  * camera partially spoils the effect showing its limits.
  */
-public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber {
+public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber, PropertyChangeListener {
     public static final ResourceUrn REFRACTIVE_REFLECTIVE_FBO = new ResourceUrn("engine:sceneReflectiveRefractive");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
@@ -82,6 +86,13 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
     private FBO refractiveReflectiveFbo;
 
     private SubmersibleCamera activeCamera;
+
+    private boolean isNormalMapping;
+    private boolean isParallaxMapping;
+    private boolean isAnimateWater;
+
+    private StateChange setNormalTerrain;
+    private StateChange setHeightTerrain;
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
@@ -137,7 +148,6 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     public RefractiveReflectiveBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
-        renderingConfig = context.get(Config.class).getRendering();
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
 
@@ -155,6 +165,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
+        renderingConfig = context.get(Config.class).getRendering();
+        isNormalMapping = renderingConfig.isNormalMapping();
+        renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
+        isParallaxMapping = renderingConfig.isParallaxMapping();
+        renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
+        isAnimateWater = renderingConfig.isAnimateWater();
+        renderingConfig.subscribe(RenderingConfig.ANIMATE_WATER, this);
+
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
@@ -163,12 +181,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
-        // TODO: monitor the renderingConfig for changes rather than check every frame
-        if (renderingConfig.isNormalMapping()) {
-            addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
-            if (renderingConfig.isParallaxMapping()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight"));
+        if (isNormalMapping) {
+            addDesiredStateChange(setNormalTerrain);
+
+            if (isParallaxMapping) {
+                addDesiredStateChange(setHeightTerrain);
             }
         }
     }
@@ -206,9 +226,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial.setInt("textureWaterNormalAlt", 4, true);
         chunkMaterial.setInt("textureWaterReflection", 5, true);
         chunkMaterial.setInt("texSceneOpaque", 6, true);
-        if (renderingConfig.isNormalMapping()) {
+        if (isNormalMapping) {
             chunkMaterial.setInt("textureAtlasNormal", 7, true);
-            if (renderingConfig.isParallaxMapping()) {
+            if (isParallaxMapping) {
                 chunkMaterial.setInt("textureAtlasHeight", 8, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
@@ -218,8 +238,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
         chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
 
-        // TODO: monitor the renderingConfig for changes rather than check every frame
-        if (renderingConfig.isAnimateWater()) {
+        if (isAnimateWater) {
             chunkMaterial.setFloat("waveIntensityFalloff", waveIntensityFalloff, true);
             chunkMaterial.setFloat("waveSizeFalloff", waveSizeFalloff, true);
             chunkMaterial.setFloat("waveSize", waveSize, true);
@@ -266,5 +285,38 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE_FBO);
 
         readOnlyGBufferFbo.attachDepthBufferTo(refractiveReflectiveFbo);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getOldValue() != event.getNewValue()) {
+            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+                isNormalMapping = renderingConfig.isNormalMapping();
+                if (isNormalMapping) {
+                    addDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    }
+                } else {
+                    removeDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
+                isParallaxMapping = renderingConfig.isParallaxMapping();
+                if (isNormalMapping) {
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    } else {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            } else {
+                isAnimateWater = renderingConfig.isAnimateWater();
+            }
+
+            worldRenderer.requestTaskListRefresh();
+        }
     }
 }
