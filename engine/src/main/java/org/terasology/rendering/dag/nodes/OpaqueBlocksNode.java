@@ -18,26 +18,34 @@ package org.terasology.rendering.dag.nodes;
 import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
@@ -47,32 +55,71 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  *
  * In a typical world this is the majority of the world's landscape.
  */
-public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
+public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, PropertyChangeListener {
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private WorldRenderer worldRenderer;
     private RenderQueuesHelper renderQueues;
+    private RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
 
-    private Camera playerCamera;
     private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
     private RenderingDebugConfig renderingDebugConfig;
 
+    private SubmersibleCamera activeCamera;
+
+    private boolean isNormalMapping;
+    private boolean isParallaxMapping;
+
+    private StateChange setNormalTerrain;
+    private StateChange setHeightTerrain;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.5f)
+    private float parallaxBias = 0.05f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.50f)
+    private float parallaxScale = 0.05f;
+
     public OpaqueBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
+        worldProvider = context.get(WorldProvider.class);
 
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         worldRenderer = context.get(WorldRenderer.class);
-        playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new LookThrough(playerCamera));
+        activeCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThrough(activeCamera));
 
         addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
+
+        renderingConfig = context.get(Config.class).getRendering();
+        isNormalMapping = renderingConfig.isNormalMapping();
+        renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
+        isParallaxMapping = renderingConfig.isParallaxMapping();
+        renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
+
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+
+        if (isNormalMapping) {
+            addDesiredStateChange(setNormalTerrain);
+
+            if (isParallaxMapping) {
+                addDesiredStateChange(setHeightTerrain);
+            }
+        }
     }
 
     public void enableWireframe() {
@@ -108,12 +155,26 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/opaqueChunks");
 
-        final Vector3f cameraPosition = playerCamera.getPosition();
+        // Common Shader Parameters
+
+        chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+        // Specific Shader Parameters
+
+        chunkMaterial.setFloat("clip", 0.0f, true);
+
+        if (isNormalMapping) {
+            if (isParallaxMapping) {
+                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
+            }
+        }
+
+        // Actual Node Processing
+
+        final Vector3f cameraPosition = activeCamera.getPosition();
 
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
-
-        chunkMaterial.setFloat("clip", 0.0f, true);
 
         while (renderQueues.chunksOpaque.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaque.poll();
@@ -153,5 +214,36 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable {
         new AABBRenderer(chunk.getAABB()).renderLocally(1f);
 
         GL11.glPopMatrix(); // Resets the matrix stack after the rendering of a chunk.
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getOldValue() != event.getNewValue()) {
+            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+                isNormalMapping = renderingConfig.isNormalMapping();
+                if (isNormalMapping) {
+                    addDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    }
+                } else {
+                    removeDesiredStateChange(setNormalTerrain);
+                    if (isParallaxMapping) {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            } else {
+                isParallaxMapping = renderingConfig.isParallaxMapping();
+                if (isNormalMapping) {
+                    if (isParallaxMapping) {
+                        addDesiredStateChange(setHeightTerrain);
+                    } else {
+                        removeDesiredStateChange(setHeightTerrain);
+                    }
+                }
+            }
+
+            worldRenderer.requestTaskListRefresh();
+        }
     }
 }

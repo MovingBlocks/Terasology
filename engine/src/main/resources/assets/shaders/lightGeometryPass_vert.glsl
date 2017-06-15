@@ -17,8 +17,6 @@
 varying vec4 vertexProjPos;
 
 uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projMatrix;
 uniform mat4 viewProjMatrix;
 
 void main()
