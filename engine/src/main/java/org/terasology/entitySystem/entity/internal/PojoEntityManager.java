@@ -17,6 +17,7 @@ package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TLongIterator;
@@ -65,6 +66,8 @@ public class PojoEntityManager implements EngineEntityManager {
 
     private PojoEntityCache globalCache = new PojoEntityCache(this);
     private PojoEntityCache sectorCache = new PojoEntityCache(this);
+
+    private Map<Long, PojoEntityCache> cacheMap = new MapMaker().initialCapacity(1000).makeMap();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -146,6 +149,12 @@ public class PojoEntityManager implements EngineEntityManager {
         }
         loadedIds.add(nextEntityId);
         return nextEntityId++;
+    }
+
+    public long createEntity(PojoEntityCache cache) {
+        long id = createEntity();
+        cacheMap.put(id, cache);
+        return id;
     }
 
     @Override
@@ -494,9 +503,15 @@ public class PojoEntityManager implements EngineEntityManager {
      * @return The component of that type owned by the given entity, or null if it doesn't have that component
      */
     @Override
-    //Todo: check all caches
     public <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
-        return globalCache.getComponentStore().get(entityId, componentClass);
+        PojoEntityCache cache = cacheMap.get(entityId);
+        //Default to the global cache
+        if (cache == null) {
+            //Todo: this happens a lot during shutdown. Possible concurrency issue?
+            logger.error("Entity {} doesn't have an assigned cache", entityId);
+            cache = globalCache;
+        }
+        return cache.getComponentStore().get(entityId, componentClass);
     }
 
     /**
@@ -511,7 +526,13 @@ public class PojoEntityManager implements EngineEntityManager {
     //Todo: be able to add to entities in any cache
     public <T extends Component> T addComponent(long entityId, T component) {
         Preconditions.checkNotNull(component);
-        Component oldComponent = globalCache.getComponentStore().put(entityId, component);
+        PojoEntityCache cache = cacheMap.get(entityId);
+        if (cache == null) {
+            logger.error("Entity {} doesn't have an assigned cache", entityId);
+            cache = globalCache;
+        }
+        Component oldComponent = cache.getComponentStore().put(entityId, component);
+
         if (oldComponent != null) {
             logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
         }
@@ -563,7 +584,13 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     //Todo: be able to save components for entities in any cache
     public void saveComponent(long entityId, Component component) {
-        Component oldComponent = globalCache.getComponentStore().put(entityId, component);
+        PojoEntityCache cache = cacheMap.get(entityId);
+        if (cache == null) {
+            logger.error("Entity {} doesn't have an assigned cache", entityId);
+            cache = globalCache;
+        }
+        Component oldComponent = cache.getComponentStore().put(entityId, component);
+
         if (oldComponent == null) {
             logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId);
         }
@@ -588,6 +615,10 @@ public class PojoEntityManager implements EngineEntityManager {
      * Implementation
      */
 
+    protected void assignToCache(EntityRef ref, PojoEntityCache cache) {
+        //Todo: job for the sector manager?
+        cacheMap.put(ref.getId(), cache);
+    }
 
     private EntityRef createEntityRef(long entityId) {
         if (entityId == NULL_ID) {

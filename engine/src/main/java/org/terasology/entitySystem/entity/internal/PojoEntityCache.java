@@ -67,7 +67,7 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create() {
-        EntityRef entityRef = createEntityRef(entityManager.createEntity());
+        EntityRef entityRef = createEntityRef(entityManager.createEntity(this));
         /*
          * The entity change listener are also used to detect new entities. By adding one component we inform those
          * listeners about the new entity.
@@ -191,7 +191,7 @@ public class PojoEntityCache implements EntityCache {
 
     private EntityRef createEntity(Iterable<Component> components) {
         entityManager.getComponentLibrary();
-        long entityId = entityManager.createEntity();
+        long entityId = entityManager.createEntity(this);
 
         Prefab prefab = null;
         for (Component component : components) {
