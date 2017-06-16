@@ -59,7 +59,9 @@ public class PojoEntityCache implements EntityCache {
     @Override
     public void clear() {
         //Todo: should also clear out ids from the EntityManager
-        entityStore.values().forEach(BaseEntityRef::invalidate);
+        for (EntityRef entity : entityStore.values()) {
+            entity.invalidate();
+        }
         componentStore.clear();
         entityStore.clear();
     }
@@ -172,9 +174,11 @@ public class PojoEntityCache implements EntityCache {
             return;
         }
         EntityRef ref = createEntityRef(entityId);
-        if (entityManager.getEventSystem() != null) {
-            entityManager.getEventSystem().send(ref, BeforeDeactivateComponent.newInstance());
-            entityManager.getEventSystem().send(ref, BeforeRemoveComponent.newInstance());
+
+        EventSystem eventSystem = entityManager.getEventSystem();
+        if (eventSystem != null) {
+            eventSystem.send(ref, BeforeDeactivateComponent.newInstance());
+            eventSystem.send(ref, BeforeRemoveComponent.newInstance());
         }
         entityManager.notifyComponentRemovalAndEntityDestruction(entityId, ref);
         destroy(ref);
@@ -203,10 +207,11 @@ public class PojoEntityCache implements EntityCache {
         }
 
         Iterable<Component> finalComponents;
-        if (entityManager.getEventSystem() != null) {
+        EventSystem eventSystem = entityManager.getEventSystem();
+        if (eventSystem != null) {
             BeforeEntityCreated event = new BeforeEntityCreated(prefab, components);
             BaseEntityRef tempRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
-            entityManager.getEventSystem().send(tempRef, event);
+            eventSystem.send(tempRef, event);
             tempRef.invalidate();
             finalComponents = event.getResultComponents();
         } else {
@@ -284,9 +289,11 @@ public class PojoEntityCache implements EntityCache {
         for (Component c : components) {
             componentStore.put(id, c);
         }
+
         EntityRef entity = createEntityRef(id);
-        if (entityManager.getEventSystem() != null) {
-            entityManager.getEventSystem().send(entity, OnActivatedComponent.newInstance());
+        EventSystem eventSystem = entityManager.getEventSystem();
+        if (eventSystem != null) {
+            eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
         for (Component component: components) {
             entityManager.notifyComponentAdded(entity, component.getClass());
