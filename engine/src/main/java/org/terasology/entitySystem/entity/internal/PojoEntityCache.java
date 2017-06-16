@@ -102,10 +102,12 @@ public class PojoEntityCache implements EntityCache {
     public EntityRef create(String prefabName) {
         if (prefabName != null && !prefabName.isEmpty()) {
             Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+
             if (prefab == null) {
                 logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
                 return EntityRef.NULL;
             }
+
             return create(prefab);
         }
         return create();
@@ -115,6 +117,12 @@ public class PojoEntityCache implements EntityCache {
     public EntityRef create(String prefabName, Vector3f position) {
         if (prefabName != null && !prefabName.isEmpty()) {
             Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+
+            if (prefab == null) {
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
+                return EntityRef.NULL;
+            }
+
             return create(prefab, position);
         }
         return create();
@@ -122,6 +130,11 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
+        if (prefab == null) {
+            logger.warn("Unable to instantiate null prefab");
+            return EntityRef.NULL;
+        }
+
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.iterateComponents()) {
             Component newComp = entityManager.getComponentLibrary().copy(component);
@@ -137,6 +150,11 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Prefab prefab) {
+        if (prefab == null) {
+            logger.warn("Unable to instantiate null prefab");
+            return EntityRef.NULL;
+        }
+
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.iterateComponents()) {
             components.add(entityManager.getComponentLibrary().copy(component));
@@ -147,6 +165,11 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        if (prefab == null) {
+            logger.warn("Unable to instantiate null prefab");
+            return EntityRef.NULL;
+        }
+
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.iterateComponents()) {
             Component newComp = entityManager.getComponentLibrary().copy(component);
