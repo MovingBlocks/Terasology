@@ -604,7 +604,7 @@ public class PojoEntityManager implements EngineEntityManager {
         }
 
         BaseEntityRef newRef = refStrategy.createRefFor(entityId, this);
-        globalCache.getEntityStore().put(entityId, newRef);
+        globalCache.putEntity(entityId, newRef);
         return newRef;
     }
 

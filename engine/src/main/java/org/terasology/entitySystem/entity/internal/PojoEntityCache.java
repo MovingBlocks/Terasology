@@ -323,8 +323,28 @@ public class PojoEntityCache implements EntityCache {
         return builder;
     }
 
-    public Map<Long, BaseEntityRef> getEntityStore() {
-        return entityStore;
+    /**
+     * Gets the internal entity store.
+     * <p>
+     * It is returned as an unmodifiable map, so cannot be edited. Use {@link #putEntity} to modify the map.
+     *
+     * @return an unmodifiable version of the internal entity store
+     */
+    protected Map<Long, BaseEntityRef> getEntityStore() {
+        return Collections.unmodifiableMap(entityStore);
+    }
+
+    /**
+     * Puts an entity into the internal storage.
+     * <p>
+     * This is intended for use by the {@link PojoEntityManager}.
+     * In most cases, it is better to use the {@link #create} or {@link #newBuilder} methods instead.
+     *
+     * @param entityId the id of the entity to add
+     * @param ref the {@link BaseEntityRef} to add
+     */
+    protected void putEntity(long entityId, BaseEntityRef ref) {
+        entityStore.put(entityId, ref);
     }
 
     public ComponentTable getComponentStore() {
