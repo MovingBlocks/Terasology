@@ -85,6 +85,7 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
+        components = (components == null) ? Collections.EMPTY_LIST : components;
         EntityRef entity = createEntity(components);
 
         EventSystem eventSystem = entityManager.getEventSystem();
@@ -92,6 +93,7 @@ public class PojoEntityCache implements EntityCache {
             eventSystem.send(entity, OnAddedComponent.newInstance());
             eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
+
         for (Component component: components) {
             entityManager.notifyComponentAdded(entity, component.getClass());
         }
@@ -217,7 +219,6 @@ public class PojoEntityCache implements EntityCache {
     }
 
     private EntityRef createEntity(Iterable<Component> components) {
-        entityManager.getComponentLibrary();
         long entityId = entityManager.createEntity(this);
 
         Prefab prefab = null;
@@ -260,6 +261,8 @@ public class PojoEntityCache implements EntityCache {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
+        components = (components == null) ? Collections.EMPTY_LIST : components;
+
         EntityRef entity = createEntity(components);
         for (Component component: components) {
             entityManager.notifyComponentAdded(entity, component.getClass());
@@ -309,6 +312,9 @@ public class PojoEntityCache implements EntityCache {
         if (!entityManager.registerId(id)) {
             return EntityRef.NULL;
         }
+
+        components = (components == null) ? Collections.EMPTY_LIST : components;
+
         for (Component c : components) {
             componentStore.put(id, c);
         }
@@ -318,7 +324,8 @@ public class PojoEntityCache implements EntityCache {
         if (eventSystem != null) {
             eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
-        for (Component component: components) {
+
+        for (Component component : components) {
             entityManager.notifyComponentAdded(entity, component.getClass());
         }
         return entity;
