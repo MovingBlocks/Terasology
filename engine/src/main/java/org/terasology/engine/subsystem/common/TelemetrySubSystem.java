@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.registry.In;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryParams;
 import org.terasology.telemetry.TelemetryUtils;
@@ -43,7 +41,6 @@ import java.util.List;
  */
 public class TelemetrySubSystem implements EngineSubsystem {
 
-    @In
     private Config config;
 
     private Metrics metrics;
@@ -114,9 +111,9 @@ public class TelemetrySubSystem implements EngineSubsystem {
     public void postInitialise(Context rootContext) {
 
         metrics.initialise();
-        InjectionHelper.inject(this, rootContext);
+        config = rootContext.get(Config.class);
 
-        if (config.getTelemetryConfig().isEnableTelemetry()) {
+        if (config.getTelemetryConfig().isTelemetryEnabled()) {
 
             Unstructured systemContextMetric = metrics.getSystemContextMetric().getMetric();
             TelemetryUtils.trackMetric(emitter,NAMESPACE_TRACKER,systemContextMetric);

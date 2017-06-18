@@ -17,6 +17,8 @@ package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.lang.reflect.Field;
@@ -31,8 +33,18 @@ import java.util.Set;
  */
 public abstract class Metric {
 
+    private static final Logger logger = LoggerFactory.getLogger(Metric.class);
+
+    /**
+     * Generates a snowplow unstructured event that the snowplow tracker can track.
+     * @return an snowplow unstructured event.
+     */
     public abstract Unstructured getMetric();
 
+    /**
+     * Fetches all TelemetryFields and create a map associating field's name (key) to field's value (value).
+     * @return a map with key (field's name) and value (field's value).
+     */
     public Map<String,Object> generateMetricMap() {
 
         Map<String, Object> metricMap = new HashMap<String,Object>();
@@ -43,12 +55,10 @@ public abstract class Metric {
                 field.setAccessible(true);
                 metricMap.put(field.getName(), field.get(this));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("The field is not inaccessible: " + e.toString());
             }
         }
 
         return metricMap;
     }
-
-    public abstract Map getMap();
 }

@@ -76,6 +76,25 @@ public class TelemetryScreen extends CoreScreenLayer {
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);
 
+        Map<TelemetryCategory, Class> telemetryCategories = fetchTelemetryCategoriesFromEnvironment();
+
+        for (Map.Entry<TelemetryCategory,Class> telemetryCategory: telemetryCategories.entrySet()) {
+            Class metricClass = telemetryCategory.getValue();
+            Metric metricType = metric.getMap().get(metricClass);
+            Map<String,Object> map = metricType.generateMetricMap();
+
+            addTelemetrySection(telemetryCategory.getKey(),mainLayout,map);
+        }
+
+        ScrollableArea area = find("area", ScrollableArea.class);
+        area.setContent(mainLayout);
+
+        WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
+        WidgetUtil.tryBindCheckbox(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE));
+
+    }
+
+    private Map<TelemetryCategory, Class> fetchTelemetryCategoriesFromEnvironment() {
         Map<TelemetryCategory, Class> telemetryCategories = Maps.newHashMap();
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
@@ -94,21 +113,7 @@ public class TelemetryScreen extends CoreScreenLayer {
             }
         }
 
-        for (TelemetryCategory telemetryCategory: telemetryCategories.keySet()) {
-            Class metricClass = telemetryCategories.get(telemetryCategory);
-            Metric metricType = metric.getMap().get(metricClass);
-            Map<String,Object> map = metricType.getMap();
-
-            addTelemetrySection(telemetryCategory,mainLayout,map);
-        }
-
-        ScrollableArea area = find("area", ScrollableArea.class);
-        area.setContent(mainLayout);
-
-        WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
-        WidgetUtil.tryBindCheckbox(this, "enableTelemetry", BindHelper.bindBeanProperty("enableTelemetry", config.getTelemetryConfig(), Boolean.TYPE));
-
-
+        return telemetryCategories;
     }
 
     private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String,Object> map) {

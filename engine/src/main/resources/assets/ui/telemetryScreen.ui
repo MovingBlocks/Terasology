@@ -62,7 +62,7 @@
                       },
                       {
                           "type": "UICheckbox",
-                          "id": "enableTelemetry"
+                          "id": "telemetryEnabled"
                       }
                   ],
                   "layoutInfo": {

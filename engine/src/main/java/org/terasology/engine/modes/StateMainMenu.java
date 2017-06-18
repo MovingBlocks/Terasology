@@ -63,7 +63,6 @@ public class StateMainMenu implements GameState {
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
-    private Config config;
 
     private String messageOnLoad = "";
 
@@ -131,19 +130,23 @@ public class StateMainMenu implements GameState {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
 
-        config = context.get(Config.class);
+        pushLaunchPopup();
+    }
+
+    private void pushLaunchPopup() {
+        Config  config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
-        if (!launchPopupConfig.isDisableLaunchPopup()) {
+        if (!launchPopupConfig.isLaunchPopupDisabled()) {
             String telemetryTitle = "Telemetry In Terasology";
             String telemetryMessage = "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the Mac address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!";
             LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
-                telemetryConfig.setEnableTelemetry(true);
+                telemetryConfig.setTelemetryEnabled(true);
             });
             telemetryConfirmPopup.setNoHandler(() -> {
-                telemetryConfig.setEnableTelemetry(false);
+                telemetryConfig.setTelemetryEnabled(false);
             });
             telemetryConfirmPopup.setOptionButtonText("Metric Menu");
             telemetryConfirmPopup.setOptionHandler(()-> {

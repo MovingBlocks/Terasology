@@ -20,13 +20,13 @@ package org.terasology.config;
  */
 public class LaunchPopupConfig {
 
-    private boolean disableLaunchPopup;
+    private boolean launchPopupDisabled;
 
-    public boolean isDisableLaunchPopup() {
-        return disableLaunchPopup;
+    public boolean isLaunchPopupDisabled() {
+        return launchPopupDisabled;
     }
 
-    public void setDisableLaunchPopup(boolean disableLaunchPopup) {
-        this.disableLaunchPopup = disableLaunchPopup;
+    public void setLaunchPopupDisabled(boolean launchPopupDisabled) {
+        this.launchPopupDisabled = launchPopupDisabled;
     }
 }

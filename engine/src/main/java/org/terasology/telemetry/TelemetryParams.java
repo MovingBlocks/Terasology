@@ -35,13 +35,12 @@ public class TelemetryParams {
 
     public final static URL TELEMETRY_SERVER_URL = urlInit("http","localhost",80);
 
-    private static URL urlInit(String protocal, String host, int port) {
+    private static URL urlInit(String protocol, String host, int port) {
         URL url = null;
         try {
-            url = new URL(protocal, host, port, "");
+            url = new URL(protocol, host, port, "");
         } catch (MalformedURLException e) {
-            logger.error("telemetry url mal formed");
-            e.printStackTrace();
+            logger.error("Telemetry server URL mal formed: " + e.toString());
         }
         return url;
     }

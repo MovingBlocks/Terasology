@@ -101,8 +101,4 @@ public class SystemContextMetric extends Metric {
 
         return systemContextEvent;
     }
-
-    public Map getMap() {
-        return this.generateMetricMap();
-    }
 }

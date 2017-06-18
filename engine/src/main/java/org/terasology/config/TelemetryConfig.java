@@ -20,13 +20,13 @@ package org.terasology.config;
  */
 public class TelemetryConfig {
 
-    private boolean enableTelemetry;
+    private boolean telemetryEnabled;
 
-    public boolean isEnableTelemetry() {
-        return enableTelemetry;
+    public boolean isTelemetryEnabled() {
+        return telemetryEnabled;
     }
 
-    public void setEnableTelemetry(boolean enableTelemetry) {
-        this.enableTelemetry = enableTelemetry;
+    public void setTelemetryEnabled(boolean telemetryEnabled) {
+        this.telemetryEnabled = telemetryEnabled;
     }
 }
