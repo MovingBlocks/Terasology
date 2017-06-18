@@ -40,7 +40,7 @@ public class TelemetryParams {
         try {
             url = new URL(protocol, host, port, "");
         } catch (MalformedURLException e) {
-            logger.error("Telemetry server URL mal formed: " + e.toString());
+            logger.error("Telemetry server URL mal formed", e);
         }
         return url;
     }

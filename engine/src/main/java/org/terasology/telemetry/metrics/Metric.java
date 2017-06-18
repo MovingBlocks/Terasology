@@ -55,7 +55,7 @@ public abstract class Metric {
                 field.setAccessible(true);
                 metricMap.put(field.getName(), field.get(this));
             } catch (IllegalAccessException e) {
-                logger.error("The field is not inaccessible: " + e.toString());
+                logger.error("The field is not inaccessible", e);
             }
         }
 
