@@ -24,6 +24,7 @@ import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
+import org.terasology.input.MenuInputSystem;
 import org.terasology.input.lwjgl.JInputControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
@@ -65,10 +66,17 @@ public class LwjglInput extends BaseLwjglSubsystem {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
+
+            LwjglMouseDevice mouseDevice = new LwjglMouseDevice();
+
             InputSystem inputSystem = new InputSystem();
             context.put(InputSystem.class, inputSystem);
-            inputSystem.setMouseDevice(new LwjglMouseDevice());
+            inputSystem.setMouseDevice(mouseDevice);
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
+
+            MenuInputSystem menuInputSystem = new MenuInputSystem();
+            context.put(MenuInputSystem.class, menuInputSystem);
+            menuInputSystem.setMouseDevice(mouseDevice);
 
             ControllerConfig controllerConfig = context.get(Config.class).getInput().getControllers();
             JInputControllerDevice controllerDevice = new JInputControllerDevice(controllerConfig);
