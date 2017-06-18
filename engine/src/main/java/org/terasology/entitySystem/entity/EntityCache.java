@@ -144,4 +144,6 @@ public interface EntityCache {
     void destroy(long entityId);
 
     void destroyEntityWithoutEvents(EntityRef entity);
+
+    Iterable<EntityRef> getAllEntities();
 }

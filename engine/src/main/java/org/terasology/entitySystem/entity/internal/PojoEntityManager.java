@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TLongIterator;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
@@ -256,7 +255,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     //Todo: implement iterating over multiple caches
     public Iterable<EntityRef> getAllEntities() {
-        return () -> new EntityIterator(globalCache.getComponentStore().entityIdIterator());
+        return globalCache.getAllEntities();
     }
 
     @SafeVarargs
@@ -737,33 +736,9 @@ public class PojoEntityManager implements EngineEntityManager {
 
         @Override
         public Iterator<EntityRef> iterator() {
-            return new EntityIterator(list.iterator());
+            return new EntityIterator(list.iterator(), globalCache);
         }
     }
-
-    private class EntityIterator implements Iterator<EntityRef> {
-        private TLongIterator idIterator;
-
-        EntityIterator(TLongIterator idIterator) {
-            this.idIterator = idIterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return idIterator.hasNext();
-        }
-
-        @Override
-        public EntityRef next() {
-            return createEntityRef(idIterator.next());
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
 
 
     public boolean registerId(long entityId) {

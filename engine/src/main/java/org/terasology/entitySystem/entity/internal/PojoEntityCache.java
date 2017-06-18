@@ -402,4 +402,9 @@ public class PojoEntityCache implements EntityCache {
         entityStore.put(entityId, newRef);
         return newRef;
     }
+
+    @Override
+    public Iterable<EntityRef> getAllEntities() {
+        return () -> new EntityIterator(componentStore.entityIdIterator(), this);
+    }
 }
