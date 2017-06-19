@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.identity;
 
-import org.terasology.identity.PrivateIdentityCertificate;
-import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.config.SecurityConfig;
+
+import java.util.Objects;
 
 public class ClientIdentity {
 
@@ -48,5 +49,22 @@ public class ClientIdentity {
             System.getSecurityManager().checkPermission(SecurityConfig.PRIVATE_CERTIFICATE_ACCESS_PERMISSION);
         }
         return playerPrivateCertificate;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(playerPublicCertificate, playerPrivateCertificate);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof ClientIdentity) {
+            ClientIdentity other = (ClientIdentity) obj;
+            return Objects.equals(playerPublicCertificate, other.playerPublicCertificate) && Objects.equals(playerPrivateCertificate, other.playerPrivateCertificate);
+        }
+        return false;
     }
 }

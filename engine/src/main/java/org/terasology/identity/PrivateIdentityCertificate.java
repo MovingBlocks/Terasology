@@ -30,6 +30,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
+import java.util.Objects;
 
 /**
  * A private certificate contains the key that only the certificate owner should know. Used for signing and decryption
@@ -95,5 +96,22 @@ public class PrivateIdentityCertificate {
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new BadEncryptedDataException("Invalid encrypted data", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof PrivateIdentityCertificate) {
+            PrivateIdentityCertificate other = (PrivateIdentityCertificate) obj;
+            return Objects.equals(modulus, other.modulus) && Objects.equals(exponent, other.exponent);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modulus.hashCode(), exponent.hashCode());
     }
 }

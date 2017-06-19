@@ -25,6 +25,7 @@ import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -55,6 +56,8 @@ public class StateMainMenu implements GameState {
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
+    private Console console;
+    private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
 
@@ -75,7 +78,8 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl(context));
+        console = new ConsoleImpl(context);
+        context.put(Console.class, console);
 
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
@@ -113,6 +117,8 @@ public class StateMainMenu implements GameState {
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
+
+        storageServiceWorker = context.get(StorageServiceWorker.class);
 
         playBackgroundMusic();
 
@@ -152,6 +158,8 @@ public class StateMainMenu implements GameState {
         updateUserInterface(delta);
 
         eventSystem.process();
+
+        storageServiceWorker.flushNotificationsToConsole(console);
     }
 
     @Override
