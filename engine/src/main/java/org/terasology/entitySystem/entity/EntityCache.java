@@ -146,4 +146,12 @@ public interface EntityCache {
     void destroyEntityWithoutEvents(EntityRef entity);
 
     Iterable<EntityRef> getAllEntities();
+
+    /**
+     * @param componentClasses
+     * @return An iterable over all entities with the provided component types.
+     */
+    Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
+
+    int getActiveEntityCount();
 }
