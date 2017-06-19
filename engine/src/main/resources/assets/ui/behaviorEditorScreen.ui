@@ -22,7 +22,7 @@
                     "rowConstraints": "[min]"
                 },
                 "layoutInfo": {
-                    "cc": "cell 2 2, aligny top, w 220!, h 300!"
+                    "cc": "cell 2 2, aligny top, w 350!, h 300!"
                 }
             },
             {
@@ -33,7 +33,7 @@
                     "rowConstraints": "[min]"
                 },
                 "layoutInfo": {
-                    "cc": "cell 2 3, aligny top, w 220!, h 300!"
+                    "cc": "cell 2 3, aligny top, w 350!, h 300!"
                 }
             },
             {
