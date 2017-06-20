@@ -75,15 +75,15 @@ public class EntityBuilder implements MutableComponentContainer {
      * @param prefab the prefab to add
      * @return whether the prefab was successfully added
      */
-    public boolean addPrefab(Prefab prefab) {
-        if (prefab == null) {
-            return false;
+    public void addPrefab(Prefab prefab) {
+        if (prefab != null) {
+            for (Component component : prefab.iterateComponents()) {
+                addComponent(entityManager.getComponentLibrary().copy(component));
+            }
+            addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        } else {
+            addComponent(new EntityInfoComponent());
         }
-        for (Component component : prefab.iterateComponents()) {
-            addComponent(entityManager.getComponentLibrary().copy(component));
-        }
-        addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return true;
     }
 
     /**

@@ -72,13 +72,7 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create() {
-        EntityRef entityRef = createEntityRef(entityManager.createEntity(this));
-        /*
-         * The entity change listener are also used to detect new entities. By adding one component we inform those
-         * listeners about the new entity.
-         */
-        entityRef.addComponent(new EntityInfoComponent());
-        return entityRef;
+        return create((Prefab) null, null, null);
     }
 
     @Override
@@ -105,90 +99,56 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(String prefabName) {
-        if (prefabName != null && !prefabName.isEmpty()) {
-            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
-
-            if (prefab == null) {
-                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
-                return EntityRef.NULL;
-            }
-
-            return create(prefab);
-        }
-        return create();
+        return create(prefabName, null, null);
     }
 
     @Override
     public EntityRef create(String prefabName, Vector3f position) {
-        if (prefabName != null && !prefabName.isEmpty()) {
-            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+        return create(prefabName, position, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position) {
+        return create(prefab, position, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab) {
+        return create(prefab, null, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        EntityBuilder builder = newBuilder(prefab);
+
+        LocationComponent locationComponent = builder.getComponent(LocationComponent.class);
+        if (locationComponent != null) {
+            if (position != null) {
+                locationComponent.setWorldPosition(position);
+            }
+            if (rotation != null) {
+                locationComponent.setWorldRotation(rotation);
+            }
+        }
+
+        return builder.build();
+    }
+
+    //@Override
+    public EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
+        Prefab prefab;
+        if (prefabName == null || prefabName.isEmpty()) {
+            prefab = null;
+        } else {
+            prefab = entityManager.getPrefabManager().getPrefab(prefabName);
 
             if (prefab == null) {
                 logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
                 return EntityRef.NULL;
             }
-
-            return create(prefab, position);
         }
-        return create();
+        return create(prefab, position, rotation);
     }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            Component newComp = entityManager.getComponentLibrary().copy(component);
-            components.add(newComp);
-            if (newComp instanceof LocationComponent) {
-                LocationComponent loc = (LocationComponent) newComp;
-                loc.setWorldPosition(position);
-            }
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            components.add(entityManager.getComponentLibrary().copy(component));
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            Component newComp = entityManager.getComponentLibrary().copy(component);
-            components.add(newComp);
-            if (newComp instanceof LocationComponent) {
-                LocationComponent loc = (LocationComponent) newComp;
-                loc.setWorldPosition(position);
-                loc.setWorldRotation(rotation);
-            }
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
 
     /**
      * Destroys this entity, sending event
