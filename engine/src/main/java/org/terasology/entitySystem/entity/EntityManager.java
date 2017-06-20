@@ -172,6 +172,6 @@ public interface EntityManager extends EntityPool {
 
     EntityPool getGlobalPool();
 
-    EntityPool getSectorPool();
+    SectorManager getSectorManager();
 
 }
