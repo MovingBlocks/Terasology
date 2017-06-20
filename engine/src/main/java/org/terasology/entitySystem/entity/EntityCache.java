@@ -154,4 +154,12 @@ public interface EntityCache {
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
     int getActiveEntityCount();
+
+    /**
+     * Gets an entity, if it already exists.
+     *
+     * @param id the id of the desired entity
+     * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
+     */
+    EntityRef getExistingEntity(long id);
 }

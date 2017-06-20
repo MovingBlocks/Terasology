@@ -432,6 +432,12 @@ public class PojoEntityCache implements EntityCache {
     }
 
     @Override
+    public EntityRef getExistingEntity(long id) {
+        EntityRef entity = entityStore.get(id);
+        return (entity == null) ? EntityRef.NULL : entity;
+    }
+
+    @Override
     public Iterable<EntityRef> getAllEntities() {
         return () -> new EntityIterator(componentStore.entityIdIterator(), this);
     }

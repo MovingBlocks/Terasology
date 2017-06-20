@@ -312,6 +312,15 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public EntityRef getExistingEntity(long id) {
+        EntityRef entity = globalCache.getExistingEntity(id);
+        if (entity == EntityRef.NULL || entity == null) {
+            entity = sectorCache.getExistingEntity(id);
+        }
+        return (entity == null) ? EntityRef.NULL : entity;
+    }
+
+    @Override
     public ComponentLibrary getComponentLibrary() {
         return componentLibrary;
     }
