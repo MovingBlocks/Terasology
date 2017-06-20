@@ -31,6 +31,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityCache;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.SectorManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -64,8 +65,7 @@ public class PojoEntityManager implements EngineEntityManager {
     private TLongSet loadedIds = new TLongHashSet();
 
     private PojoEntityCache globalCache = new PojoEntityCache(this);
-    private PojoEntityCache sectorCache = new PojoEntityCache(this);
-
+    private PojoSectorManager sectorManager = new PojoSectorManager(this);
     private Map<Long, PojoEntityCache> cacheMap = new MapMaker().initialCapacity(1000).makeMap();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
@@ -77,9 +77,6 @@ public class PojoEntityManager implements EngineEntityManager {
     private RefStrategy refStrategy = new DefaultRefStrategy();
 
     private TypeSerializationLibrary typeSerializerLibrary;
-
-    public PojoEntityManager() {
-    }
 
     public void setTypeSerializerLibrary(TypeSerializationLibrary serializerLibrary) {
         this.typeSerializerLibrary = serializerLibrary;
@@ -104,14 +101,9 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityCache getSectorCache() {
-        return sectorCache;
-    }
-
-    @Override
     public void clear() {
         globalCache.clear();
-        sectorCache.clear();
+        sectorManager.clear();
         nextEntityId = 1;
         loadedIds.clear();
     }
@@ -138,7 +130,7 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createSectorEntity() {
-        return sectorCache.create();
+        return sectorManager.create();
     }
 
     @Override
@@ -308,14 +300,14 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public int getActiveEntityCount() {
-        return globalCache.getEntityStore().size() + sectorCache.getEntityStore().size();
+        return globalCache.getActiveEntityCount() + sectorManager.getActiveEntityCount();
     }
 
     @Override
     public EntityRef getExistingEntity(long id) {
         EntityRef entity = globalCache.getExistingEntity(id);
         if (entity == EntityRef.NULL || entity == null) {
-            entity = sectorCache.getExistingEntity(id);
+            entity = sectorManager.getExistingEntity(id);
         }
         return (entity == null) ? EntityRef.NULL : entity;
     }
@@ -420,6 +412,11 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public SectorManager getSectorManager() {
+        return sectorManager;
+    }
+
+    @Override
     //Todo: include sector entities
     public void deactivateForStorage(EntityRef entity) {
         if (entity.exists()) {
@@ -459,8 +456,8 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
-        return (globalCache.getComponentStore().get(entityId, componentClass) != null) ||
-               (sectorCache.getComponentStore().get(entityId, componentClass) != null);
+        return globalCache.getComponentStore().get(entityId, componentClass) != null
+                || sectorManager.hasComponent(entityId, componentClass);
     }
 
     @Override
@@ -634,12 +631,9 @@ public class PojoEntityManager implements EngineEntityManager {
         }
 
         //Return existing entity if it exists
-        BaseEntityRef globalEntity = globalCache.getEntityStore().get(entityId);
-        BaseEntityRef sectorEntity = sectorCache.getEntityStore().get(entityId);
-        if(globalEntity != null) {
-            return globalEntity;
-        } else if (sectorEntity != null) {
-            return sectorEntity;
+        EntityRef existing = getExistingEntity(entityId);
+        if(existing != EntityRef.NULL && existing != null) {
+            return existing;
         }
 
         BaseEntityRef newRef = refStrategy.createRefFor(entityId, this);

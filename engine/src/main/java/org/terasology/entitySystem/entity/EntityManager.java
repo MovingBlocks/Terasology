@@ -172,6 +172,6 @@ public interface EntityManager extends EntityCache {
 
     EntityCache getGlobalCache();
 
-    EntityCache getSectorCache();
+    SectorManager getSectorManager();
 
 }
