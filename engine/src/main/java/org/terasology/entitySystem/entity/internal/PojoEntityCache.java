@@ -441,4 +441,10 @@ public class PojoEntityCache implements EntityCache {
     public Iterable<EntityRef> getAllEntities() {
         return () -> new EntityIterator(componentStore.entityIdIterator(), this);
     }
+
+    @Override
+    public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
+        return componentStore.get(entityId, componentClass) != null;
+    }
+
 }

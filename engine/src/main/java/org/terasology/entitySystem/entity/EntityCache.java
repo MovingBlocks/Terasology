@@ -162,4 +162,13 @@ public interface EntityCache {
      * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
      */
     EntityRef getExistingEntity(long id);
+
+    /**
+     * Fund out if a particular entity has a component of the given class.
+     *
+     * @param entityId the entity to check
+     * @param componentClass the class to check for
+     * @return whether the entity has the component
+     */
+    boolean hasComponent(long entityId, Class<? extends Component> componentClass);
 }
