@@ -65,6 +65,16 @@ public interface EntityCache {
      */
     EntityRef create(Iterable<Component> components);
 
+
+    /**
+     * Creates a new entity from the given components.
+     *
+     * @param components the components to create this entity from
+     * @param sendLifecycleEvents will only send lifecycle events if this is true
+     * @return
+     */
+    EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents);
+
     /**
      * @param prefabName The name of the prefab to create.
      * @return A new entity, based on the the prefab of the given name. If the prefab doesn't exist, just a new entity.

@@ -159,6 +159,11 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
+        return globalCache.create(components, sendLifecycleEvents);
+    }
+
+    @Override
     public void setEntityRefStrategy(RefStrategy strategy) {
         this.refStrategy = strategy;
     }

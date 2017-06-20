@@ -40,6 +40,8 @@ public class EntityBuilder implements MutableComponentContainer {
     private EntityCache cache;
     private EngineEntityManager entityManager;
 
+    private boolean sendLifecycleEvents = true;
+
     public EntityBuilder(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         this.cache = entityManager.getGlobalCache();
@@ -92,11 +94,11 @@ public class EntityBuilder implements MutableComponentContainer {
      * @return The built entity.
      */
     public EntityRef build() {
-        return cache.create(components.values());
+        return cache.create(components.values(), sendLifecycleEvents);
     }
 
     public EntityRef buildWithoutLifecycleEvents() {
-        return cache.createEntityWithoutLifecycleEvents(components.values());
+        return cache.create(components.values(), false);
     }
 
     @Override
@@ -160,6 +162,14 @@ public class EntityBuilder implements MutableComponentContainer {
             entityInfo = addComponent(new EntityInfoComponent());
         }
         return entityInfo;
+    }
+
+    public boolean willSendLifecycleEvents() {
+        return sendLifecycleEvents;
+    }
+
+    public void setSendLifecycleEvents(boolean sendLifecycleEvents) {
+        this.sendLifecycleEvents = sendLifecycleEvents;
     }
 
 }

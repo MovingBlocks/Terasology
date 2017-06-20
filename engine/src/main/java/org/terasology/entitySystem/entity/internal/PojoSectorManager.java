@@ -85,6 +85,11 @@ public class PojoSectorManager implements SectorManager {
     }
 
     @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
+        return getCache().create(components, sendLifecycleEvents);
+    }
+
+    @Override
     public EntityRef create(String prefabName) {
         return getCache().create(prefabName);
     }

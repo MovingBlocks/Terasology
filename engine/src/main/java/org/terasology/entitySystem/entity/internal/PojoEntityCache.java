@@ -15,7 +15,6 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
@@ -39,7 +38,6 @@ import org.terasology.math.geom.Vector3f;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
@@ -82,13 +80,20 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
+        return create(components, true);
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
         components = (components == null) ? Collections.EMPTY_LIST : components;
         EntityRef entity = createEntity(components);
 
-        EventSystem eventSystem = entityManager.getEventSystem();
-        if (eventSystem != null) {
-            eventSystem.send(entity, OnAddedComponent.newInstance());
-            eventSystem.send(entity, OnActivatedComponent.newInstance());
+        if (sendLifecycleEvents) {
+            EventSystem eventSystem = entityManager.getEventSystem();
+            if (eventSystem != null) {
+                eventSystem.send(entity, OnAddedComponent.newInstance());
+                eventSystem.send(entity, OnActivatedComponent.newInstance());
+            }
         }
 
         for (Component component: components) {
@@ -119,7 +124,13 @@ public class PojoEntityCache implements EntityCache {
 
     @Override
     public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        return create(prefab, position, rotation, true);
+    }
+
+    //@Override
+    private EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
         EntityBuilder builder = newBuilder(prefab);
+        builder.setSendLifecycleEvents(sendLifecycleEvents);
 
         LocationComponent locationComponent = builder.getComponent(LocationComponent.class);
         if (locationComponent != null) {
@@ -136,6 +147,10 @@ public class PojoEntityCache implements EntityCache {
 
     //@Override
     public EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
+        return create(prefabName, position, rotation, true);
+    }
+
+    private EntityRef create(String prefabName, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
         Prefab prefab;
         if (prefabName == null || prefabName.isEmpty()) {
             prefab = null;
@@ -147,7 +162,7 @@ public class PojoEntityCache implements EntityCache {
                 return EntityRef.NULL;
             }
         }
-        return create(prefab, position, rotation);
+        return create(prefab, position, rotation, sendLifecycleEvents);
     }
 
     /**
@@ -224,13 +239,7 @@ public class PojoEntityCache implements EntityCache {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
-        components = (components == null) ? Collections.EMPTY_LIST : components;
-
-        EntityRef entity = createEntity(components);
-        for (Component component: components) {
-            entityManager.notifyComponentAdded(entity, component.getClass());
-        }
-        return entity;
+        return create(components, false);
     }
 
     /**
@@ -238,7 +247,7 @@ public class PojoEntityCache implements EntityCache {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(String prefabName) {
-        return createEntityWithoutLifecycleEvents(entityManager.getPrefabManager().getPrefab(prefabName));
+        return create(prefabName, null, null, false);
     }
 
     /**
@@ -246,17 +255,7 @@ public class PojoEntityCache implements EntityCache {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Prefab prefab) {
-        if (prefab != null) {
-            List<Component> components = Lists.newArrayList();
-            for (Component component : prefab.iterateComponents()) {
-                components.add(entityManager.getComponentLibrary().copy(component));
-            }
-            components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-
-            return createEntityWithoutLifecycleEvents(components);
-        } else {
-            return createEntityWithoutLifecycleEvents(Collections.<Component>emptyList());
-        }
+        return create(prefab, null, null, false);
     }
 
     /**
