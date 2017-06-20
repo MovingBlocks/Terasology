@@ -16,13 +16,13 @@
 package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
@@ -31,7 +31,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.SectorManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -64,9 +63,9 @@ public class PojoEntityManager implements EngineEntityManager {
     private long nextEntityId = 1;
     private TLongSet loadedIds = new TLongHashSet();
 
-    private PojoEntityPool globalPool = new PojoEntityPool(this);
+    private EngineEntityPool globalPool = new PojoEntityPool(this);
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
-    private Map<Long, PojoEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
+    private Map<Long, EngineEntityPool> poolMap = new MapMaker().initialCapacity(1000).makeMap();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -96,7 +95,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityPool getGlobalPool () {
+    public EntityPool getGlobalPool() {
         return globalPool;
     }
 
@@ -142,7 +141,7 @@ public class PojoEntityManager implements EngineEntityManager {
         return nextEntityId++;
     }
 
-    public long createEntity(PojoEntityPool pool) {
+    public long createEntity(EngineEntityPool pool) {
         long id = createEntity();
         poolMap.put(id, pool);
         return id;
@@ -156,6 +155,11 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public EntityRef create(Iterable<Component> components) {
         return globalPool.create(components);
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
+        return globalPool.create(components, sendLifecycleEvents);
     }
 
     @Override
@@ -245,57 +249,15 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    //Todo: implement iterating over multiple pools
     public Iterable<EntityRef> getAllEntities() {
-        return globalPool.getAllEntities();
+        return Iterables.concat(globalPool.getAllEntities(), sectorManager.getAllEntities());
     }
 
     @SafeVarargs
     @Override
-    //Todo: implement iterating over multiple pools
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (componentClasses.length == 0) {
-            return getAllEntities();
-        }
-        if (componentClasses.length == 1) {
-            return iterateEntities(componentClasses[0]);
-        }
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = globalPool.getComponentStore().componentIterator(componentClasses[0]);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
-
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            boolean discard = false;
-            for (int i = 1; i < componentClasses.length; ++i) {
-                if (globalPool.getComponentStore().get(id, componentClasses[i]) == null) {
-                    discard = true;
-                    break;
-                }
-            }
-            if (!discard) {
-                idList.add(primeIterator.key());
-            }
-        }
-        return new EntityIterable(idList);
-    }
-
-    private Iterable<EntityRef> iterateEntities(Class<? extends Component> componentClass) {
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = globalPool.getComponentStore().componentIterator(componentClass);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
-
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            idList.add(primeIterator.key());
-        }
-        return new EntityIterable(idList);
+        return Iterables.concat(globalPool.getEntitiesWith(componentClasses),
+                sectorManager.getEntitiesWith(componentClasses));
     }
 
     @Override
@@ -374,6 +336,16 @@ public class PojoEntityManager implements EngineEntityManager {
         } else {
             return createEntityWithoutLifecycleEvents(Collections.<Component>emptyList());
         }
+    }
+
+    @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
+        globalPool.putEntity(entityId, ref);
+    }
+
+    @Override
+    public ComponentTable getComponentStore() {
+        return globalPool.getComponentStore();
     }
 
     @Override
@@ -509,7 +481,7 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
-        PojoEntityPool pool = poolMap.get(entityId);
+        EngineEntityPool pool = poolMap.get(entityId);
         //Default to the global pool
         if (pool == null) {
             //Todo: this happens a lot during shutdown. Possible concurrency issue?
@@ -531,7 +503,7 @@ public class PojoEntityManager implements EngineEntityManager {
     //Todo: be able to add to entities in any pool
     public <T extends Component> T addComponent(long entityId, T component) {
         Preconditions.checkNotNull(component);
-        PojoEntityPool pool = poolMap.get(entityId);
+        EngineEntityPool pool = poolMap.get(entityId);
         if (pool == null) {
             logger.error("Entity {} doesn't have an assigned pool", entityId);
             pool = globalPool;
@@ -589,7 +561,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     //Todo: be able to save components for entities in any pool
     public void saveComponent(long entityId, Component component) {
-        PojoEntityPool pool = poolMap.get(entityId);
+        EngineEntityPool pool = poolMap.get(entityId);
         if (pool == null) {
             logger.error("Entity {} doesn't have an assigned pool", entityId);
             pool = globalPool;
@@ -620,7 +592,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * Implementation
      */
 
-    protected void assignToPool(EntityRef ref, PojoEntityPool pool) {
+    protected void assignToPool(EntityRef ref, EngineEntityPool pool) {
         //Todo: job for the sector manager?
         poolMap.put(ref.getId(), pool);
     }
@@ -682,14 +654,8 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     @SafeVarargs
     public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
-        switch (componentClasses.length) {
-            case 0:
-                return globalPool.getComponentStore().numEntities();
-            case 1:
-                return globalPool.getComponentStore().getComponentCount(componentClasses[0]);
-            default:
-                return Lists.newArrayList(getEntitiesWith(componentClasses)).size();
-        }
+        return sectorManager.getCountOfEntitiesWith(componentClasses) +
+                globalPool.getCountOfEntitiesWith(componentClasses);
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {

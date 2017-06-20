@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.entity.internal;
 
 import gnu.trove.iterator.TLongIterator;
+import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 
 import java.util.Iterator;
@@ -25,9 +26,9 @@ import java.util.Iterator;
  */
 public class EntityIterator implements Iterator<EntityRef> {
     private TLongIterator idIterator;
-    private PojoEntityPool pool;
+    private EntityPool pool;
 
-    EntityIterator(TLongIterator idIterator, PojoEntityPool pool) {
+    EntityIterator(TLongIterator idIterator, EntityPool pool) {
         this.idIterator = idIterator;
         this.pool = pool;
     }

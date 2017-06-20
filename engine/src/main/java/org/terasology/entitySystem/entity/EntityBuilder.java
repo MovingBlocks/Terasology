@@ -40,6 +40,8 @@ public class EntityBuilder implements MutableComponentContainer {
     private EntityPool pool;
     private EngineEntityManager entityManager;
 
+    private boolean sendLifecycleEvents = true;
+
     public EntityBuilder(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         this.pool = entityManager.getGlobalPool();
@@ -75,15 +77,15 @@ public class EntityBuilder implements MutableComponentContainer {
      * @param prefab the prefab to add
      * @return whether the prefab was successfully added
      */
-    public boolean addPrefab(Prefab prefab) {
-        if (prefab == null) {
-            return false;
+    public void addPrefab(Prefab prefab) {
+        if (prefab != null) {
+            for (Component component : prefab.iterateComponents()) {
+                addComponent(entityManager.getComponentLibrary().copy(component));
+            }
+            addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        } else {
+            addComponent(new EntityInfoComponent());
         }
-        for (Component component : prefab.iterateComponents()) {
-            addComponent(entityManager.getComponentLibrary().copy(component));
-        }
-        addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return true;
     }
 
     /**
@@ -92,11 +94,11 @@ public class EntityBuilder implements MutableComponentContainer {
      * @return The built entity.
      */
     public EntityRef build() {
-        return pool.create(components.values());
+        return pool.create(components.values(), sendLifecycleEvents);
     }
 
     public EntityRef buildWithoutLifecycleEvents() {
-        return pool.createEntityWithoutLifecycleEvents(components.values());
+        return pool.create(components.values(), false);
     }
 
     @Override
@@ -160,6 +162,14 @@ public class EntityBuilder implements MutableComponentContainer {
             entityInfo = addComponent(new EntityInfoComponent());
         }
         return entityInfo;
+    }
+
+    public boolean willSendLifecycleEvents() {
+        return sendLifecycleEvents;
+    }
+
+    public void setSendLifecycleEvents(boolean sendLifecycleEvents) {
+        this.sendLifecycleEvents = sendLifecycleEvents;
     }
 
 }

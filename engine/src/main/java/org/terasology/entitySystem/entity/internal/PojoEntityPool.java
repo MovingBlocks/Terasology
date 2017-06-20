@@ -17,14 +17,10 @@ package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
-import gnu.trove.iterator.TLongObjectIterator;
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
@@ -39,14 +35,13 @@ import org.terasology.math.geom.Vector3f;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
 /**
  */
-public class PojoEntityPool implements EntityPool {
+public class PojoEntityPool implements EngineEntityPool {
 
     private PojoEntityManager entityManager;
 
@@ -72,13 +67,7 @@ public class PojoEntityPool implements EntityPool {
 
     @Override
     public EntityRef create() {
-        EntityRef entityRef = createEntityRef(entityManager.createEntity(this));
-        /*
-         * The entity change listener are also used to detect new entities. By adding one component we inform those
-         * listeners about the new entity.
-         */
-        entityRef.addComponent(new EntityInfoComponent());
-        return entityRef;
+        return create((Prefab) null, null, null);
     }
 
     @Override
@@ -88,13 +77,20 @@ public class PojoEntityPool implements EntityPool {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
+        return create(components, true);
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
         components = (components == null) ? Collections.EMPTY_LIST : components;
         EntityRef entity = createEntity(components);
 
-        EventSystem eventSystem = entityManager.getEventSystem();
-        if (eventSystem != null) {
-            eventSystem.send(entity, OnAddedComponent.newInstance());
-            eventSystem.send(entity, OnActivatedComponent.newInstance());
+        if (sendLifecycleEvents) {
+            EventSystem eventSystem = entityManager.getEventSystem();
+            if (eventSystem != null) {
+                eventSystem.send(entity, OnAddedComponent.newInstance());
+                eventSystem.send(entity, OnActivatedComponent.newInstance());
+            }
         }
 
         for (Component component: components) {
@@ -105,90 +101,66 @@ public class PojoEntityPool implements EntityPool {
 
     @Override
     public EntityRef create(String prefabName) {
-        if (prefabName != null && !prefabName.isEmpty()) {
-            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
-
-            if (prefab == null) {
-                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
-                return EntityRef.NULL;
-            }
-
-            return create(prefab);
-        }
-        return create();
+        return create(prefabName, null, null);
     }
 
     @Override
     public EntityRef create(String prefabName, Vector3f position) {
-        if (prefabName != null && !prefabName.isEmpty()) {
-            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+        return create(prefabName, position, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position) {
+        return create(prefab, position, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab) {
+        return create(prefab, null, null);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        return create(prefab, position, rotation, true);
+    }
+
+    //@Override
+    private EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
+        EntityBuilder builder = newBuilder(prefab);
+        builder.setSendLifecycleEvents(sendLifecycleEvents);
+
+        LocationComponent locationComponent = builder.getComponent(LocationComponent.class);
+        if (locationComponent != null) {
+            if (position != null) {
+                locationComponent.setWorldPosition(position);
+            }
+            if (rotation != null) {
+                locationComponent.setWorldRotation(rotation);
+            }
+        }
+
+        return builder.build();
+    }
+
+    //@Override
+    public EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
+        return create(prefabName, position, rotation, true);
+    }
+
+    private EntityRef create(String prefabName, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
+        Prefab prefab;
+        if (prefabName == null || prefabName.isEmpty()) {
+            prefab = null;
+        } else {
+            prefab = entityManager.getPrefabManager().getPrefab(prefabName);
 
             if (prefab == null) {
                 logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
                 return EntityRef.NULL;
             }
-
-            return create(prefab, position);
         }
-        return create();
+        return create(prefab, position, rotation, sendLifecycleEvents);
     }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            Component newComp = entityManager.getComponentLibrary().copy(component);
-            components.add(newComp);
-            if (newComp instanceof LocationComponent) {
-                LocationComponent loc = (LocationComponent) newComp;
-                loc.setWorldPosition(position);
-            }
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            components.add(entityManager.getComponentLibrary().copy(component));
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
-    @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
-        if (prefab == null) {
-            logger.warn("Unable to instantiate null prefab");
-            return EntityRef.NULL;
-        }
-
-        List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.iterateComponents()) {
-            Component newComp = entityManager.getComponentLibrary().copy(component);
-            components.add(newComp);
-            if (newComp instanceof LocationComponent) {
-                LocationComponent loc = (LocationComponent) newComp;
-                loc.setWorldPosition(position);
-                loc.setWorldRotation(rotation);
-            }
-        }
-        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
-    }
-
 
     /**
      * Destroys this entity, sending event
@@ -264,13 +236,7 @@ public class PojoEntityPool implements EntityPool {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
-        components = (components == null) ? Collections.EMPTY_LIST : components;
-
-        EntityRef entity = createEntity(components);
-        for (Component component: components) {
-            entityManager.notifyComponentAdded(entity, component.getClass());
-        }
-        return entity;
+        return create(components, false);
     }
 
     /**
@@ -278,7 +244,7 @@ public class PojoEntityPool implements EntityPool {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(String prefabName) {
-        return createEntityWithoutLifecycleEvents(entityManager.getPrefabManager().getPrefab(prefabName));
+        return create(prefabName, null, null, false);
     }
 
     /**
@@ -286,17 +252,7 @@ public class PojoEntityPool implements EntityPool {
      */
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Prefab prefab) {
-        if (prefab != null) {
-            List<Component> components = Lists.newArrayList();
-            for (Component component : prefab.iterateComponents()) {
-                components.add(entityManager.getComponentLibrary().copy(component));
-            }
-            components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-
-            return createEntityWithoutLifecycleEvents(components);
-        } else {
-            return createEntityWithoutLifecycleEvents(Collections.<Component>emptyList());
-        }
+        return create(prefab, null, null, false);
     }
 
     /**
@@ -374,10 +330,12 @@ public class PojoEntityPool implements EntityPool {
      * @param entityId the id of the entity to add
      * @param ref the {@link BaseEntityRef} to add
      */
-    protected void putEntity(long entityId, BaseEntityRef ref) {
+    @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
         entityStore.put(entityId, ref);
     }
 
+    @Override
     public ComponentTable getComponentStore() {
         return componentStore;
     }
@@ -400,30 +358,24 @@ public class PojoEntityPool implements EntityPool {
     @SafeVarargs
     @Override
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (componentClasses.length == 0) {
-            return getAllEntities();
-        }
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = componentStore.componentIterator(componentClasses[0]);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
+        return () -> entityStore.keySet().stream()
+                //Keep entities which have all of the required components
+                .filter(id -> Arrays.stream(componentClasses)
+                        .allMatch(component -> componentStore.get(id, component) != null))
+                .map(id -> createEntityRef(id))
+                .iterator();
+    }
 
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            boolean discard = false;
-            for (int i = 1; i < componentClasses.length; ++i) {
-                if (componentStore.get(id, componentClasses[i]) == null) {
-                    discard = true;
-                    break;
-                }
-            }
-            if (!discard) {
-                idList.add(primeIterator.key());
-            }
+    @Override
+    public int getCountOfEntitiesWith(Class<? extends Component>[] componentClasses) {
+        switch (componentClasses.length) {
+            case 0:
+                return componentStore.numEntities();
+            case 1:
+                return componentStore.getComponentCount(componentClasses[0]);
+            default:
+                return Lists.newArrayList(getEntitiesWith(componentClasses)).size();
         }
-        return () -> new EntityIterator(idList.iterator(), this);
     }
 
     @Override

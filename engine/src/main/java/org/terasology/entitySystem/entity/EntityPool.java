@@ -65,6 +65,16 @@ public interface EntityPool {
      */
     EntityRef create(Iterable<Component> components);
 
+
+    /**
+     * Creates a new entity from the given components.
+     *
+     * @param components the components to create this entity from
+     * @param sendLifecycleEvents will only send lifecycle events if this is true
+     * @return
+     */
+    EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents);
+
     /**
      * @param prefabName The name of the prefab to create.
      * @return A new entity, based on the the prefab of the given name. If the prefab doesn't exist, just a new entity.
@@ -141,10 +151,6 @@ public interface EntityPool {
      */
     EntityRef createEntityRefWithId(long id);
 
-    void destroy(long entityId);
-
-    void destroyEntityWithoutEvents(EntityRef entity);
-
     Iterable<EntityRef> getAllEntities();
 
     /**
@@ -153,6 +159,15 @@ public interface EntityPool {
      */
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
+    /**
+     * @param componentClasses
+     * @return A count of entities with the provided component types
+     */
+    int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
+
+    /**
+     * @return A count of currently active entities
+     */
     int getActiveEntityCount();
 
     /**
@@ -163,12 +178,4 @@ public interface EntityPool {
      */
     EntityRef getExistingEntity(long id);
 
-    /**
-     * Fund out if a particular entity has a component of the given class.
-     *
-     * @param entityId the entity to check
-     * @param componentClass the class to check for
-     * @return whether the entity has the component
-     */
-    boolean hasComponent(long entityId, Class<? extends Component> componentClass);
 }

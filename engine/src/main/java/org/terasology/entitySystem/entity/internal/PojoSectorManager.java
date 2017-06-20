@@ -15,11 +15,11 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.google.common.collect.Iterables;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.SectorManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -29,9 +29,9 @@ import java.util.List;
 
 /**
  */
-public class PojoSectorManager implements SectorManager {
+public class PojoSectorManager implements EngineSectorManager {
 
-    private List<PojoEntityPool> pools;
+    private List<EngineEntityPool> pools;
 
     private PojoEntityManager entityManager;
 
@@ -85,6 +85,11 @@ public class PojoSectorManager implements SectorManager {
     }
 
     @Override
+    public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
+        return getPool().create(components, sendLifecycleEvents);
+    }
+
+    @Override
     public EntityRef create(String prefabName) {
         return getPool().create(prefabName);
     }
@@ -125,6 +130,16 @@ public class PojoSectorManager implements SectorManager {
     }
 
     @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
+        getPool().putEntity(entityId, ref);
+    }
+
+    @Override
+    public ComponentTable getComponentStore() {
+        return getPool().getComponentStore();
+    }
+
+    @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
         return getPool().createEntityWithId(id, components);
     }
@@ -134,24 +149,41 @@ public class PojoSectorManager implements SectorManager {
         return getPool().createEntityRefWithId(id);
     }
 
-    @Override
     public void destroy(long entityId) {
         getPool().destroy(entityId);
     }
 
-    @Override
     public void destroyEntityWithoutEvents(EntityRef entity) {
         getPool().destroyEntityWithoutEvents(entity);
     }
 
     @Override
     public Iterable<EntityRef> getAllEntities() {
-        return getPool().getAllEntities();
+        List<Iterable<EntityRef>> entityIterables = new ArrayList<>();
+        for (EntityPool pool : pools) {
+            entityIterables.add(pool.getAllEntities());
+        }
+
+        return Iterables.concat(entityIterables);
     }
 
     @Override
     public Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        return getPool().getEntitiesWith(componentClasses);
+        List<Iterable<EntityRef>> entityIterables = new ArrayList<>();
+        for (EntityPool pool : pools) {
+            entityIterables.add(pool.getEntitiesWith(componentClasses));
+        }
+
+        return Iterables.concat(entityIterables);
+    }
+
+    @Override
+    public int getCountOfEntitiesWith(Class<? extends Component>[] componentClasses) {
+        int i = 0;
+        for (EngineEntityPool pool : pools) {
+            i += pool.getCountOfEntitiesWith(componentClasses);
+        }
+        return i;
     }
 
     @Override
@@ -175,13 +207,12 @@ public class PojoSectorManager implements SectorManager {
         return EntityRef.NULL;
     }
 
-    private PojoEntityPool getPool() {
+    private EngineEntityPool getPool() {
         return pools.get(0);
     }
 
-    @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
-        for (EntityPool pool : pools) {
+        for (EngineEntityPool pool : pools) {
             if (pool.hasComponent(entityId, componentClass)) {
                 return true;
             }
