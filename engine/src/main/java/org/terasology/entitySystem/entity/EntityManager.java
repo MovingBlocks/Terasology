@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  */
-public interface EntityManager {
+public interface EntityManager extends EntityCache {
 
     /**
      * Creates an EntityBuilder.

@@ -335,31 +335,22 @@ public class PojoEntityCache implements EntityCache {
     }
 
     public EntityBuilder newBuilder() {
-        return new EntityBuilder(this);
+        return new EntityBuilder(entityManager, this);
     }
 
     @Override
     public EntityBuilder newBuilder(String prefabName) {
-        if (prefabName != null && !prefabName.isEmpty()) {
-            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
-            if (prefab == null) {
-                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
-                return new EntityBuilder(this);
-            }
-            return newBuilder(prefab);
+        EntityBuilder builder = newBuilder();
+        if (!builder.addPrefab(prefabName)) {
+            logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
         }
-        return newBuilder();
+        return builder;
     }
 
     @Override
     public EntityBuilder newBuilder(Prefab prefab) {
-        EntityBuilder builder = new EntityBuilder(this);
-        if (prefab != null) {
-            for (Component component : prefab.iterateComponents()) {
-                builder.addComponent(entityManager.getComponentLibrary().copy(component));
-            }
-            builder.addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        }
+        EntityBuilder builder = newBuilder();
+        builder.addPrefab(prefab);
         return builder;
     }
 

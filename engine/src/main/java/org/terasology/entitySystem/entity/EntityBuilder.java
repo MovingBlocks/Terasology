@@ -16,10 +16,13 @@
 package org.terasology.entitySystem.entity;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Map;
 
@@ -30,15 +33,57 @@ import java.util.Map;
  */
 public class EntityBuilder implements MutableComponentContainer {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(EntityBuilder.class);
+
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
     private EntityCache cache;
+    private EngineEntityManager entityManager;
 
-    public EntityBuilder(EngineEntityManager manager) {
-        this.cache = manager.getGlobalCache();
+    public EntityBuilder(EngineEntityManager entityManager) {
+        this.entityManager = entityManager;
+        this.cache = entityManager.getGlobalCache();
     }
 
-    public EntityBuilder(EntityCache cache) {
+    public EntityBuilder(EngineEntityManager entityManager, EntityCache cache) {
+        this.entityManager = entityManager;
         this.cache = cache;
+    }
+
+    /**
+     * Adds all of the components from a prefab to this builder
+     *
+     * @param prefabName the name of the prefab to add
+     * @return whether the prefab was successfully added
+     */
+    public boolean addPrefab(String prefabName) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
+            if (prefab == null) {
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
+                return false;
+            }
+            addPrefab(prefab);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * Adds all of the components from a prefab to this builder
+     *
+     * @param prefab the prefab to add
+     * @return whether the prefab was successfully added
+     */
+    public boolean addPrefab(Prefab prefab) {
+        if (prefab == null) {
+            return false;
+        }
+        for (Component component : prefab.iterateComponents()) {
+            addComponent(entityManager.getComponentLibrary().copy(component));
+        }
+        addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        return true;
     }
 
     /**
