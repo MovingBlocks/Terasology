@@ -6,7 +6,7 @@
         "category"  : "basic",
         "shape"     : "diamond",
         "description": "Runs children parallel",
-        "color"     : [0.7, 0.7, 0.7],
-        "textColor" : [  0,   0,   0]
+        "color"     : [0.7, 0.7, 0.7, 255],
+        "textColor" : [  0,   0,   0, 255]
     }
 }

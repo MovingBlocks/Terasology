@@ -73,6 +73,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         if (moduleManager != null) {
             ModuleEnvironment environment = moduleManager.getEnvironment();
+            
 
             for (Class<? extends Action> type : environment.getSubtypesOf(Action.class)) {
                 ActionName actionName = type.getAnnotation(ActionName.class);

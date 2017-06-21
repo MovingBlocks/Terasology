@@ -32,6 +32,7 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.behavior.core.BehaviorNode;
@@ -43,15 +44,12 @@ import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -155,7 +153,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         categories = Lists.newArrayList(categoryComponents.keySet());
         Collections.sort(categories);
         for (String category : categories) {
-            Collections.sort(categoryComponents.get(category), (o1, o2) -> o1.name.compareTo(o2.name));
+            Collections.sort(categoryComponents.get(category), Comparator.comparing(o -> o.name));
         }
     }
 
@@ -169,7 +167,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
             );
             prefabs = Lists.newArrayList();
             for (String node : nodes) {
-                prefabs.add(prefabManager.getPrefab("engine:" + node));
+                prefabs.add(Assets.get(new ResourceUrn("engine:" + node), Prefab.class).orElse(null));
             }
         }
         for (Prefab prefab : prefabs) {
