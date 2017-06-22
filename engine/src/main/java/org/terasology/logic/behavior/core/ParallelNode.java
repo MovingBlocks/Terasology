@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.behavior.core;
 
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Opcodes;
-import jdk.internal.org.objectweb.asm.Type;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 
-import static jdk.internal.org.objectweb.asm.commons.GeneratorAdapter.EQ;
-import static jdk.internal.org.objectweb.asm.commons.GeneratorAdapter.NE;
+import static org.objectweb.asm.commons.GeneratorAdapter.EQ;
+import static org.objectweb.asm.commons.GeneratorAdapter.NE;
 
 
 /**

@@ -16,10 +16,10 @@
 package org.terasology.logic.behavior.core;
 
 
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Type;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Type;
 
-import jdk.internal.org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.GeneratorAdapter;
 import org.terasology.logic.behavior.core.compiler.ClassGenerator;
 import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 

@@ -67,8 +67,6 @@ public class BehaviorTreeFormat extends AbstractAssetFileFormat<BehaviorTreeData
             CoreRegistry.put(BehaviorTreeBuilder.class, builder);
         }
         try (InputStream stream = list.get(0).openStream()) {
-// TODO wtf am I doing here
-            BehaviorNode node = builder.fromJson(stream);
             return load(stream);
         }
     }

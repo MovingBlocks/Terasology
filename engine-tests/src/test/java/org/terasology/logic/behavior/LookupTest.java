@@ -50,7 +50,7 @@ public class LookupTest {
     public void testLookupA() {
         Print.output = new StringBuilder();
         EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(new LocationComponent(), new SkeletalMeshComponent());
-        BehaviorTree asset = CoreRegistry.get(AssetManager.class).loadAsset(new AssetUri(AssetType.BEHAVIOR, "unittest", "BehaviorLookup"), BehaviorTree.class);
+        BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookup"), BehaviorTree.class).get();
         System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
         Actor actor = new Actor(entityRef);
         actor.setDelta(0.5f);
@@ -65,7 +65,7 @@ public class LookupTest {
     public void testLookupB() {
         Print.output = new StringBuilder();
         EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(new LocationComponent(), new SkeletalMeshComponent());
-        BehaviorTree asset = CoreRegistry.get(AssetManager.class).loadAsset(new ResourceUrn(AssetType.BEHAVIOR, "unittest", "BehaviorLookupB"), BehaviorTree.class);
+        BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookupB"), BehaviorTree.class).get();
         System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
         Actor actor = new Actor(entityRef);
         actor.setDelta(0.5f);

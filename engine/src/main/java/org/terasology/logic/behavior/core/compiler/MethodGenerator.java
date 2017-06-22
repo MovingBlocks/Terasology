@@ -15,12 +15,14 @@
  */
 package org.terasology.logic.behavior.core.compiler;
 
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Type;
-import jdk.internal.org.objectweb.asm.commons.GeneratorAdapter;
-import jdk.internal.org.objectweb.asm.commons.Method;
 
 
+
+
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.commons.Method;
 import org.terasology.logic.behavior.core.Action;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorState;

@@ -16,6 +16,8 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -57,13 +59,12 @@ import java.util.stream.Collectors;
  * is loaded and an interpreter is started.
  * <p/>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
- *
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final Name BEHAVIORS = new Name("Behaviors");
-
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     @In
     private EntityManager entityManager;
     @In
@@ -88,6 +89,8 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             if (asset.isPresent()) {
                 trees.add(asset.get());
             }
+
+
         }
     }
 
@@ -104,6 +107,8 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+
+            logger.info("Running entity: %s, Component: %s", entity.toString(), entity.getComponent(BehaviorComponent.class).toString());
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
             behaviorComponent.interpreter.tick(delta);
         }

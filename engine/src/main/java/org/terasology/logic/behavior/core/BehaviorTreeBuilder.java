@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -38,10 +39,18 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.behavior.ActionName;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.nui.BehaviorNodeComponent;
+import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.module.TableModuleRegistry;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
@@ -49,8 +58,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * JSON deserializer to create trees using json:
@@ -60,10 +71,14 @@ import java.util.Map;
  * Actions and Decorators need to be registered before parsing.
  */
 public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, JsonSerializer<BehaviorNode> {
-    private final Logger logger = LoggerFactory.getLogger(BehaviorTreeBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorTreeBuilder.class);
 
     private Map<String, Class<? extends Action>> actions = Maps.newHashMap();
     private Map<String, Class<? extends Action>> decorators = Maps.newHashMap();
+
+
+    @In
+    private PrefabManager prefabManager;
 
     private Gson gson;
 
@@ -73,7 +88,29 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         if (moduleManager != null) {
             ModuleEnvironment environment = moduleManager.getEnvironment();
-            
+
+            Set<Module> behavior = new HashSet<>();
+            behavior.add(moduleManager.getRegistry().getLatestModuleVersion(new Name("Behaviors")));
+            ModuleEnvironment behaviorEnvironment =  moduleManager.loadEnvironment(behavior, false);
+
+
+
+
+            // TODO This is here until we can move everything over to Behaviors
+            for (Class<? extends Action> type : behaviorEnvironment.getSubtypesOf(Action.class)) {
+                ActionName actionName = type.getAnnotation(ActionName.class);
+                if (actionName != null) {
+                    String name = actionName.value();
+                    if (actionName.isDecorator()) {
+                        registerDecorator(name, type);
+                        logger.info("Found decorator {}", name);
+                    } else {
+                        registerAction(name, type);
+                        logger.info("Found action {}", name);
+                    }
+                }
+            }
+
 
             for (Class<? extends Action> type : environment.getSubtypesOf(Action.class)) {
                 ActionName actionName = type.getAnnotation(ActionName.class);

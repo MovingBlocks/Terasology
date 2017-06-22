@@ -15,11 +15,11 @@
  */
 package org.terasology.logic.behavior.core.compiler;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.Label;
-import jdk.internal.org.objectweb.asm.Type;
-import jdk.internal.org.objectweb.asm.commons.GeneratorAdapter;
-import jdk.internal.org.objectweb.asm.commons.Method;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.Method;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.AssemblingBehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorNode;
