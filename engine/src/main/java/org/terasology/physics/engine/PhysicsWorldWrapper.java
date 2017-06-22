@@ -87,5 +87,17 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         public boolean isBlocking() {
             return blocking;
         }
+
+        @Override
+        public float getFriction() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public float getRestitution() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
     }
 }
