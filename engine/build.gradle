@@ -88,6 +88,9 @@ configurations.all {
 // Primary dependencies definition
 dependencies {
 
+
+
+
     // Storage and networking
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.6.2'
@@ -109,6 +112,13 @@ dependencies {
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     compile group: 'com.miglayout', name: 'miglayout-core', version: '5.0'
     compile group: 'de.matthiasmann.twl', name: 'PNGDecoder', version: '1111'
+
+    // Assembly & Bytecode
+    compile group: 'org.ow2.asm', name: 'asm', version: '5.0.3'
+    compile group: 'org.ow2.asm', name: 'asm-tree', version: '5.0.4'
+    compile group: 'org.ow2.asm', name: 'asm-util', version: '5.0.4'
+    compile group: 'org.ow2.asm', name: 'asm-commons', version: '5.0.4'
+
 
     // Logging and audio
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
