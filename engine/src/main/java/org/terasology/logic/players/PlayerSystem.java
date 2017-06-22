@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -206,13 +207,18 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
-    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
+    public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
         loc.setLocalRotation(new Quat4f());  // reset rotation
         entity.saveComponent(loc);
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
+    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+        Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
             respawnPlayer(entity);

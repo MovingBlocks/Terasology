@@ -174,7 +174,6 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         if ((health != null) && !ghost) {
             int damagedAmount = health.currentHealth - Math.max(health.currentHealth - damageAmount, 0);
             health.currentHealth -= damagedAmount;
-            logger.info(String.valueOf(damageAmount) + " damage of type " + damageType);
             health.nextRegenTick = time.getGameTimeInMs() + TeraMath.floorToInt(health.waitBeforeRegen * 1000);
             entity.saveComponent(health);
             entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));
