@@ -446,6 +446,10 @@ public class UIText extends CoreWidget {
                         }
                         case KeyId.ENTER:
                         case KeyId.NUMPAD_ENTER: {
+                            if (multiline) {
+                                setText(fullText + "\n");
+                                increaseCursorPosition(1);
+                            }
                             for (ActivateEventListener listener : activationListeners) {
                                 listener.onActivated(this);
                             }
