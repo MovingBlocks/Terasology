@@ -97,6 +97,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `give portal`
 * [PotentialEnergyDevices](https://github.com/Terasology/PotentialEnergyDevices) - A library for creating entities that build up potential energy
 * [Potions](https://github.com/Terasology/Potions) - contains a set of assorted potions the player can consume to gain various effects
+* [Projectile](https://github.com/Terasology/Projectile) - supported a variety of projectiles such as grenades and fireballs
 * [QuestExamples](https://github.com/Terasology/QuestExamples) - samples for developers to help create quests
 * [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press `E` to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
