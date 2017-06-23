@@ -133,7 +133,7 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.getWorldEntity().send(blockEvent);
 
         if (!blockEvent.isConsumed()) {
-            EntityRef newDoor = entityManager.create("DoorRegion");
+            EntityRef newDoor = entityManager.create(door.doorRegionPrefab);
             entity.removeComponent(MeshComponent.class);
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
             Vector3f doorCenter = bottomBlockPos.toVector3f();
