@@ -16,6 +16,7 @@
 package org.terasology.particles;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.particles.rendering.ParticleRenderingData;
@@ -27,6 +28,8 @@ import java.util.stream.Stream;
  * Also maintains a registry of generator and affector functions to be used when processing generators
  * and affectors during a particle system update.
  */
+
+@API
 public interface ParticleSystemManager {
 
     void registerAffectorFunction(AffectorFunction affectorFunction);

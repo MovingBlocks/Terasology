@@ -15,9 +15,12 @@
  */
 package org.terasology.particles;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * Data mask used internally by the particle system.
  */
+@API
 public enum ParticleDataMask {
 
     ENERGY(0b0000001),
