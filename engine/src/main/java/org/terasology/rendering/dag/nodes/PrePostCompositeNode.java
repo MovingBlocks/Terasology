@@ -72,13 +72,13 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     private boolean localReflectionsAreEnabled;
     private boolean ssaoIsEnabled;
     private boolean outlineIsEnabled;
-    private boolean inscatteringIsEnabled;
+    private boolean hazeIsEnabled;
     private boolean volumetricFogIsEnabled;
 
     private StateChange setReflectiveRefractiveNormalsInputTexture;
     private StateChange setSsaoInputTexture;
     private StateChange setEdgesInputTexture;
-    private StateChange setSkyBandInputTexture;
+    private StateChange setHazeInputTexture;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.001f, max = 0.005f)
@@ -87,15 +87,16 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     @Range(min = 0.0f, max = 1.0f)
     private float outlineThickness = 0.65f;
 
+    // TODO : Consider a more descriptive name for this variable.
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    private float skyInscatteringLength = 1.0f;
+    private float hazeLength = 1.0f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    private float skyInscatteringStrength = 0.25f;
+    private float hazeStrength = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
-    private float skyInscatteringThreshold = 0.8f;
+    private float hazeThreshold = 0.8f;
 
     public PrePostCompositeNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -114,7 +115,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         outlineIsEnabled = renderingConfig.isOutline();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
-        inscatteringIsEnabled = renderingConfig.isInscattering();
+        hazeIsEnabled = renderingConfig.isInscattering();
         renderingConfig.subscribe(RenderingConfig.INSCATTERING, this);
         volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
         renderingConfig.subscribe(RenderingConfig.VOLUMETRIC_FOG, this);
@@ -128,7 +129,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         setReflectiveRefractiveNormalsInputTexture = new SetInputTextureFromFbo(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractiveNormals");
         setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao");
         setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, OUTLINE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges");
-        setSkyBandInputTexture = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
+        setHazeInputTexture = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
 
         if (localReflectionsAreEnabled) {
             addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
@@ -139,8 +140,8 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         if (outlineIsEnabled) {
             addDesiredStateChange(setEdgesInputTexture);
         }
-        if (inscatteringIsEnabled) {
-            addDesiredStateChange(setSkyBandInputTexture);
+        if (hazeIsEnabled) {
+            addDesiredStateChange(setHazeInputTexture);
         }
     }
 
@@ -169,8 +170,8 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
             //TODO: Other parameters and volumetric fog test case is needed
         }
 
-        if (inscatteringIsEnabled) {
-            prePostMaterial.setFloat4("skyInscatteringSettingsFrag", 0, skyInscatteringStrength, skyInscatteringLength, skyInscatteringThreshold, true);
+        if (hazeIsEnabled) {
+            prePostMaterial.setFloat4("skyInscatteringSettingsFrag", 0, hazeStrength, hazeLength, hazeThreshold, true);
         }
 
         // TODO: We never set the "fogWorldPosition" uniform in prePostComposite_frag.glsl . Either use it, or remove it.
@@ -210,11 +211,11 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
                 removeDesiredStateChange(setEdgesInputTexture);
             }
         } else if (event.getPropertyName().equals(RenderingConfig.INSCATTERING)) {
-            inscatteringIsEnabled = renderingConfig.isInscattering();
-            if (inscatteringIsEnabled) {
-                addDesiredStateChange(setSkyBandInputTexture);
+            hazeIsEnabled = renderingConfig.isInscattering();
+            if (hazeIsEnabled) {
+                addDesiredStateChange(setHazeInputTexture);
             } else {
-                removeDesiredStateChange(setSkyBandInputTexture);
+                removeDesiredStateChange(setHazeInputTexture);
             }
         } else if (event.getPropertyName().equals(RenderingConfig.VOLUMETRIC_FOG)) {
             volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
