@@ -63,10 +63,18 @@
                       {
                           "type": "UICheckbox",
                           "id": "telemetryEnabled"
+                      },
+                      {
+                          "type": "UILabel",
+                          "text": "${engine:menu#enable-error-reporting}"
+                      },
+                      {
+                          "type": "UICheckbox",
+                          "id": "errorReportingEnabled"
                       }
                   ],
                   "layoutInfo": {
-                    "width": 600,
+                    "width": 800,
                     "height": 32,
                     "position-bottom": {
                         "target": "TOP",

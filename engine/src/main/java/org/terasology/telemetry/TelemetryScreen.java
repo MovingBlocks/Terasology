@@ -37,6 +37,7 @@ import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.telemetry.metrics.Metric;
 
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class TelemetryScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     @In
-    private Metrics metric;
+    private Metrics metrics;
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryScreen.class);
 
@@ -80,8 +81,8 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         for (Map.Entry<TelemetryCategory,Class> telemetryCategory: telemetryCategories.entrySet()) {
             Class metricClass = telemetryCategory.getValue();
-            Metric metricType = metric.getMap().get(metricClass);
-            Map<String,Object> map = metricType.generateMetricMap();
+            Metric metricType = metrics.getMap().get(metricClass);
+            Map<String,Object> map = metricType.getFieldValueMap();
 
             addTelemetrySection(telemetryCategory.getKey(),mainLayout,map);
         }
@@ -91,7 +92,14 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
         WidgetUtil.tryBindCheckbox(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE));
-
+        WidgetUtil.tryBindCheckBoxWithListener(this, "errorReportingEnabled",BindHelper.bindBeanProperty("errorReportingEnabled",config.getTelemetryConfig(),Boolean.TYPE), (checkbox) -> {
+            TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
+            if (config.getTelemetryConfig().isErrorReportingEnabled()) {
+                appender.turnOnErrorReporting();
+            } else {
+                appender.turnOffErrorReporting();
+            }
+        });
     }
 
     private Map<TelemetryCategory, Class> fetchTelemetryCategoriesFromEnvironment() {
@@ -123,7 +131,14 @@ public class TelemetryScreen extends CoreScreenLayer {
         layout.addWidget(categoryHeader);
         List<Map.Entry> telemetryFields = sortFields(map);
         for (Map.Entry entry : telemetryFields) {
-            addTelemetryField(entry.getKey().toString(),entry.getValue().toString(),layout);
+            Object value = entry.getValue();
+            if (value instanceof List) {
+                List list = (List) value;
+                addTelemetryField(entry.getKey().toString(),list,layout);
+            }
+            else {
+                addTelemetryField(entry.getKey().toString(),value,layout);
+            }
         }
     }
 
@@ -133,6 +148,19 @@ public class TelemetryScreen extends CoreScreenLayer {
                 .setHorizontalSpacing(horizontalSpacing);
 
         layout.addWidget(newRow);
+    }
+
+    // Will be used if the value is a List
+    private void addTelemetryField(String type, List value, ColumnLayout layout) {
+        int moduleCount = 1;
+        for (Object o : value) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(type);
+            sb.append(" ");
+            sb.append(moduleCount);
+            addTelemetryField(sb.toString(), o, layout);
+            moduleCount = moduleCount + 1;
+        }
     }
 
     private List<Map.Entry> sortFields(Map<String,Object> map) {

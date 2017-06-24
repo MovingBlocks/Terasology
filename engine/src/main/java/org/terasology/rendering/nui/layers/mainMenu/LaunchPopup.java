@@ -21,6 +21,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
@@ -32,7 +33,7 @@ public class LaunchPopup extends CoreScreenLayer {
     @In
     private Config config;
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:launchPopup!instance");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:launchPopup");
 
     private Runnable yesHandler;
 
@@ -45,12 +46,12 @@ public class LaunchPopup extends CoreScreenLayer {
         WidgetUtil.tryBindCheckbox(this, "showLaunchPopup", BindHelper.bindBeanProperty("launchPopupDisabled", config.getLaunchPopupConfig(), Boolean.TYPE));
 
         WidgetUtil.trySubscribe(this, "yes", (button) -> {
-            getManager().popScreen();
             yesHandler.run();
+            getManager().popScreen();
         });
         WidgetUtil.trySubscribe(this, "no", (button) -> {
-            getManager().popScreen();
             noHandler.run();
+            getManager().popScreen();
         });
         WidgetUtil.trySubscribe(this, "option", (button) -> {
             getManager().popScreen();

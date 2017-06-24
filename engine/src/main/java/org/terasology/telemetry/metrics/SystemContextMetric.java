@@ -26,7 +26,6 @@ import java.util.Map;
 /**
  * This is a metric for system context.
  */
-
 @TelemetryCategory(id = "systemContext",
         displayName = "${engine:menu#telemetry-system-context}"
         )
@@ -90,13 +89,13 @@ public class SystemContextMetric extends Metric {
     }
 
     @Override
-    public  Unstructured getMetric() {
+    public  Unstructured getUnstructuredMetric() {
 
-        Map<String, Object> metricMap = generateMetricMap();
+        Map<String, Object> metricMap = getFieldValueMap();
 
-        SelfDescribingJson systemConextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
+        SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
         Unstructured systemContextEvent = Unstructured.builder()
-                .eventData(systemConextData)
+                .eventData(systemContextData)
                 .build();
 
         return systemContextEvent;
