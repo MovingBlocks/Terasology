@@ -45,6 +45,8 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.telemetry.TelemetryScreen;
+import org.terasology.telemetry.TelemetryUtils;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.utilities.Assets;
 
 /**
@@ -134,6 +136,7 @@ public class StateMainMenu implements GameState {
         Config  config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
+        TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
         if (!launchPopupConfig.isLaunchPopupDisabled()) {
             String telemetryTitle = "Telemetry In Terasology";
             String telemetryMessage = "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the Mac address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!";
@@ -141,9 +144,15 @@ public class StateMainMenu implements GameState {
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
                 telemetryConfig.setAllEnabled(true);
+
+                // Enable error reporting
+                appender.turnOnErrorReporting();
             });
             telemetryConfirmPopup.setNoHandler(() -> {
                 telemetryConfig.setAllEnabled(false);
+
+                // Disable error reporting
+                appender.turnOffErrorReporting();
             });
             telemetryConfirmPopup.setOptionButtonText("Metric Menu");
             telemetryConfirmPopup.setOptionHandler(()-> {

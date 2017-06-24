@@ -47,6 +47,8 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
     }
 
     public void turnOffErrorReporting() {
+        this.clearAllFilters();
+
         ThresholdFilter filter = new ThresholdFilter();
         filter.setLevel("off");
         filter.start();
