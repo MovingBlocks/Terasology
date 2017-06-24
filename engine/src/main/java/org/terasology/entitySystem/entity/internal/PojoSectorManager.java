@@ -29,9 +29,9 @@ import java.util.List;
 
 /**
  */
-public class PojoSectorManager implements SectorManager {
+public class PojoSectorManager implements EngineSectorManager {
 
-    private List<PojoEntityCache> caches;
+    private List<EngineEntityCache> caches;
 
     private PojoEntityManager entityManager;
 
@@ -130,6 +130,16 @@ public class PojoSectorManager implements SectorManager {
     }
 
     @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
+        getCache().putEntity(entityId, ref);
+    }
+
+    @Override
+    public ComponentTable getComponentStore() {
+        return getCache().getComponentStore();
+    }
+
+    @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
         return getCache().createEntityWithId(id, components);
     }
@@ -160,7 +170,7 @@ public class PojoSectorManager implements SectorManager {
     @Override
     public int getCountOfEntitiesWith(Class<? extends Component>[] componentClasses) {
         int i = 0;
-        for (PojoEntityCache cache : caches) {
+        for (EngineEntityCache cache : caches) {
             i += cache.getCountOfEntitiesWith(componentClasses);
         }
         return i;
@@ -187,7 +197,7 @@ public class PojoSectorManager implements SectorManager {
         return EntityRef.NULL;
     }
 
-    private PojoEntityCache getCache() {
+    private EngineEntityCache getCache() {
         return caches.get(0);
     }
 
