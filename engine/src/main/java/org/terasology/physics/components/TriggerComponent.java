@@ -28,5 +28,6 @@ import java.util.List;
  */
 @ForceBlockActive
 public class TriggerComponent implements Component {
+    public CollisionGroup collisionGroup = StandardCollisionGroup.SENSOR;
     public List<CollisionGroup> detectGroups = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT);
 }

@@ -456,10 +456,11 @@ public class BulletPhysics implements PhysicsEngine {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
+            CollisionGroup collisionGroup = trigger.collisionGroup;
             PairCachingGhostObject triggerObj = createCollider(
                     VecMath.to(location.getWorldPosition()),
                     shape,
-                    StandardCollisionGroup.SENSOR.getFlag(),
+                    collisionGroup.getFlag(),
                     combineGroups(detectGroups),
                     CollisionFlags.NO_CONTACT_RESPONSE);
             triggerObj.setUserPointer(entity);
@@ -709,12 +710,18 @@ public class BulletPhysics implements PhysicsEngine {
                     if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
                     }
+                    else if(((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof Vector3i){
+                        otherEntity = blockEntityRegistry.getBlockEntityAt((Vector3i)((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer());
+                    }
                 } else {
                     if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
                     }
+                    else if(((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof Vector3i){
+                        otherEntity = blockEntityRegistry.getBlockEntityAt((Vector3i)((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer());
+                    }
                 }
-                if (otherEntity == null) {
+                if (otherEntity == null || otherEntity == EntityRef.NULL) {
                     continue;
                 }
                 BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);
