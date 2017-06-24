@@ -37,8 +37,9 @@ Contributors
  [Rez 'zproc' N.](https://github.com/zproc),
  [Christoph "Chrisk" Köbke](https://github.com/ChrisKoebke),
  [Maternal](http://forum.terasology.org/members/maternal.810/),
- [Trekmarvel](https://github.com/Trekmarvel)
-* Design Team: 
+ [Trekmarvel](https://github.com/Trekmarvel),
+ [quaternius](https://github.com/quaternius) ([Twitter](https://twitter.com/quaternius))
+* Design Team:
  [Rasmus 'Cervator' Praestholm](https://github.com/Cervator),
  [Overdhose](https://github.com/Overdhose),
  [Cynthia 'woodspeople' Kurtz](http://forum.terasology.org/members/woodspeople.34/),
