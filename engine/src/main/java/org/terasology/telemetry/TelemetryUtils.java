@@ -15,14 +15,25 @@
  */
 package org.terasology.telemetry;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utils methods for telemetry.
  */
 public class TelemetryUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(TelemetryUtils.class);
+
 
     /**
      * track a metric.
@@ -37,5 +48,34 @@ public class TelemetryUtils {
                 .build();
 
         tracker.track(metric);
+    }
+
+    /**
+     * Transform a map to a string map.
+     * @param map the map with key type and value unknown.
+     * @return a string map.
+     */
+    public static Map<String,String> toStringMap(Map<?,?> map) {
+        Map<String,String> stringMap = new HashMap();
+        for (Map.Entry<?,?> entry : map.entrySet()) {
+            stringMap.put(entry.getKey().toString(),entry.getValue().toString());
+        }
+        return stringMap;
+    }
+
+    /**
+     * Fetch the logstash appender in the logger context.
+     * @return the {@link TelemetryLogstashAppender} in the logger context.
+     */
+    public static TelemetryLogstashAppender fetchTelemetryLogstashAppender() {
+        TelemetryLogstashAppender appender;
+        try {
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            appender = (TelemetryLogstashAppender) lc.getLogger(Logger.ROOT_LOGGER_NAME).getAppender("LOGSTASH");
+        } catch (Exception e) {
+            logger.error("Error when fetching TelemetryLogstashAppender",e);
+            return null;
+        }
+        return appender;
     }
 }

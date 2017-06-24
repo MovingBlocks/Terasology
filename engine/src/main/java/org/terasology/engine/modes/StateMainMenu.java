@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.terasology.engine.modes;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.config.LaunchPopupConfig;
-import org.terasology.config.NUIEditorConfig;
 import org.terasology.config.TelemetryConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -38,13 +37,11 @@ import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
 import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.telemetry.TelemetryScreen;
@@ -143,10 +140,10 @@ public class StateMainMenu implements GameState {
             LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
-                telemetryConfig.setTelemetryEnabled(true);
+                telemetryConfig.setAllEnabled(true);
             });
             telemetryConfirmPopup.setNoHandler(() -> {
-                telemetryConfig.setTelemetryEnabled(false);
+                telemetryConfig.setAllEnabled(false);
             });
             telemetryConfirmPopup.setOptionButtonText("Metric Menu");
             telemetryConfirmPopup.setOptionHandler(()-> {

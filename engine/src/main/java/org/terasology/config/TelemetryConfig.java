@@ -22,11 +22,26 @@ public class TelemetryConfig {
 
     private boolean telemetryEnabled;
 
+    private boolean errorReportingEnabled;
+
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
     }
 
     public void setTelemetryEnabled(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
+    }
+
+    public boolean isErrorReportingEnabled() {
+        return errorReportingEnabled;
+    }
+
+    public void setErrorReportingEnabled(boolean errorReportingEnabled) {
+        this.errorReportingEnabled = errorReportingEnabled;
+    }
+
+    public void setAllEnabled(boolean allEnabled) {
+        telemetryEnabled = allEnabled;
+        errorReportingEnabled = allEnabled;
     }
 }

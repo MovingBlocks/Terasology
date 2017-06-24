@@ -18,7 +18,6 @@ package org.terasology.engine.subsystem.common;
 import com.snowplowanalytics.snowplow.tracker.emitter.BatchEmitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.emitter.RequestCallback;
-import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.http.ApacheHttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.http.HttpClientAdapter;
 import com.snowplowanalytics.snowplow.tracker.payload.TrackerPayload;
@@ -32,9 +31,11 @@ import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryParams;
-import org.terasology.telemetry.TelemetryUtils;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 
 import java.util.List;
+
+import static org.terasology.telemetry.TelemetryUtils.fetchTelemetryLogstashAppender;
 
 /**
  * This is a telemetry engine system.
@@ -46,9 +47,6 @@ public class TelemetrySubSystem implements EngineSubsystem {
     private Metrics metrics;
 
     private Emitter emitter;
-
-    // Name space to identify the tracker
-    private final String NAMESPACE_TRACKER = this.getClass().toString();
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetrySubSystem.class);
 
@@ -110,13 +108,12 @@ public class TelemetrySubSystem implements EngineSubsystem {
     @Override
     public void postInitialise(Context rootContext) {
 
-        metrics.initialise();
+        metrics.initialise(rootContext);
         config = rootContext.get(Config.class);
 
-        if (config.getTelemetryConfig().isTelemetryEnabled()) {
+        // configure telemetryLogstashAppender
+        TelemetryLogstashAppender appender = fetchTelemetryLogstashAppender();
+        appender.configure(rootContext);
 
-            Unstructured systemContextMetric = metrics.getSystemContextMetric().getMetric();
-            TelemetryUtils.trackMetric(emitter,NAMESPACE_TRACKER,systemContextMetric);
-        }
     }
 }
