@@ -72,11 +72,11 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     private SubmersibleCamera activeCamera;
 
-    private boolean isNormalMapping;
-    private boolean isParallaxMapping;
+    private boolean normalMappingIsEnabled;
+    private boolean parallaxMappingIsEnabled;
 
-    private StateChange setNormalTerrain;
-    private StateChange setHeightTerrain;
+    private StateChange setTerrainNormalsInputTexture;
+    private StateChange setTerrainHeightInputTexture;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
@@ -104,23 +104,23 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
         renderingConfig = context.get(Config.class).getRendering();
-        isNormalMapping = renderingConfig.isNormalMapping();
+        normalMappingIsEnabled = renderingConfig.isNormalMapping();
         renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
-        isParallaxMapping = renderingConfig.isParallaxMapping();
+        parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
-        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
-        if (isNormalMapping) {
-            addDesiredStateChange(setNormalTerrain);
+        if (normalMappingIsEnabled) {
+            addDesiredStateChange(setTerrainNormalsInputTexture);
 
-            if (isParallaxMapping) {
-                addDesiredStateChange(setHeightTerrain);
+            if (parallaxMappingIsEnabled) {
+                addDesiredStateChange(setTerrainHeightInputTexture);
             }
         }
     }
@@ -167,9 +167,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         chunkMaterial.setInt("textureAtlas", 0, true);
         chunkMaterial.setInt("textureEffects", 1, true);
         chunkMaterial.setInt("textureLava", 2, true);
-        if (isNormalMapping) {
+        if (normalMappingIsEnabled) {
             chunkMaterial.setInt("textureAtlasNormal", 3, true);
-            if (isParallaxMapping) {
+            if (parallaxMappingIsEnabled) {
                 chunkMaterial.setInt("textureAtlasHeight", 4, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
@@ -209,32 +209,31 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getOldValue() != event.getNewValue()) {
-            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
-                isNormalMapping = renderingConfig.isNormalMapping();
-                if (isNormalMapping) {
-                    addDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    }
-                } else {
-                    removeDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
+        // This method is only called when oldValue != newValue.
+        if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+            normalMappingIsEnabled = renderingConfig.isNormalMapping();
+            if (normalMappingIsEnabled) {
+                addDesiredStateChange(setTerrainNormalsInputTexture);
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
                 }
             } else {
-                isParallaxMapping = renderingConfig.isParallaxMapping();
-                if (isNormalMapping) {
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    } else {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
+                removeDesiredStateChange(setTerrainNormalsInputTexture);
+                if (parallaxMappingIsEnabled) {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
                 }
             }
+        } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
+            parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
+            if (normalMappingIsEnabled) {
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
+                }
+            }
+        } // else: no other cases are possible - see subscribe operations in initialize().
 
-            worldRenderer.requestTaskListRefresh();
-        }
+        worldRenderer.requestTaskListRefresh();
     }
 }

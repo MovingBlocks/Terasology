@@ -114,12 +114,13 @@ public class ShadowMapNode extends ConditionDependentNode {
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
+        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.DYNAMIC_SHADOWS)) {
             super.propertyChange(event);
         } else if (event.getPropertyName().equals(RenderingConfig.SHADOW_MAP_RESOLUTION)) {
             int shadowMapResolution = (int) event.getNewValue();
             texelSize = calculateTexelSize(shadowMapResolution);
-        }
+        } // else: no other cases are possible - see subscribe operations in initialize().
     }
 
     /**

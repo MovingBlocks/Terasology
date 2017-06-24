@@ -19,7 +19,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -63,11 +62,11 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     private Material initialPostMaterial;
 
-    private boolean isBloom;
-    private boolean isLightShafts;
+    private boolean bloomIsEnabled;
+    private boolean lightShaftsAreEnabled;
 
-    private StateChange setTexBloom;
-    private StateChange setTexLightShafts;
+    private StateChange setBloomInputTexture;
+    private StateChange setLightShaftsInputTexture;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
@@ -96,22 +95,22 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         initialPostMaterial = getMaterial(INITIAL_POST_MATERIAL);
 
         renderingConfig = context.get(Config.class).getRendering();
-        isBloom = renderingConfig.isBloom();
+        bloomIsEnabled = renderingConfig.isBloom();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
-        isLightShafts = renderingConfig.isLightShafts();
+        lightShaftsAreEnabled = renderingConfig.isLightShafts();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
-        setTexBloom = new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
-        setTexLightShafts = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
+        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
+        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
 
-        if (isBloom) {
-            addDesiredStateChange(setTexBloom);
+        if (bloomIsEnabled) {
+            addDesiredStateChange(setBloomInputTexture);
         }
-        if (isLightShafts) {
-            addDesiredStateChange(setTexLightShafts);
+        if (lightShaftsAreEnabled) {
+            addDesiredStateChange(setLightShaftsInputTexture);
         }
     }
 
@@ -126,7 +125,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(activeCamera.getPosition()).getTint(), true);
 
-        if (isBloom) {
+        if (bloomIsEnabled) {
             initialPostMaterial.setFloat("bloomFactor", bloomFactor, true);
         }
 
@@ -141,24 +140,23 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getOldValue() != event.getNewValue()) {
-            if (event.getPropertyName().equals(RenderingConfig.BLOOM)) {
-                isBloom = renderingConfig.isBloom();
-                if (isBloom) {
-                    addDesiredStateChange(setTexBloom);
-                } else {
-                    removeDesiredStateChange(setTexBloom);
-                }
+        // This method is only called when oldValue != newValue.
+        if (event.getPropertyName().equals(RenderingConfig.BLOOM)) {
+            bloomIsEnabled = renderingConfig.isBloom();
+            if (bloomIsEnabled) {
+                addDesiredStateChange(setBloomInputTexture);
             } else {
-                isLightShafts = renderingConfig.isLightShafts();
-                if (isLightShafts) {
-                    addDesiredStateChange(setTexLightShafts);
-                } else {
-                    removeDesiredStateChange(setTexLightShafts);
-                }
+                removeDesiredStateChange(setBloomInputTexture);
             }
+        } else if (event.getPropertyName().equals(RenderingConfig.LIGHT_SHAFTS)) {
+            lightShaftsAreEnabled = renderingConfig.isLightShafts();
+            if (lightShaftsAreEnabled) {
+                addDesiredStateChange(setLightShaftsInputTexture);
+            } else {
+                removeDesiredStateChange(setLightShaftsInputTexture);
+            }
+        } // else: no other cases are possible - see subscribe operations in initialize().
 
-            worldRenderer.requestTaskListRefresh();
-        }
+        worldRenderer.requestTaskListRefresh();
     }
 }

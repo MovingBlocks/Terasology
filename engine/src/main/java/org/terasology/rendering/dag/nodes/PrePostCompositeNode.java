@@ -69,16 +69,16 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
     private Material prePostMaterial;
 
-    private boolean isLocalReflections;
-    private boolean isSsao;
-    private boolean isOutline;
-    private boolean isInscattering;
-    private boolean isVolumetricFog;
+    private boolean localReflectionsAreEnabled;
+    private boolean ssaoIsEnabled;
+    private boolean outlineIsEnabled;
+    private boolean inscatteringIsEnabled;
+    private boolean volumetricFogIsEnabled;
 
-    private StateChange setTexSceneReflectiveRefractiveNormals;
-    private StateChange setTexSsao;
-    private StateChange setTexEdges;
-    private StateChange setTexSceneSkyBand;
+    private StateChange setReflectiveRefractiveNormalsInputTexture;
+    private StateChange setSsaoInputTexture;
+    private StateChange setEdgesInputTexture;
+    private StateChange setSkyBandInputTexture;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.001f, max = 0.005f)
@@ -108,15 +108,15 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         prePostMaterial = getMaterial(PRE_POST_MATERIAL);
 
         renderingConfig = context.get(Config.class).getRendering();
-        isLocalReflections = renderingConfig.isLocalReflections();
+        localReflectionsAreEnabled = renderingConfig.isLocalReflections();
         renderingConfig.subscribe(RenderingConfig.LOCAL_REFLECTIONS, this);
-        isSsao = renderingConfig.isSsao();
+        ssaoIsEnabled = renderingConfig.isSsao();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
-        isOutline = renderingConfig.isOutline();
+        outlineIsEnabled = renderingConfig.isOutline();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
-        isInscattering = renderingConfig.isInscattering();
+        inscatteringIsEnabled = renderingConfig.isInscattering();
         renderingConfig.subscribe(RenderingConfig.INSCATTERING, this);
-        isVolumetricFog = renderingConfig.isVolumetricFog();
+        volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
         renderingConfig.subscribe(RenderingConfig.VOLUMETRIC_FOG, this);
 
         int textureSlot = 0;
@@ -125,22 +125,22 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueLightBuffer"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractive"));
-        setTexSceneReflectiveRefractiveNormals = new SetInputTextureFromFbo(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractiveNormals");
-        setTexSsao = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao");
-        setTexEdges = new SetInputTextureFromFbo(textureSlot++, OUTLINE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges");
-        setTexSceneSkyBand = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
+        setReflectiveRefractiveNormalsInputTexture = new SetInputTextureFromFbo(textureSlot++, REFRACTIVE_REFLECTIVE_FBO, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractiveNormals");
+        setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao");
+        setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, OUTLINE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges");
+        setSkyBandInputTexture = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
 
-        if (isLocalReflections) {
-            addDesiredStateChange(setTexSceneReflectiveRefractiveNormals);
+        if (localReflectionsAreEnabled) {
+            addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
         }
-        if (isSsao) {
-            addDesiredStateChange(setTexSsao);
+        if (ssaoIsEnabled) {
+            addDesiredStateChange(setSsaoInputTexture);
         }
-        if (isOutline) {
-            addDesiredStateChange(setTexEdges);
+        if (outlineIsEnabled) {
+            addDesiredStateChange(setEdgesInputTexture);
         }
-        if (isInscattering) {
-            addDesiredStateChange(setTexSceneSkyBand);
+        if (inscatteringIsEnabled) {
+            addDesiredStateChange(setSkyBandInputTexture);
         }
     }
 
@@ -154,22 +154,22 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
         // Shader Parameters
 
-        if (isLocalReflections) {
+        if (localReflectionsAreEnabled) {
             prePostMaterial.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
             prePostMaterial.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
         }
 
-        if (isOutline) {
+        if (outlineIsEnabled) {
             prePostMaterial.setFloat("outlineDepthThreshold", outlineDepthThreshold, true);
             prePostMaterial.setFloat("outlineThickness", outlineThickness, true);
         }
 
-        if (isVolumetricFog) {
+        if (volumetricFogIsEnabled) {
             prePostMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
             //TODO: Other parameters and volumetric fog test case is needed
         }
 
-        if (isInscattering) {
+        if (inscatteringIsEnabled) {
             prePostMaterial.setFloat4("skyInscatteringSettingsFrag", 0, skyInscatteringStrength, skyInscatteringLength, skyInscatteringThreshold, true);
         }
 
@@ -187,40 +187,39 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getOldValue() != event.getNewValue()) {
-            if (event.getPropertyName().equals(RenderingConfig.LOCAL_REFLECTIONS)) {
-                isLocalReflections = renderingConfig.isLocalReflections();
-                if (isLocalReflections) {
-                    addDesiredStateChange(setTexSceneReflectiveRefractiveNormals);
-                } else {
-                    removeDesiredStateChange(setTexSceneReflectiveRefractiveNormals);
-                }
-            } else if (event.getPropertyName().equals(RenderingConfig.SSAO)) {
-                isSsao = renderingConfig.isSsao();
-                if (isSsao) {
-                    addDesiredStateChange(setTexSsao);
-                } else {
-                    removeDesiredStateChange(setTexSsao);
-                }
-            } else if (event.getPropertyName().equals(RenderingConfig.OUTLINE)) {
-                isOutline = renderingConfig.isOutline();
-                if (isOutline) {
-                    addDesiredStateChange(setTexEdges);
-                } else {
-                    removeDesiredStateChange(setTexEdges);
-                }
-            } else if (event.getPropertyName().equals(RenderingConfig.INSCATTERING)) {
-                isInscattering = renderingConfig.isInscattering();
-                if (isInscattering) {
-                    addDesiredStateChange(setTexSceneSkyBand);
-                } else {
-                    removeDesiredStateChange(setTexSceneSkyBand);
-                }
-            } else if (event.getPropertyName().equals(RenderingConfig.VOLUMETRIC_FOG)) {
-                isVolumetricFog = renderingConfig.isVolumetricFog();
+        // This method is only called when oldValue != newValue.
+        if (event.getPropertyName().equals(RenderingConfig.LOCAL_REFLECTIONS)) {
+            localReflectionsAreEnabled = renderingConfig.isLocalReflections();
+            if (localReflectionsAreEnabled) {
+                addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
+            } else {
+                removeDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
             }
+        } else if (event.getPropertyName().equals(RenderingConfig.SSAO)) {
+            ssaoIsEnabled = renderingConfig.isSsao();
+            if (ssaoIsEnabled) {
+                addDesiredStateChange(setSsaoInputTexture);
+            } else {
+                removeDesiredStateChange(setSsaoInputTexture);
+            }
+        } else if (event.getPropertyName().equals(RenderingConfig.OUTLINE)) {
+            outlineIsEnabled = renderingConfig.isOutline();
+            if (outlineIsEnabled) {
+                addDesiredStateChange(setEdgesInputTexture);
+            } else {
+                removeDesiredStateChange(setEdgesInputTexture);
+            }
+        } else if (event.getPropertyName().equals(RenderingConfig.INSCATTERING)) {
+            inscatteringIsEnabled = renderingConfig.isInscattering();
+            if (inscatteringIsEnabled) {
+                addDesiredStateChange(setSkyBandInputTexture);
+            } else {
+                removeDesiredStateChange(setSkyBandInputTexture);
+            }
+        } else if (event.getPropertyName().equals(RenderingConfig.VOLUMETRIC_FOG)) {
+            volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
+        } // else: no other cases are possible - see subscribe operations in initialize().
 
-            worldRenderer.requestTaskListRefresh();
-        }
+        worldRenderer.requestTaskListRefresh();
     }
 }

@@ -87,12 +87,12 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     private SubmersibleCamera activeCamera;
 
-    private boolean isNormalMapping;
-    private boolean isParallaxMapping;
-    private boolean isAnimateWater;
+    private boolean normalMappingIsEnabled;
+    private boolean parallaxMappingIsEnabled;
+    private boolean animatedWaterIsEnabled;
 
-    private StateChange setNormalTerrain;
-    private StateChange setHeightTerrain;
+    private StateChange setTerrainNormalsInputTexture;
+    private StateChange setTerrainHeightInputTexture;
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
@@ -166,11 +166,11 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial = getMaterial(CHUNK_MATERIAL);
 
         renderingConfig = context.get(Config.class).getRendering();
-        isNormalMapping = renderingConfig.isNormalMapping();
+        normalMappingIsEnabled = renderingConfig.isNormalMapping();
         renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
-        isParallaxMapping = renderingConfig.isParallaxMapping();
+        parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
-        isAnimateWater = renderingConfig.isAnimateWater();
+        animatedWaterIsEnabled = renderingConfig.isAnimateWater();
         renderingConfig.subscribe(RenderingConfig.ANIMATE_WATER, this);
 
         int textureSlot = 0;
@@ -181,14 +181,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
-        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
-        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
-        if (isNormalMapping) {
-            addDesiredStateChange(setNormalTerrain);
+        if (normalMappingIsEnabled) {
+            addDesiredStateChange(setTerrainNormalsInputTexture);
 
-            if (isParallaxMapping) {
-                addDesiredStateChange(setHeightTerrain);
+            if (parallaxMappingIsEnabled) {
+                addDesiredStateChange(setTerrainHeightInputTexture);
             }
         }
     }
@@ -226,9 +226,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial.setInt("textureWaterNormalAlt", 4, true);
         chunkMaterial.setInt("textureWaterReflection", 5, true);
         chunkMaterial.setInt("texSceneOpaque", 6, true);
-        if (isNormalMapping) {
+        if (normalMappingIsEnabled) {
             chunkMaterial.setInt("textureAtlasNormal", 7, true);
-            if (isParallaxMapping) {
+            if (parallaxMappingIsEnabled) {
                 chunkMaterial.setInt("textureAtlasHeight", 8, true);
                 chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
             }
@@ -238,7 +238,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         chunkMaterial.setFloat4("waterSettingsFrag", waterNormalBias, waterRefraction, waterFresnelBias, waterFresnelPow, true);
         chunkMaterial.setFloat4("alternativeWaterSettingsFrag", waterTint, 0, 0, 0, true);
 
-        if (isAnimateWater) {
+        if (animatedWaterIsEnabled) {
             chunkMaterial.setFloat("waveIntensityFalloff", waveIntensityFalloff, true);
             chunkMaterial.setFloat("waveSizeFalloff", waveSizeFalloff, true);
             chunkMaterial.setFloat("waveSize", waveSize, true);
@@ -289,34 +289,33 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getOldValue() != event.getNewValue()) {
-            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
-                isNormalMapping = renderingConfig.isNormalMapping();
-                if (isNormalMapping) {
-                    addDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    }
-                } else {
-                    removeDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
-                }
-            } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
-                isParallaxMapping = renderingConfig.isParallaxMapping();
-                if (isNormalMapping) {
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    } else {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
+        // This method is only called when oldValue != newValue.
+        if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+            normalMappingIsEnabled = renderingConfig.isNormalMapping();
+            if (normalMappingIsEnabled) {
+                addDesiredStateChange(setTerrainNormalsInputTexture);
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
                 }
             } else {
-                isAnimateWater = renderingConfig.isAnimateWater();
+                removeDesiredStateChange(setTerrainNormalsInputTexture);
+                if (parallaxMappingIsEnabled) {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
+                }
             }
+        } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
+            parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
+            if (normalMappingIsEnabled) {
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
+                }
+            }
+        } else if (event.getPropertyName().equals(RenderingConfig.ANIMATE_WATER)) {
+            animatedWaterIsEnabled = renderingConfig.isAnimateWater();
+        } // else: no other cases are possible - see subscribe operations in initialize().
 
-            worldRenderer.requestTaskListRefresh();
-        }
+        worldRenderer.requestTaskListRefresh();
     }
 }

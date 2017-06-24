@@ -96,16 +96,15 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getOldValue() != event.getNewValue()) {
-            if (!renderingDebugConfig.isEnabled()) {
-                removeDesiredStateChange(enableDebugMaterial);
-                addDesiredStateChange(enablePostMaterial);
-            } else {
-                removeDesiredStateChange(enablePostMaterial);
-                addDesiredStateChange(enableDebugMaterial);
-            }
-
-            worldRenderer.requestTaskListRefresh();
+        // This method is only called when oldValue != newValue.
+        if (!renderingDebugConfig.isEnabled()) {
+            removeDesiredStateChange(enableDebugMaterial);
+            addDesiredStateChange(enablePostMaterial);
+        } else {
+            removeDesiredStateChange(enablePostMaterial);
+            addDesiredStateChange(enableDebugMaterial);
         }
+
+        worldRenderer.requestTaskListRefresh();
     }
 }
