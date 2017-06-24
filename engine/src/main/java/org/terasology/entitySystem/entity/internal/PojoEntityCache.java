@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
@@ -23,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityCache;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
@@ -44,7 +44,7 @@ import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL
 
 /**
  */
-public class PojoEntityCache implements EntityCache {
+public class PojoEntityCache implements EngineEntityCache {
 
     private PojoEntityManager entityManager;
 
@@ -333,10 +333,12 @@ public class PojoEntityCache implements EntityCache {
      * @param entityId the id of the entity to add
      * @param ref the {@link BaseEntityRef} to add
      */
-    protected void putEntity(long entityId, BaseEntityRef ref) {
+    @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
         entityStore.put(entityId, ref);
     }
 
+    @Override
     public ComponentTable getComponentStore() {
         return componentStore;
     }
@@ -383,6 +385,18 @@ public class PojoEntityCache implements EntityCache {
             }
         }
         return () -> new EntityIterator(idList.iterator(), this);
+    }
+
+    @Override
+    public int getCountOfEntitiesWith(Class<? extends Component>[] componentClasses) {
+        switch (componentClasses.length) {
+            case 0:
+                return componentStore.numEntities();
+            case 1:
+                return componentStore.getComponentCount(componentClasses[0]);
+            default:
+                return Lists.newArrayList(getEntitiesWith(componentClasses)).size();
+        }
     }
 
     @Override

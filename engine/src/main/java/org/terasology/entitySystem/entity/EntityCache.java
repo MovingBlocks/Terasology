@@ -151,10 +151,6 @@ public interface EntityCache {
      */
     EntityRef createEntityRefWithId(long id);
 
-    void destroy(long entityId);
-
-    void destroyEntityWithoutEvents(EntityRef entity);
-
     Iterable<EntityRef> getAllEntities();
 
     /**
@@ -163,6 +159,15 @@ public interface EntityCache {
      */
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
+    /**
+     * @param componentClasses
+     * @return A count of entities with the provided component types
+     */
+    int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
+
+    /**
+     * @return A count of currently active entities
+     */
     int getActiveEntityCount();
 
     /**
@@ -173,12 +178,4 @@ public interface EntityCache {
      */
     EntityRef getExistingEntity(long id);
 
-    /**
-     * Fund out if a particular entity has a component of the given class.
-     *
-     * @param entityId the entity to check
-     * @param componentClass the class to check for
-     * @return whether the entity has the component
-     */
-    boolean hasComponent(long entityId, Class<? extends Component> componentClass);
 }

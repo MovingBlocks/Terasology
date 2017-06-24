@@ -139,12 +139,10 @@ public class PojoSectorManager implements SectorManager {
         return getCache().createEntityRefWithId(id);
     }
 
-    @Override
     public void destroy(long entityId) {
         getCache().destroy(entityId);
     }
 
-    @Override
     public void destroyEntityWithoutEvents(EntityRef entity) {
         getCache().destroyEntityWithoutEvents(entity);
     }
@@ -157,6 +155,15 @@ public class PojoSectorManager implements SectorManager {
     @Override
     public Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
         return getCache().getEntitiesWith(componentClasses);
+    }
+
+    @Override
+    public int getCountOfEntitiesWith(Class<? extends Component>[] componentClasses) {
+        int i = 0;
+        for (PojoEntityCache cache : caches) {
+            i += cache.getCountOfEntitiesWith(componentClasses);
+        }
+        return i;
     }
 
     @Override
@@ -184,9 +191,8 @@ public class PojoSectorManager implements SectorManager {
         return caches.get(0);
     }
 
-    @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
-        for (EntityCache cache : caches) {
+        for (EngineEntityCache cache : caches) {
             if (cache.hasComponent(entityId, componentClass)) {
                 return true;
             }

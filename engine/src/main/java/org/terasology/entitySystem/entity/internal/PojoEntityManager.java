@@ -64,9 +64,9 @@ public class PojoEntityManager implements EngineEntityManager {
     private long nextEntityId = 1;
     private TLongSet loadedIds = new TLongHashSet();
 
-    private PojoEntityCache globalCache = new PojoEntityCache(this);
+    private EngineEntityCache globalCache = new PojoEntityCache(this);
     private PojoSectorManager sectorManager = new PojoSectorManager(this);
-    private Map<Long, PojoEntityCache> cacheMap = new MapMaker().initialCapacity(1000).makeMap();
+    private Map<Long, EngineEntityCache> cacheMap = new MapMaker().initialCapacity(1000).makeMap();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
     private Set<EntityDestroySubscriber> destroySubscribers = Sets.newLinkedHashSet();
@@ -142,7 +142,7 @@ public class PojoEntityManager implements EngineEntityManager {
         return nextEntityId++;
     }
 
-    public long createEntity(PojoEntityCache cache) {
+    public long createEntity(EngineEntityCache cache) {
         long id = createEntity();
         cacheMap.put(id, cache);
         return id;
@@ -382,6 +382,16 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
+    public void putEntity(long entityId, BaseEntityRef ref) {
+        globalCache.putEntity(entityId, ref);
+    }
+
+    @Override
+    public ComponentTable getComponentStore() {
+        return globalCache.getComponentStore();
+    }
+
+    @Override
     public void destroyEntityWithoutEvents(EntityRef entity) {
         globalCache.destroyEntityWithoutEvents(entity);
     }
@@ -514,7 +524,7 @@ public class PojoEntityManager implements EngineEntityManager {
      */
     @Override
     public <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
-        PojoEntityCache cache = cacheMap.get(entityId);
+        EngineEntityCache cache = cacheMap.get(entityId);
         //Default to the global cache
         if (cache == null) {
             //Todo: this happens a lot during shutdown. Possible concurrency issue?
@@ -536,7 +546,7 @@ public class PojoEntityManager implements EngineEntityManager {
     //Todo: be able to add to entities in any cache
     public <T extends Component> T addComponent(long entityId, T component) {
         Preconditions.checkNotNull(component);
-        PojoEntityCache cache = cacheMap.get(entityId);
+        EngineEntityCache cache = cacheMap.get(entityId);
         if (cache == null) {
             logger.error("Entity {} doesn't have an assigned cache", entityId);
             cache = globalCache;
@@ -594,7 +604,7 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     //Todo: be able to save components for entities in any cache
     public void saveComponent(long entityId, Component component) {
-        PojoEntityCache cache = cacheMap.get(entityId);
+        EngineEntityCache cache = cacheMap.get(entityId);
         if (cache == null) {
             logger.error("Entity {} doesn't have an assigned cache", entityId);
             cache = globalCache;
@@ -625,7 +635,7 @@ public class PojoEntityManager implements EngineEntityManager {
      * Implementation
      */
 
-    protected void assignToCache(EntityRef ref, PojoEntityCache cache) {
+    protected void assignToCache(EntityRef ref, EngineEntityCache cache) {
         //Todo: job for the sector manager?
         cacheMap.put(ref.getId(), cache);
     }
@@ -687,14 +697,8 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     @SafeVarargs
     public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
-        switch (componentClasses.length) {
-            case 0:
-                return globalCache.getComponentStore().numEntities();
-            case 1:
-                return globalCache.getComponentStore().getComponentCount(componentClasses[0]);
-            default:
-                return Lists.newArrayList(getEntitiesWith(componentClasses)).size();
-        }
+        return sectorManager.getCountOfEntitiesWith(componentClasses) +
+                globalCache.getCountOfEntitiesWith(componentClasses);
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
