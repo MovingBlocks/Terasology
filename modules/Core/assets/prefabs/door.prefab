@@ -13,7 +13,8 @@
         "topBlockFamily": "DoorTop",
         "bottomBlockFamily": "DoorBottom",
         "openSound": "DoorOpen",
-        "closeSound": "DoorClose"
+        "closeSound": "DoorClose",
+        "doorRegionPrefab": "Core:doorRegion"
     },
     "Health": {
         "currentHealth": 5,
