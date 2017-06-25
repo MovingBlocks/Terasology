@@ -85,7 +85,7 @@ public class SystemContextMetric extends Metric {
         processorNumbers = Runtime.getRuntime().availableProcessors();
 
         long memoryMaxByte = Runtime.getRuntime().maxMemory();
-        memoryMaxMb = (int) (memoryMaxByte/(1024*1024));
+        memoryMaxMb = (int) (memoryMaxByte / (1024 * 1024));
     }
 
     @Override
@@ -94,10 +94,9 @@ public class SystemContextMetric extends Metric {
         Map<String, Object> metricMap = getFieldValueMap();
 
         SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
-        Unstructured systemContextEvent = Unstructured.builder()
+
+        return Unstructured.builder()
                 .eventData(systemContextData)
                 .build();
-
-        return systemContextEvent;
     }
 }

@@ -54,21 +54,19 @@ public class ModulesMetric extends Metric {
     @Override
     public Unstructured getUnstructuredMetric() {
         Map<String, Object> metricMap = getFieldValueMap();
-
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, metricMap);
-        Unstructured systemContextEvent = Unstructured.builder()
+        
+        return Unstructured.builder()
                 .eventData(modulesData)
                 .build();
-
-        return systemContextEvent;
     }
 
     @Override
-    public Map<String,Object> getFieldValueMap() {
+    public Map<String, Object> getFieldValueMap() {
         updateModules();
-        Map<String,Object> map = new HashMap();
+        Map<String, Object> map = new HashMap();
         for (Module module : modules) {
-            map.put(module.getId().toString(),module.getVersion().toString());
+            map.put(module.getId().toString(), module.getVersion().toString());
         }
         return map;
     }

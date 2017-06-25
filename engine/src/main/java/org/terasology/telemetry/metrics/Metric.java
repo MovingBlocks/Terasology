@@ -45,17 +45,17 @@ public abstract class Metric {
      * Fetches all TelemetryFields and create a map associating field's name (key) to field's value (value).
      * @return a map with key (field's name) and value (field's value).
      */
-    public Map<String,Object> getFieldValueMap() {
+    public Map<String, Object> getFieldValueMap() {
 
-        Map<String, Object> metricMap = new HashMap<String,Object>();
-        Set<Field> fields = ReflectionUtils.getFields(this.getClass(),ReflectionUtils.withAnnotation(TelemetryField.class));
+        Map<String, Object> metricMap = new HashMap<String, Object>();
+        Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
                 metricMap.put(field.getName(), field.get(this));
             } catch (IllegalAccessException e) {
-                logger.error("The field is not inaccessible: ",e);
+                logger.error("The field is not inaccessible: ", e);
             }
         }
 

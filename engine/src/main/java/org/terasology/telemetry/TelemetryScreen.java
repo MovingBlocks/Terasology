@@ -16,8 +16,6 @@
 package org.terasology.telemetry;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.module.ModuleManager;
@@ -47,7 +45,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The metric menu.
+ * The metrics menu lists the telemetry field names and values that will be sent to the server.
+ * Users can enable or disable telemetry function in this menu.
  */
 public class TelemetryScreen extends CoreScreenLayer {
 
@@ -65,9 +64,6 @@ public class TelemetryScreen extends CoreScreenLayer {
     @In
     private Metrics metrics;
 
-    private static final Logger logger = LoggerFactory.getLogger(TelemetryScreen.class);
-
-
     private final int horizontalSpacing = 12;
 
     @Override
@@ -84,7 +80,7 @@ public class TelemetryScreen extends CoreScreenLayer {
             Metric metricType = metrics.getMap().get(metricClass);
             Map<String,Object> map = metricType.getFieldValueMap();
 
-            addTelemetrySection(telemetryCategory.getKey(),mainLayout,map);
+            addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
         }
 
         ScrollableArea area = find("area", ScrollableArea.class);
@@ -92,7 +88,7 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
         WidgetUtil.tryBindCheckbox(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckBoxWithListener(this, "errorReportingEnabled",BindHelper.bindBeanProperty("errorReportingEnabled",config.getTelemetryConfig(),Boolean.TYPE), (checkbox) -> {
+        WidgetUtil.tryBindCheckBoxWithListener(this, "errorReportingEnabled", BindHelper.bindBeanProperty("errorReportingEnabled", config.getTelemetryConfig(), Boolean.TYPE), (checkbox) -> {
             TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
             if (config.getTelemetryConfig().isErrorReportingEnabled()) {
                 appender.turnOnErrorReporting();
@@ -124,7 +120,13 @@ public class TelemetryScreen extends CoreScreenLayer {
         return telemetryCategories;
     }
 
-    private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String,Object> map) {
+    /**
+     * Add a new section with represents a new metrics type.
+     * @param telemetryCategory the annotation of the new metric
+     * @param layout the layout where the new section will be added
+     * @param map the map which includes the telemetry field name and value
+     */
+    private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String, Object> map) {
 
         UILabel categoryHeader = new UILabel(translationSystem.translate(telemetryCategory.displayName()));
         categoryHeader.setFamily("subheading");
@@ -134,23 +136,34 @@ public class TelemetryScreen extends CoreScreenLayer {
             Object value = entry.getValue();
             if (value instanceof List) {
                 List list = (List) value;
-                addTelemetryField(entry.getKey().toString(),list,layout);
-            }
-            else {
-                addTelemetryField(entry.getKey().toString(),value,layout);
+                addTelemetryField(entry.getKey().toString(), list, layout);
+            } else {
+                addTelemetryField(entry.getKey().toString(), value, layout);
             }
         }
     }
 
+    /**
+     * Add a new row in the menu, the new row includes the field name and value.
+     * @param type the type(name) of the this field
+     * @param value the value of this field
+     * @param layout the layout where the new line will be added
+     */
     private void addTelemetryField(String type, Object value, ColumnLayout layout) {
-        RowLayout newRow = new RowLayout(new UILabel(type),new UILabel(value.toString()))
+        RowLayout newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()))
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing);
 
         layout.addWidget(newRow);
     }
 
-    // Will be used if the value is a List
+    /**
+     * If the field value is a list, then will add more than one rows.
+     * Each new line includes the field name with index and its value.
+     * @param type the type(name) of the this field
+     * @param value the value of this field (a List)
+     * @param layout the layout where the new line will be added
+     */
     private void addTelemetryField(String type, List value, ColumnLayout layout) {
         int moduleCount = 1;
         for (Object o : value) {
@@ -163,7 +176,12 @@ public class TelemetryScreen extends CoreScreenLayer {
         }
     }
 
-    private List<Map.Entry> sortFields(Map<String,Object> map) {
+    /**
+     * Sorts the fields by the name of each fields.
+     * @param map the map that will be sorted
+     * @return a list of map entry that is ordered by fields' names
+     */
+    private List<Map.Entry> sortFields(Map<String, Object> map) {
         List<Map.Entry> list = new ArrayList<>(map.entrySet());
         Collections.sort(list, new Comparator<Map.Entry>() {
             @Override

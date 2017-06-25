@@ -26,7 +26,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.telemetry.Metrics;
@@ -38,17 +37,18 @@ import java.util.List;
 import static org.terasology.telemetry.TelemetryUtils.fetchTelemetryLogstashAppender;
 
 /**
- * This is a telemetry engine system.
+ * This is a telemetry engine sub system.
+ * It will initialise all the telemetry stuff such as the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} and configure the {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
+ * It will also adds the {@link org.terasology.telemetry.Metrics} and the {@link com.snowplowanalytics.snowplow.tracker.emitter.Emitter} to the context so that we can be use them later in other class for telemetry.
+ * @see <a href="https://github.com/GabrielXia/telemetry/wiki">https://github.com/GabrielXia/telemetry/wiki</a>
  */
 public class TelemetrySubSystem implements EngineSubsystem {
 
-    private Config config;
+    private static final Logger logger = LoggerFactory.getLogger(TelemetrySubSystem.class);
 
     private Metrics metrics;
 
     private Emitter emitter;
-
-    private static final Logger logger = LoggerFactory.getLogger(TelemetrySubSystem.class);
 
     @Override
     public String getName() {
@@ -64,7 +64,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
         // add snowplow emitter to context, contributors can use this emitter to emit other event
         emitterInit();
-        rootContext.put(Emitter.class,emitter);
+        rootContext.put(Emitter.class, emitter);
     }
 
     private void emitterInit() {
@@ -109,7 +109,6 @@ public class TelemetrySubSystem implements EngineSubsystem {
     public void postInitialise(Context rootContext) {
 
         metrics.initialise(rootContext);
-        config = rootContext.get(Config.class);
 
         // configure telemetryLogstashAppender
         TelemetryLogstashAppender appender = fetchTelemetryLogstashAppender();

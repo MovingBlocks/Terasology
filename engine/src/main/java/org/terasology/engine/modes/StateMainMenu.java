@@ -28,6 +28,8 @@ import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.i18n.assets.Translation;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -136,10 +138,11 @@ public class StateMainMenu implements GameState {
         Config  config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
+        TranslationSystem translationSystem = context.get(TranslationSystem.class);
         TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
         if (!launchPopupConfig.isLaunchPopupDisabled()) {
-            String telemetryTitle = "Telemetry In Terasology";
-            String telemetryMessage = "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the Mac address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!";
+            String telemetryTitle = translationSystem.translate("${engine:menu#telemetry-launch-popup-title}");
+            String telemetryMessage = translationSystem.translate("${engine:menu#telemetry-launch-popup-text}");
             LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
@@ -154,7 +157,7 @@ public class StateMainMenu implements GameState {
                 // Disable error reporting
                 appender.turnOffErrorReporting();
             });
-            telemetryConfirmPopup.setOptionButtonText("Metric Menu");
+            telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
             telemetryConfirmPopup.setOptionHandler(()-> {
                 nuiManager.pushScreen(TelemetryScreen.ASSET_URI,TelemetryScreen.class);
             });

@@ -52,8 +52,8 @@ public class Metrics {
         return modulesMetric;
     }
 
-    public Map<Class,Metric> getMap() {
-        Map<Class,Metric> map = new HashMap();
+    public Map<Class, Metric> getMap() {
+        Map<Class, Metric> map = new HashMap();
         map.put(SystemContextMetric.class, systemContextMetric);
         map.put(ModulesMetric.class, modulesMetric);
 

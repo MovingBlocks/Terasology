@@ -27,13 +27,13 @@ import java.net.URL;
  */
 public class TelemetryParams {
 
+    public static final String APP_ID_TERASOLOGY = "terasology";
+
+    public static final DevicePlatform PLATFORM_DESKTOP = DevicePlatform.Desktop;
+
+    public static final URL TELEMETRY_SERVER_URL = urlInit("http", "localhost", 80);
+
     private static final Logger logger = LoggerFactory.getLogger(TelemetryParams.class);
-
-    public final static String APP_ID_TERASOLOGY = "terasology";
-
-    public final static DevicePlatform PLATFORM_DESKTOP = DevicePlatform.Desktop;
-
-    public final static URL TELEMETRY_SERVER_URL = urlInit("http","localhost",80);
 
     private static URL urlInit(String protocol, String host, int port) {
         URL url = null;

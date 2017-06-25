@@ -30,9 +30,9 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
 
     private Context gameContext;
 
-    public void configure(Context gameContext) {
+    public void configure(Context context) {
 
-        this.gameContext = gameContext;
+        this.gameContext = context;
 
         // if the error reporting is disabled at the beginning, then turn off error reporting.
         Config config = gameContext.get(Config.class);

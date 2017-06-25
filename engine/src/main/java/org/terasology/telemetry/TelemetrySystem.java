@@ -27,9 +27,9 @@ import org.terasology.telemetry.metrics.ModulesMetric;
  * This component system is used to track metrics in game.
  */
 @RegisterSystem
-public class TelemetryComponentSystem extends BaseComponentSystem {
+public class TelemetrySystem extends BaseComponentSystem {
 
-    private final String NAMESPACE_TRACKER = this.getClass().toString();
+    private final String trackerNamespace = this.getClass().toString();
 
     @In
     private Emitter emitter;
@@ -51,11 +51,11 @@ public class TelemetryComponentSystem extends BaseComponentSystem {
     private void sendModuleMetric() {
         ModulesMetric modulesMetric = metrics.getModulesMetric();
         Unstructured unstructuredMetric = modulesMetric.getUnstructuredMetric();
-        TelemetryUtils.trackMetric(emitter,NAMESPACE_TRACKER,unstructuredMetric);
+        TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMetric);
     }
 
     private void sendSystemContextMetric() {
         Unstructured systemContextMetric = metrics.getSystemContextMetric().getUnstructuredMetric();
-        TelemetryUtils.trackMetric(emitter,NAMESPACE_TRACKER,systemContextMetric);
+        TelemetryUtils.trackMetric(emitter, trackerNamespace, systemContextMetric);
     }
 }
