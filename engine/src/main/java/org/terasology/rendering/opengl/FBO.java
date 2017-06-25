@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import org.terasology.assets.ResourceUrn;
 
@@ -58,7 +59,7 @@ public final class FBO {
     public int normalsBufferTextureId;
     public int lightBufferTextureId;
 
-    private final Dimensions dimensions;
+    private Dimensions dimensions;
     private boolean writeToColorBuffer;
     private boolean writeToNormalsBuffer;
     private boolean writeToLightBuffer;
@@ -367,6 +368,78 @@ public final class FBO {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
         return fbo;
+    }
+
+    public static void recreate(FBO fbo, FBOConfig fboConfig) {
+        Type type = fboConfig.getType();
+        Dimensions dimensions = fboConfig.getDimensions();
+        boolean useNormalBuffer = fboConfig.hasNormalBuffer();
+        boolean useLightBuffer = fboConfig.hasLightBuffer();
+        boolean useDepthBuffer = fboConfig.hasDepthBuffer();
+        boolean useStencilBuffer = fboConfig.hasStencilBuffer();
+
+        fbo.dimensions = fboConfig.getDimensions();
+
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo.fboId);
+
+        if (type != Type.NO_COLOR) {
+            glDeleteTextures(fbo.colorBufferTextureId);
+            createColorBuffer(fbo, dimensions, type);
+        }
+
+        if (useNormalBuffer) {
+            glDeleteTextures(fbo.normalsBufferTextureId);
+            createNormalsBuffer(fbo, dimensions);
+        }
+
+        if (useLightBuffer) {
+            glDeleteTextures(fbo.lightBufferTextureId);
+            createLightBuffer(fbo, dimensions, type);
+        }
+
+        if (useDepthBuffer) {
+            glDeleteTextures(fbo.depthStencilTextureId);
+            glDeleteRenderbuffersEXT(fbo.depthStencilRboId);
+            createDepthBuffer(fbo, dimensions, useStencilBuffer);
+        }
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+        if (type != Type.NO_COLOR) {
+            bufferIds.put(GL_COLOR_ATTACHMENT0_EXT);
+        }
+        if (useNormalBuffer) {
+            bufferIds.put(GL_COLOR_ATTACHMENT1_EXT);
+        }
+        if (useLightBuffer) {
+            bufferIds.put(GL_COLOR_ATTACHMENT2_EXT);
+        }
+        bufferIds.flip();
+
+        if (bufferIds.limit() == 0) {
+            GL11.glReadBuffer(GL11.GL_NONE);
+            GL20.glDrawBuffers(GL11.GL_NONE);
+        } else {
+            GL20.glDrawBuffers(bufferIds);
+        }
+
+        verifyCompleteness(fboConfig.getName(), type, fbo);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        /*
+        FBO fbo2 = create(fboConfig);
+        fbo.fboId = fbo2.fboId;
+        fbo.colorBufferTextureId = fbo2.colorBufferTextureId;
+        fbo.depthStencilTextureId = fbo2.depthStencilTextureId;
+        fbo.depthStencilRboId = fbo2.depthStencilRboId;
+        fbo.normalsBufferTextureId = fbo2.normalsBufferTextureId;
+        fbo.lightBufferTextureId = fbo2.lightBufferTextureId;
+        fbo.dimensions = fbo2.dimensions;
+        fbo.writeToColorBuffer = fbo2.writeToColorBuffer;
+        fbo.writeToNormalsBuffer = fbo2.writeToNormalsBuffer;
+        fbo.writeToLightBuffer = fbo2.writeToLightBuffer;
+        */
     }
 
     private static void verifyCompleteness(ResourceUrn urn, Type type, FBO fbo) {

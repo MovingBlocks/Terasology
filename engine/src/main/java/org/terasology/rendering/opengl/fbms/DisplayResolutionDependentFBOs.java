@@ -92,11 +92,20 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
 
         FBO sceneOpaqueFbo = get(READONLY_GBUFFER);
         if (sceneOpaqueFbo.dimensions().areDifferentFrom(fullScale)) {
-            disposeAllFBOs();
-            createFBOs();
+            // disposeAllFBOs();
+            // createFBOs();
+            regenFbo();
             notifySubscribers();
         }
     }
+
+    private void regenFbo() {
+        for (ResourceUrn urn : fboConfigs.keySet()) {
+            FBOConfig fboConfig = getFboConfig(urn);
+            fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
+            FBO.recreate(get(urn), getFboConfig(urn));
+        }
+   }
 
     private void disposeAllFBOs() {
         for (ResourceUrn urn : fboConfigs.keySet()) {
