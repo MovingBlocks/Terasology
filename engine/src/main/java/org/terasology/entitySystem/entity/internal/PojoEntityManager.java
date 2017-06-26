@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
@@ -250,9 +251,8 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    //Todo: implement iterating over multiple caches
     public Iterable<EntityRef> getAllEntities() {
-        return globalCache.getAllEntities();
+        return Iterables.concat(globalCache.getAllEntities(), sectorManager.getAllEntities());
     }
 
     @SafeVarargs

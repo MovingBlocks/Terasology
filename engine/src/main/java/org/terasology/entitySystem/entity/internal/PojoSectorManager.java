@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.google.common.collect.Iterables;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityCache;
@@ -159,7 +160,12 @@ public class PojoSectorManager implements EngineSectorManager {
 
     @Override
     public Iterable<EntityRef> getAllEntities() {
-        return getCache().getAllEntities();
+        List<Iterable<EntityRef>> entityIterables = new ArrayList<>();
+        for (EntityCache cache : caches) {
+            entityIterables.add(cache.getAllEntities());
+        }
+
+        return Iterables.concat(entityIterables);
     }
 
     @Override
