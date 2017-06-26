@@ -21,6 +21,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -30,6 +31,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -50,6 +52,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
     private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
+    private SubmersibleCamera activeCamera;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material outlineMaterial;
@@ -68,6 +71,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     public OutlineNode(Context context) {
         super(context);
+
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
@@ -104,6 +109,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         PerformanceMonitor.startActivity("rendering/outline");
 
         // Shader Parameters
+
+        outlineMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
 
         outlineMaterial.setFloat("texelWidth", 1.0f / sceneOpaqueFboWidth);
         outlineMaterial.setFloat("texelHeight", 1.0f / sceneOpaqueFboHeight);
