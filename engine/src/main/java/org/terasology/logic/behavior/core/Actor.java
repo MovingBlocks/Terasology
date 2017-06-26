@@ -16,8 +16,14 @@
 package org.terasology.logic.behavior.core;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentFieldUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -38,17 +44,26 @@ import com.google.common.collect.Maps;
  */
 @API
 public class Actor {
+    private static Logger logger = LoggerFactory.getLogger(Actor.class);
     private final EntityRef entity;
+    // Stores system-wide information (allows inter-node communication)
     private final Map<String, Object> blackboard;
+
+    // Stores information uniquely for each node that requires it
+    // TODO can we use a faster data structure? this gets accessed a lot
     private final Map<Integer, Object> dataMap = Maps.newHashMap();
 
-    // TODO delta implementation (feed in through a System?)
+    private final Map<String, BehaviorEvent> events = Maps.newHashMap();
+
     private float delta;
 
 
     public Actor(EntityRef entity) {
         this.entity = entity;
         blackboard = Maps.newHashMap();
+
+        blackboard.put("events", new HashSet<Component>());
+
     }
 
 
@@ -58,6 +73,10 @@ public class Actor {
 
     public void setValue(int id, Object obj) {
         dataMap.put(id, obj);
+    }
+
+    public Map<String,BehaviorEvent> getEvents() {
+        return events;
     }
 
     public float getDelta() {
@@ -100,7 +119,6 @@ public class Actor {
     }
 
     /**
-     *
      * @param component The class of the component
      * @return true if the entity has the a component of the given class
      */

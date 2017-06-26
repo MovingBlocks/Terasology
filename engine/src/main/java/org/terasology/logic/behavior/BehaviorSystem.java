@@ -108,7 +108,6 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
 
-            logger.info("Running entity: %s, Component: %s", entity.toString(), entity.getComponent(BehaviorComponent.class).toString());
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
             behaviorComponent.interpreter.tick(delta);
         }
@@ -149,7 +148,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     }
 
 
-    //TODO this or single?
+
     public List<Interpreter> getInterpreters() {
         List<Interpreter> runners = Lists.newArrayList();
         for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
@@ -160,7 +159,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         }
         if (runners.size() == 0) {
             BehaviorComponent behaviorComponent = new BehaviorComponent();
-            // TODO is this being loaded properly?
+
             behaviorComponent.tree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name("default")), new BehaviorTreeData(), BehaviorTree.class);
             dummy = entityManager.create(behaviorComponent);
             DisplayNameComponent nameComponent = new DisplayNameComponent();

@@ -125,6 +125,8 @@ public class ActionNode implements BehaviorNode {
 
     }
 
+
+    // TODO check these paths are correct before running a Tree using bytecode
     @Override
     public void assembleConstruct(MethodGenerator gen) {
         gen.invokeAction(action.getId(), "void construct(org.terasology.logic.behavior.core.Actor)");
