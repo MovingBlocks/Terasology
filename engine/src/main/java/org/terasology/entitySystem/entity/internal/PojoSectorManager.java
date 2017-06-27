@@ -170,7 +170,12 @@ public class PojoSectorManager implements EngineSectorManager {
 
     @Override
     public Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        return getCache().getEntitiesWith(componentClasses);
+        List<Iterable<EntityRef>> entityIterables = new ArrayList<>();
+        for (EntityCache cache : caches) {
+            entityIterables.add(cache.getEntitiesWith(componentClasses));
+        }
+
+        return Iterables.concat(entityIterables);
     }
 
     @Override

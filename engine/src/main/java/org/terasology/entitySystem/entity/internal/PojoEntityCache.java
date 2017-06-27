@@ -17,9 +17,6 @@ package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
-import gnu.trove.iterator.TLongObjectIterator;
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -361,30 +358,12 @@ public class PojoEntityCache implements EngineEntityCache {
     @SafeVarargs
     @Override
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (componentClasses.length == 0) {
-            return getAllEntities();
-        }
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = componentStore.componentIterator(componentClasses[0]);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
-
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            boolean discard = false;
-            for (int i = 1; i < componentClasses.length; ++i) {
-                if (componentStore.get(id, componentClasses[i]) == null) {
-                    discard = true;
-                    break;
-                }
-            }
-            if (!discard) {
-                idList.add(primeIterator.key());
-            }
-        }
-        return () -> new EntityIterator(idList.iterator(), this);
+        return () -> entityStore.keySet().stream()
+                //Keep entities which have all of the required components
+                .filter(id -> Arrays.stream(componentClasses)
+                        .allMatch(component -> componentStore.get(id, component) != null))
+                .map(id -> createEntityRef(id))
+                .iterator();
     }
 
     @Override

@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
@@ -257,50 +256,9 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @SafeVarargs
     @Override
-    //Todo: implement iterating over multiple caches
     public final Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses) {
-        if (componentClasses.length == 0) {
-            return getAllEntities();
-        }
-        if (componentClasses.length == 1) {
-            return iterateEntities(componentClasses[0]);
-        }
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = globalCache.getComponentStore().componentIterator(componentClasses[0]);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
-
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            boolean discard = false;
-            for (int i = 1; i < componentClasses.length; ++i) {
-                if (globalCache.getComponentStore().get(id, componentClasses[i]) == null) {
-                    discard = true;
-                    break;
-                }
-            }
-            if (!discard) {
-                idList.add(primeIterator.key());
-            }
-        }
-        return new EntityIterable(idList);
-    }
-
-    private Iterable<EntityRef> iterateEntities(Class<? extends Component> componentClass) {
-        TLongList idList = new TLongArrayList();
-        TLongObjectIterator<? extends Component> primeIterator = globalCache.getComponentStore().componentIterator(componentClass);
-        if (primeIterator == null) {
-            return Collections.emptyList();
-        }
-
-        while (primeIterator.hasNext()) {
-            primeIterator.advance();
-            long id = primeIterator.key();
-            idList.add(primeIterator.key());
-        }
-        return new EntityIterable(idList);
+        return Iterables.concat(globalCache.getEntitiesWith(componentClasses),
+                sectorManager.getEntitiesWith(componentClasses));
     }
 
     @Override
