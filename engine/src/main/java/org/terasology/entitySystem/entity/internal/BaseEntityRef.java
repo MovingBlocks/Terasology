@@ -23,6 +23,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.EntitySerializer;
+import org.terasology.protobuf.EntityData;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -73,6 +74,25 @@ public abstract class BaseEntityRef extends EntityRef {
             EntityInfoComponent info = getEntityInfo();
             if (!info.owner.equals(owner)) {
                 info.owner = owner;
+                saveComponent(info);
+            }
+        }
+    }
+
+    @Override
+    public EntityData.Entity.Scope getScope() {
+        if (exists()) {
+            return getEntityInfo().scope;
+        }
+        return null;
+    }
+
+    @Override
+    public void setScope(EntityData.Entity.Scope scope) {
+        if (exists()) {
+            EntityInfoComponent info = getEntityInfo();
+            if (!info.scope.equals(scope)) {
+                info.scope = scope;
                 saveComponent(info);
             }
         }

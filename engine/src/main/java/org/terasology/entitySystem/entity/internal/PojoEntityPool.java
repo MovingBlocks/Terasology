@@ -32,6 +32,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.protobuf.EntityData;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,6 +97,7 @@ public class PojoEntityPool implements EngineEntityPool {
         for (Component component: components) {
             entityManager.notifyComponentAdded(entity, component.getClass());
         }
+
         return entity;
     }
 
@@ -194,7 +196,7 @@ public class PojoEntityPool implements EngineEntityPool {
     }
 
     private EntityRef createEntity(Iterable<Component> components) {
-        long entityId = entityManager.createEntity(this);
+        long entityId = entityManager.createEntity();
 
         Prefab prefab = null;
         for (Component component : components) {
@@ -344,13 +346,14 @@ public class PojoEntityPool implements EngineEntityPool {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
-        EntityRef existing = entityManager.getEntity(entityId);
-        if (existing != null) {
+        EntityRef existing = entityManager.getExistingEntity(entityId);
+        if (existing != EntityRef.NULL && existing != null) {
             //Entity exists, but is not in this pool
             return existing;
         }
         //Todo: look into whether RefStrategy should use manager or pool?
         BaseEntityRef newRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
+
         entityStore.put(entityId, newRef);
         return newRef;
     }

@@ -220,6 +220,9 @@ public class EntitySerializer {
         if (entityData.hasAlwaysRelevant()) {
             entityInfo.alwaysRelevant = entityData.getAlwaysRelevant();
         }
+        if (entityData.hasScope()) {
+            entityInfo.scope = entityData.getScope();
+        }
 
         for (EntityData.Component componentData : entityData.getComponentList()) {
             ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
@@ -247,6 +250,11 @@ public class EntitySerializer {
         if (owner.exists()) {
             entity.setOwner(owner.getId());
         }
+        EntityData.Entity.Scope scope = entityRef.getScope();
+        if (scope != null) {
+            entity.setScope(scope);
+        }
+
         for (Component component : entityRef.iterateComponents()) {
             if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {
                 continue;
@@ -273,6 +281,12 @@ public class EntitySerializer {
         if (owner.exists()) {
             entity.setOwner(owner.getId());
         }
+        EntityData.Entity.Scope scope = entityRef.getScope();
+        if (scope != null) {
+            entity.setScope(scope);
+        }
+
+
         Set<Class<? extends Component>> presentClasses = Sets.newHashSet();
         for (Component component : entityRef.iterateComponents()) {
             if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {

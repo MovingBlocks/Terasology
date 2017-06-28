@@ -44,6 +44,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.protobuf.EntityData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,7 +130,9 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createSectorEntity() {
-        return sectorManager.create();
+        EntityRef entity = sectorManager.create();
+        entity.setScope(EntityData.Entity.Scope.SECTOR);
+        return entity;
     }
 
     @Override
@@ -139,12 +142,6 @@ public class PojoEntityManager implements EngineEntityManager {
         }
         loadedIds.add(nextEntityId);
         return nextEntityId++;
-    }
-
-    public long createEntity(EngineEntityPool pool) {
-        long id = createEntity();
-        poolMap.put(id, pool);
-        return id;
     }
 
     @Override
@@ -355,6 +352,16 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
+        //TODO: clean this up
+        for (Component c : components) {
+            if (c instanceof EntityInfoComponent) {
+                if (((EntityInfoComponent) c).scope == EntityData.Entity.Scope.SECTOR) {
+                    return sectorManager.createEntityWithId(id, components);
+                } else {
+                    break;
+                }
+            }
+        }
         return globalPool.createEntityWithId(id, components);
     }
 
@@ -384,7 +391,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public SectorManager getSectorManager() {
+    public EngineSectorManager getSectorManager() {
         return sectorManager;
     }
 
@@ -453,7 +460,8 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     //Todo: implement iterating over multiple pools
     public Iterable<Component> iterateComponents(long entityId) {
-        return globalPool.getComponentStore().iterateComponents(entityId);
+        return Iterables.concat(globalPool.getComponentStore().iterateComponents(entityId),
+                sectorManager.getComponentStore().iterateComponents(entityId));
     }
 
     @Override
@@ -485,7 +493,7 @@ public class PojoEntityManager implements EngineEntityManager {
         //Default to the global pool
         if (pool == null) {
             //Todo: this happens a lot during shutdown. Possible concurrency issue?
-            logger.error("Entity {} doesn't have an assigned pool", entityId);
+            //logger.error("Entity {} doesn't have an assigned pool", entityId);
             pool = globalPool;
         }
         return pool.getComponentStore().get(entityId, componentClass);
@@ -593,8 +601,15 @@ public class PojoEntityManager implements EngineEntityManager {
      */
 
     protected void assignToPool(EntityRef ref, EngineEntityPool pool) {
-        //Todo: job for the sector manager?
-        poolMap.put(ref.getId(), pool);
+        if (poolMap.get(ref.getId()) != pool) {
+            poolMap.put(ref.getId(), pool);
+        }
+    }
+
+    protected void assignToPool(long entityId, EngineEntityPool pool) {
+        if (poolMap.get(entityId) != pool) {
+            poolMap.put(entityId, pool);
+        }
     }
 
     private EntityRef createEntityRef(long entityId) {
