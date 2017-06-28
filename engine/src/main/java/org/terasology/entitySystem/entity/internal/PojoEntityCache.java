@@ -32,6 +32,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.protobuf.EntityData;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -351,6 +352,13 @@ public class PojoEntityCache implements EngineEntityCache {
         }
         //Todo: look into whether RefStrategy should use manager or cache?
         BaseEntityRef newRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
+
+        if (newRef.getComponent(EntityInfoComponent.class).scope == EntityData.Entity.Scope.SECTOR) {
+            entityManager.assignToCache(newRef, entityManager.getSectorManager());
+        } else {
+            entityManager.assignToCache(newRef, entityManager);
+        }
+
         entityStore.put(entityId, newRef);
         return newRef;
     }

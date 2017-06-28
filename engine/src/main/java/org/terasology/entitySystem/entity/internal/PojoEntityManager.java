@@ -45,6 +45,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.protobuf.EntityData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,7 +131,10 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createSectorEntity() {
-        return sectorManager.create();
+        EntityRef entity = sectorManager.create();
+        entity.setScope(EntityData.Entity.Scope.SECTOR);
+        assignToCache(entity, sectorManager);
+        return entity;
     }
 
     @Override
@@ -356,6 +360,16 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
+        //TODO: clean this up
+        for (Component c : components) {
+            if (c instanceof EntityInfoComponent) {
+                if (((EntityInfoComponent) c).scope == EntityData.Entity.Scope.SECTOR) {
+                    assignToCache(id, sectorManager);
+                    EntityRef e = sectorManager.createEntityWithId(id, components);
+                    return e;
+                }
+            }
+        }
         return globalCache.createEntityWithId(id, components);
     }
 
@@ -385,7 +399,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public SectorManager getSectorManager() {
+    public EngineSectorManager getSectorManager() {
         return sectorManager;
     }
 
@@ -486,7 +500,7 @@ public class PojoEntityManager implements EngineEntityManager {
         //Default to the global cache
         if (cache == null) {
             //Todo: this happens a lot during shutdown. Possible concurrency issue?
-            logger.error("Entity {} doesn't have an assigned cache", entityId);
+            //logger.error("Entity {} doesn't have an assigned cache", entityId);
             cache = globalCache;
         }
         return cache.getComponentStore().get(entityId, componentClass);
@@ -596,6 +610,10 @@ public class PojoEntityManager implements EngineEntityManager {
     protected void assignToCache(EntityRef ref, EngineEntityCache cache) {
         //Todo: job for the sector manager?
         cacheMap.put(ref.getId(), cache);
+    }
+
+    protected void assignToCache(long entityId, EngineEntityCache cache) {
+        cacheMap.put(entityId, cache);
     }
 
     private EntityRef createEntityRef(long entityId) {
