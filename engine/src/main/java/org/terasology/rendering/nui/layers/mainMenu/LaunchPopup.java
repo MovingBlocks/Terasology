@@ -30,7 +30,7 @@ import org.terasology.rendering.nui.widgets.UILabel;
  */
 public class LaunchPopup extends CoreScreenLayer {
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:launchPopup");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:launchPopup!instance");
 
     @In
     private Config config;

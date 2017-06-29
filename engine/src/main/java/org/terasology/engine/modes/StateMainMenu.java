@@ -131,7 +131,8 @@ public class StateMainMenu implements GameState {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
 
-        pushLaunchPopup();
+        // TODO: enable it when exposing the telemetry to users
+        // pushLaunchPopup();
     }
 
     private void pushLaunchPopup() {
@@ -149,13 +150,13 @@ public class StateMainMenu implements GameState {
                 telemetryConfig.setAllEnabled(true);
 
                 // Enable error reporting
-                appender.turnOnErrorReporting();
+                appender.start();
             });
             telemetryConfirmPopup.setNoHandler(() -> {
                 telemetryConfig.setAllEnabled(false);
 
                 // Disable error reporting
-                appender.turnOffErrorReporting();
+                appender.stop();
             });
             telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
             telemetryConfirmPopup.setOptionHandler(()-> {

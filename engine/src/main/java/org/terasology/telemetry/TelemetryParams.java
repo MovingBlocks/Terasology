@@ -16,11 +16,6 @@
 package org.terasology.telemetry;
 
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Terasology desktop game parameters for telemetry. They are needed by snowplow stacks.
@@ -30,18 +25,4 @@ public class TelemetryParams {
     public static final String APP_ID_TERASOLOGY = "terasology";
 
     public static final DevicePlatform PLATFORM_DESKTOP = DevicePlatform.Desktop;
-
-    public static final URL TELEMETRY_SERVER_URL = urlInit("http", "localhost", 80);
-
-    private static final Logger logger = LoggerFactory.getLogger(TelemetryParams.class);
-
-    private static URL urlInit(String protocol, String host, int port) {
-        URL url = null;
-        try {
-            url = new URL(protocol, host, port, "");
-        } catch (MalformedURLException e) {
-            logger.error("Telemetry server URL mal formed", e);
-        }
-        return url;
-    }
 }

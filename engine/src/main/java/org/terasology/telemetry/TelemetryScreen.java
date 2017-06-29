@@ -16,8 +16,10 @@
 package org.terasology.telemetry;
 
 import com.google.common.collect.Maps;
+import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.ServerInfo;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyResolver;
@@ -28,9 +30,11 @@ import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.layers.mainMenu.AddServerPopup;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -64,6 +68,12 @@ public class TelemetryScreen extends CoreScreenLayer {
     @In
     private Metrics metrics;
 
+    @In
+    private NUIManager nuiManager;
+
+    @In
+    private Emitter emitter;
+
     private final int horizontalSpacing = 12;
 
     @Override
@@ -75,10 +85,10 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         Map<TelemetryCategory, Class> telemetryCategories = fetchTelemetryCategoriesFromEnvironment();
 
-        for (Map.Entry<TelemetryCategory,Class> telemetryCategory: telemetryCategories.entrySet()) {
+        for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
             Class metricClass = telemetryCategory.getValue();
             Metric metricType = metrics.getMap().get(metricClass);
-            Map<String,Object> map = metricType.getFieldValueMap();
+            Map<String, Object> map = metricType.getFieldValueMap();
 
             addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
         }
@@ -87,14 +97,50 @@ public class TelemetryScreen extends CoreScreenLayer {
         area.setContent(mainLayout);
 
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
-        WidgetUtil.tryBindCheckbox(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckBoxWithListener(this, "errorReportingEnabled", BindHelper.bindBeanProperty("errorReportingEnabled", config.getTelemetryConfig(), Boolean.TYPE), (checkbox) -> {
-            TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
-            if (config.getTelemetryConfig().isErrorReportingEnabled()) {
-                appender.turnOnErrorReporting();
-            } else {
-                appender.turnOffErrorReporting();
+        WidgetUtil.tryBindCheckBoxWithListener(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE),(checkbox) -> {
+            if (config.getTelemetryConfig().isTelemetryEnabled()) {
+                pushAddServerPopupAndStartEmitter();
             }
+        });
+        WidgetUtil.tryBindCheckBoxWithListener(this, "errorReportingEnabled", BindHelper.bindBeanProperty("errorReportingEnabled", config.getTelemetryConfig(), Boolean.TYPE), (checkbox) -> {
+            if (config.getTelemetryConfig().isErrorReportingEnabled()) {
+                pushAddServerPopupAndStartLogBackAppender();
+            } else {
+                TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
+                telemetryLogstashAppender.stop();
+            }
+        });
+    }
+
+    private void pushAddServerPopupAndStartEmitter() {
+        AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
+        addServerPopup.setServerInfo(serverInfo);
+        addServerPopup.onSuccess((item) -> {
+            TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
+            telemetryEmitter.changeUrl(item.getURL("http"));
+        });
+        addServerPopup.onCancel((button) -> {
+            config.getTelemetryConfig().setTelemetryEnabled(false);
+        });
+    }
+
+    private void pushAddServerPopupAndStartLogBackAppender() {
+
+        AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST, TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
+        addServerPopup.setServerInfo(serverInfo);
+        addServerPopup.onSuccess((item) -> {
+            StringBuilder destinationLogstash = new StringBuilder();
+            destinationLogstash.append(item.getAddress());
+            destinationLogstash.append(":");
+            destinationLogstash.append(item.getPort());
+            TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
+            telemetryLogstashAppender.addDestination(destinationLogstash.toString());
+            telemetryLogstashAppender.start();
+        });
+        addServerPopup.onCancel((button) -> {
+            config.getTelemetryConfig().setErrorReportingEnabled(false);
         });
     }
 
