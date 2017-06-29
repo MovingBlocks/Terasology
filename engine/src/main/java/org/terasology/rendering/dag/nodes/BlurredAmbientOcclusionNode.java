@@ -56,8 +56,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
     private static final int TEXTURE_SLOT_0 = 0;
 
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     private Material ssaoBlurredMaterial;
     private float outputFboWidth;
     private float outputFboHeight;
@@ -75,12 +73,12 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL));
         ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise ssaoBlurredFbo, outputFboWidth, outputFboHeight
+        update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
@@ -107,7 +105,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     @Override
     public void update() {
-        ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
         outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }

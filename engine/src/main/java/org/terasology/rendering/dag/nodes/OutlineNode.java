@@ -53,7 +53,6 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     private RenderingConfig renderingConfig;
     private SubmersibleCamera activeCamera;
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material outlineMaterial;
 
@@ -78,7 +77,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
         requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(OUTLINE_FBO, displayResolutionDependentFBOs));
 
@@ -127,7 +127,6 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     @Override
     public void update() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
         sceneOpaqueFboWidth = sceneOpaqueFbo.width();
         sceneOpaqueFboHeight = sceneOpaqueFbo.height();
     }

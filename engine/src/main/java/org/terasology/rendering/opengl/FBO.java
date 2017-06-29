@@ -426,20 +426,6 @@ public final class FBO {
 
         verifyCompleteness(fboConfig.getName(), type, fbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-        /*
-        FBO fbo2 = create(fboConfig);
-        fbo.fboId = fbo2.fboId;
-        fbo.colorBufferTextureId = fbo2.colorBufferTextureId;
-        fbo.depthStencilTextureId = fbo2.depthStencilTextureId;
-        fbo.depthStencilRboId = fbo2.depthStencilRboId;
-        fbo.normalsBufferTextureId = fbo2.normalsBufferTextureId;
-        fbo.lightBufferTextureId = fbo2.lightBufferTextureId;
-        fbo.dimensions = fbo2.dimensions;
-        fbo.writeToColorBuffer = fbo2.writeToColorBuffer;
-        fbo.writeToNormalsBuffer = fbo2.writeToNormalsBuffer;
-        fbo.writeToLightBuffer = fbo2.writeToLightBuffer;
-        */
     }
 
     private static void verifyCompleteness(ResourceUrn urn, Type type, FBO fbo) {

@@ -34,15 +34,13 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * A BlurNode takes the content of the color buffer attached to the input FBO and generates
  * a blurred version of it in the color buffer attached to the output FBO.
  */
-public class BlurNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class BlurNode extends ConditionDependentNode {
     private static final ResourceUrn BLUR_MATERIAL = new ResourceUrn("engine:prog.blur");
 
     protected float blurRadius;
 
     private Material blurMaterial;
     private String label;
-
-    private BaseFBOsManager fboManager;
 
     private ResourceUrn inputFboUrn;
     private ResourceUrn outputFboUrn;
@@ -62,7 +60,6 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
     public BlurNode(Context context, FBOConfig inputFboConfig, FBOConfig outputFboConfig, BaseFBOsManager fboManager, float blurRadius, String label) {
         super(context);
 
-        this.fboManager = fboManager;
         this.blurRadius = blurRadius;
         this.label = label;
         this.inputFboUrn = inputFboConfig.getName();
@@ -70,12 +67,10 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
 
         setupConditions(context);
 
-        requiresFBO(inputFboConfig, fboManager);
-        requiresFBO(outputFboConfig, fboManager);
+        inputFbo = requiresFBO(inputFboConfig, fboManager);
+        outputFbo = requiresFBO(outputFboConfig, fboManager);
         addDesiredStateChange(new BindFbo(outputFboUrn, fboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, fboManager));
-        update(); // Cheeky way to initialise inputFbo, outputFbo
-        fboManager.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(BLUR_MATERIAL));
         this.blurMaterial = getMaterial(BLUR_MATERIAL);
@@ -105,11 +100,5 @@ public class BlurNode extends ConditionDependentNode implements FBOManagerSubscr
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        inputFbo = fboManager.get(inputFboUrn);
-        outputFbo = fboManager.get(outputFboUrn);
     }
 }

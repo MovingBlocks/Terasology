@@ -30,13 +30,16 @@ import org.terasology.rendering.opengl.ScreenGrabber;
  * TODO: Better naming
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
-    public static final ResourceUrn READONLY_GBUFFER = new ResourceUrn("engine:sceneOpaque");
-    public static final ResourceUrn WRITEONLY_GBUFFER = new ResourceUrn("engine:sceneOpaquePingPong");
+    // TODO: Shift this kind of swapping functionality to a more generic SwappableFBO class
+    public static final ResourceUrn BUFFER1 = new ResourceUrn("engine:sceneOpaque1");
+    public static final ResourceUrn BUFFER2 = new ResourceUrn("engine:sceneOpaque2");
     public static final ResourceUrn FINAL_BUFFER = new ResourceUrn("engine:sceneFinal");
 
     private FBO.Dimensions fullScale;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
+
+    private boolean buffersSwapped = false;
 
     public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber) {
         this.renderingConfig = renderingConfig;
@@ -47,9 +50,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     }
 
     private void generateDefaultFBOs() {
-        generateWithDimensions(new FBOConfig(READONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        generateWithDimensions(new FBOConfig(BUFFER1, FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        generateWithDimensions(new FBOConfig(WRITEONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        generateWithDimensions(new FBOConfig(BUFFER2, FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
         generateWithDimensions(new FBOConfig(FINAL_BUFFER, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
     }
@@ -90,7 +93,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     public void update() {
         updateFullScale();
 
-        FBO sceneOpaqueFbo = get(READONLY_GBUFFER);
+        FBO sceneOpaqueFbo = get(BUFFER1);
         if (sceneOpaqueFbo.dimensions().areDifferentFrom(fullScale)) {
             // disposeAllFBOs();
             // createFBOs();
@@ -120,11 +123,15 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         }
     }
 
-    // TODO: Pairing FBOs for swapping functionality
     public void swapReadWriteBuffers() {
-        FBO fbo = get(READONLY_GBUFFER);
-        fboLookup.put(READONLY_GBUFFER, get(WRITEONLY_GBUFFER));
-        fboLookup.put(WRITEONLY_GBUFFER, fbo);
-        notifySubscribers();
+        buffersSwapped = !buffersSwapped;
+    }
+
+    public FBO getPrimaryBufferUrn() {
+        return get(buffersSwapped ? BUFFER2 : BUFFER1);
+    }
+
+    public FBO getSecondaryBufferUrn() {
+        return get(buffersSwapped ? BUFFER1 : BUFFER2);
     }
 }

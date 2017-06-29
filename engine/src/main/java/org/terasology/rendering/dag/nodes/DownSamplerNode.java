@@ -36,7 +36,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * Instances of this class take the content of the color attachment of an input FBO
  * and downsamples it into the color attachment of a smaller output FBO.
  */
-public class DownSamplerNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class DownSamplerNode extends ConditionDependentNode {
     private static final String TEXTURE_NAME = "tex";
     private static final int SLOT_0 = 0;
     private static final ResourceUrn DOWN_SAMPLER_MATERIAL = new ResourceUrn("engine:prog.downSampler");
@@ -65,14 +65,12 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         this.outputFboUrn = outputFboConfig.getName();
 
         requiresFBO(inputFboConfig, inputFboManager);
-        requiresFBO(outputFboConfig, outputFboManager);
+        outputFbo = requiresFBO(outputFboConfig, outputFboManager);
 
         addDesiredStateChange(new BindFbo(outputFboUrn, outputFboManager));
         addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, outputFboManager));
         addDesiredStateChange(new SetInputTextureFromFbo(SLOT_0, inputFboConfig.getName(), ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
-        update(); // Cheeky way to initialise outputFbo
-        outputFboManager.subscribe(this);
 
         setupConditions(context);
 
@@ -101,10 +99,5 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        outputFbo = outputFboManager.get(outputFboUrn);
     }
 }

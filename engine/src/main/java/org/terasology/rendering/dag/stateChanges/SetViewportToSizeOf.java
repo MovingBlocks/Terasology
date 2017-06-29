@@ -37,8 +37,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     private ResourceUrn fboName;
     private int fboWidth;
     private int fboHeight;
-    
-    @SuppressWarnings("FieldCanBeLocal")
+
     private FBO fbo;
 
     /**
@@ -54,7 +53,9 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         this.fboManager = frameBuffersManager;
         this.fboName = fboName;
 
-        update(); // Cheeky way to initialise fbo, fboWidth, fboHeight
+        fbo = fboManager.get(fboName);
+
+        update(); // Cheeky way to initialise fboWidth, fboHeight
         fboManager.subscribe(this);
     }
 
@@ -79,8 +80,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public void update() {
-        fbo = fboManager.get(fboName);
-
         fboWidth = fbo.width();
         fboHeight = fbo.height();
     }

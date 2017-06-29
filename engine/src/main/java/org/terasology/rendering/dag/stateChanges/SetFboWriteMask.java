@@ -18,7 +18,6 @@ package org.terasology.rendering.dag.stateChanges;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
 import org.terasology.rendering.dag.StateChange;
 
@@ -34,7 +33,7 @@ import org.terasology.rendering.dag.StateChange;
  * The behaviour of this state change in relation to FBOs that do not have all the relevant attachments has not been
  * investigated.
  */
-public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange {
+public final class SetFboWriteMask implements StateChange {
     private SetFboWriteMask defaultInstance;
 
     private BaseFBOsManager fboManager;
@@ -65,8 +64,7 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         this.fboName = fboName;
         this.fboManager = fboManager;
 
-        update(); // Cheeky way to initialise fbo
-        fboManager.subscribe(this);
+        fbo = fboManager.get(fboName);
     }
 
     /**
@@ -83,8 +81,7 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
         this.fboName = fboName;
         this.fboManager = fboManager;
 
-        update(); // Cheeky way to initialise fbo
-        fboManager.subscribe(this);
+        fbo = fboManager.get(fboName);
 
         defaultInstance = this;
     }
@@ -108,11 +105,6 @@ public final class SetFboWriteMask implements FBOManagerSubscriber, StateChange 
                 && renderToColorBuffer == ((SetFboWriteMask) obj).renderToColorBuffer
                 && renderToDepthBuffer == ((SetFboWriteMask) obj).renderToDepthBuffer
                 && renderToLightBuffer == ((SetFboWriteMask) obj).renderToLightBuffer;
-    }
-
-    @Override
-    public void update() {
-        fbo = fboManager.get(fboName);
     }
 
     @Override

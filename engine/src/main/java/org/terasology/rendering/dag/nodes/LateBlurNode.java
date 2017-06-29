@@ -23,6 +23,9 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 /**
  * This class is a thin facade in front of the BlurNode class it inherits from.
  * The term "late" is due to the fact that this type of nodes is used near the
@@ -35,7 +38,7 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  * For more information on Blur: https://en.wikipedia.org/wiki/Box_blur
  * For more information on DoF: http://en.wikipedia.org/wiki/Depth_of_field
  */
-public class LateBlurNode extends BlurNode {
+public class LateBlurNode extends BlurNode implements PropertyChangeListener {
     public static final ResourceUrn FIRST_LATE_BLUR_FBO = new ResourceUrn("engine:fbo.firstLateBlur");
     public static final ResourceUrn SECOND_LATE_BLUR_FBO = new ResourceUrn("engine:fbo.secondLateBlur");
 
@@ -68,14 +71,8 @@ public class LateBlurNode extends BlurNode {
         requiresCondition(() -> renderingConfig.getBlurIntensity() != 0);
     }
 
-    /**
-     * An instance of this class is a subscriber to an FBOManager and to the RenderingConfig. The first
-     * invokes this method when FBOs have been regenerated (i.e. after resizing the display), while the
-     * second does it when its BLUR_INTENSITY parameter changes.
-     */
     @Override
-    public void update() {
-        super.update();
+    public void propertyChange(PropertyChangeEvent event) {
         updateBlurRadius();
     }
 
