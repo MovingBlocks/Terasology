@@ -41,6 +41,7 @@ import org.terasology.rendering.opengl.OpenGLUtils;
 import org.terasology.world.WorldProvider;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -99,18 +100,24 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
 
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
 
-            String text = floatingText.text;
+            List<String> text = Arrays.asList(floatingText.text.split("\n"));
             Color baseColor = floatingText.textColor;
             Color shadowColor = floatingText.textShadowColor;
             boolean underline = false;
-            int textWidth = font.getWidth(text);
+
+            String longest = "";
+            for (String s : text) {
+                if (s.length() > longest.length())
+                    longest = s;
+            }
+            int textWidth = font.getWidth(longest);
 
             FontMeshBuilder meshBuilder = new FontMeshBuilder(underlineMaterial);
 
             Map<Material, Mesh> meshMap = entityMeshCache.get(entity);
             if (meshMap == null) {
                 meshMap = meshBuilder
-                        .createTextMesh(font, Arrays.asList(text), textWidth, HorizontalAlign.CENTER, baseColor,
+                        .createTextMesh(font, text, textWidth, HorizontalAlign.CENTER, baseColor,
                                 shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
