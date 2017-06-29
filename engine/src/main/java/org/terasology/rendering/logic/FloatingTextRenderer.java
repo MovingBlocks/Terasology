@@ -41,20 +41,13 @@ import org.terasology.rendering.opengl.OpenGLUtils;
 import org.terasology.world.WorldProvider;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.*;
 
 
 @RegisterSystem(RegisterMode.CLIENT)
-public class FloatingTextRenderer extends BaseComponentSystem implements  RenderSystem {
+public class FloatingTextRenderer extends BaseComponentSystem implements RenderSystem {
 
     private static final int PIXEL_PER_METER = 250;
 
@@ -100,24 +93,23 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
 
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
 
-            List<String> text = Arrays.asList(floatingText.text.split("\n"));
+            String[] linesOfText = floatingText.text.split("\n");
             Color baseColor = floatingText.textColor;
             Color shadowColor = floatingText.textShadowColor;
             boolean underline = false;
 
-            String longest = "";
-            for (String s : text) {
-                if (s.length() > longest.length())
-                    longest = s;
+            int textWidth = font.getWidth("");
+            for (String singleLine : linesOfText) {
+                if (font.getWidth(singleLine) > textWidth)
+                    textWidth = font.getWidth(singleLine);
             }
-            int textWidth = font.getWidth(longest);
 
             FontMeshBuilder meshBuilder = new FontMeshBuilder(underlineMaterial);
 
             Map<Material, Mesh> meshMap = entityMeshCache.get(entity);
             if (meshMap == null) {
                 meshMap = meshBuilder
-                        .createTextMesh(font, text, textWidth, HorizontalAlign.CENTER, baseColor,
+                        .createTextMesh(font, Arrays.asList(linesOfText), textWidth, HorizontalAlign.CENTER, baseColor,
                                 shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
@@ -175,13 +167,13 @@ public class FloatingTextRenderer extends BaseComponentSystem implements  Render
     public void renderShadows() {
     }
 
-    @ReceiveEvent(components = {FloatingTextComponent.class })
+    @ReceiveEvent(components = {FloatingTextComponent.class})
     public void onDisplayNameChange(OnChangedComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
 
 
-    @ReceiveEvent(components = {FloatingTextComponent.class })
+    @ReceiveEvent(components = {FloatingTextComponent.class})
     public void onNameTagOwnerRemoved(BeforeDeactivateComponent event, EntityRef entity) {
         disposeCachedMeshOfEntity(entity);
     }
