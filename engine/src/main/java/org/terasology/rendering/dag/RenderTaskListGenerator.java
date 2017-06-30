@@ -69,7 +69,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s", node.toString()));
+                logger.info(String.format("%s: process()", node.toString()));
             }
         }
     }

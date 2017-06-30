@@ -145,6 +145,9 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         if (hazeIsEnabled) {
             addDesiredStateChange(setHazeInputTexture);
         }
+
+        // TODO: review - the following line is necessary, but at this stage it's unclear why.
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
     }
 
     /**
@@ -184,9 +187,6 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         // Actual Node Processing
 
         renderFullscreenQuad();
-
-        // TODO: review - the following line is necessary, but at this stage it's unclear why.
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         PerformanceMonitor.endActivity();
     }

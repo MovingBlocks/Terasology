@@ -82,7 +82,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
-                ssaoBlurredFbo, ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
+                displayResolutionDependentFBOs.get(SSAO_FBO), ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
     }
 
     /**

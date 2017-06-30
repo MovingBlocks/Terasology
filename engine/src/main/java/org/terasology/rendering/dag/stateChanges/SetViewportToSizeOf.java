@@ -80,7 +80,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fbo.fboId, fboWidth, fboHeight);
+        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.fboId, fboWidth, fboHeight);
     }
 
     public static void disposeDefaultInstance() {

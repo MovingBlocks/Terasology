@@ -44,14 +44,13 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 public class ApplyDeferredLightingNode extends AbstractNode {
     private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
 
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     public ApplyDeferredLightingNode(Context context) {
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
-        addDesiredStateChange(new BindFbo(primaryBuffer));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        addDesiredStateChange(new BindFbo(displayResolutionDependentFBOs.getSecondaryBuffer()));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
+
+        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, ColorTexture,
@@ -62,6 +61,8 @@ public class ApplyDeferredLightingNode extends AbstractNode {
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   primaryBuffer, LightAccumulationTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
+
+        displayResolutionDependentFBOs.swapReadWriteBuffers();
     }
 
     /**
@@ -79,8 +80,6 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
 
         renderFullscreenQuad();
-
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         PerformanceMonitor.endActivity();
     }
