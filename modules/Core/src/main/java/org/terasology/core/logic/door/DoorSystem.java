@@ -147,6 +147,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoor.send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
             logger.info("Closed Side: {}", newDoorComp.closedSide);
             logger.info("Open Side: {}", newDoorComp.openSide);
+            newDoor.send(new DoorPlacedEvent(event.getInstigator()));
         }
     }
 
