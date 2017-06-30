@@ -63,16 +63,16 @@ public class ToneMappingNode extends AbstractNode {
         screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(TONE_MAPPING_FBO, displayResolutionDependentFBOs));
+        FBO toneMappingFbo = requiresFBO(new FBOConfig(TONE_MAPPING_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(toneMappingFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(toneMappingFbo, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(TONE_MAPPING_MATERIAL));
 
         toneMappingMaterial = getMaterial(TONE_MAPPING_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, INITIAL_POST_FBO, ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(INITIAL_POST_FBO), ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
     }
 
     /**

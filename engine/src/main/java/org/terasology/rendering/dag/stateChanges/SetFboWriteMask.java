@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.FBO;
 import com.google.common.base.Objects;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.opengl.FBO;
 
 /**
  * Sets an FBO's write mask.
@@ -36,8 +34,6 @@ import org.terasology.rendering.dag.StateChange;
 public final class SetFboWriteMask implements StateChange {
     private SetFboWriteMask defaultInstance;
 
-    private BaseFBOsManager fboManager;
-    private ResourceUrn fboName;
     private FBO fbo;
 
     private boolean renderToColorBuffer;
@@ -53,35 +49,27 @@ public final class SetFboWriteMask implements StateChange {
      * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
      * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
      * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO should be written to.
-     * @param fboName A ResourceUrn identifying the FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
-     * @param fboManager The FBOManager responsible for managing the given FBO.
+     * @param fbo
      */
-    public SetFboWriteMask(boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer, ResourceUrn fboName, BaseFBOsManager fboManager) {
+    public SetFboWriteMask(boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer, FBO fbo) {
         this.renderToColorBuffer = renderToColorBuffer;
         this.renderToDepthBuffer = renderToDepthBuffer;
         this.renderToLightBuffer = renderToLightBuffer;
 
-        this.fboName = fboName;
-        this.fboManager = fboManager;
-
-        fbo = fboManager.get(fboName);
+        this.fbo = fbo;
     }
 
     /**
      * Creates the default instance of this class for the given FBO, resetting all masks to true.
      *
-     * @param fboName A ResourceUrn identifying the FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
-     * @param fboManager The FBOManager responsible for managing the given FBO.
+     * @param fbo
      */
-    private SetFboWriteMask(ResourceUrn fboName, BaseFBOsManager fboManager) {
+    private SetFboWriteMask(FBO fbo) {
         this.renderToColorBuffer = true;
         this.renderToDepthBuffer = true;
         this.renderToLightBuffer = true;
 
-        this.fboName = fboName;
-        this.fboManager = fboManager;
-
-        fbo = fboManager.get(fboName);
+        this.fbo = fbo;
 
         defaultInstance = this;
     }
@@ -89,19 +77,19 @@ public final class SetFboWriteMask implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null)
-            defaultInstance = new SetFboWriteMask(fboName, fboManager);
+            defaultInstance = new SetFboWriteMask(fbo);
         return defaultInstance;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fboName);
+        return Objects.hashCode(fbo.fboId);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetFboWriteMask)
-                && fboName.equals(((SetFboWriteMask) obj).fboName)
+                && fbo.fboId == ((SetFboWriteMask) obj).fbo.fboId
                 && renderToColorBuffer == ((SetFboWriteMask) obj).renderToColorBuffer
                 && renderToDepthBuffer == ((SetFboWriteMask) obj).renderToDepthBuffer
                 && renderToLightBuffer == ((SetFboWriteMask) obj).renderToLightBuffer;
@@ -109,7 +97,7 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fboName, renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
+        return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fbo.fboId, renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 
     @Override

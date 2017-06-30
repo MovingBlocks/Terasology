@@ -44,7 +44,7 @@ import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FB
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 
 /**
  * An instance of this node adds chromatic aberration (currently non-functional), light shafts,
@@ -86,9 +86,9 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
-        requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(INITIAL_POST_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(INITIAL_POST_FBO, displayResolutionDependentFBOs));
+        FBO initialPostFbo = requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(initialPostFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(INITIAL_POST_MATERIAL));
 
@@ -100,11 +100,15 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         lightShaftsAreEnabled = renderingConfig.isLightShafts();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
 
+        // TODO: Temporary hack for now.
+        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+        FBO one8thBloomFbo = requiresFBO(one8thScaleBloomConfig, displayResolutionDependentFBOs);
+
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getPrimaryBuffer(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
-        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, ONE_8TH_SCALE_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
-        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
+        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
+        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(LIGHT_SHAFTS_FBO), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
 
         if (bloomIsEnabled) {
             addDesiredStateChange(setBloomInputTexture);

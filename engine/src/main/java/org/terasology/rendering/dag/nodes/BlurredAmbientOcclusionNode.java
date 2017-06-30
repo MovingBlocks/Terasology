@@ -76,13 +76,13 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(ssaoBlurredFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoBlurredFbo, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
-                SSAO_FBO, ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
+                ssaoBlurredFbo, ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
     }
 
     /**

@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -42,8 +41,6 @@ public class DownSamplerNode extends ConditionDependentNode {
     private static final ResourceUrn DOWN_SAMPLER_MATERIAL = new ResourceUrn("engine:prog.downSampler");
 
     private String label;
-    private BaseFBOsManager outputFboManager;
-    private ResourceUrn outputFboUrn;
     private FBO outputFbo;
     private Material downSampler;
 
@@ -61,15 +58,12 @@ public class DownSamplerNode extends ConditionDependentNode {
                                             String label) {
         super(context);
 
-        this.outputFboManager = outputFboManager;
-        this.outputFboUrn = outputFboConfig.getName();
-
-        requiresFBO(inputFboConfig, inputFboManager);
+        FBO inputFbo = requiresFBO(inputFboConfig, inputFboManager);
         outputFbo = requiresFBO(outputFboConfig, outputFboManager);
 
-        addDesiredStateChange(new BindFbo(outputFboUrn, outputFboManager));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, outputFboManager));
-        addDesiredStateChange(new SetInputTextureFromFbo(SLOT_0, inputFboConfig.getName(), ColorTexture, inputFboManager,
+        addDesiredStateChange(new BindFbo(outputFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo, outputFboManager));
+        addDesiredStateChange(new SetInputTextureFromFbo(SLOT_0, inputFbo, ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
 
         setupConditions(context);

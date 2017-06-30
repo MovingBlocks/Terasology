@@ -15,16 +15,15 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
-import java.util.Objects;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+import java.util.Objects;
+
 import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
@@ -33,12 +32,9 @@ import static org.lwjgl.opengl.GL11.glViewport;
 public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
     private static SetViewportToSizeOf defaultInstance;
 
-    private BaseFBOsManager fboManager;
-    private ResourceUrn fboName;
+    private FBO fbo;
     private int fboWidth;
     private int fboHeight;
-
-    private FBO fbo;
 
     /**
      * The constructor, to be used in the initialise method of a node.
@@ -46,14 +42,11 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
      * Sample use:
      *      addDesiredStateChange(new SetViewportToSizeOf("engine:sceneOpaque", displayResolutionDependentFboManager);
      *
-     * @param fboName a URN identifying an FBO.
-     * @param frameBuffersManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     * @param fbo
+     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
      */
-    public SetViewportToSizeOf(ResourceUrn fboName, BaseFBOsManager frameBuffersManager) {
-        this.fboManager = frameBuffersManager;
-        this.fboName = fboName;
-
-        fbo = fboManager.get(fboName);
+    public SetViewportToSizeOf(FBO fbo, BaseFBOsManager fboManager) {
+        this.fbo = fbo;
 
         update(); // Cheeky way to initialise fboWidth, fboHeight
         fboManager.subscribe(this);
@@ -62,7 +55,8 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetViewportToSizeOf(READONLY_GBUFFER, CoreRegistry.get(DisplayResolutionDependentFBOs.class));
+            DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+            defaultInstance = new SetViewportToSizeOf(displayResolutionDependentFBOs.getPrimaryBuffer(), displayResolutionDependentFBOs);
         }
         return defaultInstance;
     }
@@ -86,7 +80,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fboName, fboWidth, fboHeight);
+        return String.format("%30s: %s (%sx%s)", this.getClass().getSimpleName(), fbo.fboId, fboWidth, fboHeight);
     }
 
     public static void disposeDefaultInstance() {

@@ -127,11 +127,15 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
         buffersSwapped = !buffersSwapped;
     }
 
-    public FBO getPrimaryBufferUrn() {
+    public FBO getPrimaryBuffer() {
         return get(buffersSwapped ? BUFFER2 : BUFFER1);
     }
 
-    public FBO getSecondaryBufferUrn() {
+    public FBO getSecondaryBuffer() {
         return get(buffersSwapped ? BUFFER1 : BUFFER2);
+    }
+
+    public FBO getFinalBuffer() {
+        return get(FINAL_BUFFER);
     }
 }

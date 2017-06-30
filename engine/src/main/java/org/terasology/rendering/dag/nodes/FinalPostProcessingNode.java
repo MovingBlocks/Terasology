@@ -24,15 +24,17 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.shader.ShaderParametersDebug;
+import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
@@ -71,8 +73,13 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(FINAL_BUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
+        FBO finalBuffer = displayResolutionDependentFBOs.getFinalBuffer();
+        addDesiredStateChange(new BindFbo(finalBuffer));
+        addDesiredStateChange(new SetViewportToSizeOf(finalBuffer, displayResolutionDependentFBOs));
+
+        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
+        ShaderParametersPost.setPrimaryBuffer(primaryBuffer);
+        ShaderParametersDebug.setPrimaryBuffer(primaryBuffer);
     }
 
     /**

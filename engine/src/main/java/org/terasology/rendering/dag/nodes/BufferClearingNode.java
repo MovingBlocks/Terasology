@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 import static org.lwjgl.opengl.GL11.glClear;
@@ -26,13 +27,10 @@ import static org.lwjgl.opengl.GL11.glClear;
  * Instances of this node clear specific buffers attached to an FBOs, in accordance to a clearing mask.
  * Normally this means that all the pixels in the buffers selected by the mask are reset to a default value.
  *
- * Notice that the node is fully initialised and ready to use only after calling the initialise(Object object) method.
- *
  * This class could be inherited by a more specific class that sets the default values, via (yet to be written)
  * state changes.
  */
 public class BufferClearingNode extends AbstractNode {
-
     private int clearingMask;
 
     /**
@@ -52,8 +50,8 @@ public class BufferClearingNode extends AbstractNode {
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
 
         if (argumentsAreValid) {
-            requiresFBO(fboConfig, fboManager);
-            addDesiredStateChange(new BindFbo(fboConfig.getName(), fboManager));
+            FBO fbo = requiresFBO(fboConfig, fboManager);
+            addDesiredStateChange(new BindFbo(fbo));
             this.clearingMask = clearingMask;
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");

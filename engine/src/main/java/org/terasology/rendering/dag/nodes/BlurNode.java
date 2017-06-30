@@ -26,7 +26,6 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
@@ -41,9 +40,6 @@ public class BlurNode extends ConditionDependentNode {
 
     private Material blurMaterial;
     private String label;
-
-    private ResourceUrn inputFboUrn;
-    private ResourceUrn outputFboUrn;
 
     private FBO inputFbo;
     private FBO outputFbo;
@@ -62,15 +58,13 @@ public class BlurNode extends ConditionDependentNode {
 
         this.blurRadius = blurRadius;
         this.label = label;
-        this.inputFboUrn = inputFboConfig.getName();
-        this.outputFboUrn = outputFboConfig.getName();
 
         setupConditions(context);
 
         inputFbo = requiresFBO(inputFboConfig, fboManager);
         outputFbo = requiresFBO(outputFboConfig, fboManager);
-        addDesiredStateChange(new BindFbo(outputFboUrn, fboManager));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, fboManager));
+        addDesiredStateChange(new BindFbo(outputFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo, fboManager));
 
         addDesiredStateChange(new EnableMaterial(BLUR_MATERIAL));
         this.blurMaterial = getMaterial(BLUR_MATERIAL);

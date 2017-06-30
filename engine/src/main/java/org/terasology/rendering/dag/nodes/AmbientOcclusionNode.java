@@ -29,6 +29,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.shader.ShaderParametersSSAO;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -74,10 +75,12 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SSAO_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(ssaoFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo, displayResolutionDependentFBOs));
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
+
+        ShaderParametersSSAO.setPrimaryBuffer(displayResolutionDependentFBOs.getPrimaryBuffer());
 
         // TODO: check for input textures brought in by the material
     }

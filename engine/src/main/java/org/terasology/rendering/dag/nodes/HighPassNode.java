@@ -34,7 +34,6 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * An instance of this class generates a high pass image out of the color content of the GBUFFER and stores
@@ -59,15 +58,15 @@ public class HighPassNode extends ConditionDependentNode {
         requiresCondition(renderingConfig::isBloom);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(HIGH_PASS_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));
+        FBO highPassFbo = requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(highPassFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(highPassFbo, displayResolutionDependentFBOs));
 
         highPass = getMaterial(HIGH_PASS_MATERIAL);
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getPrimaryBuffer(), ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)
