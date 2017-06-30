@@ -15,23 +15,20 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.terasology.rendering.assets.material.Material;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 /**
- * Shader parameters for the Block shader program.
- *
+ * Basic shader parameters for all shader program.
  */
-public class ShaderParametersDefault extends ShaderParametersBase {
+public class ShaderParametersEmpty implements ShaderParameters {
+    public ShaderParametersEmpty() {
+    }
+
+    @Override
+    public void initialParameters(Material material) {
+    }
+
     @Override
     public void applyParameters(Material program) {
-        super.applyParameters(program);
-
-        // TODO: verify this is still relevant
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, 0);
     }
 }
