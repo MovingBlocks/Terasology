@@ -21,12 +21,14 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
@@ -51,12 +53,14 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+
+        addDesiredStateChange(new SetInputTextureFromFbo(0, sceneFinalFbo, ColorTexture,
+                displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL, "texture"));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.

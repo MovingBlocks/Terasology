@@ -60,7 +60,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     private float outputFboWidth;
     private float outputFboHeight;
 
-    @SuppressWarnings("FieldCanBeLocal")
     private FBO ssaoBlurredFbo;
 
     public BlurredAmbientOcclusionNode(Context context) {

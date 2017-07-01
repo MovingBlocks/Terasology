@@ -77,8 +77,6 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         // Actual Node Processing
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
-
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();

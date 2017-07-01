@@ -242,7 +242,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         // (i.e. water) reflection generation
         FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
         BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode"); // TODO: verify this is necessary
+        renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
 
         Node reflectedBackdropNode = new BackdropReflectionNode(context);
         renderGraph.addNode(reflectedBackdropNode, "reflectedBackdropNode");
@@ -255,17 +255,21 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig sceneOpaqueFboConfig = displayResolutionDependentFBOs.getFboConfig(BUFFER1);
+        FBOConfig scenePrimaryBufferConfig = displayResolutionDependentFBOs.getFboConfig(BUFFER1);
+        FBOConfig sceneSecondaryBufferConfig = displayResolutionDependentFBOs.getFboConfig(BUFFER1);
 
-        BufferClearingNode readBufferClearingNode = new BufferClearingNode(sceneOpaqueFboConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        BufferClearingNode readBufferClearingNode = new BufferClearingNode(scenePrimaryBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
+
+        BufferClearingNode writeBufferClearingNode = new BufferClearingNode(sceneSecondaryBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderGraph.addNode(writeBufferClearingNode, "writeBufferClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeIntermediateNode = new HazeNode(context, sceneOpaqueFboConfig, hazeIntermediateConfig, aLabel);
+        HazeNode hazeIntermediateNode = new HazeNode(context, scenePrimaryBufferConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -330,7 +334,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, sceneOpaqueFboConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, scenePrimaryBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";

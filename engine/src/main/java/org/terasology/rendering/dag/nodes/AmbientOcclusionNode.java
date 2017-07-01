@@ -60,7 +60,6 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private float outputFboWidth;
     private float outputFboHeight;
 
-    @SuppressWarnings("FieldCanBeLocal")
     private FBO ssaoFbo;
 
     public AmbientOcclusionNode(Context context) {
