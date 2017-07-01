@@ -21,6 +21,8 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.math.geom.Vector3f;
 
 /**
+ * TODO Make CollideEvent as a server event.
+ * TODO Have a CollideRequest before the CollideEvent?
  */
 public class CollideEvent extends AbstractConsumableEvent {
     private EntityRef otherEntity;
