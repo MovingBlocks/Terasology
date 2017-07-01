@@ -18,9 +18,9 @@ package org.terasology.core.logic.door;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 /**
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class DoorSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
 
@@ -183,18 +183,39 @@ public class DoorSystem extends BaseComponentSystem {
     @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
     public void onFrob(ActivateEvent event, EntityRef entity) {
         DoorComponent door = entity.getComponent(DoorComponent.class);
-        Side newSide = (door.isOpen) ? door.closedSide : door.openSide;
+        if (door.isOpen) {
+            entity.send(new CloseDoorEvent(event.getInstigator()));
+        } else {
+            entity.send(new CloseDoorEvent(event.getInstigator()));
+        }
+    }
+
+    @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
+    public void closeDoor(CloseDoorEvent event, EntityRef entity, DoorComponent door) {
+        Side newSide = door.closedSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
-        StaticSound sound = (door.isOpen) ? door.closeSound : door.openSound;
-        if (sound != null) {
-            entity.send(new PlaySoundEvent(sound, 1f));
+        if (door.closeSound != null) {
+            entity.send(new PlaySoundEvent(door.closeSound, 1f));
         }
-
-        door.isOpen = !door.isOpen;
+        door.isOpen = false;
         entity.saveComponent(door);
+    }
+
+    @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
+    public void openDoor(OpenDoorEvent event, EntityRef entity, DoorComponent door) {
+        Side newSide = door.openSide;
+        BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
+        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
+        worldProvider.setBlock(regionComp.region.min(), bottomBlock);
+        Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
+        worldProvider.setBlock(regionComp.region.max(), topBlock);
+        if (door.openSide != null) {
+            entity.send(new PlaySoundEvent(door.openSound, 1f));
+        }
+        door.isOpen = true;
     }
 }

@@ -13,25 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic.door;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
+@API package org.terasology.core.logic.door;
 
-@BroadcastEvent
-public class DoorPlacedEvent implements Event {
-    private EntityRef instigator;
-
-    public DoorPlacedEvent() {
-        instigator = EntityRef.NULL;
-    }
-
-    public DoorPlacedEvent(EntityRef doorEntity) {
-        this.instigator = doorEntity;
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
-    }
-}
+import org.terasology.module.sandbox.API;

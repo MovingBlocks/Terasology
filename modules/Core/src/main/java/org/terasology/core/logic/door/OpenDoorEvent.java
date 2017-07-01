@@ -17,18 +17,18 @@ package org.terasology.core.logic.door;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
+import org.terasology.network.ServerEvent;
 
-@BroadcastEvent
-public class DoorPlacedEvent implements Event {
+@ServerEvent
+public class OpenDoorEvent implements Event {
     private EntityRef instigator;
 
-    public DoorPlacedEvent() {
+    public OpenDoorEvent() {
         instigator = EntityRef.NULL;
     }
 
-    public DoorPlacedEvent(EntityRef doorEntity) {
-        this.instigator = doorEntity;
+    public OpenDoorEvent(EntityRef instigator) {
+        this.instigator = instigator;
     }
 
     public EntityRef getInstigator() {
