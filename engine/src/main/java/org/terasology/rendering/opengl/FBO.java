@@ -51,13 +51,12 @@ public final class FBO {
     private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
-    // TODO: make accessors for these
-    public int fboId;
-    public int colorBufferTextureId;
-    public int depthStencilTextureId;
-    public int depthStencilRboId;
-    public int normalsBufferTextureId;
-    public int lightBufferTextureId;
+    private int fboId;
+    private int colorBufferTextureId;
+    private int depthStencilTextureId;
+    private int depthStencilRboId;
+    private int normalsBufferTextureId;
+    private int lightBufferTextureId;
 
     private Dimensions dimensions;
     private boolean writeToColorBuffer;
@@ -273,6 +272,30 @@ public final class FBO {
 
     private void setStatus(Status newStatus) {
         this.status = newStatus;
+    }
+
+    public int getId() {
+        return fboId;
+    }
+
+    public int getColorBufferTextureId() {
+        return colorBufferTextureId;
+    }
+
+    public int getDepthStencilTextureId() {
+        return depthStencilTextureId;
+    }
+
+    public int getDepthStencilRboId() {
+        return depthStencilRboId;
+    }
+
+    public int getNormalsBufferTextureId() {
+        return normalsBufferTextureId;
+    }
+
+    public int getLightBufferTextureId() {
+        return lightBufferTextureId;
     }
 
     /**

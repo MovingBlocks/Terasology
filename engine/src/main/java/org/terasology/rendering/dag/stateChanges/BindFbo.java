@@ -46,7 +46,7 @@ public final class BindFbo implements StateChange {
      *      addDesiredStateChange(new BindFbo("engine:sceneOpaque", displayResolutionDependentFBOManager));
      */
     public BindFbo(FBO fbo) {
-        fboId = fbo.fboId;
+        fboId = fbo.getId();
     }
 
     @Override

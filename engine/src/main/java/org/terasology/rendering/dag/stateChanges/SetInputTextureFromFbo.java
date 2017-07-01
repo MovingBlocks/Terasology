@@ -106,16 +106,16 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
     private int fetchTextureId() {
         switch (textureType) {
             case ColorTexture:
-                return fbo.colorBufferTextureId;
+                return fbo.getColorBufferTextureId();
 
             case DepthStencilTexture:
-                return fbo.depthStencilTextureId;
+                return fbo.getDepthStencilTextureId();
 
             case NormalsTexture:
-                return fbo.normalsBufferTextureId;
+                return fbo.getNormalsBufferTextureId();
 
             case LightAccumulationTexture:
-                return fbo.lightBufferTextureId;
+                return fbo.getLightBufferTextureId();
         }
 
         return 0;
@@ -135,7 +135,7 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
     public String toString() {
         if (this != defaultInstance) {
             return String.format("%30s: slot %s, fbo %s, textureType %s, fboManager %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
-                    textureSlot, fbo.fboId, textureType.name(), fboManager.toString(), materialUrn.toString(), shaderParameterName);
+                    textureSlot, fbo.getId(), textureType.name(), fboManager.toString(), materialUrn.toString(), shaderParameterName);
         } else {
             return String.format("%30s: slot %s, textureId 0, material %s, parameter '%s'", this.getClass().getSimpleName(),
                     textureSlot, materialUrn.toString(), shaderParameterName);
@@ -144,7 +144,7 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
 
     @Override
     public int hashCode() {
-        return Objects.hash(textureSlot, fbo.fboId, textureType, fboManager, materialUrn, shaderParameterName);
+        return Objects.hash(textureSlot, fbo, textureType, fboManager, materialUrn, shaderParameterName);
     }
 
     @Override

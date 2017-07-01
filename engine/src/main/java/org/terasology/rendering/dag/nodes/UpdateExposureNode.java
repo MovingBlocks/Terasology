@@ -95,7 +95,7 @@ public class UpdateExposureNode extends AbstractNode {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            writeOnlyPbo.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            writeOnlyPbo.copyFromFBO(downSampledScene.getId(), 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
             ByteBuffer pixels = writeOnlyPbo.readBackPixels();
 
             if (pixels.limit() < 3) {

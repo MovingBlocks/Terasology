@@ -83,13 +83,13 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fbo.fboId);
+        return Objects.hashCode(fbo);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetFboWriteMask)
-                && fbo.fboId == ((SetFboWriteMask) obj).fbo.fboId
+                && fbo == ((SetFboWriteMask) obj).fbo
                 && renderToColorBuffer == ((SetFboWriteMask) obj).renderToColorBuffer
                 && renderToDepthBuffer == ((SetFboWriteMask) obj).renderToDepthBuffer
                 && renderToLightBuffer == ((SetFboWriteMask) obj).renderToLightBuffer;
@@ -97,7 +97,7 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fbo.fboId, renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
+        return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fbo.getId(), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 
     @Override

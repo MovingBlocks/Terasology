@@ -70,11 +70,11 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
             rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
-            vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
+            vrProvider.texType[0].handle = leftEyeFbo.getColorBufferTextureId();
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[0].write();
-            vrProvider.texType[1].handle = rightEyeFbo.colorBufferTextureId;
+            vrProvider.texType[1].handle = rightEyeFbo.getColorBufferTextureId();
             vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();

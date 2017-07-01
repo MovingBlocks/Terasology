@@ -56,6 +56,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
+            assert(displayResolutionDependentFBOs != null);
             defaultInstance = new SetViewportToSizeOf(displayResolutionDependentFBOs.getPrimaryBuffer(), displayResolutionDependentFBOs);
         }
         return defaultInstance;
@@ -80,7 +81,7 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.fboId, fboWidth, fboHeight);
+        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.getId(), fboWidth, fboHeight);
     }
 
     public static void disposeDefaultInstance() {
