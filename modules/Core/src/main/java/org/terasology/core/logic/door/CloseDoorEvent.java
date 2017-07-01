@@ -19,6 +19,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
+@ServerEvent
 public class CloseDoorEvent implements Event {
     private EntityRef doorEntity;
 

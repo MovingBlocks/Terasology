@@ -21,17 +21,17 @@ import org.terasology.network.ServerEvent;
 
 @ServerEvent
 public class OpenDoorEvent implements Event {
-    private EntityRef instigator;
+    private EntityRef doorEntity;
 
     public OpenDoorEvent() {
-        instigator = EntityRef.NULL;
+        doorEntity = EntityRef.NULL;
     }
 
-    public OpenDoorEvent(EntityRef instigator) {
-        this.instigator = instigator;
+    public OpenDoorEvent(EntityRef doorEntity) {
+        this.doorEntity = doorEntity;
     }
 
-    public EntityRef getInstigator() {
-        return instigator;
+    public EntityRef getDoorEntity() {
+        return doorEntity;
     }
 }

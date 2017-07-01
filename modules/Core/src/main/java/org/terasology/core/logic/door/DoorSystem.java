@@ -18,8 +18,6 @@ package org.terasology.core.logic.door;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.systems.RegisterMode;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -27,6 +25,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -38,6 +37,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.utilities.Assets;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -184,14 +184,16 @@ public class DoorSystem extends BaseComponentSystem {
     public void onFrob(ActivateEvent event, EntityRef entity) {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         if (door.isOpen) {
-            entity.send(new CloseDoorEvent(event.getInstigator()));
+            event.getInstigator().send(new CloseDoorEvent(entity));
         } else {
-            entity.send(new CloseDoorEvent(event.getInstigator()));
+            event.getInstigator().send(new OpenDoorEvent(entity));
         }
     }
 
-    @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
-    public void closeDoor(CloseDoorEvent event, EntityRef entity, DoorComponent door) {
+    @ReceiveEvent
+    public void closeDoor(CloseDoorEvent event, EntityRef player) {
+        EntityRef entity = event.getDoorEntity();
+        DoorComponent door = entity.getComponent(DoorComponent.class);
         Side newSide = door.closedSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
@@ -205,15 +207,17 @@ public class DoorSystem extends BaseComponentSystem {
         entity.saveComponent(door);
     }
 
-    @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
-    public void openDoor(OpenDoorEvent event, EntityRef entity, DoorComponent door) {
+    @ReceiveEvent
+    public void openDoor(OpenDoorEvent event, EntityRef player) {
+        EntityRef entity = event.getDoorEntity();
+        DoorComponent door = entity.getComponent(DoorComponent.class);
         Side newSide = door.openSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
-        if (door.openSide != null) {
+        if (door.openSound != null) {
             entity.send(new PlaySoundEvent(door.openSound, 1f));
         }
         door.isOpen = true;
