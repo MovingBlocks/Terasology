@@ -144,11 +144,6 @@ public class PojoSectorManager implements EngineSectorManager {
         return getPool().createEntityWithId(id, components);
     }
 
-    @Override
-    public EntityRef createEntityRefWithId(long id) {
-        return getPool().createEntityRefWithId(id);
-    }
-
     public void destroy(long entityId) {
         getPool().destroy(entityId);
     }
@@ -196,15 +191,8 @@ public class PojoSectorManager implements EngineSectorManager {
     }
 
     @Override
-    public EntityRef getExistingEntity(long id) {
-        EntityRef entity;
-        for (EntityPool pool : pools) {
-            entity = pool.getExistingEntity(id);
-            if (entity != EntityRef.NULL && entity != null) {
-                return entity;
-            }
-        }
-        return EntityRef.NULL;
+    public EntityRef getEntity(long id) {
+        return entityManager.getEntity(id);
     }
 
     private EngineEntityPool getPool() {

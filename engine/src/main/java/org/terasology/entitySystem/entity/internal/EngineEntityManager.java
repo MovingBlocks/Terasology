@@ -54,7 +54,7 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      * @param id
      * @return The entityRef for the given id
      */
-    EntityRef createEntityRefWithId(long id);
+    EntityRef getEntity(long id);
 
     /**
      * This is used to persist the entity manager's state
@@ -102,16 +102,6 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      * @param subscriber
      */
     void unsubscribe(EntityChangeSubscriber subscriber);
-
-    void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component);
-
-    void notifyComponentRemoved(EntityRef changedEntity, Class<? extends Component> component);
-
-    void notifyComponentChanged(EntityRef changedEntity, Class<? extends Component> component);
-
-    void notifyComponentRemovalAndEntityDestruction(long entityId, EntityRef ref);
-
-    long createEntity();
 
     void remove(long entityId);
 

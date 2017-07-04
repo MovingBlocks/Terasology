@@ -51,7 +51,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     @Override
     public EntityRef deserialize(PersistedData data, DeserializationContext context) {
         if (data.isNumber()) {
-            return entityManager.createEntityRefWithId(data.getAsLong());
+            return entityManager.getEntity(data.getAsLong());
         }
         return EntityRef.NULL;
     }
@@ -85,7 +85,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         TLongIterator iterator = array.getAsLongArray().iterator();
         while (iterator.hasNext()) {
             long item = iterator.next();
-            result.add(entityManager.createEntityRefWithId(item));
+            result.add(entityManager.getEntity(item));
         }
     }
 

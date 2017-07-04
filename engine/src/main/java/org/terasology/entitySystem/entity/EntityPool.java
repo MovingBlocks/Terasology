@@ -144,12 +144,12 @@ public interface EntityPool {
     EntityRef createEntityWithId(long id, Iterable<Component> components);
 
     /**
-     * Creates an entity ref with the given id. This is used when loading components with references.
+     * Retrieve the entity ref with the given id.
      *
      * @param id
-     * @return The entityRef for the given id
+     * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
      */
-    EntityRef createEntityRefWithId(long id);
+    EntityRef getEntity(long id);
 
     Iterable<EntityRef> getAllEntities();
 
@@ -169,13 +169,5 @@ public interface EntityPool {
      * @return A count of currently active entities
      */
     int getActiveEntityCount();
-
-    /**
-     * Gets an entity, if it already exists.
-     *
-     * @param id the id of the desired entity
-     * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
-     */
-    EntityRef getExistingEntity(long id);
 
 }
