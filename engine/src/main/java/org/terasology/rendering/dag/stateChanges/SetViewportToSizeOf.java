@@ -17,9 +17,7 @@ package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.dag.StateChange;
-import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import java.util.Objects;
@@ -38,9 +36,9 @@ public final class SetViewportToSizeOf implements StateChange {
      * The constructor, to be used in the initialise method of a node.
      *
      * Sample use:
-     *      addDesiredStateChange(new SetViewportToSizeOf("engine:sceneOpaque", displayResolutionDependentFboManager);
+     *      addDesiredStateChange(new SetViewportToSizeOf(fbo);
      *
-     * @param fbo
+     * @param fbo The FBO whose dimensions the viewport will be resized to.
      */
     public SetViewportToSizeOf(FBO fbo) {
         this.fbo = fbo;

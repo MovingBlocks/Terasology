@@ -43,7 +43,7 @@ public final class BindFbo implements StateChange {
      * The constructor, to be used in the initialise method of a node.
      *
      * Sample use:
-     *      addDesiredStateChange(new BindFbo("engine:sceneOpaque", displayResolutionDependentFBOManager));
+     *      addDesiredStateChange(new BindFbo(fbo));
      */
     public BindFbo(FBO fbo) {
         fboId = fbo.getId();
