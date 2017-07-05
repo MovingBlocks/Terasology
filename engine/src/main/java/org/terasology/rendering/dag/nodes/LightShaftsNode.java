@@ -93,7 +93,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO lightShaftsFbo = requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(lightShaftsFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(lightShaftsFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(lightShaftsFbo));
 
         addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL));
 

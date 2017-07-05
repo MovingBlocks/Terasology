@@ -76,7 +76,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         addDesiredStateChange(new BindFbo(finalBuffer));
-        addDesiredStateChange(new SetViewportToSizeOf(finalBuffer, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
 
         FBO gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
         ShaderParametersPost.setGBufferRead(gBufferRead);

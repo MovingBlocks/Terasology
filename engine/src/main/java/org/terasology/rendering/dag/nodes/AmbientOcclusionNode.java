@@ -75,7 +75,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(ssaoFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 

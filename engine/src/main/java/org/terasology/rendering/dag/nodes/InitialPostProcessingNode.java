@@ -88,7 +88,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         // TODO: see if we could write this straight into a GBUFFER
         FBO initialPostFbo = requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(initialPostFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo));
 
         addDesiredStateChange(new EnableMaterial(INITIAL_POST_MATERIAL));
 

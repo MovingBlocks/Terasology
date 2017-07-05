@@ -64,7 +64,7 @@ public class BlurNode extends ConditionDependentNode {
         inputFbo = requiresFBO(inputFboConfig, fboManager);
         outputFbo = requiresFBO(outputFboConfig, fboManager);
         addDesiredStateChange(new BindFbo(outputFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFbo, fboManager));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
 
         addDesiredStateChange(new EnableMaterial(BLUR_MATERIAL));
         this.blurMaterial = getMaterial(BLUR_MATERIAL);

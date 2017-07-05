@@ -117,7 +117,7 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));

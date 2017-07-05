@@ -60,7 +60,7 @@ public class HighPassNode extends ConditionDependentNode {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO highPassFbo = requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(highPassFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(highPassFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(highPassFbo));
 
         highPass = getMaterial(HIGH_PASS_MATERIAL);
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));

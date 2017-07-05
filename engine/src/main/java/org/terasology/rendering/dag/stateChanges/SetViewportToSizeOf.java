@@ -29,12 +29,10 @@ import static org.lwjgl.opengl.GL11.glViewport;
 /**
  * TODO: Add javadocs
  */
-public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateChange {
+public final class SetViewportToSizeOf implements StateChange {
     private static SetViewportToSizeOf defaultInstance;
 
     private FBO fbo;
-    private int fboWidth;
-    private int fboHeight;
 
     /**
      * The constructor, to be used in the initialise method of a node.
@@ -43,13 +41,9 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
      *      addDesiredStateChange(new SetViewportToSizeOf("engine:sceneOpaque", displayResolutionDependentFboManager);
      *
      * @param fbo
-     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
      */
-    public SetViewportToSizeOf(FBO fbo, BaseFBOsManager fboManager) {
+    public SetViewportToSizeOf(FBO fbo) {
         this.fbo = fbo;
-
-        update(); // Cheeky way to initialise fboWidth, fboHeight
-        fboManager.subscribe(this);
     }
 
     @Override
@@ -57,31 +51,25 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
         if (defaultInstance == null) {
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
             assert(displayResolutionDependentFBOs != null);
-            defaultInstance = new SetViewportToSizeOf(displayResolutionDependentFBOs.getPrimaryBuffer(), displayResolutionDependentFBOs);
+            defaultInstance = new SetViewportToSizeOf(displayResolutionDependentFBOs.getGBuffer().getWriteFbo());
         }
         return defaultInstance;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fboWidth, fboHeight);
+        return Objects.hash(fbo.width(), fbo.height());
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof SetViewportToSizeOf) && (this.fboWidth == ((SetViewportToSizeOf) obj).fboWidth)
-                                                    && (this.fboHeight == ((SetViewportToSizeOf) obj).fboHeight);
-    }
-
-    @Override
-    public void update() {
-        fboWidth = fbo.width();
-        fboHeight = fbo.height();
+        return (obj instanceof SetViewportToSizeOf) && (this.fbo.width() == ((SetViewportToSizeOf) obj).fbo.width())
+                                                    && (this.fbo.height() == ((SetViewportToSizeOf) obj).fbo.height());
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.getId(), fboWidth, fboHeight);
+        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.getId(), fbo.width(), fbo.height());
     }
 
     public static void disposeDefaultInstance() {
@@ -90,6 +78,6 @@ public final class SetViewportToSizeOf implements FBOManagerSubscriber, StateCha
 
     @Override
     public void process() {
-        glViewport(0, 0, fboWidth, fboHeight);
+        glViewport(0, 0, fbo.width(), fbo.height());
     }
 }

@@ -93,7 +93,7 @@ public class ShadowMapNode extends ConditionDependentNode {
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
         FBO shadowMapFbo = requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(shadowMapFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo, shadowMapResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
     }
 

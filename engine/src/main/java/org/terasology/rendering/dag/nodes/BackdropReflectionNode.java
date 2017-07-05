@@ -107,7 +107,7 @@ public class BackdropReflectionNode extends AbstractNode {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo, displayResolutionDependentFBOs));
+        addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
         addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));

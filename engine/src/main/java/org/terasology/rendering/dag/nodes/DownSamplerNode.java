@@ -62,7 +62,7 @@ public class DownSamplerNode extends ConditionDependentNode {
         outputFbo = requiresFBO(outputFboConfig, outputFboManager);
 
         addDesiredStateChange(new BindFbo(outputFbo));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFbo, outputFboManager));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
         addDesiredStateChange(new SetInputTextureFromFbo(SLOT_0, inputFbo, ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
 
