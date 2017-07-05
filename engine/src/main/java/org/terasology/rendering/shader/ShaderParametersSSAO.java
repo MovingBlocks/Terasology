@@ -58,7 +58,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     private FloatBuffer ssaoSamples;
 
-    private static FBO primaryBuffer;
+    private static FBO gBufferRead;
 
     @Override
     public void initialParameters(Material material) {
@@ -97,12 +97,12 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         int texId = 0;
 
         // TODO: move to node
-        if (primaryBuffer != null) {
+        if (gBufferRead != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            primaryBuffer.bindDepthTexture();
+            gBufferRead.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            primaryBuffer.bindNormalsTexture();
+            gBufferRead.bindNormalsTexture();
             program.setInt("texNormals", texId++, true);
         }
 
@@ -148,7 +148,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         return texture.get();
     }
 
-    public static void setPrimaryBuffer(FBO fbo) {
-        primaryBuffer = fbo;
+    public static void setGBufferRead(FBO fbo) {
+        gBufferRead = fbo;
     }
 }

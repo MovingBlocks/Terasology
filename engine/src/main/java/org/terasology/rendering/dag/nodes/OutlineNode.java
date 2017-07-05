@@ -55,7 +55,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     private Material outlineMaterial;
 
-    private FBO primaryBuffer;
+    private FBO gBufferRead;
     private float primaryBufferWidth;
     private float primaryBufferHeight;
 
@@ -76,7 +76,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         requiresCondition(() -> renderingConfig.isOutline());
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
+        gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
         FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(outlineFbo));
 
@@ -88,7 +88,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         outlineMaterial = getMaterial(OUTLINE_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, primaryBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, gBufferRead, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
     }
 
     /**
@@ -125,7 +125,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     @Override
     public void update() {
-        primaryBufferWidth = primaryBuffer.width();
-        primaryBufferHeight = primaryBuffer.height();
+        primaryBufferWidth = gBufferRead.width();
+        primaryBufferHeight = gBufferRead.height();
     }
 }

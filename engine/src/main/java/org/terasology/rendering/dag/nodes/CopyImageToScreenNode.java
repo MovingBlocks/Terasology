@@ -37,7 +37,6 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
 
-    private FBO sceneFinalFbo;
     private int displayWidth;
     private int displayHeight;
 
@@ -48,13 +47,12 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         update(); // Cheeky way to initialise displayWidth, displayHeight
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
 
-        addDesiredStateChange(new SetInputTextureFromFbo(0, sceneFinalFbo, ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(0, displayResolutionDependentFBOs.get(FINAL_BUFFER), ColorTexture,
                 displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL, "texture"));
     }
 

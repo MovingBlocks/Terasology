@@ -35,13 +35,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 /**
  * An instance of this class adds depth of field blur, motion blur and film grain to the rendering
  * of the scene obtained so far. Furthermore, depending if a screenshot has been requested,
  * it instructs the ScreenGrabber to save it to a file.
  *
- * If RederingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
+ * If RenderingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
  * the content of a number of technical buffers rather than the final, post-processed rendering
  * of the scene.
  */
@@ -73,13 +74,13 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO finalBuffer = displayResolutionDependentFBOs.getFinalBuffer();
+        FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
         addDesiredStateChange(new BindFbo(finalBuffer));
         addDesiredStateChange(new SetViewportToSizeOf(finalBuffer, displayResolutionDependentFBOs));
 
-        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
-        ShaderParametersPost.setPrimaryBuffer(primaryBuffer);
-        ShaderParametersDebug.setPrimaryBuffer(primaryBuffer);
+        FBO gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
+        ShaderParametersPost.setGBufferRead(gBufferRead);
+        ShaderParametersDebug.setGBufferRead(gBufferRead);
     }
 
     /**

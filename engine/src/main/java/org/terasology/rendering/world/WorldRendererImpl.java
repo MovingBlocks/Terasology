@@ -100,7 +100,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.BUFFER1;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.GBUFFER_READ;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.GBUFFER_WRITE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -255,21 +256,21 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig scenePrimaryBufferConfig = displayResolutionDependentFBOs.getFboConfig(BUFFER1);
-        FBOConfig sceneSecondaryBufferConfig = displayResolutionDependentFBOs.getFboConfig(BUFFER1);
+        FBOConfig gBufferReadConfig = displayResolutionDependentFBOs.getFboConfig(GBUFFER_READ);
+        FBOConfig gBufferWriteConfig = displayResolutionDependentFBOs.getFboConfig(GBUFFER_WRITE);
 
-        BufferClearingNode readBufferClearingNode = new BufferClearingNode(scenePrimaryBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(readBufferClearingNode, "readBufferClearingNode");
+        BufferClearingNode gBufferReadClearingNode = new BufferClearingNode(gBufferReadConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(gBufferReadClearingNode, "gBufferReadClearingNode");
 
-        BufferClearingNode writeBufferClearingNode = new BufferClearingNode(sceneSecondaryBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderGraph.addNode(writeBufferClearingNode, "writeBufferClearingNode");
+        BufferClearingNode gBufferWriteClearingNode = new BufferClearingNode(gBufferWriteConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderGraph.addNode(gBufferWriteClearingNode, "gBufferWriteClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeIntermediateNode = new HazeNode(context, scenePrimaryBufferConfig, hazeIntermediateConfig, aLabel);
+        HazeNode hazeIntermediateNode = new HazeNode(context, gBufferReadConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -334,7 +335,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, scenePrimaryBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBufferReadConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";

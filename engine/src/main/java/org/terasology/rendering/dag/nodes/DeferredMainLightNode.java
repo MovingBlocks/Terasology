@@ -101,17 +101,17 @@ public class DeferredMainLightNode extends AbstractNode {
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
-        addDesiredStateChange(new BindFbo(primaryBuffer));
-        addDesiredStateChange(new SetFboWriteMask(false, false, true, primaryBuffer));
+        FBO gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
+        addDesiredStateChange(new BindFbo(gBufferRead));
+        addDesiredStateChange(new SetFboWriteMask(gBufferRead, false, false, true));
 
         initMainDirectionalLight();
 
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueLightBuffer"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueLightBuffer"));
         if (renderingConfig.isDynamicShadows()) {
             addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, shadowMapResolutionDependentFBOs.get(SHADOW_MAP_FBO), DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
 

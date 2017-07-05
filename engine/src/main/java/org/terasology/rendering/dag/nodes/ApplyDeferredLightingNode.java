@@ -23,6 +23,7 @@ import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -46,23 +47,25 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
     public ApplyDeferredLightingNode(Context context) {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(displayResolutionDependentFBOs.getSecondaryBuffer()));
+        SwappableFBO gBuffer = displayResolutionDependentFBOs.getGBuffer();
+
+        gBuffer.swap();
+
+        addDesiredStateChange(new BindFbo(gBuffer.getWriteFbo()));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
 
-        FBO primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
+        FBO gBufferRead = displayResolutionDependentFBOs.getGBuffer().getReadFbo();
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, ColorTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, DepthStencilTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, DepthStencilTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, NormalsTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, NormalsTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   primaryBuffer, LightAccumulationTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   gBufferRead, LightAccumulationTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
-
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
     }
 
     /**

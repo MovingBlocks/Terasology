@@ -46,17 +46,16 @@ public final class SetFboWriteMask implements StateChange {
      * Sample use:
      *      addDesiredStateChange(new SetFboWriteMask(true, false, false, "engine:sceneOpaque", displayResolutionDependentFBOManager));
      *
+     * @param fbo
      * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
      * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
      * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO should be written to.
-     * @param fbo
      */
-    public SetFboWriteMask(boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer, FBO fbo) {
+    public SetFboWriteMask(FBO fbo, boolean renderToColorBuffer, boolean renderToDepthBuffer, boolean renderToLightBuffer) {
+        this.fbo = fbo;
         this.renderToColorBuffer = renderToColorBuffer;
         this.renderToDepthBuffer = renderToDepthBuffer;
         this.renderToLightBuffer = renderToLightBuffer;
-
-        this.fbo = fbo;
     }
 
     /**
@@ -65,11 +64,10 @@ public final class SetFboWriteMask implements StateChange {
      * @param fbo
      */
     private SetFboWriteMask(FBO fbo) {
+        this.fbo = fbo;
         this.renderToColorBuffer = true;
         this.renderToDepthBuffer = true;
         this.renderToLightBuffer = true;
-
-        this.fbo = fbo;
 
         defaultInstance = this;
     }
@@ -89,7 +87,7 @@ public final class SetFboWriteMask implements StateChange {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof SetFboWriteMask)
-                && fbo == ((SetFboWriteMask) obj).fbo
+                && fbo.equals(((SetFboWriteMask) obj).fbo)
                 && renderToColorBuffer == ((SetFboWriteMask) obj).renderToColorBuffer
                 && renderToDepthBuffer == ((SetFboWriteMask) obj).renderToDepthBuffer
                 && renderToLightBuffer == ((SetFboWriteMask) obj).renderToLightBuffer;

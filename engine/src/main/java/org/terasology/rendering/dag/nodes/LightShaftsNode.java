@@ -100,7 +100,7 @@ public class LightShaftsNode extends ConditionDependentNode {
         lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getPrimaryBuffer(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBuffer().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
     }
 
     /**

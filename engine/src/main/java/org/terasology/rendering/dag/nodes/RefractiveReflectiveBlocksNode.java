@@ -78,7 +78,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     private Material chunkMaterial;
 
-    private FBO primaryBuffer;
+    private FBO gBufferRead;
     private FBO refractiveReflectiveFbo;
 
     private SubmersibleCamera activeCamera;
@@ -152,7 +152,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         addDesiredStateChange(new LookThrough(activeCamera));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        primaryBuffer = displayResolutionDependentFBOs.getPrimaryBuffer();
+        gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
         refractiveReflectiveFbo = requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
         update(); // Cheeky way to initialise readOnlyGBufferFbo, refractiveReflectiveFbo
@@ -177,7 +177,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.get(REFLECTED_FBO), ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, primaryBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
         setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
         setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
 
@@ -278,7 +278,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
     @Override
     public void update() {
-        primaryBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
+        gBufferRead.attachDepthBufferTo(refractiveReflectiveFbo);
     }
 
     @Override
