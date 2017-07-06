@@ -34,8 +34,8 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  * further away from the camera.
  */
 public class HazeNode extends BlurNode {
-    public static final ResourceUrn INTERMEDIATE_HAZE_FBO = new ResourceUrn("engine:intermediateHaze");
-    public static final ResourceUrn FINAL_HAZE_FBO = new ResourceUrn("engine:finalHaze");
+    public static final ResourceUrn INTERMEDIATE_HAZE_FBO = new ResourceUrn("engine:fbo.intermediateHaze");
+    public static final ResourceUrn FINAL_HAZE_FBO = new ResourceUrn("engine:fbo.finalHaze");
     private static final float BLUR_RADIUS = 8.0f;
 
     private RenderingConfig renderingConfig;

@@ -31,6 +31,7 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -51,8 +52,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class BlurredAmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_BLURRED_FBO = new ResourceUrn("engine:ssaoBlurred");
-    private static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
+    public static final ResourceUrn SSAO_BLURRED_FBO = new ResourceUrn("engine:fbo.ssaoBlurred");
     private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
 
     private Material ssaoBlurredMaterial;

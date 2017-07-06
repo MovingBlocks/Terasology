@@ -40,8 +40,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 public class CopyImageToHMDNode extends ConditionDependentNode {
-    private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
-    private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
+    private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:fbo.leftEye");
+    private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:fbo.rightEye");
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 

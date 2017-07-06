@@ -57,7 +57,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends ConditionDependentNode {
-    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:sceneShadowMap");
+    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:fbo.sceneShadowMap");
     private static final ResourceUrn SHADOW_MAP_MATERIAL = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private static final float STEP_SIZE = 50f;

@@ -52,7 +52,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
+    public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:fbo.ssao");
     private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
 

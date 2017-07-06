@@ -67,7 +67,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
-    private static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
+    private static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:fbo.sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;

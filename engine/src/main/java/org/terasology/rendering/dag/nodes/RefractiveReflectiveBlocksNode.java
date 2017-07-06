@@ -67,7 +67,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  * camera partially spoils the effect showing its limits.
  */
 public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber, PropertyChangeListener {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE_FBO = new ResourceUrn("engine:sceneReflectiveRefractive");
+    public static final ResourceUrn REFRACTIVE_REFLECTIVE_FBO = new ResourceUrn("engine:fbo.sceneReflectiveRefractive");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;

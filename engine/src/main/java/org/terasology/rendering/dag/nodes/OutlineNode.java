@@ -47,7 +47,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
 public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:outline");
+    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:fbo.outline");
     private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
