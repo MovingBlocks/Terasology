@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.properties.OneOf;
  * Runs a given behavior tree.
  */
 @API
-@ActionName("lookup")
+@BehaviorAction(name = "lookup")
 public class LookupAction extends BaseAction {
     @OneOf.Provider(name = "behaviorTrees")
     private BehaviorTree tree;

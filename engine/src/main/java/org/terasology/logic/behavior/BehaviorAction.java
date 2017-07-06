@@ -28,8 +28,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @API
-public @interface ActionName {
-    String value();
+public @interface BehaviorAction {
+    String name();
 
     boolean isDecorator() default false;
+
+    int priority() default 100;
 }

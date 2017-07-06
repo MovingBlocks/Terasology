@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.properties.Range;
  * Runs child for given number of times.
  */
 @API
-@ActionName(value = "counter", isDecorator = true)
+@BehaviorAction(name = "counter", isDecorator = true)
 public class CounterAction extends BaseAction {
     @Range(min = 0, max = 100)
     private int count;

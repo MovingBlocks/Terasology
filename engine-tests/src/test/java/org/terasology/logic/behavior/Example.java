@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.behavior;
 
+import org.terasology.logic.behavior.actions.Print;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorNode;
@@ -61,7 +62,7 @@ public final class Example {
 
     }
 
-    @ActionName("delay")
+    @BehaviorAction(name = "delay")
     public static class Delay extends BaseAction {
         private float duration;
 
@@ -85,7 +86,7 @@ public final class Example {
         }
     }
 
-    @ActionName("repeat")
+    @BehaviorAction(name = "repeat")
     public static class Repeat extends BaseAction {
         private int count;
 

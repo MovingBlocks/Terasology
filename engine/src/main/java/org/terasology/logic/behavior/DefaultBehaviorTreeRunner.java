@@ -80,6 +80,7 @@ public class DefaultBehaviorTreeRunner implements BehaviorTreeRunner {
         if (state != BehaviorState.RUNNING) {
             root.construct(actor);
         }
+        
         state = root.execute(actor);
         if (state != BehaviorState.RUNNING) {
             root.destruct(actor);

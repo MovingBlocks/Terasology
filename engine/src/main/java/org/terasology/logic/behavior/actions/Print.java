@@ -13,46 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.behavior.core;
+package org.terasology.logic.behavior.actions;
 
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
+import org.terasology.logic.behavior.BehaviorAction;
+import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BaseAction;
+import org.terasology.logic.behavior.core.BehaviorState;
 
-/**
- * Runs always.
+/*
+  This is a test-related action.
+  TODO move this to engine-tests once a cleaner Gestalt option is available
  */
-public class RunningNode extends LeafNode {
-    @Override
-    public String getName() {
-        return "running";
-    }
+@BehaviorAction(name = "print")
+public class Print extends BaseAction {
+    public static StringBuilder output = new StringBuilder();
 
-    @Override
-    public BehaviorNode deepCopy() {
-        return new RunningNode();
-    }
+    private String msg;
 
     @Override
     public void construct(Actor actor) {
-
-    }
-
-    @Override
-    public BehaviorState execute(Actor actor) {
-        if (actor != null && actor.interruptRequested()) {
-            actor.toggleInterrupt();
-            return BehaviorState.FAILURE;
-        }
-        return BehaviorState.RUNNING;
+        output.append("[");
     }
 
     @Override
     public void destruct(Actor actor) {
-
+        output.append("]");
     }
 
     @Override
-    public void assembleExecute(MethodGenerator gen) {
-        gen.push(BehaviorState.RUNNING.ordinal());
+    public BehaviorState modify(Actor actor, BehaviorState result) {
+        output.append(msg);
+        return BehaviorState.SUCCESS;
     }
-
 }

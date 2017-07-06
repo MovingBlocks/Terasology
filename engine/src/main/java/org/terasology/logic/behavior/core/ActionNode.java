@@ -44,6 +44,10 @@ public class ActionNode implements BehaviorNode {
         return action;
     }
 
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
     @Override
     public String getName() {
         return action != null ? action.getName() : "action";
@@ -64,6 +68,10 @@ public class ActionNode implements BehaviorNode {
     @Override
     public BehaviorState execute(Actor actor) {
         if (action != null) {
+            if (checkForEvents(actor)) {
+                actor.toggleInterrupt();
+                return BehaviorState.FAILURE;
+            }
             return action.modify(actor, BehaviorState.UNDEFINED);
         }
         return BehaviorState.UNDEFINED;
@@ -74,6 +82,10 @@ public class ActionNode implements BehaviorNode {
         if (action != null) {
             action.destruct(actor);
         }
+    }
+
+    public boolean checkForEvents(Actor actor) {
+        return actor.interruptRequested();
     }
 
     @Override
@@ -109,10 +121,6 @@ public class ActionNode implements BehaviorNode {
     @Override
     public int getMaxChildren() {
         return 0;
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
     }
 
     @Override

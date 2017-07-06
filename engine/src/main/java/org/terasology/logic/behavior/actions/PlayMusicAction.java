@@ -20,7 +20,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -33,7 +33,7 @@ import org.terasology.rendering.nui.properties.Range;
  * Plays music in background. Return SUCCESS when music ends.
  */
 @API
-@ActionName("music")
+@BehaviorAction(name = "music")
 public class PlayMusicAction extends BaseAction {
     @OneOf.Provider(name = "music")
     private ResourceUrn musicUrn;

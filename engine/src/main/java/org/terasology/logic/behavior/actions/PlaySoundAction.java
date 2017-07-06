@@ -20,7 +20,7 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -35,7 +35,7 @@ import org.terasology.rendering.nui.properties.Range;
  * Plays a sound. Return SUCCESS when sound ends.
  */
 @API
-@ActionName("sound")
+@BehaviorAction(name = "sound")
 public class PlaySoundAction extends BaseAction {
     @OneOf.Provider(name = "sounds")
     private ResourceUrn soundUrn;

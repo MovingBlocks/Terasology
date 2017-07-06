@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.core;
 
 /**
  * WIP - part of the event handling solution, will be rewritten
+ * TODO maybe change naming not to confuse with the engine's Events?
  */
 public class BehaviorEvent {
     private final String name;

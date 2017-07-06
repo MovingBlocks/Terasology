@@ -15,10 +15,12 @@
  */
 package org.terasology.logic.behavior;
 
-import junit.framework.Assert;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.logic.behavior.actions.CounterAction;
+import org.terasology.logic.behavior.actions.Print;
 import org.terasology.logic.behavior.actions.TimerAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorNode;
@@ -48,6 +50,7 @@ public class CounterTest {
 
     @Before
     public void setup() {
+
         treeBuilder = new BehaviorTreeBuilder();
         treeBuilder.registerAction("print", Print.class);
         treeBuilder.registerDecorator("counter", CounterAction.class);
@@ -67,6 +70,7 @@ public class CounterTest {
         for (int i = 0; i < executions; i++) {
             runner.step();
         }
+
 
         Assert.assertEquals(expectedOutput, Print.output.toString());
     }

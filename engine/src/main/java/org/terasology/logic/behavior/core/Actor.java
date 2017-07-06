@@ -47,13 +47,14 @@ public class Actor {
     private static Logger logger = LoggerFactory.getLogger(Actor.class);
     private final EntityRef entity;
     // Stores system-wide information (allows inter-node communication)
-    private final Map<String, Object> blackboard;
+    public final Map<String, Object> blackboard;
 
     // Stores information uniquely for each node that requires it
     // TODO can we use a faster data structure? this gets accessed a lot
     private final Map<Integer, Object> dataMap = Maps.newHashMap();
 
-    private final Map<String, BehaviorEvent> events = Maps.newHashMap();
+    //    private final Map<String, BehaviorEvent> events = Maps.newHashMap();
+    private boolean interrupted;
 
     private float delta;
 
@@ -61,8 +62,8 @@ public class Actor {
     public Actor(EntityRef entity) {
         this.entity = entity;
         blackboard = Maps.newHashMap();
+        interrupted = false;
 
-        blackboard.put("events", new HashSet<Component>());
 
     }
 
@@ -75,8 +76,21 @@ public class Actor {
         dataMap.put(id, obj);
     }
 
-    public Map<String,BehaviorEvent> getEvents() {
-        return events;
+//    public Map<String,BehaviorEvent> getEvents() {
+//        return events;
+//    }
+
+//    public void putEvent(String name, BehaviorEvent event){
+//        events.put(name, event);
+//    }
+
+
+    public boolean interruptRequested() {
+        return interrupted;
+    }
+
+    public void toggleInterrupt() {
+        interrupted = !interrupted;
     }
 
     public float getDelta() {

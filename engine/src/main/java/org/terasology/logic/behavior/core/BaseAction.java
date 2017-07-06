@@ -16,11 +16,11 @@
 package org.terasology.logic.behavior.core;
 
 
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.module.sandbox.API;
 
 /**
- * BaseAction that uses ActionName annotation as its name.
+ * BaseAction that uses BehaviorAction annotation as its name.
  */
 @API
 public abstract class BaseAction implements Action {
@@ -42,7 +42,7 @@ public abstract class BaseAction implements Action {
 
     @Override
     public String getName() {
-        return getClass().getAnnotation(ActionName.class).value();
+        return getClass().getAnnotation(BehaviorAction.class).name();
     }
 
     @Override

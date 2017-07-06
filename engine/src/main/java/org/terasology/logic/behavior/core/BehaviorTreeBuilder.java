@@ -16,7 +16,6 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -39,15 +38,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.nui.BehaviorNodeComponent;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.TableModuleRegistry;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -85,7 +81,10 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
     private int nextId = 1;
 
     public BehaviorTreeBuilder() {
+
+
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+
         if (moduleManager != null) {
             ModuleEnvironment environment = moduleManager.getEnvironment();
 
@@ -94,14 +93,12 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
             ModuleEnvironment behaviorEnvironment =  moduleManager.loadEnvironment(behavior, false);
 
 
-
-
             // TODO This is here until we can move everything over to Behaviors
             for (Class<? extends Action> type : behaviorEnvironment.getSubtypesOf(Action.class)) {
-                ActionName actionName = type.getAnnotation(ActionName.class);
-                if (actionName != null) {
-                    String name = actionName.value();
-                    if (actionName.isDecorator()) {
+                BehaviorAction behaviorAction = type.getAnnotation(BehaviorAction.class);
+                if (behaviorAction != null) {
+                    String name = behaviorAction.name();
+                    if (behaviorAction.isDecorator()) {
                         registerDecorator(name, type);
                         logger.info("Found decorator {}", name);
                     } else {
@@ -113,10 +110,10 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
 
 
             for (Class<? extends Action> type : environment.getSubtypesOf(Action.class)) {
-                ActionName actionName = type.getAnnotation(ActionName.class);
-                if (actionName != null) {
-                    String name = actionName.value();
-                    if (actionName.isDecorator()) {
+                BehaviorAction behaviorAction = type.getAnnotation(BehaviorAction.class);
+                if (behaviorAction != null) {
+                    String name = behaviorAction.name();
+                    if (behaviorAction.isDecorator()) {
                         registerDecorator(name, type);
                         logger.info("Found decorator {}", name);
                     } else {

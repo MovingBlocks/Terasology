@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.actions;
 
 import org.terasology.engine.ComponentFieldUri;
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -34,7 +34,7 @@ import java.util.Random;
  * The node stays forever in status RUNNING.
  */
 @API
-@ActionName("animation")
+@BehaviorAction(name = "animation")
 public class SetAnimationAction extends BaseAction {
     @OneOf.Provider(name = "animations")
     private ComponentFieldUri play;

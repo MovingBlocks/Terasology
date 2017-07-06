@@ -36,9 +36,11 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BehaviorEvent;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -190,4 +192,12 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             }
         }
     }
+
+    /* Debugging */
+    @Command(shortDescription = "interrupt deer", helpText = "send a deer a BehaviorEvent")
+    public String interruptDeer(){
+    getInterpreters().get(0).actor().toggleInterrupt();
+        return "Deer interrupted.";
+    }
+
 }

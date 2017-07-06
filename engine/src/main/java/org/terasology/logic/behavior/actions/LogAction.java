@@ -13,31 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.behavior;
+package org.terasology.logic.behavior.actions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
+import org.terasology.module.sandbox.API;
 
-@ActionName("print")
-public class Print extends BaseAction {
-    public static StringBuilder output = new StringBuilder();
+/**
+ * Logs a message into the console when called and returns SUCCESS
+ */
+@API
+@BehaviorAction(name = "log")
+public class LogAction extends BaseAction {
+    public static final Logger logger = LoggerFactory.getLogger(LogAction.class
+    );
 
-    private String msg;
+    private String message;
 
     @Override
     public void construct(Actor actor) {
-        output.append("[");
-    }
-
-    @Override
-    public void destruct(Actor actor) {
-        output.append("]");
+        actor.setValue(getId(), message);
     }
 
     @Override
     public BehaviorState modify(Actor actor, BehaviorState result) {
-        output.append(msg);
+        logger.info(String.format("Actor %s logs message: %s ", actor.getEntity().toString(), actor.getValue(getId())));
         return BehaviorState.SUCCESS;
     }
+
+
 }

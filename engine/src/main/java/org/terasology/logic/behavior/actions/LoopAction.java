@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.terasology.logic.behavior.ActionName;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -25,7 +25,7 @@ import org.terasology.module.sandbox.API;
  * Node, that loops its child forever
  */
 @API
-@ActionName(value = "loop", isDecorator = true)
+@BehaviorAction(name = "loop", isDecorator = true)
 public class LoopAction extends BaseAction {
 
     @Override

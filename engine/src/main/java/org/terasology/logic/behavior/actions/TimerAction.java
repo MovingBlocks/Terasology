@@ -15,7 +15,9 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.terasology.logic.behavior.ActionName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
@@ -26,13 +28,16 @@ import org.terasology.rendering.nui.properties.Range;
  * Runs child for given time
  */
 @API
-@ActionName(value = "timer", isDecorator = true)
+@BehaviorAction(name = "timer", isDecorator = true)
 public class TimerAction extends BaseAction {
+    private static Logger logger = LoggerFactory.getLogger(TimerAction.class);
     @Range(min = 0, max = 10)
     private float time;
 
     @Override
     public void construct(Actor actor) {
+        logger.info("Timer started for entity " + actor.getEntity());
+
         actor.setValue(getId(), time);
     }
 
@@ -41,6 +46,9 @@ public class TimerAction extends BaseAction {
         float timeRemaining = actor.getValue(getId());
         timeRemaining -= actor.getDelta();
         actor.setValue(getId(), timeRemaining);
+        if (timeRemaining <= 0) {
+            logger.info("Timer ended");
+        }
         return timeRemaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
     }
 }

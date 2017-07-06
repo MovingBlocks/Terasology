@@ -19,22 +19,20 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.HeadlessEnvironment;
-import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.behavior.actions.LookupAction;
+import org.terasology.logic.behavior.actions.Print;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.core.ActionNode;
-import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.BehaviorTreeRunner;
+import org.terasology.logic.behavior.core.*;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 
 public class LookupTest {
+
     @Before
     public void setup() {
         new HeadlessEnvironment();
@@ -42,8 +40,8 @@ public class LookupTest {
 
     @Test
     public void testEmptyLookup() {
-        ActionNode node = new ActionNode(new LookupAction());
-        System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(node));
+        BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookup"), BehaviorTree.class).get();
+        System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
     }
 
     @Test
@@ -52,9 +50,10 @@ public class LookupTest {
         EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(new LocationComponent(), new SkeletalMeshComponent());
         BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookup"), BehaviorTree.class).get();
         System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
+
         Actor actor = new Actor(entityRef);
         actor.setDelta(0.5f);
-        BehaviorTreeRunner runner = new DefaultBehaviorTreeRunner(asset, actor, null);
+        BehaviorTreeRunner runner = new DefaultBehaviorTreeRunner(asset.getRoot(), actor);
         runner.step();
         runner.step();
         runner.step();
