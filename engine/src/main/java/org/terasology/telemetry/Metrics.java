@@ -15,19 +15,23 @@
  */
 package org.terasology.telemetry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.Optional;
 
 /**
  * Metrics class is similar to {@link org.terasology.config.Config}, it stores the telemetry information.
  * Once a new metric is used, the new metric instance should be added in this class to show the metric value in ui.
  */
 public class Metrics {
+
+    private static final Logger logger = LoggerFactory.getLogger(Metrics.class);
 
     private SystemContextMetric systemContextMetric;
 
@@ -52,11 +56,19 @@ public class Metrics {
         return modulesMetric;
     }
 
-    public Map<Class, Metric> getMap() {
-        Map<Class, Metric> map = new HashMap();
-        map.put(SystemContextMetric.class, systemContextMetric);
-        map.put(ModulesMetric.class, modulesMetric);
+    public Optional<Metric> getMetric(Class<?> cl) {
+        Optional<Metric> optional = Optional.ofNullable(null);
+        Field[] fields = this.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType() == cl) {
+                try {
+                    return Optional.of((Metric) field.get(this));
+                } catch (IllegalAccessException e) {
+                    logger.error("The field is not inaccessible: ", e);
+                }
+            }
+        }
 
-        return map;
+        return optional;
     }
 }

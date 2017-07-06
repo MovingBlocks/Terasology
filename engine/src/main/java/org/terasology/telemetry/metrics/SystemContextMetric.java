@@ -67,7 +67,7 @@ public class SystemContextMetric extends Metric {
     private int processorNumbers;
 
     @TelemetryField
-    private int memoryMaxMb;
+    private long memoryMaxByte;
 
 
     public SystemContextMetric() {
@@ -83,9 +83,7 @@ public class SystemContextMetric extends Metric {
         openGLVersion = GL11.glGetString(GL11.GL_VERSION);
         openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
         processorNumbers = Runtime.getRuntime().availableProcessors();
-
-        long memoryMaxByte = Runtime.getRuntime().maxMemory();
-        memoryMaxMb = (int) (memoryMaxByte / (1024 * 1024));
+        memoryMaxByte = Runtime.getRuntime().maxMemory();
     }
 
     @Override

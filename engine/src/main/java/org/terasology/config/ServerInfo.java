@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 public class ServerInfo {
 
@@ -132,17 +133,18 @@ public class ServerInfo {
     }
 
     /**
-     *
      * @param protocol the protocol the server uses
      * @return the URL of the server
      */
-    public URL getURL(String protocol) {
+    public Optional<URL> getURL(String protocol) {
+        Optional<URL> optional;
         try {
-            URL url = new URL(protocol, getAddress(), getPort(),"");
-            return url;
+            URL url = new URL(protocol, getAddress(), getPort(), "");
+            optional = Optional.of(url);
         } catch (MalformedURLException e) {
             logger.error("Telemetry server URL mal formed", e);
-            return null;
+            optional = Optional.ofNullable(null);
         }
+        return optional;
     }
 }

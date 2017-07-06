@@ -122,10 +122,6 @@ public final class Config {
         return config.getTelemetryConfig();
     }
 
-    public LaunchPopupConfig getLaunchPopupConfig() {
-        return config.getLaunchPopupConfig();
-    }
-
     public String renderConfigAsJson(Object configObject) {
         return createGson().toJsonTree(configObject).toString();
     }

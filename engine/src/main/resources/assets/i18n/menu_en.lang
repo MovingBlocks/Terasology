@@ -225,7 +225,7 @@
     "start-game": "Play",
     "start-singleplayer-game": "Singleplayer",
     "telemetry-button": "Metrics Menu",
-    "telemetry-launch-popup-text": "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the Mac address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!",
+    "telemetry-launch-popup-text": "Telemetry system will send metrics and errors to the server. We do our best to avoid sending anything identifiable from your PC, e.g. telemetry includes your OS name, Java version but it doesn't include the MAC address, the home path, etc. You can review in Metric Menu and let us know if we missed something. Telemetry is super useful to an all volunteer project like ours and we'd really appreciate it!",
     "telemetry-launch-popup-title": "Telemetry In Terasology",
     "telemetry-menu": "Metrics Menu",
     "telemetry-system-context": "System context",

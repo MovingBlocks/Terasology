@@ -24,6 +24,8 @@ public class TelemetryConfig {
 
     private boolean errorReportingEnabled;
 
+    private boolean launchPopupDisabled;
+
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
     }
@@ -40,8 +42,16 @@ public class TelemetryConfig {
         this.errorReportingEnabled = errorReportingEnabled;
     }
 
-    public void setAllEnabled(boolean allEnabled) {
-        telemetryEnabled = allEnabled;
-        errorReportingEnabled = allEnabled;
+    public boolean isLaunchPopupDisabled() {
+        return launchPopupDisabled;
+    }
+
+    public void setLaunchPopupDisabled(boolean launchPopupDisabled) {
+        this.launchPopupDisabled = launchPopupDisabled;
+    }
+
+    public void setTelemetryAndErrorReportingEnable(boolean enabled) {
+        telemetryEnabled = enabled;
+        errorReportingEnabled = enabled;
     }
 }

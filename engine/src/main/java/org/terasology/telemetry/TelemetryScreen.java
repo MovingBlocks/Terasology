@@ -17,6 +17,8 @@ package org.terasology.telemetry;
 
 import com.google.common.collect.Maps;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
@@ -42,11 +44,13 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.telemetry.metrics.Metric;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The metrics menu lists the telemetry field names and values that will be sent to the server.
@@ -55,6 +59,8 @@ import java.util.Map;
 public class TelemetryScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:telemetryScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(TelemetryScreen.class);
 
     @In
     private Config config;
@@ -87,10 +93,12 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
             Class metricClass = telemetryCategory.getValue();
-            Metric metricType = metrics.getMap().get(metricClass);
-            Map<String, Object> map = metricType.getFieldValueMap();
-
-            addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
+            Optional<Metric> optional = metrics.getMetric(metricClass);
+            if (optional.isPresent()) {
+                Metric metric = optional.get();
+                Map<String, Object> map = metric.getFieldValueMap();
+                addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
+            }
         }
 
         ScrollableArea area = find("area", ScrollableArea.class);
@@ -118,7 +126,10 @@ public class TelemetryScreen extends CoreScreenLayer {
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
-            telemetryEmitter.changeUrl(item.getURL("http"));
+            Optional<URL> optionalURL = item.getURL("http");
+            if (optionalURL.isPresent()) {
+                telemetryEmitter.changeUrl(optionalURL.get());
+            }
         });
         addServerPopup.onCancel((button) -> {
             config.getTelemetryConfig().setTelemetryEnabled(false);

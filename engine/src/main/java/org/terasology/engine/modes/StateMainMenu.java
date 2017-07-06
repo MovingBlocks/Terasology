@@ -17,7 +17,6 @@ package org.terasology.engine.modes;
 
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
-import org.terasology.config.LaunchPopupConfig;
 import org.terasology.config.TelemetryConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
@@ -29,7 +28,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.i18n.assets.Translation;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -136,31 +134,30 @@ public class StateMainMenu implements GameState {
     }
 
     private void pushLaunchPopup() {
-        Config  config = context.get(Config.class);
+        Config config = context.get(Config.class);
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
-        LaunchPopupConfig launchPopupConfig = config.getLaunchPopupConfig();
         TranslationSystem translationSystem = context.get(TranslationSystem.class);
         TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
-        if (!launchPopupConfig.isLaunchPopupDisabled()) {
+        if (!telemetryConfig.isLaunchPopupDisabled()) {
             String telemetryTitle = translationSystem.translate("${engine:menu#telemetry-launch-popup-title}");
             String telemetryMessage = translationSystem.translate("${engine:menu#telemetry-launch-popup-text}");
             LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
             telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
             telemetryConfirmPopup.setYesHandler(() -> {
-                telemetryConfig.setAllEnabled(true);
+                telemetryConfig.setTelemetryAndErrorReportingEnable(true);
 
                 // Enable error reporting
                 appender.start();
             });
             telemetryConfirmPopup.setNoHandler(() -> {
-                telemetryConfig.setAllEnabled(false);
+                telemetryConfig.setTelemetryAndErrorReportingEnable(false);
 
                 // Disable error reporting
                 appender.stop();
             });
             telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
             telemetryConfirmPopup.setOptionHandler(()-> {
-                nuiManager.pushScreen(TelemetryScreen.ASSET_URI,TelemetryScreen.class);
+                nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
             });
         }
     }
