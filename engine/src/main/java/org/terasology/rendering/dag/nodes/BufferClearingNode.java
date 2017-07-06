@@ -56,12 +56,24 @@ public class BufferClearingNode extends AbstractNode {
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
         }
+    }
+
+    public BufferClearingNode(FBO fbo, int clearingMask) {
+        boolean argumentsAreValid = validateArguments(fbo, clearingMask);
+
+        if (argumentsAreValid) {
+            addDesiredStateChange(new BindFbo(fbo));
+            this.clearingMask = clearingMask;
+        } else {
+            throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
+        }
 
     }
 
+
     /**
      * Clears the buffers selected by the mask provided in setRequiredObjects, with default values.
-     *
+     * <p>
      * This method is executed within a NodeTask in the Render Tasklist.
      */
     @Override
@@ -69,17 +81,33 @@ public class BufferClearingNode extends AbstractNode {
         glClear(clearingMask);
     }
 
-    private boolean validateArguments(FBOConfig anFboConfig, BaseFBOsManager anFboManager, int clearingMask) {
+    private boolean validateArguments(FBOConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
         boolean argumentsAreValid = true;
 
-        if (anFboConfig == null) {
+        if (fboConfig == null) {
             argumentsAreValid = false;
             logger.warn("Illegal argument: fboConfig shouldn't be null.");
         }
 
-        if (anFboManager == null) {
+        if (fboManager == null) {
             argumentsAreValid = false;
             logger.warn("Illegal argument: fboManager shouldn't be null.");
+        }
+
+        if (clearingMask == 0) {
+            argumentsAreValid = false;
+            logger.warn("Illegal argument: clearingMask can't be 0.");
+        }
+
+        return argumentsAreValid;
+    }
+
+    private boolean validateArguments(FBO fbo, int clearingMask) {
+        boolean argumentsAreValid = true;
+
+        if (fbo == null) {
+            argumentsAreValid = false;
+            logger.warn("Illegal argument: fbo shouldn't be null.");
         }
 
         if (clearingMask == 0) {

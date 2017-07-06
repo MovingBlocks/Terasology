@@ -38,7 +38,7 @@ import org.terasology.rendering.world.WorldRenderer;
  *
  */
 public class ShaderParametersDebug extends ShaderParametersBase {
-    private static FBO gBufferRead;
+    private static FBO writeOnlyGBuffer;
 
     @Override
     public void applyParameters(Material program) {
@@ -62,23 +62,23 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case OPAQUE_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindTexture();
+                writeOnlyGBuffer.bindTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_NORMALS:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindNormalsTexture();
+                writeOnlyGBuffer.bindNormalsTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_DEPTH:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindDepthTexture();
+                writeOnlyGBuffer.bindDepthTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case OPAQUE_SUNLIGHT:
             case OPAQUE_LIGHT_BUFFER:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindLightBufferTexture();
+                writeOnlyGBuffer.bindLightBufferTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case TRANSPARENT_COLOR:
@@ -98,7 +98,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case BAKED_OCCLUSION:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindTexture();
+                writeOnlyGBuffer.bindTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case RECONSTRUCTED_POSITION:
@@ -108,7 +108,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 }
 
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                gBufferRead.bindDepthTexture();
+                writeOnlyGBuffer.bindDepthTexture();
                 program.setInt("texDebug", texId++, true);
                 break;
             case BLOOM:
@@ -138,7 +138,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getRendering().getDebug().getStage().getIndex());
     }
 
-    public static void setGBufferRead(FBO fbo) {
-        gBufferRead = fbo;
+    public static void setWriteOnlyGBuffer(FBO fbo) {
+        writeOnlyGBuffer = fbo;
     }
 }

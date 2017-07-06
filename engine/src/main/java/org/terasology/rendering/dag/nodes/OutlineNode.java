@@ -55,9 +55,9 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     private Material outlineMaterial;
 
-    private FBO gBufferRead;
-    private float primaryBufferWidth;
-    private float primaryBufferHeight;
+    private FBO writeOnlyGBuffer;
+    private float writeOnlyGBufferWidth;
+    private float writeOnlyGBufferHeight;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 16.0f)
@@ -76,11 +76,11 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         requiresCondition(() -> renderingConfig.isOutline());
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
+        writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
         FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(outlineFbo));
 
-        update(); // Cheeky way to initialise sceneOpaqueFboWidth, sceneOpaqueFboHeight
+        update(); // Cheeky way to initialise writeOnlyGBufferWidth, writeOnlyGBufferHeight
         displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL));
@@ -88,7 +88,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         outlineMaterial = getMaterial(OUTLINE_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, gBufferRead, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, writeOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
     }
 
     /**
@@ -110,8 +110,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
         outlineMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
 
-        outlineMaterial.setFloat("texelWidth", 1.0f / primaryBufferWidth);
-        outlineMaterial.setFloat("texelHeight", 1.0f / primaryBufferHeight);
+        outlineMaterial.setFloat("texelWidth", 1.0f / writeOnlyGBufferWidth);
+        outlineMaterial.setFloat("texelHeight", 1.0f / writeOnlyGBufferHeight);
 
         outlineMaterial.setFloat("pixelOffsetX", pixelOffsetX);
         outlineMaterial.setFloat("pixelOffsetY", pixelOffsetY);
@@ -125,7 +125,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     @Override
     public void update() {
-        primaryBufferWidth = gBufferRead.width();
-        primaryBufferHeight = gBufferRead.height();
+        writeOnlyGBufferWidth = writeOnlyGBuffer.width();
+        writeOnlyGBufferHeight = writeOnlyGBuffer.height();
     }
 }

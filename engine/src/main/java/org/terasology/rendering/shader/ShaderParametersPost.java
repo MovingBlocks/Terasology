@@ -48,7 +48,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     @Range(min = 0.0f, max = 1.0f)
     private float filmGrainIntensity = 0.05f;
 
-    private static FBO gBufferRead;
+    private static FBO writeOnlyGBuffer;
 
     @Override
     public void applyParameters(Material program) {
@@ -85,9 +85,9 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        if (gBufferRead != null) { // TODO: review need for null check
+        if (writeOnlyGBuffer != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            gBufferRead.bindDepthTexture();
+            writeOnlyGBuffer.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
 
             // TODO: review - is this loading a noise texture every frame? And why is it not in the IF(grain) block?
@@ -107,7 +107,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
                 program.setFloat("noiseOffset", rand.nextFloat(), true);
 
                 program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
-                program.setFloat2("renderTargetSize", gBufferRead.width(), gBufferRead.height(), true);
+                program.setFloat2("renderTargetSize", writeOnlyGBuffer.width(), writeOnlyGBuffer.height(), true);
             }
         }
 
@@ -120,7 +120,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         }
     }
 
-    public static void setGBufferRead(FBO fbo) {
-        gBufferRead = fbo;
+    public static void setWriteOnlyGBuffer(FBO fbo) {
+        writeOnlyGBuffer = fbo;
     }
 }

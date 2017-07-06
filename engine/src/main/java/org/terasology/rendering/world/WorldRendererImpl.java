@@ -100,8 +100,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.GBUFFER_READ;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.GBUFFER_WRITE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -256,21 +256,21 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig gBufferReadConfig = displayResolutionDependentFBOs.getFboConfig(GBUFFER_READ);
-        FBOConfig gBufferWriteConfig = displayResolutionDependentFBOs.getFboConfig(GBUFFER_WRITE);
+        FBOConfig readOnlyGBufferConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
+        FBOConfig writeOnlyGBufferConfig = displayResolutionDependentFBOs.getFboConfig(WRITEONLY_GBUFFER);
 
-        BufferClearingNode gBufferReadClearingNode = new BufferClearingNode(gBufferReadConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(gBufferReadClearingNode, "gBufferReadClearingNode");
+        BufferClearingNode readOnlyGBufferClearingNode = new BufferClearingNode(readOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(readOnlyGBufferClearingNode, "readOnlyGBufferClearingNode");
 
-        BufferClearingNode gBufferWriteClearingNode = new BufferClearingNode(gBufferWriteConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderGraph.addNode(gBufferWriteClearingNode, "gBufferWriteClearingNode");
+        BufferClearingNode writeOnlyGBufferClearingNode = new BufferClearingNode(writeOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderGraph.addNode(writeOnlyGBufferClearingNode, "writeOnlyGBufferClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeIntermediateNode = new HazeNode(context, gBufferReadConfig, hazeIntermediateConfig, aLabel);
+        HazeNode hazeIntermediateNode = new HazeNode(context, readOnlyGBufferConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -335,7 +335,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBufferReadConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, readOnlyGBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";

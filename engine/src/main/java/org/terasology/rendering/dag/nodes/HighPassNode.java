@@ -66,7 +66,7 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBuffer().getWriteFbo(), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)

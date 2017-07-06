@@ -46,7 +46,7 @@ public final class SetFboWriteMask implements StateChange {
      * Sample use:
      *      addDesiredStateChange(new SetFboWriteMask(fbo, true, false, false));
      *
-     * @param fbo The FBO whose render masks have to be modified - usually only the gBufferWrite FBO.
+     * @param fbo The FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
      * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
      * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
      * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO should be written to.
@@ -61,7 +61,7 @@ public final class SetFboWriteMask implements StateChange {
     /**
      * Creates the default instance of this class for the given FBO, resetting all masks to true.
      *
-     * @param fbo The FBO whose render masks have to be modified - usually only the gBufferWrite FBO.
+     * @param fbo The FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
      */
     private SetFboWriteMask(FBO fbo) {
         this.fbo = fbo;

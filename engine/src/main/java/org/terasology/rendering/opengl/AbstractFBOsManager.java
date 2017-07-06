@@ -44,8 +44,8 @@ import org.terasology.assets.ResourceUrn;
  * rendering engine.
  * <p>
  * Default FBOs:
- * sceneOpaque:  Primary FBO: most visual information eventually ends up here
- * sceneOpaquePingPong:  The sceneOpaque FBOs are swapped every frame, to use one for reading and the other for writing
+ * writeOnlyGBuffer:  Primary FBO: most visual information eventually ends up here
+ * readOnlyGBuffer:  The gbuffer FBOs are swapped around when needed, to use one for reading and the other for writing
  * Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
  * sceneSkyBand0:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
  * sceneSkyBand1:

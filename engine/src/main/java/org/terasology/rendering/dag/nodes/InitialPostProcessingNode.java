@@ -39,7 +39,6 @@ import org.terasology.world.WorldProvider;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.rendering.dag.nodes.BloomBlurNode.ONE_8TH_SCALE_FBO;
 import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -105,7 +104,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         FBO one8thBloomFbo = requiresFBO(one8thScaleBloomConfig, displayResolutionDependentFBOs);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBuffer().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
         setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
         setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(LIGHT_SHAFTS_FBO), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");

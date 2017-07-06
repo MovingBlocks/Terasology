@@ -107,15 +107,15 @@ public class DeferredPointLightsNode extends AbstractNode {
         addDesiredStateChange(new DisableDepthTest());
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO gBufferRead = displayResolutionDependentFBOs.getGBuffer().getWriteFbo();
-        addDesiredStateChange(new BindFbo(gBufferRead));
-        addDesiredStateChange(new SetFboWriteMask(gBufferRead, false, false, true));
+        FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
+        addDesiredStateChange(new BindFbo(readOnlyGBuffer));
+        addDesiredStateChange(new SetFboWriteMask(readOnlyGBuffer, false, false, true));
 
         initLightSphereDisplayList();
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, gBufferRead, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, gBufferRead, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, readOnlyGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
     }
 
     private void initLightSphereDisplayList() {
