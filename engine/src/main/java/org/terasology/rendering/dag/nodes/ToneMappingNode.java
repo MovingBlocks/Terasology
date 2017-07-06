@@ -72,7 +72,7 @@ public class ToneMappingNode extends AbstractNode {
         toneMappingMaterial = getMaterial(TONE_MAPPING_MATERIAL);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(INITIAL_POST_FBO), ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, INITIAL_POST_FBO, ColorTexture, displayResolutionDependentFBOs, TONE_MAPPING_MATERIAL, "texScene"));
     }
 
     /**

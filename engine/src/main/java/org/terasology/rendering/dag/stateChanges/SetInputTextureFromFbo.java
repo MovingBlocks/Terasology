@@ -83,6 +83,34 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
         fboManager.subscribe(this);
     }
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetInputTextureFromFbo(0, fbo, ColorTexture,
+     *                                  displayResolutionDependentFboManager, "engine:prog.chunk", "textureWater"));
+     *
+     * @param textureSlot an integer representing the number to add to GL_TEXTURE0 to identify a texture unit on the GPU.
+     * @param fboUrn a ResourceUrn identifying an FBO in the given fboManager, from which the texture attachment will be fetched.
+     * @param textureType one of the types available through the FboTextureType enum.
+     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     * @param materialUrn a URN identifying a Material instance.
+     * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
+     */
+    public SetInputTextureFromFbo(int textureSlot, ResourceUrn fboUrn, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+                                  ResourceUrn materialUrn, String shaderParameterName) {
+        this.textureSlot = textureSlot;
+        this.textureType = textureType;
+        this.fbo = fboManager.get(fboUrn);
+        this.materialUrn = materialUrn;
+        this.shaderParameterName = shaderParameterName;
+
+        this.material = getMaterial(materialUrn);
+
+        update(); // Cheeky way to initialise textureId
+        fboManager.subscribe(this);
+    }
+
     private SetInputTextureFromFbo(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
         this.materialUrn = materialUrn;

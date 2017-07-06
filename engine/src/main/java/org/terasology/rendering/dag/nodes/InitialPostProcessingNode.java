@@ -107,7 +107,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
         addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
         setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
-        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(LIGHT_SHAFTS_FBO), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
+        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
 
         if (bloomIsEnabled) {
             addDesiredStateChange(setBloomInputTexture);

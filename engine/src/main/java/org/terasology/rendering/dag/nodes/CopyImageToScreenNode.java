@@ -52,7 +52,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
 
-        addDesiredStateChange(new SetInputTextureFromFbo(0, displayResolutionDependentFBOs.get(FINAL_BUFFER), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture,
                 displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL, "texture"));
     }
 

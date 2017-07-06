@@ -133,9 +133,9 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneOpaqueLightBuffer"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractive"));
         setReflectiveRefractiveNormalsInputTexture = new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneReflectiveRefractiveNormals");
-        setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO), ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao");
-        setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.get(OUTLINE_FBO), ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges");
-        setHazeInputTexture = new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.get(FINAL_HAZE_FBO), ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
+        setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSsao");
+        setEdgesInputTexture = new SetInputTextureFromFbo(textureSlot++, OUTLINE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texEdges");
+        setHazeInputTexture = new SetInputTextureFromFbo(textureSlot, FINAL_HAZE_FBO, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL, "texSceneSkyBand");
 
         if (localReflectionsAreEnabled) {
             addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);

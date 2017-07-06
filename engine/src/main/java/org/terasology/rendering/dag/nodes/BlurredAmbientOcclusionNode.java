@@ -54,7 +54,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     public static final ResourceUrn SSAO_BLURRED_FBO = new ResourceUrn("engine:ssaoBlurred");
     private static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
     private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
-    private static final int TEXTURE_SLOT_0 = 0;
 
     private Material ssaoBlurredMaterial;
     private float outputFboWidth;
@@ -80,8 +79,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
-                displayResolutionDependentFBOs.get(SSAO_FBO), ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
+        addDesiredStateChange(new SetInputTextureFromFbo(0, SSAO_FBO, ColorTexture,
+                displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
     }
 
     /**

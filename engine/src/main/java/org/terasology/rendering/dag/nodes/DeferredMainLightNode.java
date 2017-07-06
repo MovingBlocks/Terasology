@@ -113,7 +113,7 @@ public class DeferredMainLightNode extends AbstractNode {
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueLightBuffer"));
         if (renderingConfig.isDynamicShadows()) {
-            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, shadowMapResolutionDependentFBOs.get(SHADOW_MAP_FBO), DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
+            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneShadowMap"));
 
             if (renderingConfig.isCloudShadows()) {
                 addDesiredStateChange(new SetInputTexture(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL, "texSceneClouds"));
