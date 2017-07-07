@@ -23,6 +23,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -36,11 +37,11 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-    private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
+    private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private boolean enabled = true;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
-        ResourceUrn fboName = fboConfig.getName();
+        SimpleUri fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
             fboUsages.put(fboName, fboManager);
@@ -54,8 +55,8 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public void dispose() {
-        for (Map.Entry<ResourceUrn, BaseFBOsManager> entry : fboUsages.entrySet()) {
-            ResourceUrn fboName = entry.getKey();
+        for (Map.Entry<SimpleUri, BaseFBOsManager> entry : fboUsages.entrySet()) {
+            SimpleUri fboName = entry.getKey();
             BaseFBOsManager baseFBOsManager = entry.getValue();
             baseFBOsManager.release(fboName);
         }

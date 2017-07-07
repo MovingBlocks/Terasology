@@ -25,13 +25,38 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
+
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT2_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_UNSUPPORTED_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_RENDERBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_STENCIL_ATTACHMENT_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glCheckFramebufferStatusEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glDeleteRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferRenderbufferEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glFramebufferTexture2DEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
 
 /**
  * FBO - Frame Buffer Object
@@ -338,7 +363,7 @@ public final class FBO {
      * If the creation process is successful (Status.COMPLETE) GPU memory has been allocated for the FrameBuffer and
      * its attachments. However, the content of the attachments is undefined.
      *
-     * @param urn An identification string. It is currently used only to log creation errors and is not stored in the FBO.
+     * @param fboName A SimpleUri that can be used to uniquely identify the FBO.
      * @param dimensions A Dimensions object wrapping width and height of the FBO.
      * @param type Can be Type.DEFAULT, Type.HDR or Type.NO_COLOR
      * @param useDepthBuffer If true the FBO will have a 24 bit depth buffer attached to it. (GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, GL_NEAREST)
@@ -349,9 +374,9 @@ public final class FBO {
      *                         (GL_DEPTH24_STENCIL8_EXT, GL_UNSIGNED_INT_24_8_EXT, GL_NEAREST)
      * @return The resuting FBO object wrapping a FrameBuffer and its attachments. Use getStatus() before use to verify completeness.
      */
-    public static FBO create(ResourceUrn urn, Dimensions dimensions, Type type,
+    public static FBO create(SimpleUri fboName, Dimensions dimensions, Type type,
                              boolean useDepthBuffer, boolean useNormalBuffer, boolean useLightBuffer, boolean useStencilBuffer) {
-        FBO fbo = new FBO(new SimpleUri(urn.toString()), dimensions.width, dimensions.height);
+        FBO fbo = new FBO(fboName, dimensions.width, dimensions.height);
 
         // Create the FBO on the GPU
         fbo.fboId = glGenFramebuffersEXT();
@@ -394,7 +419,7 @@ public final class FBO {
             GL20.glDrawBuffers(bufferIds);
         }
 
-        verifyCompleteness(urn, type, fbo);
+        verifyCompleteness(fboName, type, fbo);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
         return fbo;
@@ -458,7 +483,7 @@ public final class FBO {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 
-    private static void verifyCompleteness(ResourceUrn urn, Type type, FBO fbo) {
+    private static void verifyCompleteness(SimpleUri urn, Type type, FBO fbo) {
         int checkFB = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         switch (checkFB) {
             case GL_FRAMEBUFFER_COMPLETE_EXT:

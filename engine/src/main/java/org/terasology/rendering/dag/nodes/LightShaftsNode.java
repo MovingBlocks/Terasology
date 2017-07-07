@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -52,7 +53,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
+    public static final SimpleUri LIGHT_SHAFTS_FBO = new SimpleUri("engine:fbo.lightShafts");
     private static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;

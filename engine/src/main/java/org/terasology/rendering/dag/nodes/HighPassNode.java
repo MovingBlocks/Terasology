@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
@@ -40,7 +41,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * the result into HIGH_PASS_FBO, for other nodes to take advantage of it.
  */
 public class HighPassNode extends ConditionDependentNode {
-    public static final ResourceUrn HIGH_PASS_FBO = new ResourceUrn("engine:fbo.highPass");
+    public static final SimpleUri HIGH_PASS_FBO = new SimpleUri("engine:fbo.highPass");
     public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL = new ResourceUrn("engine:prog.highPass");
 

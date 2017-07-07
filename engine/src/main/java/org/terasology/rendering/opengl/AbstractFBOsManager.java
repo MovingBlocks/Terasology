@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 
 /**
  * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
@@ -72,9 +72,9 @@ import org.terasology.assets.ResourceUrn;
  */
 public abstract class AbstractFBOsManager implements BaseFBOsManager {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
-    protected Map<ResourceUrn, FBOConfig> fboConfigs = Maps.newHashMap();
-    protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
-    protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
+    protected Map<SimpleUri, FBOConfig> fboConfigs = Maps.newHashMap();
+    protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
+    protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();
 
     private List<FBOManagerSubscriber> fboManagerSubscribers = new ArrayList<>();
 
@@ -101,7 +101,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     }
 
 
-    protected void retain(ResourceUrn resourceUrn) {
+    protected void retain(SimpleUri resourceUrn) {
         if (fboUsageCountMap.containsKey(resourceUrn)) {
             int usageCount = fboUsageCountMap.get(resourceUrn) + 1;
             fboUsageCountMap.put(resourceUrn, usageCount);
@@ -116,7 +116,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName
      */
     @Override
-    public void release(ResourceUrn fboName) {
+    public void release(SimpleUri fboName) {
         Preconditions.checkArgument(fboUsageCountMap.containsKey(fboName), "The given fbo is not used.");
 
         if (fboUsageCountMap.get(fboName) != 1) {
@@ -139,7 +139,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboColorTexture(ResourceUrn fboName) {
+    public boolean bindFboColorTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -159,7 +159,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboDepthTexture(ResourceUrn fboName) {
+    public boolean bindFboDepthTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -180,7 +180,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboNormalsTexture(ResourceUrn fboName) {
+    public boolean bindFboNormalsTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -201,7 +201,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboLightBufferTexture(ResourceUrn fboName) {
+    public boolean bindFboLightBufferTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -223,7 +223,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return an FBO or null
      */
     @Override
-    public FBO get(ResourceUrn fboName) {
+    public FBO get(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
@@ -238,11 +238,11 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      *
      * If no FBOConfig maps to the given name, null is returned and an error is logged.
      *
-     * @param fboName a ResourceUrn representing the name of an FBO
+     * @param fboName a SimpleUri representing the name of an FBO
      * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
      */
     @Override
-    public FBOConfig getFboConfig(ResourceUrn fboName) {
+    public FBOConfig getFboConfig(SimpleUri fboName) {
         FBOConfig fboConfig = fboConfigs.get(fboName);
 
         if (fboConfig == null) {

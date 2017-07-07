@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -47,7 +48,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
 public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:fbo.outline");
+    public static final SimpleUri OUTLINE_FBO = new SimpleUri("engine:fbo.outline");
     private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;

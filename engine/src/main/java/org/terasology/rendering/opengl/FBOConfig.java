@@ -17,7 +17,7 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 
 /**
  * Builder class to simplify the syntax creating an FBO.
@@ -30,7 +30,7 @@ import org.terasology.assets.ResourceUrn;
  * existing FBO with the same title.
  */
 public class FBOConfig {
-    private ResourceUrn fboName;
+    private SimpleUri fboName;
     private FBO.Dimensions dimensions;
     private FBO.Type type;
 
@@ -56,7 +56,7 @@ public class FBOConfig {
      *                   Type.NO_COLOR will result in -no- color buffer attached to the FBO
      *                   (WARNING: this could result in an FBO with Status.DISPOSED - see FBO.getStatus()).
      */
-    public FBOConfig(ResourceUrn fboName, FBO.Dimensions dimensions, FBO.Type type) {
+    public FBOConfig(SimpleUri fboName, FBO.Dimensions dimensions, FBO.Type type) {
         this.fboName = fboName;
         this.dimensions = dimensions;
         this.type = type;
@@ -66,11 +66,11 @@ public class FBOConfig {
      * Same as the previous FBObuilder constructor, but taking in input
      * explicit, integer width and height instead of a Dimensions object.
      */
-    public FBOConfig(ResourceUrn fboName, int width, int height, FBO.Type type) {
+    public FBOConfig(SimpleUri fboName, int width, int height, FBO.Type type) {
         this(fboName, new FBO.Dimensions(width, height), type);
     }
 
-    public FBOConfig(ResourceUrn fboName, ScalingFactors factors, FBO.Type type) {
+    public FBOConfig(SimpleUri fboName, ScalingFactors factors, FBO.Type type) {
         Preconditions.checkArgument(factors.getScale() != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
@@ -78,14 +78,14 @@ public class FBOConfig {
     }
 
 
-    public FBOConfig(ResourceUrn fboName, float scale, FBO.Type type) {
+    public FBOConfig(SimpleUri fboName, float scale, FBO.Type type) {
         Preconditions.checkArgument(scale != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
         this.scale = scale;
     }
 
-    public FBOConfig(ResourceUrn fboName, FBO.Type type) {
+    public FBOConfig(SimpleUri fboName, FBO.Type type) {
         this.fboName = fboName;
         this.type = type;
     }
@@ -167,7 +167,7 @@ public class FBOConfig {
         return dimensions;
     }
 
-    public ResourceUrn getName() {
+    public SimpleUri getName() {
         return fboName;
     }
 

@@ -16,8 +16,8 @@
 package org.terasology.rendering.opengl.fbms;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -31,9 +31,9 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * TODO: Better naming
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
-    public static final ResourceUrn READONLY_GBUFFER = new ResourceUrn("engine:fbo.readOnlyGBuffer");
-    public static final ResourceUrn WRITEONLY_GBUFFER = new ResourceUrn("engine:fbo.writeOnlyGBuffer");
-    public static final ResourceUrn FINAL_BUFFER = new ResourceUrn("engine:fbo.finalBuffer");
+    public static final SimpleUri READONLY_GBUFFER = new SimpleUri("engine:fbo.readOnlyGBuffer");
+    public static final SimpleUri WRITEONLY_GBUFFER = new SimpleUri("engine:fbo.writeOnlyGBuffer");
+    public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
 
     private SwappableFBO gBufferPair;
 
@@ -62,7 +62,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     @Override
     public FBO request(FBOConfig fboConfig) {
         FBO fbo;
-        ResourceUrn fboName = fboConfig.getName();
+        SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
             if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
@@ -97,15 +97,13 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
 
         FBO readOnlyGBuffer = gBufferPair.getReadFbo();
         if (readOnlyGBuffer.dimensions().areDifferentFrom(fullScale)) {
-            // disposeAllFBOs();
-            // createFBOs();
             regenFbo();
             notifySubscribers();
         }
     }
 
     private void regenFbo() {
-        for (ResourceUrn urn : fboConfigs.keySet()) {
+        for (SimpleUri urn : fboConfigs.keySet()) {
             FBOConfig fboConfig = getFboConfig(urn);
             fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
             FBO.recreate(get(urn), getFboConfig(urn));
@@ -113,7 +111,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
    }
 
     private void disposeAllFBOs() {
-        for (ResourceUrn urn : fboConfigs.keySet()) {
+        for (SimpleUri urn : fboConfigs.keySet()) {
             fboLookup.get(urn).dispose();
         }
         fboLookup.clear();

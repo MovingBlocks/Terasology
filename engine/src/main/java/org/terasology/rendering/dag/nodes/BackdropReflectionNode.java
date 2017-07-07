@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -59,7 +60,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public class BackdropReflectionNode extends AbstractNode {
-    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:fbo.sceneReflected");
+    public static final SimpleUri REFLECTED_FBO = new SimpleUri("engine:fbo.sceneReflected");
     private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;

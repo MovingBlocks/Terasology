@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -67,7 +68,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  * camera partially spoils the effect showing its limits.
  */
 public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber, PropertyChangeListener {
-    public static final ResourceUrn REFRACTIVE_REFLECTIVE_FBO = new ResourceUrn("engine:fbo.sceneReflectiveRefractive");
+    public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;

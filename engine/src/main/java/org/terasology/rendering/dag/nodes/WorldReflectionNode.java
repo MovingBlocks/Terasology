@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -67,7 +68,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
-    private static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:fbo.sceneReflected");
+    private static final SimpleUri REFLECTED_FBO = new SimpleUri("engine:fbo.sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;

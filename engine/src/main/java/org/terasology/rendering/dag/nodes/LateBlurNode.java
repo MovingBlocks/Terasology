@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -39,8 +39,8 @@ import java.beans.PropertyChangeListener;
  * For more information on DoF: http://en.wikipedia.org/wiki/Depth_of_field
  */
 public class LateBlurNode extends BlurNode implements PropertyChangeListener {
-    public static final ResourceUrn FIRST_LATE_BLUR_FBO = new ResourceUrn("engine:fbo.firstLateBlur");
-    public static final ResourceUrn SECOND_LATE_BLUR_FBO = new ResourceUrn("engine:fbo.secondLateBlur");
+    public static final SimpleUri FIRST_LATE_BLUR_FBO = new SimpleUri("engine:fbo.firstLateBlur");
+    public static final SimpleUri SECOND_LATE_BLUR_FBO = new SimpleUri("engine:fbo.secondLateBlur");
 
     @Range(min = 0.0f, max = 16.0f)
     private static final float OVERALL_BLUR_RADIUS_FACTOR = 0.8f;

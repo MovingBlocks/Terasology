@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
@@ -52,7 +53,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:fbo.ssao");
+    public static final SimpleUri SSAO_FBO = new SimpleUri("engine:fbo.ssao");
     private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
 

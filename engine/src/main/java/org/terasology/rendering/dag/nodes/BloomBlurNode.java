@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
@@ -32,9 +33,9 @@ import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
  * For more information see: http://en.wikipedia.org/wiki/Bloom_(shader_effect)
  */
 public class BloomBlurNode extends BlurNode {
-    public static final ResourceUrn HALF_SCALE_FBO = new ResourceUrn("engine:fbo.halfScaleBlurredBloom");
-    public static final ResourceUrn QUARTER_SCALE_FBO = new ResourceUrn("engine:fbo.quarterScaleBlurredBloom");
-    public static final ResourceUrn ONE_8TH_SCALE_FBO = new ResourceUrn("engine:fbo.oneEightScaleBlurredBloom");
+    public static final SimpleUri HALF_SCALE_FBO = new SimpleUri("engine:fbo.halfScaleBlurredBloom");
+    public static final SimpleUri QUARTER_SCALE_FBO = new SimpleUri("engine:fbo.quarterScaleBlurredBloom");
+    public static final SimpleUri ONE_8TH_SCALE_FBO = new SimpleUri("engine:fbo.oneEightScaleBlurredBloom");
     private static final float BLUR_RADIUS = 12.0f;
 
     /**

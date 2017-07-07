@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -51,7 +52,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
  * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO, to be used at a later stage.
  */
 public class InitialPostProcessingNode extends AbstractNode implements PropertyChangeListener {
-    static final ResourceUrn INITIAL_POST_FBO = new ResourceUrn("engine:fbo.initialPost");
+    static final SimpleUri INITIAL_POST_FBO = new SimpleUri("engine:fbo.initialPost");
     private static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
 
     private RenderingConfig renderingConfig;
