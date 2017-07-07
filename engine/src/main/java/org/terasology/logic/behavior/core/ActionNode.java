@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.behavior.core;
 
+import org.reflections.Reflections;
+import org.terasology.entitySystem.Component;
 import org.terasology.logic.behavior.core.compiler.ClassGenerator;
 import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;

@@ -48,12 +48,10 @@ public class Actor {
     // Stores system-wide information (allows inter-node communication)
     public final Map<String, Object> blackboard;
     private final EntityRef entity;
+
     // Stores information uniquely for each node that requires it
     // TODO can we use a faster data structure? this gets accessed a lot
     private final Map<Integer, Object> dataMap = Maps.newHashMap();
-
-    //    private final Map<String, BehaviorEvent> events = Maps.newHashMap();
-    private boolean interrupted;
 
     private float delta;
 
@@ -61,7 +59,6 @@ public class Actor {
     public Actor(EntityRef entity) {
         this.entity = entity;
         blackboard = Maps.newHashMap();
-        interrupted = false;
 
 
     }
@@ -74,12 +71,6 @@ public class Actor {
     public void setValue(int id, Object obj) {
         dataMap.put(id, obj);
     }
-
-    public boolean interruptRequested() {
-        return interrupted;
-    }
-
-
 
     public float getDelta() {
         return delta;

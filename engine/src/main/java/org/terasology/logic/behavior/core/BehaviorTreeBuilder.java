@@ -100,10 +100,10 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                     String name = behaviorAction.name();
                     if (behaviorAction.isDecorator()) {
                         registerDecorator(name, type);
-                        logger.info("Found decorator {}", name);
+                        logger.debug("Found decorator {}", name);
                     } else {
                         registerAction(name, type);
-                        logger.info("Found action {}", name);
+                        logger.debug("Found action {}", name);
                     }
                 }
             }
@@ -115,10 +115,10 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                     String name = behaviorAction.name();
                     if (behaviorAction.isDecorator()) {
                         registerDecorator(name, type);
-                        logger.info("Found decorator {}", name);
+                        logger.debug("Found decorator {}", name);
                     } else {
                         registerAction(name, type);
-                        logger.info("Found action {}", name);
+                        logger.debug("Found action {}", name);
                     }
                 }
             }
