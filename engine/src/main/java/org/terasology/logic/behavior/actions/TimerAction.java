@@ -30,13 +30,12 @@ import org.terasology.rendering.nui.properties.Range;
 @API
 @BehaviorAction(name = "timer", isDecorator = true)
 public class TimerAction extends BaseAction {
-    private static Logger logger = LoggerFactory.getLogger(TimerAction.class);
+
     @Range(min = 0, max = 10)
     private float time;
 
     @Override
     public void construct(Actor actor) {
-        logger.info("Timer started for entity " + actor.getEntity());
 
         actor.setValue(getId(), time);
     }
@@ -46,9 +45,7 @@ public class TimerAction extends BaseAction {
         float timeRemaining = actor.getValue(getId());
         timeRemaining -= actor.getDelta();
         actor.setValue(getId(), timeRemaining);
-        if (timeRemaining <= 0) {
-            logger.info("Timer ended");
-        }
+
         return timeRemaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
     }
 }

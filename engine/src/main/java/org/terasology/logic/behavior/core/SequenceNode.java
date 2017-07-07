@@ -18,6 +18,8 @@ package org.terasology.logic.behavior.core;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.core.compiler.ClassGenerator;
 import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 
@@ -27,6 +29,7 @@ import java.util.Iterator;
  * Runs all children until one finishes with FAILURE
  */
 public class SequenceNode extends CompositeNode {
+    private static final Logger logger = LoggerFactory.getLogger(SequenceNode.class);
     private Iterator<BehaviorNode> iterator;
     private BehaviorNode current;
     private String reentry;

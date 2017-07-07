@@ -150,7 +150,6 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     }
 
 
-
     public List<Interpreter> getInterpreters() {
         List<Interpreter> runners = Lists.newArrayList();
         for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
@@ -194,10 +193,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     }
 
     /* Debugging */
-    @Command(shortDescription = "interrupt deer", helpText = "send a deer a BehaviorEvent")
-    public String interruptDeer(){
-    getInterpreters().get(0).actor().toggleInterrupt();
-        return "Deer interrupted.";
+    @Command(shortDescription = "interrupt deer", helpText = "add a TestComponent to the first deer available")
+    public String interruptDeer() {
+        getInterpreters().get(0).actor().getEntity().addComponent(new TestComponent());
+        return "Deer " + getInterpreters().get(0).actor().getEntity() + " interrupted.";
     }
 
 }

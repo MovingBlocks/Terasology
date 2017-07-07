@@ -38,10 +38,6 @@ public class RunningNode extends LeafNode {
 
     @Override
     public BehaviorState execute(Actor actor) {
-        if (actor != null && actor.interruptRequested()) {
-            actor.toggleInterrupt();
-            return BehaviorState.FAILURE;
-        }
         return BehaviorState.RUNNING;
     }
 

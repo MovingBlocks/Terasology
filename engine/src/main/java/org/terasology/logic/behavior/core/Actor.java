@@ -45,10 +45,9 @@ import com.google.common.collect.Maps;
 @API
 public class Actor {
     private static Logger logger = LoggerFactory.getLogger(Actor.class);
-    private final EntityRef entity;
     // Stores system-wide information (allows inter-node communication)
     public final Map<String, Object> blackboard;
-
+    private final EntityRef entity;
     // Stores information uniquely for each node that requires it
     // TODO can we use a faster data structure? this gets accessed a lot
     private final Map<Integer, Object> dataMap = Maps.newHashMap();
@@ -76,22 +75,11 @@ public class Actor {
         dataMap.put(id, obj);
     }
 
-//    public Map<String,BehaviorEvent> getEvents() {
-//        return events;
-//    }
-
-//    public void putEvent(String name, BehaviorEvent event){
-//        events.put(name, event);
-//    }
-
-
     public boolean interruptRequested() {
         return interrupted;
     }
 
-    public void toggleInterrupt() {
-        interrupted = !interrupted;
-    }
+
 
     public float getDelta() {
         return delta;
