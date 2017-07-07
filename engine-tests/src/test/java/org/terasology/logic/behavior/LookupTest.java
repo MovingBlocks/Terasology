@@ -17,6 +17,7 @@ package org.terasology.logic.behavior;
 
 import junit.framework.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.terasology.HeadlessEnvironment;
 import org.terasology.assets.ResourceUrn;
@@ -38,12 +39,14 @@ public class LookupTest {
         new HeadlessEnvironment();
     }
 
+    @Ignore("Ignored for the moment")
     @Test
     public void testEmptyLookup() {
         BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookup"), BehaviorTree.class).get();
         System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
     }
 
+    @Ignore("Ignored for the moment")
     @Test
     public void testLookupA() {
         Print.output = new StringBuilder();
@@ -60,6 +63,7 @@ public class LookupTest {
         Assert.assertEquals("[A][A][A]", Print.output.toString());
     }
 
+    @Ignore("Ignored for the moment")
     @Test
     public void testLookupB() {
         Print.output = new StringBuilder();
