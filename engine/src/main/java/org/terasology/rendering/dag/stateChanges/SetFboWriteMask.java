@@ -95,7 +95,7 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public String toString() {
-        return String.format("%30s: %s, %b, %b, %b", this.getClass().getSimpleName(), fbo.getId(), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
+        return String.format("%30s: %s (fboId: %s), %b, %b, %b", this.getClass().getSimpleName(), fbo.getName(), fbo.getId(), renderToColorBuffer, renderToDepthBuffer, renderToLightBuffer);
     }
 
     @Override

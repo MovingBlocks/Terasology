@@ -160,8 +160,8 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
     @Override
     public String toString() {
         if (this != defaultInstance) {
-            return String.format("%30s: slot %s, fbo %s, textureType %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
-                    textureSlot, fbo.getId(), textureType.name(), materialUrn.toString(), shaderParameterName);
+            return String.format("%30s: slot %s, fbo %s (fboId: %s), textureType %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
+                    textureSlot, fbo.getName(), fbo.getId(), textureType.name(), materialUrn.toString(), shaderParameterName);
         } else {
             return String.format("%30s: slot %s, textureId 0, material %s, parameter '%s'", this.getClass().getSimpleName(),
                     textureSlot, materialUrn.toString(), shaderParameterName);

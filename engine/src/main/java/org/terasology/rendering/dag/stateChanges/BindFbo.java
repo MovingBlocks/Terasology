@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
@@ -38,6 +39,7 @@ public final class BindFbo implements StateChange {
     private static StateChange defaultInstance = new UnbindFbo();
 
     private int fboId;
+    private SimpleUri fboName;
 
     /**
      * The constructor, to be used in the initialise method of a node.
@@ -47,6 +49,7 @@ public final class BindFbo implements StateChange {
      */
     public BindFbo(FBO fbo) {
         fboId = fbo.getId();
+        fboName = fbo.getName();
     }
 
     @Override
@@ -66,7 +69,7 @@ public final class BindFbo implements StateChange {
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: fboId: %s", this.getClass().getSimpleName(), fboId);
+        return String.format("%30s: %s (fboId: %s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 
     @Override

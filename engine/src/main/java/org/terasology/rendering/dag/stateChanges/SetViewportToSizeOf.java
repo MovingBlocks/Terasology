@@ -67,7 +67,7 @@ public final class SetViewportToSizeOf implements StateChange {
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: fboId %s (%sx%s)", this.getClass().getSimpleName(), fbo.getId(), fbo.width(), fbo.height());
+        return String.format("%30s: %s (fboId: %s) (%sx%s)", this.getClass().getSimpleName(), fbo.getName(), fbo.getId(), fbo.width(), fbo.height());
     }
 
     public static void disposeDefaultInstance() {

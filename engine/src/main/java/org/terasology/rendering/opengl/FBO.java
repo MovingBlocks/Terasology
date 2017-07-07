@@ -31,6 +31,7 @@ import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 
 /**
  * FBO - Frame Buffer Object
@@ -51,6 +52,7 @@ public final class FBO {
     private static final boolean DEFAULT_LIGHT_BUFFER_MASK = true;
     private static final Logger logger = LoggerFactory.getLogger(FBO.class);
 
+    private SimpleUri fboName;
     private int fboId;
     private int colorBufferTextureId;
     private int depthStencilTextureId;
@@ -80,7 +82,8 @@ public final class FBO {
 
     // private constructor: the only way to generate an instance of this class
     //                      should be through the static create() method.
-    private FBO(int width, int height) {
+    private FBO(SimpleUri fboName, int width, int height) {
+        this.fboName = fboName;
         dimensions = new Dimensions(width, height);
         writeToColorBuffer = DEFAULT_COLOR_MASK;
         writeToNormalsBuffer = DEFAULT_NORMAL_MASK;
@@ -274,6 +277,10 @@ public final class FBO {
         this.status = newStatus;
     }
 
+    public SimpleUri getName() {
+        return fboName;
+    }
+
     public int getId() {
         return fboId;
     }
@@ -344,7 +351,7 @@ public final class FBO {
      */
     public static FBO create(ResourceUrn urn, Dimensions dimensions, Type type,
                              boolean useDepthBuffer, boolean useNormalBuffer, boolean useLightBuffer, boolean useStencilBuffer) {
-        FBO fbo = new FBO(dimensions.width, dimensions.height);
+        FBO fbo = new FBO(new SimpleUri(urn.toString()), dimensions.width, dimensions.height);
 
         // Create the FBO on the GPU
         fbo.fboId = glGenFramebuffersEXT();
