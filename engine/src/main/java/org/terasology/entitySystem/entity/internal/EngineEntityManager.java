@@ -21,6 +21,8 @@ import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
+import java.util.Optional;
+
 /**
  */
 public interface EngineEntityManager extends LowLevelEntityManager, EngineEntityPool {
@@ -103,8 +105,6 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      */
     void unsubscribe(EntityChangeSubscriber subscriber);
 
-    void remove(long entityId);
-
     /**
      * Sets the event system the entity manager will use to propagate life cycle events.
      *
@@ -116,4 +116,14 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      * @return The default serialization library to use for serializing components
      */
     TypeSerializationLibrary getTypeSerializerLibrary();
+
+    /**
+     * Gets the entity pool associated with a given entity.
+     *
+     * If the pool isn't assigned or the entity doesn't exist, an error is logged and the optional is returned empty
+     *
+     * @param id the id of the entity
+     * @return an {@link Optional} containing the pool if it exists, or empty
+     */
+    Optional<EngineEntityPool> getPool(long id);
 }

@@ -170,4 +170,11 @@ public interface EntityPool {
      */
     int getActiveEntityCount();
 
+    /**
+     * Does this pool contain the given entity?
+     *
+     * @param id the id to search for
+     * @return true if this pool contains the entity; false otherwise
+     */
+    boolean contains(long id);
 }

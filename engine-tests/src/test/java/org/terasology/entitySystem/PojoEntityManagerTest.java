@@ -30,6 +30,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.entitySystem.entity.internal.PojoEntityPool;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -43,6 +44,7 @@ import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
@@ -97,6 +99,7 @@ public class PojoEntityManagerTest {
     public void testCreateEntity() {
         EntityRef entity = entityManager.create();
         assertNotNull(entity);
+        assertEquals(entity.getScope(), EntityData.Entity.Scope.GLOBAL);
     }
 
     @Test
@@ -381,5 +384,17 @@ public class PojoEntityManagerTest {
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
+    }
+
+    @Test
+    public void testMoveToPool() {
+        EntityRef entity = entityManager.create();
+        long id = entity.getId();
+
+        PojoEntityPool pool = new PojoEntityPool(entityManager);
+
+        entityManager.moveToPool(id, pool);
+
+        assertTrue(pool.contains(id));
     }
 }

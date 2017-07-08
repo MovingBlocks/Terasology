@@ -16,6 +16,8 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.internal.EngineEntityPool;
+import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
@@ -67,8 +69,10 @@ public interface EntityManager extends EntityPool {
      */
     ComponentLibrary getComponentLibrary();
 
-    EntityPool getGlobalPool();
+    EngineEntityPool getGlobalPool();
 
-    SectorManager getSectorManager();
+    EngineSectorManager getSectorManager();
+
+    boolean moveToPool(long id, EngineEntityPool pool);
 
 }

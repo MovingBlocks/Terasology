@@ -36,6 +36,7 @@ import org.terasology.math.geom.Vector3f;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
@@ -189,7 +190,7 @@ public class PojoEntityPool implements EngineEntityPool {
         // Don't allow the destruction of unloaded entities.
         long entityId = ref.getId();
         entityStore.remove(entityId);
-        entityManager.remove(entityId);
+        entityManager.unregister(entityId);
         ref.invalidate();
         componentStore.remove(entityId);
     }
@@ -391,6 +392,23 @@ public class PojoEntityPool implements EngineEntityPool {
     @Override
     public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
         return componentStore.get(entityId, componentClass) != null;
+    }
+
+    @Override
+    public Optional<BaseEntityRef> remove(long id) {
+        componentStore.remove(id);
+        return Optional.of(entityStore.get(id));
+    }
+
+    @Override
+    public void insertRef(BaseEntityRef ref, Iterable<Component> components) {
+        entityStore.put(ref.getId(), ref);
+        components.forEach(comp -> componentStore.put(ref.getId(), comp));
+    }
+
+    @Override
+    public boolean contains(long id) {
+        return entityStore.containsKey(id);
     }
 
 }

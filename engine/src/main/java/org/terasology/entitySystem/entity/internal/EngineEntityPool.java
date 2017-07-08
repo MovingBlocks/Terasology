@@ -20,6 +20,8 @@ import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 
+import java.util.Optional;
+
 /**
  */
 public interface EngineEntityPool extends EntityPool {
@@ -69,4 +71,20 @@ public interface EngineEntityPool extends EntityPool {
      * @return whether the entity has the component
      */
     boolean hasComponent(long entityId, Class<? extends Component> componentClass);
+
+    /**
+     * Remove the entity from the pool. This does not destroy the entity, it only removes the {@link EntityRef}
+     * and the {@link Component}s from this pool, so that the entity can be moved to a different pool. It does
+     * not invalidate the {@link EntityRef}.
+     *
+     * Returns an {@link Optional} {@link BaseEntityRef} if it was removed, ready to be put into another pool. If nothing
+     * was removed, return {@link Optional#empty()}.
+     *
+     * @param id the id of the entity to remove
+     * @return an optional {@link BaseEntityRef}, containing the removed entity
+     */
+    Optional<BaseEntityRef> remove(long id);
+
+    void insertRef(BaseEntityRef ref, Iterable<Component> components);
+
 }

@@ -15,6 +15,8 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
@@ -34,6 +36,7 @@ import java.util.Collections;
 public abstract class BaseEntityRef extends EntityRef {
 
     protected LowLevelEntityManager entityManager;
+    private Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);
 
     public BaseEntityRef(LowLevelEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -92,6 +95,21 @@ public abstract class BaseEntityRef extends EntityRef {
         if (exists()) {
             EntityInfoComponent info = getEntityInfo();
             if (!info.scope.equals(scope)) {
+
+                EngineEntityPool newPool;
+                switch (scope) {
+                    case GLOBAL:
+                        newPool = entityManager.getGlobalPool();
+                        break;
+                    case SECTOR:
+                        newPool = entityManager.getSectorManager();
+                        break;
+                    default:
+                        logger.error("Unrecognised scope {}.", scope);
+                        return;
+                }
+
+                entityManager.moveToPool(getId(), newPool);
                 info.scope = scope;
                 saveComponent(info);
             }
