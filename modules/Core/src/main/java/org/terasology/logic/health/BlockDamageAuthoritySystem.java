@@ -37,6 +37,7 @@ import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
@@ -46,6 +47,8 @@ import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.WorldAtlas;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -116,49 +119,50 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     }
 
     private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location, EntityRef entityRef) {
-        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
-        if (!terrainTexture.isPresent() || !terrainTexture.get().isLoaded()) {
-            return;
-        }
-
-        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
-        builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
-        TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
-
-        spriteComponent.texture = terrainTexture.get();
-
-        final float tileSize = worldAtlas.getRelativeTileSize();
-        spriteComponent.textureSize.set(tileSize, tileSize);
-
-        Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
-        Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
-
-        final float relTileSize = worldAtlas.getRelativeTileSize();
-        Vector2f particleTexSize = new Vector2f(
-                relTileSize * 0.25f,
-                relTileSize * 0.25f);
-
-        spriteComponent.textureSize.x *= 0.25f;
-        spriteComponent.textureSize.y *= 0.25f;
-
-        textureOffsetGeneratorComponent.validOffsets.add(new Vector2f(
-                offset.x + random.nextFloat() * (tileSize - particleTexSize.x),
-                offset.y + random.nextFloat() * (tileSize - particleTexSize.y)));
-
-        builder.build();
-
-        if (family.getArchetypeBlock().isDebrisOnDestroy()) {
-            EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
-            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location);
-            dustBuilder.build();
-        }
+        createBlockParticleEffect(family, location);
 
         BlockSounds sounds = family.getArchetypeBlock().getSounds();
         if (!sounds.getDigSounds().isEmpty()) {
             StaticSound sound = random.nextItem(sounds.getDigSounds());
             entityRef.send(new PlaySoundEvent(sound, 1f));
         }
+    }
+
+    /**
+     * Creates a new entity for the block damage particle effect.
+     *
+     * If the terrain texture of the damaged block is available, the particles will have the block texture. Otherwise,
+     * the default sprite (smoke) is used.
+     *
+     * @param family the {@link BlockFamily} of the damaged block
+     * @param location the location of the damaged block
+     */
+    private void createBlockParticleEffect(BlockFamily family, Vector3f location) {
+        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
+
+        builder.getComponent(LocationComponent.class).setWorldPosition(location);
+        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
+        if (terrainTexture.isPresent() && terrainTexture.get().isLoaded()) {
+            final float tileSize = worldAtlas.getRelativeTileSize();
+            final BlockAppearance blockAppearance = family.getArchetypeBlock().getPrimaryAppearance();
+            List<Vector2f> offsets =
+                    Arrays.asList(
+                            blockAppearance.getTextureAtlasPos(BlockPart.BACK),
+                            blockAppearance.getTextureAtlasPos(BlockPart.FRONT),
+                            blockAppearance.getTextureAtlasPos(BlockPart.TOP),
+                            blockAppearance.getTextureAtlasPos(BlockPart.BOTTOM),
+                            blockAppearance.getTextureAtlasPos(BlockPart.LEFT),
+                            blockAppearance.getTextureAtlasPos(BlockPart.RIGHT));
+
+            ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
+            spriteComponent.texture = terrainTexture.get();
+            spriteComponent.textureSize.set(tileSize, tileSize);
+
+            TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
+            textureOffsetGeneratorComponent.validOffsets.addAll(offsets);
+        }
+
+        builder.build();
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
