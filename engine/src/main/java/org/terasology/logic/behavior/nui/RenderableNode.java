@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,11 +20,9 @@ import org.terasology.utilities.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
-import org.terasology.logic.behavior.BehaviorNodeComponent;
-import org.terasology.logic.behavior.tree.Node;
-import org.terasology.logic.behavior.tree.Status;
-import org.terasology.logic.behavior.tree.TreeAccessor;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -36,11 +34,15 @@ import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 
 import java.util.List;
 
 /**
- * A widget to render and process inputs for a node of a behavior tree.
+ * A widget to render a node of a behavior tree. Appearance is defined by a BehaviorNodeComponent which is queried using
+ * the BehaviorNodeFactory for a given behavior node.
+ *
+ * Can be wired to other nodes.
  *
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
@@ -49,7 +51,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private final List<RenderableNode> children = Lists.newArrayList();
     private PortList portList;
 
-    private Node node;
+    private BehaviorNode node;
     private Vector2f position;
     private Vector2f size;
     private TreeAccessor<RenderableNode> withoutModel;
@@ -58,7 +60,6 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private Vector2i last;
     private BehaviorEditor editor;
     private boolean dragged;
-    private Status status;
     private boolean collapsed;
     private boolean copyMode;
 
@@ -108,10 +109,6 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
     };
 
-    public RenderableNode() {
-        this(null);
-    }
-
     public RenderableNode(BehaviorNodeComponent data) {
         this.data = data;
         position = new Vector2f();
@@ -124,14 +121,15 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawTexture(texture);
-        String text = getData().name + " " + (status != null ? status : "");
+        BehaviorState status = getState();
+        String text = getData().displayName + " " + (status != null ? status : "");
         if (collapsed) {
             text += "[+]";
         }
         canvas.drawText(text);
 
         if (editor != null) {
-            canvas.addInteractionRegion(moveListener, data.description);
+            canvas.addInteractionRegion(moveListener, getData().description);
         }
         portList.onDraw(canvas);
     }
@@ -171,7 +169,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         return portList;
     }
 
-    public void setNode(Node node) {
+    public void setNode(BehaviorNode node) {
         this.node = node;
     }
 
@@ -199,8 +197,12 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         this.size = size;
     }
 
-    public Node getNode() {
+    public BehaviorNode getNode() {
         return node;
+    }
+
+    public PropertyProvider getProperties() {
+        return node.getProperties();
     }
 
     public BehaviorNodeComponent getData() {
@@ -287,12 +289,8 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Status getStatus() {
-        return status;
+    public BehaviorState getState() {
+        return editor != null ? editor.getState(getNode()) : null;
     }
 
     @Override
@@ -315,7 +313,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
         @Override
         public void setChild(int index, RenderableNode child) {
-            getNode().setChild(index, child.getNode());
+            getNode().replaceChild(index, child.getNode());
         }
 
         @Override

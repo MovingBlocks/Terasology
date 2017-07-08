@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -35,9 +35,12 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
-import org.terasology.logic.behavior.tree.Actor;
-import org.terasology.logic.behavior.tree.Interpreter;
-import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BehaviorEvent;
+import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -46,46 +49,37 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * Behavior tree system
- * <br><br>
+ * <p/>
  * Each entity with BehaviorComponent is kept under control by this system. For each such entity a behavior tree
  * is loaded and an interpreter is started.
- * <br><br>
+ * <p/>
  * Modifications made to a behavior tree will reflect to all entities using this tree.
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final Name BEHAVIORS = new Name("Behaviors");
-
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     @In
     private EntityManager entityManager;
     @In
     private PrefabManager prefabManager;
     @In
     private AssetManager assetManager;
+    @In
+    private BehaviorTreeBuilder treeBuilder;
 
-
-    /*
-     * A hash map that maps entity to their interpreters. Behavior tree processing
-     * can trigger a behavior tree switch and thus map can change during iteration.
-     * These are stored in a List for iteration in the update method,
-     * so that a ConcurrentModificationException is avoided.
-     */
-    private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
-    /*
-     * A list that contains the entityInterpreters before they get modified inside the update method
-     */
-    private List<Interpreter> cachedInterpreters = Lists.newArrayList();
     private List<BehaviorTree> trees = Lists.newArrayList();
+
+    private EntityRef dummy;
+
 
     @Override
     public void initialise() {
@@ -97,40 +91,31 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             if (asset.isPresent()) {
                 trees.add(asset.get());
             }
+
+
         }
     }
 
     @ReceiveEvent
-    public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        cachedInterpreters = Lists.newArrayList();
+    public void onBehaviorAdded(OnAddedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
-    public void onBehaviorChanged(OnChangedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        cachedInterpreters = Lists.newArrayList();
-        updateEntity(entityRef, behaviorComponent);
-    }
-
-    @ReceiveEvent
-    public void onBehaviorDeactivated(BeforeDeactivateComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        if (behaviorComponent.tree != null) {
-            cachedInterpreters = Lists.newArrayList();
-            entityInterpreters.remove(entityRef);
-        }
+    public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        addEntity(entityRef, behaviorComponent);
     }
 
     @Override
     public void update(float delta) {
-        if (cachedInterpreters.isEmpty()) {
-            cachedInterpreters.addAll(entityInterpreters.values());
-        }
-        for (Interpreter interpreter : cachedInterpreters) {
-            interpreter.tick(delta);
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            behaviorComponent.interpreter.tick(delta);
         }
     }
 
-    public BehaviorTree createTree(String name, Node root) {
+    public BehaviorTree createTree(String name, BehaviorNode root) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(root);
         BehaviorTree behaviorTree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name(name.replaceAll("\\W+", ""))), data, BehaviorTree.class);
@@ -164,36 +149,54 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         return trees;
     }
 
-    public List<Interpreter> getInterpreter() {
-        List<Interpreter> interpreters = Lists.newArrayList();
-        interpreters.addAll(entityInterpreters.values());
-        Collections.sort(interpreters, (o1, o2) -> o1.toString().compareTo(o2.toString()));
-        return interpreters;
+
+    public List<Interpreter> getInterpreters() {
+        List<Interpreter> runners = Lists.newArrayList();
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            if (behaviorComponent.interpreter != null) {
+                runners.add(behaviorComponent.interpreter);
+            }
+        }
+        if (runners.size() == 0) {
+            BehaviorComponent behaviorComponent = new BehaviorComponent();
+
+            behaviorComponent.tree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name("default")), new BehaviorTreeData(), BehaviorTree.class);
+            dummy = entityManager.create(behaviorComponent);
+            DisplayNameComponent nameComponent = new DisplayNameComponent();
+            nameComponent.name = "Main";
+            dummy.addComponent(nameComponent);
+            dummy.addComponent(behaviorComponent);
+        }
+        runners.sort(Comparator.comparing(Interpreter::toString));
+        return runners;
     }
 
     public void treeModified(BehaviorTree tree) {
-        entityInterpreters.values().forEach(Interpreter::reset);
+        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
+            if (behaviorComponent.tree == tree) {
+                behaviorComponent.interpreter.reset();
+            }
+        }
         save(tree);
     }
 
     private void addEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        Interpreter interpreter = entityInterpreters.get(entityRef);
-        if (interpreter == null) {
-            interpreter = new Interpreter(new Actor(entityRef));
+        if (behaviorComponent.interpreter == null) {
+            behaviorComponent.interpreter = new Interpreter(new Actor(entityRef));
             BehaviorTree tree = behaviorComponent.tree;
-            entityInterpreters.put(entityRef, interpreter);
             if (tree != null) {
-                interpreter.start(tree.getRoot());
+                behaviorComponent.interpreter.setTree(tree);
             }
         }
     }
 
-    private void updateEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        Interpreter interpreter = new Interpreter(new Actor(entityRef));
-        BehaviorTree tree = behaviorComponent.tree;
-        entityInterpreters.put(entityRef, interpreter);
-        if (tree != null) {
-            interpreter.start(tree.getRoot());
-        }
+    /* Debugging */
+    @Command(shortDescription = "interrupt deer", helpText = "add a TestComponent to the first deer available")
+    public String interruptDeer() {
+        getInterpreters().get(0).actor().getEntity().addComponent(new TestComponent());
+        return "Deer " + getInterpreters().get(0).actor().getEntity() + " interrupted.";
     }
+
 }
