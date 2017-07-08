@@ -21,6 +21,7 @@ import java.util.Locale;
 /**
  */
 public enum StandardCollisionGroup implements CollisionGroup {
+    NONE((short) 0b00000000),
     DEFAULT((short) 0b00000001),
     STATIC((short) 0b00000010),
     KINEMATIC((short) 0b00000100),

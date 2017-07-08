@@ -22,11 +22,11 @@ varying vec3 waterNormalViewSpace;
 const vec3 normalDiffOffset = vec3(-1.0, 0.0, 1.0);
 const vec2 normalDiffSize = vec2(2.0, 0.0);
 
-uniform float waveIntensFalloff;
+uniform float waveIntensityFalloff;
 uniform float waveSizeFalloff;
 uniform float waveSpeedFalloff;
 uniform float waveSize;
-uniform float waveIntens;
+uniform float waveIntensity;
 uniform float waveSpeed;
 uniform float waterOffsetY;
 uniform float waveOverallScale;
@@ -54,14 +54,14 @@ float calcWaterHeightAtOffset(vec2 worldPos) {
     float height = 0.0;
 
     float size = waveSize;
-    float intens = waveIntens;
+    float intens = waveIntensity;
     float timeFactor = waveSpeed;
     for (int i=0; i<OCEAN_OCTAVES; ++i) {
         height += (smoothTriangleWave(timeToTick(time, timeFactor) + worldPos.x * waveDirections[i].x
             * size + worldPos.y * waveDirections[i].y * size) * 2.0 - 1.0) * intens;
 
         size *= waveSizeFalloff;
-        intens *= waveIntensFalloff;
+        intens *= waveIntensityFalloff;
         timeFactor *= waveSpeedFalloff;
     }
 

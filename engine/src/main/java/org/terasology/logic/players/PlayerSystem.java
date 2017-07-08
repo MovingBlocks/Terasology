@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -29,6 +30,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.AliveCharacterComponent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterTeleportEvent;
+import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
@@ -55,25 +57,19 @@ import java.util.List;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(PlayerSystem.class);
     @In
     private EntityManager entityManager;
-
     @In
     private WorldGenerator worldGenerator;
-
     @In
     private WorldProvider worldProvider;
-
     @In
     private ChunkProvider chunkProvider;
-
     @In
     private NetworkSystem networkSystem;
-
     private List<SpawningClientInfo> clientsPreparingToSpawn = Lists.newArrayList();
     private List<SpawningClientInfo> clientsPreparingToRespawn = Lists.newArrayList();
-
-    private static final Logger logger = LoggerFactory.getLogger(PlayerSystem.class);
 
     @Override
     public void initialise() {
@@ -105,6 +101,21 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 respawnPlayer(spawning.clientEntity);
                 i.remove();
             }
+        }
+    }
+
+    /**
+     * This saves a dead player entity, which is meant to be preserved, to not be destroyed even after the
+     * {@link AliveCharacterComponent} is stripped off.
+     *
+     * @param event
+     * @param entity
+     * @param playerCharacterComponent
+     */
+    @ReceiveEvent
+    public void beforeDestroyDeadPlayer(BeforeDestroyEvent event, EntityRef entity, PlayerCharacterComponent playerCharacterComponent) {
+        if (!entity.hasComponent(AliveCharacterComponent.class)) {
+            event.consume();
         }
     }
 
@@ -196,13 +207,18 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         removeRelevanceEntity(entity);
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
-    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+    @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
+    public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
         loc.setLocalRotation(new Quat4f());  // reset rotation
         entity.saveComponent(loc);
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL, components = {ClientComponent.class})
+    public void onRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
+        Vector3f spawnPosition = entity.getComponent(LocationComponent.class).getWorldPosition();
 
         if (worldProvider.isBlockRelevant(spawnPosition)) {
             respawnPlayer(entity);
@@ -254,12 +270,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         public PlayerStore playerStore;
         public Vector3f position;
 
-         SpawningClientInfo(EntityRef client, Vector3f position) {
+        SpawningClientInfo(EntityRef client, Vector3f position) {
             this.clientEntity = client;
             this.position = position;
         }
 
-         SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
+        SpawningClientInfo(EntityRef client, Vector3f position, PlayerStore playerStore) {
             this(client, position);
             this.playerStore = playerStore;
         }

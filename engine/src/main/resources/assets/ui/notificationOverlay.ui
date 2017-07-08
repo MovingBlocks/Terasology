@@ -1,6 +1,6 @@
 {
-    "type": "minichatOverlay",
-    "skin": "minichat",
+    "type": "notificationOverlay",
+    "skin": "notification",
     "contents": {
         "type": "relativeLayout",
         "contents": [

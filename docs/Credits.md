@@ -37,8 +37,9 @@ Contributors
  [Rez 'zproc' N.](https://github.com/zproc),
  [Christoph "Chrisk" Köbke](https://github.com/ChrisKoebke),
  [Maternal](http://forum.terasology.org/members/maternal.810/),
- [Trekmarvel](https://github.com/Trekmarvel)
-* Design Team: 
+ [Trekmarvel](https://github.com/Trekmarvel),
+ [quaternius](https://github.com/quaternius) ([Twitter](https://twitter.com/quaternius))
+* Design Team:
  [Rasmus 'Cervator' Praestholm](https://github.com/Cervator),
  [Overdhose](https://github.com/Overdhose),
  [Cynthia 'woodspeople' Kurtz](http://forum.terasology.org/members/woodspeople.34/),
@@ -200,7 +201,8 @@ Contributors
  [theobisproject](https://github.com/theobisproject),
  [omomthings](https://github.com/omomthings),
  [njd5475](https://github.com/njd5475),
- [Owl-A](https://github.com/Owl-A)
+ [Owl-A](https://github.com/Owl-A),
+ [niksoc](https://github.com/niksoc)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

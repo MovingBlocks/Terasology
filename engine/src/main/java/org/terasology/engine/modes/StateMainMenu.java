@@ -25,10 +25,9 @@ import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.behavior.BehaviorSystem;
-import org.terasology.logic.behavior.nui.BehaviorNodeFactory;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
@@ -57,9 +56,11 @@ public class StateMainMenu implements GameState {
     private ComponentSystemManager componentSystemManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
+    private Console console;
+    private StorageServiceWorker storageServiceWorker;
 
     private String messageOnLoad = "";
-    private BehaviorSystem behaviorSystem;
+
 
     public StateMainMenu() {
     }
@@ -78,7 +79,8 @@ public class StateMainMenu implements GameState {
         entityManager = context.get(EngineEntityManager.class);
 
         eventSystem = context.get(EventSystem.class);
-        context.put(Console.class, new ConsoleImpl(context));
+        console = new ConsoleImpl(context);
+        context.put(Console.class, console);
 
         nuiManager = new NUIManagerInternal(context.get(CanvasRenderer.class), context);
         context.put(NUIManager.class, nuiManager);
@@ -117,13 +119,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.initialise();
 
-        behaviorSystem = new BehaviorSystem();
-        componentSystemManager.register(behaviorSystem);
-        CoreRegistry.put(BehaviorSystem.class, behaviorSystem);
-
-        BehaviorNodeFactory nodeFactory = new BehaviorNodeFactory();
-        componentSystemManager.register(nodeFactory);
-        nodeFactory.refreshLibrary();
+        storageServiceWorker = context.get(StorageServiceWorker.class);
 
         playBackgroundMusic();
 
@@ -163,8 +159,8 @@ public class StateMainMenu implements GameState {
         updateUserInterface(delta);
 
         eventSystem.process();
+        storageServiceWorker.flushNotificationsToConsole(console);
 
-        behaviorSystem.update(delta);
     }
 
     @Override

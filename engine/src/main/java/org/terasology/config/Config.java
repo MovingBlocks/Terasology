@@ -117,6 +117,10 @@ public final class Config {
         return config.getNuiEditor();
     }
 
+    public IdentityStorageServiceConfig getIdentityStorageService() {
+        return config.getIdentityStorageService();
+    }
+
     public String renderConfigAsJson(Object configObject) {
         return createGson().toJsonTree(configObject).toString();
     }

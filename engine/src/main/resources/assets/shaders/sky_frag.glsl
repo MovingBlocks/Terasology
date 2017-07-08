@@ -16,7 +16,6 @@
 
 varying	vec3 colorYxy;
 varying vec3 skyVec;
-varying vec3 skyVecR;
 varying	vec4 position;
 
 uniform sampler2D texSky180;

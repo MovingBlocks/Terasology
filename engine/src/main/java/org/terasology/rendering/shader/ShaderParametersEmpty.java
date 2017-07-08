@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@ package org.terasology.rendering.shader;
 import org.terasology.rendering.assets.material.Material;
 
 /**
- * Shader parameters for the LightBufferPass shader program.
- *
+ * Basic shader parameters for all shader program.
  */
-public class ShaderParametersLightBufferPass extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
+public class ShaderParametersEmpty implements ShaderParameters {
+    public ShaderParametersEmpty() {
     }
 
+    @Override
+    public void initialParameters(Material material) {
+    }
+
+    @Override
+    public void applyParameters(Material program) {
+    }
 }

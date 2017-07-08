@@ -20,7 +20,6 @@ uniform float exposure;
 uniform float density;
 
 uniform sampler2D texScene;
-uniform sampler2D texDepth;
 
 uniform float lightDirDotViewDir;
 uniform vec2 lightScreenPos;
