@@ -126,4 +126,5 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      * @return an {@link Optional} containing the pool if it exists, or empty
      */
     Optional<EngineEntityPool> getPool(long id);
+
 }

@@ -131,14 +131,17 @@ public class PojoEntityPool implements EngineEntityPool {
         EntityBuilder builder = newBuilder(prefab);
         builder.setSendLifecycleEvents(sendLifecycleEvents);
 
-        LocationComponent locationComponent = builder.getComponent(LocationComponent.class);
-        if (locationComponent != null) {
-            if (position != null) {
-                locationComponent.setWorldPosition(position);
-            }
-            if (rotation != null) {
-                locationComponent.setWorldRotation(rotation);
-            }
+        LocationComponent loc = builder.getComponent(LocationComponent.class);
+        if (loc == null && (position != null || rotation != null)) {
+            loc = new LocationComponent();
+            builder.addComponent(loc);
+        }
+
+        if (position != null) {
+            loc.setWorldPosition(position);
+        }
+        if (rotation != null) {
+            loc.setWorldRotation(rotation);
         }
 
         return builder.build();

@@ -535,7 +535,7 @@ public class PojoEntityManager implements EngineEntityManager {
             if (id != NULL_ID) {
                 if (isExistingEntity(id)) {
                     logger.error("Entity {} doesn't have an assigned pool", id);
-                } else if (id != NULL_ID) {
+                } else {
                     logger.error("Entity {} doesn't exist", id);
                 }
             }
@@ -560,14 +560,6 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
-    /**
-     * Moves the given entity into the given pool. This will move the entity and all of its components, as well as
-     * re-assigning it in the entity manager.
-     *
-     * @param id the id of the entity to move
-     * @param pool the pool to move the entity into
-     * @return whether the move was successful
-     */
     public boolean moveToPool(long id, EngineEntityPool pool) {
 
         if (getPool(id).isPresent() && getPool(id).get().equals(pool)) {
@@ -645,16 +637,20 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
-        TLongObjectIterator<T> iterator = globalPool.getComponentStore().componentIterator(componentClass);
-        if (iterator != null) {
-            List<Map.Entry<EntityRef, T>> list = new ArrayList<>();
-            while (iterator.hasNext()) {
-                iterator.advance();
-                list.add(new EntityEntry<>(getEntity(iterator.key()), iterator.value()));
+        List<TLongObjectIterator<T>> iterators = new ArrayList<>();
+        iterators.add(globalPool.getComponentStore().componentIterator(componentClass));
+        iterators.add(sectorManager.getComponentStore().componentIterator(componentClass));
+
+        List<Map.Entry<EntityRef, T>> list = new ArrayList<>();
+        for (TLongObjectIterator<T> iterator : iterators) {
+            if (iterator != null) {
+                while (iterator.hasNext()) {
+                    iterator.advance();
+                    list.add(new EntityEntry<>(getEntity(iterator.key()), iterator.value()));
+                }
             }
-            return list;
         }
-        return Collections.emptyList();
+        return list;
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {

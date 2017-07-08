@@ -69,10 +69,4 @@ public interface EntityManager extends EntityPool {
      */
     ComponentLibrary getComponentLibrary();
 
-    EngineEntityPool getGlobalPool();
-
-    EngineSectorManager getSectorManager();
-
-    boolean moveToPool(long id, EngineEntityPool pool);
-
 }
