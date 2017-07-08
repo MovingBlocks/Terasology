@@ -18,6 +18,7 @@ package org.terasology.telemetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.telemetry.metrics.GameConfigurationMetric;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
@@ -37,6 +38,8 @@ public class Metrics {
 
     private ModulesMetric modulesMetric;
 
+    private GameConfigurationMetric gameConfigurationMetric;
+
     public Metrics() {
 
     }
@@ -44,8 +47,8 @@ public class Metrics {
     public void initialise(Context context) {
 
         systemContextMetric = new SystemContextMetric();
-
         modulesMetric = new ModulesMetric(context);
+        gameConfigurationMetric = new GameConfigurationMetric(context);
     }
 
     public SystemContextMetric getSystemContextMetric() {

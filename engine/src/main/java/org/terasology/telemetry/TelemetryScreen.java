@@ -191,6 +191,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         List<Map.Entry> telemetryFields = sortFields(map);
         for (Map.Entry entry : telemetryFields) {
             Object value = entry.getValue();
+            if (value == null) {
+                value = "Value Unknown";
+            }
             if (value instanceof List) {
                 List list = (List) value;
                 addTelemetryField(entry.getKey().toString(), list, layout);

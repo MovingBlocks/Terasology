@@ -16,6 +16,7 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

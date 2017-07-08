@@ -18,8 +18,13 @@ package org.terasology.telemetry;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.terasology.config.Config;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.health.DestroyEvent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.telemetry.metrics.ModulesMetric;
 
@@ -31,6 +36,8 @@ public class TelemetrySystem extends BaseComponentSystem {
 
     private final String trackerNamespace = this.getClass().toString();
 
+    private GamePlayStatsComponent gamePlayStatsComponent;
+
     @In
     private Emitter emitter;
 
@@ -40,12 +47,22 @@ public class TelemetrySystem extends BaseComponentSystem {
     @In
     private Config config;
 
+    @In
+    private EntityManager entityManager;
+
+    @In
+    private LocalPlayer localPlayer;
+
     @Override
     public void postBegin() {
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
             sendModuleMetric();
             sendSystemContextMetric();
         }
+
+        gamePlayStatsComponent = new GamePlayStatsComponent();
+        EntityRef localPlayerEntity = localPlayer.getClientEntity();
+        localPlayerEntity.addOrSaveComponent(gamePlayStatsComponent);
     }
 
     private void sendModuleMetric() {
@@ -57,5 +74,10 @@ public class TelemetrySystem extends BaseComponentSystem {
     private void sendSystemContextMetric() {
         Unstructured systemContextMetric = metrics.getSystemContextMetric().getUnstructuredMetric();
         TelemetryUtils.trackMetric(emitter, trackerNamespace, systemContextMetric);
+    }
+
+    @ReceiveEvent
+    public void onDestroy(DestroyEvent event, EntityRef entity) {
+        gamePlayStatsComponent.blockDistroyed++;
     }
 }
