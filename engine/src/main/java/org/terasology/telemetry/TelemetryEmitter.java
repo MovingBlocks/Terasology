@@ -132,21 +132,23 @@ public class TelemetryEmitter extends BatchEmitter {
         this.httpClientAdapter = httpClientAdapter;
     }
 
-    // TODO: remove it if the snowplow unclose issue is fixed
+    // TODO: remove it if the snowplow unclosed issue is fixed
     @Override
     public void close() {
         flushBuffer();
         if (executor != null) {
             executor.shutdown();
             try {
-                boolean e = executor.awaitTermination(closeTimeout, TimeUnit.SECONDS);
-                if (!e) {
-                    logger.debug("Executor service shut down after time out");
+                if (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    if (!executor.awaitTermination(closeTimeout, TimeUnit.SECONDS)) {
+                        logger.warn("Executor did not terminate");
+                    }
                 }
-            } catch (InterruptedException e) {
-                logger.error("Encounter an InterrupedException", e);
+            } catch (InterruptedException ie) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
             }
-            executor = null;
         }
     }
 }
