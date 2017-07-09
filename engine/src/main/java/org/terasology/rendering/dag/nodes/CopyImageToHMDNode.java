@@ -41,9 +41,9 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
 public class CopyImageToHMDNode extends ConditionDependentNode {
-    private static final SimpleUri LEFT_EYE_FBO = new SimpleUri("engine:fbo.leftEye");
-    private static final SimpleUri RIGHT_EYE_FBO = new SimpleUri("engine:fbo.rightEye");
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+    private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
+    private static final SimpleUri RIGHT_EYE_FBO_URI = new SimpleUri("engine:fbo.rightEye");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 
     private OpenVRProvider vrProvider;
@@ -67,8 +67,8 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
             worldRenderer = context.get(WorldRenderer.class);
 
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-            leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-            rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
             vrProvider.texType[0].handle = leftEyeFbo.getColorBufferTextureId();
@@ -80,7 +80,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
 
-            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
         }
     }
 

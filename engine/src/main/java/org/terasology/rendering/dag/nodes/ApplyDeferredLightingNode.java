@@ -40,7 +40,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * This node is integral to the deferred lighting technique.
  */
 public class ApplyDeferredLightingNode extends AbstractNode {
-    private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
+    private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL_URN = new ResourceUrn("engine:prog.lightBufferPass");
 
     public ApplyDeferredLightingNode(Context context) {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
@@ -50,19 +50,19 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         addDesiredStateChange(new BindFbo(gBufferPair.getWriteFbo()));
 
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL_URN));
 
         FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getReadFbo();
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaque"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueDepth"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, NormalsTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueNormals"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   readOnlyGBuffer, LightAccumulationTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
     }
 
     /**

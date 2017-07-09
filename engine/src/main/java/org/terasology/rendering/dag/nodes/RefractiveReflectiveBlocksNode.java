@@ -47,7 +47,7 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO;
+import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
@@ -68,8 +68,8 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  * camera partially spoils the effect showing its limits.
  */
 public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOManagerSubscriber, PropertyChangeListener {
-    public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
-    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
+    public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
+    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
@@ -154,14 +154,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
-        refractiveReflectiveFbo = requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
+        refractiveReflectiveFbo = requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
         update();
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
-        chunkMaterial = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL_URN);
 
         renderingConfig = context.get(Config.class).getRendering();
         normalMappingIsEnabled = renderingConfig.isNormalMapping();
@@ -172,15 +172,15 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         renderingConfig.subscribe(RenderingConfig.ANIMATE_WATER, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL, "textureWater"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL, "textureWaterNormal"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL, "textureWaterNormalAlt"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "textureWaterReflection"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL, "texSceneOpaque"));
-        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
-        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL_URN, "textureWater"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL_URN, "textureWaterNormal"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL_URN, "textureWaterNormalAlt"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO_URI, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "textureWaterReflection"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaque"));
+        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);

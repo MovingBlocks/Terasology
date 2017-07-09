@@ -53,8 +53,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    public static final SimpleUri LIGHT_SHAFTS_FBO = new SimpleUri("engine:fbo.lightShafts");
-    private static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
+    public static final SimpleUri LIGHT_SHAFTS_FBO_URI = new SimpleUri("engine:fbo.lightShafts");
+    private static final ResourceUrn LIGHT_SHAFTS_MATERIAL_URN = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;
     private SubmersibleCamera activeCamera;
@@ -92,16 +92,16 @@ public class LightShaftsNode extends ConditionDependentNode {
         requiresCondition(renderingConfig::isLightShafts);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO lightShaftsFbo = requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        FBO lightShaftsFbo = requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(lightShaftsFbo));
         addDesiredStateChange(new SetViewportToSizeOf(lightShaftsFbo));
 
-        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL_URN));
 
-        lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL);
+        lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
     }
 
     /**

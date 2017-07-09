@@ -66,7 +66,7 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.F
  * content of other buffers to correctly light up the scene.
  */
 public class DeferredPointLightsNode extends AbstractNode {
-    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
+    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL_URN = new ResourceUrn("engine:prog.lightGeometryPass");
     private static int lightSphereDisplayList = -1;
 
     private EntityManager entityManager;
@@ -95,8 +95,8 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
+        lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL_URN);
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL_URN));
 
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
@@ -114,8 +114,8 @@ public class DeferredPointLightsNode extends AbstractNode {
         initLightSphereDisplayList();
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, readOnlyGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, readOnlyGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueNormals"));
     }
 
     private void initLightSphereDisplayList() {

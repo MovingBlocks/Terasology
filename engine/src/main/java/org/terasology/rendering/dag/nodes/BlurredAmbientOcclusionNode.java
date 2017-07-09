@@ -32,7 +32,7 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
-import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_FBO;
+import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -53,8 +53,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class BlurredAmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final SimpleUri SSAO_BLURRED_FBO = new SimpleUri("engine:fbo.ssaoBlurred");
-    private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
+    public static final SimpleUri SSAO_BLURRED_FBO_URI = new SimpleUri("engine:fbo.ssaoBlurred");
+    private static final ResourceUrn SSAO_BLURRED_MATERIAL_URN = new ResourceUrn("engine:prog.ssaoBlur");
 
     private Material ssaoBlurredMaterial;
     private float outputFboWidth;
@@ -69,19 +69,19 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL));
-        ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL_URN));
+        ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL_URN);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(ssaoBlurredFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoBlurredFbo));
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new SetInputTextureFromFbo(0, SSAO_FBO, ColorTexture,
-                displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
+        addDesiredStateChange(new SetInputTextureFromFbo(0, SSAO_FBO_URI, ColorTexture,
+                displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL_URN, "tex"));
     }
 
     /**

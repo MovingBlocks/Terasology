@@ -40,7 +40,7 @@ import org.terasology.world.WorldProvider;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO;
+import static org.terasology.rendering.dag.nodes.LightShaftsNode.LIGHT_SHAFTS_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -49,11 +49,11 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 /**
  * An instance of this node adds chromatic aberration (currently non-functional), light shafts,
  * 1/8th resolution bloom and vignette onto the rendering achieved so far, stored in the gbuffer.
- * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO, to be used at a later stage.
+ * Stores the result into the InitialPostProcessingNode.INITIAL_POST_FBO_URI, to be used at a later stage.
  */
 public class InitialPostProcessingNode extends AbstractNode implements PropertyChangeListener {
-    static final SimpleUri INITIAL_POST_FBO = new SimpleUri("engine:fbo.initialPost");
-    private static final ResourceUrn INITIAL_POST_MATERIAL = new ResourceUrn("engine:prog.initialPost");
+    static final SimpleUri INITIAL_POST_FBO_URI = new SimpleUri("engine:fbo.initialPost");
+    private static final ResourceUrn INITIAL_POST_MATERIAL_URN = new ResourceUrn("engine:prog.initialPost");
 
     private RenderingConfig renderingConfig;
     private WorldProvider worldProvider;
@@ -86,13 +86,13 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         // TODO: see if we could write this straight into a GBUFFER
-        FBO initialPostFbo = requiresFBO(new FBOConfig(INITIAL_POST_FBO, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
+        FBO initialPostFbo = requiresFBO(new FBOConfig(INITIAL_POST_FBO_URI, FULL_SCALE, FBO.Type.HDR), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(initialPostFbo));
         addDesiredStateChange(new SetViewportToSizeOf(initialPostFbo));
 
-        addDesiredStateChange(new EnableMaterial(INITIAL_POST_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(INITIAL_POST_MATERIAL_URN));
 
-        initialPostMaterial = getMaterial(INITIAL_POST_MATERIAL);
+        initialPostMaterial = getMaterial(INITIAL_POST_MATERIAL_URN);
 
         renderingConfig = context.get(Config.class).getRendering();
         bloomIsEnabled = renderingConfig.isBloom();
@@ -101,14 +101,14 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
 
         // TODO: Temporary hack for now.
-        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
         FBO one8thBloomFbo = requiresFBO(one8thScaleBloomConfig, displayResolutionDependentFBOs);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texScene"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL, "texVignette"));
-        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texBloom");
-        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL, "texLightShafts");
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texScene"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:vignette", INITIAL_POST_MATERIAL_URN, "texVignette"));
+        setBloomInputTexture = new SetInputTextureFromFbo(textureSlot++, one8thBloomFbo, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texBloom");
+        setLightShaftsInputTexture = new SetInputTextureFromFbo(textureSlot, LIGHT_SHAFTS_FBO_URI, ColorTexture, displayResolutionDependentFBOs, INITIAL_POST_MATERIAL_URN, "texLightShafts");
 
         if (bloomIsEnabled) {
             addDesiredStateChange(setBloomInputTexture);
@@ -119,7 +119,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
     }
 
     /**
-     * Renders a quad, in turn filling the InitialPostProcessingNode.INITIAL_POST_FBO.
+     * Renders a quad, in turn filling the InitialPostProcessingNode.INITIAL_POST_FBO_URI.
      */
     @Override
     public void process() {

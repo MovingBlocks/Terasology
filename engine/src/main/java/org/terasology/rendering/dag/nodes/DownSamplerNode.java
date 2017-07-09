@@ -37,7 +37,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  */
 public class DownSamplerNode extends ConditionDependentNode {
     private static final String TEXTURE_NAME = "tex";
-    private static final ResourceUrn DOWN_SAMPLER_MATERIAL = new ResourceUrn("engine:prog.downSampler");
+    private static final ResourceUrn DOWN_SAMPLER_MATERIAL_URN = new ResourceUrn("engine:prog.downSampler");
 
     private String label;
     private FBO outputFbo;
@@ -63,12 +63,12 @@ public class DownSamplerNode extends ConditionDependentNode {
         addDesiredStateChange(new BindFbo(outputFbo));
         addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
         addDesiredStateChange(new SetInputTextureFromFbo(0, inputFbo, ColorTexture, inputFboManager,
-                DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
+                DOWN_SAMPLER_MATERIAL_URN, TEXTURE_NAME));
 
         setupConditions(context);
 
-        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL));
-        downSampler = getMaterial(DOWN_SAMPLER_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL_URN));
+        downSampler = getMaterial(DOWN_SAMPLER_MATERIAL_URN);
 
         this.label = label;
     }

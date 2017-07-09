@@ -53,8 +53,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final SimpleUri SSAO_FBO = new SimpleUri("engine:fbo.ssao");
-    private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
+    public static final SimpleUri SSAO_FBO_URI = new SimpleUri("engine:fbo.ssao");
+    private static final ResourceUrn SSAO_MATERIAL_URN = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
 
     private Material ssaoMaterial;
@@ -70,11 +70,11 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL));
-        ssaoMaterial = getMaterial(SSAO_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL_URN));
+        ssaoMaterial = getMaterial(SSAO_MATERIAL_URN);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(ssaoFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight

@@ -44,11 +44,11 @@ import org.terasology.engine.SimpleUri;
  * rendering engine.
  * <p>
  * Default FBOs:
- * writeOnlyGBuffer:  Primary FBO: most visual information eventually ends up here
- * readOnlyGBuffer:  The gbuffer FBOs are swapped around when needed, to use one for reading and the other for writing
+ * writeOnlyGBuffer: this is the primary FBO and its attachments are the target of a good number of rendering operations, eventually storing most information needed for the deferred rendering.
+ * readOnlyGBuffer: this FBO holds attachments that are used as input textures by a number of rendering stages.
+ * Note that these two FBOs might get swapped during the DAG creation stage, on a node's request. However, this is handled transparently and getWriteOnlyFbo() will always return the FBO appropriate for writing.
  * Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
- * sceneSkyBand0:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
- * sceneSkyBand1:
+ * sceneSkyBand and sceneSkyBand1:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
  * sceneReflectiveRefractive:  used to render reflective and refractive surfaces, most obvious case being the water surface
  * sceneReflected:  the water surface displays a reflected version of the scene. This version is stored here.
  * outline:  greyscale depth-based rendering of object outlines
@@ -57,13 +57,8 @@ import org.terasology.engine.SimpleUri;
  * scenePrePost:  intermediate step, combining a number of renderings made available so far
  * lightShafts:  light shafts rendering
  * sceneHighPass:  a number of buffers to create the bloom effect
- * sceneBloom0:
- * sceneBloom1:
- * sceneBloom2:
- * sceneBlur0:  a pair of buffers holding blurred versions of the rendered scene,
- * sceneBlur1:  also used for the bloom effect, but not only.
- * ocUndistorted:  if OculusRift support is enabled this buffer holds the side-by-side views
- * for each eye, with no lens distortion applied.
+ * sceneBloom0, sceneBloom1 and sceneBloom2: A number of buffers used to repeatedly blur and downsample the content of the high pass fbo. The resulting blurred version of the high pass is then used for the bloom effect.
+ * sceneBlur0, sceneBlur1:  a pair of buffers holding blurred versions of the rendered scene, also used for the bloom effect, but not only.
  * sceneFinal:  the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
  */
 

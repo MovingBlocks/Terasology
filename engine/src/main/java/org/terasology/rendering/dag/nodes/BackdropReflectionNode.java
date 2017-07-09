@@ -60,8 +60,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  */
 public class BackdropReflectionNode extends AbstractNode {
-    public static final SimpleUri REFLECTED_FBO = new SimpleUri("engine:fbo.sceneReflected");
-    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
+    public static final SimpleUri REFLECTED_FBO_URI = new SimpleUri("engine:fbo.sceneReflected");
+    private final static ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;
     private static final int STACKS = 128;
@@ -106,18 +106,18 @@ public class BackdropReflectionNode extends AbstractNode {
         initSkysphere();
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new DisableDepthWriting());
-        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL_URN));
 
-        skyMaterial = getMaterial(SKY_MATERIAL);
+        skyMaterial = getMaterial(SKY_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL, "texSky180"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
     }
 
     /**

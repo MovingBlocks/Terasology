@@ -47,8 +47,8 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * of the scene.
  */
 public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
-    private static final ResourceUrn POST_MATERIAL = new ResourceUrn("engine:prog.post");
-    private static final ResourceUrn DEBUG_MATERIAL = new ResourceUrn("engine:prog.debug");
+    private static final ResourceUrn POST_MATERIAL_URN = new ResourceUrn("engine:prog.post");
+    private static final ResourceUrn DEBUG_MATERIAL_URN = new ResourceUrn("engine:prog.debug");
 
     private WorldRenderer worldRenderer;
     private ScreenGrabber screenGrabber;
@@ -64,8 +64,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         renderingDebugConfig.subscribe(RenderingDebugConfig.ENABLED, this);
 
-        enablePostMaterial = new EnableMaterial(POST_MATERIAL);
-        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL);
+        enablePostMaterial = new EnableMaterial(POST_MATERIAL_URN);
+        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL_URN);
 
         if (!renderingDebugConfig.isEnabled()) {
             addDesiredStateChange(enablePostMaterial);

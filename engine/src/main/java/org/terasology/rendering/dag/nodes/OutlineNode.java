@@ -48,8 +48,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
 public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final SimpleUri OUTLINE_FBO = new SimpleUri("engine:fbo.outline");
-    private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
+    public static final SimpleUri OUTLINE_FBO_URI = new SimpleUri("engine:fbo.outline");
+    private static final ResourceUrn OUTLINE_MATERIAL_URN = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
     private SubmersibleCamera activeCamera;
@@ -78,18 +78,18 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
-        FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(outlineFbo));
 
         update(); // Cheeky way to initialise writeOnlyGBufferWidth, writeOnlyGBufferHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL_URN));
 
-        outlineMaterial = getMaterial(OUTLINE_MATERIAL);
+        outlineMaterial = getMaterial(OUTLINE_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, writeOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, writeOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL_URN, "texDepth"));
     }
 
     /**

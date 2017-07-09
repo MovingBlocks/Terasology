@@ -40,7 +40,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private ComponentSystemManager componentSystemManager;
     private WorldRenderer worldRenderer;
@@ -60,7 +60,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteFbo()));
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
     }
 
     /**

@@ -68,8 +68,8 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
-    private static final SimpleUri REFLECTED_FBO = new SimpleUri("engine:fbo.sceneReflected");
-    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
+    private static final SimpleUri REFLECTED_FBO_URI = new SimpleUri("engine:fbo.sceneReflected");
+    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
@@ -116,15 +116,15 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         addDesiredStateChange(new LookThrough(activeCamera));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(reflectedFbo));
         addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
         // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
-        chunkMaterial = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL_URN);
 
         renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> renderingConfig.isReflectiveWater());
@@ -135,11 +135,11 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
-        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (isNormalMapping) {
             addDesiredStateChange(setNormalTerrain);

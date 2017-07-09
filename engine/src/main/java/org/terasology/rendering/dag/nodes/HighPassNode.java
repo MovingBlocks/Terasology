@@ -38,12 +38,12 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * An instance of this class generates a high pass image out of the color content of the GBUFFER and stores
- * the result into HIGH_PASS_FBO, for other nodes to take advantage of it.
+ * the result into HIGH_PASS_FBO_URI, for other nodes to take advantage of it.
  */
 public class HighPassNode extends ConditionDependentNode {
-    public static final SimpleUri HIGH_PASS_FBO = new SimpleUri("engine:fbo.highPass");
-    public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT);
-    private static final ResourceUrn HIGH_PASS_MATERIAL = new ResourceUrn("engine:prog.highPass");
+    public static final SimpleUri HIGH_PASS_FBO_URI = new SimpleUri("engine:fbo.highPass");
+    public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT);
+    private static final ResourceUrn HIGH_PASS_MATERIAL_URN = new ResourceUrn("engine:prog.highPass");
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
@@ -63,22 +63,22 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new BindFbo(highPassFbo));
         addDesiredStateChange(new SetViewportToSizeOf(highPassFbo));
 
-        highPass = getMaterial(HIGH_PASS_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));
+        highPass = getMaterial(HIGH_PASS_MATERIAL_URN);
+        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL_URN));
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture,
-                displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
+                displayResolutionDependentFBOs, HIGH_PASS_MATERIAL_URN, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)
         //addDesiredStateChange(new SetInputTextureFromFbo(textureSlot + 1, READ_ONLY_GBUFFER, DepthTexture,
-        //        displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "texDepth"));
+        //        displayResolutionDependentFBOs, HIGH_PASS_MATERIAL_URN, "texDepth"));
         // TODO: also verify why SetInputTextureFromFbo only works with ColorTexture but no other texture types.
     }
 
     /**
      * Generates a high pass image out of the color content of the GBUFFER and stores it
-     * into the HIGH_PASS_FBO.
+     * into the HIGH_PASS_FBO_URI.
      *
      * This is an entirely 2D process and the only "3D" geometry involved is a full screen quad.
      */

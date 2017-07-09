@@ -35,7 +35,7 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_E
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
 public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private int displayWidth;
     private int displayHeight;
@@ -50,10 +50,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         update(); // Cheeky way to initialise displayWidth, displayHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
 
         addDesiredStateChange(new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture,
-                displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL, "texture"));
+                displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture"));
     }
 
     @Override
