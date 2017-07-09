@@ -50,6 +50,9 @@ import org.terasology.world.block.tiles.WorldAtlas;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * This system is responsible for giving blocks health when they are attacked and damaging them instead of destroying them.
@@ -139,30 +142,51 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
      */
     private void createBlockParticleEffect(BlockFamily family, Vector3f location) {
         EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
-
         builder.getComponent(LocationComponent.class).setWorldPosition(location);
+
         Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
         if (terrainTexture.isPresent() && terrainTexture.get().isLoaded()) {
-            final float tileSize = worldAtlas.getRelativeTileSize();
             final BlockAppearance blockAppearance = family.getArchetypeBlock().getPrimaryAppearance();
-            List<Vector2f> offsets =
-                    Arrays.asList(
-                            blockAppearance.getTextureAtlasPos(BlockPart.BACK),
-                            blockAppearance.getTextureAtlasPos(BlockPart.FRONT),
-                            blockAppearance.getTextureAtlasPos(BlockPart.TOP),
-                            blockAppearance.getTextureAtlasPos(BlockPart.BOTTOM),
-                            blockAppearance.getTextureAtlasPos(BlockPart.LEFT),
-                            blockAppearance.getTextureAtlasPos(BlockPart.RIGHT));
+
+            final float relativeTileSize = worldAtlas.getRelativeTileSize();
+            final int absoluteTileSize = worldAtlas.getTileSize();
+            final float tileSize = relativeTileSize / (float) absoluteTileSize;
 
             ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
             spriteComponent.texture = terrainTexture.get();
             spriteComponent.textureSize.set(tileSize, tileSize);
+
+            final List<Vector2f> offsets = generateRandomOffsets(blockAppearance, relativeTileSize, absoluteTileSize, 8);
 
             TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
             textureOffsetGeneratorComponent.validOffsets.addAll(offsets);
         }
 
         builder.build();
+    }
+
+    /**
+     * Generates n random offsets for each block part texture.
+     *
+     * @param blockAppearance the block appearance information to generate offsets from
+     * @param relativeTileSize the relative tile size in the world atlas
+     * @param absoluteTileSize the absolute tile size in the world atlas
+     * @param randomOffsetsPerSide number of random offsets to be generated for each side
+     *
+     * @return a list of random offsets equally sampled from all block parts
+     */
+    private List<Vector2f> generateRandomOffsets(BlockAppearance blockAppearance, float relativeTileSize, int absoluteTileSize, int randomOffsetsPerSide) {
+        float pixelSize = relativeTileSize / absoluteTileSize;
+
+        // the base offsets for each block part
+        final Stream<Vector2f> blockSideOffsets =
+                Arrays.stream(BlockPart.sideValues()).map(blockAppearance::getTextureAtlasPos);
+
+        return blockSideOffsets.flatMap(pos ->
+                IntStream.range(0, randomOffsetsPerSide).boxed().map(integer ->
+                        new Vector2f(pos).add(random.nextInt(absoluteTileSize) * pixelSize, random.nextInt(absoluteTileSize) * pixelSize)
+                )
+        ).collect(Collectors.toList());
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
