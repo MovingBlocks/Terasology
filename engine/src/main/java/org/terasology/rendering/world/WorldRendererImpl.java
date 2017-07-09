@@ -270,7 +270,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         String aLabel = "hazeIntermediateNode";
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeIntermediateNode = new HazeNode(context, readOnlyGBufferConfig, hazeIntermediateConfig, aLabel);
+        HazeNode hazeIntermediateNode = new HazeNode(context, writeOnlyGBufferConfig, hazeIntermediateConfig, aLabel);
         renderGraph.addNode(hazeIntermediateNode, aLabel);
 
         aLabel = "hazeFinalNode";
@@ -335,7 +335,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
         aLabel = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, readOnlyGBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, writeOnlyGBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, aLabel);
         renderGraph.addNode(exposureDownSamplerTo16pixels, aLabel);
 
         aLabel = "downSampling_16x16px_to_8x8px_forExposure";
