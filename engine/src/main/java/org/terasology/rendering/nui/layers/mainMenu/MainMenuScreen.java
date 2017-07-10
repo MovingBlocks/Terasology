@@ -86,7 +86,7 @@ public class MainMenuScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "settings", button -> triggerForwardAnimation(SettingsMenuScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "credits", button -> triggerForwardAnimation(CreditsScreen.ASSET_URI));
         WidgetUtil.trySubscribe(this, "exit", button -> engine.shutdown());
-        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("Report an error."), LoggingContext.getLoggingPath()));
+        WidgetUtil.trySubscribe(this, "crashReporter", widget -> CrashReporter.report(new Throwable("There is no error."), LoggingContext.getLoggingPath(), CrashReporter.MODE.ISSUE_REPORTER));
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> triggerForwardAnimation(PlayerSettingsScreen.ASSET_URI));
     }
 

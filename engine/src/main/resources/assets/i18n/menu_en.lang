@@ -65,7 +65,7 @@
     "connecting-to": "Connecting to",
     "connection-failed": "Connection Failed!",
     "could-not-connect-to-server": "Could not connect to server",
-    "crash-reporter": "Crash Reporter",
+    "crash-reporter": "Issue Reporter",
     "non-native-jvm-warn": "WARNING: you are using a 32-bit JVM on a 64-bit system!\nUse a 64-bit Java installation for the best performance.",
     "credits": "Credits",
     "create-game": "Create",
