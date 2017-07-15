@@ -73,18 +73,34 @@ public interface EngineEntityPool extends EntityPool {
     boolean hasComponent(long entityId, Class<? extends Component> componentClass);
 
     /**
-     * Remove the entity from the pool. This does not destroy the entity, it only removes the {@link EntityRef}
+     * Remove the entity from the pool. This does not destroy the entity, it only removes the {@link BaseEntityRef}
      * and the {@link Component}s from this pool, so that the entity can be moved to a different pool. It does
      * not invalidate the {@link EntityRef}.
      *
-     * Returns an {@link Optional} {@link BaseEntityRef} if it was removed, ready to be put into another pool. If nothing
-     * was removed, return {@link Optional#empty()}.
+     * Returns an {@link Optional} {@link BaseEntityRef} if it was removed, ready to be put into another pool. If
+     * nothing was removed, return {@link Optional#empty()}.
+     *
+     * This method is intended for use by {@link EngineEntityManager#moveToPool(long, EngineEntityPool)}. Caution
+     * should be taken if this method is used elsewhere, and the caller should ensure that the the entity is
+     * immediately placed in a new pool. All of the components are removed, so should be manually copied before this
+     * method is called if they are to be kept in use.
      *
      * @param id the id of the entity to remove
      * @return an optional {@link BaseEntityRef}, containing the removed entity
      */
     Optional<BaseEntityRef> remove(long id);
 
+    /**
+     * Insert the {@link BaseEntityRef} into this pool, with these {@link Component}s. This only inserts the ref, adds the
+     * components, and assigns the entity to this pool in the EntityManager.
+     *
+     * No events are sent, so this should only be used when inserting a ref that has been created elsewhere. It is
+     * intended for use by {@link EngineEntityManager#moveToPool(long, EngineEntityPool)}, so caution should be taken
+     * if this method is used elsewhere.
+     *
+     * @param ref the EntityRef of the entity to be inserted
+     * @param components the entity's components
+     */
     void insertRef(BaseEntityRef ref, Iterable<Component> components);
 
 }

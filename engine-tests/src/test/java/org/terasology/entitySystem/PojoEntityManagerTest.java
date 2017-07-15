@@ -391,10 +391,18 @@ public class PojoEntityManagerTest {
         EntityRef entity = entityManager.create();
         long id = entity.getId();
 
-        PojoEntityPool pool = new PojoEntityPool(entityManager);
+        PojoEntityPool pool1 = new PojoEntityPool(entityManager);
+        PojoEntityPool pool2 = new PojoEntityPool(entityManager);
 
-        entityManager.moveToPool(id, pool);
+        assertFalse(pool1.contains(id));
+        assertFalse(pool2.contains(id));
 
-        assertTrue(pool.contains(id));
+        assertTrue(entityManager.moveToPool(id, pool1));
+        assertTrue(pool1.contains(id));
+        assertFalse(pool2.contains(id));
+
+        assertTrue(entityManager.moveToPool(id, pool2));
+        assertTrue(pool2.contains(id));
+        assertFalse(pool1.contains(id));
     }
 }

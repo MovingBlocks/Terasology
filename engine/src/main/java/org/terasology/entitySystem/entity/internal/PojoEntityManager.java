@@ -560,6 +560,20 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
+    /**
+     * Remove the assignment of an entity to a pool.
+     *
+     * This does not affect anything else related to the entity, but may lead to the entity or its components being
+     * unable to be found.
+     *
+     * When using this method, be sure to properly re-assign the entity to its correct pool afterwards.
+     *
+     * @param id the id of the entity to remove the assignment for
+     */
+    protected void unassignPool(long id) {
+        poolMap.remove(id);
+    }
+
     public boolean moveToPool(long id, EngineEntityPool pool) {
 
         if (getPool(id).isPresent() && getPool(id).get().equals(pool)) {

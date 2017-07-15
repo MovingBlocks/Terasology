@@ -28,27 +28,25 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.entitySystem.entity.internal.PojoEntityPool;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 
 /**
  */
-public class BaseEntityRefTest {
+public class PojoEntityPoolTest {
 
+    private PojoEntityPool pool;
     private static Context context;
     private PojoEntityManager entityManager;
-    //private Prefab prefab;
-    private EntityRef ref;
 
     @BeforeClass
     public static void setupClass() throws Exception {
@@ -70,26 +68,25 @@ public class BaseEntityRefTest {
         EntitySystemSetupUtil.addEntityManagementRelatedClasses(context);
         entityManager = (PojoEntityManager) context.get(EntityManager.class);
 
-        ref = entityManager.create();
+        pool = new PojoEntityPool(entityManager);
+    }
+
+
+    @Test
+    public void testContains() {
+        assertFalse(pool.contains(PojoEntityManager.NULL_ID));
+        assertFalse(pool.contains(1000000));
+        EntityRef ref = pool.create();
+        assertTrue(pool.contains(ref.getId()));
     }
 
     @Test
-    public void testSetScope() {
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.GLOBAL);
-        assertTrue(entityManager.getGlobalPool().contains(ref.getId()));
-        assertFalse(entityManager.getSectorManager().contains(ref.getId()));
+    public void testRemove() {
+        EntityRef ref = pool.create();
+        assertTrue(pool.contains(ref.getId()));
 
-        //Move into sector scope
-        ref.setScope(EntityData.Entity.Scope.SECTOR);
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.SECTOR);
-        assertTrue(entityManager.getSectorManager().contains(ref.getId()));
-        assertFalse(entityManager.getGlobalPool().contains(ref.getId()));
-
-        //And move back to global scope
-        ref.setScope(EntityData.Entity.Scope.GLOBAL);
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.GLOBAL);
-        assertTrue(entityManager.getGlobalPool().contains(ref.getId()));
-        assertFalse(entityManager.getSectorManager().contains(ref.getId()));
+        pool.remove(ref.getId());
+        assertFalse(pool.contains(ref.getId()));
     }
 
 }

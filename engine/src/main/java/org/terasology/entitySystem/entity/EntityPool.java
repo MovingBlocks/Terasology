@@ -173,7 +173,7 @@ public interface EntityPool {
     /**
      * Does this pool contain the given entity?
      *
-     * @param id the id to search for
+     * @param id the id of the entity to search for
      * @return true if this pool contains the entity; false otherwise
      */
     boolean contains(long id);

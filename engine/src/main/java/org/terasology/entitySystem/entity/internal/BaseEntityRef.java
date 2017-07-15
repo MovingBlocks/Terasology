@@ -36,7 +36,7 @@ import java.util.Collections;
 public abstract class BaseEntityRef extends EntityRef {
 
     protected LowLevelEntityManager entityManager;
-    private Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);
 
     public BaseEntityRef(LowLevelEntityManager entityManager) {
         this.entityManager = entityManager;

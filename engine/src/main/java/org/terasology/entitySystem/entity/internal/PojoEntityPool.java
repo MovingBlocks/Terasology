@@ -400,13 +400,15 @@ public class PojoEntityPool implements EngineEntityPool {
     @Override
     public Optional<BaseEntityRef> remove(long id) {
         componentStore.remove(id);
-        return Optional.of(entityStore.get(id));
+        entityManager.unassignPool(id);
+        return Optional.of(entityStore.remove(id));
     }
 
     @Override
     public void insertRef(BaseEntityRef ref, Iterable<Component> components) {
         entityStore.put(ref.getId(), ref);
         components.forEach(comp -> componentStore.put(ref.getId(), comp));
+        entityManager.assignToPool(ref.getId(), this);
     }
 
     @Override
