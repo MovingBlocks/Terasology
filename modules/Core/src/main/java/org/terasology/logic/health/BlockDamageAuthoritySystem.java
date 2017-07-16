@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
@@ -107,10 +108,9 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         if (blockComponent.block != null) {
             onDamagedCommon(event, blockComponent.block, locComp.getWorldPosition(), entity);
         }
-
     }
 
-    public void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location, EntityRef entityRef) {
+    private void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location, EntityRef entityRef) {
         BlockDamageModifierComponent blockDamageSettings = event.getType().getComponent(BlockDamageModifierComponent.class);
         boolean skipDamageEffects = false;
         if (blockDamageSettings != null) {
@@ -149,14 +149,15 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
             final BlockAppearance blockAppearance = family.getArchetypeBlock().getPrimaryAppearance();
 
             final float relativeTileSize = worldAtlas.getRelativeTileSize();
-            final int absoluteTileSize = worldAtlas.getTileSize();
-            final float tileSize = relativeTileSize / (float) absoluteTileSize;
+            final float particleScale = 0.25f;
+
+            final float spriteSize = relativeTileSize * particleScale;
 
             ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
             spriteComponent.texture = terrainTexture.get();
-            spriteComponent.textureSize.set(tileSize, tileSize);
+            spriteComponent.textureSize.set(spriteSize, spriteSize);
 
-            final List<Vector2f> offsets = generateRandomOffsets(blockAppearance, relativeTileSize, absoluteTileSize, 8);
+            final List<Vector2f> offsets = computeOffsets(blockAppearance, particleScale);
 
             TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
             textureOffsetGeneratorComponent.validOffsets.addAll(offsets);
@@ -166,27 +167,26 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     }
 
     /**
-     * Generates n random offsets for each block part texture.
+     * Computes n random offset values for each block part texture.
      *
      * @param blockAppearance the block appearance information to generate offsets from
-     * @param relativeTileSize the relative tile size in the world atlas
-     * @param absoluteTileSize the absolute tile size in the world atlas
-     * @param randomOffsetsPerSide number of random offsets to be generated for each side
+     * @param scale the scale of the texture area (should be in 0 < scale <= 1.0)
      *
-     * @return a list of random offsets equally sampled from all block parts
+     * @return a list of random offsets sampled from all block parts
      */
-    private List<Vector2f> generateRandomOffsets(BlockAppearance blockAppearance, float relativeTileSize, int absoluteTileSize, int randomOffsetsPerSide) {
-        float pixelSize = relativeTileSize / absoluteTileSize;
+    private List<Vector2f> computeOffsets(BlockAppearance blockAppearance, float scale) {
+        final float relativeTileSize = worldAtlas.getRelativeTileSize();
+        final int absoluteTileSize = worldAtlas.getTileSize();
+        final float pixelSize = relativeTileSize / absoluteTileSize;
+        final int spriteWidth = TeraMath.ceilToInt(scale * absoluteTileSize);
 
-        // the base offsets for each block part
-        final Stream<Vector2f> blockSideOffsets =
-                Arrays.stream(BlockPart.sideValues()).map(blockAppearance::getTextureAtlasPos);
+        final Stream<Vector2f> baseOffsets = Arrays.stream(BlockPart.sideValues()).map(blockAppearance::getTextureAtlasPos);
 
-        return blockSideOffsets.flatMap(pos ->
-                IntStream.range(0, randomOffsetsPerSide).boxed().map(integer ->
-                        new Vector2f(pos).add(random.nextInt(absoluteTileSize) * pixelSize, random.nextInt(absoluteTileSize) * pixelSize)
-                )
-        ).collect(Collectors.toList());
+        return baseOffsets.flatMap(baseOffset ->
+                    IntStream.range(0, 8).boxed().map(i ->
+                        new Vector2f(baseOffset).add(random.nextInt(absoluteTileSize - spriteWidth) * pixelSize, random.nextInt(absoluteTileSize - spriteWidth) * pixelSize)
+                    )
+                ).collect(Collectors.toList());
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
