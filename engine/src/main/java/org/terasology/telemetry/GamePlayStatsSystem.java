@@ -15,25 +15,19 @@
  */
 package org.terasology.telemetry;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.world.WorldComponent;
+import org.terasology.world.block.entity.placement.PlaceBlocks;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  */
-public class GamePlayStatsComponent implements Component {
-
-    @Replicate
-    public Map<String, Integer> blockDestroyedMap = new HashMap<>();
-
-    @Replicate
-    public Map<String, Integer> blockPlacedMap = new HashMap<>();
-
-    @Replicate
-    public float distanceTraveled = 0;
-
-    @Replicate
-    public long playTimeMinute = 0;
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class GamePlayStatsSystem extends BaseComponentSystem {
 }

@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  */
 @TelemetryCategory(id = "gameConfiguration",
-        displayName = "${engine:menu#telemetry-modules}"
+        displayName = "${engine:menu#telemetry-game-configuration}"
 )
 public class GameConfigurationMetric extends Metric {
 
@@ -63,7 +63,7 @@ public class GameConfigurationMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, Object> metricMap = getFieldValueMap();
+        Map<String, ?> metricMap = getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, metricMap);
 
         return Unstructured.builder()
@@ -72,7 +72,7 @@ public class GameConfigurationMetric extends Metric {
     }
 
     @Override
-    public Map<String, Object> getFieldValueMap() {
+    public Map<String, ?> getFieldValueMap() {
         fetchWorldGenerator();
         fetchNetworkMode();
         fetchConfig();

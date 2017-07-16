@@ -18,7 +18,10 @@ package org.terasology.telemetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.telemetry.metrics.BlockDestroyedMetric;
+import org.terasology.telemetry.metrics.BlockPlacedMetric;
 import org.terasology.telemetry.metrics.GameConfigurationMetric;
+import org.terasology.telemetry.metrics.GamePlayMetric;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
@@ -40,6 +43,12 @@ public class Metrics {
 
     private GameConfigurationMetric gameConfigurationMetric;
 
+    private BlockDestroyedMetric blockDestroyedMetric;
+
+    private BlockPlacedMetric blockPlacedMetric;
+
+    private GamePlayMetric gameplayMetric;
+
     public Metrics() {
 
     }
@@ -49,6 +58,9 @@ public class Metrics {
         systemContextMetric = new SystemContextMetric();
         modulesMetric = new ModulesMetric(context);
         gameConfigurationMetric = new GameConfigurationMetric(context);
+        blockDestroyedMetric = new BlockDestroyedMetric();
+        blockPlacedMetric = new BlockPlacedMetric();
+        gameplayMetric = new GamePlayMetric();
     }
 
     public SystemContextMetric getSystemContextMetric() {
@@ -57,6 +69,22 @@ public class Metrics {
 
     public ModulesMetric getModulesMetric() {
         return modulesMetric;
+    }
+
+    public GameConfigurationMetric getGameConfigurationMetric() {
+        return gameConfigurationMetric;
+    }
+
+    public BlockDestroyedMetric getBlockDestroyedMetric() {
+        return blockDestroyedMetric;
+    }
+
+    public BlockPlacedMetric getBlockPlacedMetric() {
+        return blockPlacedMetric;
+    }
+
+    public GamePlayMetric getGameplayMetric() {
+        return gameplayMetric;
     }
 
     public Optional<Metric> getMetric(Class<?> cl) {

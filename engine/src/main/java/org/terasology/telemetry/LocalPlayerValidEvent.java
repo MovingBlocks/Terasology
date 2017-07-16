@@ -15,25 +15,10 @@
  */
 package org.terasology.telemetry;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.network.Replicate;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.terasology.entitySystem.event.Event;
 
 /**
+ * Created by XIAJin on 2017/7/14.
  */
-public class GamePlayStatsComponent implements Component {
-
-    @Replicate
-    public Map<String, Integer> blockDestroyedMap = new HashMap<>();
-
-    @Replicate
-    public Map<String, Integer> blockPlacedMap = new HashMap<>();
-
-    @Replicate
-    public float distanceTraveled = 0;
-
-    @Replicate
-    public long playTimeMinute = 0;
+public class LocalPlayerValidEvent implements Event {
 }

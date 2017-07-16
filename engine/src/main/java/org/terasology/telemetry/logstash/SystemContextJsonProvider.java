@@ -51,7 +51,7 @@ public class SystemContextJsonProvider extends AbstractFieldJsonProvider<ILoggin
         if (context != null) {
             Metrics metrics = context.get(Metrics.class);
             SystemContextMetric systemContextMetric = metrics.getSystemContextMetric();
-            Map<String, Object> map = systemContextMetric.getFieldValueMap();
+            Map<String, ?> map = systemContextMetric.getFieldValueMap();
             Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
 
             JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);

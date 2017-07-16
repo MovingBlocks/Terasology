@@ -53,7 +53,7 @@ public class ModulesMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, Object> metricMap = getFieldValueMap();
+        Map<String, ?> metricMap = getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, metricMap);
         
         return Unstructured.builder()
@@ -62,7 +62,7 @@ public class ModulesMetric extends Metric {
     }
 
     @Override
-    public Map<String, Object> getFieldValueMap() {
+    public Map<String, ?> getFieldValueMap() {
         updateModules();
         Map<String, Object> map = new HashMap();
         for (Module module : modules) {
