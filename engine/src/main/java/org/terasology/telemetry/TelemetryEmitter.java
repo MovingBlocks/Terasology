@@ -40,7 +40,7 @@ public class TelemetryEmitter extends BatchEmitter {
 
     public static final String DEFAULT_COLLECTOR_PROTOCOL = "http";
 
-    public static final String DEFAULT_COLLECTOR_HOST = "localhost";
+    public static final String DEFAULT_COLLECTOR_HOST = "utility.terasology.org";
 
     public static final int DEFAULT_COLLECTOR_PORT = 80;
 
