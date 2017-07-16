@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.terasology.engine.modes;
 
 import org.terasology.audio.AudioManager;
+import org.terasology.config.Config;
+import org.terasology.config.TelemetryConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -26,6 +28,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -40,7 +43,11 @@ import org.terasology.rendering.nui.editor.systems.NUIEditorSystem;
 import org.terasology.rendering.nui.editor.systems.NUISkinEditorSystem;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.telemetry.TelemetryScreen;
+import org.terasology.telemetry.TelemetryUtils;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.utilities.Assets;
 
 /**
@@ -126,6 +133,38 @@ public class StateMainMenu implements GameState {
         context.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
+        }
+
+        // TODO: enable it when exposing the telemetry to users
+        // pushLaunchPopup();
+    }
+
+    private void pushLaunchPopup() {
+        Config config = context.get(Config.class);
+        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
+        TranslationSystem translationSystem = context.get(TranslationSystem.class);
+        TelemetryLogstashAppender appender = TelemetryUtils.fetchTelemetryLogstashAppender();
+        if (!telemetryConfig.isLaunchPopupDisabled()) {
+            String telemetryTitle = translationSystem.translate("${engine:menu#telemetry-launch-popup-title}");
+            String telemetryMessage = translationSystem.translate("${engine:menu#telemetry-launch-popup-text}");
+            LaunchPopup telemetryConfirmPopup = nuiManager.pushScreen(LaunchPopup.ASSET_URI, LaunchPopup.class);
+            telemetryConfirmPopup.setMessage(telemetryTitle, telemetryMessage);
+            telemetryConfirmPopup.setYesHandler(() -> {
+                telemetryConfig.setTelemetryAndErrorReportingEnable(true);
+
+                // Enable error reporting
+                appender.start();
+            });
+            telemetryConfirmPopup.setNoHandler(() -> {
+                telemetryConfig.setTelemetryAndErrorReportingEnable(false);
+
+                // Disable error reporting
+                appender.stop();
+            });
+            telemetryConfirmPopup.setOptionButtonText(translationSystem.translate("${engine:menu#telemetry-button}"));
+            telemetryConfirmPopup.setOptionHandler(()-> {
+                nuiManager.pushScreen(TelemetryScreen.ASSET_URI, TelemetryScreen.class);
+            });
         }
     }
 

@@ -115,19 +115,32 @@
                 ]
             },
             {
-                "type": "UIButton",
-                "id": "crashReporter",
-                "text": "${engine:menu#crash-reporter}",
-                "layoutInfo": {
-                    "use-content-width": true,
-                    "use-content-height": true,
-                    "position-bottom": {
-                        "offset": 8
-                    },
-                    "position-right": {
-                        "offset": 8
-                    }
-                }
+                 "type": "RowLayout",
+                 "horizontalSpacing": 4,
+                 "contents": [
+                     {
+                         "type": "UIButton",
+                         "text": "${engine:menu#telemetry-button}",
+                         "id": "telemetry"
+                     },
+                     {
+                         "type": "UIButton",
+                         "text": "${engine:menu#crash-reporter}",
+                         "id": "crashReporter"
+                     }
+                 ],
+                 "layoutInfo": {
+                     "width":400,
+                     "height": 32,
+                     "use-content-width": true,
+                     "use-content-height": true,
+                     "position-bottom": {
+                         "offset": 8
+                     },
+                     "position-right": {
+                         "offset": 8
+                     }
+                 }
             },
             {
                 "type": "UILabel",

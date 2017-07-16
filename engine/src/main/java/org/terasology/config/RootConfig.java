@@ -40,6 +40,7 @@ public final class RootConfig {
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
     private IdentityStorageServiceConfig identityStorageService = new IdentityStorageServiceConfig();
+    private TelemetryConfig telemetryConfig = new TelemetryConfig();
 
     /**
      * Create a new, empty config
@@ -96,6 +97,10 @@ public final class RootConfig {
 
     public IdentityStorageServiceConfig getIdentityStorageService() {
         return identityStorageService;
+    }
+
+    public TelemetryConfig getTelemetryConfig() {
+        return telemetryConfig;
     }
 
     public Map<SimpleUri, Map<String, JsonElement>> getModuleConfigs() {

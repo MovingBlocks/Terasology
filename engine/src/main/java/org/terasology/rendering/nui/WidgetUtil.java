@@ -46,4 +46,19 @@ public final class WidgetUtil {
             checkbox.bindChecked(binding);
         }
     }
+
+    /**
+     * Bind a check box and boolean, and a listener will be subscribed to the checkbox.
+     * @param widget the widget.
+     * @param id the id of the checkbox.
+     * @param binding the boolean bound with the checkbox.
+     * @param listener the listener which will activated when the check box is pressed.
+     */
+    public static void tryBindCheckBoxWithListener(UIWidget widget, String id, Binding<Boolean> binding, ActivateEventListener listener) {
+        UICheckbox checkbox = widget.find(id, UICheckbox.class);
+        if (checkbox != null) {
+            checkbox.bindChecked(binding);
+            checkbox.subscribe(listener);
+        }
+    }
 }

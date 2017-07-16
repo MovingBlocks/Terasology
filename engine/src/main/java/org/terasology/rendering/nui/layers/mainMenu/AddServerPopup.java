@@ -21,6 +21,7 @@ import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -149,5 +150,13 @@ public class AddServerPopup extends CoreScreenLayer {
      */
     public void onSuccess(Consumer<ServerInfo> success) {
         this.successFunc = success;
+    }
+
+    /**
+     * And a listen to the cancel button.
+     * @param listener The listener added on the cancel button
+     */
+    public void onCancel(ActivateEventListener listener) {
+        cancelButton.subscribe(listener);
     }
 }

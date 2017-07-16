@@ -44,6 +44,7 @@ import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -168,6 +169,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
+        this.allSubsystems.add(new TelemetrySubSystem());
     }
 
     public void initialize() {

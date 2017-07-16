@@ -117,6 +117,12 @@ dependencies {
     // Small-time 3rd party libs we've stored in our Artifactory for access
     compile group: 'ec.util', name: 'MersenneTwister', version: '20'
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
+    
+    // telemetry
+    compile (group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'){
+        exclude group:'org.slf4j',module:'slf4j-simple'
+    }
+    compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.2'
@@ -128,7 +134,7 @@ dependencies {
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
