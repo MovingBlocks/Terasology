@@ -33,7 +33,7 @@ public interface EntityManager extends EntityPool {
      *
      * @return the newly created EntityRef
      */
-    default EntityRef createSectorEntity() {
+    default EntityRef createSectorEntity(long maxDelta) {
         return null;
     }
 

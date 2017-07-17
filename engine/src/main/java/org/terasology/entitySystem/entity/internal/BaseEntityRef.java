@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.EntitySerializer;
@@ -100,9 +101,13 @@ public abstract class BaseEntityRef extends EntityRef {
                 switch (scope) {
                     case GLOBAL:
                         newPool = entityManager.getGlobalPool();
+                        removeComponent(SectorSimulationComponent.class);
                         break;
                     case SECTOR:
                         newPool = entityManager.getSectorManager();
+                        if (!hasComponent(SectorSimulationComponent.class)) {
+                            addComponent(new SectorSimulationComponent());
+                        }
                         break;
                     default:
                         logger.error("Unrecognised scope {}.", scope);

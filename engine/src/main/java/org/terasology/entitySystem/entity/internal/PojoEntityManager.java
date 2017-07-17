@@ -39,6 +39,7 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -127,9 +128,14 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef createSectorEntity() {
+    public EntityRef createSectorEntity(long maxDelta) {
         EntityRef entity = sectorManager.create();
         entity.setScope(EntityData.Entity.Scope.SECTOR);
+
+        entity.addComponent(new SectorSimulationComponent(maxDelta));
+
+        //TODO: look into keeping all sector entities loaded, or converting alwaysRelevant into another scope
+        entity.setAlwaysRelevant(true);
         return entity;
     }
 
