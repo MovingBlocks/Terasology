@@ -35,5 +35,9 @@
         "pitchSymmetric": true,
         "rollSymmetric": true,
         "convexHull": true
+    },
+    "placement": {
+        "type": "Edge",
+        "symmetry": "None"
     }
 }

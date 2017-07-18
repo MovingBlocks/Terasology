@@ -85,5 +85,9 @@
                 "extents": [0.500000, 0.500000, 0.250000]
             }
         ]
+    },
+    "placement": {
+        "type": "Edge",
+        "symmetry": "Symmetric"
     }
 }

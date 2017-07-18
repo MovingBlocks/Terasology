@@ -121,7 +121,6 @@
     },
     "placement": {
         "type": "Edge",
-        "archetype": "BottomBack",
         "symmetry": "None"
     }
 }

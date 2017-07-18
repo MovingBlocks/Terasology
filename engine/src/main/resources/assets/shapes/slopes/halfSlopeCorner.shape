@@ -41,5 +41,9 @@
     },
     "collision": {
         "convexHull": true
+    },
+    "placement": {
+        "type": "Corner",
+        "symmetry": "None"
     }
 }

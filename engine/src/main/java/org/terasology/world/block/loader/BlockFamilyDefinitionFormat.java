@@ -16,16 +16,7 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.base.Charsets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -43,12 +34,7 @@ import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
-import org.terasology.world.block.family.BlockFamilyFactory;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.FreeformBlockFamilyFactory;
-import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
-import org.terasology.world.block.family.MultiSection;
-import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
+import org.terasology.world.block.family.*;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
@@ -92,8 +78,12 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
     @Override
     public BlockFamilyDefinitionData load(ResourceUrn resourceUrn, List<AssetDataFile> input) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input.get(0).openStream(), Charsets.UTF_8))) {
-            BlockFamilyDefinitionData data = gson.fromJson(reader, BlockFamilyDefinitionData.class);
-
+            BlockFamilyDefinitionData data;
+            try {
+                data = gson.fromJson(reader, BlockFamilyDefinitionData.class);
+            } catch (JsonSyntaxException e) {
+                throw new JsonSyntaxException(e.getMessage() + " in " + input.get(0).toString(), e);
+            }
             applyDefaults(resourceUrn, data.getBaseSection());
             data.getSections().values().stream().forEach(section -> applyDefaults(resourceUrn, section));
             if (!data.isTemplate()) {

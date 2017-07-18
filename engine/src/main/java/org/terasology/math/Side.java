@@ -19,8 +19,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.naming.Name;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -299,8 +302,29 @@ public enum Side {
         return !canYaw;
     }
 
-
     public Iterable<Side> tangents() {
         return tangents.get(this);
     }
+
+    public static Side of(Name name) {
+        Side side = nameSideMap.get(name);
+        if (side == null) {
+            throw new IllegalArgumentException("Invalid name " + name.toString());
+        }
+        return side;
+    }
+
+    public static Side ofOrNull(Name name) {
+        return nameSideMap.get(name);
+    }
+
+    private static Map<Name, Side> nameSideMap;
+
+    static {
+        nameSideMap = new HashMap<Name, Side>();
+        for (Side s : values()) {
+            nameSideMap.put(new Name(s.name()), s);
+        }
+    }
+
 }

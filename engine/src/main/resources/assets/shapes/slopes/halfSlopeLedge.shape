@@ -27,5 +27,9 @@
         "pitchSymmetric": true,
         "rollSymmetric": true,
         "convexHull": true
+    },
+    "placement": {
+        "type": "Corner",
+        "symmetry": "Symmetric"
     }
 }

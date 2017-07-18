@@ -24,7 +24,9 @@ import org.terasology.world.block.shapes.BlockShape;
 @RegisterBlockFamilyFactory("freeform")
 public class FreeformBlockFamilyFactory implements BlockFamilyFactory {
 
+    private BlockFamilyFactory side = new SideBlockFamilyFactory();
     private BlockFamilyFactory edge = new EdgeBlockFamilyFactory();
+    private BlockFamilyFactory corner = new CornerBlockFamilyFactory();
     private BlockFamilyFactory horizontal = new HorizontalBlockFamilyFactory();
     private BlockFamilyFactory symmetric = new SymmetricBlockFamilyFactory();
 
@@ -35,14 +37,19 @@ public class FreeformBlockFamilyFactory implements BlockFamilyFactory {
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        switch( shape.getBlockShapePlacement().getType() ) { //Fixme others...
-            case Edge:
+        switch( shape.getBlockShapePlacement().getType() ) {
+            case SIDE:
+                return side.createBlockFamily(definition, shape, blockBuilder);
+            case EDGE:
                 return edge.createBlockFamily(definition, shape, blockBuilder);
-            case HorizontalSide:
+            case CORNER:
+                return corner.createBlockFamily(definition, shape, blockBuilder);
+            case HORIZONTAL_SIDE:
                 return horizontal.createBlockFamily(definition, shape, blockBuilder);
-            default:
+            case CUBE:
                 return symmetric.createBlockFamily(definition, shape, blockBuilder);
         }
+        return symmetric.createBlockFamily(definition, shape, blockBuilder);
     }
 
     @Override

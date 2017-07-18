@@ -18,7 +18,11 @@ package org.terasology.world.block.family;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Edge;
+import org.terasology.math.Pitch;
+import org.terasology.math.Roll;
+import org.terasology.math.Rotation;
+import org.terasology.math.Side;
+import org.terasology.naming.Name;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
@@ -30,13 +34,25 @@ import java.util.EnumMap;
 import java.util.Set;
 
 
-@RegisterBlockFamilyFactory("edge")
-public class EdgeBlockFamilyFactory implements BlockFamilyFactory {
-    private static Logger logger = LoggerFactory.getLogger(EdgeBlockFamilyFactory.class);
+@RegisterBlockFamilyFactory("side")
+public class SideBlockFamilyFactory implements BlockFamilyFactory {
+    private static Logger logger = LoggerFactory.getLogger(SideBlockFamilyFactory.class);
+
+    private static EnumMap<Side, Rotation> rotations;
+
+    static {
+        rotations = new EnumMap<Side, Rotation>(Side.class);
+        rotations.put(Side.BOTTOM, Rotation.none());
+        rotations.put(Side.RIGHT, Rotation.rotate(Roll.CLOCKWISE_90));
+        rotations.put(Side.TOP, Rotation.rotate(Roll.CLOCKWISE_180));
+        rotations.put(Side.LEFT, Rotation.rotate(Roll.CLOCKWISE_270));
+        rotations.put(Side.FRONT, Rotation.rotate(Pitch.CLOCKWISE_90));
+        rotations.put(Side.BACK, Rotation.rotate(Pitch.CLOCKWISE_270));
+    }
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        throw new IllegalStateException("A shape must be provided when creating a family for a edge block family definition");
+        throw new IllegalStateException("A shape must be provided when creating a family for a side block family definition");
     }
 
     @Override
@@ -46,27 +62,19 @@ public class EdgeBlockFamilyFactory implements BlockFamilyFactory {
         }
         BlockUri uri = new BlockUri(definition.getUrn(), shape.getUrn());
 
-        Edge archetypeEdge = Edge.of(shape.getBlockShapePlacement().getArchetype());
+        Side archetypeSide = Side.valueOf(shape.getBlockShapePlacement().getArchetype().toUpperCase());
 
-        boolean symmetric = shape.getBlockShapePlacement().getSymmetry().hasEdgeSymmetry();
+        boolean symmetric = shape.getBlockShapePlacement().getSymmetry().hasSideSymmetry();
 
-        EnumMap<Edge, Block> blockMap = new EnumMap<Edge, Block>(Edge.class);
-        for( Edge edge : Edge.symmetricSubset() ) {
-            Edge equivalentEdge = edge.getSymmetricEquivalent();
-            Block block, equivalentBlock;
-            block = blockBuilder.constructTransformedBlock(definition, shape, edge.toString(), edge.getRotationFromBottomBack());
-            block.setUri(new BlockUri(uri, edge.getName()));
-            if( symmetric ) {
-                equivalentBlock = block;
-            } else {
-                equivalentBlock = blockBuilder.constructTransformedBlock(definition, shape, equivalentEdge.toString(), equivalentEdge.getRotationFromBottomBack());
-                equivalentBlock.setUri(new BlockUri(uri, equivalentEdge.getName()));
-            }
-            blockMap.put(edge, block);
-            blockMap.put(equivalentEdge, equivalentBlock);
+        EnumMap<Side, Block> blockMap = new EnumMap<Side, Block>(Side.class);
+        for (Side side : Side.values()) {
+
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString(), rotations.get(side));
+            block.setUri(new BlockUri(uri, new Name(side.toString())));
+            blockMap.put(side, block);
         }
 
-        return new EdgeBlockFamily(uri, archetypeEdge, blockMap, definition.getCategories());
+        return new SideBlockFamily(uri, archetypeSide, blockMap, definition.getCategories());
     }
 
     @Override

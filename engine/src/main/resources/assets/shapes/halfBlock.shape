@@ -65,5 +65,9 @@
                 "extents": [0.500000, 0.250000, 0.500000]
             }
         ]
+    },
+    "placement": {
+        "type": "Side",
+        "symmetry": "Symmetric"
     }
 }

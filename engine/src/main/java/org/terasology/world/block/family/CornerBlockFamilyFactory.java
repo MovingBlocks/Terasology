@@ -18,7 +18,7 @@ package org.terasology.world.block.family;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Edge;
+import org.terasology.math.Corner;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
@@ -30,13 +30,13 @@ import java.util.EnumMap;
 import java.util.Set;
 
 
-@RegisterBlockFamilyFactory("edge")
-public class EdgeBlockFamilyFactory implements BlockFamilyFactory {
-    private static Logger logger = LoggerFactory.getLogger(EdgeBlockFamilyFactory.class);
+@RegisterBlockFamilyFactory("corner")
+public class CornerBlockFamilyFactory implements BlockFamilyFactory {
+    private static Logger logger = LoggerFactory.getLogger(CornerBlockFamilyFactory.class);
 
     @Override
     public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        throw new IllegalStateException("A shape must be provided when creating a family for a edge block family definition");
+        throw new IllegalStateException("A shape must be provided when creating a family for a corner block family definition");
     }
 
     @Override
@@ -46,27 +46,33 @@ public class EdgeBlockFamilyFactory implements BlockFamilyFactory {
         }
         BlockUri uri = new BlockUri(definition.getUrn(), shape.getUrn());
 
-        Edge archetypeEdge = Edge.of(shape.getBlockShapePlacement().getArchetype());
+        Corner archetypeCorner = Corner.of(shape.getBlockShapePlacement().getArchetype());
 
-        boolean symmetric = shape.getBlockShapePlacement().getSymmetry().hasEdgeSymmetry();
+        boolean symmetric = shape.getBlockShapePlacement().getSymmetry().hasCornerSymmetry();
 
-        EnumMap<Edge, Block> blockMap = new EnumMap<Edge, Block>(Edge.class);
-        for( Edge edge : Edge.symmetricSubset() ) {
-            Edge equivalentEdge = edge.getSymmetricEquivalent();
-            Block block, equivalentBlock;
-            block = blockBuilder.constructTransformedBlock(definition, shape, edge.toString(), edge.getRotationFromBottomBack());
-            block.setUri(new BlockUri(uri, edge.getName()));
-            if( symmetric ) {
-                equivalentBlock = block;
-            } else {
-                equivalentBlock = blockBuilder.constructTransformedBlock(definition, shape, equivalentEdge.toString(), equivalentEdge.getRotationFromBottomBack());
-                equivalentBlock.setUri(new BlockUri(uri, equivalentEdge.getName()));
-            }
-            blockMap.put(edge, block);
-            blockMap.put(equivalentEdge, equivalentBlock);
+        EnumMap<Corner, Block> blockMap = new EnumMap<Corner, Block>(Corner.class);
+        for (Corner corner : Corner.symmetricSubset()) {
+            Block block;
+            block = blockBuilder.constructTransformedBlock(definition, shape, corner.toString(), corner.getRotationFromBottomLeftBack());
+            block.setUri(new BlockUri(uri, corner.getName()));
+            blockMap.put(corner, block);
         }
 
-        return new EdgeBlockFamily(uri, archetypeEdge, blockMap, definition.getCategories());
+        for (Corner corner : Corner.values()) {
+            Block block = null;
+            if (symmetric) {
+                block = blockMap.get(corner.getSymmetricEquivalent());
+            } else {
+                block = blockMap.get(corner);
+                if (block == null) {
+                    block = blockBuilder.constructTransformedBlock(definition, shape, corner.toString(), corner.getRotationFromBottomLeftBack());
+                    block.setUri(new BlockUri(uri, corner.getName()));
+                }
+            }
+            blockMap.put(corner, block);
+        }
+
+        return new CornerBlockFamily(uri, archetypeCorner, blockMap, definition.getCategories());
     }
 
     @Override

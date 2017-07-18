@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.shapes;
+package org.terasology.utilities.gson;
 
 import com.google.gson.JsonObject;
 
 import java.util.Optional;
 
 /**
- * FIXME find better location
+ * Utilities for easier access to JsonObjects.
  */
 public class JSONUtils {
 
@@ -32,25 +32,45 @@ public class JSONUtils {
         return jsonObj.has(name) && jsonObj.get(name).isJsonObject();
     }
 
-    public static <E extends Enum<E>> E getEnumOrDefault(JsonObject jsonObj, String name, Class<E> enumClass, E defaultValue ) {
+    public static <E extends Enum<E>> E getEnumOrDefault(JsonObject jsonObj, String name, Class<E> enumClass, E defaultValue) {
         if (jsonObj.has(name)) {
-            return Enum.valueOf(enumClass, jsonObj.getAsJsonPrimitive(name).getAsString());
+            return getEnumInternal(jsonObj, name, enumClass);
         } else {
             return defaultValue;
         }
     }
 
-    public static <E extends Enum<E>> Optional<E> getEnum(JsonObject jsonObj, String name, Class<E> enumClass ) {
-        if( jsonObj.has(name) ) {
-            return Optional.of(Enum.valueOf(enumClass, jsonObj.getAsJsonPrimitive(name).getAsString()));
+    public static <E extends Enum<E>> Optional<E> getEnum(JsonObject jsonObj, String name, Class<E> enumClass) {
+        if (jsonObj.has(name)) {
+            return Optional.of(getEnumInternal(jsonObj, name, enumClass));
         } else {
             return Optional.empty();
         }
     }
 
+    private static <E extends Enum<E>> E getEnumInternal(JsonObject jsonObj, String name, Class<E> enumClass) {
+        return Enum.valueOf(enumClass, jsonObj.getAsJsonPrimitive(name).getAsString().toUpperCase());
+    }
+
     public static Optional<String> getString(JsonObject jsonObj, String name) {
-        if( jsonObj.has(name) ) {
+        if (jsonObj.has(name)) {
             return Optional.of(jsonObj.getAsJsonPrimitive(name).getAsString());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static JsonObject getObjectOrNull(JsonObject jsonObj, String name) {
+        if (jsonObj.has(name)) {
+            return jsonObj.get(name).getAsJsonObject();
+        } else {
+            return null;
+        }
+    }
+
+    public static Optional<JsonObject> getObject(JsonObject jsonObj, String name) {
+        if (jsonObj.has(name)) {
+            return Optional.of(jsonObj.get(name).getAsJsonObject());
         } else {
             return Optional.empty();
         }

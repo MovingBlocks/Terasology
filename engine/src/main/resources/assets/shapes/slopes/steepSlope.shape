@@ -62,5 +62,9 @@
     },
     "collision": {
         "convexHull": true
+    },
+    "placement": {
+        "type": "Edge",
+        "symmetry": "None"
     }
 }

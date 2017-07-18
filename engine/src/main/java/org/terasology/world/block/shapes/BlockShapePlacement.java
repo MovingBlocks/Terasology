@@ -47,27 +47,27 @@ public class BlockShapePlacement {
     }
 
     public static BlockShapePlacement of(Optional<PlacementType> type, Optional<Symmetry> symmetry, Optional<String> archetype) {
-        PlacementType placementType = type.orElse(PlacementType.Cube);
-        Name archetypeName = new Name(archetype.orElseGet(() -> placementType.getArchetype()));
-        return new BlockShapePlacement(placementType, symmetry.orElse(Symmetry.Symmetric), archetypeName);
+        PlacementType placementType = type.orElse(PlacementType.CUBE);
+        Name archetypeName = new Name(archetype.orElseGet(placementType::getArchetype));
+        return new BlockShapePlacement(placementType, symmetry.orElse(Symmetry.SYMMETRIC), archetypeName);
     }
 
     public static BlockShapePlacement defaultFor(BlockShapeData shape) {
         PlacementType type = null;
         if (!shape.isYawSymmetric()) {
-            type = PlacementType.HorizontalSide;
+            type = PlacementType.HORIZONTAL_SIDE;
         } else {
-            type = PlacementType.Cube;
+            type = PlacementType.CUBE;
         }
-        return new BlockShapePlacement(type, Symmetry.Symmetric, new Name(type.getArchetype()));
+        return new BlockShapePlacement(type, Symmetry.SYMMETRIC, new Name(type.getArchetype()));
     }
 
     public enum PlacementType {
-        Cube("none"),
-        Side("FRONT"),
-        Edge("BottomBack"),
-        Corner(""), //fixme
-        HorizontalSide("FRONT");
+        CUBE("none"),
+        SIDE("FRONT"),
+        EDGE("BOTTOM_BACK"),
+        CORNER("BOTTOM_LEFT_BACK"),
+        HORIZONTAL_SIDE("FRONT");
 
         private final String archetype;
 
@@ -80,16 +80,23 @@ public class BlockShapePlacement {
         }
     }
 
-    //FIXME define different symmetries correctly
+    //TODO define different symmetries correctly
     public enum Symmetry {
 
-        None,
-        Symmetric;
+        NONE,
+        SYMMETRIC;
 
         public boolean hasEdgeSymmetry() {
-            return this == Symmetric;
+            return this == SYMMETRIC;
         }
 
+        public boolean hasSideSymmetry() {
+            return this == SYMMETRIC;
+        }
+
+        public boolean hasCornerSymmetry() {
+            return this == SYMMETRIC;
+        }
     }
 
 

@@ -16,23 +16,12 @@
 
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
-import com.bulletphysics.collision.shapes.SphereShape;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.ResourceUrn;
@@ -43,6 +32,7 @@ import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.utilities.gson.JSONUtils;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
@@ -52,7 +42,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  */
@@ -131,7 +120,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
 
             if (JSONUtils.hasObject(shapeObj,PLACEMENT) ) {
-                JsonObject placementObj = shapeObj.get(PLACEMENT).getAsJsonObject();
+                JsonObject placementObj = JSONUtils.getObjectOrNull(shapeObj, PLACEMENT);
                 shape.setBlockShapePlacement(BlockShapePlacement.of(
                         JSONUtils.getEnum(placementObj, PLACEMENT_TYPE, BlockShapePlacement.PlacementType.class),
                         JSONUtils.getEnum(placementObj, PLACEMENT_SYMMETRY, BlockShapePlacement.Symmetry.class),
