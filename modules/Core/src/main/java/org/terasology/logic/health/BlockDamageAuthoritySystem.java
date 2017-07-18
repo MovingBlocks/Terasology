@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.particles.components.ParticleDataSpriteComponent;
@@ -37,6 +38,7 @@ import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
@@ -46,7 +48,12 @@ import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.WorldAtlas;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * This system is responsible for giving blocks health when they are attacked and damaging them instead of destroying them.
@@ -101,10 +108,9 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         if (blockComponent.block != null) {
             onDamagedCommon(event, blockComponent.block, locComp.getWorldPosition(), entity);
         }
-
     }
 
-    public void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location, EntityRef entityRef) {
+    private void onDamagedCommon(OnDamagedEvent event, BlockFamily blockFamily, Vector3f location, EntityRef entityRef) {
         BlockDamageModifierComponent blockDamageSettings = event.getType().getComponent(BlockDamageModifierComponent.class);
         boolean skipDamageEffects = false;
         if (blockDamageSettings != null) {
@@ -116,49 +122,71 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
     }
 
     private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location, EntityRef entityRef) {
-        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
-        if (!terrainTexture.isPresent() || !terrainTexture.get().isLoaded()) {
-            return;
-        }
-
-        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
-        builder.getComponent(LocationComponent.class).setWorldPosition(location);
-        ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
-        TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
-
-        spriteComponent.texture = terrainTexture.get();
-
-        final float tileSize = worldAtlas.getRelativeTileSize();
-        spriteComponent.textureSize.set(tileSize, tileSize);
-
-        Block b = blockManager.getBlock(family.getURI().toString()).getBlockFamily().getArchetypeBlock();
-        Vector2f offset = b.getPrimaryAppearance().getTextureAtlasPos(BlockPart.FRONT);
-
-        final float relTileSize = worldAtlas.getRelativeTileSize();
-        Vector2f particleTexSize = new Vector2f(
-                relTileSize * 0.25f,
-                relTileSize * 0.25f);
-
-        spriteComponent.textureSize.x *= 0.25f;
-        spriteComponent.textureSize.y *= 0.25f;
-
-        textureOffsetGeneratorComponent.validOffsets.add(new Vector2f(
-                offset.x + random.nextFloat() * (tileSize - particleTexSize.x),
-                offset.y + random.nextFloat() * (tileSize - particleTexSize.y)));
-
-        builder.build();
-
-        if (family.getArchetypeBlock().isDebrisOnDestroy()) {
-            EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
-            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location);
-            dustBuilder.build();
-        }
+        createBlockParticleEffect(family, location);
 
         BlockSounds sounds = family.getArchetypeBlock().getSounds();
         if (!sounds.getDigSounds().isEmpty()) {
             StaticSound sound = random.nextItem(sounds.getDigSounds());
             entityRef.send(new PlaySoundEvent(sound, 1f));
         }
+    }
+
+    /**
+     * Creates a new entity for the block damage particle effect.
+     *
+     * If the terrain texture of the damaged block is available, the particles will have the block texture. Otherwise,
+     * the default sprite (smoke) is used.
+     *
+     * @param family the {@link BlockFamily} of the damaged block
+     * @param location the location of the damaged block
+     */
+    private void createBlockParticleEffect(BlockFamily family, Vector3f location) {
+        EntityBuilder builder = entityManager.newBuilder("core:defaultBlockParticles");
+        builder.getComponent(LocationComponent.class).setWorldPosition(location);
+
+        Optional<Texture> terrainTexture = Assets.getTexture("engine:terrain");
+        if (terrainTexture.isPresent() && terrainTexture.get().isLoaded()) {
+            final BlockAppearance blockAppearance = family.getArchetypeBlock().getPrimaryAppearance();
+
+            final float relativeTileSize = worldAtlas.getRelativeTileSize();
+            final float particleScale = 0.25f;
+
+            final float spriteSize = relativeTileSize * particleScale;
+
+            ParticleDataSpriteComponent spriteComponent = builder.getComponent(ParticleDataSpriteComponent.class);
+            spriteComponent.texture = terrainTexture.get();
+            spriteComponent.textureSize.set(spriteSize, spriteSize);
+
+            final List<Vector2f> offsets = computeOffsets(blockAppearance, particleScale);
+
+            TextureOffsetGeneratorComponent textureOffsetGeneratorComponent = builder.getComponent(TextureOffsetGeneratorComponent.class);
+            textureOffsetGeneratorComponent.validOffsets.addAll(offsets);
+        }
+
+        builder.build();
+    }
+
+    /**
+     * Computes n random offset values for each block part texture.
+     *
+     * @param blockAppearance the block appearance information to generate offsets from
+     * @param scale the scale of the texture area (should be in 0 < scale <= 1.0)
+     *
+     * @return a list of random offsets sampled from all block parts
+     */
+    private List<Vector2f> computeOffsets(BlockAppearance blockAppearance, float scale) {
+        final float relativeTileSize = worldAtlas.getRelativeTileSize();
+        final int absoluteTileSize = worldAtlas.getTileSize();
+        final float pixelSize = relativeTileSize / absoluteTileSize;
+        final int spriteWidth = TeraMath.ceilToInt(scale * absoluteTileSize);
+
+        final Stream<Vector2f> baseOffsets = Arrays.stream(BlockPart.sideValues()).map(blockAppearance::getTextureAtlasPos);
+
+        return baseOffsets.flatMap(baseOffset ->
+                    IntStream.range(0, 8).boxed().map(i ->
+                        new Vector2f(baseOffset).add(random.nextInt(absoluteTileSize - spriteWidth) * pixelSize, random.nextInt(absoluteTileSize - spriteWidth) * pixelSize)
+                    )
+                ).collect(Collectors.toList());
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
