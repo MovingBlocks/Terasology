@@ -20,6 +20,7 @@ import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.protobuf.EntityData;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -92,6 +93,21 @@ public abstract class EntityRef implements MutableComponentContainer {
     public abstract EntityRef getOwner();
 
     /**
+     * Sets the scope of the entity
+     *
+     * @param scope
+     */
+    public void setScope(EntityData.Entity.Scope scope) {
+    }
+
+    /**
+     * @return the scope of the entity
+     */
+    public EntityData.Entity.Scope getScope() {
+        return null;
+    }
+
+    /**
      * Sets the entity that owns this entity.
      *
      * @param owner
@@ -123,5 +139,11 @@ public abstract class EntityRef implements MutableComponentContainer {
     @Override
     public final int hashCode() {
         return Objects.hashCode(getId());
+    }
+
+    /**
+     * Invalidates this EntityRef
+     */
+    public void invalidate() {
     }
 }

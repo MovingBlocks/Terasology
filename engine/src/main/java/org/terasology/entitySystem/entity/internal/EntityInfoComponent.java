@@ -19,6 +19,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.Replicate;
+import org.terasology.protobuf.EntityData.Entity.Scope;
 
 import javax.annotation.Nullable;
 
@@ -38,6 +39,7 @@ public class EntityInfoComponent implements Component {
     @Replicate
     public EntityRef owner = EntityRef.NULL;
     public boolean alwaysRelevant;
+    public Scope scope = Scope.GLOBAL;
 
     public EntityInfoComponent() {
     }
@@ -46,5 +48,10 @@ public class EntityInfoComponent implements Component {
         this.parentPrefab = parentPrefab;
         this.persisted = persisted;
         this.alwaysRelevant = alwaysRelevant;
+    }
+
+    public EntityInfoComponent(@Nullable Prefab parentPrefab, boolean persisted, boolean alwaysRelevant, Scope scope) {
+        this(parentPrefab, persisted, alwaysRelevant);
+        this.scope = scope;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,88 +18,22 @@ package org.terasology.entitySystem.entity;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Map;
 
 /**
  */
-public interface EntityManager {
+public interface EntityManager extends EntityCache {
 
     /**
-     * Creates an EntityBuilder.
+     * Creates a new EntityRef in sector-scope
      *
-     * @return A new entity builder
+     * @return the newly created EntityRef
      */
-    EntityBuilder newBuilder();
-
-    /**
-     * Creates an EntityBuilder, from a prefab
-     *
-     * @return A new entity builder
-     */
-    EntityBuilder newBuilder(String prefabName);
-
-    /**
-     * Creates an EntityBuilder, from a prefab
-     *
-     * @return A new entity builder
-     */
-    EntityBuilder newBuilder(Prefab prefab);
-
-    /**
-     * @return A references to a new, unused entity
-     */
-    EntityRef create();
-
-    /**
-     * @return A references to a new, unused entity with the desired components
-     */
-    EntityRef create(Component... components);
-
-    /**
-     * @return A references to a new, unused entity with the desired components
-     */
-    EntityRef create(Iterable<Component> components);
-
-    /**
-     * @param prefabName The name of the prefab to create.
-     * @return A new entity, based on the the prefab of the given name. If the prefab doesn't exist, just a new entity.
-     */
-    EntityRef create(String prefabName);
-
-    /**
-     * @param prefab
-     * @return A new entity, based on the given prefab
-     */
-    EntityRef create(Prefab prefab);
-
-    // TODO: Review. Probably better to move these into a static helper
-
-    /**
-     * @param prefab
-     * @param position
-     * @return A new entity, based on the given prefab, at the desired position
-     */
-    EntityRef create(String prefab, Vector3f position);
-
-    /**
-     * @param prefab
-     * @param position
-     * @return A new entity, based on the given prefab, at the desired position
-     */
-    EntityRef create(Prefab prefab, Vector3f position);
-
-    /**
-     * @param prefab
-     * @param position
-     * @param rotation
-     * @return
-     */
-    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+    default EntityRef createSectorEntity() {
+        return null;
+    }
 
     /**
      * @param id
@@ -125,23 +59,6 @@ public interface EntityManager {
     Map<Class<? extends Component>, Component> copyComponents(EntityRef original);
 
     /**
-     * @return An iterable over all entities
-     */
-    Iterable<EntityRef> getAllEntities();
-
-    /**
-     * @param componentClasses
-     * @return An iterable over all entities with the provided component types.
-     */
-    Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
-
-    /**
-     * @param componentClasses
-     * @return A count of entities with the provided component types
-     */
-    int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
-
-    /**
      * @return The event system being used by the entity manager
      */
     EventSystem getEventSystem();
@@ -156,8 +73,8 @@ public interface EntityManager {
      */
     ComponentLibrary getComponentLibrary();
 
-    /**
-     * @return A count of currently active entities
-     */
-    int getActiveEntityCount();
+    EntityCache getGlobalCache();
+
+    SectorManager getSectorManager();
+
 }
