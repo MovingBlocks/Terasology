@@ -710,15 +710,9 @@ public class BulletPhysics implements PhysicsEngine {
                     if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
                     }
-                    else if(((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof Vector3i){
-                        otherEntity = blockEntityRegistry.getEntityAt((Vector3i)((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer());
-                    }
                 } else {
                     if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
-                    }
-                    else if(((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof Vector3i){
-                        otherEntity = blockEntityRegistry.getEntityAt((Vector3i)((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer());
                     }
                 }
                 if (otherEntity == null || otherEntity == EntityRef.NULL) {
