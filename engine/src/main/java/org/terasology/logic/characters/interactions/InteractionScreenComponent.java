@@ -25,5 +25,5 @@ import org.terasology.module.sandbox.API;
 @API
 public class InteractionScreenComponent implements Component {
     public String screen;
-
+    public boolean editScreen = false;
 }

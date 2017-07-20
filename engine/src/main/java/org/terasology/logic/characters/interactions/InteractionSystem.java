@@ -112,6 +112,10 @@ public class InteractionSystem extends BaseComponentSystem {
             logger.error("Interaction start predicted for entity without character component");
             return;
         }
+        if (interactionScreenComponent.editScreen) {
+            logger.debug("Interaction screen disallowed because target has an edit screen.");
+            return;
+        }
         ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
         if (controller != null && controller.local) {
             nuiManager.closeAllScreens();
