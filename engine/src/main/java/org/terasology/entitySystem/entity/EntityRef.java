@@ -96,7 +96,7 @@ public abstract class EntityRef implements MutableComponentContainer {
     /**
      * Sets the scope of the entity
      *
-     * @param scope
+     * @param scope the new scope for the entity
      */
     public void setScope(EntityScope scope) {
     }

@@ -43,7 +43,7 @@ public class SectorSimulationEvent implements Event {
      * big variations in the time between sending these events (notably, an event will be sent whenever the chunk an
      * entity is in is loaded, even if one has just been sent.
      *
-     * Using the delta will give a relaible measure of how much simulation to perform.
+     * Using the delta will give a reliable measure of how much simulation to perform.
      *
      * @return the time, in seconds, since the last time this event was sent to the given entity
      */

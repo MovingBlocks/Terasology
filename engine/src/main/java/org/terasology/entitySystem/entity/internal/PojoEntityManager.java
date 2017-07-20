@@ -54,8 +54,6 @@ import java.util.Set;
 
 import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
-/**
- */
 public class PojoEntityManager implements EngineEntityManager {
     public static final long NULL_ID = 0;
 
@@ -136,7 +134,6 @@ public class PojoEntityManager implements EngineEntityManager {
         entity.addOrSaveComponent(new SectorSimulationComponent(maxDelta));
 
         //TODO: look into keeping all sector entities loaded, or converting alwaysRelevant into another scope
-        entity.setAlwaysRelevant(true);
         return entity;
     }
 

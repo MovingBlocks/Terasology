@@ -21,16 +21,17 @@ import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 
 import java.util.Map;
 
-/**
- */
 public interface EntityManager extends EntityPool {
 
     /**
      * Creates a new EntityRef in sector-scope
      *
+     * @param maxDelta the maximum delta for the sector entity's simulations
+     *                 @see SectorSimulationComponent#maxDelta
      * @return the newly created EntityRef
      */
     default EntityRef createSectorEntity(long maxDelta) {
@@ -38,7 +39,6 @@ public interface EntityManager extends EntityPool {
     }
 
     /**
-     * @param other
      * @return A new entity with a copy of each of the other entity's components
      * @deprecated Use EntityRef.copy() instead.
      */
@@ -48,7 +48,6 @@ public interface EntityManager extends EntityPool {
     /**
      * Creates a copy of the components of an entity.
      *
-     * @param original
      * @return A map of components types to components copied from the target entity.
      */
     // TODO: Remove? A little dangerous due to ownership

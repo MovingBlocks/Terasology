@@ -15,7 +15,5 @@
  */
 package org.terasology.entitySystem.entity;
 
-/**
- */
 public interface SectorManager extends EntityPool {
 }

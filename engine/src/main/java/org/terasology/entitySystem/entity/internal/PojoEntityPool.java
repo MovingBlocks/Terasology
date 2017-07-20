@@ -40,8 +40,6 @@ import java.util.Optional;
 
 import static org.terasology.entitySystem.entity.internal.PojoEntityManager.NULL_ID;
 
-/**
- */
 public class PojoEntityPool implements EngineEntityPool {
 
     private PojoEntityManager entityManager;
@@ -94,7 +92,8 @@ public class PojoEntityPool implements EngineEntityPool {
             }
         }
 
-        for (Component component: components) {
+        //Retrieve the components again in case they were modified by the previous events
+        for (Component component : entityManager.iterateComponents(entity.getId())) {
             entityManager.notifyComponentAdded(entity, component.getClass());
         }
 
@@ -126,7 +125,6 @@ public class PojoEntityPool implements EngineEntityPool {
         return create(prefab, position, rotation, true);
     }
 
-    //@Override
     private EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation, boolean sendLifecycleEvents) {
         EntityBuilder builder = newBuilder(prefab);
         builder.setSendLifecycleEvents(sendLifecycleEvents);
@@ -147,8 +145,7 @@ public class PojoEntityPool implements EngineEntityPool {
         return builder.build();
     }
 
-    //@Override
-    public EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
+    private EntityRef create(String prefabName, Vector3f position, Quat4f rotation) {
         return create(prefabName, position, rotation, true);
     }
 
@@ -170,7 +167,7 @@ public class PojoEntityPool implements EngineEntityPool {
     /**
      * Destroys this entity, sending event
      *
-     * @param entityId
+     * @param entityId the id of the entity to destroy
      */
     @Override
     public void destroy(long entityId) {
@@ -288,6 +285,7 @@ public class PojoEntityPool implements EngineEntityPool {
         return entity;
     }
 
+    @Override
     public EntityBuilder newBuilder() {
         return new EntityBuilder(entityManager, this);
     }

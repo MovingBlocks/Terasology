@@ -19,8 +19,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 
-/**
- */
 public interface LowLevelEntityManager extends EntityManager {
 
     boolean isExistingEntity(long id);

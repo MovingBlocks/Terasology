@@ -17,7 +17,5 @@ package org.terasology.entitySystem.entity.internal;
 
 import org.terasology.entitySystem.entity.SectorManager;
 
-/**
- */
 public interface EngineSectorManager extends SectorManager, EngineEntityPool {
 }

@@ -42,13 +42,10 @@ import static org.mockito.Mockito.mock;
 import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
 import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
-/**
- */
 public class BaseEntityRefTest {
 
     private static Context context;
     private PojoEntityManager entityManager;
-    //private Prefab prefab;
     private EntityRef ref;
 
     @BeforeClass

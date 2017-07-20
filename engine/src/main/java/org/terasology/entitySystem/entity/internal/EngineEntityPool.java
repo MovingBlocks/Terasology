@@ -22,8 +22,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Optional;
 
-/**
- */
 public interface EngineEntityPool extends EntityPool {
 
     /**

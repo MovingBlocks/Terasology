@@ -20,8 +20,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
-/**
- */
 public interface EntityPool {
 
     /**
@@ -82,7 +80,6 @@ public interface EntityPool {
     EntityRef create(String prefabName);
 
     /**
-     * @param prefab
      * @return A new entity, based on the given prefab
      */
     EntityRef create(Prefab prefab);
@@ -90,24 +87,17 @@ public interface EntityPool {
     // TODO: Review. Probably better to move these into a static helper
 
     /**
-     * @param prefab
-     * @param position
      * @return A new entity, based on the given prefab, at the desired position
      */
     EntityRef create(String prefab, Vector3f position);
 
     /**
-     * @param prefab
-     * @param position
      * @return A new entity, based on the given prefab, at the desired position
      */
     EntityRef create(Prefab prefab, Vector3f position);
 
     /**
-     * @param prefab
-     * @param position
-     * @param rotation
-     * @return
+     * @return A new entity, based on the given prefab, at the desired position, and with the desired rotation
      */
     EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
@@ -116,7 +106,6 @@ public interface EntityPool {
      * <br><br>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
-     * @param components
      * @return The newly created entity ref.
      */
     EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components);
@@ -126,7 +115,6 @@ public interface EntityPool {
      * <br><br>
      * This is used by the block entity system to give an illusion of permanence to temporary block entities.
      *
-     * @param prefab
      * @return The newly created entity ref.
      */
     EntityRef createEntityWithoutLifecycleEvents(String prefab);
@@ -137,8 +125,6 @@ public interface EntityPool {
      * Allows the creation of an entity with a given id - this is used
      * when loading persisted entities
      *
-     * @param id
-     * @param components
      * @return The entityRef for the newly created entity
      */
     EntityRef createEntityWithId(long id, Iterable<Component> components);
@@ -146,21 +132,21 @@ public interface EntityPool {
     /**
      * Retrieve the entity ref with the given id.
      *
-     * @param id
      * @return the {@link EntityRef}, if it exists; {@link EntityRef#NULL} otherwise
      */
     EntityRef getEntity(long id);
 
+    /**
+     * @return an iterable over all of the entities in this pool
+     */
     Iterable<EntityRef> getAllEntities();
 
     /**
-     * @param componentClasses
      * @return An iterable over all entities with the provided component types.
      */
     Iterable<EntityRef> getEntitiesWith(Class<? extends Component>... componentClasses);
 
     /**
-     * @param componentClasses
      * @return A count of entities with the provided component types
      */
     int getCountOfEntitiesWith(Class<? extends Component>... componentClasses);
