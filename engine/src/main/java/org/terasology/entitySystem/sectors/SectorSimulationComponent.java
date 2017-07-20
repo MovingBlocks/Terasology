@@ -18,14 +18,14 @@ package org.terasology.entitySystem.sectors;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.module.sandbox.API;
-import org.terasology.protobuf.EntityData;
 
 /**
  * The component that allows the {@link SectorSimulationSystem} to send simulation events to a sector-scope entity.
  *
  * This should be automatically added by either {@link EntityManager#createSectorEntity(long)} or
- * {@link BaseEntityRef#setScope(EntityData.Entity.Scope)}, so modules should not need to modify or add it.
+ * {@link BaseEntityRef#setScope(EntityScope)}, so modules should not need to modify or add it.
  */
 @API
 public class SectorSimulationComponent implements Component {

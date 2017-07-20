@@ -19,6 +19,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
@@ -29,7 +30,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.protobuf.EntityData;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
@@ -43,7 +43,7 @@ import org.terasology.world.chunks.event.OnChunkLoaded;
  * For the purposes of this class, sector-scope means any {@link EntityRef} that's scope is SECTOR, and that has a
  * {@link SectorSimulationComponent}. The entity should automatically have the component, as long as it was created by
  * {@link EntityManager#createSectorEntity(long)} or its scope was set by
- * {@link BaseEntityRef#setScope(EntityData.Entity.Scope)}.
+ * {@link BaseEntityRef#setScope(EntityScope)}.
  *
  * It periodically sends a {@link SectorSimulationEvent} to all sector-scope entities, which should trigger any
  * simulation that needs to happen regardless of whether or not the entity's chunk is loaded.

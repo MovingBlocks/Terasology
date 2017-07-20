@@ -22,6 +22,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.Map;
@@ -41,6 +42,7 @@ public class EntityBuilder implements MutableComponentContainer {
     private EngineEntityManager entityManager;
 
     private boolean sendLifecycleEvents = true;
+    private EntityScope scope;
 
     public EntityBuilder(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -94,11 +96,19 @@ public class EntityBuilder implements MutableComponentContainer {
      * @return The built entity.
      */
     public EntityRef build() {
-        return pool.create(components.values(), sendLifecycleEvents);
+        EntityRef entity = pool.create(components.values(), sendLifecycleEvents);
+        if (scope != null) {
+            entity.setScope(scope);
+        }
+        return entity;
     }
 
     public EntityRef buildWithoutLifecycleEvents() {
-        return pool.create(components.values(), false);
+        EntityRef entity = pool.create(components.values(), false);
+        if (scope != null) {
+            entity.setScope(scope);
+        }
+        return entity;
     }
 
     @Override
@@ -146,6 +156,14 @@ public class EntityBuilder implements MutableComponentContainer {
 
     public void setAlwaysRelevant(boolean alwaysRelevant) {
         getEntityInfo().alwaysRelevant = alwaysRelevant;
+    }
+
+    public void setScope(EntityScope scope) {
+        this.scope = scope;
+    }
+
+    public EntityScope getScope() {
+        return scope;
     }
 
     public void setOwner(EntityRef owner) {

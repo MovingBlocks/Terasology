@@ -17,10 +17,11 @@ package org.terasology.entitySystem.entity;
 
 import com.google.common.base.Objects;
 import org.terasology.entitySystem.MutableComponentContainer;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.protobuf.EntityData;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -97,13 +98,21 @@ public abstract class EntityRef implements MutableComponentContainer {
      *
      * @param scope
      */
-    public void setScope(EntityData.Entity.Scope scope) {
+    public void setScope(EntityScope scope) {
+    }
+
+    /**
+     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#maxDelta}.
+     *
+     * @param maxDelta the maxDelta for the sector-scope entity
+     */
+    public void setSectorScope(long maxDelta) {
     }
 
     /**
      * @return the scope of the entity
      */
-    public EntityData.Entity.Scope getScope() {
+    public EntityScope getScope() {
         return null;
     }
 

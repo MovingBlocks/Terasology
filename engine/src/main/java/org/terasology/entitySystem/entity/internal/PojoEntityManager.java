@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityPool;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -52,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
 /**
  */
@@ -130,9 +131,9 @@ public class PojoEntityManager implements EngineEntityManager {
     @Override
     public EntityRef createSectorEntity(long maxDelta) {
         EntityRef entity = sectorManager.create();
-        entity.setScope(EntityData.Entity.Scope.SECTOR);
+        entity.setScope(SECTOR);
 
-        entity.addComponent(new SectorSimulationComponent(maxDelta));
+        entity.addOrSaveComponent(new SectorSimulationComponent(maxDelta));
 
         //TODO: look into keeping all sector entities loaded, or converting alwaysRelevant into another scope
         entity.setAlwaysRelevant(true);
@@ -303,8 +304,10 @@ public class PojoEntityManager implements EngineEntityManager {
         //TODO: clean this up
         for (Component c : components) {
             if (c instanceof EntityInfoComponent) {
-                if (((EntityInfoComponent) c).scope == EntityData.Entity.Scope.SECTOR) {
-                    return sectorManager.createEntityWithId(id, components);
+                if (((EntityInfoComponent) c).scope == SECTOR) {
+                    EntityRef entity = sectorManager.createEntityWithId(id, components);
+                    entity.setScope(SECTOR);
+                    return entity;
                 } else {
                     break;
                 }

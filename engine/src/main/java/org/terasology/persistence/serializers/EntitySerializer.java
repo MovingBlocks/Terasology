@@ -22,6 +22,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
+import org.terasology.entitySystem.entity.internal.EntityScope;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -31,6 +32,9 @@ import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 import java.util.Set;
+
+import static org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
+import static org.terasology.protobuf.EntityData.Entity.Scope.SECTOR;
 
 /**
  * Provides the ability to serialize and deserialize entities to the EntityData.Entity proto buffer format.
@@ -220,8 +224,13 @@ public class EntitySerializer {
         if (entityData.hasAlwaysRelevant()) {
             entityInfo.alwaysRelevant = entityData.getAlwaysRelevant();
         }
-        if (entityData.hasScope()) {
-            entityInfo.scope = entityData.getScope();
+        switch (entityData.getScope()) {
+            case GLOBAL:
+                entityInfo.scope = EntityScope.GLOBAL;
+                break;
+            case SECTOR:
+                entityInfo.scope = EntityScope.SECTOR;
+                break;
         }
 
         for (EntityData.Component componentData : entityData.getComponentList()) {
@@ -250,9 +259,16 @@ public class EntitySerializer {
         if (owner.exists()) {
             entity.setOwner(owner.getId());
         }
-        EntityData.Entity.Scope scope = entityRef.getScope();
+        EntityScope scope = entityRef.getScope();
         if (scope != null) {
-            entity.setScope(scope);
+            switch (scope) {
+                case GLOBAL:
+                    entity.setScope(GLOBAL);
+                    break;
+                case SECTOR:
+                    entity.setScope(SECTOR);
+                    break;
+            }
         }
 
         for (Component component : entityRef.iterateComponents()) {
@@ -281,9 +297,16 @@ public class EntitySerializer {
         if (owner.exists()) {
             entity.setOwner(owner.getId());
         }
-        EntityData.Entity.Scope scope = entityRef.getScope();
+        EntityScope scope = entityRef.getScope();
         if (scope != null) {
-            entity.setScope(scope);
+            switch (scope) {
+                case GLOBAL:
+                    entity.setScope(GLOBAL);
+                    break;
+                case SECTOR:
+                    entity.setScope(SECTOR);
+                    break;
+            }
         }
 
 

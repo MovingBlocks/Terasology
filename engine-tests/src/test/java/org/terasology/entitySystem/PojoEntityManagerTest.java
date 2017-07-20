@@ -44,7 +44,6 @@ import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.utilities.Assets;
@@ -61,6 +60,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
 
 /**
  */
@@ -99,7 +99,7 @@ public class PojoEntityManagerTest {
     public void testCreateEntity() {
         EntityRef entity = entityManager.create();
         assertNotNull(entity);
-        assertEquals(entity.getScope(), EntityData.Entity.Scope.GLOBAL);
+        assertEquals(entity.getScope(), GLOBAL);
     }
 
     @Test

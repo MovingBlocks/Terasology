@@ -26,11 +26,12 @@ import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.EntitySerializer;
-import org.terasology.protobuf.EntityData;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
+
+import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
 /**
  */
@@ -84,7 +85,7 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public EntityData.Entity.Scope getScope() {
+    public EntityScope getScope() {
         if (exists()) {
             return getEntityInfo().scope;
         }
@@ -92,7 +93,7 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public void setScope(EntityData.Entity.Scope scope) {
+    public void setScope(EntityScope scope) {
         if (exists()) {
             EntityInfoComponent info = getEntityInfo();
             if (!info.scope.equals(scope)) {
@@ -119,6 +120,12 @@ public abstract class BaseEntityRef extends EntityRef {
                 saveComponent(info);
             }
         }
+    }
+
+    @Override
+    public void setSectorScope(long maxDelta) {
+        setScope(SECTOR);
+        getComponent(SectorSimulationComponent.class).maxDelta = maxDelta;
     }
 
     @Override

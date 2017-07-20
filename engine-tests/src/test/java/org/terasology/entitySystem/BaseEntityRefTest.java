@@ -32,14 +32,15 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
 /**
  */
@@ -75,19 +76,19 @@ public class BaseEntityRefTest {
 
     @Test
     public void testSetScope() {
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.GLOBAL);
+        assertEquals(ref.getScope(), GLOBAL);
         assertTrue(entityManager.getGlobalPool().contains(ref.getId()));
         assertFalse(entityManager.getSectorManager().contains(ref.getId()));
 
         //Move into sector scope
-        ref.setScope(EntityData.Entity.Scope.SECTOR);
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.SECTOR);
+        ref.setScope(SECTOR);
+        assertEquals(ref.getScope(), SECTOR);
         assertTrue(entityManager.getSectorManager().contains(ref.getId()));
         assertFalse(entityManager.getGlobalPool().contains(ref.getId()));
 
         //And move back to global scope
-        ref.setScope(EntityData.Entity.Scope.GLOBAL);
-        assertEquals(ref.getScope(), EntityData.Entity.Scope.GLOBAL);
+        ref.setScope(GLOBAL);
+        assertEquals(ref.getScope(), GLOBAL);
         assertTrue(entityManager.getGlobalPool().contains(ref.getId()));
         assertFalse(entityManager.getSectorManager().contains(ref.getId()));
     }
