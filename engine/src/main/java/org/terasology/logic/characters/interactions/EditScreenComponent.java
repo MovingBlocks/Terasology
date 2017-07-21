@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
 
 /**
- * Entities with this component will show an UI during interactions.
+ * Entities with this component will show a different UI Screen during interactions when edit mode is on. <br/>
  *
  */
 @API
-public class InteractionScreenComponent implements Component {
-    public String screen;
+public class EditScreenComponent implements Component {
+    public String screen = null;
 }

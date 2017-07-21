@@ -526,9 +526,9 @@ public class CoreCommands extends BaseComponentSystem {
     public String toggleEditMode(@Sender EntityRef sender) {
         EntityRef character = sender.getComponent(ClientComponent.class).character;
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        characterComponent.editScreenInteraction ^= true;
+        characterComponent.editMode ^= true;
         character.saveComponent(characterComponent);
-        return "Edit Mode changed to " + characterComponent.editScreenInteraction;
+        return "Edit Mode changed to " + characterComponent.editMode;
     }
 
     /**

@@ -38,7 +38,7 @@ public final class CharacterComponent implements Component {
     /**
      * Specifies whether the character can interact with entities that have an edit screen.
      */
-    public boolean editScreenInteraction = false;
+    public boolean editMode = false;
     /**
      * The current interaction target of a character which has been authorized by the authority (e.g. the server).
      * <br><br>

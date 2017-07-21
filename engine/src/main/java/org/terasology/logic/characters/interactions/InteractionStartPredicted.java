@@ -16,6 +16,7 @@
 package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.module.sandbox.API;
 
@@ -31,7 +32,7 @@ import org.terasology.module.sandbox.API;
  *
  */
 @API
-public class InteractionStartPredicted implements Event {
+public class InteractionStartPredicted extends AbstractConsumableEvent {
     private EntityRef instigator;
 
     protected InteractionStartPredicted() {
