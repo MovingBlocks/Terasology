@@ -112,7 +112,7 @@ public class InteractionSystem extends BaseComponentSystem {
             logger.error("Interaction start predicted for entity without character component");
             return;
         }
-        if (interactionScreenComponent.editScreen) {
+        if (interactionScreenComponent.editScreen && !characterComponent.editScreenInteraction) {
             logger.debug("Interaction screen disallowed because target has an edit screen.");
             return;
         }

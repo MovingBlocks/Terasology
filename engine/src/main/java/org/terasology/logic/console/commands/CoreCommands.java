@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
@@ -518,6 +519,16 @@ public class CoreCommands extends BaseComponentSystem {
 
         blockItem.send(new DropItemEvent(spawnPos));
         return "Spawned block.";
+    }
+
+    @Command(shortDescription = "Toggle edit mode", helpText = "Toggles the edit mode to allow interaction with edit screens",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String toggleEditMode(@Sender EntityRef sender) {
+        EntityRef character = sender.getComponent(ClientComponent.class).character;
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        characterComponent.editScreenInteraction ^= true;
+        character.saveComponent(characterComponent);
+        return "Edit Mode changed to " + characterComponent.editScreenInteraction;
     }
 
     /**
