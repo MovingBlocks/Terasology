@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A component stocks game play stats such as blocks destroyed, blocks placed, etc.
  */
 public class GamePlayStatsComponent implements Component {
 
@@ -32,8 +33,11 @@ public class GamePlayStatsComponent implements Component {
     public Map<String, Integer> blockPlacedMap = new HashMap<>();
 
     @Replicate
-    public float distanceTraveled = 0;
+    public float distanceTraveled;
 
     @Replicate
-    public long playTimeMinute = 0;
+    public float playTimeMinute;
+
+    @Replicate
+    public Map<String, Integer> monsterKilled = new HashMap<>();
 }

@@ -29,7 +29,7 @@ import java.util.Map;
 @TelemetryCategory(id = "systemContext",
         displayName = "${engine:menu#telemetry-system-context}"
         )
-public class SystemContextMetric extends Metric {
+public final class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
 
@@ -89,7 +89,7 @@ public class SystemContextMetric extends Metric {
     @Override
     public  Unstructured getUnstructuredMetric() {
 
-        Map<String, ?> metricMap = getFieldValueMap();
+        getFieldValueMap();
 
         SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
 

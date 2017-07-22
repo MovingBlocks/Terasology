@@ -232,6 +232,7 @@
     "telemetry-block-placed": "Block Placed",
     "telemetry-game-configuration": "Game Configuration",
     "telemetry-game-play": "Game Play Statistics",
+    "telemetry-monster-killed": "Monster Killed",
     "telemetry-system-context": "System Context",
     "telemetry-modules": "Modules",
     "this-language-English": "English",

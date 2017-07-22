@@ -28,18 +28,18 @@ import org.terasology.telemetry.TelemetryField;
 import java.util.Map;
 
 /**
+ * A player statistic metric for blocks destroyed in a game.
  */
 @TelemetryCategory(id = "blockDestroyed",
         displayName = "${engine:menu#telemetry-block-destroyed}"
 )
-public class BlockDestroyedMetric extends Metric {
+public final class BlockDestroyedMetric extends Metric {
 
     public static final String SCHEMA_BLOCK_DESTROYED = "iglu:org.terasology/blockDestroyed/jsonschema/1-0-0";
 
-    private Context context;
-
     private LocalPlayer localPlayer;
 
+    // The telemetry field is not actually used here, it's for documentation.
     @TelemetryField
     private Map blockDestroyedMap;
 
@@ -48,7 +48,7 @@ public class BlockDestroyedMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, ?> metricMap = getFieldValueMap();
+        getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_DESTROYED, metricMap);
 
         return Unstructured.builder()
@@ -62,9 +62,10 @@ public class BlockDestroyedMetric extends Metric {
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            return gamePlayStatsComponent.blockDestroyedMap;
+            metricMap = gamePlayStatsComponent.blockDestroyedMap;
+            return metricMap;
         } else {
-            return null;
+            return metricMap;
         }
     }
 }

@@ -36,6 +36,8 @@ public abstract class Metric {
 
     private static final Logger logger = LoggerFactory.getLogger(Metric.class);
 
+    protected Map metricMap;
+
     /**
      * Generates a snowplow unstructured event that the snowplow tracker can track.
      * @return an snowplow unstructured event.
@@ -48,7 +50,7 @@ public abstract class Metric {
      */
     public Map<String, ?> getFieldValueMap() {
 
-        Map<String, Object> metricMap = new HashMap<String, Object>();
+        metricMap = new HashMap<>();
         Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
         for (Field field : fields) {

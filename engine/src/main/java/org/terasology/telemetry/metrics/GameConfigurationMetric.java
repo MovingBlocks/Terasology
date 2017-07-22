@@ -32,22 +32,23 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * A metric tracking game configuration such as world generator, network mode,etc.
  */
 @TelemetryCategory(id = "gameConfiguration",
         displayName = "${engine:menu#telemetry-game-configuration}"
 )
-public class GameConfigurationMetric extends Metric {
+public final class GameConfigurationMetric extends Metric {
 
     public static final String SCHEMA_GAME_CONFIGURATION = "iglu:org.terasology/gameConfiguration/jsonschema/1-0-0";
 
     @TelemetryField
-    private SimpleUri worldGenerator;
+    private String worldGenerator;
 
     @TelemetryField
-    private NetworkMode networkMode;
+    private String networkMode;
 
     @TelemetryField
-    private Locale language;
+    private String language;
 
     @TelemetryField
     private float playerHeight;
@@ -63,7 +64,7 @@ public class GameConfigurationMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, ?> metricMap = getFieldValueMap();
+        getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, metricMap);
 
         return Unstructured.builder()
@@ -83,18 +84,18 @@ public class GameConfigurationMetric extends Metric {
     private void fetchWorldGenerator() {
         WorldGenerator generator = CoreRegistry.get(WorldGenerator.class);
         if (generator != null) {
-            worldGenerator = generator.getUri();
+            worldGenerator = generator.getUri().toString();
         }
     }
 
     private void fetchNetworkMode() {
         NetworkSystem networkSystem = context.get(NetworkSystem.class);
-        networkMode = networkSystem.getMode();
+        networkMode = networkSystem.getMode().toString();
     }
 
     private void fetchConfig() {
         Config config = context.get(Config.class);
-        language = config.getSystem().getLocale();
+        language = config.getSystem().getLocale().toString();
 
         PlayerConfig playerConfig = config.getPlayer();
         playerHeight = playerConfig.getHeight();

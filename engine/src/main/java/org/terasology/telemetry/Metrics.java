@@ -24,6 +24,7 @@ import org.terasology.telemetry.metrics.GameConfigurationMetric;
 import org.terasology.telemetry.metrics.GamePlayMetric;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
+import org.terasology.telemetry.metrics.MonsterKilledMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.lang.reflect.Field;
@@ -47,7 +48,9 @@ public class Metrics {
 
     private BlockPlacedMetric blockPlacedMetric;
 
-    private GamePlayMetric gameplayMetric;
+    private GamePlayMetric gamePlayMetric;
+
+    private MonsterKilledMetric monsterKilledMetric;
 
     public Metrics() {
 
@@ -60,7 +63,22 @@ public class Metrics {
         gameConfigurationMetric = new GameConfigurationMetric(context);
         blockDestroyedMetric = new BlockDestroyedMetric();
         blockPlacedMetric = new BlockPlacedMetric();
-        gameplayMetric = new GamePlayMetric();
+        gamePlayMetric = new GamePlayMetric();
+        monsterKilledMetric = new MonsterKilledMetric();
+    }
+
+    public void refreshAllMetrics() {
+        Field[] fields = this.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType().getSuperclass() == Metric.class) {
+                try {
+                    Metric metric = (Metric) field.get(this);
+                    metric.getFieldValueMap();
+                } catch (IllegalAccessException e) {
+                    logger.error("The field is not inaccessible: ", e);
+                }
+            }
+        }
     }
 
     public SystemContextMetric getSystemContextMetric() {
@@ -83,8 +101,12 @@ public class Metrics {
         return blockPlacedMetric;
     }
 
-    public GamePlayMetric getGameplayMetric() {
-        return gameplayMetric;
+    public MonsterKilledMetric getMonsterKilledMetric() {
+        return monsterKilledMetric;
+    }
+
+    public GamePlayMetric getGamePlayMetric() {
+        return gamePlayMetric;
     }
 
     public Optional<Metric> getMetric(Class<?> cl) {

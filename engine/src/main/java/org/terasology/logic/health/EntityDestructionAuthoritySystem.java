@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.world.block.BlockComponent;
 
@@ -29,7 +30,7 @@ import java.util.Map;
 public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onDestroy(DestroyEvent event, EntityRef entity) {
-        recordBlockDestroyed(event,entity);
+        recordDestroyed(event,entity);
         BeforeDestroyEvent destroyCheck = new BeforeDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType());
         entity.send(destroyCheck);
         if (!destroyCheck.isConsumed()) {
@@ -38,7 +39,7 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
         }
     }
 
-    private void recordBlockDestroyed(DestroyEvent event, EntityRef entityRef) {
+    private void recordDestroyed(DestroyEvent event, EntityRef entityRef) {
         EntityRef instigator = event.getInstigator();
         if(entityRef.hasComponent(BlockComponent.class)) {
             BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
@@ -56,6 +57,23 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
                 GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
                 Map<String, Integer> blockDestroyedMap = gamePlayStatsComponent.blockDestroyedMap;
                 blockDestroyedMap.put(blockName, 1);
+                instigator.addOrSaveComponent(gamePlayStatsComponent);
+            }
+        } else if (entityRef.hasComponent(CharacterComponent.class)) {
+            String monsterName = entityRef.getParentPrefab().getName();
+            if (instigator.hasComponent(GamePlayStatsComponent.class)) {
+                GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
+                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
+                if (monsterKilled.containsKey(monsterName)) {
+                    monsterKilled.put(monsterName, monsterKilled.get(monsterName) + 1);
+                } else {
+                    monsterKilled.put(monsterName, 1);
+                }
+                instigator.saveComponent(gamePlayStatsComponent);
+            } else {
+                GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
+                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
+                monsterKilled.put(monsterName, 1);
                 instigator.addOrSaveComponent(gamePlayStatsComponent);
             }
         }

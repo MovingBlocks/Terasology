@@ -17,7 +17,6 @@ package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -28,28 +27,27 @@ import org.terasology.telemetry.TelemetryField;
 import java.util.Map;
 
 /**
- * A players statistic metric for blocks placed.
+ * A player statistic metric for monsters killed in a game.
  */
-@TelemetryCategory(id = "blockPlaced",
-        displayName = "${engine:menu#telemetry-block-placed}"
+@TelemetryCategory(id = "monsterKilled",
+        displayName = "${engine:menu#telemetry-monster-killed}"
 )
-public final class BlockPlacedMetric extends Metric {
+public final class MonsterKilledMetric extends Metric {
 
-    public static final String SCHEMA_BLOCK_PLACED = "iglu:org.terasology/blockPlaced/jsonschema/1-0-0";
-
-    // The telemetry field is not actually used here, it's for documentation.
-    @TelemetryField
-    private Map blockPlacedMap;
+    public static final String SCHEMA_MONSTER_KILLED = "iglu:org.terasology/monsterKilled/jsonschema/1-0-0";
 
     private LocalPlayer localPlayer;
 
-    public BlockPlacedMetric() {
+    @TelemetryField
+    private Map monsterKilledMap;
+
+    public MonsterKilledMetric() {
     }
 
     @Override
     public Unstructured getUnstructuredMetric() {
         getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_PLACED, metricMap);
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MONSTER_KILLED, metricMap);
 
         return Unstructured.builder()
                 .eventData(modulesData)
@@ -62,7 +60,7 @@ public final class BlockPlacedMetric extends Metric {
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            metricMap = gamePlayStatsComponent.blockPlacedMap;
+            metricMap = gamePlayStatsComponent.monsterKilled;
             return metricMap;
         } else {
             return metricMap;

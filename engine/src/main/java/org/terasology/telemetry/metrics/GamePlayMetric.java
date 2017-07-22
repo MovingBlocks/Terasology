@@ -27,18 +27,20 @@ import org.terasology.telemetry.TelemetryField;
 import java.util.Map;
 
 /**
+ * A game play metric tracking metric such as distance traveled, play time, etc.
+ * The stats begin at 0 when a new game starts.
  */
 @TelemetryCategory(id = "gameplay",
         displayName = "${engine:menu#telemetry-game-play}"
 )
-public class GamePlayMetric extends Metric {
+public final class GamePlayMetric extends Metric {
 
     public static final String SCHEMA_GAMEPLAY = "iglu:org.terasology/gamePlay/jsonschema/1-0-0";
 
     private LocalPlayer localPlayer;
 
     @TelemetryField
-    private float distancedTraveled;
+    private float distanceTraveled;
 
     @TelemetryField
     private long playTimeMinute;
@@ -48,7 +50,7 @@ public class GamePlayMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, ?> metricMap = getFieldValueMap();
+        getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, metricMap);
 
         return Unstructured.builder()
@@ -62,11 +64,11 @@ public class GamePlayMetric extends Metric {
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            distancedTraveled = gamePlayStatsComponent.distanceTraveled;
-            playTimeMinute = gamePlayStatsComponent.playTimeMinute;
+            distanceTraveled = gamePlayStatsComponent.distanceTraveled;
+            playTimeMinute = (long) gamePlayStatsComponent.playTimeMinute;
             return super.getFieldValueMap();
         } else {
-            return null;
+            return metricMap;
         }
     }
 }

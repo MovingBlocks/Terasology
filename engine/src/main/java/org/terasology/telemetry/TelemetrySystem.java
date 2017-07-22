@@ -31,6 +31,7 @@ import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
+import org.terasology.telemetry.metrics.BlockDestroyedMetric;
 import org.terasology.telemetry.metrics.ModulesMetric;
 import org.terasology.world.block.BlockComponent;
 
@@ -48,7 +49,9 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
 
     private GamePlayStatsComponent gamePlayStatsComponent;
 
-    private Instant gameStartTime;
+    private Instant lastRecordTime;
+
+    private Instant timeForRefreshMetric;
 
     private Vector3f previousPos;
 
@@ -79,6 +82,15 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
                 recordPlayTime();
             }
         }
+
+        refreshMetricsPeriodic();
+    }
+
+    private void refreshMetricsPeriodic() {
+        if (Duration.between(timeForRefreshMetric, Instant.now()).getSeconds() > 5) {
+            metrics.refreshAllMetrics();
+            timeForRefreshMetric = Instant.now();
+        }
     }
 
     private void setGamePlayStatsComponent() {
@@ -100,24 +112,26 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private void recordPlayTime() {
-        long playTime = Duration.between(gameStartTime, Instant.now()).toMinutes();
-        gamePlayStatsComponent.playTimeMinute = playTime;
+        float playTime = Duration.between(lastRecordTime, Instant.now()).toMillis() / 1000f / 60;
+        gamePlayStatsComponent.playTimeMinute += playTime;
         localPlayer.getCharacterEntity().addOrSaveComponent(gamePlayStatsComponent);
+        lastRecordTime = Instant.now();
+    }
 
+    @Override
+    public void initialise() {
+        timeForRefreshMetric = Instant.now();
     }
 
     @Override
     public void postBegin() {
-        sendMetric();
 
-        gameStartTime = Instant.now();
-    }
-
-    private void sendMetric() {
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
             sendModuleMetric();
             sendSystemContextMetric();
         }
+
+        lastRecordTime = Instant.now();
     }
 
     private void sendModuleMetric() {
@@ -129,5 +143,25 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     private void sendSystemContextMetric() {
         Unstructured systemContextMetric = metrics.getSystemContextMetric().getUnstructuredMetric();
         TelemetryUtils.trackMetric(emitter, trackerNamespace, systemContextMetric);
+    }
+
+    @Override
+    public void shutdown() {
+        if (config.getTelemetryConfig().isTelemetryEnabled()) {
+            Unstructured unstructuredBlockDestroyed = metrics.getBlockDestroyedMetric().getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockDestroyed);
+
+            Unstructured unstructuredBlockPlaced = metrics.getBlockPlacedMetric().getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockPlaced);
+
+            Unstructured unstructuredGameConfiguration = metrics.getGameConfigurationMetric().getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGameConfiguration);
+
+            Unstructured unstructuredGamePlay = metrics.getGamePlayMetric().getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGamePlay);
+
+            Unstructured unstructuredMonsterKilled = metrics.getMonsterKilledMetric().getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMonsterKilled);
+        }
     }
 }
