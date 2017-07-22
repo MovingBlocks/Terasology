@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -102,12 +103,26 @@ public final class InjectionHelper {
         }
     }
 
-
+    /**
+     * Creates a new instance for a class using constructor injection.
+     * The constructor does not need a special annotation for this.
+     * Which constructor is selected depends on the following criteria:
+     * <ul>
+     * <li>The constructor with the most parameters is used.</li>
+     * <li>All parameters have to be available in the {@link Context}.</li>
+     * <li>If not all parameters can be populated from the Context, the next Constructor with less parameters is used.</li>
+     * <li>If no parameters can be populated at all, the default constructor (if available) is used.</li>
+     * </ul>
+     * @param clazz The class to instantiate.
+     * @param context The context to use for injection.
+     * @return A new instance of the class to create.
+     * @throws NoSuchElementException if the injection failed, e.g. if no parameters were available on the context and a default constructor is missing.
+     */
     public static <E> E createWithConstructorInjection(Class<? extends E> clazz, Context context) {
         SimpleClassFactory simpleClassFactory = new SimpleClassFactory(new ParameterProvider() {
             @Override
             public <T> Optional<T> get(Class<T> x) {
-                return Optional.of(context.get(x));
+                return Optional.ofNullable(context.get(x));
             }
         });
         return simpleClassFactory.instantiateClass(clazz).get();

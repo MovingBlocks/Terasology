@@ -31,7 +31,6 @@ public interface AudioManager {
     int PRIORITY_LOW = 3;
     int PRIORITY_LOWEST = 1;
 
-
     /**
      * @return A boolean indicting the mute status
      */
@@ -41,7 +40,6 @@ public interface AudioManager {
      * @param mute A boolean indicating the new mute status.
      */
     void setMute(boolean mute);
-
 
     void playSound(StaticSound sound);
 
@@ -66,21 +64,51 @@ public interface AudioManager {
      */
     void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
 
-
+    /**
+     * Plays music once, this does not have a direction unlike playSound.
+     *
+     * @param music The music to play
+     */
     void playMusic(StreamingSound music);
 
+    /**
+     * Plays music once, this does not have a direction unlike playSound.
+     *
+     * @param volume The volume to play it at
+     */
     void playMusic(StreamingSound music, float volume);
 
+    /**
+     * Plays music once, this does not have a direction unlike playSound.
+     *
+     * @param music The music to play
+     * @param endListener The listener to call once the music ends
+     */
     void playMusic(StreamingSound music, AudioEndListener endListener);
 
     /**
-     * Plays music, this does not have a direction unlike playSound.
+     * Plays music once, this does not have a direction unlike playSound.
      *
      * @param music The music to play
-     * @param volume THe volume to play it at
+     * @param volume The volume to play it at
      * @param endListener The listener to call once the music ends
      */
     void playMusic(StreamingSound music, float volume, AudioEndListener endListener);
+
+    /**
+     * Loops music until it gets stopped, this does not have a direction unlike playSound.
+     *
+     * @param music The music to play
+     */
+    void loopMusic(StreamingSound music);
+
+    /**
+     * Loops music until it gets stopped, this does not have a direction unlike playSound.
+     *
+     * @param music The music to play
+     * @param volume The volume to play it at
+     */
+    void loopMusic(StreamingSound music, float volume);
 
     /**
      * Update AudioManager sound sources.

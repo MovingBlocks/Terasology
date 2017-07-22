@@ -19,7 +19,6 @@ import com.google.common.base.Objects;
 
 public class SetName implements StateChange {
     private static SetName defaultInstance = new SetName("bar");
-    private SetNameTask task;
 
     private String name;
 
@@ -30,14 +29,6 @@ public class SetName implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetNameTask(name);
-        }
-        return task;
     }
 
     @Override
@@ -58,4 +49,7 @@ public class SetName implements StateChange {
     public String getName() {
         return name;
     }
+
+    @Override
+    public void process() { }
 }

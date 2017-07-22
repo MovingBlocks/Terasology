@@ -20,7 +20,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
 
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
@@ -29,37 +28,25 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * TODO: Add javadocs
  */
 public final class EnableMaterial implements StateChange {
-    private static final ResourceUrn DEFAULT_MATERIAL_URN = new ResourceUrn("engine:prog.default");
+    private static StateChange defaultInstance = new DisableMaterial();
 
-    private static EnableMaterial defaultInstance = new EnableMaterial(DEFAULT_MATERIAL_URN);
-
-    private RenderPipelineTask task;
     private ResourceUrn materialUrn;
+    private Material material;
 
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new EnableMaterial("engine:prog.chunk"));
+     */
     public EnableMaterial(ResourceUrn materialUrn) {
         this.materialUrn = materialUrn;
-    }
-
-    public ResourceUrn getMaterialUrn() {
-        return materialUrn;
+        this.material = getMaterial(materialUrn);
     }
 
     @Override
     public StateChange getDefaultInstance() {
         return defaultInstance;
-    }
-
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            if (materialUrn.equals(DEFAULT_MATERIAL_URN)) {
-                task = new DisableMaterialTask();
-            } else {
-                Material shader = getMaterial(materialUrn);
-                task = new EnableMaterialTask(shader, materialUrn);
-            }
-        }
-        return task;
     }
 
     @Override
@@ -69,7 +56,7 @@ public final class EnableMaterial implements StateChange {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof EnableMaterial) && materialUrn.equals(((EnableMaterial) obj).getMaterialUrn());
+        return (obj instanceof EnableMaterial) && materialUrn.equals(((EnableMaterial) obj).materialUrn);
     }
 
     @Override
@@ -77,37 +64,33 @@ public final class EnableMaterial implements StateChange {
         return String.format("%30s: %s", this.getClass().getSimpleName(), materialUrn.toString());
     }
 
-    private class DisableMaterialTask implements RenderPipelineTask {
+    @Override
+    public void process() {
+        material.enable();
+    }
+
+    private static final class DisableMaterial implements StateChange {
+        // TODO: Switch from CoreRegistry to Context
         private ShaderManager shaderManager = CoreRegistry.get(ShaderManager.class);
 
         @Override
-        public void execute() {
+        public StateChange getDefaultInstance() {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof DisableMaterial);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%30s", this.getClass().getSimpleName());
+        }
+
+        @Override
+        public void process() {
             shaderManager.disableShader();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: program 0", this.getClass().getSimpleName());
-        }
-    }
-
-    private class EnableMaterialTask implements RenderPipelineTask {
-        private Material material;
-        private ResourceUrn materialUrn;
-
-        private EnableMaterialTask(Material material, ResourceUrn materialUrn) {
-            this.material = material;
-            this.materialUrn = materialUrn;
-        }
-
-        @Override
-        public void execute() {
-            material.enable();
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: %s", this.getClass().getSimpleName(), materialUrn.toString());
         }
     }
 }

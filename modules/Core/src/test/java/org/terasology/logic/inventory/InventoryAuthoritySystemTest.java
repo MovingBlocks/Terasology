@@ -17,10 +17,7 @@ package org.terasology.logic.inventory;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.internal.verification.AtLeast;
-import org.mockito.internal.verification.Times;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.action.GiveItemAction;
@@ -38,6 +35,9 @@ import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 
 /**
  */
@@ -80,14 +80,14 @@ public class InventoryAuthoritySystemTest {
         assertEquals(1, itemComp.stackCount);
         assertEquals(1, itemCompCopy.stackCount);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).iterateComponents();
         Mockito.verify(item).saveComponent(itemComp);
-        Mockito.verify(itemCopy, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(itemCopy, new AtLeast(0)).iterateComponents();
+        Mockito.verify(itemCopy, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(itemCopy, atLeast(0)).iterateComponents();
         Mockito.verify(itemCopy).saveComponent(itemCompCopy);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(inventory).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory).send(any(InventorySlotStackSizeChangedEvent.class));
         Mockito.verify(entityManager).copy(item);
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item, itemCopy);
@@ -112,13 +112,13 @@ public class InventoryAuthoritySystemTest {
 
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(0));
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
-        Mockito.verify(item, new AtLeast(0)).iterateComponents();
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(item, atLeast(0)).iterateComponents();
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(BeforeItemRemovedFromInventory.class));
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(BeforeItemRemovedFromInventory.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
     }
@@ -136,10 +136,10 @@ public class InventoryAuthoritySystemTest {
 
         assertEquals(1, itemComp.stackCount);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item).saveComponent(itemComp);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(inventory).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory).send(any(InventorySlotStackSizeChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
 
@@ -163,13 +163,13 @@ public class InventoryAuthoritySystemTest {
 
         assertEquals(EntityRef.NULL, inventoryComp.itemSlots.get(0));
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
         Mockito.verify(item).destroy();
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(BeforeItemRemovedFromInventory.class));
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(Mockito.any(BeforeItemRemovedFromInventory.class));
+        Mockito.verify(inventory, times(1)).send(Mockito.any(InventorySlotChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
     }
@@ -197,18 +197,18 @@ public class InventoryAuthoritySystemTest {
         assertTrue(action.isConsumed());
         assertEquals(item1, action.getRemovedItem());
 
-        Mockito.verify(item1, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item1, new AtLeast(0)).exists();
-        Mockito.verify(item1, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item1, atLeast(0)).exists();
+        Mockito.verify(item1, atLeast(0)).iterateComponents();
         Mockito.verify(item1).saveComponent(itemComp1);
-        Mockito.verify(item2, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item2, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item2, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, atLeast(0)).iterateComponents();
         Mockito.verify(item2).saveComponent(itemComp2);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(BeforeItemRemovedFromInventory.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotChangedEvent.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(BeforeItemRemovedFromInventory.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotStackSizeChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item1, item2);
     }
@@ -235,18 +235,18 @@ public class InventoryAuthoritySystemTest {
         assertTrue(action.isConsumed());
         assertNull(action.getRemovedItem());
 
-        Mockito.verify(item1, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item1, new AtLeast(0)).exists();
-        Mockito.verify(item1, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item1, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item1, atLeast(0)).exists();
+        Mockito.verify(item1, atLeast(0)).iterateComponents();
         Mockito.verify(item1).destroy();
-        Mockito.verify(item2, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item2, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item2, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, atLeast(0)).iterateComponents();
         Mockito.verify(item2).saveComponent(itemComp2);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(BeforeItemRemovedFromInventory.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotChangedEvent.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(BeforeItemRemovedFromInventory.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotStackSizeChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item1, item2);
     }
@@ -259,13 +259,12 @@ public class InventoryAuthoritySystemTest {
 
         inventoryComp.itemSlots.set(0, item);
 
-        Mockito.when(inventory.send(Matchers.any(BeforeItemRemovedFromInventory.class))).then(
+        Mockito.when(inventory.send(any(BeforeItemRemovedFromInventory.class))).then(
                 invocation -> {
                     BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
                     event.consume();
                     return null;
-                }
-        );
+                });
 
         RemoveItemAction action = new RemoveItemAction(instigator, item, true, 2);
         inventoryAuthoritySystem.removeItem(action, inventory);
@@ -273,10 +272,10 @@ public class InventoryAuthoritySystemTest {
         assertFalse(action.isConsumed());
         assertNull(action.getRemovedItem());
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(inventory).send(Matchers.any(BeforeItemRemovedFromInventory.class));
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory).send(any(BeforeItemRemovedFromInventory.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
     }
@@ -290,13 +289,13 @@ public class InventoryAuthoritySystemTest {
         GiveItemAction action = new GiveItemAction(instigator, item);
         inventoryAuthoritySystem.giveItem(action, inventory);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
         Mockito.verify(item).saveComponent(itemComp);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(BeforeItemPutInInventory.class));
-        Mockito.verify(inventory, new Times(2)).send(Matchers.any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(BeforeItemPutInInventory.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
 
@@ -319,16 +318,16 @@ public class InventoryAuthoritySystemTest {
         GiveItemAction action = new GiveItemAction(instigator, item);
         inventoryAuthoritySystem.giveItem(action, inventory);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
-        Mockito.verify(item, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(item, atLeast(0)).iterateComponents();
         Mockito.verify(item).destroy();
-        Mockito.verify(partialItem, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(partialItem, new AtLeast(0)).exists();
-        Mockito.verify(partialItem, new AtLeast(0)).iterateComponents();
+        Mockito.verify(partialItem, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(partialItem, atLeast(0)).exists();
+        Mockito.verify(partialItem, atLeast(0)).iterateComponents();
         Mockito.verify(partialItem).saveComponent(partialItemComp);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(inventory).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory).send(any(InventorySlotStackSizeChangedEvent.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item, partialItem);
 
@@ -352,19 +351,19 @@ public class InventoryAuthoritySystemTest {
         GiveItemAction action = new GiveItemAction(instigator, item);
         inventoryAuthoritySystem.giveItem(action, inventory);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
-        Mockito.verify(item, new AtLeast(0)).iterateComponents();
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(item, atLeast(0)).iterateComponents();
         Mockito.verify(item).saveComponent(itemComp);
-        Mockito.verify(partialItem, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(partialItem, new AtLeast(0)).exists();
-        Mockito.verify(partialItem, new AtLeast(0)).iterateComponents();
+        Mockito.verify(partialItem, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(partialItem, atLeast(0)).exists();
+        Mockito.verify(partialItem, atLeast(0)).iterateComponents();
         Mockito.verify(partialItem).saveComponent(partialItemComp);
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(InventorySlotChangedEvent.class));
-        Mockito.verify(inventory, new Times(3)).send(Matchers.any(BeforeItemPutInInventory.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotStackSizeChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(InventorySlotChangedEvent.class));
+        Mockito.verify(inventory, times(1)).send(any(BeforeItemPutInInventory.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item, partialItem);
 
@@ -381,21 +380,20 @@ public class InventoryAuthoritySystemTest {
         EntityRef item = Mockito.mock(EntityRef.class);
         setupItemRef(item, itemComp, 2, 10);
 
-        Mockito.when(inventory.send(Matchers.any(BeforeItemPutInInventory.class))).then(
+        Mockito.when(inventory.send(any(BeforeItemPutInInventory.class))).then(
                 invocation -> {
                     BeforeItemPutInInventory event = (BeforeItemPutInInventory) invocation.getArguments()[0];
                     event.consume();
                     return null;
-                }
-        );
+                });
 
         GiveItemAction action = new GiveItemAction(instigator, item);
         inventoryAuthoritySystem.giveItem(action, inventory);
 
-        Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
-        Mockito.verify(item, new AtLeast(0)).exists();
-        Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
-        Mockito.verify(inventory, new Times(5)).send(Matchers.any(BeforeItemPutInInventory.class));
+        Mockito.verify(item, atLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, atLeast(0)).exists();
+        Mockito.verify(inventory, atLeast(0)).getComponent(InventoryComponent.class);
+        Mockito.verify(inventory, times(5)).send(any(BeforeItemPutInInventory.class));
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item);
 
@@ -411,7 +409,6 @@ public class InventoryAuthoritySystemTest {
         Mockito.when(item.getComponent(ItemComponent.class)).thenReturn(itemComp);
         Mockito.when(item.iterateComponents()).thenReturn(new LinkedList<>());
     }
-
 
     private EntityRef createItem(String stackId, int stackCount, int stackSize) {
         ItemComponent itemComp = new ItemComponent();
@@ -485,7 +482,6 @@ public class InventoryAuthoritySystemTest {
         assertFalse(fromInventoryComp.itemSlots.get(fromSlot).exists());
     }
 
-
     @Test
     public void testMoveItemToSlotsWithToLessSpaceInTargetSlots() {
         int stackSize = 10;
@@ -517,7 +513,6 @@ public class InventoryAuthoritySystemTest {
         assertEquals(itemA3, fromInventoryComp.itemSlots.get(fromSlot));
     }
 
-
     @Test
     public void testMoveItemToSlotsWithTargetVetos() {
         int stackSize = 10;
@@ -534,7 +529,7 @@ public class InventoryAuthoritySystemTest {
         fromInventoryComp.itemSlots.set(fromSlot, itemA2);
 
         // Placement to slots 1 gets blocked by veto
-        Mockito.when(inventory.send(Matchers.any(BeforeItemPutInInventory.class))).then(
+        Mockito.when(inventory.send(any(BeforeItemPutInInventory.class))).then(
                 invocation -> {
                     Object arg = invocation.getArguments()[0];
                     if (arg instanceof BeforeItemPutInInventory) {
@@ -544,11 +539,9 @@ public class InventoryAuthoritySystemTest {
                         }
                     }
                     return null;
-                }
-        );
+                });
 
         List<Integer> toSlots = Arrays.asList(0, 1, 2, 3, 4);
-
 
         // The method that gets tested:
         boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
@@ -564,7 +557,6 @@ public class InventoryAuthoritySystemTest {
         assertEquals(itemA2, toInventoryComp.itemSlots.get(2));
         assertFalse(fromInventoryComp.itemSlots.get(fromSlot).exists());
     }
-
 
     /**
      * A shift click isn't possible because the removal of the item gets blocked
@@ -585,7 +577,7 @@ public class InventoryAuthoritySystemTest {
         fromInventoryComp.itemSlots.set(fromSlot, itemA2);
 
         // Placement to slots 1 gets blocked by veto
-        Mockito.when(fromInventory.send(Matchers.any(BeforeItemRemovedFromInventory.class))).then(
+        Mockito.when(fromInventory.send(any(BeforeItemRemovedFromInventory.class))).then(
                 invocation -> {
                     Object arg = invocation.getArguments()[0];
                     if (arg instanceof BeforeItemRemovedFromInventory) {
@@ -595,11 +587,9 @@ public class InventoryAuthoritySystemTest {
                         }
                     }
                     return null;
-                }
-        );
+                });
 
         List<Integer> toSlots = Arrays.asList(0, 1, 2, 3, 4);
-
 
         // The method that gets tested:
         boolean result = inventoryAuthoritySystem.moveItemToSlots(instigator, fromInventory, fromSlot, toInventory, toSlots);
@@ -610,7 +600,6 @@ public class InventoryAuthoritySystemTest {
         assertEquals(EntityRef.NULL, toInventoryComp.itemSlots.get(1));
         assertEquals(itemA2, fromInventoryComp.itemSlots.get(fromSlot));
     }
-
 
     @Test
     public void testMoveItemToSlotsWithFullTargetInventorySlots() {

@@ -515,7 +515,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
         //glDepthFunc(GL_LESS);
 
-        renderPipelineTaskList.forEach(RenderPipelineTask::execute);
+        renderPipelineTaskList.forEach(RenderPipelineTask::process);
 
         // this line re-establish Terasology defaults, so that the rest of the application can rely on them.
         LwjglGraphics.initOpenGLParams();

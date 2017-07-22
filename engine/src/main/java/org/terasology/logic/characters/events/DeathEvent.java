@@ -20,8 +20,10 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
+ * This event is sent to the client entity when the character dies.
  */
 @OwnerEvent
 public class DeathEvent implements Event {
-
+    public String damageTypeName;
+    public String instigatorName;
 }

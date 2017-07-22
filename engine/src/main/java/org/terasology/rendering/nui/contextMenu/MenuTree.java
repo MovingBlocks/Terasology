@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.contextMenu;
 
 import com.google.common.collect.Lists;
+import org.terasology.module.sandbox.API;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,6 +24,7 @@ import java.util.function.Consumer;
 /**
  * A data structure to store {@link ContextMenuScreen} options and submenues.
  */
+@API
 public final class MenuTree implements AbstractContextMenuItem {
     /**
      * The options of this menu.

@@ -21,20 +21,25 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
 import org.terasology.context.Context;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
-
 import org.terasology.rendering.dag.WireframeTrigger;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthWriting;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -61,23 +66,46 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     private static final int RADIUS = 1024;
 
     private WorldRenderer worldRenderer;
+    private BackdropProvider backdropProvider;
 
     private int skySphere = -1;
     private SetWireframe wireframeStateChange;
 
-    public BackdropNode(Context context) {
-        worldRenderer = context.get(WorldRenderer.class);
-        Camera playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new LookThroughNormalized(playerCamera));
+    private Material skyMaterial;
 
-        initSkysphere(playerCamera.getzFar() < RADIUS ? playerCamera.getzFar() : RADIUS);
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 1.0f, max = 8192.0f)
+    private float sunExponent = 512.0f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 1.0f, max = 8192.0f)
+    private float moonExponent = 256.0f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 10.0f)
+    private float skyDaylightBrightness = 0.6f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 10.0f)
+    private float skyNightBrightness = 1.0f;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+    @SuppressWarnings("FieldCanBeLocal")
+    private float turbidity;
+
+    public BackdropNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+
+        worldRenderer = context.get(WorldRenderer.class);
+        SubmersibleCamera activeCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThroughNormalized(activeCamera));
+
+        initSkysphere(activeCamera.getzFar() < RADIUS ? activeCamera.getzFar() : RADIUS);
 
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFBO(READONLY_GBUFFER, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
 
         addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
@@ -90,6 +118,12 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         //       due to vertex ordering the polygons we do see are the GL_BACK ones.
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+
+        skyMaterial = getMaterial(SKY_MATERIAL);
+
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL, "texSky180"));
     }
 
     public void enableWireframe() {
@@ -113,6 +147,23 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
     public void process() {
         PerformanceMonitor.startActivity("rendering/backdrop");
 
+        // Common Shader Parameters
+
+        sunDirection = backdropProvider.getSunDirection(false);
+        turbidity = backdropProvider.getTurbidity();
+
+        skyMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        skyMaterial.setFloat3("sunVec", sunDirection, true);
+
+        // Shader Parameters
+
+        skyMaterial.setFloat3("zenith", getAllWeatherZenith(backdropProvider.getSunDirection(false).y, turbidity), true);
+        skyMaterial.setFloat("turbidity", turbidity, true);
+        skyMaterial.setFloat("colorExp", backdropProvider.getColorExp(), true);
+        skyMaterial.setFloat4("skySettings", sunExponent, moonExponent, skyDaylightBrightness, skyNightBrightness, true);
+
+        // Actual Node Processing
+
         glCallList(skySphere); // Draws the skysphere
 
         PerformanceMonitor.endActivity();
@@ -127,5 +178,26 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         glNewList(skySphere, GL11.GL_COMPILE);
         sphere.draw(sphereRadius, SLICES, STACKS);
         glEndList();
+    }
+
+    static Vector3f getAllWeatherZenith(float thetaSunAngle, float turbidity) {
+        float thetaSun = (float) Math.acos(thetaSunAngle);
+        Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
+        Vector4f cx2 = new Vector4f(0.00394f, -0.03202f, 0.06377f, -0.02903f);
+        Vector4f cx3 = new Vector4f(0.25886f, 0.06052f, -0.21196f, 0.11693f);
+        Vector4f cy1 = new Vector4f(0.0f, 0.00317f, -0.00610f, 0.00275f);
+        Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
+        Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
+
+        float t2 = turbidity * turbidity;
+        float chi = (4.0f / 9.0f - turbidity / 120.0f) * ((float) Math.PI - 2.0f * thetaSun);
+
+        Vector4f theta = new Vector4f(1, thetaSun, thetaSun * thetaSun, thetaSun * thetaSun * thetaSun);
+
+        float why = (4.0453f * turbidity - 4.9710f) * (float) Math.tan(chi) - 0.2155f * turbidity + 2.4192f;
+        float x = t2 * cx1.dot(theta) + turbidity * cx2.dot(theta) + cx3.dot(theta);
+        float y = t2 * cy1.dot(theta) + turbidity * cy2.dot(theta) + cy3.dot(theta);
+
+        return new Vector3f(why, x, y);
     }
 }

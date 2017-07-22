@@ -16,15 +16,17 @@
 
 package org.terasology.i18n;
 
+import org.terasology.engine.Uri;
+import org.terasology.module.sandbox.API;
+
 import java.util.Locale;
 import java.util.function.Consumer;
-
-import org.terasology.engine.Uri;
 
 /**
  * A translation system that consists of different projects. An i18n string can either
  * contain a project URI or be used directly in a project.
  */
+@API
 public interface TranslationSystem {
 
     /**

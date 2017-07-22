@@ -17,10 +17,12 @@ package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.dag.RenderPipelineTask;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.utilities.Assets;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -28,8 +30,10 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 
+// TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
+
 /**
- * This StateChange generates the tasks that set and reset input textures.
+ * Sets a texture asset as the input for a material.
  *
  * Input textures are assigned to a texture unit and this is then communicated to the shader.
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
@@ -39,14 +43,21 @@ public class SetInputTexture implements StateChange {
     private final int textureId;
     private final ResourceUrn materialUrn;
     private final String materialParameter;
+    private Material material;
 
     private SetInputTexture defaultInstance;
-    private SetInputTextureTask task;
 
     /**
-     * Constructs an instance of SetInputTexture initialized with the given objects.
+     * The constructor, to be used in the initialise method of a node.
      *
-     * See SetInputTextureTask for more information on how the constructor's parameters are used.
+     * Sample use:
+     *      addDesiredStateChange(new SetInputTexture(0, water.getId(), "engine:prog.chunk", "textureWater"));
+     *
+     * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
+     * passed to a shader program using the material/parameter pair provided on construction. This allow for a
+     * texture asset to be used by a shader program as an input.
+     *
+     * See the source of the process() method for the nitty gritty details.
      *
      * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureId an integer representing the opengl name of a texture. This is usually the return value of glGenTexture().
@@ -58,6 +69,45 @@ public class SetInputTexture implements StateChange {
         this.textureId = textureId;
         this.materialUrn = materialUrn;
         this.materialParameter = materialParameter;
+
+        this.material = getMaterial(materialUrn);
+
+        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset if necessary
+    }
+
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetInputTexture(0, "engine:waterTex", "engine:prog.chunk", "textureWater"));
+     *
+     * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
+     * passed to a shader program using the material/parameter pair provided on construction. This allow for a
+     * texture asset to be used by a shader program as an input.
+     *
+     * See the source of the process() method for the nitty gritty details.
+     *
+     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
+     * @param textureUrn a String identifying a loaded texture, whose id will then be used by this StateChange.
+     * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
+     * @param materialParameter a String representing the variable within the shader holding the texture.
+     */
+    public SetInputTexture(int textureSlot, String textureUrn, ResourceUrn materialUrn, String materialParameter) {
+        this.textureSlot = textureSlot;
+        this.materialUrn = materialUrn;
+        this.materialParameter = materialParameter;
+
+        this.material = getMaterial(materialUrn);
+
+        Optional<Texture> optionalTexture = Assets.getTexture(textureUrn);
+        if (optionalTexture.isPresent()) {
+            this.textureId = optionalTexture.get().getId();
+        } else {
+            this.textureId = 0;
+            // TODO: Maybe throw some exception or use Logger.error()?
+        }
+
+        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset if necessary
     }
 
     private SetInputTexture(int textureSlot, ResourceUrn materialUrn, String materialParameter) {
@@ -66,20 +116,9 @@ public class SetInputTexture implements StateChange {
         this.materialUrn = materialUrn;
         this.materialParameter = materialParameter;
 
-        defaultInstance = this;
-    }
+        this.material = getMaterial(materialUrn);
 
-    /**
-     * Generates a SetInputTextureTask with the information provided on construction and returns it.
-     *
-     * @return a SetInputTextureTask instance.
-     */
-    @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetInputTextureTask(textureSlot, textureId, materialUrn, materialParameter);
-        }
-        return task;
+        defaultInstance = this;
     }
 
     @Override
@@ -111,40 +150,16 @@ public class SetInputTexture implements StateChange {
         return defaultInstance;
     }
 
-    /**
-     * Instances of this class bind a texture to a texture unit. The integer identifying
-     * the texture unit is then passed to a shader program using the material/parameter
-     * pair provided on construction. See the source of the execute() method for the
-     * nitty gritty details.
-     *
-     * WARNING: RenderPipelineTasks are not meant for direct instantiation and manipulation.
-     * Modules or other parts of the engine should take advantage of them through classes
-     * inheriting from StateChange.
-     */
-    private class SetInputTextureTask implements RenderPipelineTask {
-        private final int textureSlot;
-        private final int textureId;
-        private final Material material;
-        private final String materialParameter;
+    @Override
+    public String toString() {
+        return String.format("%30s: slot %s, texture %s, material %s, parameter %s", this.getClass().getSimpleName(),
+                textureSlot, textureId, material.getUrn().toString(), materialParameter);
+    }
 
-        private SetInputTextureTask(int textureSlot, int textureId, ResourceUrn materialURN, String materialParameter) {
-            this.textureSlot = textureSlot;
-            this.textureId = textureId;
-            this.material = getMaterial(materialURN);
-            this.materialParameter = materialParameter;
-        }
-
-        @Override
-        public void execute() {
-            glActiveTexture(GL_TEXTURE0 + textureSlot);
-            glBindTexture(GL_TEXTURE_2D, textureId);
-            material.setInt(materialParameter, textureSlot, true);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%30s: slot %s, texture %s, material %s, parameter %s", this.getClass().getSimpleName(),
-                    textureSlot, textureId, material.getUrn().toString(), materialParameter);
-        }
+    @Override
+    public void process() {
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        material.setInt(materialParameter, textureSlot, true);
     }
 }

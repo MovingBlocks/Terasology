@@ -13,6 +13,10 @@
                         "text": "${engine:menu#death-screen-title}"
                     },
                     {
+                        "type": "UILabel",
+                        "id": "deathDetails"
+                    },
+                    {
                         "type": "UISpace",
                         "size": [1, 16]
                     },

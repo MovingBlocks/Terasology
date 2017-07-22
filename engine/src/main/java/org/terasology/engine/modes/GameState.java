@@ -32,7 +32,11 @@ public interface GameState {
 
     void init(GameEngine engine);
 
-    void dispose();
+    void dispose(boolean shuttingDown);
+
+    default void dispose() {
+        dispose(false);
+    }
 
     void handleInput(float delta);
 

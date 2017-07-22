@@ -23,7 +23,6 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 
 import java.util.HashSet;
@@ -51,8 +50,8 @@ public abstract class AbstractClient implements Client {
         clientEntity.destroy();
     }
 
-    private EntityRef findClientEntityRef() {
-        for (EntityRef entityRef: CoreRegistry.get(EntityManager.class).getEntitiesWith(ClientInfoComponent.class)) {
+    private EntityRef findClientEntityRef(EntityManager entityManager) {
+        for (EntityRef entityRef: entityManager.getEntitiesWith(ClientInfoComponent.class)) {
             ClientInfoComponent clientInfoComponent = entityRef.getComponent(ClientInfoComponent.class);
             if (clientInfoComponent.playerId.equals(getId())) {
                 return entityRef;
@@ -67,7 +66,7 @@ public abstract class AbstractClient implements Client {
 
         // TODO: Send event for clientInfo creation, don't create here.
 
-        EntityRef clientInfo = findClientEntityRef();
+        EntityRef clientInfo = findClientEntityRef(entityManager);
         if (!clientInfo.exists()) {
             clientInfo = createClientInfoEntity(entityManager);
         }

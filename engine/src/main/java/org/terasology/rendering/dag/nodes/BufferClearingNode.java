@@ -16,7 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.rendering.dag.AbstractNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBOConfig;
 
@@ -53,7 +53,7 @@ public class BufferClearingNode extends AbstractNode {
 
         if (argumentsAreValid) {
             requiresFBO(fboConfig, fboManager);
-            addDesiredStateChange(new BindFBO(fboConfig.getName(), fboManager));
+            addDesiredStateChange(new BindFbo(fboConfig.getName(), fboManager));
             this.clearingMask = clearingMask;
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");

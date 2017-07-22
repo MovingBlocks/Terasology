@@ -51,7 +51,7 @@ public class PlayMusicNode extends Node {
         private boolean playing;
         private boolean finished;
 
-         PlayMusicTask(PlayMusicNode node) {
+        PlayMusicTask(PlayMusicNode node) {
             super(node);
         }
 
@@ -68,7 +68,7 @@ public class PlayMusicNode extends Node {
         }
 
         @Override
-        public void onAudioEnd() {
+        public void onAudioEnd(boolean interrupted) {
             if (playing) {
                 playing = false;
                 finished = true;

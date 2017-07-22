@@ -19,6 +19,8 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.audio.StaticSound;
@@ -38,6 +40,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
@@ -72,6 +75,8 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     private org.terasology.engine.Time time;
 
     private Random random = new FastRandom();
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
 
     @Override
     public void update(float delta) {
@@ -294,5 +299,11 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
             entity.saveComponent(characterSounds);
 
         }
+    }
+
+    @ReceiveEvent
+    public void onRespawn(OnPlayerRespawnedEvent event, EntityRef entity, HealthComponent healthComponent) {
+        healthComponent.currentHealth = healthComponent.maxHealth;
+        entity.saveComponent(healthComponent);
     }
 }

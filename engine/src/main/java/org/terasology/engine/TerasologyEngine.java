@@ -44,6 +44,7 @@ import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -168,6 +169,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
+        this.allSubsystems.add(new TelemetrySubSystem());
     }
 
     public void initialize() {
@@ -233,6 +235,9 @@ public class TerasologyEngine implements GameEngine {
         logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
         logger.info("Max. Memory: {} MiB", Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE);
         logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
+        if (NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE) {
+            logger.warn("Running on a 32-bit JVM on a 64-bit system. This may limit performance.");
+        }
     }
 
     /**
@@ -450,7 +455,7 @@ public class TerasologyEngine implements GameEngine {
         changeStatus(StandardGameStatus.SHUTTING_DOWN);
 
         if (currentState != null) {
-            currentState.dispose();
+            currentState.dispose(true);
             currentState = null;
         }
 
