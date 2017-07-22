@@ -45,23 +45,13 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.widgets.ResettableUIText;
-import org.terasology.rendering.nui.widgets.TextChangeEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.rendering.nui.widgets.*;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -90,6 +80,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
     private ModuleListDownloader metaDownloader;
+    private UICheckbox localOnlyCheckbox;
+    private boolean localOnly;
     private boolean needsUpdate = true;
 
     private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
@@ -176,12 +168,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 moduleSearch.subscribe(new TextChangeEventListener() {
                     @Override
                     public void onTextChange(String oldText, String newText) {
-                        sortedModules.clear();
-                        for (ModuleSelectionInfo m : allSortedModules) {
-                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                                sortedModules.add(m);
-                            }
-                        }
+                        filterText(newText);
                     }
                 });
             }
@@ -360,9 +347,45 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(button -> sortedModules.stream()
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
+
+            localOnlyCheckbox = find("localOnly", UICheckbox.class);
+            localOnlyCheckbox.bindChecked (
+                    new Binding<Boolean>() {
+
+                        @Override
+                        public Boolean get() {
+                            return localOnly;
+                        }
+
+                        @Override
+                        public void set(Boolean value) {
+                            localOnly = value;
+                            logger.info("Value-" + value);
+                            filterText(moduleSearch.getText());
+                            if(value) {
+                                Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+                                while (iter.hasNext()) {
+                                    ModuleSelectionInfo m = iter.next();
+                                    if (!m.isPresent()) {
+                                        iter.remove();
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    private void filterText(String newText) {
+        sortedModules.clear();
+        for (ModuleSelectionInfo m : allSortedModules) {
+            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                sortedModules.add(m);
+            }
+        }
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
