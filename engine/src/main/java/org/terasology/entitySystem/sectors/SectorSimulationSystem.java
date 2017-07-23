@@ -28,13 +28,14 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.ChunkMath;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
+
+import java.util.stream.Collectors;
 
 /**
  * This system handles the sending of sector-level simulation events, so module systems can subscribe to them for their
@@ -45,15 +46,17 @@ import org.terasology.world.chunks.event.OnChunkLoaded;
  * {@link EntityManager#createSectorEntity(long)} or its scope was set by
  * {@link BaseEntityRef#setScope(EntityScope)}.
  *
+ * @see SectorUtil#getWatchedChunks(EntityRef) for the definition of wathed chunks.
+ *
  * It periodically sends a {@link SectorSimulationEvent} to all sector-scope entities, which should trigger any
- * simulation that needs to happen regardless of whether or not the entity's chunk is loaded.
+ * simulation that needs to happen regardless of the status of the entity's watched chunks.
  *
- * It periodically sends a {@link LoadedSectorUpdateEvent} to all sector-scope entities which are in a loaded chunk.
- * This should trigger any block-based or chunk-based actions that need to happen.
+ * It periodically sends a {@link LoadedSectorUpdateEvent} to all sector-scope entities which have at least one watched
+ * chunk that is ready (loaded). This should trigger any block-based or chunk-based actions that need to happen.
  *
- * It also sends {@link OnChunkLoaded} and {@link BeforeChunkUnload} events to the entities, where appropriate. These
- * should be captured by filtering only to entities with a {@link SectorSimulationComponent}, to avoid capturing the
- * event sent to the world entity.
+ * It also sends {@link OnChunkLoaded} and {@link BeforeChunkUnload} events to the entities, whenever the status of a
+ * watched chunk changes. These should be captured by filtering only to entities with a
+ * {@link SectorSimulationComponent}, to avoid capturing the event sent to the world entity.
  */
 @RegisterSystem
 public class SectorSimulationSystem extends BaseComponentSystem {
@@ -69,6 +72,9 @@ public class SectorSimulationSystem extends BaseComponentSystem {
 
     @In
     private Time time;
+
+    @In
+    private ChunkProvider chunkProvider;
 
     public static final String SECTOR_SIMULATION_ACTION = "sector:simulationAction";
 
@@ -98,7 +104,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      * send {@link SectorSimulationEvent} and/or {@link LoadedSectorUpdateEvent}, as appropriate.
      *
      * This periodic event gets processed by
-     * {@link SectorSimulationSystem#processPeriodicSectorEvent(PeriodicActionTriggeredEvent, EntityRef)};
+     * {@link #processPeriodicSectorEvent(PeriodicActionTriggeredEvent, EntityRef)};
      *
      * @param entity the entity to add the periodic event for
      */
@@ -126,7 +132,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
 
     /**
      * Retrieve the periodic event sent to each sector-scope entity, and send the appropriate event(s) depending on the
-     * status of the the chunk the entity is in.
+     * status of the entity's watched chunks.
      *
      * Also send the correct delta, and update the {@link SectorSimulationComponent#lastSimulationTime}.
      *
@@ -138,17 +144,20 @@ public class SectorSimulationSystem extends BaseComponentSystem {
         if (event.getActionId().equals(SECTOR_SIMULATION_ACTION)) {
             float delta = simulationDelta(entity);
 
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null && worldProvider.isBlockRelevant(loc.getWorldPosition())) {
-                sendLoadedSectorUpdateEvent(entity, delta);
-            } else {
+            long readyChunks = SectorUtil.getWatchedChunks(entity).stream()
+                    .filter(chunkProvider::isChunkReady)
+                    .count();
+
+            if (readyChunks == 0) {
                 entity.send(new SectorSimulationEvent(delta));
+            } else {
+                sendLoadedSectorUpdateEvent(entity, delta);
             }
         }
     }
 
     /**
-     * Forward the OnChunkLoaded event to the appropriate sector-scope entities, if their chunk was loaded.
+     * Forward the OnChunkLoaded event to the appropriate sector-scope entities, if they are watching that chunk.
      *
      * @param event the event sent when any chunk is loaded
      * @param worldEntity ignored
@@ -156,8 +165,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void forwardOnChunkLoaded(OnChunkLoaded event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null && ChunkMath.calcChunkPos(loc.getWorldPosition()).equals(event.getChunkPos())) {
+            if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
                 entity.send(new OnChunkLoaded(event.getChunkPos()));
                 sendLoadedSectorUpdateEvent(entity, simulationDelta(entity));
             }
@@ -165,7 +173,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     }
 
     /**
-     * Forward the BeforeChunkUnloaded event to the appropriate sector-scope entities, if their chunk was unloaded.
+     * Forward the BeforeChunkUnloaded event to the appropriate sector-scope entities, if they are watching that chunk.
      *
      * @param event the event sent when any chunk is about to be unloaded
      * @param worldEntity ignored
@@ -173,8 +181,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @ReceiveEvent(components = WorldComponent.class)
     public void forwardChunkUnload(BeforeChunkUnload event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null && ChunkMath.calcChunkPos(loc.getWorldPosition()).equals(event.getChunkPos())) {
+            if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
                 entity.send(new BeforeChunkUnload(event.getChunkPos()));
             }
         }
@@ -188,7 +195,10 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      */
     private void sendLoadedSectorUpdateEvent(EntityRef entity, float delta) {
         entity.send(new SectorSimulationEvent(delta));
-        entity.send(new LoadedSectorUpdateEvent());
+        entity.send(new LoadedSectorUpdateEvent(SectorUtil.getWatchedChunks(entity)
+                .stream()
+                .filter(chunkProvider::isChunkReady)
+                .collect(Collectors.toSet())));
     }
 
     /**

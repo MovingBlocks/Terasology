@@ -16,7 +16,10 @@
 package org.terasology.entitySystem.sectors;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
+
+import java.util.Set;
 
 /**
  * This event will be sent by the {@link SectorSimulationSystem} to allow sector-scope entities to have an effect on the world,
@@ -31,7 +34,26 @@ import org.terasology.module.sandbox.API;
  */
 @API
 public class LoadedSectorUpdateEvent implements Event {
-    public LoadedSectorUpdateEvent() {
 
+    /**
+     * The set of positions of chunks which the sector is watching, and which are ready to be used.
+     */
+    private Set<Vector3i> readyChunks;
+
+    /**
+     * Create a new event with the given {@link #readyChunks}.
+     *
+     * @param readyChunks the readyChunks for the event.
+     *                    @see #readyChunks
+     */
+    public LoadedSectorUpdateEvent(Set<Vector3i> readyChunks) {
+        this.readyChunks = readyChunks;
+    }
+
+    /**
+     * @see #readyChunks
+     */
+    public Set<Vector3i> getReadyChunks() {
+        return readyChunks;
     }
 }
