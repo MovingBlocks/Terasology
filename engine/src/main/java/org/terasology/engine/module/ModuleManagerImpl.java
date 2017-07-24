@@ -36,6 +36,7 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.naming.Name;
 
 
 import java.io.IOException;
@@ -101,21 +102,38 @@ public class ModuleManagerImpl implements ModuleManager {
      * Overrides modules in modules/ with those specified via -classpath in the JVM
      */
     private void loadModulesFromClassPath() {
-        try {
-            // Only attempt this if we're using the standard URLClassLoader
-            if (ClassLoader.getSystemClassLoader() instanceof URLClassLoader) {
-                URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-                ModuleLoader loader = new ModuleLoader(metadataReader);
-                loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        // Only attempt this if we're using the standard URLClassLoader
+        if (ClassLoader.getSystemClassLoader() instanceof URLClassLoader) {
+            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            ModuleLoader loader = new ModuleLoader(metadataReader);
+            Enumeration<URL> moduleInfosInClassPath;
+            loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
-                // We're looking for jars on the classpath with a module.txt
-                Enumeration<URL> moduleInfosInClassPath = urlClassLoader.findResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
-                for (URL url : Collections.list(moduleInfosInClassPath)) {
-                    if (!url.getProtocol().equalsIgnoreCase("jar")) {
-                        continue;
-                    }
+            // We're looking for jars on the classpath with a module.txt
+            try {
+                moduleInfosInClassPath = urlClassLoader.findResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
+            } catch (IOException e) {
+                logger.warn("Failed to search for classpath modules: {}", e);
+                return;
+            }
+
+            for (URL url : Collections.list(moduleInfosInClassPath)) {
+                if (!url.getProtocol().equalsIgnoreCase("jar")) {
+                    continue;
+                }
+
+                try {
                     Reader reader = new InputStreamReader(url.openStream());
-                    String displayName = metadataReader.read(reader).getDisplayName().toString();
+                    ModuleMetadata metaData = metadataReader.read(reader);
+                    String displayName = metaData.getDisplayName().toString();
+                    Name id = metaData.getId();
+
+                    // if the display name is empty or the id is null, this probably isn't a Terasology module
+                    if (null == id || displayName.equalsIgnoreCase("")) {
+                        logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
+                        logger.warn("{}", url);
+                    }
+
                     logger.info("Loading module {} from class path at {}", displayName, url.getFile());
 
                     // the url contains a protocol, and points to the module.txt
@@ -128,10 +146,10 @@ public class ModuleManagerImpl implements ModuleManager {
 
                     Module module = loader.load(path);
                     registry.add(module);
+                } catch (IOException e) {
+                    logger.warn("Failed to load module.txt for classpath module {}", url);
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read classpath modules", e);
         }
     }
 
