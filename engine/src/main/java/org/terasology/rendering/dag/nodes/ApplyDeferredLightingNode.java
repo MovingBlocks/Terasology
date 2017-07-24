@@ -22,6 +22,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
+import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -46,7 +47,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
-        gBufferPair.swap();
+        addDesiredStateChange(new SwapGBuffers(gBufferPair));
 
         addDesiredStateChange(new BindFbo(gBufferPair.getWriteFbo()));
 

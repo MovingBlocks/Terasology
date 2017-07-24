@@ -27,6 +27,7 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
+import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
@@ -104,7 +105,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
-        gBufferPair.swap();
+        addDesiredStateChange(new SwapGBuffers(gBufferPair));
 
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL_URN));
         addDesiredStateChange(new BindFbo(gBufferPair.getWriteFbo()));
