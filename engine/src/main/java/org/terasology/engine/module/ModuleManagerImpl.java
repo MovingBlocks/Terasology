@@ -55,10 +55,9 @@ import java.util.stream.Collectors;
 
 
 public class ModuleManagerImpl implements ModuleManager {
-
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
 
-    private static Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
