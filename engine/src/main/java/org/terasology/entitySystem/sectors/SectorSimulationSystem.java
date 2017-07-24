@@ -30,7 +30,6 @@ import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.PeriodicActionTriggeredEvent;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -63,9 +62,6 @@ public class SectorSimulationSystem extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-
-    @In
-    private WorldProvider worldProvider;
 
     @In
     private DelayManager delayManager;
@@ -144,14 +140,13 @@ public class SectorSimulationSystem extends BaseComponentSystem {
         if (event.getActionId().equals(SECTOR_SIMULATION_ACTION)) {
             float delta = simulationDelta(entity);
 
-            long readyChunks = SectorUtil.getWatchedChunks(entity).stream()
-                    .filter(chunkProvider::isChunkReady)
-                    .count();
+            boolean anyChunksReady = SectorUtil.getWatchedChunks(entity).stream()
+                    .anyMatch(chunkProvider::isChunkReady);
 
-            if (readyChunks == 0) {
-                entity.send(new SectorSimulationEvent(delta));
-            } else {
+            if (anyChunksReady) {
                 sendLoadedSectorUpdateEvent(entity, delta);
+            } else {
+                entity.send(new SectorSimulationEvent(delta));
             }
         }
     }
