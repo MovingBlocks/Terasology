@@ -105,9 +105,9 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         new WireframeTrigger(renderingDebugConfig, this);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
-        addDesiredStateChange(new BindFbo(readOnlyGBuffer));
-        addDesiredStateChange(new SetFboWriteMask(readOnlyGBuffer, true, false, false));
+        FBO writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
+        addDesiredStateChange(new BindFbo(writeOnlyGBuffer));
+        addDesiredStateChange(new SetFboWriteMask(writeOnlyGBuffer, true, false, false));
 
         addDesiredStateChange(new EnableMaterial(SKY_MATERIAL_URN));
 

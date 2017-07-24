@@ -37,6 +37,11 @@ public class SwappableFBO {
         return isSwapped ? readFbo : writeFbo;
     }
 
+    // This function is an alias for getWriteFbo(), meant to make the code clearer at some places.
+    public FBO getLastUpdatedFbo() {
+        return getWriteFbo();
+    }
+
     public void swap() {
         isSwapped = !isSwapped;
     }

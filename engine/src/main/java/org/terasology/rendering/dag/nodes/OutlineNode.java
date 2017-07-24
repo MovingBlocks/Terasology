@@ -47,7 +47,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
-public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class OutlineNode extends ConditionDependentNode {
     public static final SimpleUri OUTLINE_FBO_URI = new SimpleUri("engine:fbo.outline");
     private static final ResourceUrn OUTLINE_MATERIAL_URN = new ResourceUrn("engine:prog.sobel");
 
@@ -56,9 +56,7 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
     private Material outlineMaterial;
 
-    private FBO writeOnlyGBuffer;
-    private float writeOnlyGBufferWidth;
-    private float writeOnlyGBufferHeight;
+    private FBO lastUpdatedGBuffer;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 16.0f)
@@ -77,19 +75,16 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         requiresCondition(() -> renderingConfig.isOutline());
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
+        lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
         FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(outlineFbo));
-
-        update(); // Cheeky way to initialise writeOnlyGBufferWidth, writeOnlyGBufferHeight
-        displayResolutionDependentFBOs.subscribe(this);
 
         addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL_URN));
 
         outlineMaterial = getMaterial(OUTLINE_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, writeOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL_URN, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL_URN, "texDepth"));
     }
 
     /**
@@ -111,8 +106,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
         outlineMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
 
-        outlineMaterial.setFloat("texelWidth", 1.0f / writeOnlyGBufferWidth);
-        outlineMaterial.setFloat("texelHeight", 1.0f / writeOnlyGBufferHeight);
+        outlineMaterial.setFloat("texelWidth", 1.0f / lastUpdatedGBuffer.width());
+        outlineMaterial.setFloat("texelHeight", 1.0f / lastUpdatedGBuffer.height());
 
         outlineMaterial.setFloat("pixelOffsetX", pixelOffsetX);
         outlineMaterial.setFloat("pixelOffsetY", pixelOffsetY);
@@ -122,11 +117,5 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        writeOnlyGBufferWidth = writeOnlyGBuffer.width();
-        writeOnlyGBufferHeight = writeOnlyGBuffer.height();
     }
 }

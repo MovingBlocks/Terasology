@@ -67,13 +67,8 @@ public class HighPassNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL_URN));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getWriteFbo(), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL_URN, "tex"));
-
-        // TODO: Investigate why this was commented out (right from the pre-refactoring code)
-        //addDesiredStateChange(new SetInputTextureFromFbo(textureSlot + 1, READ_ONLY_GBUFFER, DepthTexture,
-        //        displayResolutionDependentFBOs, HIGH_PASS_MATERIAL_URN, "texDepth"));
-        // TODO: also verify why SetInputTextureFromFbo only works with ColorTexture but no other texture types.
     }
 
     /**

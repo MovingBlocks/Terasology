@@ -15,13 +15,10 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.opengl.FBO;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
