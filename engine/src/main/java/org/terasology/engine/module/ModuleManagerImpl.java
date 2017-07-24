@@ -16,33 +16,25 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.module.ClasspathModule;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ModuleLoader;
-import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleMetadataJsonAdapter;
-import org.terasology.module.ModulePathScanner;
-import org.terasology.module.ModuleRegistry;
-import org.terasology.module.TableModuleRegistry;
-import org.terasology.module.sandbox.APIScanner;
-import org.terasology.module.sandbox.BytecodeInjector;
-import org.terasology.module.sandbox.ModuleSecurityManager;
-import org.terasology.module.sandbox.ModuleSecurityPolicy;
-import org.terasology.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.module.*;
+import org.terasology.module.sandbox.*;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Policy;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ModuleManagerImpl implements ModuleManager {
@@ -52,6 +44,7 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
+    private static Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
 
     public ModuleManagerImpl() {
         metadataReader = new ModuleMetadataJsonAdapter();
@@ -70,6 +63,9 @@ public class ModuleManagerImpl implements ModuleManager {
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
+
+        loadModulesFromClassPath();
+
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         scanner.scan(registry, PathManager.getInstance().getModulePaths());
@@ -83,6 +79,44 @@ public class ModuleManagerImpl implements ModuleManager {
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
+    }
+
+    /**
+     * Overrides modules in modules/ with those specified via -classpath in the JVM
+     */
+    private void loadModulesFromClassPath() {
+        try {
+            // Only attempt this if we're using the standard URLClassLoader
+            if (ClassLoader.getSystemClassLoader() instanceof URLClassLoader) {
+                URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+                ModuleLoader loader = new ModuleLoader(metadataReader);
+                loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
+                // We're looking for jars on the classpath with a module.txt
+                Enumeration<URL> moduleInfosInClassPath = urlClassLoader.findResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
+                for (URL url : Collections.list(moduleInfosInClassPath)) {
+                    if(!url.getProtocol().equalsIgnoreCase("jar")) {
+                        continue;
+                    }
+                    Reader reader = new InputStreamReader(url.openStream());
+                    String displayName = metadataReader.read(reader).getDisplayName().toString();
+                    logger.info("Loading module {} from class path at {}", displayName, url.getFile());
+
+                    // the url contains a protocol, and points to the module.txt
+                    // we need to trim both of those away to get the module's path
+                    Path path = Paths.get(url.getFile()
+                            .replace("file:", "")
+                            .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
+                            .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
+                    );
+
+                    Module module = loader.load(path);
+                    registry.add(module);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read classpath modules", e);
+        }
     }
 
     private void setupSandbox() {
