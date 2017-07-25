@@ -23,13 +23,14 @@ import org.terasology.rendering.opengl.SwappableFBO;
  * This is useful for Nodes that want to update the value of the gBuffer, by passing it's contents through a shader.
  *
  * Note that this StateChange is special because unlike all the other StateChanges that modify the state of the
- * system during the execution of the task list, this StateChange does it's job by indirectly changing what data gets
- * sent to future StateChanges, by causing a change in the return value of gBufferPair.get*Buffer().
+ * system during the execution of the task list, this StateChange does it's job during the initialization phase,
+ * changing the final state of the system indirectly by changing what data gets sent to future StateChanges.
+ * It does so by causing a change in the return value of gBufferPair.get*Buffer().
  *
  * Due to this, this StateChange -has- to be added before any calls to gBuferPair.get*Buffer() in the Node.
  */
 public class SwapGBuffers implements StateChange {
-    private static StateChange defaultInstance = new EmptyStateChange();
+    private static StateChange defaultInstance = null;
 
     public SwapGBuffers(SwappableFBO gBufferPair) {
         gBufferPair.swap();
