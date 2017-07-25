@@ -55,7 +55,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo()));
     }
 
     public void enableWireframe() {

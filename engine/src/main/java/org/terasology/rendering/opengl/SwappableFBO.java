@@ -29,17 +29,17 @@ public class SwappableFBO {
         isSwapped = false;
     }
 
-    public FBO getReadFbo() {
+    public FBO getReadOnlyFbo() {
         return isSwapped ? writeFbo : readFbo;
     }
 
-    public FBO getWriteFbo() {
+    public FBO getWriteOnlyFbo() {
         return isSwapped ? readFbo : writeFbo;
     }
 
-    // This function is an alias for getWriteFbo(), meant to make the code clearer at some places.
+    // This function is an alias for getWriteOnlyFbo(), meant to make the code clearer at some places.
     public FBO getLastUpdatedFbo() {
-        return getWriteFbo();
+        return getWriteOnlyFbo();
     }
 
     public void swap() {

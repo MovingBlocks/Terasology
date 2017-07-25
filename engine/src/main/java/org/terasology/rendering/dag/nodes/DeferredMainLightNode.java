@@ -101,8 +101,9 @@ public class DeferredMainLightNode extends AbstractNode {
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteFbo();
+        FBO writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteOnlyFbo();
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        // TODO: make sure to read from the readOnlyGBuffer (which should be the last updated) and write to the writeOnlyGBuffer.
         addDesiredStateChange(new BindFbo(writeOnlyGBuffer));
         addDesiredStateChange(new SetFboWriteMask(writeOnlyGBuffer, false, false, true));
 

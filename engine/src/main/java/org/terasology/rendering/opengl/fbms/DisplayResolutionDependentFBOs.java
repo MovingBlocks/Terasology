@@ -95,7 +95,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     public void update() {
         updateFullScale();
 
-        FBO readOnlyGBuffer = gBufferPair.getReadFbo();
+        FBO readOnlyGBuffer = gBufferPair.getReadOnlyFbo();
         if (readOnlyGBuffer.dimensions().areDifferentFrom(fullScale)) {
             regenerateFbos();
             notifySubscribers();
@@ -111,7 +111,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
    }
 
     private void disposeAllFbos() {
-        // TODO: This should be public, and should be called while disposing the DRDFboM to prevent leaks.
+        // TODO: This should be public, and should be called while disposing an object of this class, to prevent leaks.
         for (SimpleUri urn : fboConfigs.keySet()) {
             fboLookup.get(urn).dispose();
         }

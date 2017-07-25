@@ -46,7 +46,7 @@ import org.terasology.engine.SimpleUri;
  * Default FBOs:
  * writeOnlyGBuffer: this is the primary FBO and its attachments are the target of a good number of rendering operations, eventually storing most information needed for the deferred rendering.
  * readOnlyGBuffer: this FBO holds attachments that are used as input textures by a number of rendering stages.
- * Note that these two FBOs might get swapped during the DAG creation stage, on a node's request. However, this is handled transparently and getWriteOnlyFbo() will always return the FBO appropriate for writing.
+ * Note that these two FBOs may be swapped on a node's request (ping-pong technique). See the DisplayResolutionDependentFboManager class for more details.
  * Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
  * sceneSkyBand and sceneSkyBand1:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
  * sceneReflectiveRefractive:  used to render reflective and refractive surfaces, most obvious case being the water surface

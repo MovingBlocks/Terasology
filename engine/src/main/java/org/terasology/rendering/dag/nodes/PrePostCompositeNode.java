@@ -108,7 +108,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         addDesiredStateChange(new SwapGBuffers(gBufferPair));
 
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL_URN));
-        addDesiredStateChange(new BindFbo(gBufferPair.getWriteFbo()));
+        addDesiredStateChange(new BindFbo(gBufferPair.getWriteOnlyFbo()));
 
         prePostMaterial = getMaterial(PRE_POST_MATERIAL_URN);
 
@@ -124,7 +124,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
         renderingConfig.subscribe(RenderingConfig.VOLUMETRIC_FOG, this);
 
-        FBO readOnlyGBuffer = gBufferPair.getReadFbo();
+        FBO readOnlyGBuffer = gBufferPair.getReadOnlyFbo();
         FBO refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE_FBO_URI);
 
         int textureSlot = 0;

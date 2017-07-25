@@ -80,7 +80,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        ShaderParametersSSAO.setWriteOnlyGBuffer(displayResolutionDependentFBOs.getGBufferPair().getWriteFbo());
+        ShaderParametersSSAO.setWriteOnlyGBuffer(displayResolutionDependentFBOs.getGBufferPair().getWriteOnlyFbo());
 
         // TODO: check for input textures brought in by the material
     }

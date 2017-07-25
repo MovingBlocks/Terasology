@@ -49,11 +49,11 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         addDesiredStateChange(new SwapGBuffers(gBufferPair));
 
-        addDesiredStateChange(new BindFbo(gBufferPair.getWriteFbo()));
+        addDesiredStateChange(new BindFbo(gBufferPair.getWriteOnlyFbo()));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL_URN));
 
-        FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getReadFbo();
+        FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getReadOnlyFbo();
 
         int textureSlot = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture,

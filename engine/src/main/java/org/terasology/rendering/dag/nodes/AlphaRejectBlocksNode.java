@@ -96,7 +96,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo()));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 

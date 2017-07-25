@@ -41,7 +41,7 @@ public final class SetFboWriteMask implements StateChange {
     private boolean renderToLightBuffer;
 
     /**
-     * The constructor, to be used in the initialise method of a node.
+     * Creates an instance of this StateChange, that can be added to a Node's list of desired StateChanges.
      *
      * Sample use:
      *      addDesiredStateChange(new SetFboWriteMask(fbo, true, false, false));

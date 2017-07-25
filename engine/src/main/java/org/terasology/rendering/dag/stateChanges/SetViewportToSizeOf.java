@@ -47,9 +47,7 @@ public final class SetViewportToSizeOf implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
-            assert(displayResolutionDependentFBOs != null);
-            defaultInstance = new SetViewportToSizeOf(displayResolutionDependentFBOs.getGBufferPair().getWriteFbo());
+            defaultInstance = new SetViewportToSizeOf(CoreRegistry.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo());
         }
         return defaultInstance;
     }
