@@ -55,26 +55,4 @@ public class SwapGBuffers implements StateChange {
 
     @Override
     public void process() { }
-
-    private static final class EmptyStateChange implements StateChange {
-        @Override
-        public StateChange getDefaultInstance() {
-            return this;
-        }
-
-        // TODO: Add .hashCode()
-
-        @Override
-        public boolean equals(Object obj) {
-            return (obj instanceof EmptyStateChange);
-        }
-
-        @Override
-        public String toString() {
-            return "Empty State Change";
-        }
-
-        @Override
-        public void process() { }
-    }
 }
