@@ -39,7 +39,7 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
-    private LocalModulesCheckBoxConfig localModulesCheckBoxConfig = new LocalModulesCheckBoxConfig();
+    private SelectModulesConfig selectModulesConfig = new SelectModulesConfig();
 
     /**
      * Create a new, empty config
@@ -90,8 +90,8 @@ public final class RootConfig {
         return security;
     }
 
-    public LocalModulesCheckBoxConfig getLocalModulesCheckBoxConfig() {
-        return localModulesCheckBoxConfig;
+    public SelectModulesConfig getSelectModulesConfig() {
+        return selectModulesConfig;
     }
 
     public NUIEditorConfig getNuiEditor() {

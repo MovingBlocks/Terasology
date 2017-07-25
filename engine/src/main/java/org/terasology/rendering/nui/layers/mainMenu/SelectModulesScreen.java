@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.config.LocalModulesCheckBoxConfig;
+import org.terasology.config.SelectModulesConfig;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -83,7 +83,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private LocalModulesCheckBoxConfig localModulesCheckBoxConfig;
+    private SelectModulesConfig selectModulesConfig;
     @In
     private WorldGeneratorManager worldGenManager;
     @In
@@ -94,7 +94,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private DependencyResolver resolver;
     private ModuleListDownloader metaDownloader;
     private UICheckbox localOnlyCheckbox;
-    private boolean localOnly;
     private boolean needsUpdate = true;
 
     @Override
@@ -113,7 +112,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
 
-        localModulesCheckBoxConfig = config.getLocalModulesCheckBoxConfig();
+        selectModulesConfig = config.getSelectModulesConfig();
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -365,29 +364,33 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
                         @Override
                         public Boolean get() {
-                            return localModulesCheckBoxConfig.isChecked();
+                            filterText(moduleSearch.getText());
+                            prepareModuleList(selectModulesConfig.isChecked());
+                            return selectModulesConfig.isChecked();
                         }
 
                         @Override
                         public void set(Boolean value) {
-                            localOnly = value;
-                            logger.info(value+"= value ");
-                            localModulesCheckBoxConfig.setIsChecked(value);
+                            selectModulesConfig.setIsChecked(value);
                             filterText(moduleSearch.getText());
-                            if (value) {
-                                Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
-                                while (iter.hasNext()) {
-                                    if (!iter.next().isPresent()) {
-                                        iter.remove();
-                                    }
-                                }
-                            }
+                            prepareModuleList(value);
                         }
                     }
             );
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    private void prepareModuleList(boolean checked) {
+        if (selectModulesConfig.isChecked()) {
+            Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+            while (iter.hasNext()) {
+                if (!iter.next().isPresent()) {
+                    iter.remove();
+                }
+            }
+        }
     }
 
     private void filterText(String newText) {

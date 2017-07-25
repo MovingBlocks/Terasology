@@ -121,8 +121,8 @@ public final class Config {
         return createGson().toJsonTree(configObject).toString();
     }
 
-    public LocalModulesCheckBoxConfig getLocalModulesCheckBoxConfig() {
-        return config.getLocalModulesCheckBoxConfig();
+    public SelectModulesConfig getSelectModulesConfig() {
+        return config.getSelectModulesConfig();
     }
 
     /**

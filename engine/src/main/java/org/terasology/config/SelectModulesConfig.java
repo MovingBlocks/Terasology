@@ -15,7 +15,7 @@
  */
 package org.terasology.config;
 
-public class LocalModulesCheckBoxConfig {
+public class SelectModulesConfig {
     private boolean isChecked;
 
     public boolean isChecked() {
