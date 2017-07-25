@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.LocalModulesCheckBoxConfig;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -81,6 +82,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private ModuleManager moduleManager;
     @In
     private Config config;
+
+    private LocalModulesCheckBoxConfig localModulesCheckBoxConfig;
     @In
     private WorldGeneratorManager worldGenManager;
     @In
@@ -109,6 +112,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
+
+        localModulesCheckBoxConfig = config.getLocalModulesCheckBoxConfig();
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -360,12 +365,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
                         @Override
                         public Boolean get() {
-                            return localOnly;
+                            return localModulesCheckBoxConfig.isChecked();
                         }
 
                         @Override
                         public void set(Boolean value) {
                             localOnly = value;
+                            logger.info(value+"= value ");
+                            localModulesCheckBoxConfig.setIsChecked(value);
                             filterText(moduleSearch.getText());
                             if (value) {
                                 Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();

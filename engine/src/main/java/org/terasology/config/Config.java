@@ -121,6 +121,10 @@ public final class Config {
         return createGson().toJsonTree(configObject).toString();
     }
 
+    public LocalModulesCheckBoxConfig getLocalModulesCheckBoxConfig() {
+        return config.getLocalModulesCheckBoxConfig();
+    }
+
     /**
      * Saves this config to the default configuration file
      */
