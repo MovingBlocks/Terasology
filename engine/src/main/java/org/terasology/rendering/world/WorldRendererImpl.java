@@ -262,7 +262,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode readOnlyGBufferClearingNode = new BufferClearingNode(readOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(readOnlyGBufferClearingNode, "readOnlyGBufferClearingNode");
 
-        BufferClearingNode writeOnlyGBufferClearingNode = new BufferClearingNode(writeOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode writeOnlyGBufferClearingNode = new BufferClearingNode(writeOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(writeOnlyGBufferClearingNode, "writeOnlyGBufferClearingNode");
 
         Node backdropNode = new BackdropNode(context);

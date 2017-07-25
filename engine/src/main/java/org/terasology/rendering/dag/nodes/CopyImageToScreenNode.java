@@ -34,11 +34,8 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class CopyImageToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
-
-    private int displayWidth;
-    private int displayHeight;
 
     public CopyImageToScreenNode(Context context) {
         super(context);
@@ -46,14 +43,10 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        update(); // Cheeky way to initialise displayWidth, displayHeight
-        displayResolutionDependentFBOs.subscribe(this);
-
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
 
         addDesiredStateChange(new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture,
-                displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture"));
+                context.get(DisplayResolutionDependentFBOs.class), DEFAULT_TEXTURED_MATERIAL_URN, "texture"));
     }
 
     @Override
@@ -62,14 +55,8 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
-        glViewport(0, 0, displayWidth, displayHeight);
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        displayWidth = Display.getWidth();
-        displayHeight = Display.getHeight();
     }
 }

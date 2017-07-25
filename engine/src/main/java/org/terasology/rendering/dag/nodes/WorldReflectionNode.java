@@ -19,7 +19,6 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
@@ -50,6 +49,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
@@ -68,7 +68,6 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
 public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
-    private static final SimpleUri REFLECTED_FBO_URI = new SimpleUri("engine:fbo.sceneReflected");
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
