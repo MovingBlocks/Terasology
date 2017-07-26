@@ -148,7 +148,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         return texture.get();
     }
 
-    public static void setWriteOnlyGBuffer(FBO fbo) {
+    public static void setLastUpdatedGBuffer(FBO fbo) {
         writeOnlyGBuffer = fbo;
     }
 }

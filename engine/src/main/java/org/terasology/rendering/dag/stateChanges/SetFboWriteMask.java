@@ -25,8 +25,8 @@ import org.terasology.rendering.opengl.FBO;
  * A write mask is useful to render to an FBO leaving some of its attachments untouched.
  *
  * This particular state change independently enables/disables writing to the color, depth and light accumulation
- * attachments of an FBO. At this stage this functionality makes sense only in the context of the readOnly/writeOnly
- * gBuffers as only those buffers have all the attachments mentioned.
+ * attachments of an FBO. At this stage this functionality makes sense only in the context of the gBuffers,
+ * as only those buffers have all the attachments mentioned.
  *
  * The behaviour of this state change in relation to FBOs that do not have all the relevant attachments has not been
  * investigated.
@@ -46,7 +46,7 @@ public final class SetFboWriteMask implements StateChange {
      * Sample use:
      *      addDesiredStateChange(new SetFboWriteMask(fbo, true, false, false));
      *
-     * @param fbo The FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
+     * @param fbo The FBO whose render masks have to be modified - usually only the lastUpdatedGBuffer.
      * @param renderToColorBuffer A boolean indicating whether the Color buffer of the given FBO should be written to.
      * @param renderToDepthBuffer A boolean indicating whether the DepthStencil buffer of the given FBO should be written to.
      * @param renderToLightBuffer A boolean indicating whether the Light Accumulation buffer of the given FBO should be written to.
@@ -61,7 +61,7 @@ public final class SetFboWriteMask implements StateChange {
     /**
      * Creates the default instance of this class for the given FBO, resetting all masks to true.
      *
-     * @param fbo The FBO whose render masks have to be modified - usually only the writeOnlyGBuffer FBO.
+     * @param fbo The FBO whose render masks have to be modified - usually only the lastUpdatedGBuffer.
      */
     private SetFboWriteMask(FBO fbo) {
         this.fbo = fbo;

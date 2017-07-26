@@ -68,7 +68,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering, stored in the engine:writeOnlyGBuffer.
+     * calculations to the previously flat-lit world rendering, stored in the lastUpdatedGBuffer.
      * <p>
      * See http://en.wikipedia.org/wiki/Deferred_shading for more information on the general subject.
      */

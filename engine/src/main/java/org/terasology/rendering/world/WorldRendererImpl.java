@@ -249,7 +249,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addPostProcessingNodes(renderGraph);
 
-        addImageToSceeenNodes(renderGraph);
+        addCopyOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -282,14 +282,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig readOnlyGBufferConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
-        FBOConfig writeOnlyGBufferConfig = displayResolutionDependentFBOs.getFboConfig(WRITEONLY_GBUFFER);
+        FBOConfig lastUpdatedGBufferConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
+        FBOConfig staleGBufferConfig = displayResolutionDependentFBOs.getFboConfig(WRITEONLY_GBUFFER);
 
-        BufferClearingNode readOnlyGBufferClearingNode = new BufferClearingNode(readOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(readOnlyGBufferClearingNode, "readOnlyGBufferClearingNode");
+        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(lastUpdatedGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(lastUpdatedGBufferClearingNode, "lastUpdatedGBufferClearingNode");
 
-        BufferClearingNode writeOnlyGBufferClearingNode = new BufferClearingNode(writeOnlyGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(writeOnlyGBufferClearingNode, "writeOnlyGBufferClearingNode");
+        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(staleGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(staleGBufferClearingNode, "staleGBufferClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
@@ -447,7 +447,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
     }
 
-    private void addImageToSceeenNodes(RenderGraph renderGraph) {
+    private void addCopyOutputNodes(RenderGraph renderGraph) {
         Node copyToVRFrameBufferNode = new CopyImageToHMDNode(context);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
 

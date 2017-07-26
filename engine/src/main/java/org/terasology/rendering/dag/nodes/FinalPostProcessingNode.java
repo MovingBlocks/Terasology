@@ -78,9 +78,9 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         addDesiredStateChange(new BindFbo(finalBuffer));
         addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
 
-        FBO writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        ShaderParametersPost.setWriteOnlyGBuffer(writeOnlyGBuffer);
-        ShaderParametersDebug.setWriteOnlyGBuffer(writeOnlyGBuffer);
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        ShaderParametersPost.setLastUpdatedGBuffer(lastUpdatedGBuffer);
+        ShaderParametersDebug.setLastUpdatedGBuffer(lastUpdatedGBuffer);
     }
 
     /**

@@ -108,7 +108,7 @@ public class DeferredPointLightsNode extends AbstractNode {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        // TODO: make sure to read from the readOnlyGBuffer (which should be the last updated) and write to the writeOnlyGBuffer.
+        // TODO: make sure to read from the lastUpdatedGBuffer and write to the staleGBuffer.
         addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));
         addDesiredStateChange(new SetFboWriteMask(lastUpdatedGBuffer, false, false, true));
 

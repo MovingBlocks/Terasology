@@ -120,7 +120,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         }
     }
 
-    public static void setWriteOnlyGBuffer(FBO fbo) {
+    public static void setLastUpdatedGBuffer(FBO fbo) {
         writeOnlyGBuffer = fbo;
     }
 }

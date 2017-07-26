@@ -138,7 +138,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getRendering().getDebug().getStage().getIndex());
     }
 
-    public static void setWriteOnlyGBuffer(FBO fbo) {
+    public static void setLastUpdatedGBuffer(FBO fbo) {
         writeOnlyGBuffer = fbo;
     }
 }

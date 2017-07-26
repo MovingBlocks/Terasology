@@ -19,19 +19,19 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.SwappableFBO;
 
 /**
- * This StateChange is used to swap the readOnly and writeOnly FBOs in the gBufferPair.
+ * This StateChange is used to swap the lastUpdated and the stale FBOs in the gBufferPair.
  *
  * This is useful for Nodes that want to do rendering operations requiring the latest content stored in the
  * gBufferPair, to be used as inputs for a shader.
- * For instance, if Node A writes to the writeOnly FBO, Node B must swap the buffers so that the content of the
- * writeOnly FBO becomes the content of the readOnly FBO.
+ * For instance, if Node A writes to the lastUpdatedGBuffer, Node B reads from lastUpdatedGBuffer and writes to
+ * the staleGBuffer, followed by a swap.
  *
  * Note that this StateChange is special because unlike all the other StateChanges that modify the state of the
  * system during the execution of the task list, this StateChange does its job on construction and therefore
  * during the _generation_ of the task list.
  *
  * This is done by causing a change in the return value of gBufferPair.get*Buffer().
- * As a consequence this StateChange -must- be added before any calls to gBuferPair.get*Buffer() in the Node.
+ * As a consequence this StateChange -must- be added after all calls to gBuferPair.get*Buffer() in the Node.
  *
  * Note that theoretically a very similar result could have been achieved with a method available to all rendering
  * nodes. However, a state change adds an item to the task list. This way when the task list is printed out for
