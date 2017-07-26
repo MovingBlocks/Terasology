@@ -23,8 +23,10 @@ import org.terasology.rendering.opengl.SwappableFBO;
  *
  * This is useful for Nodes that want to do rendering operations requiring the latest content stored in the
  * gBufferPair, to be used as inputs for a shader.
- * For instance, if Node A writes to the lastUpdatedGBuffer, Node B reads from lastUpdatedGBuffer and writes to
- * the staleGBuffer, followed by a swap.
+ * For instance, once a node has read from the lastUpdated gBuffer and written to the stale gBuffer,
+ * it will probably want to swap the buffers so that the "stale" gBuffer becomes the "lastUpdated"
+ * one and the next node can rely on it.
+ * There can be exceptions though, as consecutive nodes might all write to the lastUpdated gBuffer, requiring no swaps.
  *
  * Note that this StateChange is special because unlike all the other StateChanges that modify the state of the
  * system during the execution of the task list, this StateChange does its job on construction and therefore
