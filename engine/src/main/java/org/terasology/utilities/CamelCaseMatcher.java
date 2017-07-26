@@ -44,7 +44,9 @@ public final class CamelCaseMatcher {
         Set<String> matches = Sets.newHashSet();
 
         String query = queryStr.replaceAll("\\*", ".*?");
+        query = query.replaceAll("\\(|\\)|\\[|\\]|\\{|\\}", "");
         query = query.replaceFirst("\\b([a-z]+)", "$1[a-z]*");
+
         String re = "\\b(" + query.replaceAll("([A-Z][^A-Z]*)", "$1[^A-Z]*") + ".*?)\\b";
 
         Pattern regex = Pattern.compile(re);

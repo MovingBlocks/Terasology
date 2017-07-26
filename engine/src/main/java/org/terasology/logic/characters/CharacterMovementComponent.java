@@ -28,6 +28,9 @@ import org.terasology.rendering.nui.properties.Range;
 import java.util.List;
 
 /**
+ * This component is attached to all character entities. It governs movement and stores
+ * associated paramenters. <br/>
+ * The {@link AliveCharacterComponent} should necessarily be attached to the character entity for the movement systems to work.
  */
 public final class CharacterMovementComponent implements Component {
 

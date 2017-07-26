@@ -40,6 +40,11 @@ public class NetworkConfig {
     private int serverPort;
 
     /**
+     * The server's Message of The Day
+     */
+    private String serverMOTD;
+
+    /**
      * The master server URL
      */
     private String masterServer = "meta.terasology.org";
@@ -62,6 +67,14 @@ public class NetworkConfig {
 
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
+    }
+
+    public String getServerMOTD() {
+        return serverMOTD;
+    }
+
+    public void setServerMOTD(String serverMOTD) {
+        this.serverMOTD = serverMOTD;
     }
 
     public void addServerInfo(ServerInfo serverInfo) {

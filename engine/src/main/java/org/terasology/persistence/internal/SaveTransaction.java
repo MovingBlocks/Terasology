@@ -18,7 +18,6 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.nio.zipfs.ZipFileSystemProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -37,6 +36,7 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileSystem;
@@ -47,7 +47,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -347,8 +346,6 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void writeChunkStores() throws IOException {
-        FileSystemProvider zipProvider = new ZipFileSystemProvider();
-
         Path chunksPath = storagePathProvider.getWorldTempPath();
         Files.createDirectories(chunksPath);
         if (storeChunksInZips) {
@@ -360,7 +357,7 @@ public class SaveTransaction extends AbstractTask {
                 if (zip == null) {
                     Path targetPath = storagePathProvider.getChunkZipTempPath(chunkZipPos);
                     Files.deleteIfExists(targetPath);
-                    zip = zipProvider.newFileSystem(targetPath, CREATE_ZIP_OPTIONS);
+                    zip = FileSystems.newFileSystem(URI.create("jar:" + targetPath.toUri()), CREATE_ZIP_OPTIONS);
                     newChunkZips.put(chunkZipPos, zip);
                 }
                 Path chunkPath = zip.getPath(storagePathProvider.getChunkFilename(chunkPos));

@@ -70,10 +70,6 @@ public final class OpenGLUtils {
         glViewport(0, 0, fbo.width(), fbo.height());
     }
 
-    public static void setViewportToSizeOf(DefaultDynamicFBOs defaultDynamicFBO) {
-        glViewport(0, 0, defaultDynamicFBO.width(), defaultDynamicFBO.height());
-    }
-
     /**
      * Unbinds any currently bound FBO and binds the default Frame Buffer,
      * which is usually the Display (be it the full screen or a window).

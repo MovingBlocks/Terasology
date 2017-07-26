@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
-
 
 /**
  * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
@@ -76,7 +76,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
     protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
 
-    private Set<FBOManagerSubscriber> fboManagerSubscribers = Sets.newHashSet();
+    private List<FBOManagerSubscriber> fboManagerSubscribers = new ArrayList<>();
 
     protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
@@ -227,19 +227,47 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
-            logger.error("Failed to retrieve FBO '" + fboName + "'!");
+            logger.warn("Failed to retrieve FBO '" + fboName + "'!");
         }
 
         return fbo;
     }
 
     /**
-     * TODO: add javadocs
+     * Returns an FBOConfig given its name.
      *
-     * @param subscriber
+     * If no FBOConfig maps to the given name, null is returned and an error is logged.
+     *
+     * @param fboName a ResourceUrn representing the name of an FBO
+     * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
+     */
+    @Override
+    public FBOConfig getFboConfig(ResourceUrn fboName) {
+        FBOConfig fboConfig = fboConfigs.get(fboName);
+
+        if (fboConfig == null) {
+            logger.warn("Failed to retrieve FBOConfig '" + fboName + "'!");
+        }
+
+        return fboConfig;
+    }
+
+    /**
+     * Adds a given FBOManagerSubscriber to the subscription list, notifying it of any changes to the FBOs.
+     *
+     * Note that an object cannot re-subscribe.
+     *
+     * @param subscriber An FBOManagerSubscriber that wants to subscribe
+     * @return a boolean indicating whether the subscription succeeded.
      */
     @Override
     public boolean subscribe(FBOManagerSubscriber subscriber) {
+        // Iterate through all existing fboManagerSubscribers, and refuse to subscribe if the given subscriber has already subscribed
+        for (FBOManagerSubscriber fboManagerSubscriber: fboManagerSubscribers) {
+            if (fboManagerSubscriber == subscriber) {
+                return false;
+            }
+        }
         return fboManagerSubscribers.add(subscriber);
     }
 

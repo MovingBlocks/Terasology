@@ -82,6 +82,9 @@ public class UIText extends CoreWidget {
     @LayoutConfig
     protected boolean readOnly;
 
+    @LayoutConfig
+    private boolean passwordMode;
+
     /** The position of the cursor in the text box. */
     protected int cursorPosition;
 
@@ -177,6 +180,12 @@ public class UIText extends CoreWidget {
         cursorTexture = Assets.getTexture("engine:white").get();
     }
 
+    private String buildPasswordString() {
+        char[] arr = new char[text.get().length()];
+        Arrays.fill(arr, '*');
+        return String.valueOf(arr);
+    }
+
     /**
      * Handles how the widget is drawn.
      *
@@ -184,6 +193,14 @@ public class UIText extends CoreWidget {
      */
     @Override
     public void onDraw(Canvas canvas) {
+        lastWidth = canvas.size().x;
+        if (isEnabled()) {
+            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        }
+        drawAll(canvas, canvas.size().x);
+    }
+
+    protected void drawAll(Canvas canvas, int multilineWidth) {
         if (text.get() == null) {
             text.set("");
         }
@@ -194,26 +211,21 @@ public class UIText extends CoreWidget {
         if (isShowingHintText) {
             setCursorPosition(0);
             if (!text.get().equals(hintText) && text.get().endsWith(hintText)) {
-                text.set(text.get().substring(0, text.get().length()-hintText.length()));
+                text.set(text.get().substring(0, text.get().length() - hintText.length()));
                 setCursorPosition(text.get().length());
                 isShowingHintText = false;
             }
         }
         lastFont = canvas.getCurrentStyle().getFont();
-        lastWidth = canvas.size().x;
-        if (isEnabled()) {
-            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
-        }
         correctCursor();
-
-        int widthForDraw = (multiline) ? canvas.size().x : lastFont.getWidth(getText());
-
+        String textToDraw = passwordMode ? buildPasswordString() : text.get();
+        int widthForDraw = (multiline) ? multilineWidth : lastFont.getWidth(textToDraw);
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
              SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
             if (isShowingHintText && !readOnly) {
-                canvas.drawTextRaw(text.get(), lastFont, canvas.getCurrentStyle().getHintTextColor(), canvas.getRegion());
+                canvas.drawTextRaw(textToDraw, lastFont, canvas.getCurrentStyle().getHintTextColor(), canvas.getRegion());
             } else {
-                canvas.drawText(text.get(), canvas.getRegion());
+                canvas.drawText(textToDraw, canvas.getRegion());
             }
             if (isFocused()) {
                 if (hasSelection()) {
@@ -354,12 +366,19 @@ public class UIText extends CoreWidget {
                         eventHandled = true;
                     }
                 }
-                if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
+                if(event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER){
+                    for (ActivateEventListener listener : activationListeners) {
+                        listener.onActivated(this);
+                    }
+                    eventHandled = true;
+                }
+                else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
                     String fullText = text.get();
                     String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
                     setText(before + event.getKeyCharacter() + after);
                     setCursorPosition(Math.min(getCursorPosition(), selectionStart) + 1);
+                    eventHandled = true;
                 }
             } else {
                 String fullText = text.get();
@@ -437,6 +456,13 @@ public class UIText extends CoreWidget {
                         }
                         case KeyId.ENTER:
                         case KeyId.NUMPAD_ENTER: {
+                            if (event.getKeyboard().isKeyDown(Keyboard.Key.LEFT_SHIFT.getId()) ||
+                                    event.getKeyboard().isKeyDown(Keyboard.Key.RIGHT_SHIFT.getId())) {
+                                if (multiline) {
+                                    setText(fullText + "\n");
+                                    increaseCursorPosition(1);
+                                }
+                            }
                             for (ActivateEventListener listener : activationListeners) {
                                 listener.onActivated(this);
                             }

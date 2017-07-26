@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class ComponentSystemManager {
             }
             Name moduleId = environment.getModuleProviding(type);
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode, isHeadless)) {
+            if (registerInfo.value().isValidFor(netMode, isHeadless) && areOptionalRequirementsContained(registerInfo,environment)) {
                 systemsByModule.put(moduleId, type);
             }
         }
@@ -103,6 +103,18 @@ public class ComponentSystemManager {
                 }
             }
         }
+    }
+
+    private boolean areOptionalRequirementsContained(RegisterSystem registerSystem, ModuleEnvironment environment) {
+        if (registerSystem.requiresOptional().length == 0) {
+            return true;
+        }
+        for (String moduleName :registerSystem.requiresOptional()) {
+            if(environment.get(new Name(moduleName)) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void register(ComponentSystem object) {

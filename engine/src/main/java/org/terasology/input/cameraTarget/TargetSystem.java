@@ -37,11 +37,20 @@ public class TargetSystem {
     private EntityRef prevTarget = EntityRef.NULL;
 
     private Vector3i targetBlockPos;
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
 
     public TargetSystem(BlockEntityRegistry blockRegistry, Physics physics) {
         this.blockRegistry = blockRegistry;
         this.physics = physics;
+    }
+
+    /**
+     * Gets the position of the block that is currently targeted. If there is currently no target, this will return
+     * a null reference (isTargetAvailable() would have returned false in this case).
+     * @return the target block position in world coordinates, a vector of 3 integers.
+     */
+    public Vector3i getTargetBlockPosition() {
+        return targetBlockPos;
     }
 
     public boolean isTargetAvailable() {

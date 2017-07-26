@@ -69,7 +69,7 @@ public class PlaySoundNode extends Node {
         }
 
         @Override
-        public void onAudioEnd() {
+        public void onAudioEnd(boolean interrupted) {
             if (playing) {
                 playing = false;
                 finished = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,22 +36,20 @@ public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
-    private Set<StateChange> desiredStateResets = Sets.newLinkedHashSet();
     private Map<ResourceUrn, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private NodeTask task;
     private boolean enabled = true;
 
-    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager frameBuffersManager) {
+    protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         ResourceUrn fboName = fboConfig.getName();
 
         if (!fboUsages.containsKey(fboName)) {
-            fboUsages.put(fboName, frameBuffersManager);
+            fboUsages.put(fboName, fboManager);
         } else {
             logger.warn("FBO " + fboName + " is already requested.");
-            return frameBuffersManager.get(fboName);
+            return fboManager.get(fboName);
         }
 
-        return frameBuffersManager.request(fboConfig);
+        return fboManager.request(fboConfig);
     }
 
     @Override
@@ -71,26 +69,14 @@ public abstract class AbstractNode implements Node {
                     stateChange.getClass().getSimpleName(), this.toString());
         }
         desiredStateChanges.add(stateChange);
-        desiredStateResets.add(stateChange.getDefaultInstance());
     }
 
     protected void removeDesiredStateChange(StateChange stateChange) {
         desiredStateChanges.remove(stateChange);
-        desiredStateResets.remove(stateChange.getDefaultInstance());
     }
 
     public Set<StateChange> getDesiredStateChanges() {
         return desiredStateChanges;
-    }
-    public Set<StateChange> getDesiredStateResets() {
-        return desiredStateResets;
-    }
-
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new NodeTask(this);
-        }
-        return task;
     }
 
     @Override

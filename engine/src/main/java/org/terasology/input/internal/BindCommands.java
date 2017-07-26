@@ -61,9 +61,9 @@ public class BindCommands extends BaseComponentSystem {
             requiredPermission = PermissionManager.NO_PERMISSION)
     public String dvorak() {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:left"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
-        inputSystem.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:left"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:right"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
 

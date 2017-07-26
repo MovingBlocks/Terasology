@@ -29,138 +29,121 @@ public class RenderTaskListGeneratorTest {
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new CharlieNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim()); // Strictly speaking we don't need
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim()); // We just do it to avoid attracting
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim()); // too much attention to it.
+        assertEquals("BravoNode",   taskList.get(4).toString().trim()); // too much attention to it.
         assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(6).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(7).toString().trim());
+        assertEquals("CharlieNode", taskList.get(6).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(7).toString().trim());
     }
 
     @Test
     public void testReducePersistingStateChanges() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
-        orderedNodes.add(initialiseNode(new DeltaNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new CharlieNode());
+        orderedNodes.add(new DeltaNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim());
+        assertEquals("BravoNode",   taskList.get(4).toString().trim());
         assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(6).toString().trim());
+        assertEquals("CharlieNode", taskList.get(6).toString().trim());
         assertEquals("----- DeltaNode",        taskList.get(7).toString().trim());
-        assertEquals("SetNameTask: delta",     taskList.get(8).toString().trim());
-        assertEquals("DeltaNode: process()",   taskList.get(9).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(10).toString().trim());
+        assertEquals("SetName: delta",     taskList.get(8).toString().trim());
+        assertEquals("DeltaNode",   taskList.get(9).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(10).toString().trim());
     }
 
     @Test
     public void testReducePersistingStateChangesEcho() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(initialiseNode(new AlphaNode()));
-        orderedNodes.add(initialiseNode(new BravoNode()));
-        orderedNodes.add(initialiseNode(new EchoNode()));
-        orderedNodes.add(initialiseNode(new CharlieNode()));
-        orderedNodes.add(initialiseNode(new DeltaNode()));
+        orderedNodes.add(new AlphaNode());
+        orderedNodes.add(new BravoNode());
+        orderedNodes.add(new EchoNode());
+        orderedNodes.add(new CharlieNode());
+        orderedNodes.add(new DeltaNode());
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
         assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode: process()",   taskList.get(2).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(1).toString().trim());
+        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
         assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode: process()",   taskList.get(4).toString().trim());
-        assertEquals("SetNameTask: bar",       taskList.get(5).toString().trim());
-        assertEquals("----- EchoNode",         taskList.get(6).toString().trim());
-        assertEquals("EchoNode: process()",    taskList.get(7).toString().trim());
+        assertEquals("BravoNode",   taskList.get(4).toString().trim());
+        assertEquals("----- EchoNode",         taskList.get(5).toString().trim());
+        assertEquals("SetName: bar",       taskList.get(6).toString().trim());
+        assertEquals("EchoNode",    taskList.get(7).toString().trim());
         assertEquals("----- CharlieNode",      taskList.get(8).toString().trim());
-        assertEquals("SetNameTask: foo",       taskList.get(9).toString().trim());
-        assertEquals("CharlieNode: process()", taskList.get(10).toString().trim());
+        assertEquals("SetName: foo",       taskList.get(9).toString().trim());
+        assertEquals("CharlieNode", taskList.get(10).toString().trim());
         assertEquals("----- DeltaNode",        taskList.get(11).toString().trim());
-        assertEquals("SetNameTask: delta",     taskList.get(12).toString().trim());
-        assertEquals("DeltaNode: process()",   taskList.get(13).toString().trim());
-
-    }
-
-    private Node initialiseNode(Node node) {
-        node.initialise();
-        return node;
+        assertEquals("SetName: delta",     taskList.get(12).toString().trim());
+        assertEquals("DeltaNode",   taskList.get(13).toString().trim());
+        assertEquals("SetName: bar",   taskList.get(14).toString().trim());
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class AlphaNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public AlphaNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class BravoNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public BravoNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class CharlieNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public CharlieNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class DeltaNode extends AbstractNode {
-        @Override
-        public void initialise() {
+        public DeltaNode() {
             addDesiredStateChange(new SetName("delta"));
         }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class EchoNode extends AbstractNode {
-        @Override
-        public void initialise() {
-
-        }
+        public EchoNode() { }
 
         @Override
-        public void process() {
-        }
+        public void process() { }
     }
 
     // TODO: Add new tests with varying state changes

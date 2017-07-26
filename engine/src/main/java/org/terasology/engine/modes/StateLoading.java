@@ -59,6 +59,7 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -224,7 +225,7 @@ public class StateLoading implements GameState {
     }
 
     @Override
-    public void dispose() {
+    public void dispose(boolean shuttingDown) {
         EngineTime time = (EngineTime) context.get(Time.class);
         time.setPaused(false);
     }
@@ -267,5 +268,10 @@ public class StateLoading implements GameState {
     @Override
     public String getLoggingPhase() {
         return gameManifest.getTitle();
+    }
+
+    @Override
+    public Context getContext() {
+        return context;
     }
 }

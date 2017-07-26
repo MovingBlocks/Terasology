@@ -71,6 +71,7 @@ public class FBOConfig {
     }
 
     public FBOConfig(ResourceUrn fboName, ScalingFactors factors, FBO.Type type) {
+        Preconditions.checkArgument(factors.getScale() != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
         this.scale = factors.getScale();
@@ -78,7 +79,7 @@ public class FBOConfig {
 
 
     public FBOConfig(ResourceUrn fboName, float scale, FBO.Type type) {
-        Preconditions.checkArgument(scale != 0, "scale can not be zero.");
+        Preconditions.checkArgument(scale != 0, "Scale can not be zero.");
         this.fboName = fboName;
         this.type = type;
         this.scale = scale;

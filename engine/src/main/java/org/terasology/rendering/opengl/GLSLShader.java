@@ -374,7 +374,11 @@ public class GLSLShader extends Shader {
                     parameters.put(metadata.getName(), metadata);
                 }
                 updateAvailableFeatures();
-                recompile();
+                try {
+                    recompile();
+                } catch (RuntimeException e) {
+                    logger.warn(e.getMessage());
+                }
             });
         } catch (InterruptedException e) {
             logger.error("Failed to reload {}", getUrn(), e);

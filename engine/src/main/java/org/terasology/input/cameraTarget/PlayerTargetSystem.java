@@ -21,9 +21,11 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.players.FirstPersonHeldItemMountPointComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.PlayerTargetChangedEvent;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -56,6 +58,14 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
         return targetSystem.getTarget();
     }
 
+    /**
+     * Get the position of the block that is currently targeted.
+     * @return the position of the block, as a Vector3i
+     */
+    public Vector3i getTargetBlockPosition() {
+        return targetSystem.getTargetBlockPosition();
+    }
+
     @Override
     public void update(float delta) {
         EntityRef charEntity = player.getCharacterEntity();
@@ -66,6 +76,11 @@ public class PlayerTargetSystem extends BaseComponentSystem implements UpdateSub
             if (charComp != null) {
                 Vector3f dir = player.getViewDirection();
                 float maxDist = charComp.interactionRange;
+                FirstPersonHeldItemMountPointComponent heldItemMountPoint = player.getCameraEntity().getComponent(FirstPersonHeldItemMountPointComponent.class);
+                if (heldItemMountPoint != null && heldItemMountPoint.isTracked()) {
+                    maxDist = heldItemMountPoint.translate.length() + 0.25f;
+                    dir = heldItemMountPoint.translate.normalize();
+                }
                 if (targetSystem.updateTarget(cameraPos, dir, maxDist)) {
                     EntityRef oldTarget = targetSystem.getPreviousTarget();
                     EntityRef newTarget = targetSystem.getTarget();

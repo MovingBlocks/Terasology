@@ -72,6 +72,7 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -530,7 +531,12 @@ public class CoreCommands extends BaseComponentSystem {
         Server server = networkSystem.getServer();
         if (server == null) {
             //TODO: i18n
-            return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+            if (networkSystem.getMode().isServer()) {
+                return "Your player is running on the server";
+            }
+            else {
+                return "Please make sure you are connected to an online server (singleplayer doesn't count)";
+            }
         }
         String[] remoteAddress = server.getRemoteAddress().split("-");
         String address = remoteAddress[1];
@@ -607,5 +613,14 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Clears the console window of previous messages.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void clear() {
         console.clear();
+    }
+
+    /**
+     * Forces all the shaders to recompile
+     */
+    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void recompileShaders() {
+        WorldRendererImpl worldRendererImpl = (WorldRendererImpl)worldRenderer;
+        worldRendererImpl.recompileShaders();
     }
 }

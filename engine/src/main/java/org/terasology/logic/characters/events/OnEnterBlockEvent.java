@@ -20,6 +20,8 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
+ * This event gets sent to the player entity when it enters a new block.
+ * For each block in the player's height, the OnEnterBlockEvent is sent.
  */
 public class OnEnterBlockEvent implements Event {
     private Block oldBlock;

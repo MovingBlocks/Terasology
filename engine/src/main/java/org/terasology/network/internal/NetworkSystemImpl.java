@@ -118,6 +118,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private static final int NULL_NET_ID = 0;
 
     // Shared
+    private Context context;
     private Optional<HibernationManager> hibernationSettings = Optional.empty();
     private NetworkConfig config;
     private NetworkMode mode = NetworkMode.NONE;
@@ -180,6 +181,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 Channel listenChannel = bootstrap.bind(new InetSocketAddress(port));
                 allChannels.add(listenChannel);
                 logger.info("Started server on port {}", port);
+                if (config.getServerMOTD() != null) {
+                    logger.info("Server MOTD is \"{}\"", config.getServerMOTD());
+                } else {
+                    logger.info("No server MOTD is defined");
+                }
 
                 // enumerate all network interfaces that listen
                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -524,14 +530,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         this.entityManager = newEntityManager;
         this.entityManager.subscribeForChanges(this);
-        this.blockManager = CoreRegistry.get(BlockManager.class);
-        this.biomeManager = CoreRegistry.get(BiomeManager.class);
+        this.blockManager = context.get(BlockManager.class);
+        this.biomeManager = context.get(BiomeManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
-        this.storageManager = CoreRegistry.get(StorageManager.class);
+        this.storageManager = context.get(StorageManager.class);
         this.eventLibrary = newEventLibrary;
         this.componentLibrary = entityManager.getComponentLibrary();
 
-        CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
+        context.get(ComponentSystemManager.class).register(new NetworkEntitySystem(this), "engine:networkEntitySystem");
 
         TypeSerializationLibrary typeSerializationLibrary = new TypeSerializationLibrary(entityManager.getTypeSerializerLibrary());
         typeSerializationLibrary.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
@@ -748,6 +754,15 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
+    /**
+     * Sets the context within which this system should operate
+     * @param context
+     */
+    @Override
+    public void setStateContext(Context context) {
+        this.context = context;
+    }
+
     void removeKickedClient(NetClient client) {
         kicked = true;
         disconnectedClients.offer(client);
@@ -819,14 +834,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     NetData.ServerInfoMessage getServerInfoMessage() {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        if (config.getServerMOTD() != null) {
+            serverInfoMessageBuilder.setMOTD(config.getServerMOTD());
+        }
+        serverInfoMessageBuilder.setOnlinePlayersAmount(clientList.size());
+        WorldProvider worldProvider = context.get(WorldProvider.class);
         if (worldProvider != null) {
             NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();
             worldInfoBuilder.setTime(worldProvider.getTime().getMilliseconds());
             worldInfoBuilder.setTitle(worldProvider.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }
-        WorldGenerator worldGen = CoreRegistry.get(WorldGenerator.class);
+        WorldGenerator worldGen = context.get(WorldGenerator.class);
         if (worldGen != null) {
             serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
         }

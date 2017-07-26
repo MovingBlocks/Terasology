@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,10 @@
  */
 package org.terasology.rendering.dag;
 
-
 import com.google.common.base.Objects;
 
 public class SetName implements StateChange {
     private static SetName defaultInstance = new SetName("bar");
-    private SetNameTask task;
 
     private String name;
 
@@ -34,14 +32,6 @@ public class SetName implements StateChange {
     }
 
     @Override
-    public RenderPipelineTask generateTask() {
-        if (task == null) {
-            task = new SetNameTask(name);
-        }
-        return task;
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hashCode(name);
     }
@@ -52,11 +42,6 @@ public class SetName implements StateChange {
     }
 
     @Override
-    public boolean isTheDefaultInstance() {
-        return this.equals(defaultInstance);
-    }
-
-    @Override
     public String toString() {
         return String.format("%30s: %s", this.getClass().getSimpleName(), name);
     }
@@ -64,5 +49,7 @@ public class SetName implements StateChange {
     public String getName() {
         return name;
     }
-}
 
+    @Override
+    public void process() { }
+}

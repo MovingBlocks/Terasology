@@ -44,6 +44,7 @@ import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -53,6 +54,7 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
@@ -145,6 +147,7 @@ public class TerasologyEngine implements GameEngine {
     public TerasologyEngine(TimeSubsystem timeSubsystem, Collection<EngineSubsystem> subsystems) {
 
         this.rootContext = new ContextImpl();
+        rootContext.put(GameEngine.class, this);
         this.timeSubsystem = timeSubsystem;
         /*
          * We can't load the engine without core registry yet.
@@ -166,9 +169,10 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
+        this.allSubsystems.add(new TelemetrySubSystem());
     }
 
-    private void initialize() {
+    public void initialize() {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
@@ -231,6 +235,9 @@ public class TerasologyEngine implements GameEngine {
         logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
         logger.info("Max. Memory: {} MiB", Runtime.getRuntime().maxMemory() / ONE_MEBIBYTE);
         logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
+        if (NonNativeJVMDetector.JVM_ARCH_IS_NONNATIVE) {
+            logger.warn("Running on a 32-bit JVM on a 64-bit system. This may limit performance.");
+        }
     }
 
     /**
@@ -389,53 +396,66 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (!shutdownRequested) {
-            assetTypeManager.reloadChangedOnDisk();
-
-            processPendingState();
-
-            if (currentState == null) {
-                shutdown();
-                break;
-            }
-
-            Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
-
-            for (EngineSubsystem subsystem : allSubsystems) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
-                    subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
-                }
-            }
-
-            while (updateCycles.hasNext()) {
-                float updateDelta = updateCycles.next(); // gameTime gets updated here!
-                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
-                    currentState.update(updateDelta);
-                }
-            }
-
-            // Waiting processes are set by modules via GameThread.a/synch() methods.
-            GameThread.processWaitingProcesses();
-
-            for (EngineSubsystem subsystem : getSubsystems()) {
-                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
-                    subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
-                }
-            }
-            assetTypeManager.disposedUnusedAssets();
-
-            PerformanceMonitor.rollCycle();
-            PerformanceMonitor.startActivity("Other");
-        }
+        while (tick()) { /* do nothing */ }
         PerformanceMonitor.endActivity();
     }
 
-    private void cleanup() {
+    /**
+     * Runs a single "tick" of the engine
+     * @return true if the loop requesting a tick should continue running
+     */
+    public boolean tick() {
+        if (shutdownRequested) {
+            return false;
+        }
+
+        assetTypeManager.reloadChangedOnDisk();
+
+        processPendingState();
+
+        if (currentState == null) {
+            shutdown();
+            return false;
+        }
+
+        Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
+        CoreRegistry.setContext(currentState.getContext());
+        rootContext.get(NetworkSystem.class).setStateContext(currentState.getContext());
+
+        for (EngineSubsystem subsystem : allSubsystems) {
+            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {
+                subsystem.preUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            }
+        }
+
+        while (updateCycles.hasNext()) {
+            float updateDelta = updateCycles.next(); // gameTime gets updated here!
+            try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                currentState.update(updateDelta);
+            }
+        }
+
+        // Waiting processes are set by modules via GameThread.a/synch() methods.
+        GameThread.processWaitingProcesses();
+
+        for (EngineSubsystem subsystem : getSubsystems()) {
+            try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " Subsystem postUpdate")) {
+                subsystem.postUpdate(currentState, timeSubsystem.getEngineTime().getRealDelta());
+            }
+        }
+        assetTypeManager.disposedUnusedAssets();
+
+        PerformanceMonitor.rollCycle();
+        PerformanceMonitor.startActivity("Other");
+        return true;
+    }
+
+    public void cleanup() {
         logger.info("Shutting down Terasology...");
         changeStatus(StandardGameStatus.SHUTTING_DOWN);
 
         if (currentState != null) {
-            currentState.dispose();
+            currentState.dispose(true);
             currentState = null;
         }
 

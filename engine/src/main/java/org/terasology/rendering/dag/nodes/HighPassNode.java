@@ -18,22 +18,23 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
-import org.terasology.rendering.dag.stateChanges.BindFBO;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
-import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFBO.FboTexturesTypes.ColorTexture;
-import static org.terasology.rendering.opengl.DefaultDynamicFBOs.READ_ONLY_GBUFFER;
-import static org.terasology.rendering.opengl.OpenGLUtils.*;
-import static org.terasology.rendering.opengl.ScalingFactors.*;
+
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * An instance of this class generates a high pass image out of the color content of the GBUFFER and stores
@@ -44,42 +45,35 @@ public class HighPassNode extends ConditionDependentNode {
     public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL = new ResourceUrn("engine:prog.highPass");
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
     private float highPassThreshold = 0.05f;
 
-    @In
-    private Config config;
-
-    @In
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
     private Material highPass;
 
-    /**
-     * This method must be called once shortly after instantiation to fully initialize the node
-     * and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        RenderingConfig renderingConfig = config.getRendering();
+    public HighPassNode(Context context) {
+        super(context);
+
+        RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         requiresFBO(HIGH_PASS_FBO_CONFIG, displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFBO(HIGH_PASS_FBO, displayResolutionDependentFBOs));
+        addDesiredStateChange(new BindFbo(HIGH_PASS_FBO, displayResolutionDependentFBOs));
         addDesiredStateChange(new SetViewportToSizeOf(HIGH_PASS_FBO, displayResolutionDependentFBOs));
 
         highPass = getMaterial(HIGH_PASS_MATERIAL);
-        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL.toString()));
+        addDesiredStateChange(new EnableMaterial(HIGH_PASS_MATERIAL));
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFBO(textureSlot, READ_ONLY_GBUFFER.getName(), ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, ColorTexture,
                 displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "tex"));
 
         // TODO: Investigate why this was commented out (right from the pre-refactoring code)
-        //addDesiredStateChange(new SetInputTextureFromFBO(textureSlot + 1, READ_ONLY_GBUFFER, DepthTexture,
+        //addDesiredStateChange(new SetInputTextureFromFbo(textureSlot + 1, READ_ONLY_GBUFFER, DepthTexture,
         //        displayResolutionDependentFBOs, HIGH_PASS_MATERIAL, "texDepth"));
-        // TODO: also verify why SetInputTextureFromFBO only works with ColorTexture but no other texture types.
+        // TODO: also verify why SetInputTextureFromFbo only works with ColorTexture but no other texture types.
     }
 
     /**

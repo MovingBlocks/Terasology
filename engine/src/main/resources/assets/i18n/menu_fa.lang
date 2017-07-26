@@ -79,7 +79,7 @@
     "drop-item": "قطع مطلب",
     "edit-server": "ویرایش",
     "edit-server-title": "اضافه/ویرایش  کارساز (سرور)",
-    "enter-username-message": "Hello and welcome to Terasology's multiplayer!\nWould you like to use a non-default username?",
+    "enter-username-message": "Hello and welcome to Terasology's multiplayer!\nWould you like to update your username?",
     "enum-editor-prompt": "انتخاب مقدار برای منحنی",
     "enum-editor-title": "ویرایشگر منحنی داده ها",
     "error-downloading-server-list": "اشتباه در دانلود فهرست کترساز (سرور)",

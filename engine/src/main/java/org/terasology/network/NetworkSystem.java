@@ -16,6 +16,7 @@
 
 package org.terasology.network;
 
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EventLibrary;
@@ -65,4 +66,6 @@ public interface NetworkSystem extends BlockRegistrationListener {
     int getOutgoingBytesDelta();
 
     void forceDisconnect(Client client);
+
+    void setStateContext(Context context);
 }

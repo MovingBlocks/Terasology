@@ -34,7 +34,7 @@ public final class HealthComponent implements Component {
     @Replicate
     public float fallingDamageSpeedThreshold = 20;
     @Replicate
-    public float horizontalDamageSpeedThreshold = 100;
+    public float horizontalDamageSpeedThreshold = 20;
     @Replicate
     public float excessSpeedDamageMultiplier = 10f;
 

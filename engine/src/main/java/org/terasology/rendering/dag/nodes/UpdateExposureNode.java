@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.In;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.nui.properties.Range;
@@ -31,6 +31,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -44,48 +45,42 @@ import java.nio.ByteBuffer;
  * (1) See https://en.wikipedia.org/wiki/Luma_(video)#Use_of_relative_luminance
  */
 public class UpdateExposureNode extends AbstractNode {
-
     private static final Logger logger = LoggerFactory.getLogger(UpdateExposureNode.class);
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposureNight = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 4.0f)
     private float hdrTargetLuminance = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
-    @In
-    private ImmutableFBOs immutableFBOs;
-
-    @In
-    private Config config;
-
-    @In
     private BackdropProvider backdropProvider;
-
-    @In
     private ScreenGrabber screenGrabber;
 
     private RenderingConfig renderingConfig;
     private FBO downSampledScene;
-    private PBO writeOnlyPBO;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
+    private PBO writeOnlyPbo;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
                                 // This data is then used in the context of eye adaptation.
 
-    /**
-     * Initializes an UpdateExposureNode instance.This method must be called once shortly after instantiation
-     * to fully initialize the node and make it ready for rendering.
-     */
-    @Override
-    public void initialise() {
-        renderingConfig = config.getRendering();
-        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, immutableFBOs);
-        writeOnlyPBO = new PBO(1, 1);
+    public UpdateExposureNode(Context context) {
+        backdropProvider = context.get(BackdropProvider.class);
+        screenGrabber = context.get(ScreenGrabber.class);
+
+        renderingConfig = context.get(Config.class).getRendering();
+        downSampledScene = requiresFBO(DownSamplerForExposureNode.FBO_1X1_CONFIG, context.get(ImmutableFBOs.class));
+        writeOnlyPbo = new PBO(1, 1);
     }
 
     /**
@@ -100,8 +95,8 @@ public class UpdateExposureNode extends AbstractNode {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            writeOnlyPBO.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
-            ByteBuffer pixels = writeOnlyPBO.readBackPixels();
+            writeOnlyPbo.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            ByteBuffer pixels = writeOnlyPbo.readBackPixels();
 
             if (pixels.limit() < 3) {
                 logger.error("Failed to auto-update the exposure value.");
@@ -144,5 +139,4 @@ public class UpdateExposureNode extends AbstractNode {
             }
         }
     }
-
 }

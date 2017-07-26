@@ -53,6 +53,11 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
+    public String getMOTD() {
+        return info.getMOTD();
+    }
+
+    @Override
     public List<WorldInfo> getWorldInfoList() {
         List<WorldInfo> result = Lists.newArrayList();
 
@@ -79,6 +84,12 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     @Override
     public float getReflectionHeight() {
         return info.getReflectionHeight();
+    }
+
+    @Override
+    public int getOnlinePlayersAmount()
+    {
+        return info.getOnlinePlayersAmount();
     }
 
     @Override

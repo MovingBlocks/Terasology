@@ -20,6 +20,8 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
+ * Sent when the entity is destroyed.
+ * Occurs only after {@link BeforeDestroyEvent} and {@link DestroyEvent} have been sent.
  */
 public class DoDestroyEvent implements Event {
     private EntityRef instigator;

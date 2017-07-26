@@ -28,7 +28,6 @@ import org.terasology.world.WorldProvider;
  * Basic shader parameters for all shader program.
  */
 public class ShaderParametersBase implements ShaderParameters {
-
     public ShaderParametersBase() {
     }
 

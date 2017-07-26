@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
+import org.terasology.logic.characters.events.OnEnterBiomeEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
@@ -35,6 +36,7 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
 import java.math.RoundingMode;
@@ -53,7 +55,6 @@ import java.math.RoundingMode;
  * <br><br>
  * TODO: Refactor to allow additional movement modes.
  * TODO: Detect entry and exit from water while ghosting.
- *
  */
 public class KinematicCharacterMover implements CharacterMover {
 
@@ -108,9 +109,8 @@ public class KinematicCharacterMover implements CharacterMover {
                         new Vector3i(result.getPosition(), RoundingMode.HALF_UP),
                         characterMovementComponent.height);
             }
-
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
-                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
+                checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun(), input.isCrouching());
             }
         }
         result.setTime(initial.getTime() + input.getDeltaMs());
@@ -134,6 +134,11 @@ public class KinematicCharacterMover implements CharacterMover {
         // TODO: This will only work for tall mobs/players and single block mobs
         // is this a different position than previously
         if (!oldPosition.equals(newPosition)) {
+            Biome oldBiome = worldProvider.getBiome(oldPosition);
+            Biome newBiome = worldProvider.getBiome(newPosition);
+            if (oldBiome != newBiome) {
+                entity.send(new OnEnterBiomeEvent(oldPosition, newPosition, oldBiome, newBiome));
+            }
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
             Vector3i currentPosition = new Vector3i(oldPosition);
@@ -167,12 +172,11 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param state        The current state of the character.
      */
     private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
-                           final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
+                           final CharacterStateEvent oldState, EntityRef entity, boolean firstRun, boolean isCrouching) {
         //If we are ghosting or we can't move, the mode cannot be changed.
         if (!state.getMode().respondToEnvironment) {
             return;
         }
-
         Vector3f worldPos = state.getPosition();
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
@@ -195,9 +199,9 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
 
-        updateMode(state, newSwimming, newDiving, newClimbing);
+        updateMode(state, newSwimming, newDiving, newClimbing, isCrouching);
     }
-
+    
     /**
      * Updates a character's movement mode and changes his vertical velocity accordingly.
      * @param state The current state of the character.
@@ -205,7 +209,7 @@ public class KinematicCharacterMover implements CharacterMover {
      * @param newDiving True if the character's body is fully inside liquid blocks.
      * @param newClimbing True if the character has a climbable block near him and is in conditions to climb it (not swimming or diving).
      */
-    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing) {
+    static void updateMode(CharacterStateEvent state, boolean newSwimming, boolean newDiving, boolean newClimbing, boolean isCrouching) {
         if (newDiving) {
             if (state.getMode() != MovementMode.DIVING) {
                 state.setMode(MovementMode.DIVING);
@@ -223,12 +227,15 @@ public class KinematicCharacterMover implements CharacterMover {
                 if (state.getVelocity().y > 0) {
                     state.getVelocity().y += 4;
                 }
-                state.setMode(MovementMode.WALKING);
+                state.setMode(isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
             }
         } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
             //We need to toggle the climbing mode
             state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+            state.setMode((newClimbing) ? MovementMode.CLIMBING : isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
+        }
+        if (state.getMode() == MovementMode.WALKING || state.getMode() == MovementMode.CROUCHING){
+            state.setMode(isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
         }
     }
 
@@ -673,7 +680,13 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         } else {
             if (moveResult.isTopHit() && endVelocity.y > 0) {
-                endVelocity.y = -0.5f * endVelocity.y;
+                if (input.isFirstRun()) {
+                    Vector3f hitVelocity = new Vector3f(state.getVelocity());
+                    hitVelocity.y += (distanceMoved.y / moveDelta.y) * (endVelocity.y - state.getVelocity().y);
+                    logger.debug("Hit at " + hitVelocity);
+                    entity.send(new VerticalCollisionEvent(state.getPosition(), hitVelocity));
+                }
+                endVelocity.y = -0.0f * endVelocity.y;
             }
 
             // Jump again in mid-air only if a jump was requested and there are jumps remaining.
@@ -698,10 +711,14 @@ public class KinematicCharacterMover implements CharacterMover {
 
             state.setGrounded(false);
         }
-        state.getVelocity().set(endVelocity);
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
-            entity.send(new HorizontalCollisionEvent(state.getPosition(), state.getVelocity()));
+            Vector3f hitVelocity = new Vector3f(state.getVelocity());
+            hitVelocity.x += (distanceMoved.x / moveDelta.x) * (endVelocity.x - state.getVelocity().x);
+            hitVelocity.z += (distanceMoved.z / moveDelta.z) * (endVelocity.z - state.getVelocity().z);
+            logger.debug("Hit at " + hitVelocity);
+            entity.send(new HorizontalCollisionEvent(state.getPosition(), hitVelocity));
         }
+        state.getVelocity().set(endVelocity);
         if (state.isGrounded() || movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
             state.setFootstepDelta(
                     state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenFootsteps);
@@ -709,6 +726,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 state.setFootstepDelta(state.getFootstepDelta() - 1);
                 if (input.isFirstRun()) {
                     switch (movementComp.mode) {
+                        case CROUCHING:
                         case WALKING:
                             entity.send(new FootstepEvent());
                             break;

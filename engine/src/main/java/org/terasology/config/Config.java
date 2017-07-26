@@ -41,6 +41,7 @@ import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
+import org.terasology.rendering.nui.layers.mainMenu.LaunchPopup;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.SetMultimapTypeAdapter;
@@ -115,6 +116,14 @@ public final class Config {
 
     public NUIEditorConfig getNuiEditor() {
         return config.getNuiEditor();
+    }
+
+    public IdentityStorageServiceConfig getIdentityStorageService() {
+        return config.getIdentityStorageService();
+    }
+
+    public TelemetryConfig getTelemetryConfig() {
+        return config.getTelemetryConfig();
     }
 
     public String renderConfigAsJson(Object configObject) {

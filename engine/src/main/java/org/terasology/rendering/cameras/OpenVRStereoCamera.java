@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.cameras;
 
+import org.joml.Quaternionf;
+import org.joml.Vector4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
@@ -22,6 +25,7 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.openvrprovider.OpenVRUtil;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.world.WorldProvider;
@@ -243,8 +247,17 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         float halfIPD = (float) Math.sqrt(Math.pow(leftEyePose.m30() - rightEyePose.m30(), 2)
                 + Math.pow(leftEyePose.m31() - rightEyePose.m31(), 2)
                 + Math.pow(leftEyePose.m32() - rightEyePose.m32(), 2)) / 2.0f;
+
+        // set camera orientation
+        Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
+        Quaternionf quaternion = new Quaternionf(vecQuaternion.x,vecQuaternion.y,vecQuaternion.z,vecQuaternion.w);
+        setOrientation(new Quat4f(quaternion.x,quaternion.y,quaternion.z,quaternion.w));
+
+
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix
         rightEyePose = rightEyePose.invert();
+
+
         if (Math.sqrt(Math.pow(leftEyePose.m30(), 2) + Math.pow(leftEyePose.m31(), 2) + Math.pow(leftEyePose.m32(), 2))  < 0.25)  {
             return;
         }
@@ -282,9 +295,13 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
         viewProjectionMatrixLeftEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixLeftEye, projectionMatrixLeftEye);
         viewProjectionMatrixRightEye = MatrixUtils.calcViewProjectionMatrix(viewMatrixRightEye, projectionMatrixRightEye);
 
+        inverseViewProjectionMatrixLeftEye = new Matrix4f(viewProjectionMatrixLeftEye);
+        inverseViewProjectionMatrixRightEye = new Matrix4f(viewProjectionMatrixRightEye);
         inverseViewProjectionMatrixLeftEye.invert(viewProjectionMatrixLeftEye);
         inverseViewProjectionMatrixRightEye.invert(viewProjectionMatrixRightEye);
 
+        inverseProjectionMatrixLeftEye = new Matrix4f(projectionMatrixLeftEye);
+        inverseProjectionMatrixRightEye = new Matrix4f(projectionMatrixRightEye);
         inverseProjectionMatrixLeftEye.invert(projectionMatrixLeftEye);
         inverseProjectionMatrixRightEye.invert(projectionMatrixRightEye);
 

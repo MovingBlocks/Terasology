@@ -85,6 +85,21 @@
                         "widget": "devTools"
                     }
                 }
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#telemetry-button}",
+                "id": "telemetry",
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-bottom": {
+                        "offset": 8
+                    },
+                    "position-left": {
+                        "offset": 8
+                    }
+                }
             }
         ]
     }

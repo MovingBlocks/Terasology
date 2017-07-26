@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes;
 
+import org.terasology.context.Context;
 import org.terasology.engine.GameEngine;
 
 /**
@@ -31,7 +32,11 @@ public interface GameState {
 
     void init(GameEngine engine);
 
-    void dispose();
+    void dispose(boolean shuttingDown);
+
+    default void dispose() {
+        dispose(false);
+    }
 
     void handleInput(float delta);
 
@@ -48,4 +53,6 @@ public interface GameState {
      * @return identifies the target for logging events
      */
     String getLoggingPhase();
+
+    Context getContext();
 }
