@@ -152,7 +152,7 @@
                                     "height": 24,
                                     "position-horizontal-center": {},
                                     "position-bottom": {
-                                        "target": "BOTTOM",
+                                        "target": "TOP",
                                         "widget": "checkBoxes",
                                         "offset": 8
                                     }
