@@ -93,7 +93,6 @@ import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_8X8_CONFIG;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.FIRST_LATE_BLUR_FBO_URI;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO_URI;
-import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPING_FBO_URI;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
@@ -295,13 +294,19 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
-        String label = "hazeIntermediateNode";
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeIntermediateNode = new HazeNode(context, writeOnlyGBufferConfig, hazeIntermediateConfig, label);
+        FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
+
+        String label = "hazeIntermediateNode";
+        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo, label);
         renderGraph.addNode(hazeIntermediateNode, label);
 
         FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
-        HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateConfig, hazeFinalConfig, label);
+        FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
+
+        HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo, label);
         renderGraph.addNode(hazeFinalNode, "hazeFinalNode");
     }
 
@@ -400,33 +405,42 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node highPassNode = new HighPassNode(context);
         renderGraph.addNode(highPassNode, "highPassNode");
 
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
         FBOConfig halfScaleBloomConfig = new FBOConfig(BloomBlurNode.HALF_SCALE_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
-        FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO_URI, QUARTER_SCALE, FBO.Type.DEFAULT);
-        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+        FBO halfScaleBloomFbo = displayResolutionDependentFBOs.request(halfScaleBloomConfig);
 
         label = "halfScaleBlurredBloom";
-        BloomBlurNode halfScaleBlurredBloom = new BloomBlurNode(context, HighPassNode.HIGH_PASS_FBO_CONFIG, halfScaleBloomConfig, label);
+        BloomBlurNode halfScaleBlurredBloom = new BloomBlurNode(context, displayResolutionDependentFBOs.get(HighPassNode.HIGH_PASS_FBO_URI), halfScaleBloomFbo, label);
         renderGraph.addNode(halfScaleBlurredBloom, label);
 
+        FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO_URI, QUARTER_SCALE, FBO.Type.DEFAULT);
+        FBO quarterScaleBloomFbo = displayResolutionDependentFBOs.request(quarterScaleBloomConfig);
+
         label = "quarterScaleBlurredBloom";
-        BloomBlurNode quarterScaleBlurredBloom = new BloomBlurNode(context, halfScaleBloomConfig, quarterScaleBloomConfig, label);
+        BloomBlurNode quarterScaleBlurredBloom = new BloomBlurNode(context, halfScaleBloomFbo, quarterScaleBloomFbo, label);
         renderGraph.addNode(quarterScaleBlurredBloom, label);
 
+        FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
+        FBO one8thScaleBloomFbo = displayResolutionDependentFBOs.request(one8thScaleBloomConfig);
+
         label = "one8thScaleBlurredBloom";
-        BloomBlurNode one8thScaleBlurredBloom = new BloomBlurNode(context, quarterScaleBloomConfig, one8thScaleBloomConfig, label);
+        BloomBlurNode one8thScaleBlurredBloom = new BloomBlurNode(context, quarterScaleBloomFbo, one8thScaleBloomFbo, label);
         renderGraph.addNode(one8thScaleBlurredBloom, label);
 
-        // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects - TODO: place next line closer to ToneMappingNode eventually.
-        FBOConfig toneMappedConfig = new FBOConfig(TONE_MAPPING_FBO_URI, FULL_SCALE, FBO.Type.HDR);
+        // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
-        FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
+        FBO firstLateBlurFbo = displayResolutionDependentFBOs.request(firstLateBlurConfig);
 
         label = "firstLateBlurNode";
-        LateBlurNode firstLateBlurNode = new LateBlurNode(context, toneMappedConfig, firstLateBlurConfig, label);
+        LateBlurNode firstLateBlurNode = new LateBlurNode(context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo, label);
         renderGraph.addNode(firstLateBlurNode, label);
 
+        FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
+        FBO secondLateBlurFbo = displayResolutionDependentFBOs.request(secondLateBlurConfig);
+
         label = "secondLateBlurNode";
-        LateBlurNode secondLateBlurNode = new LateBlurNode(context, firstLateBlurConfig, secondLateBlurConfig, label);
+        LateBlurNode secondLateBlurNode = new LateBlurNode(context, firstLateBlurFbo, secondLateBlurFbo, label);
         renderGraph.addNode(secondLateBlurNode, label);
 
         Node finalPostProcessingNode = new FinalPostProcessingNode(context);
