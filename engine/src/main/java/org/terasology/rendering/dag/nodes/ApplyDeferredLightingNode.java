@@ -47,23 +47,23 @@ public class ApplyDeferredLightingNode extends AbstractNode {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
-        addDesiredStateChange(new SwapGBuffers(gBufferPair));
-
-        addDesiredStateChange(new BindFbo(gBufferPair.getWriteOnlyFbo()));
+        addDesiredStateChange(new BindFbo(gBufferPair.getStaleFbo()));
 
         addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL_URN));
 
-        FBO readOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getReadOnlyFbo();
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaque"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, NormalsTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, NormalsTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   readOnlyGBuffer, LightAccumulationTexture,
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   lastUpdatedGBuffer, LightAccumulationTexture,
             displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
+
+        addDesiredStateChange(new SwapGBuffers(gBufferPair));
     }
 
     /**

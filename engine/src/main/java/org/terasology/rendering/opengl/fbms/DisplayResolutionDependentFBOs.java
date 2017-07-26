@@ -95,7 +95,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     public void update() {
         updateFullScale();
 
-        FBO readOnlyGBuffer = gBufferPair.getReadOnlyFbo();
+        FBO readOnlyGBuffer = gBufferPair.getStaleFbo();
         if (readOnlyGBuffer.dimensions().areDifferentFrom(fullScale)) {
             regenerateFbos();
             notifySubscribers();

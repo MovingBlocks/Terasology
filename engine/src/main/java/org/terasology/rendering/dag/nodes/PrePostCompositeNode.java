@@ -105,10 +105,8 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
-        addDesiredStateChange(new SwapGBuffers(gBufferPair));
-
         addDesiredStateChange(new EnableMaterial(PRE_POST_MATERIAL_URN));
-        addDesiredStateChange(new BindFbo(gBufferPair.getWriteOnlyFbo()));
+        addDesiredStateChange(new BindFbo(gBufferPair.getStaleFbo()));
 
         prePostMaterial = getMaterial(PRE_POST_MATERIAL_URN);
 
@@ -124,14 +122,14 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
         renderingConfig.subscribe(RenderingConfig.VOLUMETRIC_FOG, this);
 
-        FBO readOnlyGBuffer = gBufferPair.getReadOnlyFbo();
+        FBO lastUpdatedGBuffer = gBufferPair.getLastUpdatedFbo();
         FBO refractiveReflectiveFbo = displayResolutionDependentFBOs.get(REFRACTIVE_REFLECTIVE_FBO_URI);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaque"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, readOnlyGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneReflectiveRefractive"));
         setReflectiveRefractiveNormalsInputTexture = new SetInputTextureFromFbo(textureSlot++, refractiveReflectiveFbo, NormalsTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSceneReflectiveRefractiveNormals");
         setSsaoInputTexture = new SetInputTextureFromFbo(textureSlot++, SSAO_BLURRED_FBO_URI, ColorTexture, displayResolutionDependentFBOs, PRE_POST_MATERIAL_URN, "texSsao");
@@ -150,6 +148,8 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
         if (hazeIsEnabled) {
             addDesiredStateChange(setHazeInputTexture);
         }
+
+        addDesiredStateChange(new SwapGBuffers(gBufferPair));
     }
 
     /**

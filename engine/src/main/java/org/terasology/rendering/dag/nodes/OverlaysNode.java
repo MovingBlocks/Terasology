@@ -58,7 +58,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         SubmersibleCamera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
     }

@@ -107,11 +107,10 @@ public class DeferredPointLightsNode extends AbstractNode {
         addDesiredStateChange(new DisableDepthTest());
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        FBO writeOnlyGBuffer = displayResolutionDependentFBOs.getGBufferPair().getWriteOnlyFbo();
         FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
         // TODO: make sure to read from the readOnlyGBuffer (which should be the last updated) and write to the writeOnlyGBuffer.
-        addDesiredStateChange(new BindFbo(writeOnlyGBuffer));
-        addDesiredStateChange(new SetFboWriteMask(writeOnlyGBuffer, false, false, true));
+        addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));
+        addDesiredStateChange(new SetFboWriteMask(lastUpdatedGBuffer, false, false, true));
 
         initLightSphereDisplayList();
 

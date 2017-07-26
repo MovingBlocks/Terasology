@@ -19,27 +19,22 @@ package org.terasology.rendering.opengl;
  * TODO: Add Javadocs
  */
 public class SwappableFBO {
-    private FBO readFbo;
-    private FBO writeFbo;
+    private FBO lastUpdatedFbo;
+    private FBO staleFbo;
     private boolean isSwapped;
 
-    public SwappableFBO(FBO readFbo, FBO writeFbo) {
-        this.readFbo = readFbo;
-        this.writeFbo = writeFbo;
+    public SwappableFBO(FBO lastUpdatedFbo, FBO staleFbo) {
+        this.lastUpdatedFbo = lastUpdatedFbo;
+        this.staleFbo = staleFbo;
         isSwapped = false;
     }
 
-    public FBO getReadOnlyFbo() {
-        return isSwapped ? writeFbo : readFbo;
+    public FBO getStaleFbo() {
+        return isSwapped ? lastUpdatedFbo : staleFbo;
     }
 
-    public FBO getWriteOnlyFbo() {
-        return isSwapped ? readFbo : writeFbo;
-    }
-
-    // This function is an alias for getWriteOnlyFbo(), meant to make the code clearer at some places.
     public FBO getLastUpdatedFbo() {
-        return getWriteOnlyFbo();
+        return isSwapped ? staleFbo : lastUpdatedFbo;
     }
 
     public void swap() {

@@ -60,7 +60,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
         requiresCondition(() -> !renderingDebugConfig.isFirstPersonElementsHidden());
         renderingDebugConfig.subscribe(RenderingDebugConfig.FIRST_PERSON_ELEMENTS_HIDDEN, this);
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
         // this guarantee the objects drawn by this node are always drawn in front of everything else
         addDesiredStateChange(new SetDepthFunction(GL_ALWAYS));

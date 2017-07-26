@@ -93,7 +93,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getWriteOnlyFbo()));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
