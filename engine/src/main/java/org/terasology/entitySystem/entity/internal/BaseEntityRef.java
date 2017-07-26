@@ -123,9 +123,12 @@ public abstract class BaseEntityRef extends EntityRef {
     }
 
     @Override
-    public void setSectorScope(long maxDelta) {
+    public void setSectorScope(float maxDelta) {
         setScope(SECTOR);
-        getComponent(SectorSimulationComponent.class).maxDelta = maxDelta;
+        SectorSimulationComponent simulationComponent = getComponent(SectorSimulationComponent.class);
+        simulationComponent.maxDelta = maxDelta;
+        saveComponent(simulationComponent);
+
     }
 
     @Override
