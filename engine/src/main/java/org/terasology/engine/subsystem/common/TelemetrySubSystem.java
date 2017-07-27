@@ -75,17 +75,7 @@ public class TelemetrySubSystem implements EngineSubsystem {
         TelemetryLogstashAppender telemetryLogstashAppender = new TelemetryLogstashAppender(rootContext);
         lc.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(telemetryLogstashAppender);
     }
-
-    @Override
-    public void preShutdown() {
-
-        // TODO: REMOVE this when the telemetry is ready to users
-        Config config = context.get(Config.class);
-        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
-        telemetryConfig.setTelemetryEnabled(false);
-        telemetryConfig.setErrorReportingEnabled(false);
-    }
-
+    
     @Override
     public void shutdown() {
 
