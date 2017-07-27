@@ -42,7 +42,9 @@ public class TelemetryEmitter extends BatchEmitter {
 
     public static final String DEFAULT_COLLECTOR_HOST = "utility.terasology.org";
 
-    public static final int DEFAULT_COLLECTOR_PORT = 80;
+    public static final String DEFAULT_COLLECTOR_OWNER = "Terasology Community";
+
+    public static final int DEFAULT_COLLECTOR_PORT = 14654;
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryEmitter.class);
 

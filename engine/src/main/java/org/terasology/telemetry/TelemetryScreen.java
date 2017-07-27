@@ -133,7 +133,9 @@ public class TelemetryScreen extends CoreScreenLayer {
 
     private void pushAddServerPopupAndStartEmitter() {
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        addServerPopup.removeTip();
         ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
+        serverInfo.setOwner(TelemetryEmitter.DEFAULT_COLLECTOR_OWNER);
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
@@ -150,7 +152,9 @@ public class TelemetryScreen extends CoreScreenLayer {
     private void pushAddServerPopupAndStartLogBackAppender() {
 
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        addServerPopup.removeTip();
         ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST, TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
+        serverInfo.setOwner(TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER);
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             StringBuilder destinationLogstash = new StringBuilder();
