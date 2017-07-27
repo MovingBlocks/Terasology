@@ -97,7 +97,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
         // TODO: Find a better way to do this
         prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
-        prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersSSAO());
+        prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersEmpty());
