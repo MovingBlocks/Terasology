@@ -35,7 +35,6 @@ import java.util.Map;
 public class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
-    private boolean isHeadless;
     private Context context;
 
     @TelemetryField
@@ -86,8 +85,7 @@ public class SystemContextMetric extends Metric {
         jvmVersion = System.getProperty("java.vm.version");
         context = CoreRegistry.get(Context.class);
         DisplayDevice display = context.get(DisplayDevice.class);
-        isHeadless = display.isHeadless();
-        if (!isHeadless) {
+        if (!display.isHeadless()) {
             openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
             openGLVersion = GL11.glGetString(GL11.GL_VERSION);
             openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
