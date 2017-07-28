@@ -42,7 +42,6 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.shader.ShaderParameters;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -68,7 +67,6 @@ public class GLSLMaterial extends BaseMaterial {
     private int activeFeaturesMask;
 
     private final ShaderManager shaderManager;
-    private ShaderParameters shaderParameters;
 
     private DisposalAction disposalAction;
     private MaterialData materialData;
@@ -82,15 +80,6 @@ public class GLSLMaterial extends BaseMaterial {
         reload(data);
     }
 
-    public ShaderParameters getShaderParameters() {
-        return shaderParameters;
-    }
-
-    public void setShaderParameters(ShaderParameters param) {
-        this.shaderParameters = param;
-        param.initialParameters(this);
-    }
-
     @Override
     public void enable() {
         if (shaderManager.getActiveMaterial() != this || activeFeaturesChanged) {
@@ -100,11 +89,6 @@ public class GLSLMaterial extends BaseMaterial {
             // Make sure the shader manager knows that this program is currently active
             shaderManager.setActiveMaterial(this);
             activeFeaturesChanged = false;
-
-            // Set the shader parameters if available
-            if (shaderParameters != null) {
-                shaderParameters.applyParameters(this);
-            }
         }
     }
 
@@ -150,9 +134,6 @@ public class GLSLMaterial extends BaseMaterial {
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
             int featureMask = ShaderProgramFeature.getBitset(permutation);
             disposalAction.shaderPrograms.put(featureMask, shader.linkShaderProgram(featureMask));
-        }
-        if (shaderParameters != null) {
-            shaderParameters.initialParameters(this);
         }
 
         //resolves #966
