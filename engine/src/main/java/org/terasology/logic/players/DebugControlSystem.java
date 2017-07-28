@@ -136,11 +136,6 @@ public class DebugControlSystem extends BaseComponentSystem {
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
                     event.consume();
                     break;
-                case Keyboard.KeyId.F7:
-                    config.getRendering().getDebug().cycleStage();
-                    entity.send(new ConsoleMessageEvent("Set debug stage to: " + config.getRendering().getDebug().getStage()));
-                    event.consume();
-                    break;
                 case Keyboard.KeyId.F8:
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();

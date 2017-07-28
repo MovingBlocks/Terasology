@@ -221,10 +221,6 @@ public class GLSLShader extends Shader {
             builder.append("#define CLAMP_LIGHTING \n");
         }
 
-        for (RenderingDebugConfig.DebugRenderingStage stage : RenderingDebugConfig.DebugRenderingStage.values()) {
-            builder.append("#define ").append(stage.getDefineName()).append(" int(").append(stage.getIndex()).append(") \n");
-        }
-
         for (ChunkVertexFlag vertexFlag : ChunkVertexFlag.values()) {
             builder.append("#define ").append(vertexFlag.getDefineName()).append(" int(").append(vertexFlag.getValue()).append(") \n");
         }
