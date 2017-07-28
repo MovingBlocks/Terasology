@@ -31,12 +31,11 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -47,13 +46,14 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.WorldProvider;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
@@ -85,13 +85,16 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     private float outputFboWidth;
     private float outputFboHeight;
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.01f, max = 12.0f)
     private float ssaoStrength = 1.75f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.1f, max = 25.0f)
     private float ssaoRad = 1.5f;
 
     private FBO ssaoFbo;
-    private FBO lastUpdatedGBuffer;
+
+    private Camera activeCamera;
 
     private final Random random = new FastRandom();
 
@@ -99,6 +102,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     public AmbientOcclusionNode(Context context) {
         super(context);
+
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
@@ -114,7 +119,13 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        // TODO: check for input textures brought in by the material
+
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+
+        int texId = 0;
+        addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(texId, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texNormals"));
 
         if (ssaoSamples == null) {
             ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS * 3);
@@ -141,8 +152,43 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         }
 
         ssaoMaterial.setFloat3("ssaoSamples", ssaoSamples);
+    }
 
-        // TODO: check for input textures brought in by the material
+    /**
+     * If Ambient Occlusion is enabled in the render settings, this method generates and
+     * stores the necessary images into their own FBOs. The stored images are eventually
+     * combined with others.
+     * <p>
+     * For further information on Ambient Occlusion see: http://en.wikipedia.org/wiki/Ambient_occlusion
+     */
+    @Override
+    public void process() {
+        PerformanceMonitor.startActivity("rendering/ambientOcclusion");
+
+        Texture ssaoNoiseTexture = updateNoiseTexture();
+
+        // TODO: Convert this to StateChange
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
+        ssaoMaterial.setInt("texNoise", 2, true);
+
+        ssaoMaterial.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
+
+        ssaoMaterial.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+        ssaoMaterial.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+
+        ssaoMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
+        ssaoMaterial.setFloat2("noiseTexelSize", NOISE_TEXEL_SIZE, NOISE_TEXEL_SIZE, true);
+
+        renderFullscreenQuad();
+
+        PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void update() {
+        outputFboWidth = ssaoFbo.width();
+        outputFboHeight = ssaoFbo.height();
     }
 
     private Texture updateNoiseTexture() {
@@ -167,93 +213,5 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
                     new ByteBuffer[]{noiseValues}, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST), Texture.class);
         }
         return texture.get();
-    }
-
-    /**
-     * If Ambient Occlusion is enabled in the render settings, this method generates and
-     * stores the necessary images into their own FBOs. The stored images are eventually
-     * combined with others.
-     * <p>
-     * For further information on Ambient Occlusion see: http://en.wikipedia.org/wiki/Ambient_occlusion
-     */
-    @Override
-    public void process() {
-        PerformanceMonitor.startActivity("rendering/ambientOcclusion");
-
-        ssaoMaterial.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f, true);
-
-        // TODO: obtain once in superclass?
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        BackdropProvider backdropProvider = CoreRegistry.get(BackdropProvider.class);
-
-        // TODO: move into BaseMaterial?
-        if (worldRenderer != null && backdropProvider != null) {
-            ssaoMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
-            ssaoMaterial.setFloat("tick", worldRenderer.getMillisecondsSinceRenderingStart(), true);
-            ssaoMaterial.setFloat("sunlightValueAtPlayerPos", worldRenderer.getTimeSmoothedMainLightIntensity(), true);
-
-            SubmersibleCamera activeCamera = worldRenderer.getActiveCamera();
-            if (activeCamera != null) {
-                final Vector3f cameraDir = activeCamera.getViewingDirection();
-                final Vector3f cameraPosition = activeCamera.getPosition();
-
-                ssaoMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
-                ssaoMaterial.setFloat3("cameraPosition", cameraPosition.x, cameraPosition.y, cameraPosition.z, true);
-                ssaoMaterial.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z, true);
-                ssaoMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
-            }
-
-            Vector3f sunDirection = backdropProvider.getSunDirection(false);
-            ssaoMaterial.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z, true);
-        }
-
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-        if (worldProvider != null) {
-            ssaoMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
-        }
-
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
-
-        int texId = 0;
-
-        // TODO: move to node
-        if (lastUpdatedGBuffer != null) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            lastUpdatedGBuffer.bindDepthTexture();
-            ssaoMaterial.setInt("texDepth", texId++, true);
-            GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            lastUpdatedGBuffer.bindNormalsTexture();
-            ssaoMaterial.setInt("texNormals", texId++, true);
-        }
-
-        Texture ssaoNoiseTexture = updateNoiseTexture();
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
-        ssaoMaterial.setInt("texNoise", texId++, true);
-
-        // TODO: move to material?
-        ssaoMaterial.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
-
-        if (CoreRegistry.get(WorldRenderer.class) != null) {
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            if (activeCamera != null) {
-                ssaoMaterial.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
-                ssaoMaterial.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
-            }
-        }
-
-        ssaoMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
-        ssaoMaterial.setFloat2("noiseTexelSize", NOISE_TEXEL_SIZE, NOISE_TEXEL_SIZE, true);
-
-        renderFullscreenQuad();
-
-        PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        outputFboWidth = ssaoFbo.width();
-        outputFboHeight = ssaoFbo.height();
     }
 }
