@@ -22,6 +22,8 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModuleRegistry;
+import org.terasology.naming.NameVersion;
+import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 /**
  * TODO Type description
@@ -29,6 +31,10 @@ import org.terasology.module.ModuleRegistry;
 public interface ModuleManager {
 
     ModuleRegistry getRegistry();
+
+    ModuleInstaller createInstallerForModules(Iterable<RemoteModule> modules, MultiFileTransferProgressListener progressListener);
+
+    ModuleInstaller createInstallerForModuleNames(Iterable<NameVersion> modules, MultiFileTransferProgressListener progressListener);
 
     ModuleEnvironment getEnvironment();
 

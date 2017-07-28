@@ -34,6 +34,8 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.naming.NameVersion;
+import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,6 +46,7 @@ import java.security.Policy;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ModuleManagerImpl implements ModuleManager {
 
@@ -104,6 +107,17 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleRegistry getRegistry() {
         return registry;
+    }
+
+    @Override
+    public ModuleInstaller createInstallerForModules(Iterable<RemoteModule> modules, MultiFileTransferProgressListener progressListener) {
+        return new ModuleInstaller(this, () -> modules, progressListener);
+    }
+
+    @Override
+    public ModuleInstaller createInstallerForModuleNames(Iterable<NameVersion> modules, MultiFileTransferProgressListener progressListener) {
+        // TODO
+        return null;
     }
 
     @Override

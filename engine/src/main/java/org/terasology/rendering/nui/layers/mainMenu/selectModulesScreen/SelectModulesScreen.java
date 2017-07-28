@@ -25,17 +25,15 @@ import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleListDownloader;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.RemoteModule;
-import org.terasology.engine.module.RemoteModuleExtension;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
-import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
@@ -55,12 +53,8 @@ import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
-import org.terasology.utilities.download.MultiFileDownloader;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -380,47 +374,21 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return;
         }
 
-        Map<URL, Path> urlToTargetMap = determineDownloadUrlsFor(modulesToDownload);
-
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
         confirmPopup.setMessage("Confirm Download", modulesToDownload.size() + " modules will be downloaded");
-        confirmPopup.setOkHandler(() -> downloadModules(urlToTargetMap));
+        confirmPopup.setOkHandler(() -> downloadModules(modulesToDownload.stream().map(ModuleSelectionInfo::getOnlineVersion)::iterator));
     }
 
-    private void downloadModules(Map<URL, Path> urlToTargetMap) {
-        final WaitPopup<List<Path>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
-        loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
-        popup.onSuccess(paths -> {
-            for (Path filePath : paths) {
-                try {
-                    Module module = loader.load(filePath);
-                    modulesLookup.get(module.getId()).setLocalVersion(module);
-                    moduleManager.getRegistry().add(module);
-                } catch (IOException e) {
-                    logger.warn("Could not load module {}", filePath.getFileName(), e);
-                    return;
-                }
+    private void downloadModules(Iterable<RemoteModule> modulesToDownload) {
+        final WaitPopup<List<Module>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.onSuccess(newModules -> {
+            for (Module module : newModules) {
+                modulesLookup.get(module.getId()).setLocalVersion(module);
                 updateValidToSelect();
             }
         });
-        MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, new DownloadPopupProgressListener(popup));
+        ModuleInstaller operation = moduleManager.createInstallerForModules(modulesToDownload, new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
-    }
-
-    private Map<URL, Path> determineDownloadUrlsFor(List<ModuleSelectionInfo> modulesToDownload) {
-        Map<URL, Path> urlToTargetMap = Maps.newLinkedHashMap();
-        for (ModuleSelectionInfo moduleSelectionInfo : modulesToDownload) {
-            ModuleMetadata metaData = moduleSelectionInfo.getOnlineVersion().getMetadata();
-            String version = metaData.getVersion().toString();
-            String id = metaData.getId().toString();
-            URL url = RemoteModuleExtension.getDownloadUrl(metaData);
-            String fileName = String.format("%s-%s.jar", id, version);
-            Path folder = PathManager.getInstance().getHomeModPath().normalize();
-            Path target = folder.resolve(fileName);
-            urlToTargetMap.put(url, target);
-        }
-        return urlToTargetMap;
     }
 
     /**
@@ -618,7 +586,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private static final class ModuleSelectionInfo {
         private Module latestVersion;
         private Module selectedVersion;
-        private Module onlineVersion;
+        private RemoteModule onlineVersion;
         private boolean explicitSelection;
         private boolean validToSelect = true;
 
@@ -630,7 +598,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             latestVersion = module;
         }
 
-        public static ModuleSelectionInfo remote(Module module) {
+        public static ModuleSelectionInfo remote(RemoteModule module) {
             ModuleSelectionInfo info = new ModuleSelectionInfo(null);
             info.setOnlineVersion(module);
             return info;
@@ -660,7 +628,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return selectedVersion != null;
         }
 
-        public Module getOnlineVersion() {
+        public RemoteModule getOnlineVersion() {
             return onlineVersion;
         }
 
@@ -668,7 +636,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return latestVersion;
         }
 
-        public void setOnlineVersion(Module onlineVersion) {
+        public void setOnlineVersion(RemoteModule onlineVersion) {
             this.onlineVersion = onlineVersion;
         }
 
