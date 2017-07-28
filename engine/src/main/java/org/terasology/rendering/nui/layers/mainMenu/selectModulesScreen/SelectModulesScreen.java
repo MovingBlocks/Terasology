@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -25,7 +25,9 @@ import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.ModuleListDownloader;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.RemoteModule;
 import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.i18n.TranslationSystem;
@@ -45,11 +47,15 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.rendering.nui.layers.mainMenu.ConfirmPopup;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.utilities.download.MultiFileDownloader;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
@@ -62,7 +68,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
@@ -399,11 +404,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 updateValidToSelect();
             }
         });
-        ProgressListener progressListener = progress ->
-                popup.setMessage("Downloading required modules", String.format("Please wait ... %d%%", (int) (progress * 100f)));
-        // to ensure that the initial message gets set:
-        progressListener.onProgress(0);
-        MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, progressListener);
+        MultiFileDownloader operation = new MultiFileDownloader(urlToTargetMap, new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
     }
 
@@ -611,35 +612,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         DependencyResolutionFailed(String message) {
             super(message);
-        }
-    }
-
-    private static class MultiFileDownloader implements Callable<List<Path>> {
-        private Map<URL, Path> urlToTargetMap;
-        private ProgressListener progressListener;
-
-         MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
-            this.urlToTargetMap = urlToTargetMap;
-            this.progressListener = progressListener;
-        }
-
-        @Override
-        public List<Path> call() throws Exception {
-            List<Path> downloadedFiles = new ArrayList<>();
-            float fractionPerFile = (float) 1 / urlToTargetMap.size();
-            int index = 0;
-            for (Map.Entry<URL, Path> entry : urlToTargetMap.entrySet()) {
-                float progressWithFiles = fractionPerFile * index;
-                ProgressListener singleDownloadListener = fraction -> {
-                    float totalPrecentDone = progressWithFiles + (fraction / urlToTargetMap.size());
-                    progressListener.onProgress(totalPrecentDone);
-                };
-                FileDownloader fileDownloader = new FileDownloader(entry.getKey(), entry.getValue(),
-                        singleDownloadListener);
-                downloadedFiles.add(fileDownloader.call());
-                index++;
-            }
-            return downloadedFiles;
         }
     }
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.engine.module;
 
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.NetworkConfig;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.RemoteModuleExtension;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 
@@ -35,7 +34,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Downloads module meta-info from a given URL.
  */
-class ModuleListDownloader {
+public class ModuleListDownloader {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleListDownloader.class);
 
@@ -52,7 +51,7 @@ class ModuleListDownloader {
 
     private Thread dlThread;
 
-    ModuleListDownloader(String serverAddress) {
+    public ModuleListDownloader(String serverAddress) {
         this.serverAddress = serverAddress;
         dlThread = new Thread(this::download);
         dlThread.setName("ModuleList Downloader");
@@ -64,7 +63,7 @@ class ModuleListDownloader {
     }
 
     /**
-     * @return a <b>thread-safe</b> list of servers
+     * @return a <b>thread-safe</b> list of modules
      */
     public List<RemoteModule> getModules() {
         return Collections.unmodifiableList(modules);
