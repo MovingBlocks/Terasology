@@ -34,9 +34,6 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.shader.ShaderParameters;
-import org.terasology.rendering.shader.ShaderParametersDebug;
-import org.terasology.rendering.shader.ShaderParametersPost;
-import org.terasology.rendering.shader.ShaderParametersSSAO;
 
 import java.util.Optional;
 import java.util.Set;
@@ -96,7 +93,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured", new ShaderParametersEmpty());
 
         // TODO: Find a better way to do this
-        prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
+        prepareAndStoreShaderProgramInstance("post", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersEmpty());
@@ -110,7 +107,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersEmpty());
-        prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
         prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersEmpty());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersEmpty());
