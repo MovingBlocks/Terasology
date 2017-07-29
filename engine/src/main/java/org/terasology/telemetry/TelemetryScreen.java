@@ -142,6 +142,9 @@ public class TelemetryScreen extends CoreScreenLayer {
             Optional<URL> optionalURL = item.getURL("http");
             if (optionalURL.isPresent()) {
                 telemetryEmitter.changeUrl(optionalURL.get());
+
+                // Save the telemetry destination
+                config.getTelemetryConfig().setTelemetryDestination(optionalURL.get().toString());
             }
         });
         addServerPopup.onCancel((button) -> {
@@ -164,6 +167,9 @@ public class TelemetryScreen extends CoreScreenLayer {
             TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
             telemetryLogstashAppender.addDestination(destinationLogstash.toString());
             telemetryLogstashAppender.start();
+
+            // Save the destination
+            config.getTelemetryConfig().setErrorReportingDestination(destinationLogstash.toString());
         });
         addServerPopup.onCancel((button) -> {
             config.getTelemetryConfig().setErrorReportingEnabled(false);

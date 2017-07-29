@@ -82,8 +82,11 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
         jsonProviders.addProvider(new LogLevelJsonProvider());
         jsonProviders.addProvider(new LoggerNameJsonProvider());
         jsonProviders.addProvider(new ThreadNameJsonProvider());
+
+        // custom providers
         jsonProviders.addProvider(new SystemContextJsonProvider());
         jsonProviders.addProvider(new ModulesJsonProvider());
+        jsonProviders.addProvider(new UserIdJsonProvider());
 
         StackTraceJsonProvider stackTraceJsonProvider = new StackTraceJsonProvider();
         ShortenedThrowableConverter shortenedThrowableConverter = new ShortenedThrowableConverter();

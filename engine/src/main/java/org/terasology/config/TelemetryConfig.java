@@ -26,6 +26,10 @@ public class TelemetryConfig {
 
     private boolean launchPopupDisabled;
 
+    private String telemetryDestination;
+
+    private String errorReportingDestination;
+
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
     }
@@ -48,6 +52,22 @@ public class TelemetryConfig {
 
     public void setLaunchPopupDisabled(boolean launchPopupDisabled) {
         this.launchPopupDisabled = launchPopupDisabled;
+    }
+
+    public String getTelemetryDestination() {
+        return telemetryDestination;
+    }
+
+    public void setTelemetryDestination(String telemetryDestination) {
+        this.telemetryDestination = telemetryDestination;
+    }
+
+    public String getErrorReportingDestination() {
+        return errorReportingDestination;
+    }
+
+    public void setErrorReportingDestination(String errorReportingDestination) {
+        this.errorReportingDestination = errorReportingDestination;
     }
 
     public void setTelemetryAndErrorReportingEnable(boolean enabled) {
