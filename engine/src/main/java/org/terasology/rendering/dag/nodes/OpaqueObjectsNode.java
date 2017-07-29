@@ -31,8 +31,6 @@ import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
-
 /**
  * This node renders the opaque (as opposed to semi-transparent)
  * objects present in the world. This node -does not- render the landscape.
@@ -57,7 +55,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
     }
 
     public void enableWireframe() {

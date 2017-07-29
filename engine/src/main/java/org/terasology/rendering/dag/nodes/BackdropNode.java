@@ -40,6 +40,7 @@ import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -48,7 +49,6 @@ import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
 import static org.lwjgl.opengl.GL11.glNewList;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Renders the backdrop.
@@ -60,7 +60,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
-    private final static ResourceUrn SKY_MATERIAL = new ResourceUrn("engine:prog.sky");
+    private final static ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;
@@ -105,10 +105,11 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         new WireframeTrigger(renderingDebugConfig, this);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetFboWriteMask(true, false, false, READONLY_GBUFFER, displayResolutionDependentFBOs));
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));
+        addDesiredStateChange(new SetFboWriteMask(lastUpdatedGBuffer, true, false, false));
 
-        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(SKY_MATERIAL_URN));
 
         // By disabling the writing to the depth buffer the sky will always have a depth value
         // set by the latest glClear statement.
@@ -119,11 +120,11 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         addDesiredStateChange(new EnableFaceCulling());
         addDesiredStateChange(new SetFacesToCull(GL_FRONT));
 
-        skyMaterial = getMaterial(SKY_MATERIAL);
+        skyMaterial = getMaterial(SKY_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL, "texSky180"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
+        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
     }
 
     public void enableWireframe() {

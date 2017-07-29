@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
@@ -29,6 +30,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.shader.ShaderParametersSSAO;
 
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -51,17 +53,14 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
-    private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
+    public static final SimpleUri SSAO_FBO_URI = new SimpleUri("engine:fbo.ssao");
+    private static final ResourceUrn SSAO_MATERIAL_URN = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
-
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material ssaoMaterial;
     private float outputFboWidth;
     private float outputFboHeight;
 
-    @SuppressWarnings("FieldCanBeLocal")
     private FBO ssaoFbo;
 
     public AmbientOcclusionNode(Context context) {
@@ -71,15 +70,17 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL));
-        ssaoMaterial = getMaterial(SSAO_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL_URN));
+        ssaoMaterial = getMaterial(SSAO_MATERIAL_URN);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SSAO_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise ssaoFbo, outputFboWidth, outputFboHeight
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(ssaoFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
+        update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
+
+        ShaderParametersSSAO.setLastUpdatedGBuffer(displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo());
 
         // TODO: check for input textures brought in by the material
     }
@@ -105,7 +106,6 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     @Override
     public void update() {
-        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }

@@ -20,12 +20,12 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer;
@@ -40,15 +40,14 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
-public class CopyImageToHMDNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    private static final ResourceUrn LEFT_EYE_FBO = new ResourceUrn("engine:leftEye");
-    private static final ResourceUrn RIGHT_EYE_FBO = new ResourceUrn("engine:rightEye");
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+public class CopyImageToHMDNode extends ConditionDependentNode {
+    private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
+    private static final SimpleUri RIGHT_EYE_FBO_URI = new SimpleUri("engine:fbo.rightEye");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 
     private OpenVRProvider vrProvider;
     private WorldRenderer worldRenderer;
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
@@ -67,22 +66,21 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
         if (this.isEnabled()) {
             worldRenderer = context.get(WorldRenderer.class);
 
-            displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-            requiresFBO(new FBOConfig(LEFT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-            requiresFBO(new FBOConfig(RIGHT_EYE_FBO, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-            update(); // Cheeky way to initialise finalFbo, leftEyeFbo, rightEyeFbo
-            displayResolutionDependentFBOs.subscribe(this);
+            DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+            leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+            finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
 
-            vrProvider.texType[0].handle = leftEyeFbo.colorBufferTextureId;
+            vrProvider.texType[0].handle = leftEyeFbo.getColorBufferTextureId();
             vrProvider.texType[0].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[0].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[0].write();
-            vrProvider.texType[1].handle = rightEyeFbo.colorBufferTextureId;
+            vrProvider.texType[1].handle = rightEyeFbo.getColorBufferTextureId();
             vrProvider.texType[1].eColorSpace = JOpenVRLibrary.EColorSpace.EColorSpace_ColorSpace_Gamma;
             vrProvider.texType[1].eType = JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL;
             vrProvider.texType[1].write();
 
-            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+            addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
         }
     }
 
@@ -125,12 +123,5 @@ public class CopyImageToHMDNode extends ConditionDependentNode implements FBOMan
         // because it assumes that FBO 0 is bound before this node is run.
         // TODO: break this node into two different nodes that use addDesiredStateChange(BindFbo...))
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    }
-
-    @Override
-    public void update() {
-        finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
-        leftEyeFbo = displayResolutionDependentFBOs.get(LEFT_EYE_FBO);
-        rightEyeFbo = displayResolutionDependentFBOs.get(RIGHT_EYE_FBO);
     }
 }

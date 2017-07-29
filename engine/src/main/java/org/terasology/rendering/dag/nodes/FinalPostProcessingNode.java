@@ -24,8 +24,11 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.shader.ShaderParametersDebug;
+import org.terasology.rendering.shader.ShaderParametersPost;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;
@@ -39,13 +42,13 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * of the scene obtained so far. Furthermore, depending if a screenshot has been requested,
  * it instructs the ScreenGrabber to save it to a file.
  *
- * If RederingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
+ * If RenderingDebugConfig.isEnabled() returns true, this node is instead responsible for displaying
  * the content of a number of technical buffers rather than the final, post-processed rendering
  * of the scene.
  */
 public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
-    private static final ResourceUrn POST_MATERIAL = new ResourceUrn("engine:prog.post");
-    private static final ResourceUrn DEBUG_MATERIAL = new ResourceUrn("engine:prog.debug");
+    private static final ResourceUrn POST_MATERIAL_URN = new ResourceUrn("engine:prog.post");
+    private static final ResourceUrn DEBUG_MATERIAL_URN = new ResourceUrn("engine:prog.debug");
 
     private WorldRenderer worldRenderer;
     private ScreenGrabber screenGrabber;
@@ -61,8 +64,8 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         renderingDebugConfig.subscribe(RenderingDebugConfig.ENABLED, this);
 
-        enablePostMaterial = new EnableMaterial(POST_MATERIAL);
-        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL);
+        enablePostMaterial = new EnableMaterial(POST_MATERIAL_URN);
+        enableDebugMaterial = new EnableMaterial(DEBUG_MATERIAL_URN);
 
         if (!renderingDebugConfig.isEnabled()) {
             addDesiredStateChange(enablePostMaterial);
@@ -71,8 +74,13 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         }
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(FINAL_BUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(FINAL_BUFFER, displayResolutionDependentFBOs));
+        FBO finalBuffer = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        addDesiredStateChange(new BindFbo(finalBuffer));
+        addDesiredStateChange(new SetViewportToSizeOf(finalBuffer));
+
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        ShaderParametersPost.setLastUpdatedGBuffer(lastUpdatedGBuffer);
+        ShaderParametersDebug.setLastUpdatedGBuffer(lastUpdatedGBuffer);
     }
 
     /**

@@ -18,9 +18,9 @@ package org.terasology.rendering.opengl.fbms;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.SimpleUri;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -44,7 +44,7 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
     @Override
     public FBO request(FBOConfig fboConfig) {
         FBO fbo;
-        ResourceUrn fboName = fboConfig.getName();
+        SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
             if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
@@ -63,8 +63,8 @@ public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implem
             int shadowMapResFromSettings = (int) evt.getNewValue();
             shadowMapResolution = new FBO.Dimensions(shadowMapResFromSettings, shadowMapResFromSettings);
 
-            for (Map.Entry<ResourceUrn, FBOConfig> entry : fboConfigs.entrySet()) {
-                ResourceUrn fboName = entry.getKey();
+            for (Map.Entry<SimpleUri, FBOConfig> entry : fboConfigs.entrySet()) {
+                SimpleUri fboName = entry.getKey();
                 FBOConfig fboConfig = entry.getValue();
 
                 if (fboLookup.containsKey(fboName)) {
