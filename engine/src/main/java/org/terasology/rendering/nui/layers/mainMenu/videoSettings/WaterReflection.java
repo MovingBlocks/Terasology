@@ -44,7 +44,7 @@ public enum WaterReflection {
 
     private String displayName;
 
-     WaterReflection(String displayName) {
+    WaterReflection(String displayName) {
         this.displayName = displayName;
     }
 

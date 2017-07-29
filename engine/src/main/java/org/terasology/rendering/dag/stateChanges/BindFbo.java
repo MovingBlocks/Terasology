@@ -15,11 +15,10 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import org.terasology.assets.ResourceUrn;
-import org.terasology.rendering.opengl.BaseFBOsManager;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import com.google.common.base.Objects;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.dag.StateChange;
+import org.terasology.rendering.opengl.FBO;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
@@ -33,25 +32,21 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
  * When this state change is reset OpenGL's default framebuffer (usually the display) is bound again.
  * Similarly, nodes that do not take advantage of this state change will normally write to the default framebuffer.
  */
-public final class BindFbo implements FBOManagerSubscriber, StateChange {
+public final class BindFbo implements StateChange {
     private static StateChange defaultInstance = new UnbindFbo();
 
-    private ResourceUrn fboName;
-    private BaseFBOsManager fboManager;
     private int fboId;
+    private SimpleUri fboName;
 
     /**
      * The constructor, to be used in the initialise method of a node.
      *
      * Sample use:
-     *      addDesiredStateChange(new BindFbo("engine:sceneOpaque", displayResolutionDependentFBOManager));
+     *      addDesiredStateChange(new BindFbo(fbo));
      */
-    public BindFbo(ResourceUrn fboName, BaseFBOsManager fboManager) {
-        this.fboName = fboName;
-        this.fboManager = fboManager;
-
-        update(); // Cheeky way to initialise fboId
-        fboManager.subscribe(this);
+    public BindFbo(FBO fbo) {
+        fboId = fbo.getId();
+        fboName = fbo.getName();
     }
 
     @Override
@@ -61,22 +56,17 @@ public final class BindFbo implements FBOManagerSubscriber, StateChange {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fboName);
+        return Objects.hashCode(fboId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof BindFbo) && fboName.equals(((BindFbo) obj).fboName);
-    }
-
-    @Override
-    public void update() {
-        fboId = fboManager.get(fboName).fboId;
+        return (obj instanceof BindFbo) && fboId == ((BindFbo) obj).fboId;
     }
 
     @Override
     public String toString() { // TODO: used for logging purposes at the moment, investigate different methods
-        return String.format("%30s: %s (fboId:%s)", this.getClass().getSimpleName(), fboName, fboId);
+        return String.format("%30s: %s (fboId: %s)", this.getClass().getSimpleName(), fboName, fboId);
     }
 
     @Override

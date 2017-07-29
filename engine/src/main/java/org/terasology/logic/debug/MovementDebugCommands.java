@@ -260,15 +260,16 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Sets the eye-height of the player", runOnServer = true,
             requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String playerEyeHeight(@Sender EntityRef client, @CommandParam("height") float amount) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
+    public String playerEyeHeight(@Sender EntityRef client, @CommandParam("eye-height") float amount) {
+        EntityRef player = client.getComponent(ClientComponent.class).character;
         try {
-            GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
+            GazeMountPointComponent gazeMountPointComponent = player.getComponent(GazeMountPointComponent.class);
             if (gazeMountPointComponent != null) {
                 float prevHeight = gazeMountPointComponent.translate.y;
-                Location.removeChild(client, gazeMountPointComponent.gazeEntity);
                 gazeMountPointComponent.translate.y = amount;
-                Location.attachChild(client, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                Location.removeChild(player, gazeMountPointComponent.gazeEntity);
+                Location.attachChild(player, gazeMountPointComponent.gazeEntity, gazeMountPointComponent.translate, new Quat4f(Quat4f.IDENTITY));
+                player.saveComponent(gazeMountPointComponent);
                 return "Eye-height of player set to " + amount + " (was " + prevHeight + ")";
             }
             return "";

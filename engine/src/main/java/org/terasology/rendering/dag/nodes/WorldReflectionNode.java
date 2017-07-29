@@ -23,25 +23,34 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.backdrop.BackdropProvider;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
-import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
+import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
 /**
@@ -58,16 +67,31 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
-public class WorldReflectionNode extends ConditionDependentNode {
-    public static final ResourceUrn REFLECTED_FBO = new ResourceUrn("engine:sceneReflected");
-    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
+public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
+    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;
+    private BackdropProvider backdropProvider;
+    private WorldProvider worldProvider;
 
-    private Camera playerCamera;
     private Material chunkMaterial;
     private RenderingConfig renderingConfig;
+
+    private SubmersibleCamera activeCamera;
+
+    private boolean isNormalMapping;
+    private boolean isParallaxMapping;
+
+    private StateChange setNormalTerrain;
+    private StateChange setHeightTerrain;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.5f)
+    private float parallaxBias = 0.05f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.50f)
+    private float parallaxScale = 0.05f;
 
     /**
      * Constructs an instance of this class.
@@ -82,27 +106,47 @@ public class WorldReflectionNode extends ConditionDependentNode {
         super(context);
 
         renderQueues = context.get(RenderQueuesHelper.class);
+        backdropProvider = context.get(BackdropProvider.class);
+        worldProvider = context.get(WorldProvider.class);
 
         worldRenderer = context.get(WorldRenderer.class);
-        playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new ReflectedCamera(playerCamera)); // this has to go before the LookThrough state change
-        addDesiredStateChange(new LookThrough(playerCamera));
+        activeCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new ReflectedCamera(activeCamera)); // this has to go before the LookThrough state change
+        addDesiredStateChange(new LookThrough(activeCamera));
+
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        FBO reflectedFbo = requiresFBO(new FBOConfig(REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(reflectedFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(reflectedFbo));
+        addDesiredStateChange(new EnableFaceCulling());
+        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
+
+        // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
+        chunkMaterial = getMaterial(CHUNK_MATERIAL_URN);
 
         renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> renderingConfig.isReflectiveWater());
         renderingConfig.subscribe(RenderingConfig.REFLECTIVE_WATER, this);
+        isNormalMapping = renderingConfig.isNormalMapping();
+        renderingConfig.subscribe(RenderingConfig.NORMAL_MAPPING, this);
+        isParallaxMapping = renderingConfig.isParallaxMapping();
+        renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(REFLECTED_FBO, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(REFLECTED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(REFLECTED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new EnableFaceCulling());
-        addDesiredStateChange(new SetFacesToCull(GL_FRONT));
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
+        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
-        // we must get this here because in process we activate/deactivate a specific shader feature.
-        // TODO: improve EnableMaterial to take advantage of shader feature bitmasks.
-        chunkMaterial = getMaterial(CHUNK_MATERIAL);
+        if (isNormalMapping) {
+            addDesiredStateChange(setNormalTerrain);
+
+            if (isParallaxMapping) {
+                addDesiredStateChange(setHeightTerrain);
+            }
+        }
     }
 
     /**
@@ -118,13 +162,36 @@ public class WorldReflectionNode extends ConditionDependentNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/worldReflection");
 
+        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+
+        // Common Shader Parameters
+
+        chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+        chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+
+        // Specific Shader Parameters
+
+        // TODO: This is necessary right now because activateFeature removes all material parameters.
+        // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
+        chunkMaterial.setInt("textureAtlas", 0, true);
+        chunkMaterial.setInt("textureEffects", 1, true);
+        chunkMaterial.setInt("textureLava", 2, true);
+        if (isNormalMapping) {
+            chunkMaterial.setInt("textureAtlasNormal", 3, true);
+            if (isParallaxMapping) {
+                chunkMaterial.setInt("textureAtlasHeight", 4, true);
+                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
+            }
+        }
+
+        chunkMaterial.setFloat("clip", 0.0f, true);
+
+        // Actual Node Processing
+
         int numberOfRenderedTriangles = 0;
         int numberOfChunksThatAreNotReadyYet = 0;
 
-        final Vector3f cameraPosition = playerCamera.getPosition();
-
-        chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        chunkMaterial.setFloat("clip", playerCamera.getClipHeight(), true);
+        final Vector3f cameraPosition = activeCamera.getPosition();
 
         while (renderQueues.chunksOpaqueReflection.size() > 0) {
             RenderableChunk chunk = renderQueues.chunksOpaqueReflection.poll();
@@ -147,5 +214,37 @@ public class WorldReflectionNode extends ConditionDependentNode {
         worldRenderer.increaseNotReadyChunkCount(numberOfChunksThatAreNotReadyYet);
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        // This method is only called when oldValue != newValue.
+        if (event.getPropertyName().equals(RenderingConfig.REFLECTIVE_WATER)) {
+            requiresCondition(() -> renderingConfig.isReflectiveWater());
+        } else if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+            isNormalMapping = renderingConfig.isNormalMapping();
+            if (isNormalMapping) {
+                addDesiredStateChange(setNormalTerrain);
+                if (isParallaxMapping) {
+                    addDesiredStateChange(setHeightTerrain);
+                }
+            } else {
+                removeDesiredStateChange(setNormalTerrain);
+                if (isParallaxMapping) {
+                    removeDesiredStateChange(setHeightTerrain);
+                }
+            }
+        } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
+            isParallaxMapping = renderingConfig.isParallaxMapping();
+            if (isNormalMapping) {
+                if (isParallaxMapping) {
+                    addDesiredStateChange(setHeightTerrain);
+                } else {
+                    removeDesiredStateChange(setHeightTerrain);
+                }
+            }
+        } // else: no other cases are possible - see subscribe operations in initialize().
+
+        worldRenderer.requestTaskListRefresh();
     }
 }

@@ -49,6 +49,28 @@ public class PermissionCommands extends BaseComponentSystem {
     @In
     private Config config;
 
+    @Command(shortDescription = "Use an one time key to get all permissions",
+            helpText = "The config file contains a one time key which can be used to get all permissions.",
+            runOnServer = true, requiredPermission = PermissionManager.NO_PERMISSION)
+    public String usePermissionKey(@CommandParam("key") String key, @Sender EntityRef client) {
+        PermissionConfig permissionConfig = config.getPermission();
+        String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
+
+        if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
+            permissionConfig.setOneTimeAuthorizationKey("");
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            EntityRef clientInfo = clientComponent.clientInfo;
+            for (String permission: findAllPermissions()) {
+                permissionManager.addPermission(clientInfo, permission);
+            }
+            PermissionSetComponent permissionSetComp = clientInfo.getComponent(PermissionSetComponent.class);
+            return "Permission key used: You have now the following permissions: " + permissionSetComp.permissions;
+        } else {
+            return "Key invalid or used";
+        }
+    }
+
+    /* TODO: Consider enabling the debug exclusion variant later, like when we enter Beta.
     @Command(shortDescription = "Use an one time key to get all* permissions",
             helpText = "The config file contains a one time key which can be used to get all* permissions."
                     + "Please note that the debug permission will only be granted if the debug setting is on.",
@@ -75,7 +97,7 @@ public class PermissionCommands extends BaseComponentSystem {
         } else {
             return "Key invalid or used";
         }
-    }
+    }*/
 
     private Set<String> findAllPermissions() {
         Set<String> allPermissions = new HashSet<>();

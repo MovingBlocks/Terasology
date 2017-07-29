@@ -35,7 +35,7 @@ import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.OnlineUsernameSuggester;
-import org.terasology.logic.console.ui.MiniChatOverlay;
+import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -54,7 +54,6 @@ public class ChatSystem extends BaseComponentSystem {
 
     private static final ResourceUrn CHAT_UI = new ResourceUrn("engine:chat");
     private static final ResourceUrn CONSOLE_UI = new ResourceUrn("engine:console");
-    private static final ResourceUrn MINICHAT_UI = new ResourceUrn("engine:minichatOverlay");
 
     @In
     private EntityManager entityManager;
@@ -62,11 +61,11 @@ public class ChatSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
-    private MiniChatOverlay overlay;
+    private NotificationOverlay overlay;
 
     @Override
     public void initialise() {
-        overlay = nuiManager.addOverlay(MINICHAT_UI, MiniChatOverlay.class);
+        overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)

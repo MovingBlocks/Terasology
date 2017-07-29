@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 
 /**
  * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
@@ -44,11 +44,11 @@ import org.terasology.assets.ResourceUrn;
  * rendering engine.
  * <p>
  * Default FBOs:
- * sceneOpaque:  Primary FBO: most visual information eventually ends up here
- * sceneOpaquePingPong:  The sceneOpaque FBOs are swapped every frame, to use one for reading and the other for writing
+ * writeOnlyGBuffer: this is the primary FBO and its attachments are the target of a good number of rendering operations, eventually storing most information needed for the deferred rendering.
+ * readOnlyGBuffer: this FBO holds attachments that are used as input textures by a number of rendering stages.
+ * Note that these two FBOs may be swapped on a node's request (ping-pong technique). See the DisplayResolutionDependentFboManager class for more details.
  * Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
- * sceneSkyBand0:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
- * sceneSkyBand1:
+ * sceneSkyBand and sceneSkyBand1:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
  * sceneReflectiveRefractive:  used to render reflective and refractive surfaces, most obvious case being the water surface
  * sceneReflected:  the water surface displays a reflected version of the scene. This version is stored here.
  * outline:  greyscale depth-based rendering of object outlines
@@ -57,13 +57,8 @@ import org.terasology.assets.ResourceUrn;
  * scenePrePost:  intermediate step, combining a number of renderings made available so far
  * lightShafts:  light shafts rendering
  * sceneHighPass:  a number of buffers to create the bloom effect
- * sceneBloom0:
- * sceneBloom1:
- * sceneBloom2:
- * sceneBlur0:  a pair of buffers holding blurred versions of the rendered scene,
- * sceneBlur1:  also used for the bloom effect, but not only.
- * ocUndistorted:  if OculusRift support is enabled this buffer holds the side-by-side views
- * for each eye, with no lens distortion applied.
+ * sceneBloom0, sceneBloom1 and sceneBloom2: A number of buffers used to repeatedly blur and downsample the content of the high pass fbo. The resulting blurred version of the high pass is then used for the bloom effect.
+ * sceneBlur0, sceneBlur1:  a pair of buffers holding blurred versions of the rendered scene, also used for the bloom effect, but not only.
  * sceneFinal:  the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
  */
 
@@ -72,9 +67,9 @@ import org.terasology.assets.ResourceUrn;
  */
 public abstract class AbstractFBOsManager implements BaseFBOsManager {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
-    protected Map<ResourceUrn, FBOConfig> fboConfigs = Maps.newHashMap();
-    protected Map<ResourceUrn, FBO> fboLookup = Maps.newHashMap();
-    protected Map<ResourceUrn, Integer> fboUsageCountMap = Maps.newHashMap();
+    protected Map<SimpleUri, FBOConfig> fboConfigs = Maps.newHashMap();
+    protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
+    protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();
 
     private List<FBOManagerSubscriber> fboManagerSubscribers = new ArrayList<>();
 
@@ -101,7 +96,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
     }
 
 
-    protected void retain(ResourceUrn resourceUrn) {
+    protected void retain(SimpleUri resourceUrn) {
         if (fboUsageCountMap.containsKey(resourceUrn)) {
             int usageCount = fboUsageCountMap.get(resourceUrn) + 1;
             fboUsageCountMap.put(resourceUrn, usageCount);
@@ -116,7 +111,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName
      */
     @Override
-    public void release(ResourceUrn fboName) {
+    public void release(SimpleUri fboName) {
         Preconditions.checkArgument(fboUsageCountMap.containsKey(fboName), "The given fbo is not used.");
 
         if (fboUsageCountMap.get(fboName) != 1) {
@@ -139,7 +134,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboColorTexture(ResourceUrn fboName) {
+    public boolean bindFboColorTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -159,7 +154,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @param fboName the urn of an FBO
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
-    public boolean bindFboDepthTexture(ResourceUrn fboName) {
+    public boolean bindFboDepthTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -180,7 +175,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboNormalsTexture(ResourceUrn fboName) {
+    public boolean bindFboNormalsTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -201,7 +196,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return True if an FBO associated with the given name exists. False otherwise.
      */
     @Override
-    public boolean bindFboLightBufferTexture(ResourceUrn fboName) {
+    public boolean bindFboLightBufferTexture(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo != null) {
@@ -223,7 +218,7 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      * @return an FBO or null
      */
     @Override
-    public FBO get(ResourceUrn fboName) {
+    public FBO get(SimpleUri fboName) {
         FBO fbo = fboLookup.get(fboName);
 
         if (fbo == null) {
@@ -238,11 +233,11 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
      *
      * If no FBOConfig maps to the given name, null is returned and an error is logged.
      *
-     * @param fboName a ResourceUrn representing the name of an FBO
+     * @param fboName a SimpleUri representing the name of an FBO
      * @return an FBOConfig instance if one is found associated with the given fboName, null otherwise
      */
     @Override
-    public FBOConfig getFboConfig(ResourceUrn fboName) {
+    public FBOConfig getFboConfig(SimpleUri fboName) {
         FBOConfig fboConfig = fboConfigs.get(fboName);
 
         if (fboConfig == null) {

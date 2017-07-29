@@ -17,6 +17,7 @@ package org.terasology.logic.console.ui;
 
 import com.google.common.collect.Iterables;
 import org.codehaus.plexus.util.StringUtils;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -30,7 +31,9 @@ import org.terasology.rendering.nui.widgets.UILabel;
 /**
  * The miniaturized chat console widget.
  */
-public class MiniChatOverlay extends CoreScreenLayer {
+public class NotificationOverlay extends CoreScreenLayer {
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:notificationOverlay");
 
     /**
      * Extra display time per message char.

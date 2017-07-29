@@ -18,6 +18,7 @@ package org.terasology.rendering.dag.nodes;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.opengl.BaseFBOsManager;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 
 import static org.lwjgl.opengl.GL11.glClear;
@@ -26,13 +27,10 @@ import static org.lwjgl.opengl.GL11.glClear;
  * Instances of this node clear specific buffers attached to an FBOs, in accordance to a clearing mask.
  * Normally this means that all the pixels in the buffers selected by the mask are reset to a default value.
  *
- * Notice that the node is fully initialised and ready to use only after calling the initialise(Object object) method.
- *
  * This class could be inherited by a more specific class that sets the default values, via (yet to be written)
  * state changes.
  */
 public class BufferClearingNode extends AbstractNode {
-
     private int clearingMask;
 
     /**
@@ -52,8 +50,19 @@ public class BufferClearingNode extends AbstractNode {
         boolean argumentsAreValid = validateArguments(fboConfig, fboManager, clearingMask);
 
         if (argumentsAreValid) {
-            requiresFBO(fboConfig, fboManager);
-            addDesiredStateChange(new BindFbo(fboConfig.getName(), fboManager));
+            FBO fbo = requiresFBO(fboConfig, fboManager);
+            addDesiredStateChange(new BindFbo(fbo));
+            this.clearingMask = clearingMask;
+        } else {
+            throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
+        }
+    }
+
+    public BufferClearingNode(FBO fbo, int clearingMask) {
+        boolean argumentsAreValid = validateArguments(fbo, clearingMask);
+
+        if (argumentsAreValid) {
+            addDesiredStateChange(new BindFbo(fbo));
             this.clearingMask = clearingMask;
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
@@ -61,9 +70,10 @@ public class BufferClearingNode extends AbstractNode {
 
     }
 
+
     /**
      * Clears the buffers selected by the mask provided in setRequiredObjects, with default values.
-     *
+     * <p>
      * This method is executed within a NodeTask in the Render Tasklist.
      */
     @Override
@@ -71,17 +81,33 @@ public class BufferClearingNode extends AbstractNode {
         glClear(clearingMask);
     }
 
-    private boolean validateArguments(FBOConfig anFboConfig, BaseFBOsManager anFboManager, int clearingMask) {
+    private boolean validateArguments(FBOConfig fboConfig, BaseFBOsManager fboManager, int clearingMask) {
         boolean argumentsAreValid = true;
 
-        if (anFboConfig == null) {
+        if (fboConfig == null) {
             argumentsAreValid = false;
             logger.warn("Illegal argument: fboConfig shouldn't be null.");
         }
 
-        if (anFboManager == null) {
+        if (fboManager == null) {
             argumentsAreValid = false;
             logger.warn("Illegal argument: fboManager shouldn't be null.");
+        }
+
+        if (clearingMask == 0) {
+            argumentsAreValid = false;
+            logger.warn("Illegal argument: clearingMask can't be 0.");
+        }
+
+        return argumentsAreValid;
+    }
+
+    private boolean validateArguments(FBO fbo, int clearingMask) {
+        boolean argumentsAreValid = true;
+
+        if (fbo == null) {
+            argumentsAreValid = false;
+            logger.warn("Illegal argument: fbo shouldn't be null.");
         }
 
         if (clearingMask == 0) {

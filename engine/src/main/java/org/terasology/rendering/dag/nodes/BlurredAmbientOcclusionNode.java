@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.ConditionDependentNode;
@@ -28,12 +29,13 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+
+import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * Instances of this node work in tandem with instances of the AmbientOcclusionNode class.
@@ -51,18 +53,13 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.F
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
 public class BlurredAmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_BLURRED_FBO = new ResourceUrn("engine:ssaoBlurred");
-    private static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
-    private static final ResourceUrn SSAO_BLURRED_MATERIAL = new ResourceUrn("engine:prog.ssaoBlur");
-    private static final int TEXTURE_SLOT_0 = 0;
-
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    public static final SimpleUri SSAO_BLURRED_FBO_URI = new SimpleUri("engine:fbo.ssaoBlurred");
+    private static final ResourceUrn SSAO_BLURRED_MATERIAL_URN = new ResourceUrn("engine:prog.ssaoBlur");
 
     private Material ssaoBlurredMaterial;
     private float outputFboWidth;
     private float outputFboHeight;
 
-    @SuppressWarnings("FieldCanBeLocal")
     private FBO ssaoBlurredFbo;
 
     public BlurredAmbientOcclusionNode(Context context) {
@@ -72,19 +69,19 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL));
-        ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(SSAO_BLURRED_MATERIAL_URN));
+        ssaoBlurredMaterial = getMaterial(SSAO_BLURRED_MATERIAL_URN);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        requiresFBO(new FBOConfig(SSAO_BLURRED_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SSAO_BLURRED_FBO, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise ssaoBlurredFbo, outputFboWidth, outputFboHeight
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(ssaoBlurredFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoBlurredFbo));
+        update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(this);
 
-        addDesiredStateChange(new SetInputTextureFromFbo(TEXTURE_SLOT_0,
-                SSAO_FBO, ColorTexture, displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL, "tex"));
+        addDesiredStateChange(new SetInputTextureFromFbo(0, SSAO_FBO_URI, ColorTexture,
+                displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL_URN, "tex"));
     }
 
     /**
@@ -107,7 +104,6 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
 
     @Override
     public void update() {
-        ssaoBlurredFbo = displayResolutionDependentFBOs.get(SSAO_BLURRED_FBO);
         outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }

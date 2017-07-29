@@ -31,6 +31,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.PBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -46,16 +47,22 @@ import java.nio.ByteBuffer;
 public class UpdateExposureNode extends AbstractNode {
     private static final Logger logger = LoggerFactory.getLogger(UpdateExposureNode.class);
 
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrExposureDefault = 2.5f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposure = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMaxExposureNight = 8.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 10.0f)
     private float hdrMinExposure = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 4.0f)
     private float hdrTargetLuminance = 1.0f;
+    @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
@@ -88,7 +95,7 @@ public class UpdateExposureNode extends AbstractNode {
         if (renderingConfig.isEyeAdaptation()) {
             PerformanceMonitor.startActivity("rendering/updateExposure");
 
-            writeOnlyPbo.copyFromFBO(downSampledScene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
+            writeOnlyPbo.copyFromFBO(downSampledScene.getId(), 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
             ByteBuffer pixels = writeOnlyPbo.readBackPixels();
 
             if (pixels.limit() < 3) {

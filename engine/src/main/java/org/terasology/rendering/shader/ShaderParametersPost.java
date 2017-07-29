@@ -18,10 +18,6 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.dag.nodes.LateBlurNode;
-import org.terasology.rendering.dag.nodes.ToneMappingNode;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -30,14 +26,17 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.dag.nodes.LateBlurNode;
+import org.terasology.rendering.dag.nodes.ToneMappingNode;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -48,6 +47,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
     @Range(min = 0.0f, max = 1.0f)
     private float filmGrainIntensity = 0.05f;
+
+    private static FBO writeOnlyGBuffer;
 
     @Override
     public void applyParameters(Material program) {
@@ -60,13 +61,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
         // TODO: move into node
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPING_FBO);
+        displayResolutionDependentFBOs.bindFboColorTexture(ToneMappingNode.TONE_MAPPING_FBO_URI);
         program.setInt("texScene", texId++, true);
 
         // TODO: monitor property rather than check every frame
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            displayResolutionDependentFBOs.get(LateBlurNode.SECOND_LATE_BLUR_FBO).bindTexture();
+            displayResolutionDependentFBOs.get(LateBlurNode.SECOND_LATE_BLUR_FBO_URI).bindTexture();
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
@@ -84,11 +85,9 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texColorGradingLut", texId++, true);
         }
 
-        FBO sceneCombined = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-
-        if (sceneCombined != null) { // TODO: review need for null check
+        if (writeOnlyGBuffer != null) { // TODO: review need for null check
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneCombined.bindDepthTexture();
+            writeOnlyGBuffer.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
 
             // TODO: review - is this loading a noise texture every frame? And why is it not in the IF(grain) block?
@@ -108,7 +107,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
                 program.setFloat("noiseOffset", rand.nextFloat(), true);
 
                 program.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
-                program.setFloat2("renderTargetSize", sceneCombined.width(), sceneCombined.height(), true);
+                program.setFloat2("renderTargetSize", writeOnlyGBuffer.width(), writeOnlyGBuffer.height(), true);
             }
         }
 
@@ -119,5 +118,9 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
             program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix(), true);
         }
+    }
+
+    public static void setLastUpdatedGBuffer(FBO fbo) {
+        writeOnlyGBuffer = fbo;
     }
 }

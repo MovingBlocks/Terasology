@@ -18,8 +18,6 @@ package org.terasology.rendering.shader;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.math.TeraMath;
@@ -31,7 +29,9 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -40,7 +40,6 @@ import java.nio.FloatBuffer;
 import java.util.Optional;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -58,6 +57,8 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     private float ssaoRad = 1.5f;
 
     private FloatBuffer ssaoSamples;
+
+    private static FBO writeOnlyGBuffer;
 
     @Override
     public void initialParameters(Material material) {
@@ -93,17 +94,15 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class); // TODO: switch from CoreRegistry to Context.
 
-        FBO sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-
         int texId = 0;
 
         // TODO: move to node
-        if (sceneOpaqueFbo != null) {
+        if (writeOnlyGBuffer != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            sceneOpaqueFbo.bindDepthTexture();
+            writeOnlyGBuffer.bindDepthTexture();
             program.setInt("texDepth", texId++, true);
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            sceneOpaqueFbo.bindNormalsTexture();
+            writeOnlyGBuffer.bindNormalsTexture();
             program.setInt("texNormals", texId++, true);
         }
 
@@ -149,4 +148,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         return texture.get();
     }
 
+    public static void setLastUpdatedGBuffer(FBO fbo) {
+        writeOnlyGBuffer = fbo;
+    }
 }

@@ -39,6 +39,7 @@ public final class RootConfig {
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
     private NUIEditorConfig nuiEditor = new NUIEditorConfig();
+    private IdentityStorageServiceConfig identityStorageService = new IdentityStorageServiceConfig();
     private TelemetryConfig telemetryConfig = new TelemetryConfig();
 
     /**
@@ -92,6 +93,10 @@ public final class RootConfig {
 
     public NUIEditorConfig getNuiEditor() {
         return nuiEditor;
+    }
+
+    public IdentityStorageServiceConfig getIdentityStorageService() {
+        return identityStorageService;
     }
 
     public TelemetryConfig getTelemetryConfig() {

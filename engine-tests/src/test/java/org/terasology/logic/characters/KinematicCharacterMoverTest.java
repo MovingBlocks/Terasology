@@ -27,30 +27,64 @@ public class KinematicCharacterMoverTest {
         CharacterStateEvent state = new CharacterStateEvent();
         state.setMode(MovementMode.WALKING);
 
-        KinematicCharacterMover.updateMode(state, false, true, true);
+        KinematicCharacterMover.updateMode(state, false, true, true, false);
         Assert.assertSame(MovementMode.DIVING, state.getMode());
 
-        KinematicCharacterMover.updateMode(state, true, false, true);
+        KinematicCharacterMover.updateMode(state, true, false, true, false);
         Assert.assertSame(MovementMode.SWIMMING, state.getMode());
 
         state.setMode(MovementMode.FLYING);
-        KinematicCharacterMover.updateMode(state, false, true, true);
+        KinematicCharacterMover.updateMode(state, false, true, true, false);
         Assert.assertSame(MovementMode.DIVING, state.getMode());
 
-        KinematicCharacterMover.updateMode(state, false, false, false);
+        KinematicCharacterMover.updateMode(state, false, false, false, false);
         Assert.assertSame(MovementMode.WALKING, state.getMode());
 
-        KinematicCharacterMover.updateMode(state, false, false, true);
+        KinematicCharacterMover.updateMode(state, false, false, true, false);
         Assert.assertSame(MovementMode.CLIMBING, state.getMode());
 
-        KinematicCharacterMover.updateMode(state, false, false, false);
+        KinematicCharacterMover.updateMode(state, false, false, false, false);
         Assert.assertSame(MovementMode.WALKING, state.getMode());
 
         state.setMode(MovementMode.GHOSTING);
-        KinematicCharacterMover.updateMode(state, false, true, false);
+        KinematicCharacterMover.updateMode(state, false, true, false, false);
         Assert.assertSame(MovementMode.DIVING, state.getMode());
 
-        KinematicCharacterMover.updateMode(state, false, false, true);
+        KinematicCharacterMover.updateMode(state, false, false, true, false);
         Assert.assertSame(MovementMode.CLIMBING, state.getMode());
+
+        state.setMode(MovementMode.WALKING);
+
+        KinematicCharacterMover.updateMode(state, false, true, true, true);
+        Assert.assertSame(MovementMode.DIVING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, true, false, true, true);
+        Assert.assertSame(MovementMode.SWIMMING, state.getMode());
+
+        state.setMode(MovementMode.FLYING);
+        KinematicCharacterMover.updateMode(state, false, true, true, true);
+        Assert.assertSame(MovementMode.DIVING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, false, true);
+        Assert.assertSame(MovementMode.CROUCHING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, true, true);
+        Assert.assertSame(MovementMode.CLIMBING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, false, true);
+        Assert.assertSame(MovementMode.CROUCHING, state.getMode());
+
+        state.setMode(MovementMode.GHOSTING);
+        KinematicCharacterMover.updateMode(state, false, true, false, true);
+        Assert.assertSame(MovementMode.DIVING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, true, true);
+        Assert.assertSame(MovementMode.CLIMBING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, false, false);
+        Assert.assertSame(MovementMode.WALKING, state.getMode());
+
+        KinematicCharacterMover.updateMode(state, false, false, false, true);
+        Assert.assertSame(MovementMode.CROUCHING, state.getMode());
     }
 }

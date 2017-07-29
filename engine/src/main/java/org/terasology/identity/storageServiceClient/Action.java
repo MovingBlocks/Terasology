@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
-
-import org.terasology.rendering.assets.material.Material;
+package org.terasology.identity.storageServiceClient;
 
 /**
- * Shader parameters for the Shadow Map shader program.
- *
+ * Represents an interaction that can be made with the storage service server.
  */
-public class ShaderParametersShadowMap extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-    }
+interface Action {
+
+    void perform(StorageServiceWorker worker);
 }

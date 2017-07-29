@@ -93,6 +93,7 @@ public final class EntityDataJSONFormat {
                 .registerTypeAdapter(EntityData.Component.class, new ComponentHandler())
                 .registerTypeAdapter(EntityData.Component.Builder.class, new ComponentBuilderHandler())
                 .registerTypeAdapter(EntityData.Value.class, new ValueHandler())
+                .serializeSpecialFloatingPointValues()
                 .create();
     }
 

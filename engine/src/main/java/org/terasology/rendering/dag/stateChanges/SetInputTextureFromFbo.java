@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag.stateChanges;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
@@ -23,7 +24,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
@@ -46,15 +46,11 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
         LightAccumulationTexture,
     }
 
-    private static final Logger logger = Logger.getLogger("SetInputTextureFromFbo");
-
     private SetInputTextureFromFbo defaultInstance;
 
     private int textureSlot;
-    private ResourceUrn fboUrn;
-    private FBO inputFbo;
+    private FBO fbo;
     private FboTexturesTypes textureType;
-    private BaseFBOsManager fboManager;
     private ResourceUrn materialUrn;
     private String shaderParameterName;
     private Material material;
@@ -64,26 +60,52 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
      * The constructor, to be used in the initialise method of a node.
      *
      * Sample use:
-     *      addDesiredStateChange(new SetInputTextureFromFbo(0, "engine:sceneOpaque", ColorTexture,
+     *      addDesiredStateChange(new SetInputTextureFromFbo(0, fbo, ColorTexture,
      *                                  displayResolutionDependentFboManager, "engine:prog.chunk", "textureWater"));
      *
      * @param textureSlot an integer representing the number to add to GL_TEXTURE0 to identify a texture unit on the GPU.
-     * @param fboUrn a URN identifying an FBO.
+     * @param fbo the FBO from which the texture attachment will be fetched.
      * @param textureType one of the types available through the FboTextureType enum.
      * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
      * @param materialUrn a URN identifying a Material instance.
      * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
      */
-    public SetInputTextureFromFbo(int textureSlot, ResourceUrn fboUrn, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+    public SetInputTextureFromFbo(int textureSlot, FBO fbo, FboTexturesTypes textureType, BaseFBOsManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
         this.textureSlot = textureSlot;
         this.textureType = textureType;
-        this.fboUrn = fboUrn;
-        this.fboManager = fboManager;
+        this.fbo = fbo;
         this.materialUrn = materialUrn;
         this.shaderParameterName = shaderParameterName;
 
-        this.inputFbo = fboManager.get(fboUrn);
+        this.material = getMaterial(materialUrn);
+
+        update(); // Cheeky way to initialise textureId
+        fboManager.subscribe(this);
+    }
+
+    /**
+     * The constructor, to be used in the initialise method of a node.
+     *
+     * Sample use:
+     *      addDesiredStateChange(new SetInputTextureFromFbo(0, fboUri, ColorTexture,
+     *                                  displayResolutionDependentFboManager, "engine:prog.chunk", "textureWater"));
+     *
+     * @param textureSlot an integer representing the number to add to GL_TEXTURE0 to identify a texture unit on the GPU.
+     * @param fboUri a SimpleUri identifying an FBO in the given fboManager, from which the texture attachment will be fetched.
+     * @param textureType one of the types available through the FboTextureType enum.
+     * @param fboManager the BaseFBOsManager instance that will send change notifications via the update() method of this class.
+     * @param materialUrn a ResourceUrn identifying a Material instance.
+     * @param shaderParameterName the name of a variable in the shader program used to sample the texture.
+     */
+    public SetInputTextureFromFbo(int textureSlot, SimpleUri fboUri, FboTexturesTypes textureType, BaseFBOsManager fboManager,
+                                  ResourceUrn materialUrn, String shaderParameterName) {
+        this.textureSlot = textureSlot;
+        this.textureType = textureType;
+        this.fbo = fboManager.get(fboUri);
+        this.materialUrn = materialUrn;
+        this.shaderParameterName = shaderParameterName;
+
         this.material = getMaterial(materialUrn);
 
         update(); // Cheeky way to initialise textureId
@@ -109,23 +131,18 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
     }
 
     private int fetchTextureId() {
-        // TODO: make checks to verify the FBOs has the requested buffer;
-        if (inputFbo != null) {
-            switch (textureType) {
-                case ColorTexture:
-                    return inputFbo.colorBufferTextureId;
+        switch (textureType) {
+            case ColorTexture:
+                return fbo.getColorBufferTextureId();
 
-                case DepthStencilTexture:
-                    return inputFbo.depthStencilTextureId;
+            case DepthStencilTexture:
+                return fbo.getDepthStencilTextureId();
 
-                case NormalsTexture:
-                    return inputFbo.normalsBufferTextureId;
+            case NormalsTexture:
+                return fbo.getNormalsBufferTextureId();
 
-                case LightAccumulationTexture:
-                    return inputFbo.lightBufferTextureId;
-            }
-        } else {
-            logger.warning("FBOs manager has no record of an FBO named " + this.fboUrn.toString());
+            case LightAccumulationTexture:
+                return fbo.getLightBufferTextureId();
         }
 
         return 0;
@@ -138,15 +155,14 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
      */
     @Override
     public void update() {
-        inputFbo = fboManager.get(fboUrn);
         textureId = fetchTextureId();
     }
 
     @Override
     public String toString() {
         if (this != defaultInstance) {
-            return String.format("%30s: slot %s, fbo %s, textureType %s, fboManager %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
-                    textureSlot, fboUrn.toString(), textureType.name(), fboManager.toString(), materialUrn.toString(), shaderParameterName);
+            return String.format("%30s: slot %s, fbo %s (fboId: %s), textureType %s, material %s, parameter '%s'", this.getClass().getSimpleName(),
+                    textureSlot, fbo.getName(), fbo.getId(), textureType.name(), materialUrn.toString(), shaderParameterName);
         } else {
             return String.format("%30s: slot %s, textureId 0, material %s, parameter '%s'", this.getClass().getSimpleName(),
                     textureSlot, materialUrn.toString(), shaderParameterName);
@@ -155,16 +171,15 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
 
     @Override
     public int hashCode() {
-        return Objects.hash(textureSlot, fboUrn, textureType, fboManager, materialUrn, shaderParameterName);
+        return Objects.hash(textureSlot, fbo, textureType, materialUrn, shaderParameterName);
     }
 
     @Override
     public boolean equals(Object other) {
         return (other instanceof SetInputTextureFromFbo)
                 && this.textureSlot == ((SetInputTextureFromFbo) other).textureSlot
-                && this.fboUrn == ((SetInputTextureFromFbo) other).fboUrn
+                && this.fbo == ((SetInputTextureFromFbo) other).fbo
                 && this.textureType == ((SetInputTextureFromFbo) other).textureType
-                && this.fboManager == ((SetInputTextureFromFbo) other).fboManager
                 && this.materialUrn.equals(((SetInputTextureFromFbo) other).materialUrn)
                 && this.shaderParameterName.equals(((SetInputTextureFromFbo) other).shaderParameterName);
     }

@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.logic.players;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.terasology.rendering.assets.material.Material;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import org.terasology.entitySystem.Component;
 
 /**
- * Shader parameters for the Block shader program.
- *
+ * This is only attached to the player entities. <br/>
+ * Used to differentiate between player characters and other character entities.
  */
-public class ShaderParametersDefault extends ShaderParametersBase {
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
-
-        // TODO: verify this is still relevant
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        glBindTexture(GL11.GL_TEXTURE_2D, 0);
-    }
+public class PlayerCharacterComponent implements Component {
 }

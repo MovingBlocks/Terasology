@@ -19,12 +19,14 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OrthographicCamera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
@@ -56,18 +58,19 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends ConditionDependentNode {
-    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:sceneShadowMap");
-    public static final ResourceUrn SHADOW_MAP_MATERIAL = new ResourceUrn("engine:prog.shadowMap");
+    public static final SimpleUri SHADOW_MAP_FBO_URI = new SimpleUri("engine:fbo.sceneShadowMap");
+    private static final ResourceUrn SHADOW_MAP_MATERIAL_URN = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private static final float STEP_SIZE = 50f;
+
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
-    private WorldRenderer worldRenderer;
-    private RenderQueuesHelper renderQueues;
     private BackdropProvider backdropProvider;
-
+    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
-    private Camera playerCamera;
+    private RenderQueuesHelper renderQueues;
+
+    private SubmersibleCamera activeCamera;
     private float texelSize;
 
     public ShadowMapNode(Context context) {
@@ -75,10 +78,11 @@ public class ShadowMapNode extends ConditionDependentNode {
 
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
-
+        renderingConfig = context.get(Config.class).getRendering();
         worldRenderer = context.get(WorldRenderer.class);
-        this.playerCamera = worldRenderer.getActiveCamera();
-        this.renderingConfig = context.get(Config.class).getRendering();
+
+        activeCamera = worldRenderer.getActiveCamera();
+
         context.get(RenderableWorld.class).setShadowMapCamera(shadowMapCamera);
 
         texelSize = 1.0f / renderingConfig.getShadowMapResolution() * 2.0f;
@@ -88,10 +92,10 @@ public class ShadowMapNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
+        FBO shadowMapFbo = requiresFBO(new FBOConfig(SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(shadowMapFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
+        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL_URN));
     }
 
     private float calculateTexelSize(int shadowMapResolution) {
@@ -111,12 +115,13 @@ public class ShadowMapNode extends ConditionDependentNode {
      */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
+        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.DYNAMIC_SHADOWS)) {
             super.propertyChange(event);
         } else if (event.getPropertyName().equals(RenderingConfig.SHADOW_MAP_RESOLUTION)) {
             int shadowMapResolution = (int) event.getNewValue();
             texelSize = calculateTexelSize(shadowMapResolution);
-        }
+        } // else: no other cases are possible - see subscribe operations in initialize().
     }
 
     /**
@@ -136,6 +141,9 @@ public class ShadowMapNode extends ConditionDependentNode {
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
             PerformanceMonitor.startActivity("rendering/shadowMap");
+
+            // Actual Node Processing
+
             positionShadowMapCamera(); // TODO: extract these calculation into a separate node.
 
             int numberOfRenderedTriangles = 0;
@@ -169,7 +177,7 @@ public class ShadowMapNode extends ConditionDependentNode {
 
     private void positionShadowMapCamera() {
         // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude
-        Vector3f mainLightPosition = new Vector3f(playerCamera.getPosition().x, 0.0f, playerCamera.getPosition().z); // world-space coordinates
+        Vector3f mainLightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z); // world-space coordinates
 
         // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
         // That's why we first convert it to the previous frame's light-space coordinates and then back to world-space.

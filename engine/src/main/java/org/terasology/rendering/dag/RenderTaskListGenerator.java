@@ -69,7 +69,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s", node.toString()));
+                logger.info(String.format("%s: process()", node.toString()));
             }
         }
     }
@@ -150,7 +150,10 @@ public final class RenderTaskListGenerator {
                     if (!requestedStateChanges.contains(key)) {
                         // This StateChange was not requested by the current Node, so we reset it.
                         requestedStateChanges.remove(key);
-                        taskList.add(stateChange.getDefaultInstance());
+                        StateChange resetTask = stateChange.getDefaultInstance();
+                        if (resetTask != null) {
+                            taskList.add(resetTask);
+                        }
                         iterator.remove();
                     }
                     // Else: The StateChange was requested by the current Node, so do nothing.

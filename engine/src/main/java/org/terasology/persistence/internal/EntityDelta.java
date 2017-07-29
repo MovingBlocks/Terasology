@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,16 @@ import org.terasology.entitySystem.Component;
 import java.util.Map;
 import java.util.Set;
 
-/**
- */
 public class EntityDelta {
     private Set<Class<? extends Component>> removedComponents = Sets.newHashSet();
     private Map<Class<? extends Component>, Component> changedComponents = Maps.newHashMap();
+
     /**
-     *
      * @param component a snapshot of the original entity component at the time when the entity delta got created.
      */
     public void setChangedComponent(Component component) {
         if (component == null) {
-            throw new RuntimeException("component null");
+            throw new RuntimeException("Cannot set a changed component with a null component variable");
         }
         Class<? extends Component> clazz = component.getClass();
         changedComponents.put(clazz, component);

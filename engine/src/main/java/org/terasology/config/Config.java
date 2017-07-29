@@ -118,6 +118,10 @@ public final class Config {
         return config.getNuiEditor();
     }
 
+    public IdentityStorageServiceConfig getIdentityStorageService() {
+        return config.getIdentityStorageService();
+    }
+
     public TelemetryConfig getTelemetryConfig() {
         return config.getTelemetryConfig();
     }

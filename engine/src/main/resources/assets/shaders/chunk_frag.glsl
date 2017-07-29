@@ -20,10 +20,6 @@
 #define WATER_SPEC 1.0
 
 #ifdef FEATURE_REFRACTIVE_PASS
-varying vec3 waterNormalViewSpace;
-#endif
-
-#ifdef FEATURE_REFRACTIVE_PASS
 uniform vec4 waterSettingsFrag;
 #define waterNormalBias waterSettingsFrag.x
 #define waterRefraction waterSettingsFrag.y
@@ -35,11 +31,13 @@ uniform vec4 alternativeWaterSettingsFrag;
 uniform vec4 lightingSettingsFrag;
 #define waterSpecExp lightingSettingsFrag.z
 
-uniform sampler2D textureWaterRefraction;
+uniform sampler2D textureWater;
 uniform sampler2D textureWaterReflection;
 uniform sampler2D texSceneOpaque;
 uniform sampler2D textureWaterNormal;
 uniform sampler2D textureWaterNormalAlt;
+
+varying vec3 waterNormalViewSpace;
 #endif
 
 #if defined (NORMAL_MAPPING)
@@ -72,11 +70,9 @@ varying vec3 normal;
 varying float blockHint;
 varying float isUpside;
 
-uniform sampler2D textureWater;
-uniform sampler2D textureLava;
-
 uniform sampler2D textureAtlas;
 uniform sampler2D textureEffects;
+uniform sampler2D textureLava;
 
 uniform float clip;
 
@@ -149,13 +145,15 @@ void main() {
     }
 #endif
 
+#if defined (FEATURE_REFRACTIVE_PASS) || defined (FEATURE_USE_FORWARD_LIGHTING)
     vec3 sunVecViewAdjusted = sunVecView;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
     // Now featuring linear interpolation to make the transition smoother... :-)
     if (daylight < 0.1) {
         sunVecViewAdjusted = mix(sunVecViewAdjusted * -1.0, sunVecViewAdjusted, daylight / 0.1);
-     }
+    }
+#endif
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
