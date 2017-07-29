@@ -38,11 +38,11 @@ public class ModuleInstaller implements Callable<List<Module>> {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleInstaller.class);
 
-    private Callable<Iterable<RemoteModule>> moduleListProvider;
+    private Callable<Iterable<Module>> moduleListProvider;
     private ModuleManager moduleManager;
     private MultiFileTransferProgressListener downloadProgressListener;
 
-    ModuleInstaller(ModuleManager moduleManager, Callable<Iterable<RemoteModule>> moduleListProvider,
+    ModuleInstaller(ModuleManager moduleManager, Callable<Iterable<Module>> moduleListProvider,
                     MultiFileTransferProgressListener downloadProgressListener) {
         this.moduleListProvider = moduleListProvider;
         this.downloadProgressListener = downloadProgressListener;
@@ -72,9 +72,9 @@ public class ModuleInstaller implements Callable<List<Module>> {
         return newInstalledModules;
     }
 
-    private Map<URL, Path> getDownloadUrls(Iterable<RemoteModule> modules) {
+    private Map<URL, Path> getDownloadUrls(Iterable<Module> modules) {
         Map<URL, Path> result = new HashMap<>();
-        for (RemoteModule module: modules) {
+        for (Module module: modules) {
             ModuleMetadata metadata = module.getMetadata();
             String version = metadata.getVersion().toString();
             String id = metadata.getId().toString();

@@ -35,7 +35,7 @@ public final class ModuleManagerFactory {
     }
 
     public static ModuleManager create() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl();
+        ModuleManager moduleManager = new ModuleManagerImpl("");
         try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));

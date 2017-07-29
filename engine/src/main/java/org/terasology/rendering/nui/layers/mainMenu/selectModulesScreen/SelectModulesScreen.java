@@ -26,15 +26,14 @@ import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleInstaller;
-import org.terasology.engine.module.ModuleListDownloader;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.RemoteModule;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
+import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
@@ -58,10 +57,13 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +90,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
-    private ModuleListDownloader metaDownloader;
+    private Future<ModuleRegistry> futureRemoteModuleRegistry;
+    private ModuleRegistry remoteModuleRegistry;
     private boolean needsUpdate = true;
 
     private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
@@ -109,7 +112,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
+        futureRemoteModuleRegistry = Executors.newSingleThreadExecutor().submit(moduleManager.getRemoteRegistry());
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -365,21 +368,23 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
-        List<ModuleSelectionInfo> modulesToDownload;
-        try {
-            modulesToDownload = getModulesRequiredToDownloadFor(moduleMetadata);
-        } catch (DependencyResolutionFailed e) {
+        DependencyResolver remoteDependencyResolver = new DependencyResolver(remoteModuleRegistry);
+        ResolutionResult result = remoteDependencyResolver.resolve(moduleMetadata.getMetadata().getId());
+        if (!result.isSuccess()) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            messagePopup.setMessage("Depedency resolution failed", e.getMessage());
+            messagePopup.setMessage("Error", "Dependency resolution failed");
             return;
         }
-
+        List<Module> modulesToDownload = result.getModules().stream()
+                .filter(module -> !module.getId().equals(TerasologyConstants.ENGINE_MODULE)) // TODO: don't just exclude, check for version
+                .filter(module -> !modulesLookup.containsKey(module.getId()) || modulesLookup.get(module.getId()).isOnlineVersionNewer())
+                .collect(Collectors.toList());
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
         confirmPopup.setMessage("Confirm Download", modulesToDownload.size() + " modules will be downloaded");
-        confirmPopup.setOkHandler(() -> downloadModules(modulesToDownload.stream().map(ModuleSelectionInfo::getOnlineVersion)::iterator));
+        confirmPopup.setOkHandler(() -> downloadModules(modulesToDownload));
     }
 
-    private void downloadModules(Iterable<RemoteModule> modulesToDownload) {
+    private void downloadModules(Iterable<Module> modulesToDownload) {
         final WaitPopup<List<Module>> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.onSuccess(newModules -> {
             for (Module module : newModules) {
@@ -390,72 +395,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
         ModuleInstaller operation = moduleManager.createInstallerForModules(modulesToDownload, new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
     }
-
-    /**
-     * @return All modules that are required to play the online version of the specified module. The list contains the
-     * passed module too.
-     */
-    private List<ModuleSelectionInfo> getModulesRequiredFor(ModuleSelectionInfo mainModuleInfo) throws DependencyResolutionFailed {
-        ModuleMetadata mainModuleMetadata = mainModuleInfo.getOnlineVersion().getMetadata();
-        LinkedList<Name> idsToCheck = Lists.newLinkedList();
-        idsToCheck.add(mainModuleMetadata.getId());
-        Map<Name, ModuleSelectionInfo> requiredIdToMetaDataMap = Maps.newLinkedHashMap();
-        requiredIdToMetaDataMap.put(mainModuleMetadata.getId(), mainModuleInfo);
-        while (!idsToCheck.isEmpty()) {
-            Name moduleToCheck = idsToCheck.removeFirst();
-            ModuleSelectionInfo moduleToCheckInfo = requiredIdToMetaDataMap.get(moduleToCheck);
-            ModuleMetadata metaDataOfModuleToCheck = moduleToCheckInfo.getOnlineVersion().getMetadata();
-
-            for (DependencyInfo dependencyInfo : metaDataOfModuleToCheck.getDependencies()) {
-                Name depName = dependencyInfo.getId();
-
-                ModuleMetadata depMetaData;
-                if (depName.equals(TerasologyConstants.ENGINE_MODULE)) {
-                    depMetaData = moduleManager.getRegistry().getLatestModuleVersion(TerasologyConstants.ENGINE_MODULE).getMetadata();
-                    if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
-                        throw new DependencyResolutionFailed(String.format(
-                                "Module %s %s requires %s in version range %s, but you are using version %s",
-                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
-                                depMetaData.getVersion()));
-                    }
-                } else {
-                    ModuleSelectionInfo depInfo = modulesLookup.get(depName);
-                    if (depInfo == null) {
-                        throw new DependencyResolutionFailed(String.format("%s requires %s which is missing", moduleToCheck,
-                                depName));
-                    }
-                    depMetaData = depInfo.getOnlineVersion().getMetadata();
-
-                    if (!dependencyInfo.versionRange().contains(depMetaData.getVersion())) {
-                        throw new DependencyResolutionFailed(String.format(
-                                "Module %s %s requires %s in version range %s, but the online version has version %s",
-                                moduleToCheck, metaDataOfModuleToCheck.getVersion(), depName, dependencyInfo.versionRange(),
-                                depMetaData.getVersion()));
-                    }
-                    if (!requiredIdToMetaDataMap.containsKey(depName)) {
-                        idsToCheck.add(depName);
-                        requiredIdToMetaDataMap.put(depName, depInfo);
-                    }
-                }
-            }
-        }
-        List<ModuleSelectionInfo> sortedDependencies = Lists.newArrayList(requiredIdToMetaDataMap.values());
-        return sortedDependencies;
-    }
-
-    /**
-     * @return all modules that need to be downloaded to use the newest version of the specified module and all its
-     * dependencies.
-     */
-    private List<ModuleSelectionInfo> getModulesRequiredToDownloadFor(ModuleSelectionInfo mainModuleInfo)
-            throws DependencyResolutionFailed {
-        List<ModuleSelectionInfo> requiredModules = getModulesRequiredFor(mainModuleInfo);
-
-        List<ModuleSelectionInfo> modulesToDownload = requiredModules.stream().filter(ModuleSelectionInfo::isOnlineVersionNewer)
-                .collect(Collectors.toList());
-        return modulesToDownload;
-    }
-
 
     private void updateValidToSelect() {
         List<Name> selectedModules = Lists.newArrayList();
@@ -480,9 +419,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void updateModuleInformation() {
+        try {
+            remoteModuleRegistry = futureRemoteModuleRegistry.get();
+        } catch (CancellationException | ExecutionException | InterruptedException ex) {
+            logger.warn("Failed to retrieve module list from meta server", ex);
+            MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+            message.setMessage("Warning", "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
+            return;
+        }
 
         Set<Name> filtered = ImmutableSet.of(TerasologyConstants.ENGINE_MODULE, new Name("engine-test"));
-        for (RemoteModule remote : metaDownloader.getModules()) {
+        for (Module remote : remoteModuleRegistry) {
             ModuleSelectionInfo info = modulesLookup.get(remote.getId());
             if (!filtered.contains(remote.getId())) {
                 if (info == null) {
@@ -505,7 +452,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         super.update(delta);
 
         if (needsUpdate) {
-            if (metaDownloader.isDone()) {
+            if (futureRemoteModuleRegistry.isDone()) {
                 needsUpdate = false;
             }
             updateModuleInformation();
@@ -574,19 +521,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
-    private static final class DependencyResolutionFailed extends Exception {
-
-        private static final long serialVersionUID = -2098680881126171195L;
-
-        DependencyResolutionFailed(String message) {
-            super(message);
-        }
-    }
-
     private static final class ModuleSelectionInfo {
         private Module latestVersion;
         private Module selectedVersion;
-        private RemoteModule onlineVersion;
+        private Module onlineVersion;
         private boolean explicitSelection;
         private boolean validToSelect = true;
 
@@ -598,7 +536,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             latestVersion = module;
         }
 
-        public static ModuleSelectionInfo remote(RemoteModule module) {
+        public static ModuleSelectionInfo remote(Module module) {
             ModuleSelectionInfo info = new ModuleSelectionInfo(null);
             info.setOnlineVersion(module);
             return info;
@@ -628,7 +566,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return selectedVersion != null;
         }
 
-        public RemoteModule getOnlineVersion() {
+        public Module getOnlineVersion() {
             return onlineVersion;
         }
 
@@ -636,7 +574,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return latestVersion;
         }
 
-        public void setOnlineVersion(RemoteModule onlineVersion) {
+        public void setOnlineVersion(Module onlineVersion) {
             this.onlineVersion = onlineVersion;
         }
 

@@ -17,6 +17,7 @@ package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
 import org.terasology.assets.Asset;
+import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
@@ -45,6 +46,7 @@ import java.net.URISyntaxException;
 import java.security.Policy;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,7 +58,10 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
 
-    public ModuleManagerImpl() {
+    private String remoteMasterServer;
+
+    public ModuleManagerImpl(String masterServerAddress) {
+        this.remoteMasterServer = masterServerAddress;
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -88,6 +93,10 @@ public class ModuleManagerImpl implements ModuleManager {
         loadEnvironment(Sets.newHashSet(engineModule), true);
     }
 
+    public ModuleManagerImpl(Config config) {
+        this(config.getNetwork().getMasterServer());
+    }
+
     private void setupSandbox() {
         ExternalApiWhitelist.CLASSES.stream().forEach(clazz ->
                 permissionProviderFactory.getBasePermissionSet().addAPIClass(clazz));
@@ -110,7 +119,12 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     @Override
-    public ModuleInstaller createInstallerForModules(Iterable<RemoteModule> modules, MultiFileTransferProgressListener progressListener) {
+    public Callable<ModuleRegistry> getRemoteRegistry() {
+        return new ModuleListDownloader(remoteMasterServer);
+    }
+
+    @Override
+    public ModuleInstaller createInstallerForModules(Iterable<Module> modules, MultiFileTransferProgressListener progressListener) {
         return new ModuleInstaller(this, () -> modules, progressListener);
     }
 

@@ -17,6 +17,7 @@
 package org.terasology.engine.module;
 
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -32,7 +33,9 @@ public interface ModuleManager {
 
     ModuleRegistry getRegistry();
 
-    ModuleInstaller createInstallerForModules(Iterable<RemoteModule> modules, MultiFileTransferProgressListener progressListener);
+    Callable<ModuleRegistry> getRemoteRegistry();
+
+    ModuleInstaller createInstallerForModules(Iterable<Module> modules, MultiFileTransferProgressListener progressListener);
 
     ModuleInstaller createInstallerForModuleNames(Iterable<NameVersion> modules, MultiFileTransferProgressListener progressListener);
 
