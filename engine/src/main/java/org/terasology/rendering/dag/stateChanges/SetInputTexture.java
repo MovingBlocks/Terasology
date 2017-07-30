@@ -167,7 +167,7 @@ public class SetInputTexture implements StateChange {
     @Override
     public void process() {
         glActiveTexture(GL_TEXTURE0 + textureSlot);
-        glBindTexture(GL_TEXTURE_2D, textureId);
+        glBindTexture(target, textureId);
         material.setInt(materialParameter, textureSlot, true);
     }
 }

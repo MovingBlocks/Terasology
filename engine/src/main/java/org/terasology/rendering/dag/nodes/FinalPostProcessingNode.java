@@ -121,7 +121,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, TONE_MAPPING_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texDepth"));
         setBlurTexStateChage = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
-        // addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));
+        addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));
         // TODO: use GLSL noise functions to have a completely shader-based film grain.
         setNoiseTexStateChage = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(filmGrainTexSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
 
@@ -145,27 +145,11 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         postMaterial.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true); //for use in DOF effect
 
-        // TODO: convert to StateChange
-        Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1").get();
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL12.GL_TEXTURE_3D, colorGradingLut.getId());
-        postMaterial.setInt("texColorGradingLut", 2, true);
-
         if (isFilmGrainEnabled) {
-            // TODO: review - is this loading a noise texture every frame?
-            // TODO:          and must it be monitored like a standard texture?
-            // TODO: convert to StateChange
-            // TODO: use GLSL noise functions to have a completely shader-based film grain.
-            ResourceUrn noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
-            Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri).get();
-            GL13.glActiveTexture(GL13.GL_TEXTURE3);
-            glBindTexture(GL11.GL_TEXTURE_2D, filmGrainNoiseTexture.getId());
-            postMaterial.setInt("texNoise", 3, true);
-
             postMaterial.setFloat("grainIntensity", filmGrainIntensity, true);
             postMaterial.setFloat("noiseOffset", randomGenerator.nextFloat(), true);
 
-            postMaterial.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
+            postMaterial.setFloat2("noiseSize", filmGrainTexSize, filmGrainTexSize, true);
             postMaterial.setFloat2("renderTargetSize", lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height(), true);
         }
 
@@ -203,6 +187,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             }
         } // else: no other cases are possible - see subscribe operations in initialize().
 
-        worldRenderer.requestTaskListRefresh();
+        // worldRenderer.requestTaskListRefresh();
     }
 }
