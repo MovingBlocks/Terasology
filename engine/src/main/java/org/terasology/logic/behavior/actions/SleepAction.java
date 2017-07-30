@@ -25,31 +25,27 @@ import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Runs child for the given amount of time.
- * Can be used without specifying a child as a simple 'wait' action.
+ * Sleeps for a given amount of time (RUNNING),
+ * then returns with SUCCESS.
  */
 @API
-@BehaviorAction(name = "counter", isDecorator = true)
-public class CounterAction extends BaseAction {
-    private static final Logger logger = LoggerFactory.getLogger(CounterAction.class);
+@BehaviorAction(name = "sleep")
+public class SleepAction extends BaseAction {
 
-    @Range(min = 0, max = 100)
-    private int count;
+    @Range(min = 0, max = 20)
+    private float time;
 
     @Override
     public void construct(Actor actor) {
-        logger.info("Counter construct running for actor {} entity {}", actor, actor.getEntity());
-        actor.setValue(getId(), count);
+        actor.setValue(getId(), time);
     }
 
     @Override
     public BehaviorState modify(Actor actor, BehaviorState result) {
-        if (result == BehaviorState.SUCCESS) {
-            int remaining = actor.getValue(getId());
-            remaining--;
-            actor.setValue(getId(), remaining);
-            return remaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
-        }
-        return result;
+        float timeRemaining = actor.getValue(getId());
+        timeRemaining -= actor.getDelta();
+        actor.setValue(getId(), timeRemaining);
+        return timeRemaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
     }
+
 }

@@ -15,16 +15,19 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.reflections.Reflections;
-import org.terasology.entitySystem.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.core.compiler.ClassGenerator;
 import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
+
 /**
- * An action node uses a associated Action to control the result state. It cannot have any children.
+ * An action node uses a associated Action to control the result state.
+ * It is a leaf node - it cannot have any children.
  */
 public class ActionNode implements BehaviorNode {
+    private static final Logger logger = LoggerFactory.getLogger(ActionNode.class);
     protected Action action;
 
     public ActionNode() {
@@ -70,7 +73,14 @@ public class ActionNode implements BehaviorNode {
     @Override
     public BehaviorState execute(Actor actor) {
         if (action != null) {
-            return action.modify(actor, BehaviorState.UNDEFINED);
+            try {
+                return action.modify(actor, BehaviorState.UNDEFINED);
+            } catch (Exception e) {
+                logger.info("Exception while running action {} from entity {}: ", action, actor.getEntity(), e);
+                // TODO maybe returning UNDEFINED would be more fitting?
+                return BehaviorState.FAILURE;
+            }
+
         }
         return BehaviorState.UNDEFINED;
     }
@@ -89,22 +99,22 @@ public class ActionNode implements BehaviorNode {
 
     @Override
     public void insertChild(int index, BehaviorNode child) {
-        throw new IllegalArgumentException("ActionNodes cant have any children");
+        throw new IllegalArgumentException("ActionNodes can't have any children");
     }
 
     @Override
     public void replaceChild(int index, BehaviorNode child) {
-        throw new IllegalArgumentException("ActionNodes cant have any children");
+        throw new IllegalArgumentException("ActionNodes can't have any children");
     }
 
     @Override
     public BehaviorNode removeChild(int index) {
-        throw new IllegalArgumentException("ActionNodes cant have any children");
+        throw new IllegalArgumentException("ActionNodes can't have any children");
     }
 
     @Override
     public BehaviorNode getChild(int index) {
-        throw new IllegalArgumentException("ActionNodes cant have any children");
+        throw new IllegalArgumentException("ActionNodes can't have any children");
     }
 
     @Override

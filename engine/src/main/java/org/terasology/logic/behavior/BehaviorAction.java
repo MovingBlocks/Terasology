@@ -32,6 +32,4 @@ public @interface BehaviorAction {
     String name();
 
     boolean isDecorator() default false;
-
-    int priority() default 100;
 }
