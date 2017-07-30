@@ -369,7 +369,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
         Set<Module> modulesToDownload;
         try {
-            modulesToDownload = moduleManager.getInstallManager().getDownloadListGenerator().getAllModulesToDownloadFor(moduleMetadata.getOnlineVersion());
+            modulesToDownload = moduleManager.getInstallManager().getAllModulesToDownloadFor(moduleMetadata.getMetadata().getId());
         } catch (DependencyResolutionFailedException ex) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
             messagePopup.setMessage("Error", ex.getMessage());

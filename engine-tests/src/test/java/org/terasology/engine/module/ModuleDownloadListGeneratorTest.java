@@ -45,15 +45,7 @@ public class ModuleDownloadListGeneratorTest {
     public void testResolverFailed() throws DependencyResolutionFailedException {
         ModuleRegistry localRegistry = buildRegistry("1.0.0", buildSimpleModule("myModule", "1.0.0"));
         DependencyResolver resolver = mockResolver(false);
-        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, null, resolver);
-        buildList(listGenerator);
-    }
-
-    @Test(expected = DependencyResolutionFailedException.class)
-    public void testEngineVersionNotSupported() throws DependencyResolutionFailedException {
-        ModuleRegistry localRegistry = buildRegistry("1.0.0");
-        DependencyResolver resolver = mockResolver(true, buildEngineModule("2.0.0"));
-        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, null, resolver);
+        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, resolver);
         buildList(listGenerator);
     }
 
@@ -61,7 +53,7 @@ public class ModuleDownloadListGeneratorTest {
     public void testSingleModuleNoUpdate() throws DependencyResolutionFailedException {
         ModuleRegistry localRegistry = buildRegistry("1.0.0", buildSimpleModule("myModule", "1.0.0"));
         DependencyResolver resolver = mockResolver(true, buildSimpleModule("myModule", "1.0.0"), buildEngineModule("1.0.0"));
-        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, null, resolver);
+        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, resolver);
         assertEquals(Collections.emptySet(), buildList(listGenerator));
     }
 
@@ -71,26 +63,33 @@ public class ModuleDownloadListGeneratorTest {
         Module moduleV2 = buildSimpleModule("myModule", "2.0.0");
         ModuleRegistry localRegistry = buildRegistry("1.0.0", moduleV1);
         DependencyResolver resolver = mockResolver(true, moduleV2, buildEngineModule("1.0.0"));
-        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, null, resolver);
-        assertEquals(makeSet(moduleV2), buildList(listGenerator));
+        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, resolver);
+        assertEquals(Collections.singleton(moduleV2), buildList(listGenerator));
     }
 
-    private <T> Set<T> makeSet(T... values) {
-        return new HashSet<>(Arrays.asList(values));
+    @Test
+    public void testMultipleModulesPartialUpdate() throws DependencyResolutionFailedException {
+        Module moduleAV1 = buildSimpleModule("myModuleA", "1.0.0");
+        Module moduleBV1 = buildSimpleModule("myModuleB", "1.0.0");
+        Module moduleBV2 = buildSimpleModule("myModuleB", "2.0.0");
+        ModuleRegistry localRegistry = buildRegistry("1.0.0", moduleAV1, moduleBV1);
+        DependencyResolver resolver = mockResolver(true, moduleBV1, moduleBV2, buildEngineModule("1.0.0"));
+        ModuleDownloadListGenerator listGenerator = new ModuleDownloadListGenerator(localRegistry, resolver);
+        assertEquals(Collections.singleton(moduleBV2), buildList(listGenerator));
     }
 
     private DependencyResolver mockResolver(boolean success, Module... resolutionResult) {
         DependencyResolver result = mock(DependencyResolver.class);
-        when(result.resolve(any(Name.class))).thenReturn(new ResolutionResult(success, makeSet(resolutionResult)));
+        DependencyResolver.ResolutionBuilder builder = mock(DependencyResolver.ResolutionBuilder.class);
+        when(builder.requireVersion(any(), any())).thenReturn(builder);
+        when(builder.requireAll(any(Name[].class))).thenReturn(builder);
+        when(builder.build()).thenReturn(new ResolutionResult(success, new HashSet<>(Arrays.asList(resolutionResult))));
+        when(result.builder()).thenReturn(builder);
         return result;
     }
 
     private Set<Module> buildList(ModuleDownloadListGenerator generatorWithMockedResolver) throws DependencyResolutionFailedException {
-        return generatorWithMockedResolver.getAllModulesToDownloadFor(buildSimpleModule(""));
-    }
-
-    private Module buildSimpleModule(String name) {
-        return buildSimpleModule(name, null);
+        return generatorWithMockedResolver.getAllModulesToDownloadFor();
     }
 
     private Module buildSimpleModule(String id, String version) {

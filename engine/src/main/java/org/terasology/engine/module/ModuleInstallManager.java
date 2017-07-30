@@ -18,10 +18,12 @@ package org.terasology.engine.module;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleRegistry;
+import org.terasology.naming.Name;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class ModuleInstallManager {
@@ -39,7 +41,7 @@ public class ModuleInstallManager {
     public Callable<Void> updateRemoteRegistry() {
         return (() -> {
             remoteRegistry = remoteRegistryUpdater.call();
-            downloadListGenerator = new ModuleDownloadListGenerator(moduleManager.getRegistry(), remoteRegistry, new DependencyResolver(remoteRegistry));
+            downloadListGenerator = new ModuleDownloadListGenerator(moduleManager.getRegistry(), new DependencyResolver(remoteRegistry));
             return null;
         });
     }
@@ -48,11 +50,11 @@ public class ModuleInstallManager {
         return Collections.unmodifiableCollection(remoteRegistry);
     }
 
-    public ModuleDownloadListGenerator getDownloadListGenerator() throws DependencyResolutionFailedException {
+    public Set<Module> getAllModulesToDownloadFor(Name... modulesToInstall) throws DependencyResolutionFailedException {
         if (downloadListGenerator == null) {
-            throw new DependencyResolutionFailedException("The online module list hasn't been downloaded");
+            throw new DependencyResolutionFailedException("The online module list hasn't been downloaded.");
         }
-        return downloadListGenerator;
+        return downloadListGenerator.getAllModulesToDownloadFor(modulesToInstall);
     }
 
     public ModuleInstaller createInstaller(Iterable<Module> modules, MultiFileTransferProgressListener progressListener) {

@@ -21,51 +21,36 @@ import org.terasology.module.Module;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
-import org.terasology.naming.NameVersion;
 import org.terasology.naming.Version;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class ModuleDownloadListGenerator {
+class ModuleDownloadListGenerator {
 
     private ModuleRegistry localRegistry;
-    private ModuleRegistry remoteRegistry;
     private DependencyResolver remoteDependencyResolver;
 
-    ModuleDownloadListGenerator(ModuleRegistry localRegistry, ModuleRegistry remoteRegistry, DependencyResolver remoteDependencyResolver) {
+    ModuleDownloadListGenerator(ModuleRegistry localRegistry, DependencyResolver remoteDependencyResolver) {
         this.localRegistry = localRegistry;
-        this.remoteRegistry = remoteRegistry;
         this.remoteDependencyResolver = remoteDependencyResolver;
     }
 
-    public Set<Module> getAllModulesToDownloadFor(NameVersion moduleToInstall) throws DependencyResolutionFailedException {
-        return getAllModulesToDownloadFor(moduleToInstall.getName(), moduleToInstall.getVersion());
+    Set<Module> getAllModulesToDownloadFor(Name... modulesToInstall) throws DependencyResolutionFailedException {
+        Version currentEngineVersion = localRegistry.getLatestModuleVersion(TerasologyConstants.ENGINE_MODULE).getVersion();
+        ResolutionResult resolutionResult = remoteDependencyResolver.builder()
+                .requireVersion(TerasologyConstants.ENGINE_MODULE, currentEngineVersion)
+                .requireAll(modulesToInstall)
+                .build();
+        return processResolutionResult(resolutionResult);
     }
 
-    public Set<Module> getAllModulesToDownloadFor(Name moduleName, Version moduleVersion) throws DependencyResolutionFailedException {
-        return getAllModulesToDownloadFor(remoteRegistry.getModule(moduleName, moduleVersion));
-    }
-
-    public Set<Module> getAllModulesToDownloadFor(Name moduleName) throws DependencyResolutionFailedException {
-        return getAllModulesToDownloadFor(remoteRegistry.getLatestModuleVersion(moduleName));
-    }
-
-    public Set<Module> getAllModulesToDownloadFor(Module moduleToInstall) throws DependencyResolutionFailedException {
-        ResolutionResult result = remoteDependencyResolver.resolve(moduleToInstall.getMetadata().getId());
-        if (!result.isSuccess()) {
+    private Set<Module> processResolutionResult(ResolutionResult resolutionResult) throws DependencyResolutionFailedException {
+        if (!resolutionResult.isSuccess()) {
             throw new DependencyResolutionFailedException("Module dependency resolution failed.");
         }
-        Predicate<Module> isEngine = module -> module.getId().equals(TerasologyConstants.ENGINE_MODULE);
-        Optional<Module> requiredEngine = result.getModules().stream().filter(isEngine).findFirst();
-        Version currentEngineVersion = localRegistry.getLatestModuleVersion(TerasologyConstants.ENGINE_MODULE).getVersion();
-        if (requiredEngine.isPresent() && !requiredEngine.get().getVersion().equals(currentEngineVersion)) {
-            throw new DependencyResolutionFailedException("The required engine version does not match the current engine version.");
-        }
-        return result.getModules().stream()
-                .filter(isEngine.negate())
+        return resolutionResult.getModules().stream()
+                .filter(module -> !module.getId().equals(TerasologyConstants.ENGINE_MODULE))
                 .filter(module -> isOnlineVersionNewer(localRegistry.getLatestModuleVersion(module.getId()), module))
                 .collect(Collectors.toSet());
     }
@@ -83,7 +68,7 @@ public class ModuleDownloadListGenerator {
         } else if (versionCompare == 0) {
                 /*
                  * Multiple binaries get released as the same snapshot version, A version name match thus does not
-                 * gurantee that we have the newest version already if it is a snapshot version.
+                 * guarantee that we have the newest version already if it is a snapshot version.
                  *
                  * Having the user redownload the same binary again is not ideal, but it is better then having the user
                  * being stuck on an outdated snapshot binary.
