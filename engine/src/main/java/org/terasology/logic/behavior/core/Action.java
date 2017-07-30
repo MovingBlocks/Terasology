@@ -18,9 +18,9 @@ package org.terasology.logic.behavior.core;
 import org.terasology.module.sandbox.API;
 
 /**
- * The action that is used by an action node. Every action node of a behavior tree has its own action instance. There
- * is only one action instance for all actors, that run a behavior tree - so all state information needs to be stored
- * at the actor.
+ * The action that is used by an action or decorator node. Every action node of a behavior tree has its own action
+ * instance. There is only one action instance for all actors, that run a behavior tree - so all state information
+ * needs to be stored at the actor.
  * <p/>
  * Action instances are shown in the property panel of the behavior editor.
  */
@@ -69,4 +69,6 @@ public interface Action {
      * Is called when the action node is deconstructed on last update tick (when state switches from RUNNING to anything else)
      */
     void destruct(Actor actor);
+
+
 }

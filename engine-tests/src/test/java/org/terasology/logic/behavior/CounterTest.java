@@ -15,13 +15,12 @@
  */
 package org.terasology.logic.behavior;
 
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.logic.behavior.actions.CounterAction;
 import org.terasology.logic.behavior.actions.Print;
-import org.terasology.logic.behavior.actions.TimerAction;
+import org.terasology.logic.behavior.actions.TimeoutAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
@@ -42,10 +41,9 @@ public class CounterTest {
         assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][A][B][A][A][B]");
 
         assertRun("{ sequence:[ { counter:{ count=2, child:{ counter:{ count=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 4, "[A][A][A][A][B]");
-
-        assertRun("{ sequence:[ { timer:{ time=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][A][B]");
-        assertRun("{ sequence:[ { timer:{ time=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][A][A][A][B]");
-        assertRun("{ sequence:[ { timer:{ time=1, child:{ timer:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 2, "[A][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][B][A][B][A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ timeout:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
     }
 
     @Before
@@ -54,7 +52,8 @@ public class CounterTest {
         treeBuilder = new BehaviorTreeBuilder();
         treeBuilder.registerAction("print", Print.class);
         treeBuilder.registerDecorator("counter", CounterAction.class);
-        treeBuilder.registerDecorator("timer", TimerAction.class);
+        treeBuilder.registerDecorator("timeout", TimeoutAction.class);
+
     }
 
     private void assertRun(String tree, int executions, String expectedOutput) {
@@ -70,7 +69,6 @@ public class CounterTest {
         for (int i = 0; i < executions; i++) {
             runner.step();
         }
-
 
         Assert.assertEquals(expectedOutput, Print.output.toString());
     }

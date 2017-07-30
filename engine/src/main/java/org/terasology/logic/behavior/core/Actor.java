@@ -59,10 +59,16 @@ public class Actor {
     public Actor(EntityRef entity) {
         this.entity = entity;
         blackboard = Maps.newHashMap();
+    }
 
+    public <T> T readFromBlackboard(String reference) {
+        return (T) blackboard.getOrDefault(reference, null);
 
     }
 
+    public void writeToBlackboard(String reference, Object value) {
+        blackboard.put(reference, value);
+    }
 
     public <T> T getValue(int id) {
         return (T) dataMap.get(id);

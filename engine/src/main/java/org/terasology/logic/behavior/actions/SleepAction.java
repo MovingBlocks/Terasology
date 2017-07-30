@@ -22,28 +22,30 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.module.sandbox.API;
+import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Logs a message into the console when called and returns SUCCESS
+ * Sleeps for a given amount of time (RUNNING),
+ * then returns with SUCCESS.
  */
 @API
-@BehaviorAction(name = "log")
-public class LogAction extends BaseAction {
-    public static final Logger logger = LoggerFactory.getLogger(LogAction.class
-    );
+@BehaviorAction(name = "sleep")
+public class SleepAction extends BaseAction {
 
-    private String message;
+    @Range(min = 0, max = 20)
+    private float time;
 
     @Override
     public void construct(Actor actor) {
-        actor.setValue(getId(), message);
+        actor.setValue(getId(), time);
     }
 
     @Override
     public BehaviorState modify(Actor actor, BehaviorState result) {
-        logger.info(String.format("Actor %s logs message: %s ", actor.getEntity().toString(), actor.getValue(getId())));
-        return BehaviorState.SUCCESS;
+        float timeRemaining = actor.getValue(getId());
+        timeRemaining -= actor.getDelta();
+        actor.setValue(getId(), timeRemaining);
+        return timeRemaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
     }
-
 
 }

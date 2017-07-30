@@ -86,13 +86,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         List<ResourceUrn> uris = Lists.newArrayList();
         uris.addAll(assetManager.getAvailableAssets(StaticSound.class).stream().collect(Collectors.toList()));
         for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
-
             Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
             if (asset.isPresent()) {
                 trees.add(asset.get());
             }
-
-
         }
     }
 
@@ -108,8 +105,8 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
 
     @Override
     public void update(float delta) {
-        for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
-
+        Iterable<EntityRef> entities = entityManager.getEntitiesWith(BehaviorComponent.class);
+        for (EntityRef entity : entities) {
             BehaviorComponent behaviorComponent = entity.getComponent(BehaviorComponent.class);
             behaviorComponent.interpreter.tick(delta);
         }
@@ -149,7 +146,6 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         return trees;
     }
 
-
     public List<Interpreter> getInterpreters() {
         List<Interpreter> runners = Lists.newArrayList();
         for (EntityRef entity : entityManager.getEntitiesWith(BehaviorComponent.class)) {
@@ -158,16 +154,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
                 runners.add(behaviorComponent.interpreter);
             }
         }
-        if (runners.size() == 0) {
-            BehaviorComponent behaviorComponent = new BehaviorComponent();
 
-            behaviorComponent.tree = assetManager.loadAsset(new ResourceUrn(BEHAVIORS, new Name("default")), new BehaviorTreeData(), BehaviorTree.class);
-            dummy = entityManager.create(behaviorComponent);
-            DisplayNameComponent nameComponent = new DisplayNameComponent();
-            nameComponent.name = "Main";
-            dummy.addComponent(nameComponent);
-            dummy.addComponent(behaviorComponent);
-        }
         runners.sort(Comparator.comparing(Interpreter::toString));
         return runners;
     }
@@ -192,11 +179,5 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         }
     }
 
-    /* Debugging */
-    @Command(shortDescription = "interrupt deer", helpText = "add a TestComponent to the first deer available")
-    public String interruptDeer() {
-        getInterpreters().get(0).actor().getEntity().addComponent(new TestComponent());
-        return "Deer " + getInterpreters().get(0).actor().getEntity() + " interrupted.";
-    }
 
 }
