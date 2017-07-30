@@ -17,14 +17,11 @@
 package org.terasology.engine.module;
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleMetadataJsonAdapter;
 import org.terasology.module.ModuleRegistry;
-import org.terasology.naming.NameVersion;
-import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 /**
  * TODO Type description
@@ -33,11 +30,7 @@ public interface ModuleManager {
 
     ModuleRegistry getRegistry();
 
-    Callable<ModuleRegistry> getRemoteRegistry();
-
-    ModuleInstaller createInstallerForModules(Iterable<Module> modules, MultiFileTransferProgressListener progressListener);
-
-    ModuleInstaller createInstallerForModuleNames(Iterable<NameVersion> modules, MultiFileTransferProgressListener progressListener);
+    ModuleInstallManager getInstallManager();
 
     ModuleEnvironment getEnvironment();
 

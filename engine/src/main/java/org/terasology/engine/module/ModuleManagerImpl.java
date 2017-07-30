@@ -35,8 +35,6 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
-import org.terasology.naming.NameVersion;
-import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,9 +44,7 @@ import java.net.URISyntaxException;
 import java.security.Policy;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ModuleManagerImpl implements ModuleManager {
 
@@ -57,11 +53,9 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
-
-    private String remoteMasterServer;
+    private ModuleInstallManager installManager;
 
     public ModuleManagerImpl(String masterServerAddress) {
-        this.remoteMasterServer = masterServerAddress;
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -91,6 +85,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
     }
 
     public ModuleManagerImpl(Config config) {
@@ -119,19 +114,8 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     @Override
-    public Callable<ModuleRegistry> getRemoteRegistry() {
-        return new ModuleListDownloader(remoteMasterServer);
-    }
-
-    @Override
-    public ModuleInstaller createInstallerForModules(Iterable<Module> modules, MultiFileTransferProgressListener progressListener) {
-        return new ModuleInstaller(this, () -> modules, progressListener);
-    }
-
-    @Override
-    public ModuleInstaller createInstallerForModuleNames(Iterable<NameVersion> modules, MultiFileTransferProgressListener progressListener) {
-        // TODO
-        return null;
+    public ModuleInstallManager getInstallManager() {
+        return installManager;
     }
 
     @Override

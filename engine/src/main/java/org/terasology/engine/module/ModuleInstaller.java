@@ -38,20 +38,20 @@ public class ModuleInstaller implements Callable<List<Module>> {
 
     private static final Logger logger = LoggerFactory.getLogger(ModuleInstaller.class);
 
-    private Callable<Iterable<Module>> moduleListProvider;
+    private Iterable<Module> moduleList;
     private ModuleManager moduleManager;
     private MultiFileTransferProgressListener downloadProgressListener;
 
-    ModuleInstaller(ModuleManager moduleManager, Callable<Iterable<Module>> moduleListProvider,
+    ModuleInstaller(ModuleManager moduleManager, Iterable<Module> moduleList,
                     MultiFileTransferProgressListener downloadProgressListener) {
-        this.moduleListProvider = moduleListProvider;
+        this.moduleList = moduleList;
         this.downloadProgressListener = downloadProgressListener;
         this.moduleManager = moduleManager;
     }
 
     @Override
     public List<Module> call() throws Exception {
-        Map<URL, Path> filesToDownload = getDownloadUrls(moduleListProvider.call());
+        Map<URL, Path> filesToDownload = getDownloadUrls(moduleList);
         logger.info("Started downloading {} modules", filesToDownload.size());
         MultiFileDownloader downloader = new MultiFileDownloader(filesToDownload, downloadProgressListener);
         List<Path> downloadedModulesPaths = downloader.call();

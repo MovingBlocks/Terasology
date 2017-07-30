@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.utilities.download.MultiFileTransferProgressListener;
 
-public class DownloadPopupProgressListener implements MultiFileTransferProgressListener {
+final class DownloadPopupProgressListener implements MultiFileTransferProgressListener {
 
     private static final String POPUP_TITLE = "Downloading required modules, please wait...";
     private WaitPopup popup;

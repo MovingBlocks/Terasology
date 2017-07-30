@@ -25,6 +25,7 @@ import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.module.DependencyResolutionFailedException;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
@@ -33,7 +34,6 @@ import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleMetadata;
-import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
@@ -90,8 +90,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
-    private Future<ModuleRegistry> futureRemoteModuleRegistry;
-    private ModuleRegistry remoteModuleRegistry;
+    private Future<Void> remoteModuleRegistryUpdater;
     private boolean needsUpdate = true;
 
     private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
@@ -112,7 +111,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        futureRemoteModuleRegistry = Executors.newSingleThreadExecutor().submit(moduleManager.getRemoteRegistry());
+        remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor().submit(moduleManager.getInstallManager().updateRemoteRegistry());
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -368,17 +367,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
-        DependencyResolver remoteDependencyResolver = new DependencyResolver(remoteModuleRegistry);
-        ResolutionResult result = remoteDependencyResolver.resolve(moduleMetadata.getMetadata().getId());
-        if (!result.isSuccess()) {
+        List<Module> modulesToDownload;
+        try {
+            modulesToDownload = moduleManager.getInstallManager().getDependentModulesToDownload(moduleMetadata.getOnlineVersion());
+        } catch (DependencyResolutionFailedException ex) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            messagePopup.setMessage("Error", "Dependency resolution failed");
+            messagePopup.setMessage("Error", ex.getMessage());
             return;
         }
-        List<Module> modulesToDownload = result.getModules().stream()
-                .filter(module -> !module.getId().equals(TerasologyConstants.ENGINE_MODULE)) // TODO: don't just exclude, check for version
-                .filter(module -> !modulesLookup.containsKey(module.getId()) || modulesLookup.get(module.getId()).isOnlineVersionNewer())
-                .collect(Collectors.toList());
         ConfirmPopup confirmPopup = getManager().pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
         confirmPopup.setMessage("Confirm Download", modulesToDownload.size() + " modules will be downloaded");
         confirmPopup.setOkHandler(() -> downloadModules(modulesToDownload));
@@ -392,7 +388,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 updateValidToSelect();
             }
         });
-        ModuleInstaller operation = moduleManager.createInstallerForModules(modulesToDownload, new DownloadPopupProgressListener(popup));
+        ModuleInstaller operation = moduleManager.getInstallManager().createInstaller(modulesToDownload, new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
     }
 
@@ -419,15 +415,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void updateModuleInformation() {
-        try {
-            remoteModuleRegistry = futureRemoteModuleRegistry.get();
-        } catch (CancellationException | ExecutionException | InterruptedException ex) {
-            logger.warn("Failed to retrieve module list from meta server", ex);
-            MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-            message.setMessage("Warning", "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
-            return;
-        }
-
+        Iterable<Module> remoteModuleRegistry = moduleManager.getInstallManager().getRemoteRegistry();
         Set<Name> filtered = ImmutableSet.of(TerasologyConstants.ENGINE_MODULE, new Name("engine-test"));
         for (Module remote : remoteModuleRegistry) {
             ModuleSelectionInfo info = modulesLookup.get(remote.getId());
@@ -451,9 +439,15 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void update(float delta) {
         super.update(delta);
 
-        if (needsUpdate) {
-            if (futureRemoteModuleRegistry.isDone()) {
-                needsUpdate = false;
+        if (needsUpdate && remoteModuleRegistryUpdater.isDone()) {
+            needsUpdate = false;
+            try {
+                remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+            } catch (CancellationException | InterruptedException | ExecutionException ex) {
+                logger.warn("Failed to retrieve module list from meta server", ex);
+                MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                message.setMessage("Warning", "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
+                return;
             }
             updateModuleInformation();
         }
@@ -519,107 +513,5 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
         setSelectedVersions(resolver.resolve(selectedModules));
         updateValidToSelect();
-    }
-
-    private static final class ModuleSelectionInfo {
-        private Module latestVersion;
-        private Module selectedVersion;
-        private Module onlineVersion;
-        private boolean explicitSelection;
-        private boolean validToSelect = true;
-
-        private ModuleSelectionInfo(Module module) {
-            this.latestVersion = module;
-        }
-
-        public void setLocalVersion(Module module) {
-            latestVersion = module;
-        }
-
-        public static ModuleSelectionInfo remote(Module module) {
-            ModuleSelectionInfo info = new ModuleSelectionInfo(null);
-            info.setOnlineVersion(module);
-            return info;
-        }
-
-        public static ModuleSelectionInfo local(Module module) {
-            return new ModuleSelectionInfo(module);
-        }
-
-        public ModuleMetadata getMetadata() {
-            if (selectedVersion != null) {
-                return selectedVersion.getMetadata();
-            } else if (latestVersion != null) {
-                return latestVersion.getMetadata();
-            } else if (onlineVersion != null) {
-                return onlineVersion.getMetadata();
-            }
-
-            return null;
-        }
-
-        public boolean isPresent() {
-            return latestVersion != null;
-        }
-
-        public boolean isSelected() {
-            return selectedVersion != null;
-        }
-
-        public Module getOnlineVersion() {
-            return onlineVersion;
-        }
-
-        public Module getLatestVersion() {
-            return latestVersion;
-        }
-
-        public void setOnlineVersion(Module onlineVersion) {
-            this.onlineVersion = onlineVersion;
-        }
-
-        public void setSelectedVersion(Module selectedVersion) {
-            this.selectedVersion = selectedVersion;
-        }
-
-        public boolean isExplicitSelection() {
-            return explicitSelection;
-        }
-
-        public void setExplicitSelection(boolean explicitSelection) {
-            this.explicitSelection = explicitSelection;
-        }
-
-        public boolean isValidToSelect() {
-            return validToSelect;
-        }
-
-        public void setValidToSelect(boolean validToSelect) {
-            this.validToSelect = validToSelect;
-        }
-
-        public boolean isOnlineVersionNewer() {
-            if (onlineVersion == null) {
-                return false;
-            }
-            if (latestVersion == null) {
-                return true;
-            }
-            int versionCompare = onlineVersion.getVersion().compareTo(latestVersion.getVersion());
-            if (versionCompare > 0) {
-                return true;
-            } else if (versionCompare == 0) {
-                /*
-                 * Multiple binaries get released as the same snapshot version, A version name match thus does not
-                 * gurantee that we have the newest version already if it is a snapshot version.
-                 *
-                 * Having the user redownload the same binary again is not ideal, but it is better then ahving the user
-                 * being stuck on an outdated snapshot binary.
-                 */
-                return onlineVersion.getVersion().isSnapshot();
-            } else {
-                return false;
-            }
-        }
     }
 }
