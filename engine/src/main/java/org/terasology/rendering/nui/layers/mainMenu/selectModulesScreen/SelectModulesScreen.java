@@ -367,9 +367,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
-        List<Module> modulesToDownload;
+        Set<Module> modulesToDownload;
         try {
-            modulesToDownload = moduleManager.getInstallManager().getDependentModulesToDownload(moduleMetadata.getOnlineVersion());
+            modulesToDownload = moduleManager.getInstallManager().getDownloadListGenerator().getAllModulesToDownloadFor(moduleMetadata.getOnlineVersion());
         } catch (DependencyResolutionFailedException ex) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
             messagePopup.setMessage("Error", ex.getMessage());
