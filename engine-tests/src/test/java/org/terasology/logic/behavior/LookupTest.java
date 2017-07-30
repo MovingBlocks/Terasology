@@ -42,7 +42,7 @@ public class LookupTest {
     @Ignore("Ignored for the moment")
     @Test
     public void testEmptyLookup() {
-        BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorLookup"), BehaviorTree.class).get();
+        BehaviorTree asset = CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn("unittest", "BehaviorEmptyLookup"), BehaviorTree.class).get();
         System.out.println(CoreRegistry.get(BehaviorTreeBuilder.class).toJson(asset.getRoot()));
     }
 

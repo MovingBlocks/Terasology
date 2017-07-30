@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Maps;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -33,18 +34,13 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
@@ -54,10 +50,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * JSON deserializer to create trees using json:
@@ -72,7 +66,6 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
     private Map<String, Class<? extends Action>> actions = Maps.newHashMap();
     private Map<String, Class<? extends Action>> decorators = Maps.newHashMap();
 
-
     @In
     private PrefabManager prefabManager;
 
@@ -82,33 +75,10 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
 
     public BehaviorTreeBuilder() {
 
-
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
         if (moduleManager != null) {
             ModuleEnvironment environment = moduleManager.getEnvironment();
-
-            Set<Module> behavior = new HashSet<>();
-            behavior.add(moduleManager.getRegistry().getLatestModuleVersion(new Name("Behaviors")));
-            ModuleEnvironment behaviorEnvironment =  moduleManager.loadEnvironment(behavior, false);
-
-
-            // TODO This is here until we can move everything over to Behaviors
-            for (Class<? extends Action> type : behaviorEnvironment.getSubtypesOf(Action.class)) {
-                BehaviorAction behaviorAction = type.getAnnotation(BehaviorAction.class);
-                if (behaviorAction != null) {
-                    String name = behaviorAction.name();
-                    if (behaviorAction.isDecorator()) {
-                        registerDecorator(name, type);
-                        logger.debug("Found decorator {}", name);
-                    } else {
-                        registerAction(name, type);
-                        logger.debug("Found action {}", name);
-                    }
-                }
-            }
-
-
             for (Class<? extends Action> type : environment.getSubtypesOf(Action.class)) {
                 BehaviorAction behaviorAction = type.getAnnotation(BehaviorAction.class);
                 if (behaviorAction != null) {
@@ -141,11 +111,17 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
     }
 
     public void registerAction(String name, Class<? extends Action> action) {
+        if (actions.containsKey(name)) {
+            logger.error("Duplicate Action definition! {} - overwriting...", name);
+        }
         actions.put(name, action);
         gson = null;
     }
 
     public void registerDecorator(String name, Class<? extends Action> action) {
+        if (decorators.containsKey(name)) {
+            logger.error("Duplicate Decorator definition! {} - overwriting...", name);
+        }
         decorators.put(name, action);
         gson = null;
     }
@@ -169,7 +145,9 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                 @Override
                 public BehaviorTree read(JsonReader in) throws IOException {
                     String uri = in.nextString();
-                    return CoreRegistry.get(AssetManager.class).getAsset(new ResourceUrn(uri), BehaviorTree.class).get();
+                    AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+                    return assetManager.getAsset(new ResourceUrn(uri), BehaviorTree.class).orElse(assetManager.getAsset(new ResourceUrn("Behaviors:fallback"), BehaviorTree.class).get());
+
                 }
             });
             gson = gsonBuilder.create();

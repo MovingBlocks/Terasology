@@ -79,7 +79,7 @@ public class Interpreter {
     }
 
     public String toString() {
-        return actor.getComponent(DisplayNameComponent.class).name;
+        return actor.hasComponent(DisplayNameComponent.class) ? actor.getComponent(DisplayNameComponent.class).name : "unnamed " + actor.getEntity().getParentPrefab().getName();
     }
 
     public void pause() {

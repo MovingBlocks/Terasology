@@ -15,10 +15,14 @@
  */
 package org.terasology.logic.behavior.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A decorator node uses a associated Action to control the result state of the child node.
  */
 public class DecoratorNode extends ActionNode {
+    private static final Logger logger = LoggerFactory.getLogger(DecoratorNode.class);
     private BehaviorNode child;
     private BehaviorState lastState = BehaviorState.UNDEFINED;
 
@@ -80,7 +84,17 @@ public class DecoratorNode extends ActionNode {
         if (!action.prune(actor)) {
             runChild(actor);
         }
-        BehaviorState modifiedState = action.modify(actor, lastState);
+
+        BehaviorState modifiedState;
+        try {
+            modifiedState = action.modify(actor, lastState);
+        } catch (Exception e) {
+            logger.info("Exception while running action {} from entity {}: ", action, actor.getEntity(), e.getStackTrace());
+            // TODO maybe returning UNDEFINED would be more canonical?
+            return BehaviorState.FAILURE;
+        }
+
+
         if (modifiedState != BehaviorState.RUNNING && lastState == BehaviorState.RUNNING) {
             child.destruct(actor);
         }
