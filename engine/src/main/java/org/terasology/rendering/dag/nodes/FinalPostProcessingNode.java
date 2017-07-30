@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
@@ -25,7 +22,6 @@ import org.terasology.context.Context;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
@@ -41,14 +37,12 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.terasology.rendering.dag.nodes.LateBlurNode.SECOND_LATE_BLUR_FBO_URI;
 import static org.terasology.rendering.dag.nodes.ToneMappingNode.TONE_MAPPING_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -88,10 +82,10 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
     private boolean isFilmGrainEnabled;
     private boolean isMotionBlurEnabled;
 
-    private StateChange setBlurTexStateChage;
-    private StateChange setNoiseTexStateChage;
+    private StateChange setBlurTexture;
+    private StateChange setFilmGrainNoiseTexture;
 
-    private final int filmGrainTexSize = 1024;
+    private final int filmGrainNoiseTextureSize = 1024;
 
     public FinalPostProcessingNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -120,17 +114,17 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         int texId = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, TONE_MAPPING_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texDepth"));
-        setBlurTexStateChage = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
+        setBlurTexture = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
         addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));
-        // TODO: use GLSL noise functions to have a completely shader-based film grain.
-        setNoiseTexStateChage = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(filmGrainTexSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
+        // TODO: evaluate the possibility to use GPU-based noise algorithms instead of CPU-generated textures.
+        setFilmGrainNoiseTexture = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(filmGrainNoiseTextureSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
 
         if (renderingConfig.getBlurIntensity() != 0) {
-            addDesiredStateChange(setBlurTexStateChage);
+            addDesiredStateChange(setBlurTexture);
         }
 
         if (isFilmGrainEnabled) {
-            addDesiredStateChange(setNoiseTexStateChage);
+            addDesiredStateChange(setFilmGrainNoiseTexture);
         }
     }
 
@@ -149,7 +143,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             postMaterial.setFloat("grainIntensity", filmGrainIntensity, true);
             postMaterial.setFloat("noiseOffset", randomGenerator.nextFloat(), true);
 
-            postMaterial.setFloat2("noiseSize", filmGrainTexSize, filmGrainTexSize, true);
+            postMaterial.setFloat2("noiseSize", filmGrainNoiseTextureSize, filmGrainNoiseTextureSize, true);
             postMaterial.setFloat2("renderTargetSize", lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height(), true);
         }
 
@@ -173,20 +167,20 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         if (event.getPropertyName().equals(RenderingConfig.FILM_GRAIN)) {
             isFilmGrainEnabled = renderingConfig.isFilmGrain();
             if (isFilmGrainEnabled) {
-                addDesiredStateChange(setNoiseTexStateChage);
+                addDesiredStateChange(setFilmGrainNoiseTexture);
             } else {
-                removeDesiredStateChange(setNoiseTexStateChage);
+                removeDesiredStateChange(setFilmGrainNoiseTexture);
             }
         } else if (event.getPropertyName().equals(RenderingConfig.MOTION_BLUR)) {
             isMotionBlurEnabled = renderingConfig.isMotionBlur();
         } else if (event.getPropertyName().equals(RenderingConfig.BLUR_INTENSITY)) {
             if (renderingConfig.getBlurIntensity() != 0) {
-                addDesiredStateChange(setBlurTexStateChage);
+                addDesiredStateChange(setBlurTexture);
             } else {
-                removeDesiredStateChange(setBlurTexStateChage);
+                removeDesiredStateChange(setBlurTexture);
             }
         } // else: no other cases are possible - see subscribe operations in initialize().
 
-        // worldRenderer.requestTaskListRefresh();
+        worldRenderer.requestTaskListRefresh();
     }
 }

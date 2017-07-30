@@ -127,8 +127,6 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         if (ssaoSamples == null) {
             createSamplesBuffer();
         }
-
-        ssaoMaterial.setFloat3("ssaoSamples", ssaoSamples);
     }
 
     /**
@@ -149,6 +147,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
         ssaoMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
         ssaoMaterial.setFloat2("noiseTexelSize", NOISE_TEXEL_SIZE, NOISE_TEXEL_SIZE, true);
+
+        ssaoMaterial.setFloat3("ssaoSamples", ssaoSamples);
 
         renderFullscreenQuad();
 

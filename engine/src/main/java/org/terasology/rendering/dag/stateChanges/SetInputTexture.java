@@ -24,7 +24,6 @@ import org.terasology.utilities.Assets;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -39,7 +38,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
  * This StateChange and the underlying task only handles textures of type GL_TEXTURE_2D.
  */
 public class SetInputTexture implements StateChange {
-    private final int target;
+    private final int textureType;
     private final int textureSlot;
     private final int textureId;
     private final ResourceUrn materialUrn;
@@ -62,14 +61,14 @@ public class SetInputTexture implements StateChange {
      *
      * It is recommended to use one of the children classes (SetInputTexture2D / SetInputTexture3D) to make the code clearer.
      *
-     * @param target the attachment point (like TEXTURE_2D) where the texture will be attached to.
+     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureId an integer representing the opengl name of a texture. This is usually the return value of glGenTexture().
      * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
      * @param materialParameter a String representing the variable within the shader holding the texture.
      */
-    public SetInputTexture(int target, int textureSlot, int textureId, ResourceUrn materialUrn, String materialParameter) {
-        this.target = target;
+    public SetInputTexture(int textureType, int textureSlot, int textureId, ResourceUrn materialUrn, String materialParameter) {
+        this.textureType = textureType;
         this.textureSlot = textureSlot;
         this.textureId = textureId;
         this.materialUrn = materialUrn;
@@ -92,14 +91,13 @@ public class SetInputTexture implements StateChange {
      *
      * See the source of the process() method for the nitty gritty details.
      *
-     * @param target the attachment point (like TEXTURE_2D) where the texture will be attached to.
-     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
+     * @param textureType an opengl constant, can be GL_TEXTURE_2D, GL_TEXTURE_3D and any other texture type listed in https://www.khronos.org/opengl/wiki/Texture#Theory     * @param textureSlot a 0-based integer. Notice that textureUnit = GL_TEXTURE0 + textureSlot. See OpenGL spects for maximum allowed values.
      * @param textureUrn a String identifying a loaded texture, whose id will then be used by this StateChange.
      * @param materialUrn a ResourceURN object uniquely identifying a Material asset.
      * @param materialParameter a String representing the variable within the shader holding the texture.
      */
-    public SetInputTexture(int target, int textureSlot, String textureUrn, ResourceUrn materialUrn, String materialParameter) {
-        this.target = target;
+    public SetInputTexture(int textureType, int textureSlot, String textureUrn, ResourceUrn materialUrn, String materialParameter) {
+        this.textureType = textureType;
         this.textureSlot = textureSlot;
         this.materialUrn = materialUrn;
         this.materialParameter = materialParameter;
@@ -117,8 +115,8 @@ public class SetInputTexture implements StateChange {
         // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset if necessary
     }
 
-    private SetInputTexture(int target, int textureSlot, ResourceUrn materialUrn, String materialParameter) {
-        this.target = target;
+    private SetInputTexture(int textureType, int textureSlot, ResourceUrn materialUrn, String materialParameter) {
+        this.textureType = textureType;
         this.textureSlot = textureSlot;
         this.textureId = 0;
         this.materialUrn = materialUrn;
@@ -153,7 +151,7 @@ public class SetInputTexture implements StateChange {
     @Override
     public StateChange getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new SetInputTexture(target, textureSlot, materialUrn, materialParameter);
+            defaultInstance = new SetInputTexture(textureType, textureSlot, materialUrn, materialParameter);
         }
         return defaultInstance;
     }
@@ -167,7 +165,7 @@ public class SetInputTexture implements StateChange {
     @Override
     public void process() {
         glActiveTexture(GL_TEXTURE0 + textureSlot);
-        glBindTexture(target, textureId);
+        glBindTexture(textureType, textureId);
         material.setInt(materialParameter, textureSlot, true);
     }
 }
