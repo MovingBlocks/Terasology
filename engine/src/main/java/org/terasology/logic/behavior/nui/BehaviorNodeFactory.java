@@ -32,7 +32,6 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.behavior.core.BehaviorNode;
@@ -49,7 +48,12 @@ import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +64,8 @@ import java.util.stream.Collectors;
 @Share(BehaviorNodeFactory.class)
 public class BehaviorNodeFactory extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
+
+    private static final Comparator<BehaviorNodeComponent> COMPARE_BY_NAME = Comparator.comparing(o -> o.name);
 
     private List<BehaviorNodeComponent> nodeComponents = Lists.newArrayList();
     private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
@@ -90,37 +96,34 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         sounds.addAll(assetManager.getAvailableAssets(StaticSound.class).stream().collect(Collectors.toList()));
         music.addAll(assetManager.getAvailableAssets(StreamingSound.class).stream().collect(Collectors.toList()));
         providerFactory.register("sounds", new ReadOnlyBinding<List<ResourceUrn>>() {
-                    @Override
-                    public List<ResourceUrn> get() {
-                        return sounds;
-                    }
-                }, new StringTextRenderer<ResourceUrn>() {
-                    @Override
-                    public String getString(ResourceUrn value) {
-                        return value.getResourceName().toString();
-                    }
-                }
-        );
+            @Override
+            public List<ResourceUrn> get() {
+                return sounds;
+            }
+        }, new StringTextRenderer<ResourceUrn>() {
+            @Override
+            public String getString(ResourceUrn value) {
+                return value.getResourceName().toString();
+            }
+        });
         providerFactory.register("music", new ReadOnlyBinding<List<ResourceUrn>>() {
-                    @Override
-                    public List<ResourceUrn> get() {
-                        return music;
-                    }
-                }, new StringTextRenderer<ResourceUrn>() {
-                    @Override
-                    public String getString(ResourceUrn value) {
-                        return value.getResourceName().toString();
-                    }
-                }
-        );
+            @Override
+            public List<ResourceUrn> get() {
+                return music;
+            }
+        }, new StringTextRenderer<ResourceUrn>() {
+            @Override
+            public String getString(ResourceUrn value) {
+                return value.getResourceName().toString();
+            }
+        });
         providerFactory.register("animations", new AnimationPoolUriBinding(),
                 new StringTextRenderer<ComponentFieldUri>() {
                     @Override
                     public String getString(ComponentFieldUri value) {
                         return value.toString();
                     }
-                }
-        );
+                });
         refreshPrefabs();
         sortLibrary();
     }
@@ -153,7 +156,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         categories = Lists.newArrayList(categoryComponents.keySet());
         Collections.sort(categories);
         for (String category : categories) {
-            Collections.sort(categoryComponents.get(category), Comparator.comparing(o -> o.name));
+            Collections.sort(categoryComponents.get(category), COMPARE_BY_NAME);
         }
     }
 
@@ -163,8 +166,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
             // called from main menu
             List<String> nodes = Arrays.asList(
                     "counter", "timer", "loop", "lookup", "dynselector",
-                    "fail", "parallel", "playMusic", "playSound", "running", "selector", "setAnimation", "sequence", "succeed"
-            );
+                    "fail", "parallel", "playMusic", "playSound", "running", "selector", "setAnimation", "sequence", "succeed");
             prefabs = Lists.newArrayList();
             for (String node : nodes) {
                 prefabs.add(Assets.get(new ResourceUrn("engine:" + node), Prefab.class).orElse(null));
