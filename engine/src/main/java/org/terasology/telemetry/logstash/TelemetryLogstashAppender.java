@@ -44,6 +44,8 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
 
     public static final String DEFAULT_LOGSTASH_HOST = "utility.terasology.org";
 
+    public static final String DEFAULT_LOGSTASH_OWNER = "Terasology Community";
+
     public static final int DEFAULT_LOGSTASH_PORT = 9600;
 
     private Context gameContext;
@@ -80,8 +82,11 @@ public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
         jsonProviders.addProvider(new LogLevelJsonProvider());
         jsonProviders.addProvider(new LoggerNameJsonProvider());
         jsonProviders.addProvider(new ThreadNameJsonProvider());
+
+        // custom providers
         jsonProviders.addProvider(new SystemContextJsonProvider());
         jsonProviders.addProvider(new ModulesJsonProvider());
+        jsonProviders.addProvider(new UserIdJsonProvider());
 
         StackTraceJsonProvider stackTraceJsonProvider = new StackTraceJsonProvider();
         ShortenedThrowableConverter shortenedThrowableConverter = new ShortenedThrowableConverter();

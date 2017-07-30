@@ -37,7 +37,7 @@ import java.util.Map;
 @TelemetryCategory(id = "modules",
         displayName = "${engine:menu#telemetry-modules}"
 )
-public class ModulesMetric extends Metric {
+public final class ModulesMetric extends Metric {
 
     public static final String SCHEMA_MODULES = "iglu:org.terasology/modules/jsonschema/1-0-0";
 
@@ -53,7 +53,7 @@ public class ModulesMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        Map<String, Object> metricMap = getFieldValueMap();
+        getFieldValueMap();
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, metricMap);
         
         return Unstructured.builder()
@@ -62,13 +62,13 @@ public class ModulesMetric extends Metric {
     }
 
     @Override
-    public Map<String, Object> getFieldValueMap() {
+    public Map<String, ?> getFieldValueMap() {
         updateModules();
-        Map<String, Object> map = new HashMap();
+        metricMap = new HashMap();
         for (Module module : modules) {
-            map.put(module.getId().toString(), module.getVersion().toString());
+            metricMap.put(module.getId().toString(), module.getVersion().toString());
         }
-        return map;
+        return metricMap;
     }
 
     private void updateModules() {

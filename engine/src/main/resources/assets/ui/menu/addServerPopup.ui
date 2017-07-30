@@ -96,7 +96,8 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "${engine:menu#add-server-tip}"
+                            "text": "${engine:menu#add-server-tip}",
+                            "id": "tip"
                         },
                         {
                             "type": "UISpace",

@@ -16,6 +16,7 @@
 package org.terasology.telemetry;
 
 import ch.qos.logback.classic.LoggerContext;
+import com.snowplowanalytics.snowplow.tracker.Subject;
 import com.snowplowanalytics.snowplow.tracker.Tracker;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
@@ -40,8 +41,13 @@ public class TelemetryUtils {
      * @param metric The new metric.
      */
     public static void trackMetric(Emitter emitter, String nameSpace, Unstructured metric) {
+        Subject subject = new Subject.SubjectBuilder()
+                .userId(TelemetryParams.userId)
+                .build();
+
         // initialise tracker
         Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
+                .subject(subject)
                 .platform(TelemetryParams.PLATFORM_DESKTOP)
                 .build();
 
@@ -71,7 +77,7 @@ public class TelemetryUtils {
             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
             appender = (TelemetryLogstashAppender) lc.getLogger(Logger.ROOT_LOGGER_NAME).getAppender("LOGSTASH");
         } catch (Exception e) {
-            logger.error("Error when fetching TelemetryLogstashAppender",e);
+            logger.error("Error when fetching TelemetryLogstashAppender", e);
             return null;
         }
         return appender;

@@ -97,7 +97,7 @@ public class SystemContextMetric extends Metric {
     @Override
     public Unstructured getUnstructuredMetric() {
 
-        Map<String, Object> metricMap = getFieldValueMap();
+        getFieldValueMap();
 
         SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
 

@@ -85,24 +85,7 @@ public class TelemetryScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        ColumnLayout mainLayout = new ColumnLayout();
-        mainLayout.setHorizontalSpacing(8);
-        mainLayout.setVerticalSpacing(8);
-
-        Map<TelemetryCategory, Class> telemetryCategories = fetchTelemetryCategoriesFromEnvironment();
-
-        for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
-            Class metricClass = telemetryCategory.getValue();
-            Optional<Metric> optional = metrics.getMetric(metricClass);
-            if (optional.isPresent()) {
-                Metric metric = optional.get();
-                Map<String, Object> map = metric.getFieldValueMap();
-                addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
-            }
-        }
-
-        ScrollableArea area = find("area", ScrollableArea.class);
-        area.setContent(mainLayout);
+        refreshContent();
 
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
         WidgetUtil.tryBindCheckBoxWithListener(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE),(checkbox) -> {
@@ -120,15 +103,48 @@ public class TelemetryScreen extends CoreScreenLayer {
         });
     }
 
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        refreshContent();
+    }
+
+    private void refreshContent() {
+        ColumnLayout mainLayout = new ColumnLayout();
+        mainLayout.setHorizontalSpacing(8);
+        mainLayout.setVerticalSpacing(8);
+        Map<TelemetryCategory, Class> telemetryCategories = fetchTelemetryCategoriesFromEnvironment();
+
+        for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
+            Class metricClass = telemetryCategory.getValue();
+            Optional<Metric> optional = metrics.getMetric(metricClass);
+            if (optional.isPresent()) {
+                Metric metric = optional.get();
+                Map<String, ?> map = metric.getFieldValueMap();
+                if (map != null) {
+                    addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
+                }
+            }
+        }
+
+        ScrollableArea area = find("area", ScrollableArea.class);
+        area.setContent(mainLayout);
+    }
+
     private void pushAddServerPopupAndStartEmitter() {
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        addServerPopup.removeTip();
         ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
+        serverInfo.setOwner(TelemetryEmitter.DEFAULT_COLLECTOR_OWNER);
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
             Optional<URL> optionalURL = item.getURL("http");
             if (optionalURL.isPresent()) {
                 telemetryEmitter.changeUrl(optionalURL.get());
+
+                // Save the telemetry destination
+                config.getTelemetryConfig().setTelemetryDestination(optionalURL.get().toString());
             }
         });
         addServerPopup.onCancel((button) -> {
@@ -139,7 +155,9 @@ public class TelemetryScreen extends CoreScreenLayer {
     private void pushAddServerPopupAndStartLogBackAppender() {
 
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+        addServerPopup.removeTip();
         ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST, TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
+        serverInfo.setOwner(TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER);
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             StringBuilder destinationLogstash = new StringBuilder();
@@ -149,6 +167,9 @@ public class TelemetryScreen extends CoreScreenLayer {
             TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
             telemetryLogstashAppender.addDestination(destinationLogstash.toString());
             telemetryLogstashAppender.start();
+
+            // Save the destination
+            config.getTelemetryConfig().setErrorReportingDestination(destinationLogstash.toString());
         });
         addServerPopup.onCancel((button) -> {
             config.getTelemetryConfig().setErrorReportingEnabled(false);
@@ -183,7 +204,7 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param layout the layout where the new section will be added
      * @param map the map which includes the telemetry field name and value
      */
-    private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String, Object> map) {
+    private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String, ?> map) {
 
         UILabel categoryHeader = new UILabel(translationSystem.translate(telemetryCategory.displayName()));
         categoryHeader.setFamily("subheading");
@@ -191,6 +212,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         List<Map.Entry> telemetryFields = sortFields(map);
         for (Map.Entry entry : telemetryFields) {
             Object value = entry.getValue();
+            if (value == null) {
+                value = "Value Unknown";
+            }
             if (value instanceof List) {
                 List list = (List) value;
                 addTelemetryField(entry.getKey().toString(), list, layout);
@@ -238,7 +262,7 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param map the map that will be sorted
      * @return a list of map entry that is ordered by fields' names
      */
-    private List<Map.Entry> sortFields(Map<String, Object> map) {
+    private List<Map.Entry> sortFields(Map<String, ?> map) {
         List<Map.Entry> list = new ArrayList<>(map.entrySet());
         Collections.sort(list, new Comparator<Map.Entry>() {
             @Override
