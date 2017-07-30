@@ -31,14 +31,12 @@ import org.terasology.rendering.nui.properties.Range;
 @API
 @BehaviorAction(name = "counter", isDecorator = true)
 public class CounterAction extends BaseAction {
-    private static final Logger logger = LoggerFactory.getLogger(CounterAction.class);
 
     @Range(min = 0, max = 100)
     private int count;
 
     @Override
     public void construct(Actor actor) {
-        logger.info("Counter construct running for actor {} entity {}", actor, actor.getEntity());
         actor.setValue(getId(), count);
     }
 

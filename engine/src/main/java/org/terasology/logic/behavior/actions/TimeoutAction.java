@@ -30,10 +30,9 @@ import org.terasology.rendering.nui.properties.Range;
  * or returns FAILURE if child doesn't finish in time.
  */
 @API
-@BehaviorAction(name = "timer", isDecorator = true)
-public class TimerAction extends BaseAction {
-    private static final Logger logger = LoggerFactory.getLogger(TimerAction.class);
-
+@BehaviorAction(name = "timeout", isDecorator = true)
+public class TimeoutAction extends BaseAction {
+    private static final Logger logger = LoggerFactory.getLogger(TimeoutAction.class);
 
     @Range(min = 0, max = 10)
     private float time;
@@ -48,7 +47,7 @@ public class TimerAction extends BaseAction {
         switch (result) {
             case UNDEFINED:
                 // If used with no child specified
-                logger.error("TimerAction received an UNDEFINED state to modify. Is a child specified?");
+                logger.error("TimeoutAction received an UNDEFINED state to modify. Is a child specified?");
                 float timeRemaining = actor.getValue(getId());
                 timeRemaining -= actor.getDelta();
                 actor.setValue(getId(), timeRemaining);
@@ -63,7 +62,6 @@ public class TimerAction extends BaseAction {
                 // If child returned a final state, pass the state on
                 return result;
         }
-
 
     }
 }
