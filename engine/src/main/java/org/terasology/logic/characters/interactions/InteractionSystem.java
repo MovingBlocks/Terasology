@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -59,6 +60,36 @@ public class InteractionSystem extends BaseComponentSystem {
         characterComponent.authorizedInteractionId = event.getActivationId();
         instigator.saveComponent(characterComponent);
 
+    }
+
+    /**
+     * To consume the activation event in the edit mode if the target entity has an EditScreenComponent with no screen defined.
+     * @param event
+     * @param target
+     * @param editScreenComponent
+     */
+    @ReceiveEvent(components = {InteractionTargetComponent.class}, priority = EventPriority.PRIORITY_HIGH)
+    public void onEditModeActivationPredicted(ActivationPredicted event, EntityRef target,
+                                              EditScreenComponent editScreenComponent) {
+        EntityRef character = event.getInstigator();
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return;
+        }
+        if (characterComponent.predictedInteractionTarget.exists()) {
+            InteractionUtil.cancelInteractionAsClient(character);
+        }
+        if (editScreenComponent.screen == null && characterComponent.editMode) {
+            logger.info("No screen defined in Edit Mode");
+            event.consume();
+        }
+        if (editScreenComponent.screen != null && characterComponent.editMode) {
+            return;
+        }
+        if (!target.hasComponent(InteractionScreenComponent.class) && !characterComponent.editMode) {
+            logger.info("No screen defined in Normal Mode");
+            event.consume();
+        }
     }
 
     @ReceiveEvent(components = {InteractionTargetComponent.class})
@@ -102,8 +133,27 @@ public class InteractionSystem extends BaseComponentSystem {
         nuiManager.closeScreen(screenComponent.screen);
     }
 
+    @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
+    public void onEditModeInteractionStartPredicted(InteractionStartPredicted event, EntityRef container,
+                                                    EditScreenComponent editScreenComponent) {
+        EntityRef investigator = event.getInstigator();
+        CharacterComponent characterComponent = investigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction start predicted for entity without character component");
+            return;
+        }
+        if (!characterComponent.editMode) {
+            return;
+        }
+        ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
+        if (controller != null && controller.local) {
+            event.consume();
+            nuiManager.closeAllScreens();
+            nuiManager.pushScreen(editScreenComponent.screen);
+        }
+    }
 
-    @ReceiveEvent(components = {InteractionScreenComponent.class})
+    @ReceiveEvent
     public void onInteractionStartPredicted(InteractionStartPredicted event, EntityRef container,
                                             InteractionScreenComponent interactionScreenComponent) {
         EntityRef investigator = event.getInstigator();

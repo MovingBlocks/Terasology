@@ -36,6 +36,10 @@ public final class CharacterComponent implements Component {
      */
     public float interactionRange = 5f;
     /**
+     * Specifies whether the character can interact with entities that have an edit screen.
+     */
+    public boolean editMode = false;
+    /**
      * The current interaction target of a character which has been authorized by the authority (e.g. the server).
      * <br><br>
      * Modules should not modify this field directly.
