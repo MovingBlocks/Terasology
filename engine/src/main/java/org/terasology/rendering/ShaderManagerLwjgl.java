@@ -87,27 +87,27 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     @Override
     public void initShaders() {
-        defaultShaderProgram = prepareAndStoreShaderProgramInstance("default");
-        defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured");
+        defaultShaderProgram = loadShaderProgram("default");
+        defaultTexturedShaderProgram = loadShaderProgram("defaultTextured");
 
         // TODO: Find a better way to do this
-        prepareAndStoreShaderProgramInstance("post");
-        prepareAndStoreShaderProgramInstance("ssao");
-        prepareAndStoreShaderProgramInstance("lightShafts");
-        prepareAndStoreShaderProgramInstance("sobel");
-        prepareAndStoreShaderProgramInstance("initialPost");
-        prepareAndStoreShaderProgramInstance("prePostComposite");
-        prepareAndStoreShaderProgramInstance("highPass");
-        prepareAndStoreShaderProgramInstance("blur");
-        prepareAndStoreShaderProgramInstance("downSampler");
-        prepareAndStoreShaderProgramInstance("toneMapping");
-        prepareAndStoreShaderProgramInstance("sky");
-        prepareAndStoreShaderProgramInstance("chunk");
-        prepareAndStoreShaderProgramInstance("particle");
-        prepareAndStoreShaderProgramInstance("shadowMap");
-        prepareAndStoreShaderProgramInstance("lightBufferPass");
-        prepareAndStoreShaderProgramInstance("lightGeometryPass");
-        prepareAndStoreShaderProgramInstance("ssaoBlur");
+        loadShaderProgram("post");
+        loadShaderProgram("ssao");
+        loadShaderProgram("lightShafts");
+        loadShaderProgram("sobel");
+        loadShaderProgram("initialPost");
+        loadShaderProgram("prePostComposite");
+        loadShaderProgram("highPass");
+        loadShaderProgram("blur");
+        loadShaderProgram("downSampler");
+        loadShaderProgram("toneMapping");
+        loadShaderProgram("sky");
+        loadShaderProgram("chunk");
+        loadShaderProgram("particle");
+        loadShaderProgram("shadowMap");
+        loadShaderProgram("lightBufferPass");
+        loadShaderProgram("lightGeometryPass");
+        loadShaderProgram("ssaoBlur");
     }
 
     @Override
@@ -145,7 +145,8 @@ public class ShaderManagerLwjgl implements ShaderManager {
         activeMaterial = null;
     }
 
-    public GLSLMaterial prepareAndStoreShaderProgramInstance(String title) {
+    // TODO: discuss having a `public unloadShaderProgram`, to dispose shader programs no longer in use by any node
+    public GLSLMaterial loadShaderProgram(String title) {
         String uri = "engine:" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);

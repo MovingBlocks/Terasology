@@ -31,7 +31,7 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -172,15 +172,15 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         renderingConfig.subscribe(RenderingConfig.ANIMATE_WATER, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterStill", CHUNK_MATERIAL_URN, "textureWater"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL_URN, "textureWaterNormal"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL_URN, "textureWaterNormalAlt"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:waterStill", CHUNK_MATERIAL_URN, "textureWater"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL_URN, "textureWaterNormal"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL_URN, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO_URI, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "textureWaterReflection"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaque"));
-        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
-        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
+        setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);

@@ -33,7 +33,7 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -106,11 +106,11 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
-        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
-        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
+        setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);

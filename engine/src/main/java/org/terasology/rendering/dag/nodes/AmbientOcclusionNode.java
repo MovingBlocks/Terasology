@@ -16,10 +16,7 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -27,7 +24,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -35,6 +31,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -51,7 +48,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Optional;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -96,7 +92,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
     private Camera activeCamera;
 
-    private final Random random = new FastRandom();
+    private final Random randomGenerator = new FastRandom();
 
     private FloatBuffer ssaoSamples;
 
@@ -125,30 +121,11 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
 
         int texId = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(texId, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texNormals"));
+        addDesiredStateChange(new SetInputTexture2D(texId, generateNoiseTexture().getId(), SSAO_MATERIAL_URN, "texNoise"));
 
         if (ssaoSamples == null) {
-            ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS * 3);
-
-            for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
-                Vector3f vec = new Vector3f();
-                vec.x = random.nextFloat(-1.0f, 1.0f);
-                vec.y = random.nextFloat(-1.0f, 1.0f);
-                vec.z = random.nextFloat();
-
-                vec.normalize();
-                vec.scale(random.nextFloat(0.0f, 1.0f));
-                float scale = i / (float) SSAO_KERNEL_ELEMENTS;
-                scale = TeraMath.lerp(0.25f, 1.0f, scale * scale);
-
-                vec.scale(scale);
-
-                ssaoSamples.put(vec.x);
-                ssaoSamples.put(vec.y);
-                ssaoSamples.put(vec.z);
-            }
-
-            ssaoSamples.flip();
+            createSamplesBuffer();
         }
 
         ssaoMaterial.setFloat3("ssaoSamples", ssaoSamples);
@@ -164,13 +141,6 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/ambientOcclusion");
-
-        Texture ssaoNoiseTexture = updateNoiseTexture();
-
-        // TODO: Convert this to StateChange
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, ssaoNoiseTexture.getId());
-        ssaoMaterial.setInt("texNoise", 2, true);
 
         ssaoMaterial.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
 
@@ -191,14 +161,37 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
         outputFboHeight = ssaoFbo.height();
     }
 
-    private Texture updateNoiseTexture() {
-        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset only if necessary
-        Optional<Texture> texture = CoreRegistry.get(AssetManager.class).getAsset("engine:ssaoNoise", Texture.class);
+    private void createSamplesBuffer() {
+        ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS * 3);
+
+        for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
+            Vector3f vec = new Vector3f();
+            vec.x = randomGenerator.nextFloat(-1.0f, 1.0f);
+            vec.y = randomGenerator.nextFloat(-1.0f, 1.0f);
+            vec.z = randomGenerator.nextFloat();
+
+            vec.normalize();
+            vec.scale(randomGenerator.nextFloat(0.0f, 1.0f));
+            float scale = i / (float) SSAO_KERNEL_ELEMENTS;
+            scale = TeraMath.lerp(0.25f, 1.0f, scale * scale);
+
+            vec.scale(scale);
+
+            ssaoSamples.put(vec.x);
+            ssaoSamples.put(vec.y);
+            ssaoSamples.put(vec.z);
+        }
+
+        ssaoSamples.flip();
+    }
+
+    private Texture generateNoiseTexture() {
+        Optional<Texture> texture = Assets.getTexture("engine:ssaoNoise");
         if (!texture.isPresent()) {
             ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
 
             for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
-                Vector3f noiseVector = new Vector3f(random.nextFloat(-1.0f, 1.0f), random.nextFloat(-1.0f, 1.0f), 0.0f);
+                Vector3f noiseVector = new Vector3f(randomGenerator.nextFloat(-1.0f, 1.0f), randomGenerator.nextFloat(-1.0f, 1.0f), 0.0f);
                 noiseVector.normalize();
 
                 noiseValues.put((byte) ((noiseVector.x * 0.5 + 0.5) * 255.0f));

@@ -29,8 +29,11 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture3D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -65,12 +68,13 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 public class FinalPostProcessingNode extends AbstractNode implements PropertyChangeListener {
     private static final ResourceUrn POST_MATERIAL_URN = new ResourceUrn("engine:prog.post");
 
+    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
     private Material postMaterial;
 
-    private Random rand = new FastRandom();
+    private Random randomGenerator = new FastRandom();
 
     private CameraTargetSystem cameraTargetSystem;
     private Camera activeCamera;
@@ -84,8 +88,14 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
     private boolean isFilmGrainEnabled;
     private boolean isMotionBlurEnabled;
 
+    private StateChange setBlurTexStateChage;
+    private StateChange setNoiseTexStateChage;
+
+    private final int filmGrainTexSize = 1024;
+
     public FinalPostProcessingNode(Context context) {
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        worldRenderer = context.get(WorldRenderer.class);
+        activeCamera = worldRenderer.getActiveCamera();
         screenGrabber = context.get(ScreenGrabber.class);
         cameraTargetSystem = context.get(CameraTargetSystem.class);
 
@@ -100,25 +110,34 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         renderingConfig = context.get(Config.class).getRendering();
         isFilmGrainEnabled = renderingConfig.isFilmGrain();
+        renderingConfig.subscribe(RenderingConfig.FILM_GRAIN, this);
         isMotionBlurEnabled = renderingConfig.isMotionBlur();
+        renderingConfig.subscribe(RenderingConfig.MOTION_BLUR, this);
+        renderingConfig.subscribe(RenderingConfig.BLUR_INTENSITY, this);
 
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
 
         int texId = 0;
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, TONE_MAPPING_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texScene"));
         addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texDepth"));
+        setBlurTexStateChage = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
+        // addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));
+        // TODO: use GLSL noise functions to have a completely shader-based film grain.
+        setNoiseTexStateChage = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(filmGrainTexSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
+
         if (renderingConfig.getBlurIntensity() != 0) {
-            addDesiredStateChange(new SetInputTextureFromFbo(texId, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur"));
+            addDesiredStateChange(setBlurTexStateChage);
         }
 
-        // TODO: take advantage of Texture.subscribeToDisposal(Runnable) to reobtain the asset only if necessary
+        if (isFilmGrainEnabled) {
+            addDesiredStateChange(setNoiseTexStateChage);
+        }
     }
 
     /**
      * Execute the final post processing on the rendering of the scene obtained so far.
      *
-     * It uses the GBUFFER as input and the FINAL FBO to store its output, rendering
-     * everything to a quad.
+     * It uses the data stored in multiple FBOs as input and the FINAL FBO to store its output, rendering everything to a quad.
      */
     @Override
     public void process() {
@@ -136,6 +155,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             // TODO: review - is this loading a noise texture every frame?
             // TODO:          and must it be monitored like a standard texture?
             // TODO: convert to StateChange
+            // TODO: use GLSL noise functions to have a completely shader-based film grain.
             ResourceUrn noiseTextureUri = TextureUtil.getTextureUriForWhiteNoise(1024, 0x1234, 0, 512);
             Texture filmGrainNoiseTexture = Assets.getTexture(noiseTextureUri).get();
             GL13.glActiveTexture(GL13.GL_TEXTURE3);
@@ -143,7 +163,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             postMaterial.setInt("texNoise", 3, true);
 
             postMaterial.setFloat("grainIntensity", filmGrainIntensity, true);
-            postMaterial.setFloat("noiseOffset", rand.nextFloat(), true);
+            postMaterial.setFloat("noiseOffset", randomGenerator.nextFloat(), true);
 
             postMaterial.setFloat2("noiseSize", filmGrainNoiseTexture.getWidth(), filmGrainNoiseTexture.getHeight(), true);
             postMaterial.setFloat2("renderTargetSize", lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height(), true);
@@ -168,10 +188,21 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.FILM_GRAIN)) {
             isFilmGrainEnabled = renderingConfig.isFilmGrain();
+            if (isFilmGrainEnabled) {
+                addDesiredStateChange(setNoiseTexStateChage);
+            } else {
+                removeDesiredStateChange(setNoiseTexStateChage);
+            }
         } else if (event.getPropertyName().equals(RenderingConfig.MOTION_BLUR)) {
             isMotionBlurEnabled = renderingConfig.isMotionBlur();
+        } else if (event.getPropertyName().equals(RenderingConfig.BLUR_INTENSITY)) {
+            if (renderingConfig.getBlurIntensity() != 0) {
+                addDesiredStateChange(setBlurTexStateChage);
+            } else {
+                removeDesiredStateChange(setBlurTexStateChage);
+            }
         } // else: no other cases are possible - see subscribe operations in initialize().
 
-        // TODO: Do we have to monitor BlurIntensity?
+        worldRenderer.requestTaskListRefresh();
     }
 }

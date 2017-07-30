@@ -33,7 +33,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -134,11 +134,11 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
-        setNormalTerrain = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
-        setHeightTerrain = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
+        setNormalTerrain = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setHeightTerrain = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (isNormalMapping) {
             addDesiredStateChange(setNormalTerrain);
