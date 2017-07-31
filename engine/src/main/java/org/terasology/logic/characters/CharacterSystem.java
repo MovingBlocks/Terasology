@@ -86,8 +86,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     private BlockEntityRegistry blockRegistry;
 
     @ReceiveEvent
-    public void beforeDestroy(BeforeDestroyEvent event, EntityRef entity, CharacterComponent character, AliveCharacterComponent aliveCharacterComponent) {
-        if (entity.hasComponent(PlayerCharacterComponent.class)) {
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character, CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
+        if (character.hasComponent(PlayerCharacterComponent.class)) {
             // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
             event.consume();
             // PlayerDeathEvent only sent to the client for the player entity.
@@ -95,16 +95,16 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             //Store the details of the death in the event for display on the death screen
             playerDeathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
             playerDeathEvent.instigatorName = getInstigatorName(event.getInstigator());
-            character.controller.send(playerDeathEvent);
+            character.send(playerDeathEvent);
         }
 
         // DeathEvent sent to client for any character entity.
         DeathEvent deathEvent = new DeathEvent();
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
-        character.controller.send(deathEvent);
+        characterComponent.controller.send(deathEvent);
 
-        entity.removeComponent(AliveCharacterComponent.class);
+        character.removeComponent(AliveCharacterComponent.class);
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);

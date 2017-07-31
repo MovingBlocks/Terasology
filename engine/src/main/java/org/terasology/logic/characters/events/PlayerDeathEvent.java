@@ -20,7 +20,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.network.OwnerEvent;
 
 /**
- * This event is sent to the client entity when the player dies.
+ * This event is sent to the player entity when the player dies.
  */
 @OwnerEvent
 public class PlayerDeathEvent implements Event {
