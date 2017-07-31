@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL12.GL_TEXTURE_3D;
  */
 public class SetInputTexture3D extends SetInputTexture {
     /**
-     * The constructor, to be used in the initialise method of a node.
+     * Constructs an instance of this class, to be used in the constructor of a node.
      *
      * Sample use:
      *      addDesiredStateChange(new SetInputTexture3D(0, water.getId(), "engine:prog.chunk", "textureWater"));
@@ -46,7 +46,7 @@ public class SetInputTexture3D extends SetInputTexture {
     }
 
     /**
-     * The constructor, to be used in the initialise method of a node.
+     * Constructs an instance of this class, to be used in the constructor of a node.
      *
      * Sample use:
      *      addDesiredStateChange(new SetInputTexture3D(0, "engine:water", "engine:prog.chunk", "textureWater"));
