@@ -83,9 +83,9 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
     private boolean isMotionBlurEnabled;
 
     private StateChange setBlurTexture;
-    private StateChange setFilmGrainNoiseTexture;
+    private StateChange setNoiseTexture;
 
-    private final int filmGrainNoiseTextureSize = 1024;
+    private final int noiseTextureSize = 1024;
 
     public FinalPostProcessingNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -117,14 +117,14 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         setBlurTexture = new SetInputTextureFromFbo(texId++, SECOND_LATE_BLUR_FBO_URI, ColorTexture, displayResolutionDependentFBOs, POST_MATERIAL_URN, "texBlur");
         addDesiredStateChange(new SetInputTexture3D(texId++, "engine:colorGradingLut1", POST_MATERIAL_URN, "texColorGradingLut"));
         // TODO: evaluate the possibility to use GPU-based noise algorithms instead of CPU-generated textures.
-        setFilmGrainNoiseTexture = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(filmGrainNoiseTextureSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
+        setNoiseTexture = new SetInputTexture2D(texId, TextureUtil.getTextureUriForWhiteNoise(noiseTextureSize, 0x1234, 0, 512).toString(), POST_MATERIAL_URN, "texNoise");
 
         if (renderingConfig.getBlurIntensity() != 0) {
             addDesiredStateChange(setBlurTexture);
         }
 
         if (isFilmGrainEnabled) {
-            addDesiredStateChange(setFilmGrainNoiseTexture);
+            addDesiredStateChange(setNoiseTexture);
         }
     }
 
@@ -143,7 +143,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
             postMaterial.setFloat("grainIntensity", filmGrainIntensity, true);
             postMaterial.setFloat("noiseOffset", randomGenerator.nextFloat(), true);
 
-            postMaterial.setFloat2("noiseSize", filmGrainNoiseTextureSize, filmGrainNoiseTextureSize, true);
+            postMaterial.setFloat2("noiseSize", noiseTextureSize, noiseTextureSize, true);
             postMaterial.setFloat2("renderTargetSize", lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height(), true);
         }
 
@@ -167,9 +167,9 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
         if (event.getPropertyName().equals(RenderingConfig.FILM_GRAIN)) {
             isFilmGrainEnabled = renderingConfig.isFilmGrain();
             if (isFilmGrainEnabled) {
-                addDesiredStateChange(setFilmGrainNoiseTexture);
+                addDesiredStateChange(setNoiseTexture);
             } else {
-                removeDesiredStateChange(setFilmGrainNoiseTexture);
+                removeDesiredStateChange(setNoiseTexture);
             }
         } else if (event.getPropertyName().equals(RenderingConfig.MOTION_BLUR)) {
             isMotionBlurEnabled = renderingConfig.isMotionBlur();
