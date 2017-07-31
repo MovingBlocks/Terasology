@@ -16,6 +16,7 @@
 package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 
 /**
  * This is only attached to the <b>alive character</b> entities. <br/>
@@ -26,5 +27,6 @@ import org.terasology.entitySystem.Component;
  * Can be used to differently handle situations for character entities that can remain in a dead state
  * or respawn after a while.
  */
+@Replicate
 public class AliveCharacterComponent implements Component {
 }
