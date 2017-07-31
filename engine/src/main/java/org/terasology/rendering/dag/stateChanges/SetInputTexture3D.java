@@ -20,7 +20,7 @@ import org.terasology.assets.ResourceUrn;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_3D;
 
 /**
- * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
+ * Instances of this class bind a 3D texture to a texture unit. The integer identifying the texture unit is then
  * passed to a shader program using the material/parameter pair provided on construction. This allow for a
  * texture asset to be used by a shader program as an input.
  *
