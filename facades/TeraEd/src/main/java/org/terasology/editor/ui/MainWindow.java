@@ -131,6 +131,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     }
 
     public void onStateChange() {
+        /*
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();
         GameState gameState = engine.getState();
@@ -156,8 +157,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
                 }
             }
         }
-
-
+        */
     }
 
     @Override

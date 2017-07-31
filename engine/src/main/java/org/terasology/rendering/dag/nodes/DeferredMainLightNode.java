@@ -33,7 +33,7 @@ import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.FBO;
@@ -117,7 +117,7 @@ public class DeferredMainLightNode extends AbstractNode {
             addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO_URI, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneShadowMap"));
 
             if (renderingConfig.isCloudShadows()) {
-                addDesiredStateChange(new SetInputTexture(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL_URN, "texSceneClouds"));
+                addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL_URN, "texSceneClouds"));
             }
         }
     }

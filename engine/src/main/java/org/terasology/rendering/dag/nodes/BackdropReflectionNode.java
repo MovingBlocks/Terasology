@@ -32,7 +32,7 @@ import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.ReflectedCamera;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -116,8 +116,8 @@ public class BackdropReflectionNode extends AbstractNode {
         skyMaterial = getMaterial(SKY_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
     }
 
     /**

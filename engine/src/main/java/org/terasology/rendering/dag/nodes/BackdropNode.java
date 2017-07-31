@@ -37,7 +37,7 @@ import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThroughNormalized;
 import org.terasology.rendering.dag.stateChanges.SetFacesToCull;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
@@ -123,8 +123,8 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
         skyMaterial = getMaterial(SKY_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
-        addDesiredStateChange(new SetInputTexture(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:sky90", SKY_MATERIAL_URN, "texSky90"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:sky180", SKY_MATERIAL_URN, "texSky180"));
     }
 
     public void enableWireframe() {
