@@ -20,7 +20,7 @@ import org.terasology.assets.ResourceUrn;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 
 /**
- * Instances of this class bind a texture to a texture unit. The integer identifying the texture unit is then
+ * Instances of this class bind a 2D texture to a texture unit. The integer identifying the texture unit is then
  * passed to a shader program using the material/parameter pair provided on construction. This allow for a
  * texture asset to be used by a shader program as an input.
  *
@@ -30,7 +30,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
  */
 public class SetInputTexture2D extends SetInputTexture {
     /**
-     * The constructor, to be used in the initialise method of a node.
+     * Constructs an instance of this class, to be used in the constructor of a node.
      *
      * Sample use:
      *      addDesiredStateChange(new SetInputTexture2D(0, water.getId(), "engine:prog.chunk", "textureWater"));
@@ -45,7 +45,7 @@ public class SetInputTexture2D extends SetInputTexture {
     }
 
     /**
-     * The constructor, to be used in the initialise method of a node.
+     * Constructs an instance of this class, to be used in the constructor of a node.
      *
      * Sample use:
      *      addDesiredStateChange(new SetInputTexture2D(0, "engine:water", "engine:prog.chunk", "textureWater"));
