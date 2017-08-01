@@ -34,9 +34,7 @@ public interface EntityManager extends EntityPool {
      *                 @see SectorSimulationComponent#maxDelta
      * @return the newly created EntityRef
      */
-    default EntityRef createSectorEntity(long maxDelta) {
-        return null;
-    }
+    EntityRef createSectorEntity(long maxDelta);
 
     /**
      * @return A new entity with a copy of each of the other entity's components

@@ -27,17 +27,17 @@ import org.terasology.module.sandbox.API;
  */
 @API
 public class SectorSimulationEvent implements Event {
-    private float delta;
+    private long delta;
 
     /**
      * @see SectorSimulationEvent#getDelta() for the delta parameter
      */
-    protected SectorSimulationEvent(float delta) {
+    protected SectorSimulationEvent(long delta) {
         this.delta = delta;
     }
 
     /**
-     * This gives the time elapsed, in seconds, since the last time this event was sent to the given {@link EntityRef}.
+     * This gives the time elapsed, in ms, since the last time this event was sent to the given {@link EntityRef}.
      *
      * Performing simulation based on the the number of times this event is sent is not reliable, because there may be
      * big variations in the time between sending these events (notably, an event will be sent whenever the chunk an
@@ -45,9 +45,9 @@ public class SectorSimulationEvent implements Event {
      *
      * Using the delta will give a reliable measure of how much simulation to perform.
      *
-     * @return the time, in seconds, since the last time this event was sent to the given entity
+     * @return the time, in ms, since the last time this event was sent to the given entity
      */
-    public float getDelta() {
+    public long getDelta() {
         return delta;
     }
 }

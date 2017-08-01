@@ -30,15 +30,17 @@ import org.terasology.module.sandbox.API;
 @API
 public class SectorSimulationComponent implements Component {
 
-    public static final float MAX_DELTA_DEFAULT = 10;
+    public static final long MAX_DELTA_DEFAULT = 10;
 
     /**
-     * The maximum time that can elapse between {@link SectorSimulationEvent}s being sent. This value does not change
-     * the fact that a simulation event is always sent when the chunk the entity is in is loaded.
+     * The maximum time that can elapse between {@link SectorSimulationEvent}s being sent, in ms. This value does not
+     * change the fact that a simulation event is always sent when the chunk the entity is in is loaded.
      *
-     * TODO: this should only affect the timing of events sent when the chunk is not loaded; a different value should
-     * TODO: be used when the chunk is loaded. This will allow this value to be set as high as possible (or even to a
-     * TODO: non-simulating value) if all of the simulation can be postponed until chunk load.
+     *
+     * TODO: add a way of simulating at a different maxDelta when the entity is loaded
+     * This should only affect the timing of events sent when the chunk is not loaded; a different value should
+     * be used when the chunk is loaded. This will allow this value to be set as high as possible (or even to a
+     * non-simulating value) if all of the simulation can be postponed until chunk load.
      *
      * This should be set as high as possible, so that fewer simulation events need to be sent in total. The purpose of
      * this value is to allow checking for whether its borders need to be expanded regularly, so that the appropriate
@@ -47,15 +49,15 @@ public class SectorSimulationComponent implements Component {
      * E.g. if a city expands while the player is away, it needs to tell the system to load buildings at the edge of
      * the city region without the centre of the city needing to be loaded (to force a simulation).
      */
-    public float maxDelta;
+    public long maxDelta;
 
     /**
-     * The last time a {@link SectorSimulationEvent} was sent to this entity.
+     * The last time (game time, in ms) a {@link SectorSimulationEvent} was sent to this entity.
      *
      * This is used to calculate the delta between simulation events, and should not be changed outside of this class
      * or the {@link SectorSimulationSystem}.
      */
-    protected float lastSimulationTime;
+    protected long lastSimulationTime;
 
     /**
      * Create a new {@link SectorSimulationComponent} with the default max delta.
@@ -67,7 +69,7 @@ public class SectorSimulationComponent implements Component {
     /**
      * @see SectorSimulationComponent#maxDelta
      */
-    public SectorSimulationComponent(float maxDelta) {
+    public SectorSimulationComponent(long maxDelta) {
         this.maxDelta = maxDelta;
     }
 }
