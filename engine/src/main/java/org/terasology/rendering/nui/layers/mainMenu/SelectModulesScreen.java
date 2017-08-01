@@ -571,7 +571,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-
+        if(selectModulesConfig.isChecked()) {
+            return;
+        }
         if (needsUpdate) {
             if (metaDownloader.isDone()) {
                 needsUpdate = false;
