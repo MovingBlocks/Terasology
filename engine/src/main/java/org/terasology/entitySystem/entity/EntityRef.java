@@ -106,7 +106,7 @@ public abstract class EntityRef implements MutableComponentContainer {
      *
      * @param maxDelta the maxDelta for the sector-scope entity
      */
-    public void setSectorScope(float maxDelta) {
+    public void setSectorScope(long maxDelta) {
     }
 
     /**

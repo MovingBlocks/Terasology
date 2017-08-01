@@ -108,7 +108,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
         SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
 
         unregisterSimulationComponent(entity);
-        delayManager.addPeriodicAction(entity, SECTOR_SIMULATION_ACTION, 0, (long) (simulationComponent.maxDelta * 1000));
+        delayManager.addPeriodicAction(entity, SECTOR_SIMULATION_ACTION, 0, simulationComponent.maxDelta);
     }
 
     /**
@@ -138,7 +138,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     @ReceiveEvent(components = SectorSimulationComponent.class)
     public void processPeriodicSectorEvent(PeriodicActionTriggeredEvent event, EntityRef entity) {
         if (event.getActionId().equals(SECTOR_SIMULATION_ACTION)) {
-            float delta = simulationDelta(entity);
+            long delta = simulationDelta(entity);
 
             boolean anyChunksReady = SectorUtil.getWatchedChunks(entity).stream()
                     .anyMatch(chunkProvider::isChunkReady);
@@ -186,9 +186,9 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      * Send the appropriate events to a sector-scope entity in a loaded chunk.
      *
      * @param entity the entity to send the events to
-     * @param delta the time since the last time {@link SectorSimulationEvent} was sent
+     * @param delta the time since the last time {@link SectorSimulationEvent} was sent, in ms
      */
-    private void sendLoadedSectorUpdateEvent(EntityRef entity, float delta) {
+    private void sendLoadedSectorUpdateEvent(EntityRef entity, long delta) {
         entity.send(new SectorSimulationEvent(delta));
         entity.send(new LoadedSectorUpdateEvent(SectorUtil.getWatchedChunks(entity)
                 .stream()
@@ -202,13 +202,13 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      * @param entity
      * @return
      */
-    private float simulationDelta(EntityRef entity) {
+    private long simulationDelta(EntityRef entity) {
         SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
-        float currentTime = time.getGameTime();
+        long currentTime = time.getGameTimeInMs();
         if (simulationComponent.lastSimulationTime == 0) {
             simulationComponent.lastSimulationTime = currentTime;
         }
-        float delta = currentTime - simulationComponent.lastSimulationTime;
+        long delta = currentTime - simulationComponent.lastSimulationTime;
         simulationComponent.lastSimulationTime = currentTime;
         return delta;
     }
