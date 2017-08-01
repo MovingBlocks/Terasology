@@ -22,8 +22,6 @@ import org.terasology.network.Replicate;
 
 import javax.annotation.Nullable;
 
-import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
-
 /**
  * Component for storing entity system information on an entity
  *
@@ -40,7 +38,7 @@ public class EntityInfoComponent implements Component {
     @Replicate
     public EntityRef owner = EntityRef.NULL;
     public boolean alwaysRelevant;
-    public EntityScope scope = GLOBAL;
+    public EntityScope scope = EntityScope.getDefaultScope();
 
     public EntityInfoComponent() {
     }

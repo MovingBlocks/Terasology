@@ -76,13 +76,15 @@ public class PojoEntityPoolTest {
     public void testContains() {
         assertFalse(pool.contains(PojoEntityManager.NULL_ID));
         assertFalse(pool.contains(1000000));
-        EntityRef ref = pool.create();
+        EntityRef ref = entityManager.create();
+        entityManager.moveToPool(ref.getId(), pool);
         assertTrue(pool.contains(ref.getId()));
     }
 
     @Test
     public void testRemove() {
-        EntityRef ref = pool.create();
+        EntityRef ref = entityManager.create();
+        entityManager.moveToPool(ref.getId(), pool);
         assertTrue(pool.contains(ref.getId()));
 
         pool.remove(ref.getId());

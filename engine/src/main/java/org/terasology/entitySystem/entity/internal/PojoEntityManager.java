@@ -42,7 +42,6 @@ import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.protobuf.EntityData;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -133,11 +132,11 @@ public class PojoEntityManager implements EngineEntityManager {
 
         entity.addOrSaveComponent(new SectorSimulationComponent(maxDelta));
 
-        //TODO: look into keeping all sector entities loaded, or converting alwaysRelevant into another scope
         return entity;
     }
 
-    protected long createEntity() {
+    @Override
+    public long createEntity() {
         if (nextEntityId == NULL_ID) {
             nextEntityId++;
         }
@@ -298,19 +297,10 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
-        //TODO: clean this up
-        for (Component c : components) {
-            if (c instanceof EntityInfoComponent) {
-                if (((EntityInfoComponent) c).scope == SECTOR) {
-                    EntityRef entity = sectorManager.createEntityWithId(id, components);
-                    entity.setScope(SECTOR);
-                    return entity;
-                } else {
-                    break;
-                }
-            }
-        }
-        return globalPool.createEntityWithId(id, components);
+        EntityBuilder builder = newBuilder();
+        builder.setId(id);
+        builder.addComponents(components);
+        return builder.build();
     }
 
     @Override
@@ -560,7 +550,8 @@ public class PojoEntityManager implements EngineEntityManager {
      * @param entityId the id of the entity to assign
      * @param pool the pool to assign the entity to
      */
-    protected void assignToPool(long entityId, EngineEntityPool pool) {
+    @Override
+    public void assignToPool(long entityId, EngineEntityPool pool) {
         if (poolMap.get(entityId) != pool) {
             poolMap.put(entityId, pool);
         }
@@ -612,7 +603,8 @@ public class PojoEntityManager implements EngineEntityManager {
         return true;
     }
 
-    protected void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component) {
+    @Override
+    public void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component) {
         for (EntityChangeSubscriber subscriber : subscribers) {
             subscriber.onEntityComponentAdded(changedEntity, component);
         }
@@ -698,7 +690,8 @@ public class PojoEntityManager implements EngineEntityManager {
         }
     }
 
-    protected boolean registerId(long entityId) {
+    @Override
+    public boolean registerId(long entityId) {
         if (entityId >= nextEntityId) {
             logger.error("Prevented attempt to create entity with an invalid id.");
             return false;

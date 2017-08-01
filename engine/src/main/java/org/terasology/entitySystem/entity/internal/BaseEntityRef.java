@@ -31,6 +31,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 
+import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
 import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
 
 /**
@@ -51,16 +53,14 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public boolean isAlwaysRelevant() {
-        return isActive() && getEntityInfo().alwaysRelevant;
+        return isActive() && getScope().getAlwaysRelevant();
     }
 
     @Override
     public void setAlwaysRelevant(boolean alwaysRelevant) {
         if (exists()) {
-            EntityInfoComponent info = getEntityInfo();
-            if (info.alwaysRelevant != alwaysRelevant) {
-                info.alwaysRelevant = alwaysRelevant;
-                saveComponent(info);
+            if (alwaysRelevant != isAlwaysRelevant()) {
+                setScope(alwaysRelevant ? GLOBAL : CHUNK);
             }
         }
     }
@@ -101,6 +101,7 @@ public abstract class BaseEntityRef extends EntityRef {
                 EngineEntityPool newPool;
                 switch (scope) {
                     case GLOBAL:
+                    case CHUNK:
                         newPool = entityManager.getGlobalPool();
                         removeComponent(SectorSimulationComponent.class);
                         break;

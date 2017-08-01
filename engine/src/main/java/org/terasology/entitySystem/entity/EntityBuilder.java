@@ -21,11 +21,16 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityPool;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.entity.internal.EntityScope;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.prefab.Prefab;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * An entity builder provides the ability to set up an entity before creating it. This prevents events being sent
@@ -38,18 +43,19 @@ public class EntityBuilder implements MutableComponentContainer {
     private static final Logger logger = LoggerFactory.getLogger(EntityBuilder.class);
 
     private Map<Class<? extends Component>, Component> components = Maps.newHashMap();
-    private EntityPool pool;
+    private EngineEntityPool pool;
     private EngineEntityManager entityManager;
 
     private boolean sendLifecycleEvents = true;
-    private EntityScope scope;
+    private Optional<EntityScope> scope = Optional.empty();
+    private Optional<Long> id = Optional.empty();
 
     public EntityBuilder(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
         this.pool = entityManager.getGlobalPool();
     }
 
-    public EntityBuilder(EngineEntityManager entityManager, EntityPool pool) {
+    public EntityBuilder(EngineEntityManager entityManager, EngineEntityPool pool) {
         this.entityManager = entityManager;
         this.pool = pool;
     }
@@ -96,19 +102,36 @@ public class EntityBuilder implements MutableComponentContainer {
      * @return The built entity.
      */
     public EntityRef build() {
-        EntityRef entity = pool.create(components.values(), sendLifecycleEvents);
-        if (scope != null) {
-            entity.setScope(scope);
+        if (id.isPresent() && !entityManager.registerId(id.get())) {
+            return EntityRef.NULL;
         }
+        long finalId = id.orElse(entityManager.createEntity());
+
+        components.values().forEach(c -> entityManager.getComponentStore().put(finalId, c));
+
+        entityManager.assignToPool(finalId, pool);
+
+        EntityRef entity = entityManager.getEntity(finalId);
+
+        if (sendLifecycleEvents && entityManager.getEventSystem() != null) {
+            //TODO: don't send OnAddedComponent when the entity is being re-loaded from storage
+            entity.send(OnAddedComponent.newInstance());
+            entity.send(OnActivatedComponent.newInstance());
+        }
+
+        //Retrieve the components again in case they were modified by the previous events
+        for (Component component : entityManager.iterateComponents(entity.getId())) {
+            entityManager.notifyComponentAdded(entity, component.getClass());
+        }
+
+        entity.setScope(scope.orElse(getEntityInfo().scope));
+
         return entity;
     }
 
     public EntityRef buildWithoutLifecycleEvents() {
-        EntityRef entity = pool.create(components.values(), false);
-        if (scope != null) {
-            entity.setScope(scope);
-        }
-        return entity;
+        sendLifecycleEvents = false;
+        return build();
     }
 
     @Override
@@ -125,6 +148,11 @@ public class EntityBuilder implements MutableComponentContainer {
     public <T extends Component> T addComponent(T component) {
         components.put(component.getClass(), component);
         return component;
+    }
+
+    public void addComponents(Iterable<? extends Component> components) {
+        components = (components == null) ? Collections.EMPTY_LIST : components;
+        components.forEach(this::addComponent);
     }
 
     @Override
@@ -159,11 +187,11 @@ public class EntityBuilder implements MutableComponentContainer {
     }
 
     public void setScope(EntityScope scope) {
-        this.scope = scope;
+        this.scope = Optional.of(scope);
     }
 
     public EntityScope getScope() {
-        return scope;
+        return scope.orElse(null);
     }
 
     public void setOwner(EntityRef owner) {
@@ -188,6 +216,10 @@ public class EntityBuilder implements MutableComponentContainer {
 
     public void setSendLifecycleEvents(boolean sendLifecycleEvents) {
         this.sendLifecycleEvents = sendLifecycleEvents;
+    }
+
+    public void setId(long id) {
+        this.id = Optional.of(id);
     }
 
 }

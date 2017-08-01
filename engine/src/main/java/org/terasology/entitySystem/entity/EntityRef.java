@@ -85,7 +85,9 @@ public abstract class EntityRef implements MutableComponentContainer {
      * not relevant
      *
      * @param alwaysRelevant
+     * @deprecated replaced by {{@link #setScope(EntityScope)}}
      */
+    @Deprecated
     public abstract void setAlwaysRelevant(boolean alwaysRelevant);
 
     /**

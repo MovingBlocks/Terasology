@@ -19,6 +19,21 @@ import org.terasology.module.sandbox.API;
 
 @API
 public enum EntityScope {
-    GLOBAL,
-    SECTOR
+    GLOBAL(true),
+    SECTOR(true),
+    CHUNK(false);
+
+    private boolean alwaysRelevant;
+
+    EntityScope(boolean alwaysRelevant) {
+        this.alwaysRelevant = alwaysRelevant;
+    }
+
+    public boolean getAlwaysRelevant() {
+        return alwaysRelevant;
+    }
+
+    public static EntityScope getDefaultScope() {
+        return CHUNK;
+    }
 }

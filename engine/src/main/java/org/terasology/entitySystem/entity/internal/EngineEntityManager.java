@@ -125,4 +125,46 @@ public interface EngineEntityManager extends LowLevelEntityManager, EngineEntity
      */
     Optional<EngineEntityPool> getPool(long id);
 
+    /**
+     * Creates a new entity.
+     *
+     * This method is designed for internal use by the EntityBuilder; the {@link #create} methods should be used in
+     * most circumstances.
+     *
+     * @return the id of the newly created entity
+     */
+    long createEntity();
+
+    /**
+     * Attempts to register a new id with the entity manager.
+     *
+     * This method is designed for internal use by the EntityBuilder.
+     *
+     * @param id the id to register
+     * @return whether the registration was successful
+     */
+    boolean registerId(long id);
+
+    /**
+     * Notifies the appropriate subscribers that an entity's component was changed.
+     *
+     * This method is designed for internal use by the EntityBuilder.
+     *
+     * @param changedEntity the entity which the changed component belongs to
+     * @param component the class of the changed component
+     */
+    void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component);
+
+    /**
+     *
+     * Tell the EntityManager which pool the given entity is in, so that its components can be found.
+     *
+     * This is designed for internal use; {@link #moveToPool(long, EngineEntityPool)} should be used to move entities
+     * between pools.
+     *
+     * @param entityId the id of the entity to assign
+     * @param pool the pool the entity is in
+     */
+    void assignToPool(long entityId, EngineEntityPool pool);
+
 }
