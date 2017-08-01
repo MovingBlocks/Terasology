@@ -182,7 +182,7 @@
                                     {
                                         "type": "UICheckbox",
                                         "id": "library",
-                                        "enabled": true,
+                                        "enabled": false,
                                         "layoutInfo": {
                                             "relativeWidth": 0.11
                                         }
@@ -192,7 +192,8 @@
                                         "text": "Show Library/API",
                                         "layoutInfo": {
                                             "relativeWidth": 0.48
-                                        }
+                                        },
+                                        "enabled": false
                                     }
                                 ],
                                 "layoutInfo": {
