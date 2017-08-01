@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.SelectModulesConfig;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -48,6 +49,7 @@ import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -58,6 +60,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -72,29 +75,26 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
+            o1.getMetadata().getDisplayName().toString().compareTo(
+                    o2.getMetadata().getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
-
     @In
     private Config config;
 
+    private SelectModulesConfig selectModulesConfig;
     @In
     private WorldGeneratorManager worldGenManager;
-
     @In
     private TranslationSystem translationSystem;
-
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
     private ModuleListDownloader metaDownloader;
+    private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
-
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
-            o1.getMetadata().getDisplayName().toString().compareTo(
-                    o2.getMetadata().getDisplayName().toString());
 
     @Override
     public void onOpened() {
@@ -111,6 +111,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         metaDownloader = new ModuleListDownloader(config.getNetwork().getMasterServer());
+
+        selectModulesConfig = config.getSelectModulesConfig();
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -176,12 +178,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 moduleSearch.subscribe(new TextChangeEventListener() {
                     @Override
                     public void onTextChange(String oldText, String newText) {
-                        sortedModules.clear();
-                        for (ModuleSelectionInfo m : allSortedModules) {
-                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                                sortedModules.add(m);
-                            }
-                        }
+                        filterText(newText);
                     }
                 });
             }
@@ -360,9 +357,49 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(button -> sortedModules.stream()
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
+
+            localOnlyCheckbox = find("localOnly", UICheckbox.class);
+            localOnlyCheckbox.bindChecked(
+                    new Binding<Boolean>() {
+
+                        @Override
+                        public Boolean get() {
+                            filterText(moduleSearch.getText());
+                            prepareModuleList(selectModulesConfig.isChecked());
+                            return selectModulesConfig.isChecked();
+                        }
+
+                        @Override
+                        public void set(Boolean value) {
+                            selectModulesConfig.setIsChecked(value);
+                            filterText(moduleSearch.getText());
+                            prepareModuleList(value);
+                        }
+                    }
+            );
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    private void prepareModuleList(boolean checked) {
+        if (selectModulesConfig.isChecked()) {
+            Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+            while (iter.hasNext()) {
+                if (!iter.next().isPresent()) {
+                    iter.remove();
+                }
+            }
+        }
+    }
+
+    private void filterText(String newText) {
+        sortedModules.clear();
+        for (ModuleSelectionInfo m : allSortedModules) {
+            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                sortedModules.add(m);
+            }
+        }
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
@@ -534,7 +571,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-
+        if(selectModulesConfig.isChecked()) {
+            return;
+        }
         if (needsUpdate) {
             if (metaDownloader.isDone()) {
                 needsUpdate = false;
@@ -618,7 +657,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         private Map<URL, Path> urlToTargetMap;
         private ProgressListener progressListener;
 
-         MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
+        MultiFileDownloader(Map<URL, Path> urlToTargetMap, ProgressListener progressListener) {
             this.urlToTargetMap = urlToTargetMap;
             this.progressListener = progressListener;
         }
@@ -654,10 +693,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             this.latestVersion = module;
         }
 
-        public void setLocalVersion(Module module) {
-            latestVersion = module;
-        }
-
         public static ModuleSelectionInfo remote(Module module) {
             ModuleSelectionInfo info = new ModuleSelectionInfo(null);
             info.setOnlineVersion(module);
@@ -666,6 +701,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
         public static ModuleSelectionInfo local(Module module) {
             return new ModuleSelectionInfo(module);
+        }
+
+        public void setLocalVersion(Module module) {
+            latestVersion = module;
         }
 
         public ModuleMetadata getMetadata() {
@@ -692,12 +731,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
             return onlineVersion;
         }
 
-        public Module getLatestVersion() {
-            return latestVersion;
-        }
-
         public void setOnlineVersion(Module onlineVersion) {
             this.onlineVersion = onlineVersion;
+        }
+
+        public Module getLatestVersion() {
+            return latestVersion;
         }
 
         public void setSelectedVersion(Module selectedVersion) {
