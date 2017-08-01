@@ -23,10 +23,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.location.LocationComponent;
@@ -81,23 +78,10 @@ public class PojoEntityPool implements EngineEntityPool {
 
     @Override
     public EntityRef create(Iterable<Component> components, boolean sendLifecycleEvents) {
-        components = (components == null) ? Collections.EMPTY_LIST : components;
-        EntityRef entity = createEntity(components);
-
-        if (sendLifecycleEvents) {
-            EventSystem eventSystem = entityManager.getEventSystem();
-            if (eventSystem != null) {
-                eventSystem.send(entity, OnAddedComponent.newInstance());
-                eventSystem.send(entity, OnActivatedComponent.newInstance());
-            }
-        }
-
-        //Retrieve the components again in case they were modified by the previous events
-        for (Component component : entityManager.iterateComponents(entity.getId())) {
-            entityManager.notifyComponentAdded(entity, component.getClass());
-        }
-
-        return entity;
+        EntityBuilder builder = newBuilder();
+        builder.addComponents(components);
+        builder.setSendLifecycleEvents(sendLifecycleEvents);
+        return builder.build();
     }
 
     @Override
@@ -195,36 +179,6 @@ public class PojoEntityPool implements EngineEntityPool {
         componentStore.remove(entityId);
     }
 
-    private EntityRef createEntity(Iterable<Component> components) {
-        long entityId = entityManager.createEntity();
-
-        Prefab prefab = null;
-        for (Component component : components) {
-            if (component instanceof EntityInfoComponent) {
-                EntityInfoComponent comp = (EntityInfoComponent) component;
-                prefab = comp.parentPrefab;
-                break;
-            }
-        }
-
-        Iterable<Component> finalComponents;
-        EventSystem eventSystem = entityManager.getEventSystem();
-        if (eventSystem != null) {
-            BeforeEntityCreated event = new BeforeEntityCreated(prefab, components);
-            BaseEntityRef tempRef = entityManager.getEntityRefStrategy().createRefFor(entityId, entityManager);
-            eventSystem.send(tempRef, event);
-            tempRef.invalidate();
-            finalComponents = event.getResultComponents();
-        } else {
-            finalComponents = components;
-        }
-
-        for (Component c : finalComponents) {
-            componentStore.put(entityId, c);
-        }
-        return getEntity(entityId);
-    }
-
     /**
      * Creates the entity without sending any events. The entity life cycle subscriber will however be informed.
      */
@@ -262,27 +216,10 @@ public class PojoEntityPool implements EngineEntityPool {
 
     @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
-        if (!entityManager.registerId(id)) {
-            return EntityRef.NULL;
-        }
-
-        components = (components == null) ? Collections.EMPTY_LIST : components;
-
-        for (Component c : components) {
-            componentStore.put(id, c);
-        }
-
-        EntityRef entity = getEntity(id);
-
-        EventSystem eventSystem = entityManager.getEventSystem();
-        if (eventSystem != null) {
-            eventSystem.send(entity, OnActivatedComponent.newInstance());
-        }
-
-        for (Component component : components) {
-            entityManager.notifyComponentAdded(entity, component.getClass());
-        }
-        return entity;
+        EntityBuilder builder = newBuilder();
+        builder.setId(id);
+        builder.addComponents(components);
+        return builder.build();
     }
 
     @Override

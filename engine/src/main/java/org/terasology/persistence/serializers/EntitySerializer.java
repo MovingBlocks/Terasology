@@ -33,6 +33,7 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 import java.util.Set;
 
+import static org.terasology.protobuf.EntityData.Entity.Scope.CHUNK;
 import static org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
 import static org.terasology.protobuf.EntityData.Entity.Scope.SECTOR;
 
@@ -231,6 +232,9 @@ public class EntitySerializer {
             case SECTOR:
                 entityInfo.scope = EntityScope.SECTOR;
                 break;
+            case CHUNK:
+                entityInfo.scope = EntityScope.CHUNK;
+                break;
         }
 
         for (EntityData.Component componentData : entityData.getComponentList()) {
@@ -268,6 +272,10 @@ public class EntitySerializer {
                 case SECTOR:
                     entity.setScope(SECTOR);
                     break;
+                case CHUNK:
+                    entity.setScope(CHUNK);
+                    break;
+
             }
         }
 
@@ -305,6 +313,9 @@ public class EntitySerializer {
                     break;
                 case SECTOR:
                     entity.setScope(SECTOR);
+                    break;
+                case CHUNK:
+                    entity.setScope(CHUNK);
                     break;
             }
         }

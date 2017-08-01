@@ -4435,6 +4435,10 @@ public final class EntityData {
        * <code>SECTOR = 1;</code>
        */
       SECTOR(1, 1),
+      /**
+       * <code>CHUNK = 2;</code>
+       */
+      CHUNK(2, 2),
       ;
 
       /**
@@ -4445,6 +4449,10 @@ public final class EntityData {
        * <code>SECTOR = 1;</code>
        */
       public static final int SECTOR_VALUE = 1;
+      /**
+       * <code>CHUNK = 2;</code>
+       */
+      public static final int CHUNK_VALUE = 2;
 
 
       public final int getNumber() { return value; }
@@ -4453,6 +4461,7 @@ public final class EntityData {
         switch (value) {
           case 0: return GLOBAL;
           case 1: return SECTOR;
+          case 2: return CHUNK;
           default: return null;
         }
       }
@@ -16754,52 +16763,52 @@ public final class EntityData {
       "\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nna" +
       "me_index\030\003 \001(\005\"S\n\tComponent\022\022\n\ntype_inde" +
       "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
-      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\373\001\n\006Entity\022\n\n\002id\030\001 \001",
+      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\206\002\n\006Entity\022\n\n\002id\030\001 \001",
       "(\003\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
       "oved_component_index\030\003 \003(\005B\002\020\001\022\025\n\rparent" +
       "_prefab\030\004 \001(\t\022\026\n\016alwaysRelevant\030\005 \001(\010\022\r\n" +
       "\005owner\030\006 \001(\003\022\031\n\021removed_component\030\017 \003(\t\022" +
-      "\034\n\005scope\030\007 \001(\0162\r.Entity.Scope\"\037\n\005Scope\022\n" +
-      "\n\006GLOBAL\020\000\022\n\n\006SECTOR\020\001*\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014Pa" +
-      "ckedEntity\022\n\n\002id\030\001 \001(\003\022\027\n\013componentId\030\002 " +
-      "\003(\005B\002\020\001\022\034\n\024componentFieldCounts\030\003 \001(\014\022\020\n" +
-      "\010fieldIds\030\004 \001(\014\022\032\n\nfieldValue\030\005 \003(\0132\006.Va" +
-      "lue\022\034\n\020removedComponent\030\006 \003(\005B\002\020\001\022\r\n\005own",
-      "er\030\007 \001(\003\022\027\n\017parentPrefabUri\030\020 \001(\t*\t\010\210\'\020\200" +
-      "\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname_index\030\001 \001(\005\022\035\n\tc" +
-      "omponent\030\002 \003(\0132\n.Component\022\026\n\ndeprecated" +
-      "\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004true\022\030\n\020r" +
-      "emovedComponent\030\005 \003(\t\022\026\n\016alwaysRelevant\030" +
-      "\006 \001(\010\022\014\n\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \001(\t" +
-      "*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022\014\n\004type\030\001 \001(\005\022\020\n\010fi" +
-      "eldIds\030\002 \001(\014\022\032\n\nfieldValue\030\003 \003(\0132\006.Value" +
-      "*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntityStore\022\027\n\006entity\030\001 \003" +
-      "(\0132\007.Entity\022\027\n\017component_class\030\003 \003(\t\022\022\n\n",
-      "entityName\030\002 \003(\t\022\027\n\013entityNamed\030\004 \003(\003B\002\020" +
-      "\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013PlayerStore\022\033\n\005store\030\001 " +
-      "\001(\0132\014.EntityStore\022\025\n\rcharacterPosX\030\017 \001(\002" +
-      "\022\025\n\rcharacterPosY\030\020 \001(\002\022\025\n\rcharacterPosZ" +
-      "\030\021 \001(\002\022\024\n\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"" +
-      "\332\002\n\nChunkStore\022\033\n\005store\030\001 \001(\0132\014.EntitySt" +
-      "ore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001z\030\004 \001(\021\022\031\n\021" +
-      "deprecated_data_3\030\005 \001(\005\022\031\n\021deprecated_da" +
-      "ta_4\030\006 \001(\014\022\031\n\021deprecated_data_1\030\007 \001(\014\022\031\n" +
-      "\021deprecated_data_2\030\010 \001(\014\022\031\n\021deprecated_d",
-      "ata_5\030\t \001(\014\022(\n\nblock_data\030\n \001(\0132\024.RunLen" +
-      "gthEncoding16\022(\n\013liquid_data\030\013 \001(\0132\023.Run" +
-      "LengthEncoding8\022(\n\nbiome_data\030\014 \001(\0132\024.Ru" +
-      "nLengthEncoding16*\t\010\210\'\020\200\200\200\200\002\"L\n\023RunLengt" +
-      "hEncoding16\022\026\n\nrunLengths\030\001 \003(\021B\002\020\001\022\022\n\006v" +
-      "alues\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"G\n\022RunLengthE" +
-      "ncoding8\022\026\n\nrunLengths\030\001 \003(\021B\002\020\001\022\016\n\006valu" +
-      "es\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\260\001\n\013GlobalStore\022\027\n\006e" +
-      "ntity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.P" +
-      "refab\022\027\n\017component_class\030\003 \003(\t\022\026\n\016next_e",
-      "ntity_id\030\020 \001(\003\022\036\n\022deprecated_data_17\030\021 \003" +
-      "(\003B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\t\010\210\'\020\200\200\200\200\002*4" +
-      "\n\tStoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016Chun" +
-      "kStoreType\020\002B\'\n\027org.terasology.protobufB" +
-      "\nEntityDataH\001"
+      "\034\n\005scope\030\007 \001(\0162\r.Entity.Scope\"*\n\005Scope\022\n" +
+      "\n\006GLOBAL\020\000\022\n\n\006SECTOR\020\001\022\t\n\005CHUNK\020\002*\t\010\210\'\020\200" +
+      "\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\003\022\027\n\013com" +
+      "ponentId\030\002 \003(\005B\002\020\001\022\034\n\024componentFieldCoun" +
+      "ts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfieldValue" +
+      "\030\005 \003(\0132\006.Value\022\034\n\020removedComponent\030\006 \003(\005",
+      "B\002\020\001\022\r\n\005owner\030\007 \001(\003\022\027\n\017parentPrefabUri\030\020" +
+      " \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname_index" +
+      "\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\026\n" +
+      "\ndeprecated\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010" +
+      ":\004true\022\030\n\020removedComponent\030\005 \003(\t\022\026\n\016alwa" +
+      "ysRelevant\030\006 \001(\010\022\014\n\004name\030\017 \001(\t\022\023\n\013parent" +
+      "_name\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022\014\n\004type\030" +
+      "\001 \001(\005\022\020\n\010fieldIds\030\002 \001(\014\022\032\n\nfieldValue\030\003 " +
+      "\003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntityStore\022\027\n" +
+      "\006entity\030\001 \003(\0132\007.Entity\022\027\n\017component_clas",
+      "s\030\003 \003(\t\022\022\n\nentityName\030\002 \003(\t\022\027\n\013entityNam" +
+      "ed\030\004 \003(\003B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013PlayerStore\022" +
+      "\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rcharacte" +
+      "rPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002\022\025\n\rch" +
+      "aracterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030\022 \001(\010*" +
+      "\t\010\210\'\020\200\200\200\200\002\"\332\002\n\nChunkStore\022\033\n\005store\030\001 \001(\013" +
+      "2\014.EntityStore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001" +
+      "z\030\004 \001(\021\022\031\n\021deprecated_data_3\030\005 \001(\005\022\031\n\021de" +
+      "precated_data_4\030\006 \001(\014\022\031\n\021deprecated_data" +
+      "_1\030\007 \001(\014\022\031\n\021deprecated_data_2\030\010 \001(\014\022\031\n\021d",
+      "eprecated_data_5\030\t \001(\014\022(\n\nblock_data\030\n \001" +
+      "(\0132\024.RunLengthEncoding16\022(\n\013liquid_data\030" +
+      "\013 \001(\0132\023.RunLengthEncoding8\022(\n\nbiome_data" +
+      "\030\014 \001(\0132\024.RunLengthEncoding16*\t\010\210\'\020\200\200\200\200\002\"" +
+      "L\n\023RunLengthEncoding16\022\026\n\nrunLengths\030\001 \003" +
+      "(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"G\n" +
+      "\022RunLengthEncoding8\022\026\n\nrunLengths\030\001 \003(\021B" +
+      "\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\260\001\n\013Globa" +
+      "lStore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefa" +
+      "b\030\002 \003(\0132\007.Prefab\022\027\n\017component_class\030\003 \003(",
+      "\t\022\026\n\016next_entity_id\030\020 \001(\003\022\036\n\022deprecated_" +
+      "data_17\030\021 \003(\003B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\t" +
+      "\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerStoreTyp" +
+      "e\020\001\022\022\n\016ChunkStoreType\020\002B\'\n\027org.terasolog" +
+      "y.protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

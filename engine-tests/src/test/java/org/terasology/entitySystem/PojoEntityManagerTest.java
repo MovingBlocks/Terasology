@@ -60,7 +60,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 
 /**
  */
@@ -99,7 +99,9 @@ public class PojoEntityManagerTest {
     public void testCreateEntity() {
         EntityRef entity = entityManager.create();
         assertNotNull(entity);
-        assertEquals(entity.getScope(), GLOBAL);
+        assertEquals(CHUNK, entity.getScope());
+        assertTrue(entityManager.getGlobalPool().contains(entity.getId()));
+        assertFalse(entityManager.getSectorManager().contains(entity.getId()));
     }
 
     @Test
@@ -109,6 +111,9 @@ public class PojoEntityManagerTest {
         assertNotNull(entity);
         assertNotNull(entity.getComponent(StringComponent.class));
         assertEquals(comp, entity.getComponent(StringComponent.class));
+        assertEquals(CHUNK, entity.getScope());
+        assertTrue(entityManager.getGlobalPool().contains(entity.getId()));
+        assertFalse(entityManager.getSectorManager().contains(entity.getId()));
     }
 
     @Test
