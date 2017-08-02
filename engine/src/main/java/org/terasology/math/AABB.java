@@ -16,15 +16,17 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.btAABB;
 import com.bulletphysics.linearmath.AabbUtil2;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -146,15 +148,15 @@ public final class AABB {
     }
 
     public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
-        Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
+        Matrix4 transform = new Matrix4(VecMath.to(offset),VecMath.to(rotation),new Vector3(scale,scale,scale));
+        //Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
         return transform(transform);
     }
 
-    public AABB transform(Transform transform) {
-        javax.vecmath.Vector3f newMin = new javax.vecmath.Vector3f();
-        javax.vecmath.Vector3f newMax = new javax.vecmath.Vector3f();
-        AabbUtil2.transformAabb(VecMath.to(min), VecMath.to(max), 0.01f, transform, newMin, newMax);
-        return new AABB(VecMath.from(newMin), VecMath.from(newMax));
+    public AABB transform(Matrix4 transform) {
+        btAABB aabb =  new btAABB(VecMath.to(min),VecMath.to(max),new Vector3(),.01f);
+        aabb.appy_transform(transform);
+        return new AABB(new Vector3f(aabb.getMin().x(),aabb.getMin().y(),aabb.getMin().z()), new Vector3f(aabb.getMax().x(),aabb.getMax().y(),aabb.getMax().z()));
     }
 
     /**

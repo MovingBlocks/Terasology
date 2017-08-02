@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.characters;
 
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.ClosestConvexResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.ConvexResultCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,10 +30,12 @@ import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VecMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.physics.bullet.BulletSweepCallback;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
@@ -388,6 +393,7 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
+
             SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0,
                     (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
@@ -405,6 +411,7 @@ public class KinematicCharacterMover implements CharacterMover {
             if (callback.hasHit()) {
                 float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
                 if (originalSlope < slopeFactor) {
+                    //TODO: implement sweep callback
                     float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
@@ -471,6 +478,7 @@ public class KinematicCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
+
             SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
 
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)

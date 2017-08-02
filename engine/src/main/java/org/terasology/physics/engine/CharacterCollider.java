@@ -16,6 +16,8 @@
 
 package org.terasology.physics.engine;
 
+import com.badlogic.gdx.physics.bullet.collision.ClosestConvexResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.ConvexResultCallback;
 import org.terasology.math.geom.Vector3f;
 
 /**

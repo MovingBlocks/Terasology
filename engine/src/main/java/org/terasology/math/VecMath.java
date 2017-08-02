@@ -16,6 +16,8 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -27,21 +29,18 @@ public final class VecMath {
     private VecMath() {
         // no instances
     }
+    public  static Vector3f from(com.badlogic.gdx.math.Vector3 v){return new Vector3f(v.x,v.y,v.z);}
 
-    public static Vector3f from(javax.vecmath.Vector3f v) {
-        return new Vector3f(v.x, v.y, v.z);
+    public static Vector3 to(Vector3f v) {
+        return new Vector3(v.x, v.y, v.z);
     }
 
-    public static javax.vecmath.Vector3f to(Vector3f v) {
-        return new javax.vecmath.Vector3f(v.x, v.y, v.z);
-    }
-
-    public static Quat4f from(javax.vecmath.Quat4f v) {
+    public static Quat4f from(Quaternion v) {
         return new Quat4f(v.x, v.y, v.z, v.w);
     }
 
-    public static javax.vecmath.Quat4f to(Quat4f v) {
-        return new javax.vecmath.Quat4f(v.x, v.y, v.z, v.w);
+    public static Quaternion to(Quat4f v) {
+        return new Quaternion(v.x, v.y, v.z, v.w);
     }
 
 }

@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import com.badlogic.gdx.math.Matrix4;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -52,6 +53,11 @@ public interface RigidBody {
      * @param translation the translation to apply.
      */
     void translate(Vector3f translation);
+
+
+    Matrix4 getWorldTransform();
+    Matrix4 setWorldTransform(Matrix4 trans);
+
 
     /**
      * Returns the orientation of this body.
@@ -142,4 +148,9 @@ public interface RigidBody {
      * @return True if this entity is active, false otherwise.
      */
     boolean isActive();
+
+    /**
+     * Disposes of all unmanaged memory
+     */
+    void dispose();
 }

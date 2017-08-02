@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.logic;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -171,7 +173,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Transform transWorldSpace = new Transform();
+      //  Matrix4 transWorldSpace = new Matrix4();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -203,14 +205,14 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
 
-                    javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
-                    transWorldSpace.set(matrixWorldSpace);
+                    Matrix4 matrixWorldSpace = new Matrix4( VecMath.to(worldPos),VecMath.to(worldRot),new Vector3(worldScale,worldScale,worldScale));
+                   // transWorldSpace.set(matrixWorldSpace);
 
                     Vector3f worldPositionCameraSpace = new Vector3f();
                     worldPositionCameraSpace.sub(worldPos, cameraPosition);
                     Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
+                    AABB aabb = meshComp.mesh.getAABB().transform(matrixWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {

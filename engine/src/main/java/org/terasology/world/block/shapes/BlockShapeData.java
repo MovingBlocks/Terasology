@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.shapes;
 
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
@@ -31,7 +32,7 @@ public class BlockShapeData implements AssetData {
     private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
-    private CollisionShape collisionShape;
+    private btCollisionShape collisionShape;
     private Vector3f collisionOffset = new Vector3f();
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
@@ -84,11 +85,11 @@ public class BlockShapeData implements AssetData {
         collisionOffset.set(offset);
     }
 
-    public CollisionShape getCollisionShape() {
+    public btCollisionShape getCollisionShape() {
         return collisionShape;
     }
 
-    public void setCollisionShape(CollisionShape shape) {
+    public void setCollisionShape(btCollisionShape shape) {
         collisionShape = shape;
     }
 

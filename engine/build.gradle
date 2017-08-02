@@ -88,6 +88,12 @@ configurations.all {
 // Primary dependencies definition
 dependencies {
 
+    //bullet
+    compile "com.badlogicgames.gdx:gdx:1.9.7-SNAPSHOT"
+    compile "com.badlogicgames.gdx:gdx-bullet:1.9.7-SNAPSHOT"
+    compile "com.badlogicgames.gdx:gdx-platform:1.9.7-SNAPSHOT:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-bullet-platform:1.9.7-SNAPSHOT:natives-desktop"
+
     // Storage and networking
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.6.2'

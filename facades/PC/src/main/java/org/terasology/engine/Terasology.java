@@ -15,6 +15,7 @@
  */
 package org.terasology.engine;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.terasology.config.Config;
@@ -362,6 +363,7 @@ public final class Terasology {
     }
 
     private static void populateSubsystems(TerasologyEngineBuilder builder) {
+
         if (isHeadless) {
             builder.add(new HeadlessGraphics())
                     .add(new HeadlessTimer())

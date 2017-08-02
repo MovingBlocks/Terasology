@@ -16,6 +16,11 @@
 
 package org.terasology.world.block.shapes;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.utils.BufferUtils;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
@@ -50,6 +55,8 @@ import org.terasology.world.block.BlockPart;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,7 +64,7 @@ import java.util.Locale;
  */
 @RegisterAssetFileFormat
 public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData> {
-    private static final BoxShape CUBE_SHAPE = new BoxShape(new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
+    //private static final btBoxShape CUBE_SHAPE = new btBoxShape(new Vector3(.5f,.5f,.5f));//new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
     private Gson gson;
 
     public JsonBlockShapeLoader() {
@@ -120,7 +127,9 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonObject collisionInfo = shapeObj.get(COLLISION).getAsJsonObject();
                 processCollision(context, shape, collisionInfo);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionSymmetric(true);
             }
             return shape;
@@ -149,30 +158,41 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
 
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
-                ObjectArrayList<javax.vecmath.Vector3f> verts = buildVertList(shape);
-                ConvexHullShape convexHull = new ConvexHullShape(verts);
+
+                int size = 0;
+                for (BlockPart part : BlockPart.values()) {
+                    BlockMeshPart meshPart = shape.getMeshPart(part);
+                    if (meshPart != null) {
+                        size += meshPart.size() * 3;
+                    }
+                }
+
+                int numPoints = 0;
+                FloatBuffer buffer = BufferUtils.newFloatBuffer(size);
+                for (BlockPart part : BlockPart.values()) {
+                    BlockMeshPart meshPart = shape.getMeshPart(part);
+                    if (meshPart != null) {
+                        for (int i = 0; i < meshPart.size(); ++i) {
+                            buffer.put(meshPart.getVertex(i).x);
+                            buffer.put(meshPart.getVertex(i).y);
+                            buffer.put(meshPart.getVertex(i).z);
+                            numPoints++;
+                            //result.add(VecMath.to(meshPart.getVertex(i)));
+                        }
+                    }
+                }
+
+                btConvexHullShape convexHull = new btConvexHullShape(buffer, numPoints,3 * Float.BYTES);
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
                     && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
                 JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionSymmetric(true);
             }
-        }
-
-        private ObjectArrayList<javax.vecmath.Vector3f> buildVertList(BlockShapeData shape) {
-            ObjectArrayList<javax.vecmath.Vector3f> result = new ObjectArrayList<>();
-            for (BlockPart part : BlockPart.values()) {
-                BlockMeshPart meshPart = shape.getMeshPart(part);
-                if (meshPart != null) {
-                    for (int i = 0; i < meshPart.size(); ++i) {
-                        result.add(VecMath.to(meshPart.getVertex(i)));
-                    }
-                }
-            }
-            return result;
         }
 
         private void processColliders(JsonDeserializationContext context, JsonArray colliderArray, BlockShapeData shape) {
@@ -199,18 +219,21 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionShape(colliders.get(0).collisionShape);
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
         }
 
         private ColliderInfo processCompoundShape(List<ColliderInfo> colliders) {
-            CompoundShape collisionShape = new CompoundShape();
+            btCompoundShape collisionShape = new btCompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
-                collisionShape.addChildShape(transform, collider.collisionShape);
+
+                collisionShape.addChildShape(new Matrix4(VecMath.to(collider.offset),VecMath.to(Rotation.none().getQuat4f()),new Vector3(1,1,1)),collider.collisionShape);
+               // Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
+               // collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);
         }
@@ -226,7 +249,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
             extent.absolute();
 
-            return new ColliderInfo(offset, new BoxShape(VecMath.to(extent)));
+
+            return new ColliderInfo(offset, new btBoxShape(VecMath.to(extent)));//new BoxShape(VecMath.to(extent)));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {
@@ -236,14 +260,14 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 throw new JsonParseException("Sphere Collider missing position");
             }
 
-            return new ColliderInfo(offset, new SphereShape(radius));
+            return new ColliderInfo(offset, new btSphereShape(radius));
         }
 
         private static class ColliderInfo {
             public Vector3f offset;
-            public CollisionShape collisionShape;
+            public btCollisionShape collisionShape;
 
-            ColliderInfo(Vector3f offset, CollisionShape shape) {
+            ColliderInfo(Vector3f offset, btCollisionShape shape) {
                 this.offset = offset;
                 this.collisionShape = shape;
             }

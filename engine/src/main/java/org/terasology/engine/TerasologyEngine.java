@@ -16,6 +16,10 @@
 
 package org.terasology.engine;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.utils.GdxNativesLoader;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
@@ -173,9 +177,14 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public void initialize() {
+
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
+            //need to fix
+            GdxNativesLoader.load();
+            Bullet.init();
+
             logger.info("Initializing Terasology...");
             logEnvironmentInfo();
 
