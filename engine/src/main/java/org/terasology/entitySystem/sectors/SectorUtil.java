@@ -21,6 +21,7 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -97,6 +98,21 @@ public final class SectorUtil {
             chunks.addAll(regionComponent.chunks);
         }
         return chunks;
+    }
+
+    /**
+     * Calculate whether the entity is watching no loaded chunks, or only the given chunk is loaded.
+     *
+     * @param entity the sector-scope entity to query
+     * @param chunkPos the position of the chunk to check
+     * @param chunkProvider the chunkProvider, so that it can check which chunks are loaded
+     * @return whether the entity is watching no loaded chunks, or only the given chunk is loaded
+     */
+    public static boolean onlyWatchedChunk(EntityRef entity, Vector3i chunkPos, ChunkProvider chunkProvider) {
+        Set<Vector3i> readyChunks = getWatchedChunks(entity).stream()
+                .filter(chunkProvider::isChunkReady)
+                .collect(Collectors.toSet());
+        return readyChunks.isEmpty() || (readyChunks.size() == 1 && readyChunks.contains(chunkPos));
     }
 
 }

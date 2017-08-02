@@ -104,11 +104,22 @@ public abstract class EntityRef implements MutableComponentContainer {
     }
 
     /**
-     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#maxDelta}.
+     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#unloadedMaxDelta}
+     * and {@link SectorSimulationComponent#loadedMaxDelta} to the same given value.
      *
-     * @param maxDelta the maxDelta for the sector-scope entity
+     * @param maxDelta the maximum delta for the sector-scope entity (loaded and unloaded)
      */
     public void setSectorScope(long maxDelta) {
+    }
+
+    /**
+     * Sets the scope of this entity to sector-scope, and sets the {@link SectorSimulationComponent#unloadedMaxDelta}
+     * and {@link SectorSimulationComponent#loadedMaxDelta} to the given values.
+     *
+     * @param unloadedMaxDelta the maximum unloaded delta for the sector-scope entity
+     * @param loadedMaxDelta the maximum loaded delta for the sector-scope entity
+     */
+    public void setSectorScope(long unloadedMaxDelta, long loadedMaxDelta) {
     }
 
     /**
