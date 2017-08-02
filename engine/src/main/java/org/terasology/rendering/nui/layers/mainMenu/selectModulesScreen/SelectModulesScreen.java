@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
+import org.terasology.config.SelectModulesConfig;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -50,6 +51,7 @@ import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.widgets.ResettableUIText;
 import org.terasology.rendering.nui.widgets.TextChangeEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -57,6 +59,7 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,29 +76,26 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
+            o1.getMetadata().getDisplayName().toString().compareTo(
+                    o2.getMetadata().getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
-
     @In
     private Config config;
 
+    private SelectModulesConfig selectModulesConfig;
     @In
     private WorldGeneratorManager worldGenManager;
-
     @In
     private TranslationSystem translationSystem;
-
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
     private Future<Void> remoteModuleRegistryUpdater;
+    private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
-
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
-            o1.getMetadata().getDisplayName().toString().compareTo(
-                    o2.getMetadata().getDisplayName().toString());
 
     @Override
     public void onOpened() {
@@ -112,6 +112,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor().submit(moduleManager.getInstallManager().updateRemoteRegistry());
+
+        selectModulesConfig = config.getSelectModulesConfig();
 
         resolver = new DependencyResolver(moduleManager.getRegistry());
 
@@ -177,12 +179,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 moduleSearch.subscribe(new TextChangeEventListener() {
                     @Override
                     public void onTextChange(String oldText, String newText) {
-                        sortedModules.clear();
-                        for (ModuleSelectionInfo m : allSortedModules) {
-                            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                                sortedModules.add(m);
-                            }
-                        }
+                        filterText(newText);
                     }
                 });
             }
@@ -361,9 +358,49 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(button -> sortedModules.stream()
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
+
+            localOnlyCheckbox = find("localOnly", UICheckbox.class);
+            localOnlyCheckbox.bindChecked(
+                    new Binding<Boolean>() {
+
+                        @Override
+                        public Boolean get() {
+                            filterText(moduleSearch.getText());
+                            prepareModuleList(selectModulesConfig.isChecked());
+                            return selectModulesConfig.isChecked();
+                        }
+
+                        @Override
+                        public void set(Boolean value) {
+                            selectModulesConfig.setIsChecked(value);
+                            filterText(moduleSearch.getText());
+                            prepareModuleList(value);
+                        }
+                    }
+            );
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    private void prepareModuleList(boolean checked) {
+        if (selectModulesConfig.isChecked()) {
+            Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+            while (iter.hasNext()) {
+                if (!iter.next().isPresent()) {
+                    iter.remove();
+                }
+            }
+        }
+    }
+
+    private void filterText(String newText) {
+        sortedModules.clear();
+        for (ModuleSelectionInfo m : allSortedModules) {
+            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                sortedModules.add(m);
+            }
+        }
     }
 
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
@@ -438,8 +475,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-
-        if (needsUpdate && remoteModuleRegistryUpdater.isDone()) {
+        
+        if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isChecked()) {
             needsUpdate = false;
             try {
                 remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions

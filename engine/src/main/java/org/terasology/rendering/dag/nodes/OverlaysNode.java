@@ -33,8 +33,6 @@ import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
-
 /**
  * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
  *
@@ -42,7 +40,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private ComponentSystemManager componentSystemManager;
     private WorldRenderer worldRenderer;
@@ -60,9 +58,9 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         SubmersibleCamera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
     }
 
     /**

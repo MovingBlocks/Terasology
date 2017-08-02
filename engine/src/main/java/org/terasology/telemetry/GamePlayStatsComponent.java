@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters;
+package org.terasology.telemetry;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * This is only attached to the <b>alive character</b> entities. <br/>
- * Used to differentiate between alive and dead character entities.<br/><br/>
- *
- * This needs to be necessarily attached to all character entities that require CharacterMovementComponent
- * for movement systems to work.<br/>
- * Can be used to differently handle situations for character entities that can remain in a dead state
- * or respawn after a while.
+ * A component stocks game play stats such as blocks destroyed, blocks placed, etc.
  */
-@Replicate
-public class AliveCharacterComponent implements Component {
+public class GamePlayStatsComponent implements Component {
+
+    @Replicate
+    public Map<String, Integer> blockDestroyedMap = new HashMap<>();
+
+    @Replicate
+    public Map<String, Integer> blockPlacedMap = new HashMap<>();
+
+    @Replicate
+    public float distanceTraveled;
+
+    @Replicate
+    public float playTimeMinute;
+
+    @Replicate
+    public Map<String, Integer> monsterKilled = new HashMap<>();
 }

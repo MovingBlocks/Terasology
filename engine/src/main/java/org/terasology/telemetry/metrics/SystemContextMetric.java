@@ -18,6 +18,9 @@ package org.terasology.telemetry.metrics;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.lwjgl.opengl.GL11;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
@@ -28,10 +31,11 @@ import java.util.Map;
  */
 @TelemetryCategory(id = "systemContext",
         displayName = "${engine:menu#telemetry-system-context}"
-        )
+)
 public class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
+    private Context context;
 
     @TelemetryField
     private String osName;
@@ -79,17 +83,21 @@ public class SystemContextMetric extends Metric {
         javaVersion = System.getProperty("java.version");
         jvmName = System.getProperty("java.vm.name");
         jvmVersion = System.getProperty("java.vm.version");
-        openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
-        openGLVersion = GL11.glGetString(GL11.GL_VERSION);
-        openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
+        context = CoreRegistry.get(Context.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
+        if (!display.isHeadless()) {
+            openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
+            openGLVersion = GL11.glGetString(GL11.GL_VERSION);
+            openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
+        }
         processorNumbers = Runtime.getRuntime().availableProcessors();
         memoryMaxByte = Runtime.getRuntime().maxMemory();
     }
 
     @Override
-    public  Unstructured getUnstructuredMetric() {
+    public Unstructured getUnstructuredMetric() {
 
-        Map<String, Object> metricMap = getFieldValueMap();
+        getFieldValueMap();
 
         SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
 

@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -36,7 +37,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * This nodes (or rather the shader used by it) takes advantage of the Sobel operator [1]
@@ -47,20 +47,16 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  *
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
-public class OutlineNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn OUTLINE_FBO = new ResourceUrn("engine:outline");
-    private static final ResourceUrn OUTLINE_MATERIAL = new ResourceUrn("engine:prog.sobel");
+public class OutlineNode extends ConditionDependentNode {
+    public static final SimpleUri OUTLINE_FBO_URI = new SimpleUri("engine:fbo.outline");
+    private static final ResourceUrn OUTLINE_MATERIAL_URN = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
     private SubmersibleCamera activeCamera;
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material outlineMaterial;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private FBO sceneOpaqueFbo;
-    private float sceneOpaqueFboWidth;
-    private float sceneOpaqueFboHeight;
+    private FBO lastUpdatedGBuffer;
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 16.0f)
@@ -78,19 +74,17 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
         requiresCondition(() -> renderingConfig.isOutline());
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(OUTLINE_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(OUTLINE_FBO, displayResolutionDependentFBOs));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        FBO outlineFbo = requiresFBO(new FBOConfig(OUTLINE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(outlineFbo));
 
-        update(); // Cheeky way to initialise sceneOpaqueFboWidth, sceneOpaqueFboHeight
-        displayResolutionDependentFBOs.subscribe(this);
+        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL_URN));
 
-        addDesiredStateChange(new EnableMaterial(OUTLINE_MATERIAL));
-
-        outlineMaterial = getMaterial(OUTLINE_MATERIAL);
+        outlineMaterial = getMaterial(OUTLINE_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, OUTLINE_MATERIAL_URN, "texDepth"));
     }
 
     /**
@@ -112,8 +106,8 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
 
         outlineMaterial.setFloat3("cameraParameters", activeCamera.getzNear(), activeCamera.getzFar(), 0.0f, true);
 
-        outlineMaterial.setFloat("texelWidth", 1.0f / sceneOpaqueFboWidth);
-        outlineMaterial.setFloat("texelHeight", 1.0f / sceneOpaqueFboHeight);
+        outlineMaterial.setFloat("texelWidth", 1.0f / lastUpdatedGBuffer.width());
+        outlineMaterial.setFloat("texelHeight", 1.0f / lastUpdatedGBuffer.height());
 
         outlineMaterial.setFloat("pixelOffsetX", pixelOffsetX);
         outlineMaterial.setFloat("pixelOffsetY", pixelOffsetY);
@@ -123,12 +117,5 @@ public class OutlineNode extends ConditionDependentNode implements FBOManagerSub
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        sceneOpaqueFbo = displayResolutionDependentFBOs.get(READONLY_GBUFFER);
-        sceneOpaqueFboWidth = sceneOpaqueFbo.width();
-        sceneOpaqueFboHeight = sceneOpaqueFbo.height();
     }
 }

@@ -31,7 +31,6 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * An instance of this class renders and blends semi-transparent objects into the content of the existing g-buffer.
@@ -57,7 +56,7 @@ public class SimpleBlendMaterialsNode extends AbstractNode {
         Camera playerCamera = context.get(WorldRenderer.class).getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
         // Sets the state for the rendering of objects or portions of objects having some degree of transparency.
         // Generally speaking objects drawn with this state will have their color blended with the background

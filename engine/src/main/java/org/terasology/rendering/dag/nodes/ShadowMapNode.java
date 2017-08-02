@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -57,8 +58,8 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
 public class ShadowMapNode extends ConditionDependentNode {
-    public static final ResourceUrn SHADOW_MAP_FBO = new ResourceUrn("engine:sceneShadowMap");
-    private static final ResourceUrn SHADOW_MAP_MATERIAL = new ResourceUrn("engine:prog.shadowMap");
+    public static final SimpleUri SHADOW_MAP_FBO_URI = new SimpleUri("engine:fbo.sceneShadowMap");
+    private static final ResourceUrn SHADOW_MAP_MATERIAL_URN = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
     private static final float STEP_SIZE = 50f;
 
@@ -91,10 +92,10 @@ public class ShadowMapNode extends ConditionDependentNode {
         renderingConfig.subscribe(RenderingConfig.DYNAMIC_SHADOWS, this);
 
         ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SHADOW_MAP_FBO, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SHADOW_MAP_FBO, shadowMapResolutionDependentFBOs));
-        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL));
+        FBO shadowMapFbo = requiresFBO(new FBOConfig(SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer(), shadowMapResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(shadowMapFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
+        addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL_URN));
     }
 
     private float calculateTexelSize(int shadowMapResolution) {

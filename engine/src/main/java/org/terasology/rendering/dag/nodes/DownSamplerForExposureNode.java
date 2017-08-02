@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -34,11 +35,11 @@ import org.terasology.rendering.opengl.FBOConfig;
  * encode the average brightness of the rendering, which in turn is used to tweak the exposure parameter later nodes use.
  */
 public class DownSamplerForExposureNode extends DownSamplerNode {
-    public static final FBOConfig FBO_16X16_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.16x16px"), 16, 16, FBO.Type.DEFAULT);
-    public static final FBOConfig FBO_8X8_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.8x8px"), 8, 8, FBO.Type.DEFAULT);
-    public static final FBOConfig FBO_4X4_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.4x4px"), 4, 4, FBO.Type.DEFAULT);
-    public static final FBOConfig FBO_2X2_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.2x2px"), 2, 2, FBO.Type.DEFAULT);
-    public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new ResourceUrn("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
+    public static final FBOConfig FBO_16X16_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.16x16px"), 16, 16, FBO.Type.DEFAULT);
+    public static final FBOConfig FBO_8X8_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.8x8px"), 8, 8, FBO.Type.DEFAULT);
+    public static final FBOConfig FBO_4X4_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.4x4px"), 4, 4, FBO.Type.DEFAULT);
+    public static final FBOConfig FBO_2X2_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.2x2px"), 2, 2, FBO.Type.DEFAULT);
+    public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
 
     public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                                         FBOConfig outputFboConfig, BaseFBOsManager outputFboManager,

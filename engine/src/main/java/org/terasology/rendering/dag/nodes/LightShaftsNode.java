@@ -19,6 +19,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -39,7 +40,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 /**
  * An instance of this class takes advantage of the color and depth buffers attached to the read-only gbuffer
@@ -53,8 +53,8 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
 public class LightShaftsNode extends ConditionDependentNode {
-    public static final ResourceUrn LIGHT_SHAFTS_FBO = new ResourceUrn("engine:fbo.lightShafts");
-    private static final ResourceUrn LIGHT_SHAFTS_MATERIAL = new ResourceUrn("engine:prog.lightShafts");
+    public static final SimpleUri LIGHT_SHAFTS_FBO_URI = new SimpleUri("engine:fbo.lightShafts");
+    private static final ResourceUrn LIGHT_SHAFTS_MATERIAL_URN = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;
     private SubmersibleCamera activeCamera;
@@ -92,16 +92,16 @@ public class LightShaftsNode extends ConditionDependentNode {
         requiresCondition(renderingConfig::isLightShafts);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(LIGHT_SHAFTS_FBO, displayResolutionDependentFBOs));
+        FBO lightShaftsFbo = requiresFBO(new FBOConfig(LIGHT_SHAFTS_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(lightShaftsFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(lightShaftsFbo));
 
-        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(LIGHT_SHAFTS_MATERIAL_URN));
 
-        lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL);
+        lightShaftsMaterial = getMaterial(LIGHT_SHAFTS_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, READONLY_GBUFFER, ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL, "texScene"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), ColorTexture, displayResolutionDependentFBOs, LIGHT_SHAFTS_MATERIAL_URN, "texScene"));
     }
 
     /**

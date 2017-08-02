@@ -51,7 +51,7 @@ public class ModulesJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent
         if (context != null) {
             Metrics metrics = context.get(Metrics.class);
             ModulesMetric modulesMetric = metrics.getModulesMetric();
-            Map<String, Object> map = modulesMetric.getFieldValueMap();
+            Map<String, ?> map = modulesMetric.getFieldValueMap();
             Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
 
             JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);

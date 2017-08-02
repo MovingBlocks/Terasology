@@ -18,8 +18,13 @@ package org.terasology.telemetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.telemetry.metrics.BlockDestroyedMetric;
+import org.terasology.telemetry.metrics.BlockPlacedMetric;
+import org.terasology.telemetry.metrics.GameConfigurationMetric;
+import org.terasology.telemetry.metrics.GamePlayMetric;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
+import org.terasology.telemetry.metrics.MonsterKilledMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.lang.reflect.Field;
@@ -37,6 +42,16 @@ public class Metrics {
 
     private ModulesMetric modulesMetric;
 
+    private GameConfigurationMetric gameConfigurationMetric;
+
+    private BlockDestroyedMetric blockDestroyedMetric;
+
+    private BlockPlacedMetric blockPlacedMetric;
+
+    private GamePlayMetric gamePlayMetric;
+
+    private MonsterKilledMetric monsterKilledMetric;
+
     public Metrics() {
 
     }
@@ -44,8 +59,26 @@ public class Metrics {
     public void initialise(Context context) {
 
         systemContextMetric = new SystemContextMetric();
-
         modulesMetric = new ModulesMetric(context);
+        gameConfigurationMetric = new GameConfigurationMetric(context);
+        blockDestroyedMetric = new BlockDestroyedMetric();
+        blockPlacedMetric = new BlockPlacedMetric();
+        gamePlayMetric = new GamePlayMetric();
+        monsterKilledMetric = new MonsterKilledMetric();
+    }
+
+    public void refreshAllMetrics() {
+        Field[] fields = this.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType().getSuperclass() == Metric.class) {
+                try {
+                    Metric metric = (Metric) field.get(this);
+                    metric.getFieldValueMap();
+                } catch (IllegalAccessException e) {
+                    logger.error("The field is not inaccessible: ", e);
+                }
+            }
+        }
     }
 
     public SystemContextMetric getSystemContextMetric() {
@@ -54,6 +87,26 @@ public class Metrics {
 
     public ModulesMetric getModulesMetric() {
         return modulesMetric;
+    }
+
+    public GameConfigurationMetric getGameConfigurationMetric() {
+        return gameConfigurationMetric;
+    }
+
+    public BlockDestroyedMetric getBlockDestroyedMetric() {
+        return blockDestroyedMetric;
+    }
+
+    public BlockPlacedMetric getBlockPlacedMetric() {
+        return blockPlacedMetric;
+    }
+
+    public MonsterKilledMetric getMonsterKilledMetric() {
+        return monsterKilledMetric;
+    }
+
+    public GamePlayMetric getGamePlayMetric() {
+        return gamePlayMetric;
     }
 
     public Optional<Metric> getMetric(Class<?> cl) {

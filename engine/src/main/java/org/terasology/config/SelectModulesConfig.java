@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.shader;
+package org.terasology.config;
 
-import org.terasology.rendering.assets.material.Material;
+public class SelectModulesConfig {
+    private boolean isChecked;
 
-/**
- * Shader parameters for the Particle shader program.
- *
- */
-public class ShaderParametersParticle extends ShaderParametersBase {
-
-    @Override
-    public void applyParameters(Material program) {
-        super.applyParameters(program);
+    public boolean isChecked() {
+        return isChecked;
     }
 
+    public void setIsChecked(boolean value) {
+        this.isChecked = value;
+    }
 }

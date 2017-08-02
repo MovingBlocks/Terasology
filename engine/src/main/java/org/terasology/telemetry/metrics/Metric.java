@@ -16,6 +16,7 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ public abstract class Metric {
 
     private static final Logger logger = LoggerFactory.getLogger(Metric.class);
 
+    protected Map metricMap;
+
     /**
      * Generates a snowplow unstructured event that the snowplow tracker can track.
      * @return an snowplow unstructured event.
@@ -45,9 +48,9 @@ public abstract class Metric {
      * Fetches all TelemetryFields and create a map associating field's name (key) to field's value (value).
      * @return a map with key (field's name) and value (field's value).
      */
-    public Map<String, Object> getFieldValueMap() {
+    public Map<String, ?> getFieldValueMap() {
 
-        Map<String, Object> metricMap = new HashMap<String, Object>();
+        metricMap = new HashMap<>();
         Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
         for (Field field : fields) {

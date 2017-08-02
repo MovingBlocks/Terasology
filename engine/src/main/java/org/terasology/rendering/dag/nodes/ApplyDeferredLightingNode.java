@@ -16,32 +16,22 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.backdrop.BackdropProvider;
-import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
+import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.LightAccumulationTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
  * The ApplyDeferredLightingNode takes advantage of the information stored by previous nodes
@@ -51,30 +41,34 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * This node is integral to the deferred lighting technique.
  */
 public class ApplyDeferredLightingNode extends AbstractNode {
-    private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL = new ResourceUrn("engine:prog.lightBufferPass");
-
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+    private static final ResourceUrn DEFERRED_LIGHTING_MATERIAL_URN = new ResourceUrn("engine:prog.lightBufferPass");
 
     public ApplyDeferredLightingNode(Context context) {
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(WRITEONLY_GBUFFER, displayResolutionDependentFBOs));
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
 
-        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL));
+        addDesiredStateChange(new BindFbo(gBufferPair.getStaleFbo()));
+
+        addDesiredStateChange(new EnableMaterial(DEFERRED_LIGHTING_MATERIAL_URN));
+
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, ColorTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaque"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, DepthStencilTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueDepth"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, READONLY_GBUFFER, NormalsTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueNormals"));
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   READONLY_GBUFFER, LightAccumulationTexture,
-            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL, "texSceneOpaqueLightBuffer"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, NormalsTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot,   lastUpdatedGBuffer, LightAccumulationTexture,
+            displayResolutionDependentFBOs, DEFERRED_LIGHTING_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
+
+        addDesiredStateChange(new SwapGBuffers(gBufferPair));
     }
 
     /**
      * Part of the deferred lighting technique, this method applies lighting through screen-space
-     * calculations to the previously flat-lit world rendering, stored in the engine:sceneOpaque.
+     * calculations to the previously flat-lit world rendering, stored in the lastUpdatedGBuffer.
      * <p>
      * See http://en.wikipedia.org/wiki/Deferred_shading for more information on the general subject.
      */
@@ -84,11 +78,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
 
         // Actual Node Processing
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO: this is necessary - but why? Verify in the shader.
-
         renderFullscreenQuad();
-
-        displayResolutionDependentFBOs.swapReadWriteBuffers();
 
         PerformanceMonitor.endActivity();
     }

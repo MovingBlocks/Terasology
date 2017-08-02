@@ -21,25 +21,21 @@ import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
-
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-
-    private FBO sceneFinalFbo;
-    private int displayWidth;
-    private int displayHeight;
+public class CopyImageToScreenNode extends ConditionDependentNode {
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     public CopyImageToScreenNode(Context context) {
         super(context);
@@ -47,29 +43,20 @@ public class CopyImageToScreenNode extends ConditionDependentNode implements FBO
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        update(); // Cheeky way to initialise sceneFinalFbo
-        displayResolutionDependentFBOs.subscribe(this);
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        addDesiredStateChange(new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture,
+                context.get(DisplayResolutionDependentFBOs.class), DEFAULT_TEXTURED_MATERIAL_URN, "texture"));
     }
 
     @Override
     public void process() {
         PerformanceMonitor.startActivity("rendering/copyImageToScreen");
-        sceneFinalFbo.bindTexture(); // TODO: Convert to a StateChange
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
-        glViewport(0, 0, displayWidth, displayHeight);
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
-        displayWidth = Display.getWidth();
-        displayHeight = Display.getHeight();
     }
 }

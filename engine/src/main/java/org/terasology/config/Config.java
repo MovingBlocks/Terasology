@@ -130,6 +130,10 @@ public final class Config {
         return createGson().toJsonTree(configObject).toString();
     }
 
+    public SelectModulesConfig getSelectModulesConfig() {
+        return config.getSelectModulesConfig();
+    }
+
     /**
      * Saves this config to the default configuration file
      */

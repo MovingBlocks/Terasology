@@ -25,41 +25,6 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 /**
  */
 public class RenderingDebugConfig extends AbstractSubscribable implements PropertyChangeListener {
-    public enum DebugRenderingStage {
-        OPAQUE_COLOR(0, "DEBUG_STAGE_OPAQUE_COLOR"),
-        TRANSPARENT_COLOR(1, "DEBUG_STAGE_TRANSPARENT_COLOR"),
-        OPAQUE_NORMALS(2, "DEBUG_STAGE_OPAQUE_NORMALS"),
-        OPAQUE_DEPTH(3, "DEBUG_STAGE_OPAQUE_DEPTH"),
-        OPAQUE_SUNLIGHT(4, "DEBUG_STAGE_OPAQUE_SUNLIGHT"),
-        BAKED_OCCLUSION(5, "DEBUG_STAGE_BAKED_OCCLUSION"),
-        SSAO(6, "DEBUG_STAGE_SSAO"),
-        OPAQUE_LIGHT_BUFFER(7, "DEBUG_STAGE_OPAQUE_LIGHT_BUFFER"),
-        SHADOW_MAP(8, "DEBUG_STAGE_SHADOW_MAP"),
-        SOBEL(9, "DEBUG_STAGE_SOBEL"),
-        HIGH_PASS(10, "DEBUG_STAGE_HIGH_PASS"),
-        BLOOM(11, "DEBUG_STAGE_BLOOM"),
-        SKY_BAND(12, "DEBUG_STAGE_SKY_BAND"),
-        LIGHT_SHAFTS(13, "DEBUG_STAGE_LIGHT_SHAFTS"),
-        RECONSTRUCTED_POSITION(14, "DEBUG_STAGE_RECONSTRUCTED_POSITION"),
-        VOLUMETRIC_LIGHTING(15, "DEBUG_STAGE_VOLUMETRIC_LIGHTING");
-
-        private int index;
-        private String defineName;
-
-        DebugRenderingStage(int index, String defineName) {
-            this.index = index;
-            this.defineName = defineName;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public String getDefineName() {
-            return defineName;
-        }
-    }
-
     public static final String WIREFRAME = "wireframe";
     public static final String ENABLED = "enabled";
     public static final String STAGE = "stage";
@@ -70,7 +35,6 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
     private static final Logger logger = LoggerFactory.getLogger(WorldRendererImpl.class);
 
     private boolean enabled;
-    private DebugRenderingStage stage;
     private boolean firstPersonElementsHidden;
     private boolean hudHidden;
     private boolean wireframe;
@@ -99,20 +63,6 @@ public class RenderingDebugConfig extends AbstractSubscribable implements Proper
         boolean oldValue = this.enabled;
         this.enabled = enabled;
         propertyChangeSupport.firePropertyChange(ENABLED, oldValue, this.enabled);
-    }
-
-    public void cycleStage() {
-        this.stage = DebugRenderingStage.values()[(stage.ordinal() + 1) % DebugRenderingStage.values().length];
-    }
-
-    public DebugRenderingStage getStage() {
-        return stage;
-    }
-
-    public void setStage(DebugRenderingStage stage) {
-        DebugRenderingStage oldStage = this.stage;
-        this.stage = stage;
-        propertyChangeSupport.firePropertyChange(STAGE, oldStage, this.stage);
     }
 
     public boolean isFirstPersonElementsHidden() {

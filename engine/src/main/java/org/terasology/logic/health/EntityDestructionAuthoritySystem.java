@@ -20,16 +20,62 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.telemetry.GamePlayStatsComponent;
+import org.terasology.world.block.BlockComponent;
+
+import java.util.Map;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onDestroy(DestroyEvent event, EntityRef entity) {
+        recordDestroyed(event,entity);
         BeforeDestroyEvent destroyCheck = new BeforeDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType());
         entity.send(destroyCheck);
         if (!destroyCheck.isConsumed()) {
             entity.send(new DoDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType()));
             entity.destroy();
+        }
+    }
+
+    private void recordDestroyed(DestroyEvent event, EntityRef entityRef) {
+        EntityRef instigator = event.getInstigator();
+        if(entityRef.hasComponent(BlockComponent.class)) {
+            BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
+            String blockName = blockComponent.getBlock().getDisplayName();
+            if (instigator.hasComponent(GamePlayStatsComponent.class)) {
+                GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
+                Map<String, Integer> blockDestroyedMap = gamePlayStatsComponent.blockDestroyedMap;
+                if (blockDestroyedMap.containsKey(blockName)) {
+                    blockDestroyedMap.put(blockName, blockDestroyedMap.get(blockName) + 1);
+                } else {
+                    blockDestroyedMap.put(blockName, 1);
+                }
+                instigator.saveComponent(gamePlayStatsComponent);
+            } else {
+                GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
+                Map<String, Integer> blockDestroyedMap = gamePlayStatsComponent.blockDestroyedMap;
+                blockDestroyedMap.put(blockName, 1);
+                instigator.addOrSaveComponent(gamePlayStatsComponent);
+            }
+        } else if (entityRef.hasComponent(CharacterComponent.class)) {
+            String monsterName = entityRef.getParentPrefab().getName();
+            if (instigator.hasComponent(GamePlayStatsComponent.class)) {
+                GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
+                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
+                if (monsterKilled.containsKey(monsterName)) {
+                    monsterKilled.put(monsterName, monsterKilled.get(monsterName) + 1);
+                } else {
+                    monsterKilled.put(monsterName, 1);
+                }
+                instigator.saveComponent(gamePlayStatsComponent);
+            } else {
+                GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
+                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
+                monsterKilled.put(monsterName, 1);
+                instigator.addOrSaveComponent(gamePlayStatsComponent);
+            }
         }
     }
 }

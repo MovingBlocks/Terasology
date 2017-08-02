@@ -20,12 +20,14 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.config.TelemetryConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryEmitter;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * This is a telemetry engine sub system.
@@ -41,8 +43,6 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     private Emitter emitter;
 
-    private Context context;
-
     @Override
     public String getName() {
         return "Telemetry";
@@ -50,8 +50,6 @@ public class TelemetrySubSystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-
-        context = rootContext;
 
         // Add metrics to context, this helps show metric values in ui
         metrics = new Metrics();
@@ -68,24 +66,40 @@ public class TelemetrySubSystem implements EngineSubsystem {
         metrics.initialise(rootContext);
 
         addTelemetryLogstashAppender(rootContext);
+        setTelemetryDestinationIfEnable(rootContext);
     }
 
     private void addTelemetryLogstashAppender(Context rootContext) {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         TelemetryLogstashAppender telemetryLogstashAppender = new TelemetryLogstashAppender(rootContext);
         lc.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(telemetryLogstashAppender);
+
+        Config config = rootContext.get(Config.class);
+        if (config.getTelemetryConfig().isErrorReportingEnabled()) {
+            String errorReportingDestination = config.getTelemetryConfig().getErrorReportingDestination();
+            if (errorReportingDestination != null) {
+                telemetryLogstashAppender.addDestination(errorReportingDestination);
+                telemetryLogstashAppender.start();
+            }
+        }
     }
 
-    @Override
-    public void preShutdown() {
-
-        // TODO: REMOVE this when the telemetry is ready to users
-        Config config = context.get(Config.class);
-        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
-        telemetryConfig.setTelemetryEnabled(false);
-        telemetryConfig.setErrorReportingEnabled(false);
+    private void setTelemetryDestinationIfEnable(Context rootContext) {
+        Config config = rootContext.get(Config.class);
+        if (config.getTelemetryConfig().isTelemetryEnabled()) {
+            String telemetryDestination = config.getTelemetryConfig().getTelemetryDestination();
+            if (telemetryDestination != null) {
+                try {
+                    URL url = new URL(telemetryDestination);
+                    TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
+                    telemetryEmitter.changeUrl(url);
+                } catch (MalformedURLException e) {
+                    logger.error("URL malformed", e);
+                }
+            }
+        }
     }
-
+    
     @Override
     public void shutdown() {
 
