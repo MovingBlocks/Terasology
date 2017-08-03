@@ -27,10 +27,6 @@ import java.util.Set;
  *
  * This event will always be immediately preceded by a {@link SectorSimulationEvent}, so no extra simulation needs to
  * take place for this event.
- *
- * TODO: This is currently sent on the same schedule as {@link SectorSimulationEvent}, based on
- * TODO: {@link SectorSimulationComponent#maxDelta}. It should be able to have its own schedule for when the chunk is
- * TODO: loaded.
  */
 @API
 public class LoadedSectorUpdateEvent implements Event {
@@ -44,7 +40,6 @@ public class LoadedSectorUpdateEvent implements Event {
      * Create a new event with the given {@link #readyChunks}.
      *
      * @param readyChunks the readyChunks for the event.
-     *                    @see #readyChunks
      */
     public LoadedSectorUpdateEvent(Set<Vector3i> readyChunks) {
         this.readyChunks = readyChunks;

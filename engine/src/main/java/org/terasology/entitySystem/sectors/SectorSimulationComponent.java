@@ -30,17 +30,13 @@ import org.terasology.module.sandbox.API;
 @API
 public class SectorSimulationComponent implements Component {
 
-    public static final long MAX_DELTA_DEFAULT = 10;
+    public static final long UNLOADED_MAX_DELTA_DEFAULT = 60_000;
+    public static final long LOADED_MAX_DELTA_DEFAULT = 10_000;
 
     /**
-     * The maximum time that can elapse between {@link SectorSimulationEvent}s being sent, in ms. This value does not
-     * change the fact that a simulation event is always sent when the chunk the entity is in is loaded.
-     *
-     *
-     * TODO: add a way of simulating at a different maxDelta when the entity is loaded
-     * This should only affect the timing of events sent when the chunk is not loaded; a different value should
-     * be used when the chunk is loaded. This will allow this value to be set as high as possible (or even to a
-     * non-simulating value) if all of the simulation can be postponed until chunk load.
+     * The maximum time that can elapse between {@link SectorSimulationEvent}s being sent, in ms, when none of the
+     * entity's watched chunks are loaded. This value does not change the fact that a simulation event is always sent
+     * when the chunk the entity is in is loaded.
      *
      * This should be set as high as possible, so that fewer simulation events need to be sent in total. The purpose of
      * this value is to allow checking for whether its borders need to be expanded regularly, so that the appropriate
@@ -49,7 +45,13 @@ public class SectorSimulationComponent implements Component {
      * E.g. if a city expands while the player is away, it needs to tell the system to load buildings at the edge of
      * the city region without the centre of the city needing to be loaded (to force a simulation).
      */
-    public long maxDelta;
+    public long unloadedMaxDelta;
+
+    /**
+     * The maximum time that can elapse between {@link SectorSimulationEvent}s being sent, in ms, when at least one of
+     * this entity's watched chunks is loaded.
+     */
+    public long loadedMaxDelta;
 
     /**
      * The last time (game time, in ms) a {@link SectorSimulationEvent} was sent to this entity.
@@ -63,13 +65,8 @@ public class SectorSimulationComponent implements Component {
      * Create a new {@link SectorSimulationComponent} with the default max delta.
      */
     public SectorSimulationComponent() {
-        new SectorSimulationComponent(MAX_DELTA_DEFAULT);
+        unloadedMaxDelta = UNLOADED_MAX_DELTA_DEFAULT;
+        loadedMaxDelta = LOADED_MAX_DELTA_DEFAULT;
     }
 
-    /**
-     * @see SectorSimulationComponent#maxDelta
-     */
-    public SectorSimulationComponent(long maxDelta) {
-        this.maxDelta = maxDelta;
-    }
 }

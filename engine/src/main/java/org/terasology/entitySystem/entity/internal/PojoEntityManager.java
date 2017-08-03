@@ -127,10 +127,18 @@ public class PojoEntityManager implements EngineEntityManager {
 
     @Override
     public EntityRef createSectorEntity(long maxDelta) {
+        return createSectorEntity(maxDelta, maxDelta);
+    }
+
+    @Override
+    public EntityRef createSectorEntity(long unloadedMaxDelta, long loadedMaxDelta) {
         EntityRef entity = sectorManager.create();
         entity.setScope(SECTOR);
 
-        entity.addOrSaveComponent(new SectorSimulationComponent(maxDelta));
+        SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
+        simulationComponent.unloadedMaxDelta = unloadedMaxDelta;
+        simulationComponent.loadedMaxDelta = loadedMaxDelta;
+        entity.saveComponent(simulationComponent);
 
         return entity;
     }

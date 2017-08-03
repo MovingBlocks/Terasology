@@ -90,14 +90,15 @@ public class SectorSimulationSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = SectorSimulationComponent.class)
     public void simulationComponentRemoved(BeforeRemoveComponent event, EntityRef entity) {
-        unregisterSimulationComponent(entity);
+        unregisterSimulationAction(entity);
     }
 
     /**
      * Add the sector simulation periodic action event for this sector-level entity.
      *
-     * This event will be sent on a schedule based on {@link SectorSimulationComponent#maxDelta}, and will be used to
-     * send {@link SectorSimulationEvent} and/or {@link LoadedSectorUpdateEvent}, as appropriate.
+     * This event will be sent on a schedule based on {@link SectorSimulationComponent#loadedMaxDelta} and
+     * {@link SectorSimulationComponent#unloadedMaxDelta}, and will be used to send {@link SectorSimulationEvent}
+     * and/or {@link LoadedSectorUpdateEvent}, as appropriate.
      *
      * This periodic event gets processed by
      * {@link #processPeriodicSectorEvent(PeriodicActionTriggeredEvent, EntityRef)};
@@ -105,10 +106,23 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      * @param entity the entity to add the periodic event for
      */
     private void registerSimulationComponent(EntityRef entity) {
-        SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
+        if (SectorUtil.getWatchedChunks(entity).isEmpty()) {
+            addUnloadedAction(entity);
+        } else {
+            addLoadedAction(entity);
+        }
+    }
 
-        unregisterSimulationComponent(entity);
-        delayManager.addPeriodicAction(entity, SECTOR_SIMULATION_ACTION, 0, simulationComponent.maxDelta);
+    private void addUnloadedAction(EntityRef entity) {
+        SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
+        unregisterSimulationAction(entity);
+        delayManager.addPeriodicAction(entity, SECTOR_SIMULATION_ACTION, 0, simulationComponent.unloadedMaxDelta);
+    }
+
+    private void addLoadedAction(EntityRef entity) {
+        SectorSimulationComponent simulationComponent = entity.getComponent(SectorSimulationComponent.class);
+        unregisterSimulationAction(entity);
+        delayManager.addPeriodicAction(entity, SECTOR_SIMULATION_ACTION, 0, simulationComponent.loadedMaxDelta);
     }
 
     /**
@@ -116,7 +130,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      *
      * @param entity the event to cancel the periodic event for
      */
-    private void unregisterSimulationComponent(EntityRef entity) {
+    private void unregisterSimulationAction(EntityRef entity) {
         if (delayManager.hasPeriodicAction(entity, SECTOR_SIMULATION_ACTION)) {
             delayManager.cancelPeriodicAction(entity, SECTOR_SIMULATION_ACTION);
         }
@@ -132,7 +146,7 @@ public class SectorSimulationSystem extends BaseComponentSystem {
      *
      * Also send the correct delta, and update the {@link SectorSimulationComponent#lastSimulationTime}.
      *
-     * @param event the periodic action event sent at intervals of {@link SectorSimulationComponent#maxDelta}
+     * @param event the periodic action event sent at intervals based on the entity's max delta values
      * @param entity the sector-scope entity the event was sent to
      */
     @ReceiveEvent(components = SectorSimulationComponent.class)
@@ -152,34 +166,56 @@ public class SectorSimulationSystem extends BaseComponentSystem {
     }
 
     /**
-     * Forward the OnChunkLoaded event to the appropriate sector-scope entities, if they are watching that chunk.
+     * Handles the OnChunkLoaded event for sector entities.
+     *
+     * Forwards the event to the appropriate sector-scope entities, if they are watching that chunk, and sends a
+     * {@link SectorEntityLoad} event if this is the first watched chunk to be loaded for that entity.
      *
      * @param event the event sent when any chunk is loaded
      * @param worldEntity ignored
      */
     @ReceiveEvent(components = WorldComponent.class)
-    public void forwardOnChunkLoaded(OnChunkLoaded event, EntityRef worldEntity) {
+    public void chunkLoad(OnChunkLoaded event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
             if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
                 entity.send(new OnChunkLoaded(event.getChunkPos()));
+                if (SectorUtil.onlyWatchedChunk(entity, event.getChunkPos(), chunkProvider)) {
+                    entity.send(new SectorEntityLoad());
+                }
                 sendLoadedSectorUpdateEvent(entity, simulationDelta(entity));
             }
         }
     }
 
     /**
-     * Forward the BeforeChunkUnloaded event to the appropriate sector-scope entities, if they are watching that chunk.
+     * Handles the BeforeChunkUnload event for sector entities.
+     *
+     * Forwards the event to the appropriate sector-scope entities, if they are watching that chunk, and sends a
+     * {@link SectorEntityUnload} event if this chunk is the last chunk that the entity is watching.
      *
      * @param event the event sent when any chunk is about to be unloaded
      * @param worldEntity ignored
      */
     @ReceiveEvent(components = WorldComponent.class)
-    public void forwardChunkUnload(BeforeChunkUnload event, EntityRef worldEntity) {
+    public void chunkUnload(BeforeChunkUnload event, EntityRef worldEntity) {
         for (EntityRef entity : entityManager.getEntitiesWith(SectorSimulationComponent.class)) {
             if (SectorUtil.getWatchedChunks(entity).contains(event.getChunkPos())) {
                 entity.send(new BeforeChunkUnload(event.getChunkPos()));
+                if (SectorUtil.onlyWatchedChunk(entity, event.getChunkPos(), chunkProvider)) {
+                    entity.send(new SectorEntityUnload());
+                }
             }
         }
+    }
+
+    @ReceiveEvent(components = SectorSimulationComponent.class)
+    public void sectorEntityLoaded(SectorEntityLoad event, EntityRef entity) {
+        addLoadedAction(entity);
+    }
+
+    @ReceiveEvent(components = SectorSimulationComponent.class)
+    public void sectorEntityUnloaded(SectorEntityUnload event, EntityRef entity) {
+        addUnloadedAction(entity);
     }
 
     /**
