@@ -32,7 +32,7 @@ import java.util.Map;
 @TelemetryCategory(id = "systemContext",
         displayName = "${engine:menu#telemetry-system-context}"
 )
-public class SystemContextMetric extends Metric {
+public final class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
     private Context context;

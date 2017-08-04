@@ -43,7 +43,6 @@ import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
-import org.terasology.telemetry.metrics.FeedbackMetric;
 import org.terasology.telemetry.metrics.Metric;
 
 import java.net.URL;
