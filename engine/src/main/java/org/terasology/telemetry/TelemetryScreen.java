@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
+import org.terasology.config.TelemetryConfig;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyResolver;
@@ -42,6 +43,7 @@ import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.telemetry.metrics.FeedbackMetric;
 import org.terasology.telemetry.metrics.Metric;
 
 import java.net.URL;
@@ -134,8 +136,25 @@ public class TelemetryScreen extends CoreScreenLayer {
     private void pushAddServerPopupAndStartEmitter() {
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
         addServerPopup.removeTip();
-        ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
-        serverInfo.setOwner(TelemetryEmitter.DEFAULT_COLLECTOR_OWNER);
+        ServerInfo serverInfo;
+        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
+        String telemetryDestination = telemetryConfig.getTelemetryDestination();
+        if (telemetryDestination != null) {
+            try {
+                URL url = new URL(telemetryDestination);
+                String address = url.getHost();
+                int port = url.getPort();
+                serverInfo = new ServerInfo(telemetryConfig.getTelemetryServerName(), address, port);
+                serverInfo.setOwner(telemetryConfig.getTelemetryServerOwner());
+            } catch (Exception e) {
+                logger.error("Exception when get telemetry server information", e);
+                serverInfo = new ServerInfo(TelemetryEmitter.DEFAULT_COLLECTOR_NAME, TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
+                serverInfo.setOwner(TelemetryEmitter.DEFAULT_COLLECTOR_OWNER);
+            }
+        } else {
+            serverInfo = new ServerInfo(TelemetryEmitter.DEFAULT_COLLECTOR_NAME, TelemetryEmitter.DEFAULT_COLLECTOR_HOST, TelemetryEmitter.DEFAULT_COLLECTOR_PORT);
+            serverInfo.setOwner(TelemetryEmitter.DEFAULT_COLLECTOR_OWNER);
+        }
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             TelemetryEmitter telemetryEmitter = (TelemetryEmitter) emitter;
@@ -144,7 +163,9 @@ public class TelemetryScreen extends CoreScreenLayer {
                 telemetryEmitter.changeUrl(optionalURL.get());
 
                 // Save the telemetry destination
-                config.getTelemetryConfig().setTelemetryDestination(optionalURL.get().toString());
+                telemetryConfig.setTelemetryDestination(optionalURL.get().toString());
+                telemetryConfig.setTelemetryServerName(item.getName());
+                telemetryConfig.setTelemetryServerOwner(item.getOwner());
             }
         });
         addServerPopup.onCancel((button) -> {
@@ -156,8 +177,24 @@ public class TelemetryScreen extends CoreScreenLayer {
 
         AddServerPopup addServerPopup = nuiManager.pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
         addServerPopup.removeTip();
-        ServerInfo serverInfo = new ServerInfo("TelemetryCollector", TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST, TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
-        serverInfo.setOwner(TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER);
+        ServerInfo serverInfo;
+        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
+        if (telemetryConfig.getErrorReportingDestination() != null) {
+            try {
+                URL url = new URL(telemetryConfig.getErrorReportingDestination());
+                serverInfo = new ServerInfo(telemetryConfig.getErrorReportingServerName(), url.getHost(), url.getPort());
+                serverInfo.setOwner(telemetryConfig.getErrorReportingServerOwner());
+            } catch (Exception e) {
+                logger.error("Exception when get telemetry server information", e);
+                serverInfo = new ServerInfo(TelemetryLogstashAppender.DEFAULT_LOGSTASH_NAME, TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST,
+                        TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
+                serverInfo.setOwner(TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER);
+            }
+        } else {
+            serverInfo = new ServerInfo(TelemetryLogstashAppender.DEFAULT_LOGSTASH_NAME, TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST,
+                    TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT);
+            serverInfo.setOwner(TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER);
+        }
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
             StringBuilder destinationLogstash = new StringBuilder();
@@ -169,10 +206,12 @@ public class TelemetryScreen extends CoreScreenLayer {
             telemetryLogstashAppender.start();
 
             // Save the destination
-            config.getTelemetryConfig().setErrorReportingDestination(destinationLogstash.toString());
+            telemetryConfig.setErrorReportingDestination(destinationLogstash.toString());
+            telemetryConfig.setErrorReportingServerName(item.getName());
+            telemetryConfig.setErrorReportingServerOwner(item.getOwner());
         });
         addServerPopup.onCancel((button) -> {
-            config.getTelemetryConfig().setErrorReportingEnabled(false);
+            telemetryConfig.setErrorReportingEnabled(false);
         });
     }
 

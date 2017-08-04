@@ -44,6 +44,8 @@ public class TelemetryEmitter extends BatchEmitter {
 
     public static final String DEFAULT_COLLECTOR_OWNER = "Terasology Community";
 
+    public static final String DEFAULT_COLLECTOR_NAME = "TelemetryCollector";
+
     public static final int DEFAULT_COLLECTOR_PORT = 14654;
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryEmitter.class);

@@ -22,13 +22,21 @@ public class TelemetryConfig {
 
     private boolean telemetryEnabled;
 
-    private boolean errorReportingEnabled;
-
-    private boolean launchPopupDisabled;
-
     private String telemetryDestination;
 
+    private String telemetryServerName;
+
+    private String telemetryServerOwner;
+
+    private boolean errorReportingEnabled;
+
     private String errorReportingDestination;
+
+    private String errorReportingServerName;
+
+    private String errorReportingServerOwner;
+
+    private boolean launchPopupDisabled;
 
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
@@ -36,22 +44,6 @@ public class TelemetryConfig {
 
     public void setTelemetryEnabled(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
-    }
-
-    public boolean isErrorReportingEnabled() {
-        return errorReportingEnabled;
-    }
-
-    public void setErrorReportingEnabled(boolean errorReportingEnabled) {
-        this.errorReportingEnabled = errorReportingEnabled;
-    }
-
-    public boolean isLaunchPopupDisabled() {
-        return launchPopupDisabled;
-    }
-
-    public void setLaunchPopupDisabled(boolean launchPopupDisabled) {
-        this.launchPopupDisabled = launchPopupDisabled;
     }
 
     public String getTelemetryDestination() {
@@ -62,12 +54,60 @@ public class TelemetryConfig {
         this.telemetryDestination = telemetryDestination;
     }
 
+    public String getTelemetryServerName() {
+        return telemetryServerName;
+    }
+
+    public void setTelemetryServerName(String telemetryServerName) {
+        this.telemetryServerName = telemetryServerName;
+    }
+
+    public String getTelemetryServerOwner() {
+        return telemetryServerOwner;
+    }
+
+    public void setTelemetryServerOwner(String telemetryServerOwner) {
+        this.telemetryServerOwner = telemetryServerOwner;
+    }
+
+    public boolean isErrorReportingEnabled() {
+        return errorReportingEnabled;
+    }
+
+    public void setErrorReportingEnabled(boolean errorReportingEnabled) {
+        this.errorReportingEnabled = errorReportingEnabled;
+    }
+
     public String getErrorReportingDestination() {
         return errorReportingDestination;
     }
 
     public void setErrorReportingDestination(String errorReportingDestination) {
         this.errorReportingDestination = errorReportingDestination;
+    }
+
+    public String getErrorReportingServerName() {
+        return errorReportingServerName;
+    }
+
+    public void setErrorReportingServerName(String errorReportingServerName) {
+        this.errorReportingServerName = errorReportingServerName;
+    }
+
+    public String getErrorReportingServerOwner() {
+        return errorReportingServerOwner;
+    }
+
+    public void setErrorReportingServerOwner(String errorReportingServerOwner) {
+        this.errorReportingServerOwner = errorReportingServerOwner;
+    }
+
+    public boolean isLaunchPopupDisabled() {
+        return launchPopupDisabled;
+    }
+
+    public void setLaunchPopupDisabled(boolean launchPopupDisabled) {
+        this.launchPopupDisabled = launchPopupDisabled;
     }
 
     public void setTelemetryAndErrorReportingEnable(boolean enabled) {
