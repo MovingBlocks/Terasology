@@ -38,7 +38,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.physics.components.RigidBodyComponent;
+import org.terasology.physics.engine.RigidBody;
 import org.terasology.registry.In;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 @RegisterSystem(RegisterMode.CLIENT)
@@ -251,5 +253,13 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         locationComponent.setLocalPosition(offset);
 
         mountPointComponent.mountPointEntity.saveComponent(locationComponent);
+    }
+
+    @Override
+    public void preSave()
+    {
+        if (clientHeldItem != EntityRef.NULL){
+            clientHeldItem.destroy();
+        }
     }
 }

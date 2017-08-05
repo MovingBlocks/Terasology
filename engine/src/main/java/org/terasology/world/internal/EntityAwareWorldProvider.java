@@ -99,6 +99,14 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public void preAutoSave() {
+    }
+
+    @Override
+    public void postAutoSave() {
+    }
+
+    @Override
     public void preSave() {
     }
 

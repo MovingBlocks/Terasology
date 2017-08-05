@@ -377,9 +377,13 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
 
         checkSaveTransactionAndClearUpIfItIsDone();
-        if (saveRequested || isSavingNecessary()) {
+        if (saveRequested) {
             startSaving();
         }
+        else if (isSavingNecessary()){
+            startAutoSaving();
+        }
+
     }
 
     private boolean isRunModeAllowSaving() {
@@ -389,7 +393,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void startSaving() {
         logger.info("Saving - Creating game snapshot");
-        PerformanceMonitor.startActivity("Auto Saving");
+        PerformanceMonitor.startActivity("Saving");
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.preSave();
@@ -402,12 +406,31 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.postSave();
         }
-        scheduleNextAutoSave();
         PerformanceMonitor.endActivity();
         entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         logger.info("Saving - Snapshot created: Writing phase starts");
     }
 
+    private void startAutoSaving() {
+        logger.info("Auto Saving - Creating game snapshot");
+        PerformanceMonitor.startActivity("Auto Saving");
+        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.preAutoSave();
+        }
+
+        saveTransaction = createSaveTransaction();
+        saveThreadManager.offer(saveTransaction);
+
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.postAutoSave();
+        }
+
+        scheduleNextAutoSave();
+        PerformanceMonitor.endActivity();
+        entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
+        logger.info("Auto Saving - Snapshot created: Writing phase starts");
+    }
 
     private boolean isSavingNecessary() {
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
