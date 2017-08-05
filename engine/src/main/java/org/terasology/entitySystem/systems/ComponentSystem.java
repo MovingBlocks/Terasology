@@ -34,6 +34,16 @@ public interface ComponentSystem {
     void postBegin();
 
     /**
+     * Called before the game is auto-saved
+     */
+    void preAutoSave();
+
+    /**
+     * Called after the game is auto-saved
+     */
+    void postAutoSave();
+
+    /**
      * Called before the game is saved (this may be after shutdown)
      */
     void preSave();
