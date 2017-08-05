@@ -26,6 +26,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.rendering.dag.nodes.DebugNode;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -184,6 +185,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     @Override
     public RenderingStage getCurrentRenderStage() {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DebugNode getDebugNode() {
         return null;
     }
 

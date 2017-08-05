@@ -20,6 +20,7 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.context.Context;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.dag.ConditionDependentNode;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
@@ -34,19 +35,25 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode {
+public class CopyFboColorAttachmentToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
-    public CopyImageToScreenNode(Context context) {
+    private WorldRenderer worldRenderer;
+    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
+
+    private StateChange bindFbo;
+
+    public CopyFboColorAttachmentToScreenNode(Context context) {
         super(context);
 
-        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+        worldRenderer = context.get(WorldRenderer.class);
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
 
-        addDesiredStateChange(new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture,
-                context.get(DisplayResolutionDependentFBOs.class), DEFAULT_TEXTURED_MATERIAL_URN, "texture"));
+        displayResolutionDependentFBOs =context.get(DisplayResolutionDependentFBOs.class);
+        bindFbo = new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
+        addDesiredStateChange(bindFbo);
     }
 
     @Override
@@ -58,5 +65,12 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
+    }
+
+    public void setFbo(FBO fbo) {
+    	removeDesiredStateChange(bindFbo);
+        bindFbo = new SetInputTextureFromFbo(0, fbo, ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
+        addDesiredStateChange(bindFbo);
+        worldRenderer.requestTaskListRefresh();
     }
 }

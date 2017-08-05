@@ -44,7 +44,8 @@ import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
 import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
-import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
+import org.terasology.rendering.dag.nodes.CopyFboColorAttachmentToScreenNode;
+import org.terasology.rendering.dag.nodes.DebugNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
@@ -152,6 +153,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
 
+    // TODO: These Nodes are stored to allow inter-Node communication.
+    // These should be removed as soon as possible (potentially with DAG).
+    private DebugNode debugNode;
+    private CopyFboColorAttachmentToScreenNode copyFboColorAttachmentToScreenNode;
+
     /**
      * Instantiates a WorldRenderer implementation.
      *
@@ -249,7 +255,11 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addPostProcessingNodes(renderGraph);
 
+        addDebuggingNodes(renderGraph);
+
         addCopyOutputNodes(renderGraph);
+
+        linkDebuggingAndOutputNodes();
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -447,12 +457,21 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
     }
 
-    private void addCopyOutputNodes(RenderGraph renderGraph) {
-        Node copyToVRFrameBufferNode = new CopyImageToHMDNode(context);
-        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+    private void addDebuggingNodes(RenderGraph renderGraph) {
+    	debugNode = new DebugNode(context);
+    	renderGraph.addNode(debugNode, "debugNode");
+    }
 
-        Node copyImageToScreenNode = new CopyImageToScreenNode(context);
-        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
+    private void addCopyOutputNodes(RenderGraph renderGraph) {
+        Node copyImageToHMDNode = new CopyImageToHMDNode(context);
+        renderGraph.addNode(copyImageToHMDNode, "copyImageToHMDNode");
+
+        copyFboColorAttachmentToScreenNode = new CopyFboColorAttachmentToScreenNode(context);
+        renderGraph.addNode(copyFboColorAttachmentToScreenNode, "copyFboColorAttachmentToScreenNode");
+    }
+
+    private void linkDebuggingAndOutputNodes() {
+    	debugNode.setOutputNode(copyFboColorAttachmentToScreenNode);
     }
 
     @Override
@@ -676,5 +695,10 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     public void recompileShaders() {
         shaderManager.recompileAllShaders();
+    }
+
+    @Override
+    public DebugNode getDebugNode() {
+        return debugNode;
     }
 }
