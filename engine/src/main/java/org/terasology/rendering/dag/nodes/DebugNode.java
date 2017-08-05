@@ -63,6 +63,9 @@ public class DebugNode extends AbstractNode {
             default:
                 // TODO: We should probably do some more error checking here.
                 fbo = displayResolutionDependentFBOs.get(new SimpleUri(fboUri));
+                if (fbo == null) {
+                    fbo = lastUpdatedGBuffer;
+                }
                 break;
         }
 
