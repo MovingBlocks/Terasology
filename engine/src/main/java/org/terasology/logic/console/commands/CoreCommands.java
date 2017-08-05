@@ -623,4 +623,13 @@ public class CoreCommands extends BaseComponentSystem {
         WorldRendererImpl worldRendererImpl = (WorldRendererImpl)worldRenderer;
         worldRendererImpl.recompileShaders();
     }
+
+    /**
+     * Debugging command for DAG.
+     */
+    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void dagDebug(@CommandParam("fboUri") final String fboUri) {
+        WorldRendererImpl worldRendererImpl = (WorldRendererImpl)worldRenderer;
+        worldRendererImpl.getDebugNode().setFbo(fboUri);
+    }
 }
