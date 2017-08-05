@@ -192,6 +192,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                     heldItemTransformComponent = new FirstPersonHeldItemTransformComponent();
                     clientHeldItem.addComponent(heldItemTransformComponent);
                 }
+
                 Location.attachChild(mountPointComponent.mountPointEntity, clientHeldItem,
                         heldItemTransformComponent.translate,
                         new Quat4f(
@@ -199,6 +200,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
                         heldItemTransformComponent.scale);
+
+                currentHeldItem = clientHeldItem;
             }
         }
     }
@@ -254,8 +257,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     }
 
     @Override
-    public void preSave()
-    {
+    public void preSave() {
         if (clientHeldItem != EntityRef.NULL){
             clientHeldItem.destroy();
         }
