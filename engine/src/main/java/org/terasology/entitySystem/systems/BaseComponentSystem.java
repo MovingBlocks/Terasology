@@ -35,14 +35,6 @@ public abstract class BaseComponentSystem implements ComponentSystem {
     }
 
     @Override
-    public void preAutoSave() {
-    }
-
-    @Override
-    public void postAutoSave() {
-    }
-
-    @Override
     public void preSave() {
     }
 

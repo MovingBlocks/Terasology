@@ -191,16 +191,6 @@ public class SpriteParticleRenderer implements RenderSystem {
     }
 
     @Override
-    public void preAutoSave() {
-
-    }
-
-    @Override
-    public void postAutoSave() {
-
-    }
-
-    @Override
     public void preSave() {
 
     }
