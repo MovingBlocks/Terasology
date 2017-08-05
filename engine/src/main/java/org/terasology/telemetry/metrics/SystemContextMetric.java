@@ -32,7 +32,7 @@ import java.util.Map;
 @TelemetryCategory(id = "systemContext",
         displayName = "${engine:menu#telemetry-system-context}"
 )
-public class SystemContextMetric extends Metric {
+public final class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
     private Context context;
@@ -73,7 +73,6 @@ public class SystemContextMetric extends Metric {
     @TelemetryField
     private long memoryMaxByte;
 
-
     public SystemContextMetric() {
 
         osName = System.getProperty("os.name");
@@ -89,6 +88,10 @@ public class SystemContextMetric extends Metric {
             openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
             openGLVersion = GL11.glGetString(GL11.GL_VERSION);
             openGLRenderer = GL11.glGetString(GL11.GL_RENDERER);
+        } else {
+            openGLVendor = "headless";
+            openGLVersion = "headless";
+            openGLRenderer = "headless";
         }
         processorNumbers = Runtime.getRuntime().availableProcessors();
         memoryMaxByte = Runtime.getRuntime().maxMemory();
