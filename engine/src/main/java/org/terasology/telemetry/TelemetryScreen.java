@@ -37,10 +37,13 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.layers.mainMenu.AddServerPopup;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.telemetry.metrics.Metric;
@@ -244,22 +247,24 @@ public class TelemetryScreen extends CoreScreenLayer {
      */
     private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String, ?> map) {
 
-        UILabel categoryHeader = new UILabel(translationSystem.translate(telemetryCategory.displayName()));
-        categoryHeader.setFamily("subheading");
-        layout.addWidget(categoryHeader);
-        List<Map.Entry> telemetryFields = sortFields(map);
-        for (Map.Entry entry : telemetryFields) {
-            Object value = entry.getValue();
-            if (value == null) {
-                value = "Value Unknown";
+        if (!telemetryCategory.isOneMapMetric()) {
+            UILabel categoryHeader = new UILabel(translationSystem.translate(telemetryCategory.displayName()));
+            categoryHeader.setFamily("subheading");
+            layout.addWidget(categoryHeader);
+            List<Map.Entry> telemetryFields = sortFields(map);
+            for (Map.Entry entry : telemetryFields) {
+                Object value = entry.getValue();
+                if (value == null) {
+                    value = "Value Unknown";
+                }
+                if (value instanceof List) {
+                    List list = (List) value;
+                    addTelemetryField(entry.getKey().toString(), list, layout);
+                } else {
+                    addTelemetryField(entry.getKey().toString(), value, layout);
+                }
             }
-            if (value instanceof List) {
-                List list = (List) value;
-                addTelemetryField(entry.getKey().toString(), list, layout);
-            } else {
-                addTelemetryField(entry.getKey().toString(), value, layout);
-            }
-        }
+        } 
     }
 
     /**
@@ -269,7 +274,24 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param layout the layout where the new line will be added
      */
     private void addTelemetryField(String type, Object value, ColumnLayout layout) {
-        RowLayout newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()))
+        UICheckbox uiCheckbox = new UICheckbox(type);
+        Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+        if (!bindingMap.containsKey(type)) {
+            bindingMap.put(type, true);
+        }
+        Binding<Boolean> binding = new Binding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return bindingMap.get(type);
+            }
+
+            @Override
+            public void set(Boolean value) {
+                bindingMap.put(type, value);
+            }
+        };
+        uiCheckbox.bindChecked(binding);
+        RowLayout newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()), uiCheckbox)
                 .setColumnRatios(0.4f)
                 .setHorizontalSpacing(horizontalSpacing);
 

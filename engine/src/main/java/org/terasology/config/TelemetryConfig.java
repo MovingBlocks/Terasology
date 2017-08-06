@@ -42,6 +42,16 @@ public class TelemetryConfig {
         return telemetryEnabled;
     }
 
+    private MetricsUserPermissionConfig metricsUserPermissionConfig = new MetricsUserPermissionConfig();
+
+    public MetricsUserPermissionConfig getMetricsUserPermissionConfig() {
+        return metricsUserPermissionConfig;
+    }
+
+    public void setMetricsUserPermissionConfig(MetricsUserPermissionConfig metricsUserPermissionConfig) {
+        this.metricsUserPermissionConfig = metricsUserPermissionConfig;
+    }
+
     public void setTelemetryEnabled(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
     }

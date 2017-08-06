@@ -36,4 +36,6 @@ public @interface TelemetryCategory {
      * @return The displayable name for this category
      */
     String displayName();
+
+    boolean isOneMapMetric();
 }
