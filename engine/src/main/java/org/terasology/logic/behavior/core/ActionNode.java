@@ -66,7 +66,11 @@ public class ActionNode implements BehaviorNode {
     @Override
     public void construct(Actor actor) {
         if (action != null) {
-            action.construct(actor);
+            try {
+                action.construct(actor);
+            } catch (Exception e){
+                logger.info("Exception while running construct() of action {} from entity {}:", action, actor.getEntity());
+            }
         }
     }
 
