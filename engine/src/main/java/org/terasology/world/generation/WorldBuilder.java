@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.viewer.zones.Zone;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,12 @@ public class WorldBuilder {
 
     public WorldBuilder addRasterizer(WorldRasterizer rasterizer) {
         rasterizers.add(rasterizer);
+        return this;
+    }
+
+    public WorldBuilder addZone(Zone zone) {
+        providersList.addAll(zone.getFacetProviders());
+        addRasterizer(zone);
         return this;
     }
 
