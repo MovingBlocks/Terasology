@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @API
@@ -39,10 +40,14 @@ public class Zone implements FacetProvider, WorldRasterizer {
     private final List<WorldRasterizer> rasterizers = new ArrayList<>();
     //TODO: add entity providers
 
-    Function<BaseVector3i, Boolean> regionFunction;
+    private final BiFunction<BaseVector3i, Region, Boolean> regionFunction;
+
+    public Zone(BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
+        this.regionFunction = regionFunction;
+    }
 
     public Zone(Function<BaseVector3i, Boolean> regionFunction) {
-        this.regionFunction = regionFunction;
+        this.regionFunction = (pos, region) -> regionFunction.apply(pos);
     }
 
     @Override
@@ -66,7 +71,7 @@ public class Zone implements FacetProvider, WorldRasterizer {
         Map<BaseVector3i, Block> savedBlocks = new HashMap<>();
         ChunkBlockIterator iterator = chunk.getBlockIterator();
         while (iterator.next()) {
-            if (!containsBlock(iterator.getBlockPos())) {
+            if (!containsBlock(iterator.getBlockPos(), chunkRegion)) {
                 Block block = chunk.getBlock(ChunkMath.calcBlockPos(iterator.getBlockPos()));
                 savedBlocks.put(ChunkMath.calcBlockPos(iterator.getBlockPos()), block);
             }
@@ -95,7 +100,7 @@ public class Zone implements FacetProvider, WorldRasterizer {
         return rasterizers;
     }
 
-    public boolean containsBlock(BaseVector3i worldPos) {
-        return regionFunction.apply(worldPos);
+    public boolean containsBlock(BaseVector3i worldPos, Region chunkRegion) {
+        return regionFunction.apply(worldPos, chunkRegion);
     }
 }
