@@ -123,4 +123,9 @@ public class Zone implements FacetProvider, WorldRasterizer {
     public PreviewGenerator preview(WorldGenerator generator) {
         return new FacetLayerPreview(generator, facetLayers);
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

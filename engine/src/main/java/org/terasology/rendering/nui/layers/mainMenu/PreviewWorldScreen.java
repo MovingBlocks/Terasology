@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
@@ -50,14 +50,17 @@ import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.utilities.Assets;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.viewer.zones.Zone;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -94,6 +97,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private UIImage previewImage;
     private UISlider zoomSlider;
+    private UIDropdown<Zone> zoneSelector;
     private UIButton applyButton;
 
     private UIText seed;
@@ -132,8 +136,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             worldGenerator.setWorldSeed(seed.getText());
             if (worldGenerator.getZones().isEmpty()) {
                 previewGen = new FacetLayerPreview(environment, worldGenerator);
+                zoneSelector.setVisible(false);
             } else {
-                previewGen = worldGenerator.getZones().get(targetZone).preview(worldGenerator);
+                List<Zone> zones = Lists.newArrayList(worldGenerator.getZones().values());
+                zoneSelector.setOptions(zones);
+                zoneSelector.setSelection(zones.get(0));
+                zoneSelector.setVisible(true);
             }
             configureProperties();
         } else {
@@ -236,6 +244,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         seed = find("seed", UIText.class);
 
+        zoneSelector = find("zoneSelector", UIDropdown.class);
+
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
             applyButton.subscribe(widget -> updatePreview());
@@ -275,6 +285,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
             int zoom = TeraMath.floorToInt(zoomSlider.getValue());
             TextureData data = texture.getData();
+
+            if (zoneSelector.isVisible()) {
+                targetZone = zoneSelector.getSelection().getName();
+                previewGen = worldGenerator.getZones().get(targetZone).preview(worldGenerator);
+            }
             previewGen.render(data, zoom, progressListener);
 
             return data;
