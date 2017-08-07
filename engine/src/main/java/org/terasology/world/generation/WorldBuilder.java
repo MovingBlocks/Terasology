@@ -27,6 +27,7 @@ import org.terasology.world.viewer.zones.Zone;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -43,6 +44,7 @@ public class WorldBuilder {
     private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private final List<EntityProvider> entityProviders = new ArrayList<>();
+    private final Map<String,Zone> zones = new HashMap<>();
     private int seaLevel = 32;
     private Long seed;
 
@@ -63,9 +65,14 @@ public class WorldBuilder {
     }
 
     public WorldBuilder addZone(Zone zone) {
+        zones.put(zone.getName(), zone);
         providersList.addAll(zone.getFacetProviders());
         addRasterizer(zone);
         return this;
+    }
+
+    public Map<String, Zone> getZones() {
+        return zones;
     }
 
     public WorldBuilder addEntities(EntityProvider entityProvider) {

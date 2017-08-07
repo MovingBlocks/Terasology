@@ -19,6 +19,9 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.viewer.zones.Zone;
+
+import java.util.Map;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
@@ -80,6 +83,11 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
             world = getWorldBuilder().build();
         }
         return world;
+    }
+
+    @Override
+    public Map<String, Zone> getZones() {
+        return getWorldBuilder().getZones();
     }
 
     private WorldBuilder getWorldBuilder() {

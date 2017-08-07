@@ -18,6 +18,8 @@ package org.terasology.world.viewer.zones;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.module.sandbox.API;
+import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
+import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.CoreChunk;
@@ -25,6 +27,8 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
+import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.viewer.layers.FacetLayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,15 +43,18 @@ public class Zone implements FacetProvider, WorldRasterizer {
     private final List<FacetProvider> facetProviders = new ArrayList<>();
     private final List<WorldRasterizer> rasterizers = new ArrayList<>();
     //TODO: add entity providers
+    private final List<FacetLayer> facetLayers = new ArrayList<>();
 
     private final BiFunction<BaseVector3i, Region, Boolean> regionFunction;
+    private final String name;
 
-    public Zone(BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
+    public Zone(String name, BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
         this.regionFunction = regionFunction;
+        this.name = name;
     }
 
-    public Zone(Function<BaseVector3i, Boolean> regionFunction) {
-        this.regionFunction = (pos, region) -> regionFunction.apply(pos);
+    public Zone(String name, Function<BaseVector3i, Boolean> regionFunction) {
+        this(name, (pos, region) -> regionFunction.apply(pos));
     }
 
     @Override
@@ -100,7 +107,20 @@ public class Zone implements FacetProvider, WorldRasterizer {
         return rasterizers;
     }
 
+    public Zone addPreviewLayer(FacetLayer facetLayer) {
+        facetLayers.add(facetLayer);
+        return this;
+    }
+
     public boolean containsBlock(BaseVector3i worldPos, Region chunkRegion) {
         return regionFunction.apply(worldPos, chunkRegion);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public PreviewGenerator preview(WorldGenerator generator) {
+        return new FacetLayerPreview(generator, facetLayers);
     }
 }

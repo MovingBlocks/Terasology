@@ -107,6 +107,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Texture texture;
 
     private boolean triggerUpdate;
+    private String targetZone = "Surface";
 
     public PreviewWorldScreen() {
     }
@@ -129,7 +130,11 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
             worldGenerator.setWorldSeed(seed.getText());
-            previewGen = new FacetLayerPreview(environment, worldGenerator);
+            if (worldGenerator.getZones().isEmpty()) {
+                previewGen = new FacetLayerPreview(environment, worldGenerator);
+            } else {
+                previewGen = worldGenerator.getZones().get(targetZone).preview(worldGenerator);
+            }
             configureProperties();
         } else {
             throw new UnresolvedDependencyException("Unable to resolve depencencies for " + worldGenUri);

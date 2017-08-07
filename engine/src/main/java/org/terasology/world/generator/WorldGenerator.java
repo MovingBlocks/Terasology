@@ -23,6 +23,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.World;
+import org.terasology.world.viewer.zones.Zone;
+
+import java.util.Map;
 
 public interface WorldGenerator {
     SimpleUri getUri();
@@ -38,6 +41,8 @@ public interface WorldGenerator {
     WorldConfigurator getConfigurator();
 
     World getWorld();
+
+    Map<String, Zone> getZones();
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.

@@ -82,6 +82,11 @@ public class FacetLayerPreview implements PreviewGenerator {
      * @param environment
      * @param worldGenerator
      */
+    public FacetLayerPreview(WorldGenerator worldGenerator, List<FacetLayer> facetLayers) {
+        this.worldGenerator = worldGenerator;
+        this.facetLayers = facetLayers;
+    }
+
     public FacetLayerPreview(ModuleEnvironment environment, WorldGenerator worldGenerator) {
         this.worldGenerator = worldGenerator;
 
