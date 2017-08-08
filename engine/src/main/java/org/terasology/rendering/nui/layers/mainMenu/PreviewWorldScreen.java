@@ -60,7 +60,7 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
-import org.terasology.world.viewer.zones.Zone;
+import org.terasology.world.zones.Zone;
 
 import java.nio.ByteBuffer;
 import java.util.List;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.viewer.zones;
+package org.terasology.world.zones;
 
 import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.BaseVector3i;

@@ -19,7 +19,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.viewer.zones.Zone;
+import org.terasology.world.zones.Zone;
 
 import java.util.Map;
 

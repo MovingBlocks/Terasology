@@ -23,7 +23,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.World;
-import org.terasology.world.viewer.zones.Zone;
+import org.terasology.world.zones.Zone;
 
 import java.util.Map;
 
