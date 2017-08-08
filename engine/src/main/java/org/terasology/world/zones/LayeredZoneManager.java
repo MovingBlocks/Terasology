@@ -21,6 +21,11 @@ import org.terasology.module.sandbox.API;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A manager for a set of {@link LayeredZoneRegionFunction}s. The manager will split the layers into aboveground and
+ * underground layers, and sort each set by increasing distance from the surface (in terms of their ordering), so that
+ * each zone can work out where it is positioned.
+ */
 @API
 public class LayeredZoneManager {
 

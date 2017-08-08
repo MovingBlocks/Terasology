@@ -23,6 +23,11 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import java.util.List;
 import java.util.function.BiFunction;
 
+/**
+ * A function that can be used as a {@link Zone#regionFunction} to create zones that are layered on top of each other.
+ *
+ * These layers are ordered according to {@link #ordering}, and have a width of {@link #minWidth}.
+ */
 @API
 public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Region, Boolean> {
 
@@ -56,6 +61,13 @@ public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Regio
         }
     }
 
+    /**
+     * Calculates whether or not the given block is part of this layer.
+     *
+     * @param pos the position to check
+     * @param region the Region in the area
+     * @return true if the position is within this layer, false otherwise
+     */
     @Override
     public Boolean apply(BaseVector3i pos, Region region) {
         int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos.x(), pos.z()));
