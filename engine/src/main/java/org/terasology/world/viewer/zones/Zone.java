@@ -89,6 +89,13 @@ public class Zone implements FacetProvider, WorldRasterizer {
         savedBlocks.forEach(chunk::setBlock);
     }
 
+    public Zone addZone(Zone zone) {
+        facetProviders.addAll(zone.getFacetProviders());
+        facetLayers.addAll(zone.getPreviewLayers());
+        rasterizers.add(zone);
+        return this;
+    }
+
     public Zone addProvider(FacetProvider facet) {
         facetProviders.add(facet);
         return this;
