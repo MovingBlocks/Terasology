@@ -25,6 +25,7 @@ import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
+import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.viewer.layers.FacetLayer;
@@ -36,6 +37,19 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * A region in the world with its own rasterization and world preview properties.
+ *
+ * Each top-level zone (those directly added to the {@link WorldBuilder}) with one or more preview layers added to it
+ * will show up in the drop-down list of zones on the world preview screen, allowing it to be previewed separately.
+ *
+ * A zone affects a certain region, given by the {@link #regionFunction}. Only blocks that are present in this region
+ * will be rasterized, so zones can be combined together and, unless their regions overlap, they will not be able to
+ * affect each other.
+ *
+ * Zones can also be nested, with the inner zones only being able to affect areas that are also included in their parent
+ * zone. Preview layers on the inner zones also get added to their parent zone.
+ */
 @API
 public class Zone implements WorldRasterizer {
 
