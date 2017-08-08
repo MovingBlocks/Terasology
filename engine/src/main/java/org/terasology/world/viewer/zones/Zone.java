@@ -24,7 +24,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.FacetProvider;
-import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generator.WorldGenerator;
@@ -38,7 +37,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @API
-public class Zone implements FacetProvider, WorldRasterizer {
+public class Zone implements WorldRasterizer {
 
     private final List<FacetProvider> facetProviders = new ArrayList<>();
     private final List<WorldRasterizer> rasterizers = new ArrayList<>();
@@ -58,18 +57,8 @@ public class Zone implements FacetProvider, WorldRasterizer {
     }
 
     @Override
-    public void setSeed(long seed) {
-        facetProviders.forEach(fp -> fp.setSeed(seed));
-    }
-
-    @Override
     public void initialize() {
         rasterizers.forEach(WorldRasterizer::initialize);
-    }
-
-    @Override
-    public void process(GeneratingRegion region) {
-        facetProviders.forEach(fp -> fp.process(region));
     }
 
     @Override
