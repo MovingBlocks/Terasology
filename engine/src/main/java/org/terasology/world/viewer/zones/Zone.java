@@ -112,6 +112,10 @@ public class Zone implements FacetProvider, WorldRasterizer {
         return this;
     }
 
+    public List<FacetLayer> getPreviewLayers() {
+        return facetLayers;
+    }
+
     public boolean containsBlock(BaseVector3i worldPos, Region chunkRegion) {
         return regionFunction.apply(worldPos, chunkRegion);
     }

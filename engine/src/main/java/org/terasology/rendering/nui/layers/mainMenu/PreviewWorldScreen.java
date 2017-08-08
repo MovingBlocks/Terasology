@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -134,15 +135,20 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
             worldGenerator.setWorldSeed(seed.getText());
-            if (worldGenerator.getZones().isEmpty()) {
-                previewGen = new FacetLayerPreview(environment, worldGenerator);
+
+            List<Zone> previewZones = Lists.newArrayList(worldGenerator.getZones().values())
+                    .stream()
+                    .filter(z -> !z.getPreviewLayers().isEmpty())
+                    .collect(Collectors.toList());
+            if (previewZones.isEmpty()) {
                 zoneSelector.setVisible(false);
+                previewGen = new FacetLayerPreview(environment, worldGenerator);
             } else {
-                List<Zone> zones = Lists.newArrayList(worldGenerator.getZones().values());
-                zoneSelector.setOptions(zones);
-                zoneSelector.setSelection(zones.get(0));
                 zoneSelector.setVisible(true);
+                zoneSelector.setOptions(previewZones);
+                zoneSelector.setSelection(previewZones.get(0));
             }
+
             configureProperties();
         } else {
             throw new UnresolvedDependencyException("Unable to resolve depencencies for " + worldGenUri);
