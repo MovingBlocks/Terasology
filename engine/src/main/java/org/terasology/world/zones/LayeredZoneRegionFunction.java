@@ -16,11 +16,16 @@
 package org.terasology.world.zones;
 
 import org.terasology.math.geom.BaseVector3i;
+import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +39,7 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
     private List<LayeredZoneRegionFunction> siblings;
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
+    private Map<Vector2i, LayerRange> layerRangeMap = new HashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
 
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
@@ -65,27 +71,58 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
      */
     @Override
     public Boolean apply(BaseVector3i pos, Region region) {
-        int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos.x(), pos.z()));
-        boolean underground = pos.y() < surfaceHeight;
-        int cumulativeDistance = 0;
-        List<LayeredZoneRegionFunction> applicableLayers = underground ?
-                getUndergroundLayers() : getAbovegroundLayers();
-        for (LayeredZoneRegionFunction layer : applicableLayers) {
-            //TODO: allow variable-width layers
-            cumulativeDistance += layer.getMinWidth();
-            if ((!underground && surfaceHeight + cumulativeDistance > pos.y())
-                    || (underground && surfaceHeight - cumulativeDistance - 1 < pos.y())) {
-                //Position is within the layer currently being tested
-                return this.equals(layer);
-            }
-        }
-        int lastIndex = applicableLayers.size() - 1;
-        if (lastIndex < 0) {
-            return false;
-        }
-        LayeredZoneRegionFunction lastLayer = applicableLayers.get(lastIndex);
+        return getLayerRange(pos.x(), pos.z(), region).layerContains(pos.y());
+    }
 
-        return this.equals(lastLayer) && underground == (lastLayer.ordering < 0);
+    private LayerRange getLayerRange(int x, int z, Region region) {
+        Vector2i pos = new Vector2i(x, z);
+        if (!layerRangeMap.containsKey(pos)) {
+            int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
+
+            boolean aboveground = ordering >= 0;
+            int cumulativeDistanceSmall = 0;
+            int cumulativeDistanceLarge = 0;
+            LayerRange layerRange = null;
+
+            List<LayeredZoneRegionFunction> layers = aboveground ? getAbovegroundLayers() : getUndergroundLayers();
+
+            int i;
+            for (i = 0; i < layers.size(); i++) {
+                LayeredZoneRegionFunction layer = layers.get(i);
+                //TODO: allow variable-width layers
+                cumulativeDistanceLarge += layer.getMinWidth();
+                if (this.equals(layer)) {
+                    if (aboveground) {
+                        layerRange = new LayerRange()
+                                .setMin(surfaceHeight + cumulativeDistanceSmall)
+                                .setMax(surfaceHeight + cumulativeDistanceLarge);
+                        break;
+                    } else {
+                        layerRange = new LayerRange()
+                                .setMin(surfaceHeight -cumulativeDistanceLarge)
+                                .setMax(surfaceHeight - cumulativeDistanceSmall);
+                        break;
+                    }
+                }
+                cumulativeDistanceSmall += layer.getMinWidth();
+            }
+
+            if (layers.size() <= 0 || layerRange == null) {
+                throw new IllegalStateException("Layer for zone '" + getZone() + "' not found in list of " +
+                        (aboveground ? "aboveground" : "underground") + " layers.");
+            }
+
+            if (i == layers.size() - 1) {
+                //At one of the edge layers
+                if (aboveground) {
+                    layerRange.unsetMax();
+                } else {
+                    layerRange.unsetMin();
+                }
+            }
+            layerRangeMap.put(pos, layerRange);
+        }
+        return layerRangeMap.get(pos);
     }
 
     private List<LayeredZoneRegionFunction> getSiblings() {
@@ -131,6 +168,39 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
 
     public boolean isUnderground() {
         return ordering < 0;
+    }
+
+    private static class LayerRange {
+        private Optional<Integer> min = Optional.empty();
+        private Optional<Integer> max = Optional.empty();
+
+        public LayerRange setMin(int min) {
+            this.min = Optional.of(min);
+            return this;
+        }
+
+        public LayerRange setMax(int max) {
+            this.max = Optional.of(max);
+            return this;
+        }
+
+        public LayerRange unsetMin() {
+            this.min = Optional.empty();
+            return this;
+        }
+
+        public LayerRange unsetMax() {
+            this.max = Optional.empty();
+            return this;
+        }
+
+        public boolean layerContains(int height) {
+            boolean satisfiesMin = !min.isPresent() || min.get() <= height;
+            boolean satisfiesMax = !max.isPresent() || max.get() > height;
+
+            return satisfiesMin && satisfiesMax;
+        }
+
     }
 
 }

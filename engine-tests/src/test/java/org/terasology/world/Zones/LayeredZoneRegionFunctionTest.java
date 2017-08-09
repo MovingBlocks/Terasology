@@ -70,7 +70,7 @@ public class LayeredZoneRegionFunctionTest {
                             generatingRegion.getBorderForFacet(SurfaceHeightFacet.class));
 
                     for (BaseVector2i pos : facet.getRelativeRegion().contents()) {
-                        facet.set(pos, 0);
+                        facet.set(pos, 100);
                     }
 
                     generatingRegion.setRegionFacet(SurfaceHeightFacet.class, facet);
@@ -97,23 +97,25 @@ public class LayeredZoneRegionFunctionTest {
     }
 
     @Test
-    public void testApply() {
-        //Test values in the surface layer
-        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 0, 0), region));
-        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 99, 0), region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, -1, 0), region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 100, 0), region));
+    public void testSurface() {
+        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 100, 0), region));
+        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 199, 0), region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 99, 0), region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 200, 0), region));
+    }
 
+    @Test
+    public void testUnderground() {
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 99, 0), region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 0, 0), region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 100, 0), region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -1, 0), region));
+    }
 
-
-        //Test values in the shallow underground layer
-        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -1, 0), region));
-        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -100, 0), region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 0, 0), region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -101, 0), region));
-
+    @Test
+    public void testExtremes() {
         //Test values at the extremes (beyond the top and bottom of the declared layers
-        //The last parent in each direction should extend outwards
+        //The last layer in each direction should extend outwards
         assertTrue(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, 10000, 0), region));
         assertTrue(parent.getChildZone("Medium underground").containsBlock(new Vector3i(0, -10000, 0), region));
         assertFalse(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, -10000, 0), region));
