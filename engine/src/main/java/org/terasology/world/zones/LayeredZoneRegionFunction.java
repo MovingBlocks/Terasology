@@ -21,7 +21,7 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * A function that can be used as a {@link Zone#regionFunction} to create zones that are layered on top of each other.
@@ -29,7 +29,7 @@ import java.util.function.BiFunction;
  * These layers are ordered according to {@link #ordering}, and have a width of {@link #minWidth}.
  */
 @API
-public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Region, Boolean> {
+public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
 
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
@@ -42,23 +42,14 @@ public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Regio
 
     }
 
-    private final LayeredZoneManager manager;
-
     private final int minWidth;
     private final int maxWidth;
     private final int ordering;
 
-    public LayeredZoneRegionFunction(int minWidth, int maxWidth, int ordering, LayeredZoneManager manager) {
-        this.manager = manager;
+    public LayeredZoneRegionFunction(int minWidth, int maxWidth, int ordering) {
         this.minWidth = minWidth;
         this.maxWidth = maxWidth;
         this.ordering = ordering;
-
-        if (ordering < 0) {
-            manager.addUndergroundLayer(this);
-        } else {
-            manager.addAbovegroundLayer(this);
-        }
     }
 
     /**
@@ -73,8 +64,9 @@ public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Regio
         int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos.x(), pos.z()));
         boolean underground = pos.y() < surfaceHeight;
         int cumulativeDistance = 0;
-        List<LayeredZoneRegionFunction> applicableLayers =
-                underground ? manager.getUndergroundLayers() : manager.getAbovegroundLayers();
+        List<LayeredZoneRegionFunction> applicableLayers = getSiblings().stream()
+                .filter(l -> underground == l.isUnderground())
+                .collect(Collectors.toList());
         for (LayeredZoneRegionFunction layer : applicableLayers) {
             //TODO: allow variable-width layers
             cumulativeDistance += layer.getMinWidth();
@@ -89,7 +81,16 @@ public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Regio
             return false;
         }
         LayeredZoneRegionFunction lastLayer = applicableLayers.get(lastIndex);
+
         return this.equals(lastLayer) && underground == (lastLayer.ordering < 0);
+    }
+
+    private List<LayeredZoneRegionFunction> getSiblings() {
+        return getSiblingRegionFunctions().stream()
+                .filter(f -> f instanceof LayeredZoneRegionFunction)
+                .map(l -> (LayeredZoneRegionFunction) l)
+                .sorted((l1, l2) -> ((Integer) Math.abs(l1.getOrdering())).compareTo(Math.abs(l2.getOrdering())))
+                .collect(Collectors.toList());
     }
 
     public int getMinWidth() {
@@ -102,6 +103,10 @@ public class LayeredZoneRegionFunction implements BiFunction<BaseVector3i, Regio
 
     public int getOrdering() {
         return ordering;
+    }
+
+    public boolean isUnderground() {
+        return ordering < 0;
     }
 
 }

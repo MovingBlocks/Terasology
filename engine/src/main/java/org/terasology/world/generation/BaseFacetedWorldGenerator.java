@@ -21,7 +21,7 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.zones.Zone;
 
-import java.util.Map;
+import java.util.List;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
@@ -86,8 +86,13 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public Map<String, Zone> getZones() {
-        return getWorldBuilder().getZones();
+    public List<Zone> getZones() {
+        return getWorldBuilder().getChildZones();
+    }
+
+    @Override
+    public Zone getNamedZone(String name) {
+        return getWorldBuilder().getChildZone(name);
     }
 
     private WorldBuilder getWorldBuilder() {

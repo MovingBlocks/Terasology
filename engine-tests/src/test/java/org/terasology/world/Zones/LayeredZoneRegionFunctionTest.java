@@ -19,6 +19,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.context.Context;
+import org.terasology.context.internal.ContextImpl;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
@@ -26,18 +28,19 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.RegionImpl;
+import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.world.zones.LayeredZoneManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
+import org.terasology.world.zones.Zone;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_SKY;
@@ -47,18 +50,18 @@ import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOr
 
 public class LayeredZoneRegionFunctionTest {
 
-    private final List<LayeredZoneRegionFunction> functions = new ArrayList<>();
+    private ProviderStore parent;
     private Region region;
 
     @Before
     public void setup() {
-        LayeredZoneManager manager = new LayeredZoneManager();
-        functions.add(new LayeredZoneRegionFunction(100, 100, SURFACE, manager));
-        functions.add(new LayeredZoneRegionFunction(100, 100, LOW_SKY, manager));
-        functions.add(new LayeredZoneRegionFunction(100, 100, MEDIUM_SKY, manager));
-        functions.add(new LayeredZoneRegionFunction(100, 100, SHALLOW_UNDERGROUND, manager));
-        functions.add(new LayeredZoneRegionFunction(100, 100, MEDIUM_UNDERGROUND, manager));
-
+        Context context = new ContextImpl();
+        parent = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class))
+                .addZone(new Zone("Surface", new LayeredZoneRegionFunction(100, 100, SURFACE)))
+                .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(100, 100, LOW_SKY)))
+                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(100, 100, MEDIUM_SKY)))
+                .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(100, 100, SHALLOW_UNDERGROUND)))
+                .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(100, 100, MEDIUM_UNDERGROUND)));
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = ArrayListMultimap.create();
 
@@ -86,8 +89,7 @@ public class LayeredZoneRegionFunctionTest {
         int maxWidth = 200;
         int ordering = 1000;
 
-        LayeredZoneManager manager = new LayeredZoneManager();
-        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(minWidth, maxWidth, ordering, manager);
+        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(minWidth, maxWidth, ordering);
 
         assertEquals(minWidth, function.getMinWidth());
         assertEquals(maxWidth, function.getMaxWidth());
@@ -97,24 +99,25 @@ public class LayeredZoneRegionFunctionTest {
     @Test
     public void testApply() {
         //Test values in the surface layer
-        assertTrue(functions.get(0).apply(new Vector3i(0, 0, 0), region));
-        assertTrue(functions.get(0).apply(new Vector3i(0, 99, 0), region));
-        assertFalse(functions.get(0).apply(new Vector3i(0, -1, 0), region));
-        assertFalse(functions.get(0).apply(new Vector3i(0, 100, 0), region));
+        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 0, 0), region));
+        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 99, 0), region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, -1, 0), region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 100, 0), region));
+
 
 
         //Test values in the shallow underground layer
-        assertTrue(functions.get(3).apply(new Vector3i(0, -1, 0), region));
-        assertTrue(functions.get(3).apply(new Vector3i(0, -100, 0), region));
-        assertFalse(functions.get(3).apply(new Vector3i(0, 0, 0), region));
-        assertFalse(functions.get(3).apply(new Vector3i(0, -101, 0), region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -1, 0), region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -100, 0), region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 0, 0), region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -101, 0), region));
 
         //Test values at the extremes (beyond the top and bottom of the declared layers
-        //The last zone in each direction should extend outwards
-        assertTrue(functions.get(2).apply(new Vector3i(0, 10000, 0), region));
-        assertTrue(functions.get(4).apply(new Vector3i(0, -10000, 0), region));
-        assertFalse(functions.get(2).apply(new Vector3i(0, -10000, 0), region));
-        assertFalse(functions.get(4).apply(new Vector3i(0, 10000, 0), region));
+        //The last parent in each direction should extend outwards
+        assertTrue(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, 10000, 0), region));
+        assertTrue(parent.getChildZone("Medium underground").containsBlock(new Vector3i(0, -10000, 0), region));
+        assertFalse(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, -10000, 0), region));
+        assertFalse(parent.getChildZone("Medium underground").containsBlock(new Vector3i(0, 10000, 0), region));
     }
 
 }

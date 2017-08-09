@@ -51,24 +51,36 @@ import java.util.function.Function;
  * zone. Preview layers on the inner zones also get added to their parent zone.
  */
 @API
-public class Zone implements WorldRasterizer {
+public class Zone extends ProviderStore implements WorldRasterizer {
 
     private final List<FacetProvider> facetProviders = new ArrayList<>();
     private final List<WorldRasterizer> rasterizers = new ArrayList<>();
     //TODO: add entity providers
     private final List<FacetLayer> facetLayers = new ArrayList<>();
 
-    private final BiFunction<BaseVector3i, Region, Boolean> regionFunction;
+    private ProviderStore parent;
+
+    private final ZoneRegionFunction regionFunction;
     private final String name;
 
-    public Zone(String name, BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
-        this.regionFunction = regionFunction;
-        this.name = name;
-    }
 
     public Zone(String name, Function<BaseVector3i, Boolean> regionFunction) {
         this(name, (pos, region) -> regionFunction.apply(pos));
     }
+
+    public Zone(String name, BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
+        this.regionFunction = new StandardZoneRegionFunction(this, regionFunction);
+        this.name = name;
+    }
+
+    public Zone(String name, ConfigurableZoneRegionFunction regionFunction) {
+        this.regionFunction = regionFunction;
+        this.name = name;
+        regionFunction.initialize(this);
+    }
+
+    /* WorldRasterizer methods */
+
 
     @Override
     public void initialize() {
@@ -92,30 +104,8 @@ public class Zone implements WorldRasterizer {
         savedBlocks.forEach(chunk::setBlock);
     }
 
-    public Zone addZone(Zone zone) {
-        facetProviders.addAll(zone.getFacetProviders());
-        facetLayers.addAll(zone.getPreviewLayers());
-        rasterizers.add(zone);
-        return this;
-    }
+    /* Preview features */
 
-    public Zone addProvider(FacetProvider facet) {
-        facetProviders.add(facet);
-        return this;
-    }
-
-    public List<FacetProvider> getFacetProviders() {
-        return facetProviders;
-    }
-
-    public Zone addRasterizer(WorldRasterizer rasterizer) {
-        rasterizers.add(rasterizer);
-        return this;
-    }
-
-    public List<WorldRasterizer> getRasterizers() {
-        return rasterizers;
-    }
 
     public Zone addPreviewLayer(FacetLayer facetLayer) {
         facetLayers.add(facetLayer);
@@ -126,20 +116,68 @@ public class Zone implements WorldRasterizer {
         return facetLayers;
     }
 
+    public PreviewGenerator preview(WorldGenerator generator) {
+        return new FacetLayerPreview(generator, facetLayers);
+    }
+
+
+    /* General utility */
+
+
     public boolean containsBlock(BaseVector3i worldPos, Region chunkRegion) {
         return regionFunction.apply(worldPos, chunkRegion);
+    }
+
+    public ZoneRegionFunction getRegionFunction() {
+        return regionFunction;
+    }
+
+    public List<FacetProvider> getFacetProviders() {
+        return facetProviders;
+    }
+
+    public List<WorldRasterizer> getRasterizers() {
+        return rasterizers;
+    }
+
+    public void setParent(ProviderStore parent) {
+        this.parent = parent;
+    }
+
+    public ProviderStore getParent() {
+        return parent;
     }
 
     public String getName() {
         return name;
     }
 
-    public PreviewGenerator preview(WorldGenerator generator) {
-        return new FacetLayerPreview(generator, facetLayers);
-    }
-
     @Override
     public String toString() {
         return getName();
     }
+
+
+    /* BuilderZone methods */
+
+
+    @Override
+    public Zone addProvider(FacetProvider facet) {
+        facetProviders.add(facet);
+        return this;
+    }
+
+    @Override
+    public Zone addRasterizer(WorldRasterizer rasterizer) {
+        rasterizers.add(rasterizer);
+        return this;
+    }
+
+    @Override
+    public Zone addZone(Zone zone) {
+        super.addZone(zone);
+        zone.getPreviewLayers().forEach(this::addPreviewLayer);
+        return this;
+    }
+
 }

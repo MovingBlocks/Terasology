@@ -136,7 +136,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
             worldGenerator.setWorldSeed(seed.getText());
 
-            List<Zone> previewZones = Lists.newArrayList(worldGenerator.getZones().values())
+            List<Zone> previewZones = Lists.newArrayList(worldGenerator.getZones())
                     .stream()
                     .filter(z -> !z.getPreviewLayers().isEmpty())
                     .collect(Collectors.toList());
@@ -294,7 +294,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
             if (zoneSelector.isVisible()) {
                 targetZone = zoneSelector.getSelection().getName();
-                previewGen = worldGenerator.getZones().get(targetZone).preview(worldGenerator);
+                previewGen = worldGenerator.getNamedZone(targetZone).preview(worldGenerator);
             }
             previewGen.render(data, zoom, progressListener);
 

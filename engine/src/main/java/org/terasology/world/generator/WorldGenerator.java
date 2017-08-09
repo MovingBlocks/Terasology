@@ -25,7 +25,7 @@ import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.World;
 import org.terasology.world.zones.Zone;
 
-import java.util.Map;
+import java.util.List;
 
 public interface WorldGenerator {
     SimpleUri getUri();
@@ -42,7 +42,9 @@ public interface WorldGenerator {
 
     World getWorld();
 
-    Map<String, Zone> getZones();
+    List<Zone> getZones();
+
+    Zone getNamedZone(String name);
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.
