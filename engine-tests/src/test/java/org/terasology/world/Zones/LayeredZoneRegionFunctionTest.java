@@ -98,28 +98,28 @@ public class LayeredZoneRegionFunctionTest {
 
     @Test
     public void testSurface() {
-        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 100, 0), region));
-        assertTrue(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 199, 0), region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 99, 0), region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(new Vector3i(0, 200, 0), region));
+        assertTrue(parent.getChildZone("Surface").containsBlock(0, 100, 0, region));
+        assertTrue(parent.getChildZone("Surface").containsBlock(0, 199, 0, region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(0, 99, 0, region));
+        assertFalse(parent.getChildZone("Surface").containsBlock(0, 200, 0, region));
     }
 
     @Test
     public void testUnderground() {
-        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 99, 0), region));
-        assertTrue(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 0, 0), region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, 100, 0), region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(new Vector3i(0, -1, 0), region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(0, 99, 0, region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(0, 0, 0, region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, 100, 0, region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, -1, 0, region));
     }
 
     @Test
     public void testExtremes() {
         //Test values at the extremes (beyond the top and bottom of the declared layers
         //The last layer in each direction should extend outwards
-        assertTrue(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, 10000, 0), region));
-        assertTrue(parent.getChildZone("Medium underground").containsBlock(new Vector3i(0, -10000, 0), region));
-        assertFalse(parent.getChildZone("Medium sky").containsBlock(new Vector3i(0, -10000, 0), region));
-        assertFalse(parent.getChildZone("Medium underground").containsBlock(new Vector3i(0, 10000, 0), region));
+        assertTrue(parent.getChildZone("Medium sky").containsBlock(0, 10000, 0, region));
+        assertTrue(parent.getChildZone("Medium underground").containsBlock(0, -10000, 0, region));
+        assertFalse(parent.getChildZone("Medium sky").containsBlock(0, -10000, 0, region));
+        assertFalse(parent.getChildZone("Medium underground").containsBlock(0, 10000, 0, region));
     }
 
 }

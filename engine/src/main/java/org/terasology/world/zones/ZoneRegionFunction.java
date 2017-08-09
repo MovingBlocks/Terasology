@@ -22,11 +22,22 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-public abstract class ZoneRegionFunction implements BiFunction<BaseVector3i, Region, Boolean> {
-    public abstract Zone getZone();
+public interface ZoneRegionFunction {
 
-    List<ZoneRegionFunction> getSiblingRegionFunctions() {
-        return getZone().getParent().getChildZones().stream()
+    /**
+     * Calculates whether or not the given block is part of this layer.
+     *
+     * @param x the x position to check
+     * @param y the y position to check
+     * @param z the z position to check
+     * @param region the Region in the area
+     * @param zone the zone that contains this function
+     * @return true if the position is within this layer, false otherwise
+     */
+    boolean apply(int x, int y, int z, Region region, Zone zone);
+
+    default List<ZoneRegionFunction> getSiblingRegionFunctions(Zone zone) {
+        return zone.getParent().getChildZones().stream()
                     .map(Zone::getRegionFunction)
                     .collect(Collectors.toList());
     }

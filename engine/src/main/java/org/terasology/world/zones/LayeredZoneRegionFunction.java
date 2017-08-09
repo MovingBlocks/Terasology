@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * These layers are ordered according to {@link #ordering}, and have a width of {@link #minWidth}.
  */
 @API
-public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
+public class LayeredZoneRegionFunction implements ZoneRegionFunction {
 
     private List<LayeredZoneRegionFunction> siblings;
     private List<LayeredZoneRegionFunction> abovegroundLayers;
@@ -62,19 +62,12 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
         this.ordering = ordering;
     }
 
-    /**
-     * Calculates whether or not the given block is part of this layer.
-     *
-     * @param pos the position to check
-     * @param region the Region in the area
-     * @return true if the position is within this layer, false otherwise
-     */
     @Override
-    public Boolean apply(BaseVector3i pos, Region region) {
-        return getLayerRange(pos.x(), pos.z(), region).layerContains(pos.y());
+    public boolean apply(int x, int y, int z, Region region, Zone zone) {
+        return getLayerRange(x, z, region, zone).layerContains(y);
     }
 
-    private LayerRange getLayerRange(int x, int z, Region region) {
+    private LayerRange getLayerRange(int x, int z, Region region, Zone zone) {
         Vector2i pos = new Vector2i(x, z);
         if (!layerRangeMap.containsKey(pos)) {
             int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
@@ -84,7 +77,8 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
             int cumulativeDistanceLarge = 0;
             LayerRange layerRange = null;
 
-            List<LayeredZoneRegionFunction> layers = aboveground ? getAbovegroundLayers() : getUndergroundLayers();
+            List<LayeredZoneRegionFunction> layers =
+                    aboveground ? getAbovegroundLayers(zone) : getUndergroundLayers(zone);
 
             int i;
             for (i = 0; i < layers.size(); i++) {
@@ -108,7 +102,7 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
             }
 
             if (layers.size() <= 0 || layerRange == null) {
-                throw new IllegalStateException("Layer for zone '" + getZone() + "' not found in list of " +
+                throw new IllegalStateException("Layer for zone '" + zone + "' not found in list of " +
                         (aboveground ? "aboveground" : "underground") + " layers.");
             }
 
@@ -125,9 +119,9 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
         return layerRangeMap.get(pos);
     }
 
-    private List<LayeredZoneRegionFunction> getSiblings() {
+    private List<LayeredZoneRegionFunction> getSiblings(Zone zone) {
         if (siblings == null) {
-            siblings = getSiblingRegionFunctions().stream()
+            siblings = getSiblingRegionFunctions(zone).stream()
                     .filter(f -> f instanceof LayeredZoneRegionFunction)
                     .map(l -> (LayeredZoneRegionFunction) l)
                     .sorted((l1, l2) -> ((Integer) Math.abs(l1.getOrdering())).compareTo(Math.abs(l2.getOrdering())))
@@ -136,18 +130,18 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
         return siblings;
     }
 
-    private List<LayeredZoneRegionFunction> getUndergroundLayers() {
+    private List<LayeredZoneRegionFunction> getUndergroundLayers(Zone zone) {
         if (undergroundLayers == null) {
-            undergroundLayers = getSiblings().stream()
+            undergroundLayers = getSiblings(zone).stream()
                     .filter(LayeredZoneRegionFunction::isUnderground)
                     .collect(Collectors.toList());
         }
          return undergroundLayers;
     }
 
-    private List<LayeredZoneRegionFunction> getAbovegroundLayers() {
+    private List<LayeredZoneRegionFunction> getAbovegroundLayers(Zone zone) {
         if (abovegroundLayers == null) {
-            abovegroundLayers = getSiblings().stream()
+            abovegroundLayers = getSiblings(zone).stream()
                     .filter(l -> !l.isUnderground())
                     .collect(Collectors.toList());
         }

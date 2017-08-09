@@ -16,6 +16,7 @@
 package org.terasology.world.zones;
 
 import org.terasology.math.geom.BaseVector3i;
+import org.terasology.math.geom.ImmutableVector3i;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
@@ -32,7 +33,10 @@ import org.terasology.world.viewer.layers.FacetLayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.terasology.world.chunks.ChunkConstants.SIZE_X;
 import static org.terasology.world.chunks.ChunkConstants.SIZE_Y;
@@ -65,20 +69,24 @@ public class Zone extends ProviderStore implements WorldRasterizer {
     private final String name;
 
 
-    public Zone(String name, Function<BaseVector3i, Boolean> regionFunction) {
-        this(name, (pos, region) -> regionFunction.apply(pos));
+
+    public Zone(String name, BooleanSupplier regionFunction) {
+        this(name, (pos, region) -> regionFunction.getAsBoolean());
     }
 
-    public Zone(String name, BiFunction<BaseVector3i, Region, Boolean> regionFunction) {
-        this.regionFunction = new StandardZoneRegionFunction(this, regionFunction);
-        this.name = name;
+    public Zone(String name, Predicate<BaseVector3i> regionFunction) {
+        this(name, (pos, region) -> regionFunction.test(pos));
     }
 
-    public Zone(String name, ConfigurableZoneRegionFunction regionFunction) {
+    public Zone(String name, BiPredicate<BaseVector3i, Region> regionFunction) {
+        this(name, (x, y, z, region, zone) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
+    }
+
+    public Zone(String name, ZoneRegionFunction regionFunction) {
         this.regionFunction = regionFunction;
         this.name = name;
-        regionFunction.initialize(this);
     }
+
 
     /* WorldRasterizer methods */
 
@@ -102,7 +110,7 @@ public class Zone extends ProviderStore implements WorldRasterizer {
         for (int x = 0; x < SIZE_X; x++) {
             for (int y = 0; y < SIZE_Y; y++) {
                 for (int z = 0; z < SIZE_Z; z++) {
-                    if (!containsBlock(new Vector3i(x + offsetX, y + offsetY, z + offsetZ), chunkRegion)) {
+                    if (!containsBlock(x + offsetX, y + offsetY, z + offsetZ, chunkRegion)) {
                         savedBlocks[x][y][z] = chunk.getBlock(x, y, z);
                         changeAllBlocks = false;
                     } else {
@@ -154,8 +162,8 @@ public class Zone extends ProviderStore implements WorldRasterizer {
     /* General utility */
 
 
-    public boolean containsBlock(BaseVector3i worldPos, Region chunkRegion) {
-        return regionFunction.apply(worldPos, chunkRegion);
+    public boolean containsBlock(int x, int y, int z, Region chunkRegion) {
+        return regionFunction.apply(x, y, z, chunkRegion, this);
     }
 
     public ZoneRegionFunction getRegionFunction() {

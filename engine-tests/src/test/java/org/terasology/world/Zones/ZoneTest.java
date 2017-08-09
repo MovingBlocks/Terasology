@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.world.generation.Region;
-import org.terasology.world.zones.ConfigurableZoneRegionFunction;
 import org.terasology.world.zones.Zone;
 
 import static org.junit.Assert.assertEquals;
@@ -33,23 +32,13 @@ public class ZoneTest {
 
     @Before
     public void setup() {
-        zone = new Zone("Test", new ConfigurableZoneRegionFunction() {
-            @Override
-            public Boolean apply(BaseVector3i baseVector3i, Region region) {
-                return true;
-            }
-        });
+        zone = new Zone("Test", () -> true);
     }
 
     @Test
     public void testGetChildZones() {
         assertTrue(zone.getChildZones().isEmpty());
-        Zone child = new Zone("Child", new ConfigurableZoneRegionFunction() {
-            @Override
-            public Boolean apply(BaseVector3i baseVector3i, Region region) {
-                return false;
-            }
-        });
+        Zone child = new Zone("Child", () -> false);
         zone.addZone(child);
         assertFalse(zone.getChildZones().isEmpty());
         assertTrue(zone.getChildZones().contains(child));
