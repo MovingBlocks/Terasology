@@ -15,19 +15,19 @@
  */
 package org.terasology.world.zones;
 
-import com.google.common.collect.ImmutableList;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.world.generation.Region;
 
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public abstract class ZoneRegionFunction implements BiFunction<BaseVector3i, Region, Boolean> {
     public abstract Zone getZone();
 
-    ImmutableList<ZoneRegionFunction> getSiblingRegionFunctions() {
-        return ImmutableList.copyOf(getZone().getParent().getChildZones().stream()
+    List<ZoneRegionFunction> getSiblingRegionFunctions() {
+        return getZone().getParent().getChildZones().stream()
                     .map(Zone::getRegionFunction)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
     }
 }

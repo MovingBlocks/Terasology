@@ -22,6 +22,7 @@ import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkBlockIterator;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
@@ -98,10 +99,12 @@ public class Zone extends ProviderStore implements WorldRasterizer {
                 savedBlocks.put(ChunkMath.calcBlockPos(iterator.getBlockPos()), block);
             }
         }
-        //Do the rasterization
-        rasterizers.forEach(r -> r.generateChunk(chunk, chunkRegion));
-        //Restore the saved blocks
-        savedBlocks.forEach(chunk::setBlock);
+        if (savedBlocks.size() != ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z) {
+            //Do the rasterization
+            rasterizers.forEach(r -> r.generateChunk(chunk, chunkRegion));
+            //Restore the saved blocks
+            savedBlocks.forEach(chunk::setBlock);
+        }
     }
 
     /* Preview features */

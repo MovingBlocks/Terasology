@@ -31,6 +31,10 @@ import java.util.stream.Collectors;
 @API
 public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
 
+    private List<LayeredZoneRegionFunction> siblings;
+    private List<LayeredZoneRegionFunction> abovegroundLayers;
+    private List<LayeredZoneRegionFunction> undergroundLayers;
+
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
         public static final int MEDIUM_SKY = 200;
@@ -64,9 +68,8 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
         int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos.x(), pos.z()));
         boolean underground = pos.y() < surfaceHeight;
         int cumulativeDistance = 0;
-        List<LayeredZoneRegionFunction> applicableLayers = getSiblings().stream()
-                .filter(l -> underground == l.isUnderground())
-                .collect(Collectors.toList());
+        List<LayeredZoneRegionFunction> applicableLayers = underground ?
+                getUndergroundLayers() : getAbovegroundLayers();
         for (LayeredZoneRegionFunction layer : applicableLayers) {
             //TODO: allow variable-width layers
             cumulativeDistance += layer.getMinWidth();
@@ -86,11 +89,32 @@ public class LayeredZoneRegionFunction extends ConfigurableZoneRegionFunction {
     }
 
     private List<LayeredZoneRegionFunction> getSiblings() {
-        return getSiblingRegionFunctions().stream()
-                .filter(f -> f instanceof LayeredZoneRegionFunction)
-                .map(l -> (LayeredZoneRegionFunction) l)
-                .sorted((l1, l2) -> ((Integer) Math.abs(l1.getOrdering())).compareTo(Math.abs(l2.getOrdering())))
-                .collect(Collectors.toList());
+        if (siblings == null) {
+            siblings = getSiblingRegionFunctions().stream()
+                    .filter(f -> f instanceof LayeredZoneRegionFunction)
+                    .map(l -> (LayeredZoneRegionFunction) l)
+                    .sorted((l1, l2) -> ((Integer) Math.abs(l1.getOrdering())).compareTo(Math.abs(l2.getOrdering())))
+                    .collect(Collectors.toList());
+        }
+        return siblings;
+    }
+
+    private List<LayeredZoneRegionFunction> getUndergroundLayers() {
+        if (undergroundLayers == null) {
+            undergroundLayers = getSiblings().stream()
+                    .filter(LayeredZoneRegionFunction::isUnderground)
+                    .collect(Collectors.toList());
+        }
+         return undergroundLayers;
+    }
+
+    private List<LayeredZoneRegionFunction> getAbovegroundLayers() {
+        if (abovegroundLayers == null) {
+            abovegroundLayers = getSiblings().stream()
+                    .filter(l -> !l.isUnderground())
+                    .collect(Collectors.toList());
+        }
+        return abovegroundLayers;
     }
 
     public int getMinWidth() {
