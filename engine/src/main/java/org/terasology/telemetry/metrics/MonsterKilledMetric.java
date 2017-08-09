@@ -30,7 +30,8 @@ import java.util.Map;
  * A player statistic metric for monsters killed in a game.
  */
 @TelemetryCategory(id = "monsterKilled",
-        displayName = "${engine:menu#telemetry-monster-killed}"
+        displayName = "${engine:menu#telemetry-monster-killed}",
+        isOneMapMetric = true
 )
 public final class MonsterKilledMetric extends Metric {
 
@@ -40,9 +41,6 @@ public final class MonsterKilledMetric extends Metric {
 
     @TelemetryField
     private Map monsterKilledMap;
-
-    public MonsterKilledMetric() {
-    }
 
     @Override
     public Unstructured getUnstructuredMetric() {

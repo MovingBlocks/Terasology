@@ -58,12 +58,12 @@ public class Metrics {
 
     public void initialise(Context context) {
 
-        systemContextMetric = new SystemContextMetric();
+        systemContextMetric = new SystemContextMetric(context);
         modulesMetric = new ModulesMetric(context);
         gameConfigurationMetric = new GameConfigurationMetric(context);
         blockDestroyedMetric = new BlockDestroyedMetric();
         blockPlacedMetric = new BlockPlacedMetric();
-        gamePlayMetric = new GamePlayMetric();
+        gamePlayMetric = new GamePlayMetric(context);
         monsterKilledMetric = new MonsterKilledMetric();
     }
 

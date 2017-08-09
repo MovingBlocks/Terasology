@@ -15,6 +15,13 @@
  */
 package org.terasology.config;
 
+import org.terasology.telemetry.TelemetryEmitter;
+import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+
+import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_HOST;
+import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
+import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
+
 /**
  *  Configuration (authorisation) for telemetry system.
  */
@@ -22,27 +29,27 @@ public class TelemetryConfig {
 
     private boolean telemetryEnabled;
 
-    private String telemetryDestination;
+    private String telemetryDestination = TelemetryEmitter.getDefaultCollectorURL(DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT).toString();
 
-    private String telemetryServerName;
+    private String telemetryServerName = TelemetryEmitter.DEFAULT_COLLECTOR_NAME;
 
-    private String telemetryServerOwner;
+    private String telemetryServerOwner = TelemetryEmitter.DEFAULT_COLLECTOR_OWNER;
 
     private boolean errorReportingEnabled;
 
-    private String errorReportingDestination;
+    private String errorReportingDestination = TelemetryLogstashAppender.DEFAULT_LOGSTASH_HOST + ":" + TelemetryLogstashAppender.DEFAULT_LOGSTASH_PORT;
 
-    private String errorReportingServerName;
+    private String errorReportingServerName = TelemetryLogstashAppender.DEFAULT_LOGSTASH_NAME;
 
-    private String errorReportingServerOwner;
+    private String errorReportingServerOwner = TelemetryLogstashAppender.DEFAULT_LOGSTASH_OWNER;
 
     private boolean launchPopupDisabled;
+
+    private MetricsUserPermissionConfig metricsUserPermissionConfig = new MetricsUserPermissionConfig();
 
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
     }
-
-    private MetricsUserPermissionConfig metricsUserPermissionConfig = new MetricsUserPermissionConfig();
 
     public MetricsUserPermissionConfig getMetricsUserPermissionConfig() {
         return metricsUserPermissionConfig;

@@ -35,11 +35,14 @@ import java.util.Map;
  * A metric tracking game configuration such as world generator, network mode,etc.
  */
 @TelemetryCategory(id = "gameConfiguration",
-        displayName = "${engine:menu#telemetry-game-configuration}"
+        displayName = "${engine:menu#telemetry-game-configuration}",
+        isOneMapMetric = false
 )
 public final class GameConfigurationMetric extends Metric {
 
     public static final String SCHEMA_GAME_CONFIGURATION = "iglu:org.terasology/gameConfiguration/jsonschema/1-0-0";
+
+    private Map<String, Boolean> bindingMap;
 
     @TelemetryField
     private String worldGenerator;
@@ -60,12 +63,14 @@ public final class GameConfigurationMetric extends Metric {
 
     public GameConfigurationMetric(Context context) {
         this.context = context;
+        bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }
 
     @Override
     public Unstructured getUnstructuredMetric() {
         getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, metricMap);
+        Map filteredMetricMap = filterMetricMap(bindingMap);
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, filteredMetricMap);
 
         return Unstructured.builder()
                 .eventData(modulesData)

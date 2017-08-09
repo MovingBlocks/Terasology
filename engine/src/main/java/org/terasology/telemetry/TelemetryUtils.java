@@ -22,7 +22,11 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
+import org.terasology.telemetry.metrics.Metric;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +42,11 @@ public class TelemetryUtils {
      * track a metric.
      * @param emitter Emitter sending telemetry to the server.
      * @param nameSpace The name the class tracking this metric.
-     * @param metric The new metric.
+     * @param event The new event.
+     * @param metric the Metric class instance that this event belongs to.
+     * @param bindingMap the binding map contains fields who has user's permission.
      */
-    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured metric) {
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
         Subject subject = new Subject.SubjectBuilder()
                 .userId(TelemetryParams.userId)
                 .build();
@@ -51,7 +57,18 @@ public class TelemetryUtils {
                 .platform(TelemetryParams.PLATFORM_DESKTOP)
                 .build();
 
-        tracker.track(metric);
+        Context context = CoreRegistry.get(Context.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
+        if (bindingMap.size() == 0 && display.isHeadless()) {
+            tracker.track(event);
+        } else if (bindingMap.size() != 0) {
+            TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
+            if (telemetryCategory != null) {
+                if ((bindingMap.get(telemetryCategory.id()))) {
+                    tracker.track(event);
+                }
+            }
+        }
     }
 
     /**
@@ -60,7 +77,7 @@ public class TelemetryUtils {
      * @return a string map.
      */
     public static Map<String, String> toStringMap(Map<?, ?> map) {
-        Map<String, String> stringMap = new HashMap();
+        Map<String, String> stringMap = new HashMap<>();
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             stringMap.put(entry.getKey().toString(), entry.getValue().toString());
         }

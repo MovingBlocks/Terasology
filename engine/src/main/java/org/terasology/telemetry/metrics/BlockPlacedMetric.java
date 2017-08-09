@@ -31,7 +31,8 @@ import java.util.Map;
  * A players statistic metric for blocks placed.
  */
 @TelemetryCategory(id = "blockPlaced",
-        displayName = "${engine:menu#telemetry-block-placed}"
+        displayName = "${engine:menu#telemetry-block-placed}",
+        isOneMapMetric = true
 )
 public final class BlockPlacedMetric extends Metric {
 

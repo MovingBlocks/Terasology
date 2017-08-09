@@ -31,7 +31,8 @@ import java.util.Map;
  * A player statistic metric for blocks destroyed in a game.
  */
 @TelemetryCategory(id = "blockDestroyed",
-        displayName = "${engine:menu#telemetry-block-destroyed}"
+        displayName = "${engine:menu#telemetry-block-destroyed}",
+        isOneMapMetric = true
 )
 public final class BlockDestroyedMetric extends Metric {
 

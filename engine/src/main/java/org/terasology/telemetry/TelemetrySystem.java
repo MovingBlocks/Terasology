@@ -17,23 +17,22 @@ package org.terasology.telemetry;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.telemetry.metrics.BlockDestroyedMetric;
+import org.terasology.telemetry.metrics.BlockPlacedMetric;
+import org.terasology.telemetry.metrics.GameConfigurationMetric;
+import org.terasology.telemetry.metrics.GamePlayMetric;
 import org.terasology.telemetry.metrics.ModulesMetric;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.telemetry.metrics.MonsterKilledMetric;
+import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -54,6 +53,8 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     private Instant timeForRefreshMetric;
 
     private Vector3f previousPos;
+
+    private Map<String, Boolean> bindingMap;
 
     @In
     private Emitter emitter;
@@ -125,43 +126,48 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
 
     @Override
     public void postBegin() {
-
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
+            bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
             sendModuleMetric();
             sendSystemContextMetric();
         }
-
         lastRecordTime = Instant.now();
     }
 
     private void sendModuleMetric() {
         ModulesMetric modulesMetric = metrics.getModulesMetric();
         Unstructured unstructuredMetric = modulesMetric.getUnstructuredMetric();
-        TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMetric);
+        TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMetric, modulesMetric, bindingMap);
     }
 
     private void sendSystemContextMetric() {
-        Unstructured systemContextMetric = metrics.getSystemContextMetric().getUnstructuredMetric();
-        TelemetryUtils.trackMetric(emitter, trackerNamespace, systemContextMetric);
+        SystemContextMetric systemContextMetric = metrics.getSystemContextMetric();
+        Unstructured unstructured = systemContextMetric.getUnstructuredMetric();
+        TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructured, systemContextMetric, bindingMap);
     }
 
     @Override
     public void shutdown() {
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
-            Unstructured unstructuredBlockDestroyed = metrics.getBlockDestroyedMetric().getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockDestroyed);
+            BlockDestroyedMetric blockDestroyedMetric = metrics.getBlockDestroyedMetric();
+            Unstructured unstructuredBlockDestroyed = blockDestroyedMetric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockDestroyed, blockDestroyedMetric, bindingMap);
 
-            Unstructured unstructuredBlockPlaced = metrics.getBlockPlacedMetric().getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockPlaced);
+            BlockPlacedMetric blockPlacedMetric = metrics.getBlockPlacedMetric();
+            Unstructured unstructuredBlockPlaced = blockPlacedMetric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockPlaced, blockPlacedMetric, bindingMap);
 
-            Unstructured unstructuredGameConfiguration = metrics.getGameConfigurationMetric().getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGameConfiguration);
+            GameConfigurationMetric gameConfigurationMetric = metrics.getGameConfigurationMetric();
+            Unstructured unstructuredGameConfiguration = gameConfigurationMetric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGameConfiguration, gameConfigurationMetric, bindingMap);
 
-            Unstructured unstructuredGamePlay = metrics.getGamePlayMetric().getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGamePlay);
+            GamePlayMetric gamePlayMetric = metrics.getGamePlayMetric();
+            Unstructured unstructuredGamePlay = gamePlayMetric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGamePlay, gamePlayMetric, bindingMap);
 
-            Unstructured unstructuredMonsterKilled = metrics.getMonsterKilledMetric().getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMonsterKilled);
+            MonsterKilledMetric monsterKilledMetric = metrics.getMonsterKilledMetric();
+            Unstructured unstructuredMonsterKilled = monsterKilledMetric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMonsterKilled, monsterKilledMetric, bindingMap);
         }
     }
 }
