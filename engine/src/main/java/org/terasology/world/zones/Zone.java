@@ -15,14 +15,12 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.ChunkMath;
 import org.terasology.math.geom.BaseVector3i;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
@@ -32,11 +30,13 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.viewer.layers.FacetLayer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import static org.terasology.world.chunks.ChunkConstants.SIZE_X;
+import static org.terasology.world.chunks.ChunkConstants.SIZE_Y;
+import static org.terasology.world.chunks.ChunkConstants.SIZE_Z;
 
 /**
  * A region in the world with its own rasterization and world preview properties.
@@ -90,22 +90,49 @@ public class Zone extends ProviderStore implements WorldRasterizer {
 
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
-        //Save the blocks that aren't meant to be changed
-        Map<BaseVector3i, Block> savedBlocks = new HashMap<>();
-        ChunkBlockIterator iterator = chunk.getBlockIterator();
-        while (iterator.next()) {
-            if (!containsBlock(iterator.getBlockPos(), chunkRegion)) {
-                Block block = chunk.getBlock(ChunkMath.calcBlockPos(iterator.getBlockPos()));
-                savedBlocks.put(ChunkMath.calcBlockPos(iterator.getBlockPos()), block);
+        Block[][][] savedBlocks = new Block[SIZE_X][SIZE_Y][SIZE_Z];
+        boolean changeAllBlocks = true;
+        boolean saveAllBlocks = true;
+
+        int offsetX = chunk.getChunkWorldOffsetX();
+        int offsetY = chunk.getChunkWorldOffsetY();
+        int offsetZ = chunk.getChunkWorldOffsetZ();
+
+        //Save the blocks that aren't in the zone
+        for (int x = 0; x < SIZE_X; x++) {
+            for (int y = 0; y < SIZE_Y; y++) {
+                for (int z = 0; z < SIZE_Z; z++) {
+                    if (!containsBlock(new Vector3i(x + offsetX, y + offsetY, z + offsetZ), chunkRegion)) {
+                        savedBlocks[x][y][z] = chunk.getBlock(x, y, z);
+                        changeAllBlocks = false;
+                    } else {
+                        saveAllBlocks = false;
+                    }
+                }
             }
         }
-        if (savedBlocks.size() != ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z) {
-            //Do the rasterization
+
+        //If none of the blocks are in the zone, it doesn't need to be rasterized
+        if (!saveAllBlocks) {
+            //Rasterize the zone
             rasterizers.forEach(r -> r.generateChunk(chunk, chunkRegion));
-            //Restore the saved blocks
-            savedBlocks.forEach(chunk::setBlock);
+
+            //Replace any blocks that aren't in the zone
+            if (!changeAllBlocks) {
+                for (int x = 0; x < SIZE_X; x++) {
+                    for (int y = 0; y < SIZE_Y; y++) {
+                        for (int z = 0; z < SIZE_Z; z++) {
+                            Block block = savedBlocks[x][y][z];
+                            if (block != null) {
+                                chunk.setBlock(x, y, z, block);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
 
     /* Preview features */
 
