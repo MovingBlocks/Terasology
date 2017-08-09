@@ -15,13 +15,13 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.BaseVector3i;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.generation.Region;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+@API
 public interface ZoneRegionFunction {
 
     /**
