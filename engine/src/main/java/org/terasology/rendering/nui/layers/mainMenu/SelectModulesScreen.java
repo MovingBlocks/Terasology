@@ -380,6 +380,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        WidgetUtil.trySubscribe(this, "advancedFilter", w -> triggerForwardAnimation(AdvanceModuleFilter.ASSET_URI));
     }
 
     private void prepareModuleList(boolean checked) {
