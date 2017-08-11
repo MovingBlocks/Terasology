@@ -6,6 +6,7 @@
     "contents": [
       {
         "type": "UIBox",
+        "id": "container",
         "layoutInfo": {
           "width": 500,
           "use-content-height": true,
@@ -120,7 +121,7 @@
               "contents": [
                 {
                   "type": "UICheckbox",
-                  "id": "augemtationCheckbox",
+                  "id": "augmentationCheckbox",
                   "family": "option-grid",
                   "layoutInfo": {
                     "relativeWidth": 0.04
@@ -129,7 +130,7 @@
                 {
                   "type": "UILabel",
                   "text": "Augmentation",
-                  "id": "augemtation",
+                  "id": "augmentation",
                   "id": "augmentation",
                   "layoutInfo": {
                     "relativeWidth": 0.26
@@ -159,6 +160,21 @@
               ]
             }
           ]
+        }
+      },
+      {
+        "type": "UIButton",
+        "text": "Back",
+        "id": "back",
+        "layoutInfo": {
+          "width": 100,
+          "height": 25,
+          "position-horizontal-center": {},
+          "position-bottom":{
+            "widget":"container",
+            "target":"BOTTOM",
+            "offset": -50
+          }
         }
       }
     ]
