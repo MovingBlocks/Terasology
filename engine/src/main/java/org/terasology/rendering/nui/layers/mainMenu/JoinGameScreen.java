@@ -185,6 +185,7 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
+        System.out.println("Want to exit");
         infoService.close();
 
         super.onClosed();
@@ -481,14 +482,16 @@ public class JoinGameScreen extends CoreScreenLayer {
     }
 
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
-            if (isEscapeToCloseAllowed()) {
-                triggerBackAnimation();
-                return true;
+        if (event.isDown()) {
+            if (event.getKey() == Keyboard.Key.ESCAPE) {
+                if (isEscapeToCloseAllowed()) {
+                    triggerBackAnimation();
+                    return true;
+                }
             }
-        }
-        if (event.isDown() && event.getKey() == Keyboard.Key.R) {
-            refresh();
+            else if (event.getKey() == Keyboard.Key.R) {
+                refresh();
+            }
         }
         return false;
     }
