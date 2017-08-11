@@ -481,6 +481,12 @@ public class JoinGameScreen extends CoreScreenLayer {
     }
 
     public boolean onKeyEvent(NUIKeyEvent event) {
+        if (event.isDown() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (isEscapeToCloseAllowed()) {
+                triggerBackAnimation();
+                return true;
+            }
+        }
         if (event.isDown() && event.getKey() == Keyboard.Key.R) {
             refresh();
         }
