@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +41,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> siblings;
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
-    private Map<Vector2i, LayerRange> layerRangeMap = new HashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
+    private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
 
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
