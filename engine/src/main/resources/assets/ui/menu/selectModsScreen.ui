@@ -180,20 +180,9 @@
 
                                     },
                                     {
-                                        "type": "UICheckbox",
-                                        "id": "library",
-                                        "enabled": false,
-                                        "layoutInfo": {
-                                            "relativeWidth": 0.11
-                                        }
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "text": "Show Library/API",
-                                        "layoutInfo": {
-                                            "relativeWidth": 0.48
-                                        },
-                                        "enabled": false
+                                        "type": "UIButton",
+                                        "id": "advancedFilter",
+                                        "text":"Advanced Filter"
                                     }
                                 ],
                                 "layoutInfo": {
