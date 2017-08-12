@@ -40,7 +40,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
-public class CopyImageToHMDNode extends ConditionDependentNode {
+public class OutputToHMDNode extends ConditionDependentNode {
     private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
     private static final SimpleUri RIGHT_EYE_FBO_URI = new SimpleUri("engine:fbo.rightEye");
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
@@ -57,7 +57,7 @@ public class CopyImageToHMDNode extends ConditionDependentNode {
      * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
-    public CopyImageToHMDNode(Context context) {
+    public OutputToHMDNode(Context context) {
         super(context);
 
         vrProvider = context.get(OpenVRProvider.class);

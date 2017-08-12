@@ -20,12 +20,12 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
+import org.terasology.rendering.dag.nodes.OutputToScreenNode;
 
 @RegisterSystem
 public class DebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagSetOutputFbo(@CommandParam("fboUri") final String fboUri) {
-        CopyImageToScreenNode.getInstance().setFbo(fboUri);
+        OutputToScreenNode.getInstance().setFbo(fboUri);
     }
 }

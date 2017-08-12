@@ -36,11 +36,11 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class CopyImageToScreenNode extends ConditionDependentNode {
+public class OutputToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     // TODO: Remove as soon as nodeGraph.findNode(nodeUri) is available
-    private static CopyImageToScreenNode nodeInstance;
+    private static OutputToScreenNode nodeInstance;
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private WorldRenderer worldRenderer;
@@ -50,7 +50,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
 
     private StateChange bindFbo;
 
-    public CopyImageToScreenNode(Context context) {
+    public OutputToScreenNode(Context context) {
         super(context);
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
@@ -81,7 +81,7 @@ public class CopyImageToScreenNode extends ConditionDependentNode {
         PerformanceMonitor.endActivity();
     }
 
-    public static CopyImageToScreenNode getInstance() {
+    public static OutputToScreenNode getInstance() {
         return nodeInstance;
     }
 

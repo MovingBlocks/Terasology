@@ -43,8 +43,8 @@ import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
-import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
-import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
+import org.terasology.rendering.dag.nodes.OutputToHMDNode;
+import org.terasology.rendering.dag.nodes.OutputToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
@@ -448,10 +448,10 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void addCopyOutputNodes(RenderGraph renderGraph) {
-        Node copyToVRFrameBufferNode = new CopyImageToHMDNode(context);
+        Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
         renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
 
-        Node copyImageToScreenNode = new CopyImageToScreenNode(context);
+        Node copyImageToScreenNode = new OutputToScreenNode(context);
         renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
     }
 
