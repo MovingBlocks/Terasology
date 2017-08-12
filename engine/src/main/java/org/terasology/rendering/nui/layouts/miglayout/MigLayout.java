@@ -160,6 +160,11 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         invalidate();
     }
 
+    @Override
+    public void removeAllWidgets() {
+        clear();
+    }
+
     public void clear() {
         wrappers.clear();
         ccMap.clear();
