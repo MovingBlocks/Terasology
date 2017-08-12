@@ -33,4 +33,9 @@ public interface UILayout<T extends LayoutHint> extends UIWidget {
      * @param element the element to remove
      */
     void removeWidget(UIWidget element);
+
+    /**
+     * Remove all widgets from the layout.
+     */
+    void removeAllWidgets();
 }

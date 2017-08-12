@@ -68,6 +68,11 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
         widgetList.remove(widget);
     }
 
+    @Override
+    public void removeAllWidgets() {
+        widgetList.clear();
+    }
+
     public int getRows() {
         return rows;
     }

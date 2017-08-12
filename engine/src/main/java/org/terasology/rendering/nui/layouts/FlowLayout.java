@@ -43,6 +43,11 @@ public class FlowLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
+    public void removeAllWidgets() {
+        contents.clear();
+    }
+
+    @Override
     public void onDraw(Canvas canvas) {
         int filledWidth = 0;
         int filledHeight = 0;

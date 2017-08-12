@@ -95,6 +95,11 @@ public class CardLayout extends CoreLayout<LayoutHint> {
         }
     }
 
+    @Override
+    public void removeAllWidgets() {
+        widgets.clear();
+    }
+
     /**
      * Sets the currently displayed widget.
      *

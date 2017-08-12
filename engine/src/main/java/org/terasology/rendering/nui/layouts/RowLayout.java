@@ -111,6 +111,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     /**
      * Removes all widgets from this layout's widget list.
      */
+    @Override
     public void removeAllWidgets() {
         contents.clear();
         hints.clear();

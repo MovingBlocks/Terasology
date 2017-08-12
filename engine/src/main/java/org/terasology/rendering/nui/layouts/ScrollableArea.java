@@ -206,6 +206,11 @@ public class ScrollableArea extends CoreLayout {
         }
     }
 
+    @Override
+    public void removeAllWidgets() {
+        content = null;
+    }
+
     public boolean isStickToBottom() {
         return stickToBottom;
     }

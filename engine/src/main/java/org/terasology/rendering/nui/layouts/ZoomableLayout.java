@@ -110,6 +110,11 @@ public class ZoomableLayout extends CoreLayout {
         }
     }
 
+    @Override
+    public void removeAllWidgets() {
+        removeAll();
+    }
+
     public void removeWidget(PositionalWidget widget) {
         if (widget != null) {
             widget.onRemoved(this);
