@@ -109,6 +109,15 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     /**
+     * Removes all widgets from this layout's widget list.
+     */
+    @Override
+    public void removeAllWidgets() {
+        contents.clear();
+        hints.clear();
+    }
+
+    /**
      * Draws the widgets contained in this layout's widget list,
      * according to the widths calculated in {@link #calcWidths(Canvas)}.
      * This is called every frame.

@@ -72,6 +72,11 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         widgetList.remove(widget);
     }
 
+    @Override
+    public void removeAllWidgets() {
+        widgetList.clear();
+    }
+
     public int getColumns() {
         return columns;
     }
