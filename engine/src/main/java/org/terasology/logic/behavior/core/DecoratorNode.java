@@ -58,7 +58,11 @@ public class DecoratorNode extends ActionNode {
     @Override
     public void construct(Actor actor) {
         if (action != null) {
-            action.construct(actor);
+            try {
+                action.construct(actor);
+            } catch (Exception e) {
+                logger.info("Exception while running construct() of action {} from entity {}:", action, actor.getEntity());
+            }
         }
     }
 
@@ -93,7 +97,6 @@ public class DecoratorNode extends ActionNode {
             // TODO maybe returning UNDEFINED would be more canonical?
             return BehaviorState.FAILURE;
         }
-
 
         if (modifiedState != BehaviorState.RUNNING && lastState == BehaviorState.RUNNING) {
             child.destruct(actor);

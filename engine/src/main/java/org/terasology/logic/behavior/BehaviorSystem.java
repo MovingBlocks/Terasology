@@ -36,11 +36,8 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BehaviorEvent;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -49,10 +46,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Behavior tree system
@@ -84,12 +81,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
     @Override
     public void initialise() {
         List<ResourceUrn> uris = Lists.newArrayList();
-        uris.addAll(assetManager.getAvailableAssets(StaticSound.class).stream().collect(Collectors.toList()));
+        uris.addAll(new ArrayList<>(assetManager.getAvailableAssets(StaticSound.class)));
         for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
             Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
-            if (asset.isPresent()) {
-                trees.add(asset.get());
-            }
+            asset.ifPresent(behaviorTree -> trees.add(behaviorTree));
         }
     }
 

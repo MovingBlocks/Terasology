@@ -25,6 +25,11 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.properties.TextField;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Condition leaf node.
@@ -39,8 +44,11 @@ import org.terasology.registry.In;
 @BehaviorAction(name = "condition")
 public class ConditionAction extends BaseAction {
     private static final Logger logger = LoggerFactory.getLogger(ConditionAction.class);
+
     protected String componentPresent;
+
     protected String componentAbsent;
+
     protected String[] values;
 
     @In
@@ -80,6 +88,7 @@ public class ConditionAction extends BaseAction {
             }
         }
         if (componentPresent != null) {
+
             Component component = actor.getComponent(componentLibrary.resolve(componentPresent).getType());
             if (component == null) {
                 passing = false;
@@ -88,64 +97,114 @@ public class ConditionAction extends BaseAction {
                 if (values != null) {
                     for (String value : values) {
                         String[] tokens = value.split(" ");
-                        Object fieldVal = component.getClass().getDeclaredField(tokens[0]).get(component);
+                        Object fieldValue = component.getClass().getDeclaredField(tokens[1]).get(component);
+
+                        String secondValue;
+                        switch (tokens[0]) {
+                            // Read second value from the definition
+                            case "V":
+                                secondValue = tokens[3];
+                                break;
+                            // Read second value from a field of the component
+                            case "F":
+                                secondValue = component.getClass().getDeclaredField(tokens[3]).get(component).toString();
+                                break;
+                            // No second value needed.
+                            case "N":
+                                secondValue = "";
+                                break;
+                            default:
+                                logger.error("Unsupported guard value type: {}", tokens[0]);
+                                secondValue = "";
+
+                        }
 
                         // Can't use a switch for this :(
-                        if (fieldVal instanceof Boolean) {
-                            switch (tokens[1]) {
+                        if (fieldValue instanceof Boolean) {
+                            switch (tokens[2]) {
                                 case "=":
                                 case "==":
-                                    passing = (Boolean) fieldVal == Boolean.parseBoolean(tokens[2]);
+                                    passing = (Boolean) fieldValue == Boolean.parseBoolean(secondValue);
                                     break;
                                 case "!":
                                 case "!=":
-                                    passing = (Boolean) fieldVal != Boolean.parseBoolean(tokens[2]);
+                                    passing = (Boolean) fieldValue != Boolean.parseBoolean(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for boolean values: {}", tokens[1]);
+                                    logger.error("Unsupported operation for boolean values: {}", tokens[2]);
 
                             }
 
-                        } else if (fieldVal instanceof Number) {
-                            switch (tokens[1]) {
+                        } else if (fieldValue instanceof Number) {
+                            switch (tokens[2]) {
                                 case "=":
                                 case "==":
-                                    passing = (Double) fieldVal == Double.parseDouble(tokens[2]);
+                                    passing = (Double) fieldValue == Double.parseDouble(secondValue);
                                     break;
                                 case "!":
                                 case "!=":
-                                    passing = (Double) fieldVal == Double.parseDouble(tokens[2]);
+                                    passing = (Double) fieldValue == Double.parseDouble(secondValue);
                                     break;
                                 case "<=":
-                                    passing = ((Number) fieldVal).doubleValue() <= Double.parseDouble(tokens[2]);
+                                    passing = ((Number) fieldValue).doubleValue() <= Double.parseDouble(secondValue);
                                     break;
                                 case ">=":
-                                    passing = ((Number) fieldVal).doubleValue() >= Double.parseDouble(tokens[2]);
+                                    passing = ((Number) fieldValue).doubleValue() >= Double.parseDouble(secondValue);
                                     break;
                                 case ">":
-                                    passing = ((Number) fieldVal).doubleValue() > Double.parseDouble(tokens[2]);
+                                    passing = ((Number) fieldValue).doubleValue() > Double.parseDouble(secondValue);
                                     break;
                                 case "<":
-                                    passing = ((Number) fieldVal).doubleValue() < Double.parseDouble(tokens[2]);
+                                    passing = ((Number) fieldValue).doubleValue() < Double.parseDouble(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for numeric values: {}", tokens[1]);
+                                    logger.error("Unsupported operation for numeric values: {}", tokens[2]);
 
                             }
 
-                        } else if (fieldVal instanceof String) {
-                            switch (tokens[1]) {
+                        } else if (fieldValue instanceof String) {
+                            switch (tokens[2]) {
                                 case "=":
                                 case "==":
-                                    passing = fieldVal.equals(tokens[2]);
+                                    passing = fieldValue.equals(secondValue);
                                     break;
                                 case "!":
                                 case "!=":
-                                    passing = !fieldVal.equals(tokens[2]);
+                                    passing = !fieldValue.equals(secondValue);
                                     break;
                                 default:
-                                    logger.error("Unsupported operation for strings: {}", tokens[1]);
+                                    logger.error("Unsupported operation for strings: {}", tokens[2]);
 
+                            }
+                        } else {
+                            // Assume it's a nullable Object
+
+                            if (fieldValue == null) {
+                                if (!tokens[2].equals("null")) {
+                                    // If a more complex check is requested and the field is null, fail
+                                    passing = false;
+                                }
+                            } else {
+                                switch (tokens[2]) {
+
+                                    // Null check
+                                    case "exists":
+                                        break;
+                                    // Collection checks
+                                    case "empty":
+                                        if (fieldValue instanceof Collection) {
+                                            passing = ((Collection) fieldValue).isEmpty();
+                                        }
+                                        break;
+                                    case "nonEmpty":
+                                        if (fieldValue instanceof Collection) {
+                                            passing = !((Collection) fieldValue).isEmpty();
+                                        }
+                                        break;
+
+                                    default:
+                                        logger.error("Unknown field type or operation: {} {}", fieldValue.getClass(), tokens[2]);
+                                }
                             }
                         }
 

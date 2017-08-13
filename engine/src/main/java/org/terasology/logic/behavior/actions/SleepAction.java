@@ -31,18 +31,26 @@ import org.terasology.rendering.nui.properties.Range;
 @API
 @BehaviorAction(name = "sleep")
 public class SleepAction extends BaseAction {
+    static Logger logger = LoggerFactory.getLogger(SleepAction.class);
 
     @Range(min = 0, max = 20)
     private float time;
 
     @Override
     public void construct(Actor actor) {
+//        logger.info("Construct running for entity {} id {}", actor.getEntity(), getId());
         actor.setValue(getId(), time);
     }
 
     @Override
     public BehaviorState modify(Actor actor, BehaviorState result) {
-        float timeRemaining = actor.getValue(getId());
+
+        float timeRemaining = 0;
+        try {// TODO figure out the delegation issue
+            timeRemaining = actor.getValue(getId());
+        } catch (NullPointerException e) {
+            construct(actor);
+        }
         timeRemaining -= actor.getDelta();
         actor.setValue(getId(), timeRemaining);
         return timeRemaining > 0 ? BehaviorState.RUNNING : BehaviorState.SUCCESS;
