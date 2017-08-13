@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,9 @@ public interface UILayout<T extends LayoutHint> extends UIWidget {
 
     /**
      * Remove all widgets from the layout.
+     * TODO: Method made default to avoid API violation. Consider making non-default later or provide "real" implementation
      */
-    void removeAllWidgets();
+    default void removeAllWidgets() {
+        throw new UnsupportedOperationException("Not implemented yet (default method)");
+    }
 }
