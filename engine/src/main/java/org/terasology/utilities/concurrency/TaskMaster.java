@@ -126,4 +126,17 @@ public final class TaskMaster<T extends Task> {
         }
     }
 
+    /**
+     * Get the {@link ExecutorService} underlying this TaskMaster. Note that by default the service will have a
+     * {@link TaskProcessor} enqueued for each thread. In order to use the ExecutorService directly you will need to
+     * {@method offer} a {@link ShutdownTask} as shown:
+     * <p>
+     * {@code
+     * taskMaster.offer(new ShutdownTask());
+     * }
+     * @return the {@link ExecutorService} used by this instance
+     */
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
 }
