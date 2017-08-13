@@ -185,7 +185,6 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        System.out.println("Want to exit");
         infoService.close();
 
         super.onClosed();
