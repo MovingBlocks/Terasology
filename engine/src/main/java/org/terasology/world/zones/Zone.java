@@ -23,6 +23,8 @@ import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.EntityBuffer;
+import org.terasology.world.generation.EntityProvider;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldBuilder;
@@ -56,11 +58,11 @@ import static org.terasology.world.chunks.ChunkConstants.SIZE_Z;
  * zone. Preview layers on the inner zones also get added to their parent zone.
  */
 @API
-public class Zone extends ProviderStore implements WorldRasterizer {
+public class Zone extends ProviderStore implements WorldRasterizer, EntityProvider {
 
     private final List<FacetProvider> facetProviders = new ArrayList<>();
     private final List<WorldRasterizer> rasterizers = new ArrayList<>();
-    //TODO: add entity providers
+    private final List<EntityProvider> entityProviders = new ArrayList<>();
     private final List<FacetLayer> facetLayers = new ArrayList<>();
 
     private ProviderStore parent;
@@ -94,6 +96,12 @@ public class Zone extends ProviderStore implements WorldRasterizer {
     @Override
     public void initialize() {
         rasterizers.forEach(WorldRasterizer::initialize);
+    }
+
+    @Override
+    public void process(Region region, EntityBuffer buffer) {
+        entityProviders.forEach(EntityProvider::initialize);
+        entityProviders.forEach(provider -> provider.process(region, buffer));
     }
 
     @Override
@@ -202,6 +210,12 @@ public class Zone extends ProviderStore implements WorldRasterizer {
     @Override
     public Zone addProvider(FacetProvider facet) {
         facetProviders.add(facet);
+        return this;
+    }
+
+    @Override
+    public Zone addEntities(EntityProvider entityProvider) {
+        entityProviders.add(entityProvider);
         return this;
     }
 

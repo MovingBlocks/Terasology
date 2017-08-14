@@ -16,6 +16,7 @@
 package org.terasology.world.zones;
 
 import com.google.common.collect.ImmutableList;
+import org.terasology.world.generation.EntityProvider;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.WorldRasterizer;
 
@@ -28,6 +29,8 @@ public abstract class ProviderStore {
 
     public abstract ProviderStore addProvider(FacetProvider facet);
 
+    public abstract ProviderStore addEntities(EntityProvider entityProvider);
+
     public abstract ProviderStore addRasterizer(WorldRasterizer rasterizer);
 
     public synchronized ProviderStore addZone(Zone zone) {
@@ -36,6 +39,7 @@ public abstract class ProviderStore {
 
         zone.getFacetProviders().forEach(this::addProvider);
         addRasterizer(zone);
+        addEntities(zone);
 
         return this;
     }
