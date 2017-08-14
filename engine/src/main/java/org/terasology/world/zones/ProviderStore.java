@@ -25,6 +25,8 @@ import java.util.List;
 
 public abstract class ProviderStore {
 
+    protected Long seed;
+
     private final List<Zone> childZones = new ArrayList<>();
 
     public abstract ProviderStore addProvider(FacetProvider facet);
@@ -42,6 +44,17 @@ public abstract class ProviderStore {
         addEntities(zone);
 
         return this;
+    }
+
+    public void setSeed(long seed) {
+        this.seed = seed;
+        for (Zone zone : getChildZones()) {
+            zone.setSeed(seed);
+        }
+    }
+
+    public long getSeed() {
+        return seed;
     }
 
     public ImmutableList<Zone> getChildZones() {

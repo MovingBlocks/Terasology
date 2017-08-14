@@ -45,7 +45,6 @@ public class WorldBuilder extends ProviderStore {
     private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
     private final List<EntityProvider> entityProviders = new ArrayList<>();
     private int seaLevel = 32;
-    private Long seed;
 
     private WorldGeneratorPluginLibrary pluginLibrary;
 
@@ -88,10 +87,6 @@ public class WorldBuilder extends ProviderStore {
     public WorldBuilder setSeaLevel(int level) {
         this.seaLevel = level;
         return this;
-    }
-
-    public void setSeed(long seed) {
-        this.seed = seed;
     }
 
     public World build() {

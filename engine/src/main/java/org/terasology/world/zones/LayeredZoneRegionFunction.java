@@ -15,16 +15,16 @@
  */
 package org.terasology.world.zones;
 
-import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
+import org.terasology.utilities.procedural.BrownianNoise;
+import org.terasology.utilities.procedural.Noise;
+import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -42,6 +42,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
     private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
+    private Noise noise;
 
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
@@ -70,6 +71,10 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     }
 
     private LayerRange getLayerRange(int x, int z, Region region, Zone zone) {
+        if (noise == null) {
+            setNoise(zone.getSeed());
+        }
+
         Vector2i pos = new Vector2i(x, z);
         if (!layerRangeMap.containsKey(pos)) {
             int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
@@ -85,8 +90,16 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
             int i;
             for (i = 0; i < layers.size(); i++) {
                 LayeredZoneRegionFunction layer = layers.get(i);
-                //TODO: allow variable-width layers
-                cumulativeDistanceLarge += layer.getMinWidth();
+
+                float noiseScale = 100f;
+                float noiseValue = noise.noise(x / noiseScale, 10000 * i * (aboveground ? 1 : -1), z / noiseScale);
+
+                //Convert noise value to range [0..1]
+                noiseValue = (noiseValue + 1) / 2;
+
+                int layerWidth = Math.round(layer.getMinWidth() + noiseValue * (layer.getMaxWidth() - layer.getMinWidth()));
+
+                cumulativeDistanceLarge += layerWidth;
                 if (this.equals(layer)) {
                     if (aboveground) {
                         layerRange = new LayerRange()
@@ -100,7 +113,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                         break;
                     }
                 }
-                cumulativeDistanceSmall += layer.getMinWidth();
+                cumulativeDistanceSmall += layerWidth;
             }
 
             if (layers.size() <= 0 || layerRange == null) {
@@ -119,6 +132,10 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
             layerRangeMap.put(pos, layerRange);
         }
         return layerRangeMap.get(pos);
+    }
+
+    private void setNoise(long seed) {
+        noise = new BrownianNoise(new SimplexNoise(seed), 2);
     }
 
     private List<LayeredZoneRegionFunction> getSiblings(Zone zone) {

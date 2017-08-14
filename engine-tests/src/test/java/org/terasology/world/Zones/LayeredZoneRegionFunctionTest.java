@@ -32,8 +32,8 @@ import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
-import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
+import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.Zone;
 
 import java.util.HashMap;
@@ -62,6 +62,7 @@ public class LayeredZoneRegionFunctionTest {
                 .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(100, 100, MEDIUM_SKY)))
                 .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(100, 100, SHALLOW_UNDERGROUND)))
                 .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(100, 100, MEDIUM_UNDERGROUND)));
+        parent.setSeed(12345);
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = ArrayListMultimap.create();
 
