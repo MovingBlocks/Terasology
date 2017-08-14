@@ -18,8 +18,14 @@ package org.terasology.rendering.world;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
@@ -112,7 +118,8 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
-public final class WorldRendererImpl implements WorldRenderer {
+@RegisterSystem
+public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
@@ -151,6 +158,21 @@ public final class WorldRendererImpl implements WorldRenderer {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
+
+    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
+
+    // Required for the reflection magic that Systems use.
+    public WorldRendererImpl() {
+        renderingConfig = null;
+        vrProvider = null;
+        renderQueues = null;
+        context = null;
+        backdropProvider = null;
+        worldProvider = null;
+        renderableWorld = null;
+        shaderManager = null;
+        playerCamera = null;
+    }
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -229,8 +251,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderGraph() {
-        RenderGraph renderGraph = new RenderGraph();
-
         addShadowMapNodes(renderGraph);
 
         addReflectionNodes(renderGraph);
@@ -249,7 +269,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addPostProcessingNodes(renderGraph);
 
-        addCopyOutputNodes(renderGraph);
+        addOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -447,12 +467,12 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
     }
 
-    private void addCopyOutputNodes(RenderGraph renderGraph) {
+    private void addOutputNodes(RenderGraph renderGraph) {
         Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
-        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+        renderGraph.addNode(copyToVRFrameBufferNode, "outputToVRFrameBufferNode");
 
         Node copyImageToScreenNode = new OutputToScreenNode(context);
-        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
+        renderGraph.addNode(copyImageToScreenNode, "outputToScreenNode");
     }
 
     @Override
@@ -676,5 +696,30 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     public void recompileShaders() {
         shaderManager.recompileAllShaders();
+    }
+
+    @Override
+    public void initialise() { }
+
+    @Override
+    public void preBegin() { }
+
+    @Override
+    public void postBegin() { }
+
+    @Override
+    public void preSave() { }
+
+    @Override
+    public void postSave() { }
+
+    @Override
+    public void shutdown() { }
+
+    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam("arg1") final String arg1) {
+        // TODO: Convert arg1 to args[]
+        Node node = renderGraph.findNode(nodeUri);
+        node.handleCommand(command, arg1);
     }
 }

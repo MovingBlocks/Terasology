@@ -39,9 +39,6 @@ import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 public class OutputToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
-    // TODO: Remove as soon as nodeGraph.findNode(nodeUri) is available
-    private static OutputToScreenNode nodeInstance;
-
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private WorldRenderer worldRenderer;
 
@@ -64,7 +61,6 @@ public class OutputToScreenNode extends ConditionDependentNode {
         bindFbo = new SetInputTextureFromFbo(0, FINAL_BUFFER, ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
         addDesiredStateChange(bindFbo);
 
-        nodeInstance = this;
         SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
         lastUpdatedGBuffer = gBufferPair.getLastUpdatedFbo();
         staleGBuffer = gBufferPair.getStaleFbo();
@@ -81,28 +77,30 @@ public class OutputToScreenNode extends ConditionDependentNode {
         PerformanceMonitor.endActivity();
     }
 
-    public static OutputToScreenNode getInstance() {
-        return nodeInstance;
-    }
+    @Override
+    public void handleCommand(String command, String arg1) {
+        switch (command) {
+            case "setFbo":
+                FBO fbo;
+                switch (arg1) {
+                    case "engine:fbo.gBuffer":
+                    case "engine:fbo.lastUpdatedGBuffer":
+                        fbo = lastUpdatedGBuffer;
+                        break;
+                    case "engine:fbo.staleGBuffer":
+                        fbo = staleGBuffer;
+                        break;
+                    default:
+                        // TODO: We should probably do some more error checking here.
+                        fbo = displayResolutionDependentFBOs.get(new SimpleUri(arg1));
+                        break;
+                }
+                setFbo(fbo);
 
-    public void setFbo(String fboUri) {
-        FBO fbo;
-
-        switch (fboUri) {
-            case "engine:fbo.gBuffer":
-            case "engine:fbo.lastUpdatedGBuffer":
-                fbo = lastUpdatedGBuffer;
-                break;
-            case "engine:fbo.staleGBuffer":
-                fbo = staleGBuffer;
                 break;
             default:
-                // TODO: We should probably do some more error checking here.
-                fbo = displayResolutionDependentFBOs.get(new SimpleUri(fboUri));
-                break;
+                // TODO: Throw error or log something?
         }
-
-        setFbo(fbo);
     }
 
     private void setFbo(FBO fbo) {
