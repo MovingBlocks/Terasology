@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
+import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
@@ -62,8 +63,9 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
+    private ModuleInstallManager installManager;
 
-    public ModuleManagerImpl() {
+    public ModuleManagerImpl(String masterServerAddress) {
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -96,6 +98,11 @@ public class ModuleManagerImpl implements ModuleManager {
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    public ModuleManagerImpl(Config config) {
+        this(config.getNetwork().getMasterServer());
     }
 
     /**
@@ -172,6 +179,11 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleRegistry getRegistry() {
         return registry;
+    }
+
+    @Override
+    public ModuleInstallManager getInstallManager() {
+        return installManager;
     }
 
     @Override

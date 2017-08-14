@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.utilities.download;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,23 +33,23 @@ import org.slf4j.LoggerFactory;
 /**
  * Downloads a file.
  */
-public class FileDownloader implements Callable<Path> {
+public class SingleFileDownloader implements Callable<Path> {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileDownloader.class);
+    private static final Logger logger = LoggerFactory.getLogger(SingleFileDownloader.class);
 
     private final URL url;
     private final Path target;
-    private final ProgressListener listener;
+    private final SingleFileTransferProgressListener listener;
 
-    public FileDownloader(URL url, Path target) {
-        this(url, target, p -> { });
+    public SingleFileDownloader(URL url, Path target) {
+        this(url, target, (transferred, total) -> { });
     }
 
     /**
      * @param url
      * @param listener a progress listener. Will be called with 0 repeatedly if size cannot be determined.
      */
-    public FileDownloader(URL url, Path target, ProgressListener listener) {
+    public SingleFileDownloader(URL url, Path target, SingleFileTransferProgressListener listener) {
         this.url = url;
         this.target = target;
         this.listener = listener;
@@ -84,7 +84,7 @@ public class FileDownloader implements Callable<Path> {
      * Reads all bytes from an input stream and writes them to an output stream.
      * Copied and adapted from Files.copy().
      */
-    private static long copy(InputStream source, OutputStream sink, long max, ProgressListener listener) throws IOException {
+    private static long copy(InputStream source, OutputStream sink, long max, SingleFileTransferProgressListener listener) throws IOException {
         long nread = 0L;
         int bufferSize = 0x10000;  // 64 kB
         byte[] buf = new byte[bufferSize];
@@ -93,9 +93,9 @@ public class FileDownloader implements Callable<Path> {
             sink.write(buf, 0, n);
             nread += n;
             if (max <= 0) {
-                listener.onProgress(0);
+                listener.onProgress(0, max);
             } else {
-                listener.onProgress((float) nread / max);
+                listener.onProgress(nread, max);
             }
         }
         return nread;

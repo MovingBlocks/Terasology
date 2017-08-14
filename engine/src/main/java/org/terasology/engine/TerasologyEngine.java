@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
@@ -283,7 +284,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        ModuleManager moduleManager = new ModuleManagerImpl();
+        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class));
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
