@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commands;
 
-import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -25,7 +24,7 @@ import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.logic.players.SpawnLocationComponent;
+import org.terasology.logic.players.StaticSpawnLocationComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -76,12 +75,12 @@ public class ClientCommands extends BaseComponentSystem {
     @Command(shortDescription = "Sets the spawn location for the client to the current location", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String setSpawnLocation(@Sender EntityRef sender) {
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
-        SpawnLocationComponent spawnLocationComponent = new SpawnLocationComponent();
-        if (clientInfo.hasComponent(SpawnLocationComponent.class)) {
-            spawnLocationComponent = clientInfo.getComponent(SpawnLocationComponent.class);
+        StaticSpawnLocationComponent staticSpawnLocationComponent = new StaticSpawnLocationComponent();
+        if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
+            staticSpawnLocationComponent = clientInfo.getComponent(StaticSpawnLocationComponent.class);
         }
-        spawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition();
-        clientInfo.addOrSaveComponent(spawnLocationComponent);
-        return "Set spawn location to- " + spawnLocationComponent.position;
+        staticSpawnLocationComponent.position = sender.getComponent(ClientComponent.class).character.getComponent(LocationComponent.class).getWorldPosition();
+        clientInfo.addOrSaveComponent(staticSpawnLocationComponent);
+        return "Set spawn location to- " + staticSpawnLocationComponent.position;
     }
 }

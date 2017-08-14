@@ -214,8 +214,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
         EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
         Vector3f spawnPosition;
-        if (clientInfo.hasComponent(SpawnLocationComponent.class)) {
-            spawnPosition = clientInfo.getComponent(SpawnLocationComponent.class).position;
+        if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
+            spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
         } else {
             spawnPosition = worldGenerator.getSpawnPosition(entity);
         }

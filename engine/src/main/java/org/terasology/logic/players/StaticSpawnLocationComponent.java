@@ -22,7 +22,7 @@ import org.terasology.network.Replicate;
 /**
  * This is attached to the player entities in order to manually set a custom spawn location.
  */
-public class SpawnLocationComponent implements Component {
+public class StaticSpawnLocationComponent implements Component {
     @Replicate
     public Vector3f position;
 }
