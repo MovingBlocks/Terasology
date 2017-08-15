@@ -36,7 +36,7 @@ import org.terasology.utilities.Assets;
 public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
-    private String nodeUri;
+    private SimpleUri nodeUri;
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
@@ -98,17 +98,17 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public void setUri(String nodeUri) {
+    public void setUri(SimpleUri nodeUri) {
         this.nodeUri = nodeUri;
     }
 
     @Override
-    public String getUri() {
+    public SimpleUri getUri() {
         return nodeUri;
     }
 
     @Override
-    public void handleCommand(String command, String arg1) { }
+    public void handleCommand(String command, String[] args) { }
 
     /**
      * Utility method to conveniently retrieve materials from the Assets system,

@@ -68,7 +68,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/copyImageToScreen");
+        PerformanceMonitor.startActivity("rendering/outputToScreen");
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
@@ -78,11 +78,15 @@ public class OutputToScreenNode extends ConditionDependentNode {
     }
 
     @Override
-    public void handleCommand(String command, String arg1) {
+    public void handleCommand(String command, String[] args) {
         switch (command) {
             case "setFbo":
+                if (args.length != 1) {
+                    throw new RuntimeException("Invalid number of arguments; expected 1, received " + args.length + "!");
+                }
+
                 FBO fbo;
-                switch (arg1) {
+                switch (args[0]) {
                     case "engine:fbo.gBuffer":
                     case "engine:fbo.lastUpdatedGBuffer":
                         fbo = lastUpdatedGBuffer;
@@ -91,15 +95,19 @@ public class OutputToScreenNode extends ConditionDependentNode {
                         fbo = staleGBuffer;
                         break;
                     default:
-                        // TODO: We should probably do some more error checking here.
-                        fbo = displayResolutionDependentFBOs.get(new SimpleUri(arg1));
+                        fbo = displayResolutionDependentFBOs.get(new SimpleUri(args[0]));
+
+                        if (fbo == null) {
+                            throw new RuntimeException("Invalid fbo uri: " + args[0] + "!");
+                        }
+
                         break;
                 }
                 setFbo(fbo);
 
                 break;
             default:
-                // TODO: Throw error or log something?
+                throw new RuntimeException("Invalid command: " + command + "!");
         }
     }
 

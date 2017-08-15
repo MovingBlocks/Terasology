@@ -34,9 +34,9 @@ public interface Node extends RenderPipelineTask {
 
     void setEnabled(boolean enabled);
 
-    void setUri(String nodeUri);
+    void setUri(SimpleUri nodeUri);
 
-    String getUri();
+    SimpleUri getUri();
 
-    void handleCommand(String command, String arg1);
+    void handleCommand(String command, String[] args);
 }

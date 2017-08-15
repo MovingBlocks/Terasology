@@ -31,8 +31,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * TODO: Better naming
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
-    public static final SimpleUri READONLY_GBUFFER = new SimpleUri("engine:fbo.readOnlyGBuffer");
-    public static final SimpleUri WRITEONLY_GBUFFER = new SimpleUri("engine:fbo.writeOnlyGBuffer");
     public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
 
     private SwappableFBO gBufferPair;
@@ -50,13 +48,13 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     }
 
     private void generateDefaultFBOs() {
-        FBO readOnlyGBuffer = generateWithDimensions(new FBOConfig(READONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer1 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer1"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        FBO writeOnlyGBuffer = generateWithDimensions(new FBOConfig(WRITEONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer2 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer2"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
         generateWithDimensions(new FBOConfig(FINAL_BUFFER, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
 
-        gBufferPair = new SwappableFBO(readOnlyGBuffer, writeOnlyGBuffer);
+        gBufferPair = new SwappableFBO(gBuffer1, gBuffer2);
     }
 
     @Override
