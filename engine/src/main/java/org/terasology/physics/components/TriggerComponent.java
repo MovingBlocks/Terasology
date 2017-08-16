@@ -30,7 +30,7 @@ import java.util.List;
 @ForceBlockActive
 public class TriggerComponent implements Component {
     @Replicate
-    public CollisionGroup collisionGroup = StandardCollisionGroup.SENSOR;
+    public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
     
     @Replicate
     public List<CollisionGroup> detectGroups = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT);

@@ -97,7 +97,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private LocalPlayer localPlayer;
     @In
     private WorldProvider worldProvider;
-    private Camera playerCamera;
+    public Camera playerCamera;
     @In
     private MovementDebugCommands movementDebugCommands;
     @In
@@ -109,6 +109,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Config config;
     @In
     private InputSystem inputSystem;
+    
+    private MovementMode lastMode;
 
     private BindsConfig bindsConfig;
     private float bobFactor;
@@ -489,10 +491,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             }
         }
 
-        if (charMovementComp.mode == MovementMode.GHOSTING) {
-            playerCamera.extendFov(24);
-        } else {
-            playerCamera.resetFov();
+        if(charMovementComp.mode != lastMode){
+            if (charMovementComp.mode == MovementMode.GHOSTING) {
+                playerCamera.extendFov(24);
+            } else {
+                playerCamera.resetFov();
+            }
+            lastMode = charMovementComp.mode;
         }
     }
 
