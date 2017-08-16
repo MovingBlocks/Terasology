@@ -1,0 +1,14 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Animation Test"
+    },
+    "Item": {
+        "icon": "engine:items#whiteRecipe"
+    },
+    "InspectionTool": {},
+    "InteractionTarget": {},
+    "InteractionScreen": {
+        "screen": "engine:animationTest"
+    }
+}
