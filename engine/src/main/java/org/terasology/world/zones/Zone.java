@@ -77,7 +77,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
     }
 
     public Zone(String name, BiPredicate<BaseVector3i, Region> regionFunction) {
-        this(name, (x, y, z, region, zone) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
+        this(name, (x, y, z, region) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
     }
 
     public Zone(String name, ZoneRegionFunction regionFunction) {
@@ -91,6 +91,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
     @Override
     public void initialize() {
+        regionFunction.initialize(this);
         rasterizers.forEach(WorldRasterizer::initialize);
     }
 
@@ -167,7 +168,7 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
 
     public boolean containsBlock(int x, int y, int z, Region chunkRegion) {
-        return regionFunction.apply(x, y, z, chunkRegion, this);
+        return regionFunction.apply(x, y, z, chunkRegion);
     }
 
     public ZoneRegionFunction getRegionFunction() {

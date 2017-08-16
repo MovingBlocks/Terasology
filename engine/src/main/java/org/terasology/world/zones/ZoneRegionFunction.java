@@ -31,10 +31,16 @@ public interface ZoneRegionFunction {
      * @param y the y position to check
      * @param z the z position to check
      * @param region the Region in the area
-     * @param zone the zone that contains this function
      * @return true if the position is within this layer, false otherwise
      */
-    boolean apply(int x, int y, int z, Region region, Zone zone);
+    boolean apply(int x, int y, int z, Region region);
+
+    /**
+     * Initialize this function with data from the parent zone.
+     *
+     * @param parent the zone this function is attached to
+     */
+    default void initialize(Zone parent) {}
 
     default List<ZoneRegionFunction> getSiblingRegionFunctions(Zone zone) {
         return zone.getParent().getChildZones().stream()

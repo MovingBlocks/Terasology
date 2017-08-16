@@ -19,8 +19,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.context.Context;
-import org.terasology.context.internal.ContextImpl;
 import org.terasology.math.Region3i;
 import org.terasology.math.geom.BaseVector2i;
 import org.terasology.math.geom.Vector3i;
@@ -28,12 +26,10 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.RegionImpl;
-import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
-import org.terasology.world.zones.ProviderStore;
+import org.terasology.world.zones.MinMaxLayerWidth;
 import org.terasology.world.zones.Zone;
 
 import java.util.HashMap;
@@ -50,19 +46,18 @@ import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOr
 
 public class LayeredZoneRegionFunctionTest {
 
-    private ProviderStore parent;
+    private Zone parent = new Zone("Parent", () -> true);
     private Region region;
 
     @Before
     public void setup() {
-        Context context = new ContextImpl();
-        parent = new WorldBuilder(context.get(WorldGeneratorPluginLibrary.class))
-                .addZone(new Zone("Surface", new LayeredZoneRegionFunction(100, 100, SURFACE)))
-                .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(100, 100, LOW_SKY)))
-                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(100, 100, MEDIUM_SKY)))
-                .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(100, 100, SHALLOW_UNDERGROUND)))
-                .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(100, 100, MEDIUM_UNDERGROUND)));
+        parent .addZone(new Zone("Surface", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), SURFACE)))
+                .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), LOW_SKY)))
+                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), MEDIUM_SKY)))
+                .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), SHALLOW_UNDERGROUND)))
+                .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), MEDIUM_UNDERGROUND)));
         parent.setSeed(12345);
+        parent.initialize();
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = ArrayListMultimap.create();
 
@@ -90,10 +85,8 @@ public class LayeredZoneRegionFunctionTest {
         int maxWidth = 200;
         int ordering = 1000;
 
-        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(minWidth, maxWidth, ordering);
+        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(new MinMaxLayerWidth(minWidth, maxWidth), ordering);
 
-        assertEquals(minWidth, function.getMinWidth());
-        assertEquals(maxWidth, function.getMaxWidth());
         assertEquals(ordering, function.getOrdering());
     }
 

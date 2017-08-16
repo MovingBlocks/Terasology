@@ -17,9 +17,6 @@ package org.terasology.world.zones;
 
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.sandbox.API;
-import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.Noise;
-import org.terasology.utilities.procedural.SimplexNoise;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * A function that can be used as a {@link Zone#regionFunction} to create zones that are layered on top of each other.
  *
- * These layers are ordered according to {@link #ordering}, and have a width of {@link #minWidth}.
+ * These layers are ordered according to {@link #ordering}, and have a width determined by {@link #layerWidth}.
  */
 @API
 public class LayeredZoneRegionFunction implements ZoneRegionFunction {
@@ -43,7 +40,9 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
     private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
-    private Noise noise;
+    private LayerWidth layerWidth;
+    private long seed;
+    private Zone parent;
 
     public static final class LayeredZoneOrdering {
         public static final int HIGH_SKY = 300;
@@ -56,26 +55,41 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
 
     }
 
-    private final int minWidth;
-    private final int maxWidth;
     private final int ordering;
 
-    public LayeredZoneRegionFunction(int minWidth, int maxWidth, int ordering) {
-        this.minWidth = minWidth;
-        this.maxWidth = maxWidth;
+    public LayeredZoneRegionFunction(LayerWidth layerWidth, int ordering) {
+        this.layerWidth = layerWidth;
         this.ordering = ordering;
     }
 
     @Override
-    public boolean apply(int x, int y, int z, Region region, Zone zone) {
-        return getLayerRange(x, z, region, zone).layerContains(y);
+    public boolean apply(int x, int y, int z, Region region) {
+        return getLayerRange(x, z, region).layerContains(y);
     }
 
-    private LayerRange getLayerRange(int x, int z, Region region, Zone zone) {
-        if (noise == null) {
-            setNoise(zone.getSeed());
-        }
+    @Override
+    public void initialize(Zone parent) {
+        this.parent = parent;
 
+        siblings = getSiblingRegionFunctions(parent).stream()
+                .filter(function -> function instanceof LayeredZoneRegionFunction)
+                .map(layerFunction -> (LayeredZoneRegionFunction) layerFunction)
+                .sorted(Comparator.comparingInt(layerFunction -> Math.abs(layerFunction.getOrdering())))
+                .collect(Collectors.toList());
+
+        undergroundLayers = siblings.stream()
+                .filter(LayeredZoneRegionFunction::isUnderground)
+                .collect(Collectors.toList());
+
+        abovegroundLayers = siblings.stream()
+                .filter(layer -> !layer.isUnderground())
+                .collect(Collectors.toList());
+
+        seed = parent.getSeed();
+        layerWidth.initialize(this);
+    }
+
+    private LayerRange getLayerRange(int x, int z, Region region) {
         Vector2i pos = new Vector2i(x, z);
         if (!layerRangeMap.containsKey(pos)) {
             int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
@@ -85,23 +99,16 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
             int cumulativeDistanceLarge = 0;
             LayerRange layerRange = null;
 
-            List<LayeredZoneRegionFunction> layers =
-                    aboveground ? getAbovegroundLayers(zone) : getUndergroundLayers(zone);
+            List<LayeredZoneRegionFunction> layers = aboveground ? abovegroundLayers : undergroundLayers;
 
             int layerIndex;
             for (layerIndex = 0; layerIndex < layers.size(); layerIndex++) {
-                LayeredZoneRegionFunction layer = layers.get(layerIndex);
+                LayeredZoneRegionFunction currentLayer = layers.get(layerIndex);
 
-                float noiseScale = 100f;
-                float noiseValue = noise.noise(x / noiseScale, 10000 * layerIndex * (aboveground ? 1 : -1), z / noiseScale);
+                int width = currentLayer.layerWidth.get(x, z);
 
-                //Convert noise value to range [0..1]
-                noiseValue = (noiseValue + 1) / 2;
-
-                int layerWidth = Math.round(layer.getMinWidth() + noiseValue * (layer.getMaxWidth() - layer.getMinWidth()));
-
-                cumulativeDistanceLarge += layerWidth;
-                if (this.equals(layer)) {
+                cumulativeDistanceLarge += width;
+                if (this.equals(currentLayer)) {
                     if (aboveground) {
                         layerRange = new LayerRange()
                                 .setMin(surfaceHeight + cumulativeDistanceSmall)
@@ -109,16 +116,16 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                         break;
                     } else {
                         layerRange = new LayerRange()
-                                .setMin(surfaceHeight -cumulativeDistanceLarge)
+                                .setMin(surfaceHeight - cumulativeDistanceLarge)
                                 .setMax(surfaceHeight - cumulativeDistanceSmall);
                         break;
                     }
                 }
-                cumulativeDistanceSmall += layerWidth;
+                cumulativeDistanceSmall += width;
             }
 
             if (layers.size() <= 0 || layerRange == null) {
-                throw new IllegalStateException("Layer for zone '" + zone + "' not found in list of " +
+                throw new IllegalStateException("Layer for zone '" + parent + "' not found in list of " +
                         (aboveground ? "aboveground" : "underground") + " layers.");
             }
 
@@ -135,53 +142,16 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
         return layerRangeMap.get(pos);
     }
 
-    private void setNoise(long seed) {
-        noise = new BrownianNoise(new SimplexNoise(seed), 2);
-    }
-
-    private List<LayeredZoneRegionFunction> getSiblings(Zone zone) {
-        if (siblings == null) {
-            siblings = getSiblingRegionFunctions(zone).stream()
-                    .filter(function -> function instanceof LayeredZoneRegionFunction)
-                    .map(layerFunction -> (LayeredZoneRegionFunction) layerFunction)
-                    .sorted(Comparator.comparingInt(layerFunction -> Math.abs(layerFunction.getOrdering())))
-                    .collect(Collectors.toList());
-        }
-        return siblings;
-    }
-
-    private List<LayeredZoneRegionFunction> getUndergroundLayers(Zone zone) {
-        if (undergroundLayers == null) {
-            undergroundLayers = getSiblings(zone).stream()
-                    .filter(LayeredZoneRegionFunction::isUnderground)
-                    .collect(Collectors.toList());
-        }
-         return undergroundLayers;
-    }
-
-    private List<LayeredZoneRegionFunction> getAbovegroundLayers(Zone zone) {
-        if (abovegroundLayers == null) {
-            abovegroundLayers = getSiblings(zone).stream()
-                    .filter(l -> !l.isUnderground())
-                    .collect(Collectors.toList());
-        }
-        return abovegroundLayers;
-    }
-
-    public int getMinWidth() {
-        return minWidth;
-    }
-
-    public int getMaxWidth() {
-        return maxWidth;
-    }
-
     public int getOrdering() {
         return ordering;
     }
 
     public boolean isUnderground() {
         return ordering < 0;
+    }
+
+    public long getSeed() {
+        return seed;
     }
 
     private static class LayerRange {
