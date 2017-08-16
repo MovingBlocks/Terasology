@@ -17,7 +17,6 @@ package org.terasology.world.zones;
 
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.ImmutableVector3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.layers.mainMenu.preview.FacetLayerPreview;
 import org.terasology.rendering.nui.layers.mainMenu.preview.PreviewGenerator;
@@ -34,10 +33,8 @@ import org.terasology.world.viewer.layers.FacetLayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.terasology.world.chunks.ChunkConstants.SIZE_X;
@@ -69,7 +66,6 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
     private final ZoneRegionFunction regionFunction;
     private final String name;
-
 
 
     public Zone(String name, BooleanSupplier regionFunction) {

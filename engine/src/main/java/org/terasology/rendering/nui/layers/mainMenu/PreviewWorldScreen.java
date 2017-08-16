@@ -293,8 +293,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             TextureData data = texture.getData();
 
             if (zoneSelector.isVisible()) {
-                targetZone = zoneSelector.getSelection().getName();
-                previewGen = worldGenerator.getNamedZone(targetZone).preview(worldGenerator);
+                previewGen = zoneSelector.getSelection().preview(worldGenerator);
             }
             previewGen.render(data, zoom, progressListener);
 

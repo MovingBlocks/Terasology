@@ -78,10 +78,7 @@ public class FacetLayerPreview implements PreviewGenerator {
             Runtime.getRuntime().availableProcessors(),
             new TileThreadFactory());
 
-    /**
-     * @param environment
-     * @param worldGenerator
-     */
+
     public FacetLayerPreview(WorldGenerator worldGenerator, List<FacetLayer> facetLayers) {
         this.worldGenerator = worldGenerator;
         this.facetLayers = facetLayers;
