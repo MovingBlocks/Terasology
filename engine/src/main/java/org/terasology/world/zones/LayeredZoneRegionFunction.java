@@ -24,6 +24,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,12 +88,12 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
             List<LayeredZoneRegionFunction> layers =
                     aboveground ? getAbovegroundLayers(zone) : getUndergroundLayers(zone);
 
-            int i;
-            for (i = 0; i < layers.size(); i++) {
-                LayeredZoneRegionFunction layer = layers.get(i);
+            int layerIndex;
+            for (layerIndex = 0; layerIndex < layers.size(); layerIndex++) {
+                LayeredZoneRegionFunction layer = layers.get(layerIndex);
 
                 float noiseScale = 100f;
-                float noiseValue = noise.noise(x / noiseScale, 10000 * i * (aboveground ? 1 : -1), z / noiseScale);
+                float noiseValue = noise.noise(x / noiseScale, 10000 * layerIndex * (aboveground ? 1 : -1), z / noiseScale);
 
                 //Convert noise value to range [0..1]
                 noiseValue = (noiseValue + 1) / 2;
@@ -121,7 +122,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                         (aboveground ? "aboveground" : "underground") + " layers.");
             }
 
-            if (i == layers.size() - 1) {
+            if (layerIndex == layers.size() - 1) {
                 //At one of the edge layers
                 if (aboveground) {
                     layerRange.unsetMax();
@@ -141,9 +142,9 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> getSiblings(Zone zone) {
         if (siblings == null) {
             siblings = getSiblingRegionFunctions(zone).stream()
-                    .filter(f -> f instanceof LayeredZoneRegionFunction)
-                    .map(l -> (LayeredZoneRegionFunction) l)
-                    .sorted((l1, l2) -> ((Integer) Math.abs(l1.getOrdering())).compareTo(Math.abs(l2.getOrdering())))
+                    .filter(function -> function instanceof LayeredZoneRegionFunction)
+                    .map(layerFunction -> (LayeredZoneRegionFunction) layerFunction)
+                    .sorted(Comparator.comparingInt(layerFunction -> Math.abs(layerFunction.getOrdering())))
                     .collect(Collectors.toList());
         }
         return siblings;
