@@ -180,6 +180,14 @@
 
                                     },
                                     {
+                                        "type": "UICheckbox",
+                                        "id": "advancedFilter",
+                                        "enabled": true,
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.11
+                                        }
+                                    },
+                                    {
                                         "type": "UIButton",
                                         "id": "advancedFilter",
                                         "text":"Advanced Filter"

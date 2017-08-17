@@ -29,6 +29,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.DependencyResolutionFailedException;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
@@ -96,6 +97,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private Future<Void> remoteModuleRegistryUpdater;
     private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
+    private UICheckbox advancedFilter;
 
     @Override
     public void onOpened() {
@@ -378,10 +380,39 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         }
                     }
             );
-        }
 
+            advancedFilter = find("advancedFilter", UICheckbox.class);
+            advancedFilter.bindChecked(
+                    new Binding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            if (selectModulesConfig.isAdvanceFilterChecked()) {
+                                moduleWiseFilter();
+                            }
+                            else {
+                                filterText(moduleSearch.getText());
+                            }
+                            return selectModulesConfig.isAdvanceFilterChecked();
+                        }
+
+                        @Override
+                        public void set(Boolean value) {
+                            selectModulesConfig.setIsAdvanceFilterChecked(value);
+                            if (value) {
+                                moduleWiseFilter();
+                            }
+                            else {
+                                filterText(moduleSearch.getText());
+                            }
+                        }
+                    }
+            );
+        }
+        Name defaultGameplayModuleName = new Name("Compass");
+        logger.info(defaultGameplayModuleName+" "+StandardModuleExtension.isServerSideOnly(moduleManager.getRegistry().getLatestModuleVersion(defaultGameplayModuleName)));
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
         WidgetUtil.trySubscribe(this, "advancedFilter", w -> triggerForwardAnimation(AdvanceModuleFilter.ASSET_URI));
+
     }
 
     private void prepareModuleList(boolean checked) {
@@ -401,6 +432,45 @@ public class SelectModulesScreen extends CoreScreenLayer {
             if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
                 sortedModules.add(m);
             }
+        }
+    }
+
+
+    private void moduleWiseFilter() {
+        sortedModules.clear();
+        for (ModuleSelectionInfo m : allSortedModules) {
+            if (selectModulesConfig.isLibraryChecked() && StandardModuleExtension.isLibraryModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("Library");
+            }
+            if (selectModulesConfig.isAssetChecked() && StandardModuleExtension.isAssetModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("Asset");
+
+            }
+            if (selectModulesConfig.isWorldChecked() && StandardModuleExtension.isWorldModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("World");
+
+            }
+            if (selectModulesConfig.isGameplayChecked() && StandardModuleExtension.isGameplayModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("Gameplay");
+
+            }
+            if (selectModulesConfig.isSpecialChecked() && StandardModuleExtension.isSpecialModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("Special");
+
+            }
+            if (selectModulesConfig.isAugmentationChecked() && StandardModuleExtension.isAugmentationModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
+                sortedModules.add(m);
+                logger.info("Augmentation");
+
+            }
+        }
+        for(ModuleSelectionInfo m : sortedModules) {
+            logger.info(m.getMetadata().getId().toString());
         }
     }
 
@@ -476,7 +546,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        
+
         if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isChecked()) {
             needsUpdate = false;
             try {
