@@ -408,8 +408,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     }
             );
         }
-        Name defaultGameplayModuleName = new Name("Compass");
-        logger.info(defaultGameplayModuleName+" "+StandardModuleExtension.isServerSideOnly(moduleManager.getRegistry().getLatestModuleVersion(defaultGameplayModuleName)));
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
         WidgetUtil.trySubscribe(this, "advancedFilter", w -> triggerForwardAnimation(AdvanceModuleFilter.ASSET_URI));
 
@@ -441,36 +439,23 @@ public class SelectModulesScreen extends CoreScreenLayer {
         for (ModuleSelectionInfo m : allSortedModules) {
             if (selectModulesConfig.isLibraryChecked() && StandardModuleExtension.isLibraryModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("Library");
             }
             if (selectModulesConfig.isAssetChecked() && StandardModuleExtension.isAssetModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("Asset");
 
             }
             if (selectModulesConfig.isWorldChecked() && StandardModuleExtension.isWorldModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("World");
-
             }
             if (selectModulesConfig.isGameplayChecked() && StandardModuleExtension.isGameplayModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("Gameplay");
-
             }
             if (selectModulesConfig.isSpecialChecked() && StandardModuleExtension.isSpecialModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("Special");
-
             }
             if (selectModulesConfig.isAugmentationChecked() && StandardModuleExtension.isAugmentationModule(moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId()))) {
                 sortedModules.add(m);
-                logger.info("Augmentation");
-
             }
-        }
-        for(ModuleSelectionInfo m : sortedModules) {
-            logger.info(m.getMetadata().getId().toString());
         }
     }
 
