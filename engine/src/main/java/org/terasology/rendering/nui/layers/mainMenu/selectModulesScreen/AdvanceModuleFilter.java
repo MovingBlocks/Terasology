@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu;
+package org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen;
 
 
 import org.terasology.assets.ResourceUrn;
@@ -26,7 +26,6 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 
 
-
 public class AdvanceModuleFilter extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:moduleTypes");
@@ -36,10 +35,11 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
     private UICheckbox augmentationCheckBox;
     private UICheckbox worldCheckBox;
     private UICheckbox gameplayCheckBox;
-    private SelectModulesConfig selectModulesConfig;
 
     @In
     private Config config;
+    private SelectModulesConfig selectModulesConfig;
+    private SelectModulesScreen selectModulesScreen;
 
     @Override
     public void initialise() {
@@ -141,7 +141,6 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
                     }
                 }
         );
-
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
 
     }
