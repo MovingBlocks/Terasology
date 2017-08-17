@@ -26,6 +26,11 @@ public enum StandardModuleExtension implements ModuleExtension {
 
     SERVER_SIDE_ONLY("serverSideOnly", Boolean.class),
     IS_GAMEPLAY("isGameplay", Boolean.class),
+    IS_ASSET("isAsset", Boolean.class),
+    IS_WORLD("isWorld", Boolean.class),
+    IS_LIBRARY("isLibrary", Boolean.class),
+    IS_SPECIAL("isSpecial", Boolean.class),
+    IS_AUGMENTATION("isAugmentation", Boolean.class),
     DEFAULT_WORLD_GENERATOR("defaultWorldGenerator", String.class);
 
     private final String key;
@@ -54,6 +59,31 @@ public enum StandardModuleExtension implements ModuleExtension {
     public static boolean isGameplayModule(Module module) {
         Boolean isGameplay = module.getMetadata().getExtension(IS_GAMEPLAY.getKey(), Boolean.class);
         return isGameplay != null && isGameplay;
+    }
+
+    public static boolean isAssetModule(Module module) {
+        Boolean isAssetplay = module.getMetadata().getExtension(IS_ASSET.getKey(), Boolean.class);
+        return isAssetplay != null && isAssetplay;
+    }
+
+    public static boolean isWorldModule(Module module) {
+        Boolean isWorld = module.getMetadata().getExtension(IS_WORLD.getKey(), Boolean.class);
+        return isWorld != null && isWorld;
+    }
+
+    public static boolean isLibraryModule(Module module) {
+        Boolean isLibrary = module.getMetadata().getExtension(IS_LIBRARY.getKey(), Boolean.class);
+        return isLibrary != null && isLibrary;
+    }
+
+    public static boolean isSpecialModule(Module module) {
+        Boolean isSpecial = module.getMetadata().getExtension(IS_SPECIAL.getKey(), Boolean.class);
+        return isSpecial != null && isSpecial;
+    }
+
+    public static boolean isAugmentationModule(Module module) {
+        Boolean isAugmentation = module.getMetadata().getExtension(IS_AUGMENTATION.getKey(), Boolean.class);
+        return isAugmentation != null && isAugmentation;
     }
 
     public static SimpleUri getDefaultWorldGenerator(Module module) {
