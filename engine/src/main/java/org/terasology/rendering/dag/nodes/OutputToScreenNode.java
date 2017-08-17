@@ -78,15 +78,15 @@ public class OutputToScreenNode extends ConditionDependentNode {
     }
 
     @Override
-    public void handleCommand(String command, String[] args) {
+    public void handleCommand(String command, String... arguments) {
         switch (command) {
             case "setFbo":
-                if (args.length != 1) {
-                    throw new RuntimeException("Invalid number of arguments; expected 1, received " + args.length + "!");
+                if (arguments.length != 1) {
+                    throw new RuntimeException("Invalid number of arguments; expected 1, received " + arguments.length + "!");
                 }
 
                 FBO fbo;
-                switch (args[0]) {
+                switch (arguments[0]) {
                     case "engine:fbo.gBuffer":
                     case "engine:fbo.lastUpdatedGBuffer":
                         fbo = lastUpdatedGBuffer;
@@ -95,10 +95,10 @@ public class OutputToScreenNode extends ConditionDependentNode {
                         fbo = staleGBuffer;
                         break;
                     default:
-                        fbo = displayResolutionDependentFBOs.get(new SimpleUri(args[0]));
+                        fbo = displayResolutionDependentFBOs.get(new SimpleUri(arguments[0]));
 
                         if (fbo == null) {
-                            throw new RuntimeException("Invalid fbo uri: " + args[0] + "!");
+                            throw new RuntimeException("Invalid fbo uri: " + arguments[0] + "!");
                         }
 
                         break;

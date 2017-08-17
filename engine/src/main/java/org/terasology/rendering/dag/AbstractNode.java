@@ -108,7 +108,7 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    public void handleCommand(String command, String[] args) { }
+    public void handleCommand(String command, String... arguments) { }
 
     /**
      * Utility method to conveniently retrieve materials from the Assets system,

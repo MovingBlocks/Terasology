@@ -30,13 +30,14 @@ public class RenderGraph { // TODO: add extends DirectedAcyclicGraph<Node>
         nodes = Lists.newArrayList();
     }
 
-    public SimpleUri addNode(Node node, SimpleUri suggestedId) {
+    public SimpleUri addNode(Node node, String suggestedUri) {
         nodes.add(node);
 
         // TODO: make sure URIs are actually unique: if "myModule:blur" is present the node gets the uri "myModule:blur2" instead.
         // TODO: make sure the namespace in the uri is engine-assigned, so that only engine nodes can have the "engine:" namespace - everything else gets the namespace of the module.
-        node.setUri(suggestedId);
-        return suggestedId;
+        SimpleUri nodeUri = new SimpleUri("engine:" + suggestedUri);
+        node.setUri(nodeUri);
+        return nodeUri;
     }
 
     public Node findNode(SimpleUri nodeUri) {
