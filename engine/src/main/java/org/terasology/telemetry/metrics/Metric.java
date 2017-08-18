@@ -83,10 +83,12 @@ public abstract class Metric {
         Map metricMapAfterPermission = new HashMap<>();
         for (Object key : metricMap.keySet()) {
             String fieldName = key.toString();
-            if (bindingMap.get(fieldName)) {
-                metricMapAfterPermission.put(fieldName, metricMap.get(fieldName));
-            } else {
-                metricMapAfterPermission.put(fieldName, "Disabled Field");
+            if (bindingMap.containsKey(fieldName)) {
+                if (bindingMap.get(fieldName)) {
+                    metricMapAfterPermission.put(fieldName, metricMap.get(fieldName));
+                } else {
+                    metricMapAfterPermission.put(fieldName, "Disabled Field");
+                }
             }
         }
 

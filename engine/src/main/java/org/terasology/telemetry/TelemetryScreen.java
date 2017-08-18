@@ -123,6 +123,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         addGroupEnablingListener();
     }
 
+    /**
+     * Add a listener to the telemetryEnable checkbox. If the checkbox os enabled/disabled, it will enable/disable all the telemetry field.
+     */
     private void addEnablingAllTelemetryListener() {
         UICheckbox uiCheckbox = this.find("telemetryEnabled", UICheckbox.class);
         if (uiCheckbox != null) {
@@ -152,6 +155,10 @@ public class TelemetryScreen extends CoreScreenLayer {
         }
     }
 
+    /**
+     * Add a listener to the checkbox in the telemetry category row.
+     * If this checkbox is checked, all the sub telemetry fields will be enabled/disabled.
+     */
     private void addGroupEnablingListener() {
         fetchTelemetryCategoriesFromEnvironment();
         for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
@@ -162,11 +169,13 @@ public class TelemetryScreen extends CoreScreenLayer {
                 }
                 uiCheckbox.subscribe((checkbox) -> {
                     Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
-                    boolean isGroupEnable = bindingMap.get(telemetryCategory.getKey().id());
-                    Set<Field> fields = ReflectionUtils.getFields(telemetryCategory.getValue(), ReflectionUtils.withAnnotation(TelemetryField.class));
-                    for (Field field : fields) {
-                        String fieldName = field.getName();
-                        bindingMap.put(fieldName, isGroupEnable);
+                    if (bindingMap.containsKey(telemetryCategory.getKey().id())) {
+                        boolean isGroupEnable = bindingMap.get(telemetryCategory.getKey().id());
+                        Set<Field> fields = ReflectionUtils.getFields(telemetryCategory.getValue(), ReflectionUtils.withAnnotation(TelemetryField.class));
+                        for (Field field : fields) {
+                            String fieldName = field.getName();
+                            bindingMap.put(fieldName, isGroupEnable);
+                        }
                     }
                 });
             }
@@ -274,6 +283,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         addServerPopup.onCancel((button) -> telemetryConfig.setErrorReportingEnabled(false));
     }
 
+    /**
+     * refresh the telemtryCategories map.
+     */
     private void fetchTelemetryCategoriesFromEnvironment() {
         telemetryCategories = Maps.newHashMap();
 

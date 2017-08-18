@@ -64,8 +64,10 @@ public class TelemetryUtils {
         } else if (bindingMap.size() != 0) {
             TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
             if (telemetryCategory != null) {
-                if ((bindingMap.get(telemetryCategory.id()))) {
-                    tracker.track(event);
+                if (bindingMap.containsKey(telemetryCategory.id())) {
+                    if ((bindingMap.get(telemetryCategory.id()))) {
+                        tracker.track(event);
+                    }
                 }
             }
         }
