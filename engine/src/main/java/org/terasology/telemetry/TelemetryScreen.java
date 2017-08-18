@@ -187,6 +187,8 @@ public class TelemetryScreen extends CoreScreenLayer {
                 Map<String, ?> map = metric.getFieldValueMap();
                 if (map != null) {
                     addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
+                } else {
+                    
                 }
             }
         }

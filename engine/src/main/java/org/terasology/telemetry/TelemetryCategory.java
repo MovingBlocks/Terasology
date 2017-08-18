@@ -15,6 +15,8 @@
  */
 package org.terasology.telemetry;
 
+import org.terasology.module.sandbox.API;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,6 +26,7 @@ import java.lang.annotation.Target;
  * A new metric class show has this annotation.
  * The {@link org.terasology.telemetry.TelemetryScreen} find telemetry information via this annotation.
  */
+@API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface TelemetryCategory {

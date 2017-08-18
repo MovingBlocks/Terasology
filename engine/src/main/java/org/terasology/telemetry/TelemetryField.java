@@ -15,6 +15,8 @@
  */
 package org.terasology.telemetry;
 
+import org.terasology.module.sandbox.API;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,6 +26,7 @@ import java.lang.annotation.Target;
  * All telemetry fields should have this annotation.
  * {@link org.terasology.telemetry.metrics.Metric} finds all the telemetry fields & values via this annotation.
  */
+@API
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TelemetryField {

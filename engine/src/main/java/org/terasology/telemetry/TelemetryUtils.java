@@ -24,16 +24,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.telemetry.metrics.Metric;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Utils methods for telemetry.
  */
+@API
 public class TelemetryUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryUtils.class);
@@ -47,28 +51,59 @@ public class TelemetryUtils {
      * @param bindingMap the binding map contains fields who has user's permission.
      */
     public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
-        Subject subject = new Subject.SubjectBuilder()
-                .userId(TelemetryParams.userId)
-                .build();
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 
-        // initialise tracker
-        Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
-                .subject(subject)
-                .platform(TelemetryParams.PLATFORM_DESKTOP)
-                .build();
+            Subject subject = new Subject.SubjectBuilder()
+                    .userId(TelemetryParams.userId)
+                    .ipAddress("anonymous")
+                    .timezone("anonymous")
+                    .build();
 
-        Context context = CoreRegistry.get(Context.class);
-        DisplayDevice display = context.get(DisplayDevice.class);
-        if (bindingMap.size() == 0 && display.isHeadless()) {
-            tracker.track(event);
-        } else if (bindingMap.size() != 0) {
-            TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
-            if (telemetryCategory != null) {
-                if ((bindingMap.get(telemetryCategory.id()))) {
-                    tracker.track(event);
+            // initialise tracker
+            Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
+                    .subject(subject)
+                    .platform(TelemetryParams.PLATFORM_DESKTOP)
+                    .build();
+
+            Context context = CoreRegistry.get(Context.class);
+            DisplayDevice display = context.get(DisplayDevice.class);
+            if (bindingMap.size() == 0 && display.isHeadless()) {
+                tracker.track(event);
+            } else if (bindingMap.size() != 0) {
+                TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
+                if (telemetryCategory != null) {
+                    if ((bindingMap.get(telemetryCategory.id()))) {
+                        tracker.track(event);
+                    }
                 }
             }
-        }
+            return null;
+        });
+    }
+
+    /**
+     * track a metric.
+     * @param emitter Emitter sending telemetry to the server.
+     * @param nameSpace The name the class tracking this metric.
+     * @param event The new event.
+     */
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event) {
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            Subject subject = new Subject.SubjectBuilder()
+                    .userId(TelemetryParams.userId)
+                    .ipAddress("anonymous")
+                    .timezone("anonymous")
+                    .build();
+
+            // initialise tracker
+            Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
+                    .subject(subject)
+                    .platform(TelemetryParams.PLATFORM_DESKTOP)
+                    .build();
+            tracker.track(event);
+
+            return null;
+        });
     }
 
     /**

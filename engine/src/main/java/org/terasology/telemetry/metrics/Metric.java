@@ -21,10 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.module.sandbox.API;
+import org.terasology.module.sandbox.StandardPermissionProviderFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryField;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +39,7 @@ import java.util.Set;
  * A new metric should extends this class, with annotation {@link org.terasology.telemetry.TelemetryCategory} and all metric fields with annotation {@link org.terasology.telemetry.TelemetryField}.
  * An example is {@link org.terasology.telemetry.metrics.SystemContextMetric}.
  */
+@API(permissionSet = {StandardPermissionProviderFactory.BASE_PERMISSION_SET, "accessDeclaredMembers"})
 public abstract class Metric {
 
     private static final Logger logger = LoggerFactory.getLogger(Metric.class);
@@ -51,20 +57,22 @@ public abstract class Metric {
      * @return a map with key (field's name) and value (field's value).
      */
     public Map<String, ?> getFieldValueMap() {
+        return AccessController.doPrivileged((PrivilegedAction<Map<String, ?>>)() -> {
 
-        metricMap = new HashMap();
-        Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
+            metricMap = new HashMap();
+            Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                metricMap.put(field.getName(), field.get(this));
-            } catch (IllegalAccessException e) {
-                logger.error("The field is not inaccessible: ", e);
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true);
+                    metricMap.put(field.getName(), field.get(this));
+                } catch (IllegalAccessException e) {
+                    logger.error("The field is not inaccessible: ", e);
+                }
             }
-        }
 
-        return metricMap;
+            return metricMap;
+        });
     }
 
     /**
@@ -91,5 +99,9 @@ public abstract class Metric {
         }
 
         return metricMapAfterPermission;
+    }
+
+    public void addToMetrics(Metrics metrics) {
+        metrics.addMetric(this);
     }
 }

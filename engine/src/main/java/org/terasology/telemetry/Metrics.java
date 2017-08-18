@@ -18,6 +18,7 @@ package org.terasology.telemetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
+import org.terasology.module.sandbox.API;
 import org.terasology.telemetry.metrics.BlockDestroyedMetric;
 import org.terasology.telemetry.metrics.BlockPlacedMetric;
 import org.terasology.telemetry.metrics.GameConfigurationMetric;
@@ -27,30 +28,20 @@ import org.terasology.telemetry.metrics.ModulesMetric;
 import org.terasology.telemetry.metrics.MonsterKilledMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
-import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
  * Metrics class is similar to {@link org.terasology.config.Config}, it stores the telemetry information.
  * Once a new metric is used, the new metric instance should be added in this class to show the metric value in ui.
  */
+@API
 public class Metrics {
 
     private static final Logger logger = LoggerFactory.getLogger(Metrics.class);
 
-    private SystemContextMetric systemContextMetric;
-
-    private ModulesMetric modulesMetric;
-
-    private GameConfigurationMetric gameConfigurationMetric;
-
-    private BlockDestroyedMetric blockDestroyedMetric;
-
-    private BlockPlacedMetric blockPlacedMetric;
-
-    private GamePlayMetric gamePlayMetric;
-
-    private MonsterKilledMetric monsterKilledMetric;
+    private Map<String, Metric> metricsMap = new HashMap<>();
 
     public Metrics() {
 
@@ -58,70 +49,34 @@ public class Metrics {
 
     public void initialise(Context context) {
 
-        systemContextMetric = new SystemContextMetric(context);
-        modulesMetric = new ModulesMetric(context);
-        gameConfigurationMetric = new GameConfigurationMetric(context);
-        blockDestroyedMetric = new BlockDestroyedMetric();
-        blockPlacedMetric = new BlockPlacedMetric();
-        gamePlayMetric = new GamePlayMetric(context);
-        monsterKilledMetric = new MonsterKilledMetric();
+        SystemContextMetric systemContextMetric = new SystemContextMetric(context);
+        ModulesMetric modulesMetric = new ModulesMetric(context);
+        GameConfigurationMetric gameConfigurationMetric = new GameConfigurationMetric(context);
+        BlockDestroyedMetric blockDestroyedMetric = new BlockDestroyedMetric();
+        BlockPlacedMetric blockPlacedMetric = new BlockPlacedMetric();
+        GamePlayMetric gamePlayMetric = new GamePlayMetric(context);
+        MonsterKilledMetric monsterKilledMetric = new MonsterKilledMetric();
+
+        metricsMap.put(SystemContextMetric.class.getName(), systemContextMetric);
+        metricsMap.put(ModulesMetric.class.getName(), modulesMetric);
+        metricsMap.put(GameConfigurationMetric.class.getName(), gameConfigurationMetric);
+        metricsMap.put(BlockDestroyedMetric.class.getName(), blockDestroyedMetric);
+        metricsMap.put(BlockPlacedMetric.class.getName(), blockPlacedMetric);
+        metricsMap.put(GamePlayMetric.class.getName(), gamePlayMetric);
+        metricsMap.put(MonsterKilledMetric.class.getName(), monsterKilledMetric);
     }
 
     public void refreshAllMetrics() {
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType().getSuperclass() == Metric.class) {
-                try {
-                    Metric metric = (Metric) field.get(this);
-                    metric.getFieldValueMap();
-                } catch (IllegalAccessException e) {
-                    logger.error("The field is not inaccessible: ", e);
-                }
-            }
+        for (Metric metric: metricsMap.values()) {
+            metric.getFieldValueMap();
         }
-    }
-
-    public SystemContextMetric getSystemContextMetric() {
-        return systemContextMetric;
-    }
-
-    public ModulesMetric getModulesMetric() {
-        return modulesMetric;
-    }
-
-    public GameConfigurationMetric getGameConfigurationMetric() {
-        return gameConfigurationMetric;
-    }
-
-    public BlockDestroyedMetric getBlockDestroyedMetric() {
-        return blockDestroyedMetric;
-    }
-
-    public BlockPlacedMetric getBlockPlacedMetric() {
-        return blockPlacedMetric;
-    }
-
-    public MonsterKilledMetric getMonsterKilledMetric() {
-        return monsterKilledMetric;
-    }
-
-    public GamePlayMetric getGamePlayMetric() {
-        return gamePlayMetric;
     }
 
     public Optional<Metric> getMetric(Class<?> cl) {
-        Optional<Metric> optional = Optional.ofNullable(null);
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType() == cl) {
-                try {
-                    return Optional.of((Metric) field.get(this));
-                } catch (IllegalAccessException e) {
-                    logger.error("The field is not inaccessible: ", e);
-                }
-            }
-        }
+        return Optional.ofNullable(metricsMap.get(cl.getName()));
+    }
 
-        return optional;
+    public void addMetric(Metric metric) {
+        metricsMap.put(metric.getClass().getName(), metric);
     }
 }
