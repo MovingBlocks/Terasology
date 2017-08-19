@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.ingame.metrics;
+package org.terasology.core.debug;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -36,19 +35,18 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
-import org.terasology.rendering.nui.BaseInteractionScreen;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.*;
 
 import java.util.ArrayList;
 
 /**
+ * A Tool for testing the animations of entities.
+ * Animation speed can be edited with this utility
  */
 public class AnimationScreen extends CoreScreenLayer {
-    private UIText fullDescriptionLabel;
-    private UIText entityIdField;
-    private UIButton spawnEntityIdButton;
-    private UISlider animationSpeedSlider;
+
+    private static final Logger logger = LoggerFactory.getLogger(AnimationScreen.class);
     @In
     private EntityRef entityRef;
     @In
@@ -57,31 +55,33 @@ public class AnimationScreen extends CoreScreenLayer {
     private EntityManager entityManager;
     @In
     private AssetManager assetManager;
-
-    private static final Logger logger = LoggerFactory.getLogger(AnimationScreen.class);
-
+    private UIButton spawnEntityIdButton;
+    private UISlider animationSpeedSlider;
+    private UIDropdownScrollable<ResourceUrn> entityDropdown;
 
     @Override
     public void initialise() {
         spawnEntityIdButton = find("spawnEntityIdButton", UIButton.class);
-        UIDropdown<ResourceUrn> entityDropdown = find("entityDropdown", UIDropdownScrollable.class);
+        entityDropdown = find("entityDropdown", UIDropdownScrollable.class);
         logger.info("Number of available skeletal meshes: " + assetManager.getAvailableAssets(SkeletalMesh.class).size());
-        if (entityDropdown != null) {
+        //ArrayList skeletalMesh = );
+        if (entityDropdown != null ) {
             entityDropdown.setOptions(new ArrayList(assetManager.getAvailableAssets(SkeletalMesh.class)));
         }
         animationSpeedSlider = find("entityAnimationSpeedSlider", UISlider.class);
         if (animationSpeedSlider != null) {
-            animationSpeedSlider.setMinimum(-2.5f);
+            animationSpeedSlider.setMinimum(-0.0f);
             animationSpeedSlider.setIncrement(0.1f);
-            animationSpeedSlider.setRange(5.0f);
+            animationSpeedSlider.setRange(10.0f);
             animationSpeedSlider.setPrecision(1);
         }
         spawnEntityIdButton.subscribe(widget -> {
             Vector3f localPlayerPosition = localPlayer.getPosition();
             Quat4f localPlayerRotation = localPlayer.getRotation();
-            java.util.Optional<Prefab> prefab = assetManager.getAsset(entityDropdown.getSelection(), Prefab.class);
-            if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null)
-            entityRef = entityManager.create(prefab.get(), localPlayerPosition, localPlayerRotation);
+            Optional<Prefab> prefab = assetManager.getAsset(entityDropdown.getSelection(), Prefab.class);
+            if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
+                entityRef = entityManager.create(prefab.get(), localPlayerPosition, localPlayerRotation);
+            }
             SkeletalMeshComponent skeletalMeshComponent = entityRef.getComponent(SkeletalMeshComponent.class);
             skeletalMeshComponent.animationRate = animationSpeedSlider.getValue();
             entityRef.saveComponent(skeletalMeshComponent);

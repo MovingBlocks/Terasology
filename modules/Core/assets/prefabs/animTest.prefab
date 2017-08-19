@@ -6,9 +6,7 @@
     "Item": {
         "icon": "engine:items#whiteRecipe"
     },
-    "InspectionTool": {},
-    "InteractionTarget": {},
     "InteractionScreen": {
-        "screen": "engine:animationTest"
+        "screen": "core:animationTest"
     }
 }
