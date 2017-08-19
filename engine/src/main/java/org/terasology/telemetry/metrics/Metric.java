@@ -16,10 +16,12 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.TelemetryField;
 
 import java.lang.reflect.Field;
@@ -50,7 +52,7 @@ public abstract class Metric {
      */
     public Map<String, ?> getFieldValueMap() {
 
-        metricMap = new HashMap<>();
+        metricMap = new HashMap();
         Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
         for (Field field : fields) {
@@ -63,5 +65,33 @@ public abstract class Metric {
         }
 
         return metricMap;
+    }
+
+    /**
+     * Filter the metric map by the binding map.
+     * If the user doesn't want the field to be sent, its value will be covered by "Disabled Field".
+     * @param bindingMap the binding map.
+     * @return a new metric map that covers the field that the user doesn't want to send by "Disabled Field".
+     */
+    protected Map<String, ?> filterMetricMap(Map<String, Boolean> bindingMap) {
+
+        Context context = CoreRegistry.get(Context.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
+        if (display.isHeadless()) {
+            return metricMap;
+        }
+        Map metricMapAfterPermission = new HashMap<>();
+        for (Object key : metricMap.keySet()) {
+            String fieldName = key.toString();
+            if (bindingMap.containsKey(fieldName)) {
+                if (bindingMap.get(fieldName)) {
+                    metricMapAfterPermission.put(fieldName, metricMap.get(fieldName));
+                } else {
+                    metricMapAfterPermission.put(fieldName, "Disabled Field");
+                }
+            }
+        }
+
+        return metricMapAfterPermission;
     }
 }

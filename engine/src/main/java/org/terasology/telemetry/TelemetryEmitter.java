@@ -116,7 +116,7 @@ public class TelemetryEmitter extends BatchEmitter {
 
     private static RequestCallback getDefaultRequestCallback() {
 
-        RequestCallback callback = new RequestCallback() {
+        return new RequestCallback() {
 
             public void onSuccess(int successCount) {
                 logger.info("Success sent, successCount: " + successCount);
@@ -126,8 +126,6 @@ public class TelemetryEmitter extends BatchEmitter {
                 logger.warn("Failure, successCount: " + successCount + "\nfailedEvent:\n" + failedEvents.toString());
             }
         };
-
-        return callback;
     }
 
     public void changeUrl(URL url) {

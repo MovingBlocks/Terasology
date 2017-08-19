@@ -17,6 +17,8 @@ package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -31,11 +33,14 @@ import java.util.Map;
  * The stats begin at 0 when a new game starts.
  */
 @TelemetryCategory(id = "gameplay",
-        displayName = "${engine:menu#telemetry-game-play}"
+        displayName = "${engine:menu#telemetry-game-play}",
+        isOneMapMetric = false
 )
 public final class GamePlayMetric extends Metric {
 
     public static final String SCHEMA_GAMEPLAY = "iglu:org.terasology/gamePlay/jsonschema/1-0-0";
+
+    private Map<String, Boolean> bindingMap;
 
     private LocalPlayer localPlayer;
 
@@ -45,13 +50,15 @@ public final class GamePlayMetric extends Metric {
     @TelemetryField
     private long playTimeMinute;
 
-    public GamePlayMetric() {
+    public GamePlayMetric(Context context) {
+        bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }
 
     @Override
     public Unstructured getUnstructuredMetric() {
         getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, metricMap);
+        Map<String, ?> filteredMetricMap = filterMetricMap(bindingMap);
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, filteredMetricMap);
 
         return Unstructured.builder()
                 .eventData(modulesData)

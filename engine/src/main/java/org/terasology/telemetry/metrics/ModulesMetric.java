@@ -35,7 +35,8 @@ import java.util.Map;
  * Metric includes module name and module version.
  */
 @TelemetryCategory(id = "modules",
-        displayName = "${engine:menu#telemetry-modules}"
+        displayName = "${engine:menu#telemetry-modules}",
+        isOneMapMetric = true
 )
 public final class ModulesMetric extends Metric {
 
