@@ -24,15 +24,11 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.StandComponent;
-import org.terasology.logic.characters.WalkComponent;
-import org.terasology.logic.common.InspectionToolComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -65,9 +61,9 @@ public class AnimationScreen extends CoreScreenLayer {
         spawnEntityIdButton = find("spawnEntityIdButton", UIButton.class);
         entityDropdown = find("entityDropdown", UIDropdownScrollable.class);
         logger.info("Number of available skeletal meshes: " + assetManager.getAvailableAssets(SkeletalMesh.class).size());
-        //ArrayList skeletalMesh = );
+        ArrayList skeletalMesh = new ArrayList(assetManager.getAvailableAssets(SkeletalMesh.class));
         if (entityDropdown != null ) {
-            entityDropdown.setOptions(new ArrayList(assetManager.getAvailableAssets(SkeletalMesh.class)));
+            entityDropdown.setOptions(skeletalMesh);
         }
         animationSpeedSlider = find("entityAnimationSpeedSlider", UISlider.class);
         if (animationSpeedSlider != null) {
@@ -79,6 +75,10 @@ public class AnimationScreen extends CoreScreenLayer {
         spawnEntityIdButton.subscribe(widget -> {
             Vector3f localPlayerPosition = localPlayer.getPosition();
             Quat4f localPlayerRotation = localPlayer.getRotation();
+            Vector3f offset = localPlayer.getViewDirection();
+            offset.scale(2.0f);
+            offset.y = 0;
+            localPlayerPosition.add(offset);
             Optional<Prefab> prefab = assetManager.getAsset(entityDropdown.getSelection(), Prefab.class);
             if (prefab.isPresent() && prefab.get().getComponent(LocationComponent.class) != null) {
                 entityRef = entityManager.create(prefab.get(), localPlayerPosition, localPlayerRotation);
