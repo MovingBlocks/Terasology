@@ -62,6 +62,7 @@ public final class GameConfigurationMetric extends Metric {
     private Context context;
 
     public GameConfigurationMetric(Context context) {
+        super(context);
         this.context = context;
         bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }

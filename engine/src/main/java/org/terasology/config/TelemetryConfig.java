@@ -15,6 +15,7 @@
  */
 package org.terasology.config;
 
+import org.terasology.module.sandbox.API;
 import org.terasology.telemetry.TelemetryEmitter;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 
@@ -25,6 +26,7 @@ import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOC
 /**
  *  Configuration (authorisation) for telemetry system.
  */
+@API
 public class TelemetryConfig {
 
     private boolean telemetryEnabled;

@@ -17,6 +17,7 @@ package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -41,6 +42,10 @@ public final class MonsterKilledMetric extends Metric {
 
     @TelemetryField
     private Map monsterKilledMap;
+
+    public MonsterKilledMetric(Context context) {
+        super(context);
+    }
 
     @Override
     public Unstructured getUnstructuredMetric() {

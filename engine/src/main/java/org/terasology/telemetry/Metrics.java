@@ -39,31 +39,17 @@ import java.util.Optional;
 @API
 public class Metrics {
 
-    private static final Logger logger = LoggerFactory.getLogger(Metrics.class);
-
     private Map<String, Metric> metricsMap = new HashMap<>();
-
-    public Metrics() {
-
-    }
 
     public void initialise(Context context) {
 
-        SystemContextMetric systemContextMetric = new SystemContextMetric(context);
-        ModulesMetric modulesMetric = new ModulesMetric(context);
-        GameConfigurationMetric gameConfigurationMetric = new GameConfigurationMetric(context);
-        BlockDestroyedMetric blockDestroyedMetric = new BlockDestroyedMetric();
-        BlockPlacedMetric blockPlacedMetric = new BlockPlacedMetric();
-        GamePlayMetric gamePlayMetric = new GamePlayMetric(context);
-        MonsterKilledMetric monsterKilledMetric = new MonsterKilledMetric();
-
-        metricsMap.put(SystemContextMetric.class.getName(), systemContextMetric);
-        metricsMap.put(ModulesMetric.class.getName(), modulesMetric);
-        metricsMap.put(GameConfigurationMetric.class.getName(), gameConfigurationMetric);
-        metricsMap.put(BlockDestroyedMetric.class.getName(), blockDestroyedMetric);
-        metricsMap.put(BlockPlacedMetric.class.getName(), blockPlacedMetric);
-        metricsMap.put(GamePlayMetric.class.getName(), gamePlayMetric);
-        metricsMap.put(MonsterKilledMetric.class.getName(), monsterKilledMetric);
+        new SystemContextMetric(context);
+        new ModulesMetric(context);
+        new GameConfigurationMetric(context);
+        new BlockDestroyedMetric(context);
+        new BlockPlacedMetric(context);
+        new GamePlayMetric(context);
+        new MonsterKilledMetric(context);
     }
 
     public void refreshAllMetrics() {
@@ -72,6 +58,15 @@ public class Metrics {
         }
     }
 
+    public Map<String, Metric> getMetricsMap() {
+        return metricsMap;
+    }
+
+    /**
+     * Get the metric in the context {@link org.terasology.telemetry.Metrics} class.
+     * @param cl the class of the metric class.
+     * @return the metric in the game context.
+     */
     public Optional<Metric> getMetric(Class<?> cl) {
         return Optional.ofNullable(metricsMap.get(cl.getName()));
     }

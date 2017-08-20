@@ -51,6 +51,7 @@ public final class GamePlayMetric extends Metric {
     private long playTimeMinute;
 
     public GamePlayMetric(Context context) {
+        super(context);
         bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }
 
@@ -75,7 +76,7 @@ public final class GamePlayMetric extends Metric {
             playTimeMinute = (long) gamePlayStatsComponent.playTimeMinute;
             return super.getFieldValueMap();
         } else {
-            return metricMap;
+            return super.getFieldValueMap();
         }
     }
 }

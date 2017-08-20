@@ -44,7 +44,8 @@ public final class BlockPlacedMetric extends Metric {
 
     private LocalPlayer localPlayer;
 
-    public BlockPlacedMetric() {
+    public BlockPlacedMetric(Context context) {
+        super(context);
     }
 
     @Override

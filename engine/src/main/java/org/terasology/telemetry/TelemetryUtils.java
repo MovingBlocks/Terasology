@@ -52,7 +52,6 @@ public class TelemetryUtils {
      */
     public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-
             Subject subject = new Subject.SubjectBuilder()
                     .userId(TelemetryParams.userId)
                     .ipAddress("anonymous")
@@ -72,8 +71,10 @@ public class TelemetryUtils {
             } else if (bindingMap.size() != 0) {
                 TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
                 if (telemetryCategory != null) {
-                    if ((bindingMap.get(telemetryCategory.id()))) {
-                        tracker.track(event);
+                    if (bindingMap.containsKey(telemetryCategory.id())) {
+                        if ((bindingMap.get(telemetryCategory.id()))) {
+                            tracker.track(event);
+                        }
                     }
                 }
             }

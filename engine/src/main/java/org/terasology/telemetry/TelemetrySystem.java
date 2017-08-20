@@ -37,6 +37,7 @@ import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -89,10 +90,36 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
         refreshMetricsPeriodic();
     }
 
+    /**
+     * Refresh all the metric value and the bindingMap who notes user's authorization.
+     */
     private void refreshMetricsPeriodic() {
         if (Duration.between(timeForRefreshMetric, Instant.now()).getSeconds() > 5) {
             metrics.refreshAllMetrics();
             timeForRefreshMetric = Instant.now();
+            if (bindingMap != null) {
+                refreshBindingMap();
+            }
+        }
+    }
+
+    /**
+     * Refresh the bindingMap who notes user's authorization.
+     * If a new map is added during the game, the authorization functionality could also be used.
+     */
+    private void refreshBindingMap() {
+        Map<String, Metric> metricsMap = metrics.getMetricsMap();
+        for (Metric metric : metricsMap.values()) {
+            TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
+            if (!bindingMap.containsKey(telemetryCategory.id())) {
+                bindingMap.put(telemetryCategory.id(), config.getTelemetryConfig().isTelemetryEnabled());
+            }
+            List<String> fields = metric.getTelemetryFields();
+            for (String telemetryField : fields) {
+                if (!bindingMap.containsKey(telemetryField)) {
+                    bindingMap.put(telemetryField, config.getTelemetryConfig().isTelemetryEnabled());
+                }
+            }
         }
     }
 
@@ -124,12 +151,15 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     @Override
     public void initialise() {
         timeForRefreshMetric = Instant.now();
+        bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+        if (bindingMap != null) {
+            refreshBindingMap();
+        }
     }
 
     @Override
     public void postBegin() {
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
-            bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
             sendModuleMetric();
             sendSystemContextMetric();
         }

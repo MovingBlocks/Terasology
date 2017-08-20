@@ -79,7 +79,7 @@ public final class SystemContextMetric extends Metric {
     private long memoryMaxByte;
 
     public SystemContextMetric(Context context) {
-
+        super(context);
         bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
 
         osName = System.getProperty("os.name");

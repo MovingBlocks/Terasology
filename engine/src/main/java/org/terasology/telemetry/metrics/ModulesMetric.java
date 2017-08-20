@@ -48,7 +48,7 @@ public final class ModulesMetric extends Metric {
     private Context context;
 
     public ModulesMetric(Context context) {
-
+        super(context);
         this.context = context;
     }
 

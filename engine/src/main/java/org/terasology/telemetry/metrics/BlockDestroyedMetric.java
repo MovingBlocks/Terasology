@@ -44,7 +44,8 @@ public final class BlockDestroyedMetric extends Metric {
     @TelemetryField
     private Map blockDestroyedMap;
 
-    public BlockDestroyedMetric() {
+    public BlockDestroyedMetric(Context context) {
+        super(context);
     }
 
     @Override
