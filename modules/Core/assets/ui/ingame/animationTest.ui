@@ -1,5 +1,5 @@
 {
-    "type": "Core:AnimationScreen",
+    "type": "AnimationScreen",
     "contents": {
         "type": "RelativeLayout",
         "contents": [

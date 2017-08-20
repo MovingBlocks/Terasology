@@ -6,6 +6,7 @@
     "Item": {
         "icon": "engine:items#whiteRecipe"
     },
+    "InteractionTarget": {},
     "InteractionScreen": {
         "screen": "core:animationTest"
     }
