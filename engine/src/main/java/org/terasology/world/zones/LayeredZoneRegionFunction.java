@@ -71,7 +71,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     public void initialize(Zone parent) {
         this.parent = parent;
 
-        siblings = getSiblingRegionFunctions(parent).stream()
+        siblings = Zone.getSiblingRegionFunctions(parent).stream()
                 .filter(function -> function instanceof LayeredZoneRegionFunction)
                 .map(layerFunction -> (LayeredZoneRegionFunction) layerFunction)
                 .sorted(Comparator.comparingInt(layerFunction -> Math.abs(layerFunction.getOrdering())))

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.terasology.world.chunks.ChunkConstants.SIZE_X;
 import static org.terasology.world.chunks.ChunkConstants.SIZE_Y;
@@ -198,6 +199,20 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
     @Override
     public String toString() {
         return getName();
+    }
+
+    /**
+     * Get the region functions of all zones which are siblings of the given zone (including the given zone).
+     *
+     * Sibling zones are zones that have the same parent.
+     *
+     * @param zone the zone to find the siblings of
+     * @return the region functions of the given zone's siblings
+     */
+    static List<ZoneRegionFunction> getSiblingRegionFunctions(Zone zone) {
+        return zone.getParent().getChildZones().stream()
+                .map(Zone::getRegionFunction)
+                .collect(Collectors.toList());
     }
 
 

@@ -18,9 +18,6 @@ package org.terasology.world.zones;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.generation.Region;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @API
 public interface ZoneRegionFunction {
 
@@ -42,9 +39,4 @@ public interface ZoneRegionFunction {
      */
     default void initialize(Zone parent) {}
 
-    default List<ZoneRegionFunction> getSiblingRegionFunctions(Zone zone) {
-        return zone.getParent().getChildZones().stream()
-                    .map(Zone::getRegionFunction)
-                    .collect(Collectors.toList());
-    }
 }
