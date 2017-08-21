@@ -20,8 +20,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
-import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
+import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
@@ -69,7 +69,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
     private int horizontalSpacing = 12;
 
     @In
-    private Config config;
+    private InputDeviceConfiguration inputDeviceConfiguration;
 
     @In
     private BindsManager bindsManager;
@@ -95,12 +95,12 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mainLayout.setFamily("option-grid");
 
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
-        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
+        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration, Float.TYPE));
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
-        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
+        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration, Boolean.TYPE));
 
         mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
         mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
@@ -146,7 +146,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         List<String> controllers = inputSystem.getControllerDevice().getControllers();
         for (String name : controllers) {
-            ControllerInfo cfg = config.getInput().getControllers().getController(name);
+            ControllerInfo cfg = inputDeviceConfiguration.getController(name);
             addInputSection(mainLayout, name, cfg);
         }
 
@@ -154,7 +154,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
         area.setContent(mainLayout);
 
         WidgetUtil.trySubscribe(this, "reset", button -> {
-            config.getInput().reset(context);
+            inputDeviceConfiguration.reset();
             bindsManager.getBindsConfig().setBinds(bindsManager.getDefaultBindsConfig());
         });
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());

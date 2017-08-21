@@ -43,15 +43,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
- *
+ * User binds configuration. This holds the key/mouse binding for Button Binds.
  */
 public final class BindsConfig {
 
-    private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
-
-    public BindsConfig() {
-    }
+    private ListMultimap<SimpleUri, Input> bindUriToInput = ArrayListMultimap.create();
 
     /**
      * Returns true if an input has already been bound to another key
@@ -60,7 +56,7 @@ public final class BindsConfig {
      * @return True if newInput has been bound. False otherwise.
      */
     public boolean isBound(Input newInput) {
-        return newInput != null && data.containsValue(newInput);
+        return newInput != null && bindUriToInput.containsValue(newInput);
     }
 
     /**
@@ -69,12 +65,12 @@ public final class BindsConfig {
      * @param other The BindsConfig to copy
      */
     public void setBinds(BindsConfig other) {
-        data.clear();
-        data.putAll(other.data);
+        bindUriToInput.clear();
+        bindUriToInput.putAll(other.bindUriToInput);
     }
 
     public List<Input> getBinds(SimpleUri uri) {
-        return data.get(uri);
+        return bindUriToInput.get(uri);
     }
 
     /**
@@ -85,7 +81,7 @@ public final class BindsConfig {
      * @return Whether the given bind has been registered with the BindsConfig
      */
     public boolean hasBinds(SimpleUri uri) {
-        return !data.get(uri).isEmpty();
+        return !bindUriToInput.get(uri).isEmpty();
     }
 
     /**
@@ -103,14 +99,14 @@ public final class BindsConfig {
         Set<Input> uniqueInputs = Sets.newLinkedHashSet(inputs);
 
         // Clear existing usages of the given inputs
-        Iterator<Input> iterator = data.values().iterator();
+        Iterator<Input> iterator = bindUriToInput.values().iterator();
         while (iterator.hasNext()) {
             Input i = iterator.next();
             if (uniqueInputs.contains(i)) {
                 iterator.remove();
             }
         }
-        data.replaceValues(bindUri, uniqueInputs);
+        bindUriToInput.replaceValues(bindUri, uniqueInputs);
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
@@ -123,7 +119,7 @@ public final class BindsConfig {
                 SetMultimap<String, Input> map = context.deserialize(entry.getValue(), SetMultimap.class);
                 for (String id : map.keySet()) {
                     SimpleUri uri = new SimpleUri(new Name(entry.getKey()), id);
-                    result.data.putAll(uri, map.get(id));
+                    result.bindUriToInput.putAll(uri, map.get(id));
                 }
             }
             return result;
@@ -133,7 +129,7 @@ public final class BindsConfig {
         public JsonElement serialize(BindsConfig src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             SetMultimap<Name, SimpleUri> bindByModule = HashMultimap.create();
-            for (SimpleUri key : src.data.keySet()) {
+            for (SimpleUri key : src.bindUriToInput.keySet()) {
                 bindByModule.put(key.getModuleName(), key);
             }
             List<Name> sortedModules = Lists.newArrayList(bindByModule.keySet());
@@ -141,7 +137,7 @@ public final class BindsConfig {
             for (Name moduleId : sortedModules) {
                 SetMultimap<String, Input> moduleBinds = HashMultimap.create();
                 for (SimpleUri bindUri : bindByModule.get(moduleId)) {
-                    moduleBinds.putAll(bindUri.getObjectName().toString(), src.data.get(bindUri));
+                    moduleBinds.putAll(bindUri.getObjectName().toString(), src.bindUriToInput.get(bindUri));
                 }
                 JsonElement map = context.serialize(moduleBinds, SetMultimap.class);
                 result.add(moduleId.toString(), map);
@@ -150,8 +146,8 @@ public final class BindsConfig {
         }
     }
 
-    public Collection<Input> values() {
-        return data.values();
+    public Collection<Input> getBoundInputs() {
+        return bindUriToInput.values();
     }
 
 }

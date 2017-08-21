@@ -53,8 +53,8 @@ public class BindsConfigurationImpl implements BindsConfiguration {
     }
 
     @Override
-    public Collection<Input> values() {
-        return config.getBinds().values();
+    public Collection<Input> getBoundInputs() {
+        return config.getBinds().getBoundInputs();
     }
 
 }

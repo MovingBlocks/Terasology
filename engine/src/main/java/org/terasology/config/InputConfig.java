@@ -15,8 +15,6 @@
  */
 package org.terasology.config;
 
-import org.terasology.context.Context;
-
 public class InputConfig {
 
     private ControllerConfig controllers = new ControllerConfig();
@@ -35,7 +33,7 @@ public class InputConfig {
         this.mouseSensitivity = mouseSensitivity;
     }
 
-    public void reset(Context context) {
+    public void reset() {
         Config defaultConfig = new Config();
         defaultConfig.loadDefaults();
         InputConfig defaultInputConfig = defaultConfig.getInput();

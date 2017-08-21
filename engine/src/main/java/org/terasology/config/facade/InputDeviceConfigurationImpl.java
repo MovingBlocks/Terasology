@@ -3,7 +3,6 @@ package org.terasology.config.facade;
 
 import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
-import org.terasology.context.Context;
 
 public class InputDeviceConfigurationImpl implements InputDeviceConfiguration {
     private Config config;
@@ -23,8 +22,8 @@ public class InputDeviceConfigurationImpl implements InputDeviceConfiguration {
     }
 
     @Override
-    public void reset(Context context) {
-        config.getInput().reset(context);
+    public void reset() {
+        config.getInput().reset();
     }
 
     @Override

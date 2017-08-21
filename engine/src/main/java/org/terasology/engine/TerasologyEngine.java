@@ -398,7 +398,8 @@ public class TerasologyEngine implements GameEngine {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         while (tick()) {
-            /* do nothing */ }
+            /* do nothing */
+        }
         PerformanceMonitor.endActivity();
     }
 

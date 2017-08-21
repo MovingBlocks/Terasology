@@ -178,7 +178,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private List<Input> fetchDefaultBindings(Class<?> event, BindsConfiguration config) {
         List<Input> defaultInputs = Lists.newArrayList();
-        Collection<Input> values = config.values();
+        Collection<Input> values = config.getBoundInputs();
         for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
             DefaultBinding defaultBinding = (DefaultBinding) annotation;
             Input input = defaultBinding.type().getInput(defaultBinding.id());
@@ -424,8 +424,8 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
         }
 
         @Override
-        public Collection<Input> values() {
-            return bindsConfig.values();
+        public Collection<Input> getBoundInputs() {
+            return bindsConfig.getBoundInputs();
         }
 
     }
