@@ -18,17 +18,29 @@ package org.terasology.world.zones;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.generation.Region;
 
+/**
+ * The ZoneRegionFunction determines which blocks are part of a given region.
+ *
+ * Distinct ZoneRegionFunction objects should be used for each zone, because the region function can cache results to
+ * reduce the computation needed.
+ */
 @API
+@FunctionalInterface
 public interface ZoneRegionFunction {
 
     /**
-     * Calculates whether or not the given block is part of this layer.
+     * Calculates whether or not the given block is part of this zone.
+     *
+     * This method must be thread-safe, because it will be called from multiple world generator threads simultaneously.
+     *
+     * Care should be taken to make sure this method is fast enough, because it will be called once for every block
+     * that is in the parent zone (or for every block in the world, for top-level zones).
      *
      * @param x the x position to check
      * @param y the y position to check
      * @param z the z position to check
      * @param region the Region in the area
-     * @return true if the position is within this layer, false otherwise
+     * @return true if the position is within this zone, false otherwise
      */
     boolean apply(int x, int y, int z, Region region);
 

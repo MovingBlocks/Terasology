@@ -17,11 +17,17 @@ package org.terasology.world.zones;
 
 import org.terasology.module.sandbox.API;
 
+/**
+ * This is a {@link LayerWidth} for a layer that has a constant, predetermined width at all paints.
+ */
 @API
 public class ConstantLayerWidth implements LayerWidth {
 
     private final int width;
 
+    /**
+     * @param width the desired width of this layer
+     */
     public ConstantLayerWidth(int width) {
         this.width = width;
     }

@@ -24,7 +24,7 @@ import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 
 /**
- * This rasterizer will fill the whole area with the given block.
+ * A rasterizer that will fill the whole area with the given block.
  *
  * This can be used to block-fill a {@link Zone} with the block.
  */

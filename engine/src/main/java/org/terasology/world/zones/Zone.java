@@ -63,6 +63,9 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
     private final List<EntityProvider> entityProviders = new ArrayList<>();
     private final List<FacetLayer> facetLayers = new ArrayList<>();
 
+    /**
+     * This zone's parent. This is either the base {@link WorldBuilder}, or another zone.
+     */
     private ProviderStore parent;
 
     private final ZoneRegionFunction regionFunction;
@@ -81,6 +84,10 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
         this(name, (x, y, z, region) -> regionFunction.test(new ImmutableVector3i(x, y, z), region));
     }
 
+    /**
+     * @param name the name of this zone
+     * @param regionFunction the region function to use
+     */
     public Zone(String name, ZoneRegionFunction regionFunction) {
         this.regionFunction = regionFunction;
         this.name = name;
@@ -92,16 +99,29 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
 
     @Override
     public void initialize() {
+        //TODO: this gets called twice (WorldRasterizer and EntityProvider)
         regionFunction.initialize(this);
         rasterizers.forEach(WorldRasterizer::initialize);
     }
 
+    /**
+     * Process the EntityProviders.
+     *
+     * @see EntityProvider#process(Region, EntityBuffer)
+     */
     @Override
     public void process(Region region, EntityBuffer buffer) {
         entityProviders.forEach(EntityProvider::initialize);
         entityProviders.forEach(provider -> provider.process(region, buffer));
     }
 
+    /**
+     * Generate the chunk for this zone, based on the rasterizers and nested zones that have been added.
+     *
+     * This will only change blocks for which {@link #containsBlock(int, int, int, Region)} returns true.
+     *
+     * @see WorldRasterizer#generateChunk(CoreChunk, Region)
+     */
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         Block[][][] savedBlocks = new Block[SIZE_X][SIZE_Y][SIZE_Z];
@@ -151,15 +171,31 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
     /* Preview features */
 
 
+    /**
+     * Add a preview layer to this zone, which will be used when the preview is generated.
+     *
+     *
+     * @param facetLayer
+     * @return
+     */
     public Zone addPreviewLayer(FacetLayer facetLayer) {
         facetLayers.add(facetLayer);
         return this;
     }
 
+    /**
+     * @return the list of added preview layers
+     */
     public List<FacetLayer> getPreviewLayers() {
         return facetLayers;
     }
 
+    /**
+     * Generate a preview screen for this zone, using the added preview layers.
+     *
+     * @param generator the world generator that is in use
+     * @return a PreviewGenerator for this zone
+     */
     public PreviewGenerator preview(WorldGenerator generator) {
         return new FacetLayerPreview(generator, facetLayers);
     }
@@ -168,26 +204,57 @@ public class Zone extends ProviderStore implements WorldRasterizer, EntityProvid
     /* General utility */
 
 
+    /**
+     * Test whether this zone contains the block at the given world position.
+     *
+     * @param x the world x position of the block
+     * @param y the world y position of the block
+     * @param z the world z position of the block
+     * @param chunkRegion the Region corresponding to that position
+     * @return true if the zone contains the given block; false otherwise
+     */
     public boolean containsBlock(int x, int y, int z, Region chunkRegion) {
         return regionFunction.apply(x, y, z, chunkRegion);
     }
 
+    /**
+     * @return the region function that this zone is using
+     */
     public ZoneRegionFunction getRegionFunction() {
         return regionFunction;
     }
 
+    /**
+     * @return the list of facet providers attached to this zone
+     */
     public List<FacetProvider> getFacetProviders() {
         return facetProviders;
     }
 
+    /**
+     * @return the list of rasterizers attached to this zone
+     */
     public List<WorldRasterizer> getRasterizers() {
         return rasterizers;
     }
 
+    /**
+     * Set the parent of this zone.
+     *
+     * @see #getParent()
+     *
+     * @param parent the parent of this zone
+     */
     public void setParent(ProviderStore parent) {
         this.parent = parent;
     }
 
+    /**
+     * The parent is the ProviderStore that this zone is attached to (via the {@link ProviderStore#addZone(Zone)}
+     * method)
+     *
+     * @return the parent of this zone
+     */
     public ProviderStore getParent() {
         return parent;
     }

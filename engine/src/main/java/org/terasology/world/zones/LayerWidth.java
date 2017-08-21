@@ -17,11 +17,24 @@ package org.terasology.world.zones;
 
 import org.terasology.module.sandbox.API;
 
+/**
+ * This function is used to determine the width of a {@link LayeredZoneRegionFunction} at each point on the layer.
+ */
 @API
 @FunctionalInterface
 public interface LayerWidth {
 
+    /**
+     * @param x the world x coordinate
+     * @param z the world z coordinate
+     * @return the layer's width at the given co-ordinates
+     */
     int get(int x, int z);
 
+    /**
+     * Initialize this with information about the parent region function, if needed.
+     *
+     * @param parent the layer this is attached to
+     */
     default void initialize(LayeredZoneRegionFunction parent) {}
 }
