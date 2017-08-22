@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.zones.ProviderStore;
 import org.terasology.world.zones.Zone;
+import org.terasology.world.zones.ZonePlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +77,7 @@ public class WorldBuilder extends ProviderStore {
         pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class).forEach(this::addProvider);
         pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class).forEach(this::addRasterizer);
         pluginLibrary.instantiateAllOfType(EntityProviderPlugin.class).forEach(this::addEntities);
+        pluginLibrary.instantiateAllOfType(ZonePlugin.class).forEach(this::addZone);
 
         return this;
     }
