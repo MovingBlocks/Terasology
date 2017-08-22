@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
 /**
@@ -64,30 +62,6 @@ public abstract class LeafNode implements BehaviorNode {
         return 0;
     }
 
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleTeardown(ClassGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleConstruct(MethodGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleDestruct(MethodGenerator gen) {
-
-    }
 
     @Override
     public void construct(Actor actor) {

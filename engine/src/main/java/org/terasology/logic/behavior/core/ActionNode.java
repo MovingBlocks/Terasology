@@ -17,8 +17,6 @@ package org.terasology.logic.behavior.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
 
@@ -131,32 +129,6 @@ public class ActionNode implements BehaviorNode {
         return 0;
     }
 
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleTeardown(ClassGenerator gen) {
-
-    }
 
 
-    // TODO check these paths are correct before running a Tree using bytecode
-    @Override
-    public void assembleConstruct(MethodGenerator gen) {
-        gen.invokeAction(action.getId(), "void construct(org.terasology.logic.behavior.core.Actor)");
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        gen.invokeAction(action.getId(),
-                "org.terasology.logic.behavior.core.BehaviorState modify(org.terasology.logic.behavior.core.Actor, org.terasology.logic.behavior.core.BehaviorState)",
-                BehaviorState.RUNNING);
-    }
-
-    @Override
-    public void assembleDestruct(MethodGenerator gen) {
-        gen.invokeAction(action.getId(), "void destruct(org.terasology.logic.behavior.core.Actor)");
-    }
 }

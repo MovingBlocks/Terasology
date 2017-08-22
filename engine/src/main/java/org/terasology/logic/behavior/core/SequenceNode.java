@@ -15,13 +15,8 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 
 import java.util.Iterator;
 
@@ -85,69 +80,4 @@ public class SequenceNode extends CompositeNode {
     public void destruct(Actor actor) {
     }
 
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-        super.assembleSetup(gen);
-        reentry = gen.generateField(Type.INT_TYPE);
-    }
-
-    @Override
-    public void assembleConstruct(MethodGenerator gen) {
-        gen.loadThis();
-        gen.push(-1);
-        gen.storeField(reentry);
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        Label[] labels = new Label[children.size()];
-        for (int i = 0; i < children.size(); i++) {
-            labels[i] = gen.newLabel();
-        }
-        Label defaultLabel = gen.newLabel();
-        Label exitSuccess = gen.newLabel();
-        Label exitFailure = gen.newLabel();
-        Label exitRunning = gen.newLabel();
-
-        gen.loadThis();
-        gen.loadField(reentry);
-        gen.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
-
-        Label loop = gen.mark();
-        for (int i = 0; i < labels.length; i++) {
-            BehaviorNode child = children.get(i);
-            child.assembleConstruct(gen);
-            gen.mark(labels[i]);
-
-            gen.loadThis();
-            gen.push(i);
-            gen.storeField(reentry);
-
-            child.assembleExecute(gen);
-            gen.dup();
-            gen.push(BehaviorState.RUNNING.ordinal());
-            gen.ifICmp(GeneratorAdapter.EQ, exitRunning);
-
-            child.assembleDestruct(gen);
-            gen.push(BehaviorState.SUCCESS.ordinal());
-            gen.ifICmp(GeneratorAdapter.NE, exitFailure);
-        }
-
-        gen.push(BehaviorState.SUCCESS.ordinal());
-        gen.goTo(exitSuccess);
-
-        gen.mark(defaultLabel);
-        gen.goTo(loop);
-
-        gen.mark(exitFailure);
-        gen.push(BehaviorState.FAILURE.ordinal());
-
-        gen.mark(exitSuccess);
-
-        gen.loadThis();
-        gen.push(-1);
-        gen.storeField(reentry);
-
-        gen.mark(exitRunning);
-    }
 }

@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
-
 /**
  * Runs always.
  */
@@ -45,10 +43,6 @@ public class RunningNode extends LeafNode {
     public void destruct(Actor actor) {
 
     }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        gen.push(BehaviorState.RUNNING.ordinal());
-    }
+    
 
 }

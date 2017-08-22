@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
 /**
@@ -81,31 +79,6 @@ public class DelegateNode implements BehaviorNode {
     @Override
     public int getMaxChildren() {
         return delegate.getMaxChildren();
-    }
-
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-        delegate.assembleSetup(gen);
-    }
-
-    @Override
-    public void assembleTeardown(ClassGenerator gen) {
-        delegate.assembleTeardown(gen);
-    }
-
-    @Override
-    public void assembleConstruct(MethodGenerator gen) {
-        delegate.assembleConstruct(gen);
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        delegate.assembleExecute(gen);
-    }
-
-    @Override
-    public void assembleDestruct(MethodGenerator gen) {
-        delegate.assembleDestruct(gen);
     }
 
     @Override

@@ -16,8 +16,6 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Lists;
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
 import java.util.List;
@@ -76,38 +74,11 @@ public abstract class CompositeNode implements BehaviorNode {
         return Integer.MAX_VALUE;
     }
 
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-        for (BehaviorNode child : children) {
-            child.assembleSetup(gen);
-        }
-    }
-
-    @Override
-    public void assembleTeardown(ClassGenerator gen) {
-        for (BehaviorNode child : children) {
-            child.assembleTeardown(gen);
-        }
-    }
 
     public List<BehaviorNode> getChildren() {
         return children;
     }
 
-    @Override
-    public void assembleConstruct(MethodGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-
-    }
-
-    @Override
-    public void assembleDestruct(MethodGenerator gen) {
-
-    }
 
     @Override
     public void construct(Actor actor) {
