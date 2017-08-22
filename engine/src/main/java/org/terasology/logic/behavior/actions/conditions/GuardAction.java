@@ -42,8 +42,11 @@ public class GuardAction extends ConditionAction {
 
     @Override
     public boolean prune(Actor actor) {
+
         try {
-            return !condition(actor);
+            boolean condition = condition(actor);
+
+            return !condition;
         } catch (ClassNotFoundException e) {
             logger.error("Class not found. Does the Component specified exist?", e);
         } catch (NoSuchFieldException e) {

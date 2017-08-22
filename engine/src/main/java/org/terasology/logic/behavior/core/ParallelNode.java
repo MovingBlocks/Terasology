@@ -23,11 +23,18 @@ import org.terasology.logic.behavior.core.compiler.MethodGenerator;
 import static org.objectweb.asm.commons.GeneratorAdapter.EQ;
 import static org.objectweb.asm.commons.GeneratorAdapter.NE;
 
-
 /**
  * Runs all children parallel.
  */
 public class ParallelNode extends CompositeNode {
+
+    private enum Policy {
+        RequireOne,
+        RequireAll
+    }
+
+    private Policy policy = Policy.RequireOne;
+
     @Override
     public String getName() {
         return "parallel";
@@ -61,7 +68,9 @@ public class ParallelNode extends CompositeNode {
                 successCounter++;
             }
         }
-        return successCounter == children.size() ? BehaviorState.SUCCESS : BehaviorState.RUNNING;
+        return policy == Policy.RequireAll ?
+                successCounter == children.size() ? BehaviorState.SUCCESS : BehaviorState.RUNNING :
+                successCounter > 0 ? BehaviorState.SUCCESS : BehaviorState.RUNNING;
     }
 
     @Override
