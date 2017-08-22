@@ -16,7 +16,6 @@
 package org.terasology.telemetry;
 
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
-import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -39,7 +38,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * This component system is used to track metrics in game.
@@ -108,13 +106,13 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
      * If a new map is added during the game, the authorization functionality could also be used.
      */
     private void refreshBindingMap() {
-        Map<String, Metric> metricsMap = metrics.getMetricsMap();
+        Map<String, Metric> metricsMap = metrics.getClassNameToMetric();
         for (Metric metric : metricsMap.values()) {
             TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
             if (!bindingMap.containsKey(telemetryCategory.id())) {
                 bindingMap.put(telemetryCategory.id(), config.getTelemetryConfig().isTelemetryEnabled());
             }
-            List<String> fields = metric.getTelemetryFields();
+            List<String> fields = metric.createTelemetryFieldList();
             for (String telemetryField : fields) {
                 if (!bindingMap.containsKey(telemetryField)) {
                     bindingMap.put(telemetryField, config.getTelemetryConfig().isTelemetryEnabled());
@@ -167,60 +165,25 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private void sendModuleMetric() {
-        Optional<Metric> optional = metrics.getMetric(ModulesMetric.class);
-        if (optional.isPresent()) {
-            Metric modulesMetric = optional.get();
-            Unstructured unstructuredMetric = modulesMetric.getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMetric, modulesMetric, bindingMap);
+        if (config.getTelemetryConfig().isTelemetryEnabled()) {
+            TelemetryUtils.fetchMetricAndSend(metrics, ModulesMetric.class, emitter, trackerNamespace, bindingMap);
         }
     }
 
     private void sendSystemContextMetric() {
-        Optional<Metric> optional = metrics.getMetric(SystemContextMetric.class);
-        if (optional.isPresent()) {
-            Metric systemContextMetric = optional.get();
-            Unstructured unstructured = systemContextMetric.getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructured, systemContextMetric, bindingMap);
+        if (config.getTelemetryConfig().isTelemetryEnabled()) {
+            TelemetryUtils.fetchMetricAndSend(metrics, SystemContextMetric.class, emitter, trackerNamespace, bindingMap);
         }
     }
 
     @Override
     public void shutdown() {
         if (config.getTelemetryConfig().isTelemetryEnabled()) {
-            Optional<Metric> optional = metrics.getMetric(BlockDestroyedMetric.class);
-            if (optional.isPresent()) {
-                Metric blockDestroyedMetric = optional.get();
-                Unstructured unstructuredBlockDestroyed = blockDestroyedMetric.getUnstructuredMetric();
-                TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockDestroyed, blockDestroyedMetric, bindingMap);
-            }
-
-            optional = metrics.getMetric(BlockPlacedMetric.class);
-            if (optional.isPresent()) {
-                Metric blockPlacedMetric = optional.get();
-                Unstructured unstructuredBlockPlaced = blockPlacedMetric.getUnstructuredMetric();
-                TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredBlockPlaced, blockPlacedMetric, bindingMap);
-            }
-
-            optional = metrics.getMetric(GameConfigurationMetric.class);
-            if (optional.isPresent()) {
-                Metric gameConfigurationMetric = optional.get();
-                Unstructured unstructuredGameConfiguration = gameConfigurationMetric.getUnstructuredMetric();
-                TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGameConfiguration, gameConfigurationMetric, bindingMap);
-            }
-
-            optional = metrics.getMetric(GamePlayMetric.class);
-            if (optional.isPresent()) {
-                Metric gamePlayMetric = optional.get();
-                Unstructured unstructuredGamePlay = gamePlayMetric.getUnstructuredMetric();
-                TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredGamePlay, gamePlayMetric, bindingMap);
-            }
-
-            optional = metrics.getMetric(MonsterKilledMetric.class);
-            if (optional.isPresent()) {
-                Metric monsterKilledMetric = optional.get();
-                Unstructured unstructuredMonsterKilled = monsterKilledMetric.getUnstructuredMetric();
-                TelemetryUtils.trackMetric(emitter, trackerNamespace, unstructuredMonsterKilled, monsterKilledMetric, bindingMap);
-            }
+            TelemetryUtils.fetchMetricAndSend(metrics, BlockPlacedMetric.class, emitter, trackerNamespace, bindingMap);
+            TelemetryUtils.fetchMetricAndSend(metrics, BlockDestroyedMetric.class, emitter, trackerNamespace, bindingMap);
+            TelemetryUtils.fetchMetricAndSend(metrics, GameConfigurationMetric.class, emitter, trackerNamespace, bindingMap);
+            TelemetryUtils.fetchMetricAndSend(metrics, MonsterKilledMetric.class, emitter, trackerNamespace, bindingMap);
+            TelemetryUtils.fetchMetricAndSend(metrics, GamePlayMetric.class, emitter, trackerNamespace, bindingMap);
         }
     }
 }

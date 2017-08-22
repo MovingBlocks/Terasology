@@ -41,23 +41,21 @@ import java.util.Set;
  * A new metric should extends this class, with annotation {@link org.terasology.telemetry.TelemetryCategory}.
  * All metric fields should be annotated {@link org.terasology.telemetry.TelemetryField}.
  * An example is {@link org.terasology.telemetry.metrics.SystemContextMetric}.
+ * The metric will be instantiated automatically in {@link org.terasology.telemetry.Metrics}
+ * By convention, a new Metric can have only one constructor and constructor will need no arguments or only {@link org.terasology.context.Context}.
+ * If a Metric Constructor needs some specific arguments other than {@link org.terasology.context.Context},
+ * it should be instantiated and added to {@link org.terasology.telemetry.Metrics} manually.
  */
 @API
 public abstract class Metric {
 
     private static final Logger logger = LoggerFactory.getLogger(Metric.class);
 
-    protected Map metricMap = new HashMap();
-
     /**
-     * One a new metric is created, it should be added to the {@link org.terasology.telemetry.Metrics}.
-     * Use this constructor (super(context);) will add metric automatically to Metrics class.
-     * @param context the game context.
+     * The map contains telemetry field name as key and field value as value.
+     * If the telemetry field is a map, then this map equals to that.
      */
-    public Metric(Context context) {
-        Metrics metrics = context.get(Metrics.class);
-        addToMetrics(metrics);
-    }
+    protected Map<String, Object> telemetryFieldToValue = new HashMap<>();
 
     /**
      * Generates a snowplow unstructured event that the snowplow tracker can track.
@@ -69,22 +67,22 @@ public abstract class Metric {
      * Fetches all TelemetryFields and create a map associating field's name (key) to field's value (value).
      * @return a map with key (field's name) and value (field's value).
      */
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         return AccessController.doPrivileged((PrivilegedAction<Map<String, ?>>) () -> {
 
-            metricMap = new HashMap();
+            telemetryFieldToValue = new HashMap<>();
             Set<Field> fields = ReflectionUtils.getFields(this.getClass(), ReflectionUtils.withAnnotation(TelemetryField.class));
 
             for (Field field : fields) {
                 try {
                     field.setAccessible(true);
-                    metricMap.put(field.getName(), field.get(this));
+                    telemetryFieldToValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     logger.error("The field is not inaccessible: ", e);
                 }
             }
 
-            return metricMap;
+            return telemetryFieldToValue;
         });
     }
 
@@ -99,15 +97,15 @@ public abstract class Metric {
         Context context = CoreRegistry.get(Context.class);
         DisplayDevice display = context.get(DisplayDevice.class);
         if (display.isHeadless()) {
-            return metricMap;
+            return telemetryFieldToValue;
         }
-        Map metricMapAfterPermission = new HashMap<>();
-        for (Object key : metricMap.keySet()) {
+        Map<String, Object> metricMapAfterPermission = new HashMap<>();
+        for (Object key : telemetryFieldToValue.keySet()) {
             String fieldName = key.toString();
             String fieldNamewithID = telemetryCategory.id() + ":" + key.toString();
             if (bindingMap.containsKey(fieldNamewithID)) {
                 if (bindingMap.get(fieldNamewithID)) {
-                    metricMapAfterPermission.put(fieldName, metricMap.get(fieldName));
+                    metricMapAfterPermission.put(fieldName, telemetryFieldToValue.get(fieldName));
                 } else {
                     metricMapAfterPermission.put(fieldName, "Disabled Field");
                 }
@@ -119,6 +117,7 @@ public abstract class Metric {
 
     /**
      * Add the new metric to {@link org.terasology.telemetry.Metrics} instance.
+     * This method will only be used when a metric constructor needs some specific arguments other than {@link org.terasology.context.Context}.
      * @param metrics the metrics class instance in the game context.
      */
     public void addToMetrics(Metrics metrics) {
@@ -130,7 +129,7 @@ public abstract class Metric {
      * The field name is in the form telemetryCategory.id() + ":" fieldName.
      * @return the list of all the telemetry field names in this class.
      */
-    public List<String> getTelemetryFields() {
+    public List<String> createTelemetryFieldList() {
         TelemetryCategory telemetryCategory = this.getClass().getAnnotation(TelemetryCategory.class);
         List<String> fieldsList = new ArrayList<>();
         if (!telemetryCategory.isOneMapMetric()) {

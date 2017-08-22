@@ -193,7 +193,7 @@ public class TelemetryScreen extends CoreScreenLayer {
             Optional<Metric> optional = metrics.getMetric(metricClass);
             if (optional.isPresent()) {
                 Metric metric = optional.get();
-                Map<String, ?> map = metric.getFieldValueMap();
+                Map<String, ?> map = metric.createTelemetryFieldToValue();
                 if (map != null) {
                     addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
                 }

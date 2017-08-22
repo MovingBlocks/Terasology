@@ -33,14 +33,36 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Utils methods for telemetry.
  */
 @API
-public class TelemetryUtils {
+public final class TelemetryUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TelemetryUtils.class);
+
+    private TelemetryUtils() {
+        // static utility class, no instance needed
+    }
+
+    /**
+     * fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
+     * @param metrics Metrics class in the game context.
+     * @param metricClass The class of metric.
+     * @param emitter Emitter sending telemetry to the server.
+     * @param nameSpace The name the class tracking this metric.
+     * @param bindingMap the binding map contains fields who has user's permission.
+     */
+    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Emitter emitter, String nameSpace, Map<String, Boolean> bindingMap) {
+        Optional<Metric> optional = metrics.getMetric(metricClass);
+        if (optional.isPresent()) {
+            Metric metric = optional.get();
+            Unstructured unstructuredBlockDestroyed = metric.getUnstructuredMetric();
+            TelemetryUtils.trackMetric(emitter, nameSpace, unstructuredBlockDestroyed, metric, bindingMap);
+        }
+    }
 
     /**
      * track a metric.
@@ -58,7 +80,6 @@ public class TelemetryUtils {
                     .timezone("anonymous")
                     .build();
 
-            // initialise tracker
             Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
                     .subject(subject)
                     .platform(TelemetryParams.PLATFORM_DESKTOP)
@@ -96,7 +117,6 @@ public class TelemetryUtils {
                     .timezone("anonymous")
                     .build();
 
-            // initialise tracker
             Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
                     .subject(subject)
                     .platform(TelemetryParams.PLATFORM_DESKTOP)

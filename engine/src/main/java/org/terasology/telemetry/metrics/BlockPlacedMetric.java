@@ -44,14 +44,10 @@ public final class BlockPlacedMetric extends Metric {
 
     private LocalPlayer localPlayer;
 
-    public BlockPlacedMetric(Context context) {
-        super(context);
-    }
-
     @Override
     public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_PLACED, metricMap);
+        createTelemetryFieldToValue();
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_PLACED, telemetryFieldToValue);
 
         return Unstructured.builder()
                 .eventData(modulesData)
@@ -59,15 +55,16 @@ public final class BlockPlacedMetric extends Metric {
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            metricMap = gamePlayStatsComponent.blockPlacedMap;
-            return metricMap;
+            telemetryFieldToValue.clear();
+            telemetryFieldToValue.putAll(gamePlayStatsComponent.blockPlacedMap);
+            return telemetryFieldToValue;
         } else {
-            return metricMap;
+            return telemetryFieldToValue;
         }
     }
 }

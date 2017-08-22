@@ -43,14 +43,10 @@ public final class MonsterKilledMetric extends Metric {
     @TelemetryField
     private Map monsterKilledMap;
 
-    public MonsterKilledMetric(Context context) {
-        super(context);
-    }
-
     @Override
     public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MONSTER_KILLED, metricMap);
+        createTelemetryFieldToValue();
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MONSTER_KILLED, telemetryFieldToValue);
 
         return Unstructured.builder()
                 .eventData(modulesData)
@@ -58,15 +54,16 @@ public final class MonsterKilledMetric extends Metric {
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            metricMap = gamePlayStatsComponent.monsterKilled;
-            return metricMap;
+            telemetryFieldToValue.clear();
+            telemetryFieldToValue.putAll(gamePlayStatsComponent.monsterKilled);
+            return telemetryFieldToValue;
         } else {
-            return metricMap;
+            return telemetryFieldToValue;
         }
     }
 }
