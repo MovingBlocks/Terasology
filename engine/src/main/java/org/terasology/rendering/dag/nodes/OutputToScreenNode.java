@@ -98,7 +98,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
                         fbo = displayResolutionDependentFBOs.get(new SimpleUri(arguments[0]));
 
                         if (fbo == null) {
-                            throw new RuntimeException("Invalid fbo uri: " + arguments[0] + "!");
+                            throw new RuntimeException(("No FBO is associated with URI '" + arguments[0] + "'"));
                         }
 
                         break;
@@ -107,7 +107,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
                 break;
             default:
-                throw new RuntimeException("Invalid command: " + command + "!");
+                throw new RuntimeException("Unrecognized command: '" + command + "'");
         }
     }
 
