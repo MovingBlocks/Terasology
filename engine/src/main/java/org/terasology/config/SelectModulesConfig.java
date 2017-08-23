@@ -38,7 +38,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsLibraryChecked(boolean value) {
-        this.isLibraryChecked =value;
+        this.isLibraryChecked = value;
     }
 
     public boolean isAssetChecked() {
@@ -46,7 +46,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsAssetChecked(boolean value) {
-        this.isAssetChecked =value;
+        this.isAssetChecked = value;
     }
 
     public boolean isGameplayChecked() {
@@ -54,7 +54,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsGameplayChecked(boolean value) {
-        this.isGameplayChecked =value;
+        this.isGameplayChecked = value;
     }
 
     public boolean isAugmentationChecked() {
@@ -62,7 +62,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsAugmentationChecked(boolean value) {
-        this.isAugmentationChecked =value;
+        this.isAugmentationChecked = value;
     }
 
     public boolean isSpecialChecked() {
@@ -70,7 +70,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsSpecialChecked(boolean value) {
-        this.isSpecialChecked =value;
+        this.isSpecialChecked = value;
     }
 
     public boolean isWorldChecked() {
@@ -78,7 +78,7 @@ public class SelectModulesConfig {
     }
 
     public void setIsWorldChecked(boolean value) {
-        this.isWorldChecked =value;
+        this.isWorldChecked = value;
     }
 
     public boolean isAdvanceFilterChecked() {
