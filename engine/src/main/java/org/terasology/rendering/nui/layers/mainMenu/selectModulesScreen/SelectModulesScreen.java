@@ -110,18 +110,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
 
         refreshSelection();
-        logger.info("kikiji");
-    }
-
-
-    @Override
-    public void onShow() {
-        logger.info("On show");
-    }
-
-    @Override
-    public void onGainFocus() {
-        logger.info("on gain focus");
     }
 
     @Override
@@ -389,7 +377,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             filterModules();
             triggerForwardAnimation(AdvanceModuleFilter.ASSET_URI);
         });
-
     }
 
      private void filterModules() {
@@ -429,7 +416,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
         while (iter.hasNext()) {
             ModuleSelectionInfo m = iter.next();
             Module module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
-            System.out.println(module.getId().toString());
             if (selectModulesConfig.isLibraryChecked() && !StandardModuleExtension.isLibraryModule(module)) {
                 iter.remove();
                 continue;
@@ -452,7 +438,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             }
             if (selectModulesConfig.isAugmentationChecked() && !StandardModuleExtension.isAugmentationModule(module)) {
                 iter.remove();
-                continue;
             }
         }
     }

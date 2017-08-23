@@ -29,24 +29,17 @@ import org.terasology.rendering.nui.widgets.UICheckbox;
 public class AdvanceModuleFilter extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:moduleTypes");
-    private UICheckbox libraryCheckBox;
-    private UICheckbox assetCheckBox;
-    private UICheckbox specialCheckBox;
-    private UICheckbox augmentationCheckBox;
-    private UICheckbox worldCheckBox;
-    private UICheckbox gameplayCheckBox;
 
     @In
     private Config config;
     private SelectModulesConfig selectModulesConfig;
-    private SelectModulesScreen selectModulesScreen;
 
     @Override
     public void initialise() {
 
         selectModulesConfig = config.getSelectModulesConfig();
 
-        libraryCheckBox = find("libraryCheckbox", UICheckbox.class);
+        UICheckbox libraryCheckBox = find("libraryCheckbox", UICheckbox.class);
         libraryCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
@@ -62,23 +55,23 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
                 }
         );
 
-        assetCheckBox = find("assetCheckbox", UICheckbox.class);
+        UICheckbox assetCheckBox = find("assetCheckbox", UICheckbox.class);
         assetCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
                     public Boolean get() {
-                        return selectModulesConfig.isAssetChecked();
+                        return selectModulesConfig.isAssetplayChecked();
                     }
 
                     @Override
                     public void set(Boolean value) {
-                        selectModulesConfig.setIsAssetChecked(value);
+                        selectModulesConfig.setIsAssetplayChecked(value);
 
                     }
                 }
         );
 
-        worldCheckBox = find("worldCheckbox", UICheckbox.class);
+        UICheckbox worldCheckBox = find("worldCheckbox", UICheckbox.class);
         worldCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
@@ -94,7 +87,7 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
                 }
         );
 
-        gameplayCheckBox = find("gameplayCheckbox", UICheckbox.class);
+        UICheckbox gameplayCheckBox = find("gameplayCheckbox", UICheckbox.class);
         gameplayCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
@@ -110,7 +103,7 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
                 }
         );
 
-        augmentationCheckBox = find("augmentationCheckbox", UICheckbox.class);
+        UICheckbox augmentationCheckBox = find("augmentationCheckbox", UICheckbox.class);
         augmentationCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
@@ -126,7 +119,7 @@ public class AdvanceModuleFilter extends CoreScreenLayer {
                 }
         );
 
-        specialCheckBox = find("specialCheckbox", UICheckbox.class);
+        UICheckbox specialCheckBox = find("specialCheckbox", UICheckbox.class);
         specialCheckBox.bindChecked(
                 new Binding<Boolean>() {
                     @Override
