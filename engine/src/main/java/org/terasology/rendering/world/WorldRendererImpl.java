@@ -619,7 +619,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderableWorld.dispose();
         worldProvider.dispose();
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
-            SetViewportToSizeOf.disposeDefaultInstance();
+        SetViewportToSizeOf.disposeDefaultInstance();
     }
 
     @Override
