@@ -718,8 +718,11 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     public void shutdown() { }
 
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "args") final String... arguments) {
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
         Node node = renderGraph.findNode(new SimpleUri(nodeUri));
+        if (node == null) {
+            throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
+        }
         node.handleCommand(command, arguments);
     }
 }
