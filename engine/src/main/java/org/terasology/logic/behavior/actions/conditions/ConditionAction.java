@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
@@ -88,6 +89,7 @@ public class ConditionAction extends BaseAction {
             }
         }
         if (componentPresent != null) {
+
 
             Component component = actor.getComponent(componentLibrary.resolve(componentPresent).getType());
             if (component == null) {
@@ -189,6 +191,9 @@ public class ConditionAction extends BaseAction {
 
                                     // Null check
                                     case "exists":
+                                        if(fieldValue instanceof EntityRef && fieldValue == EntityRef.NULL) {
+                                            passing = false;
+                                        }
                                         break;
                                     // Collection checks
                                     case "empty":
