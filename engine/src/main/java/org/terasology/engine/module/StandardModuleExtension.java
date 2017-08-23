@@ -28,7 +28,7 @@ public enum StandardModuleExtension implements ModuleExtension {
 
     SERVER_SIDE_ONLY("serverSideOnly", Boolean.class),
     IS_GAMEPLAY("isGameplay", Boolean.class),
-    IS_ASSET("isAsset", Boolean.class),
+    IS_ASSETPLAY("isAsset", Boolean.class),
     IS_WORLD("isWorld", Boolean.class),
     IS_LIBRARY("isLibrary", Boolean.class),
     IS_SPECIAL("isSpecial", Boolean.class),
@@ -63,8 +63,8 @@ public enum StandardModuleExtension implements ModuleExtension {
         return getBooleanExtension(module, IS_GAMEPLAY);
     }
 
-    public static boolean isAssetModule(Module module) {
-        return getBooleanExtension(module, IS_ASSET);
+    public static boolean isAssetplayModule(Module module) {
+        return getBooleanExtension(module, IS_ASSETPLAY);
     }
 
     public static boolean isWorldModule(Module module) {

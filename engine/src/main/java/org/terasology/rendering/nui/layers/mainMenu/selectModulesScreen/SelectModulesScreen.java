@@ -434,7 +434,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 iter.remove();
                 continue;
             }
-            if (selectModulesConfig.isAssetChecked() && !StandardModuleExtension.isAssetModule(module)) {
+            if (selectModulesConfig.isAssetplayChecked() && !StandardModuleExtension.isAssetplayModule(module)) {
                 iter.remove();
                 continue;
             }

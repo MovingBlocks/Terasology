@@ -18,7 +18,7 @@ package org.terasology.config;
 public class SelectModulesConfig {
     private boolean isChecked;
     private boolean isLibraryChecked;
-    private boolean isAssetChecked;
+    private boolean isAssetplayChecked;
     private boolean isWorldChecked;
     private boolean isGameplayChecked;
     private boolean isAugmentationChecked;
@@ -41,12 +41,12 @@ public class SelectModulesConfig {
         this.isLibraryChecked = value;
     }
 
-    public boolean isAssetChecked() {
-        return isAssetChecked;
+    public boolean isAssetplayChecked() {
+        return isAssetplayChecked;
     }
 
-    public void setIsAssetChecked(boolean value) {
-        this.isAssetChecked = value;
+    public void setIsAssetplayChecked(boolean value) {
+        this.isAssetplayChecked = value;
     }
 
     public boolean isGameplayChecked() {
