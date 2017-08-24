@@ -45,10 +45,11 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private Zone parent;
 
     public static final class LayeredZoneOrdering {
-        public static final int HIGH_SKY = 300;
-        public static final int MEDIUM_SKY = 200;
-        public static final int LOW_SKY = 100;
-        public static final int SURFACE = 0;
+        public static final int HIGH_SKY = 400;
+        public static final int MEDIUM_SKY = 300;
+        public static final int LOW_SKY = 200;
+        public static final int ABOVE_GROUND = 100;
+        public static final int GROUND = 0;
         public static final int SHALLOW_UNDERGROUND = -100;
         public static final int MEDIUM_UNDERGROUND = -200;
         public static final int DEEP_UNDERGROUND = -300;
@@ -94,7 +95,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
         if (!layerRangeMap.containsKey(pos)) {
             int surfaceHeight = (int) Math.floor(region.getFacet(SurfaceHeightFacet.class).getWorld(pos));
 
-            boolean aboveground = ordering >= 0;
+            boolean aboveground = ordering > 0;
             int cumulativeDistanceSmall = 0;
             int cumulativeDistanceLarge = 0;
             LayerRange layerRange = null;
@@ -147,7 +148,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     }
 
     public boolean isUnderground() {
-        return ordering < 0;
+        return ordering <= 0;
     }
 
     public long getSeed() {
@@ -179,8 +180,8 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
         }
 
         public boolean layerContains(int height) {
-            boolean satisfiesMin = !min.isPresent() || min.get() <= height;
-            boolean satisfiesMax = !max.isPresent() || max.get() > height;
+            boolean satisfiesMin = !min.isPresent() || min.get() < height;
+            boolean satisfiesMax = !max.isPresent() || max.get() >= height;
 
             return satisfiesMin && satisfiesMax;
         }

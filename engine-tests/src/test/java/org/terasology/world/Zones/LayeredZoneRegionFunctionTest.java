@@ -38,11 +38,12 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.ABOVE_GROUND;
+import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.GROUND;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.LOW_SKY;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_SKY;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.MEDIUM_UNDERGROUND;
 import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.SHALLOW_UNDERGROUND;
-import static org.terasology.world.zones.LayeredZoneRegionFunction.LayeredZoneOrdering.SURFACE;
 
 public class LayeredZoneRegionFunctionTest {
 
@@ -51,7 +52,8 @@ public class LayeredZoneRegionFunctionTest {
 
     @Before
     public void setup() {
-        parent .addZone(new Zone("Surface", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), SURFACE)))
+        parent .addZone(new Zone("Above ground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), ABOVE_GROUND)))
+                .addZone(new Zone("Ground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), GROUND)))
                 .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), LOW_SKY)))
                 .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), MEDIUM_SKY)))
                 .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), SHALLOW_UNDERGROUND)))
@@ -92,18 +94,30 @@ public class LayeredZoneRegionFunctionTest {
 
     @Test
     public void testSurface() {
-        assertTrue(parent.getChildZone("Surface").containsBlock(0, 100, 0, region));
-        assertTrue(parent.getChildZone("Surface").containsBlock(0, 199, 0, region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(0, 99, 0, region));
-        assertFalse(parent.getChildZone("Surface").containsBlock(0, 200, 0, region));
+        assertTrue(parent.getChildZone("Ground").containsBlock(0, 100, 0, region));
+        assertTrue(parent.getChildZone("Ground").containsBlock(0, 1, 0, region));
+        assertFalse(parent.getChildZone("Ground").containsBlock(0, 101, 0, region));
+        assertFalse(parent.getChildZone("Ground").containsBlock(0, 0, 0, region));
+        assertTrue(parent.getChildZone("Above ground").containsBlock(0, 101, 0, region));
+        assertTrue(parent.getChildZone("Above ground").containsBlock(0, 200, 0, region));
+        assertFalse(parent.getChildZone("Above ground").containsBlock(0, 100, 0, region));
+        assertFalse(parent.getChildZone("Above ground").containsBlock(0, 201, 0, region));
     }
 
     @Test
     public void testUnderground() {
-        assertTrue(parent.getChildZone("Shallow underground").containsBlock(0, 99, 0, region));
         assertTrue(parent.getChildZone("Shallow underground").containsBlock(0, 0, 0, region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, 100, 0, region));
-        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, -1, 0, region));
+        assertTrue(parent.getChildZone("Shallow underground").containsBlock(0, -99, 0, region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, 1, 0, region));
+        assertFalse(parent.getChildZone("Shallow underground").containsBlock(0, -100, 0, region));
+    }
+
+    @Test
+    public void testSky() {
+        assertTrue(parent.getChildZone("Low sky").containsBlock(0, 201, 0, region));
+        assertTrue(parent.getChildZone("Low sky").containsBlock(0, 300, 0, region));
+        assertFalse(parent.getChildZone("Low sky").containsBlock(0, 200, 0, region));
+        assertFalse(parent.getChildZone("Low sky").containsBlock(0, 301, 0, region));
     }
 
     @Test
