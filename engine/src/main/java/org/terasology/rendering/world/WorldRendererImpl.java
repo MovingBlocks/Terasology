@@ -18,8 +18,14 @@ package org.terasology.rendering.world;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
@@ -43,8 +49,6 @@ import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
-import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
-import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
@@ -58,6 +62,8 @@ import org.terasology.rendering.dag.nodes.LightShaftsNode;
 import org.terasology.rendering.dag.nodes.OpaqueBlocksNode;
 import org.terasology.rendering.dag.nodes.OpaqueObjectsNode;
 import org.terasology.rendering.dag.nodes.OutlineNode;
+import org.terasology.rendering.dag.nodes.OutputToHMDNode;
+import org.terasology.rendering.dag.nodes.OutputToScreenNode;
 import org.terasology.rendering.dag.nodes.OverlaysNode;
 import org.terasology.rendering.dag.nodes.PrePostCompositeNode;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
@@ -99,8 +105,6 @@ import static org.terasology.rendering.opengl.ScalingFactors.ONE_16TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_32TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.ONE_8TH_SCALE;
 import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.WRITEONLY_GBUFFER;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
@@ -112,7 +116,8 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
-public final class WorldRendererImpl implements WorldRenderer {
+@RegisterSystem
+public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
@@ -151,6 +156,24 @@ public final class WorldRendererImpl implements WorldRenderer {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
+
+    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
+
+    // Required for ComponentSystem to register the system (via @RegisterSystem).
+    // @RegisterSystem requires a default constructor, and since we have final variables in the class,
+    // it was essential to set them to some value (in this case, null) in this constructor.
+    // Note that this constructor shouldn't be actually used normally anywhere in code.
+    public WorldRendererImpl() {
+        renderingConfig = null;
+        vrProvider = null;
+        renderQueues = null;
+        context = null;
+        backdropProvider = null;
+        worldProvider = null;
+        renderableWorld = null;
+        shaderManager = null;
+        playerCamera = null;
+    }
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -229,8 +252,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     private void initRenderGraph() {
-        RenderGraph renderGraph = new RenderGraph();
-
         addShadowMapNodes(renderGraph);
 
         addReflectionNodes(renderGraph);
@@ -249,7 +270,7 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addPostProcessingNodes(renderGraph);
 
-        addCopyOutputNodes(renderGraph);
+        addOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
@@ -282,14 +303,14 @@ public final class WorldRendererImpl implements WorldRenderer {
         BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
-        FBOConfig lastUpdatedGBufferConfig = displayResolutionDependentFBOs.getFboConfig(READONLY_GBUFFER);
-        FBOConfig staleGBufferConfig = displayResolutionDependentFBOs.getFboConfig(WRITEONLY_GBUFFER);
+        FBOConfig gBuffer1Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer1")); // TODO: Remove the hard coded value here
+        FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
 
-        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(lastUpdatedGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(lastUpdatedGBufferClearingNode, "lastUpdatedGBufferClearingNode");
+        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(lastUpdatedGBufferClearingNode, "gBuffer1ClearingNode");
 
-        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(staleGBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(staleGBufferClearingNode, "staleGBufferClearingNode");
+        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(staleGBufferClearingNode, "gBuffer2ClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
@@ -299,15 +320,16 @@ public final class WorldRendererImpl implements WorldRenderer {
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
         FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
 
-        String label = "hazeIntermediateNode";
+        String label = "hazeIntermediate";
         HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo, label);
-        renderGraph.addNode(hazeIntermediateNode, label);
+        renderGraph.addNode(hazeIntermediateNode, label + "Node");
 
         FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
         FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
 
+        label = "hazeFinal";
         HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo, label);
-        renderGraph.addNode(hazeFinalNode, "hazeFinalNode");
+        renderGraph.addNode(hazeFinalNode, label + "Node");
     }
 
     private void addWorldRenderingNodes(RenderGraph renderGraph) {
@@ -374,26 +396,26 @@ public final class WorldRendererImpl implements WorldRenderer {
         Node initialPostProcessingNode = new InitialPostProcessingNode(context);
         renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
 
-        FBOConfig writeOnlyGBufferConfig = displayResolutionDependentFBOs.getFboConfig(WRITEONLY_GBUFFER);
+        FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
         String label = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, writeOnlyGBufferConfig, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo16pixels, label);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
+        renderGraph.addNode(exposureDownSamplerTo16pixels, label + "Node");
 
         label = "downSampling_16x16px_to_8x8px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo8pixels = new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo8pixels, label);
+        renderGraph.addNode(exposureDownSamplerTo8pixels, label + "Node");
 
         label = "downSampling_8x8px_to_4x4px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo4pixels = new DownSamplerForExposureNode(context, FBO_8X8_CONFIG, immutableFBOs, FBO_4X4_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo4pixels, label);
+        renderGraph.addNode(exposureDownSamplerTo4pixels, label + "Node");
 
         label = "downSampling_4x4px_to_2x2px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo2pixels = new DownSamplerForExposureNode(context, FBO_4X4_CONFIG, immutableFBOs, FBO_2X2_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo2pixels, label);
+        renderGraph.addNode(exposureDownSamplerTo2pixels, label + "Node");
 
         label = "downSampling_2x2px_to_1x1px_forExposure";
         DownSamplerForExposureNode exposureDownSamplerTo1pixel = new DownSamplerForExposureNode(context, FBO_2X2_CONFIG, immutableFBOs, FBO_1X1_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo1pixel, label);
+        renderGraph.addNode(exposureDownSamplerTo1pixel, label + "Node");
 
         Node updateExposureNode = new UpdateExposureNode(context);
         renderGraph.addNode(updateExposureNode, "updateExposureNode");
@@ -412,47 +434,47 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         label = "halfScaleBlurredBloom";
         BloomBlurNode halfScaleBlurredBloom = new BloomBlurNode(context, displayResolutionDependentFBOs.get(HighPassNode.HIGH_PASS_FBO_URI), halfScaleBloomFbo, label);
-        renderGraph.addNode(halfScaleBlurredBloom, label);
+        renderGraph.addNode(halfScaleBlurredBloom, label + "Node");
 
         FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO_URI, QUARTER_SCALE, FBO.Type.DEFAULT);
         FBO quarterScaleBloomFbo = displayResolutionDependentFBOs.request(quarterScaleBloomConfig);
 
         label = "quarterScaleBlurredBloom";
         BloomBlurNode quarterScaleBlurredBloom = new BloomBlurNode(context, halfScaleBloomFbo, quarterScaleBloomFbo, label);
-        renderGraph.addNode(quarterScaleBlurredBloom, label);
+        renderGraph.addNode(quarterScaleBlurredBloom, label + "Node");
 
         FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
         FBO one8thScaleBloomFbo = displayResolutionDependentFBOs.request(one8thScaleBloomConfig);
 
         label = "one8thScaleBlurredBloom";
         BloomBlurNode one8thScaleBlurredBloom = new BloomBlurNode(context, quarterScaleBloomFbo, one8thScaleBloomFbo, label);
-        renderGraph.addNode(one8thScaleBlurredBloom, label);
+        renderGraph.addNode(one8thScaleBlurredBloom, label + "Node");
 
         // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO firstLateBlurFbo = displayResolutionDependentFBOs.request(firstLateBlurConfig);
 
-        label = "firstLateBlurNode";
+        label = "firstLateBlur";
         LateBlurNode firstLateBlurNode = new LateBlurNode(context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo, label);
-        renderGraph.addNode(firstLateBlurNode, label);
+        renderGraph.addNode(firstLateBlurNode, label + "Node");
 
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO secondLateBlurFbo = displayResolutionDependentFBOs.request(secondLateBlurConfig);
 
-        label = "secondLateBlurNode";
+        label = "secondLateBlur";
         LateBlurNode secondLateBlurNode = new LateBlurNode(context, firstLateBlurFbo, secondLateBlurFbo, label);
-        renderGraph.addNode(secondLateBlurNode, label);
+        renderGraph.addNode(secondLateBlurNode, label + "Node");
 
         Node finalPostProcessingNode = new FinalPostProcessingNode(context);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
     }
 
-    private void addCopyOutputNodes(RenderGraph renderGraph) {
-        Node copyToVRFrameBufferNode = new CopyImageToHMDNode(context);
-        renderGraph.addNode(copyToVRFrameBufferNode, "copyToVRFrameBufferNode");
+    private void addOutputNodes(RenderGraph renderGraph) {
+        Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
+        renderGraph.addNode(copyToVRFrameBufferNode, "outputToVRFrameBufferNode");
 
-        Node copyImageToScreenNode = new CopyImageToScreenNode(context);
-        renderGraph.addNode(copyImageToScreenNode, "copyImageToScreenNode");
+        Node copyImageToScreenNode = new OutputToScreenNode(context);
+        renderGraph.addNode(copyImageToScreenNode, "outputToScreenNode");
     }
 
     @Override
@@ -485,7 +507,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     public void update(float deltaInSeconds) {
         secondsSinceLastFrame += deltaInSeconds;
     }
-
 
     private void resetStats() {
         statChunkMeshEmpty = 0;
@@ -598,7 +619,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.dispose();
         worldProvider.dispose();
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
-            SetViewportToSizeOf.disposeDefaultInstance();
+        SetViewportToSizeOf.disposeDefaultInstance();
     }
 
     @Override
@@ -676,5 +697,32 @@ public final class WorldRendererImpl implements WorldRenderer {
 
     public void recompileShaders() {
         shaderManager.recompileAllShaders();
+    }
+
+    @Override
+    public void initialise() { }
+
+    @Override
+    public void preBegin() { }
+
+    @Override
+    public void postBegin() { }
+
+    @Override
+    public void preSave() { }
+
+    @Override
+    public void postSave() { }
+
+    @Override
+    public void shutdown() { }
+
+    @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
+        Node node = renderGraph.findNode(new SimpleUri(nodeUri));
+        if (node == null) {
+            throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
+        }
+        node.handleCommand(command, arguments);
     }
 }

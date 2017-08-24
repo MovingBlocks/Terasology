@@ -294,5 +294,4 @@ public class HeadlessWorldRenderer implements WorldRenderer {
             return distance2 > distance ? -1 : 1;
         }
     }
-
 }
