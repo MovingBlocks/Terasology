@@ -21,17 +21,17 @@ import org.terasology.utilities.procedural.Noise;
 import java.util.function.LongFunction;
 
 /**
- * An abstract class for building a {@link LayerWidth} that is based on the value of a noise function.
+ * An abstract class for building a {@link LayerThickness} that is based on the value of a noise function.
  *
- * Note that the noise values are in the range [-1..1], so they must me adjusted to fit the desired layer width.
+ * Note that the noise values are in the range [-1..1], so they must me adjusted to fit the desired layer thickness.
  */
 @API
-public abstract class SeededNoiseLayerWidth implements LayerWidth {
+public abstract class SeededNoiseLayerThickness implements LayerThickness {
 
     private final LongFunction<Noise> seededNoiseFunction;
     protected Noise noise;
 
-    public SeededNoiseLayerWidth(LongFunction<Noise> seededNoiseFunction) {
+    public SeededNoiseLayerThickness(LongFunction<Noise> seededNoiseFunction) {
         this.seededNoiseFunction = seededNoiseFunction;
     }
 

@@ -18,22 +18,22 @@ package org.terasology.world.zones;
 import org.terasology.module.sandbox.API;
 
 /**
- * This is a {@link LayerWidth} for a layer that has a constant, predetermined width at all paints.
+ * This is a {@link LayerThickness} for a layer that has a constant, predetermined thickness at all paints.
  */
 @API
-public class ConstantLayerWidth implements LayerWidth {
+public class ConstantLayerThickness implements LayerThickness {
 
-    private final int width;
+    private final int thickness;
 
     /**
-     * @param width the desired width of this layer
+     * @param thickness the desired thickness of this layer
      */
-    public ConstantLayerWidth(int width) {
-        this.width = width;
+    public ConstantLayerThickness(int thickness) {
+        this.thickness = thickness;
     }
 
     @Override
     public int get(int x, int z) {
-        return width;
+        return thickness;
     }
 }

@@ -29,7 +29,7 @@ import org.terasology.world.generation.RegionImpl;
 import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.zones.LayeredZoneRegionFunction;
-import org.terasology.world.zones.MinMaxLayerWidth;
+import org.terasology.world.zones.MinMaxLayerThickness;
 import org.terasology.world.zones.Zone;
 
 import java.util.HashMap;
@@ -52,12 +52,12 @@ public class LayeredZoneRegionFunctionTest {
 
     @Before
     public void setup() {
-        parent .addZone(new Zone("Above ground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), ABOVE_GROUND)))
-                .addZone(new Zone("Ground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), GROUND)))
-                .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), LOW_SKY)))
-                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), MEDIUM_SKY)))
-                .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), SHALLOW_UNDERGROUND)))
-                .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(new MinMaxLayerWidth(100, 100), MEDIUM_UNDERGROUND)));
+        parent .addZone(new Zone("Above ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), ABOVE_GROUND)))
+                .addZone(new Zone("Ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), GROUND)))
+                .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), LOW_SKY)))
+                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), MEDIUM_SKY)))
+                .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), SHALLOW_UNDERGROUND)))
+                .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), MEDIUM_UNDERGROUND)));
         parent.setSeed(12345);
         parent.initialize();
 
@@ -87,7 +87,7 @@ public class LayeredZoneRegionFunctionTest {
         int maxWidth = 200;
         int ordering = 1000;
 
-        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(new MinMaxLayerWidth(minWidth, maxWidth), ordering);
+        LayeredZoneRegionFunction function = new LayeredZoneRegionFunction(new MinMaxLayerThickness(minWidth, maxWidth), ordering);
 
         assertEquals(ordering, function.getOrdering());
     }

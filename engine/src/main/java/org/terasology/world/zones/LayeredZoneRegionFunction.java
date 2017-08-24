@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * A function that can be used as a {@link Zone#regionFunction} to create zones that are layered on top of each other.
  *
- * These layers are ordered according to {@link #ordering}, and have a width determined by {@link #layerWidth}.
+ * These layers are ordered according to {@link #ordering}, and have a thickness determined by {@link #layerThickness}.
  */
 @API
 public class LayeredZoneRegionFunction implements ZoneRegionFunction {
@@ -40,7 +40,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
     private List<LayeredZoneRegionFunction> abovegroundLayers;
     private List<LayeredZoneRegionFunction> undergroundLayers;
     private ConcurrentMap<Vector2i, LayerRange> layerRangeMap = new ConcurrentHashMap<>(ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z * 100);
-    private LayerWidth layerWidth;
+    private LayerThickness layerThickness;
     private long seed;
     private Zone parent;
 
@@ -58,8 +58,8 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
 
     private final int ordering;
 
-    public LayeredZoneRegionFunction(LayerWidth layerWidth, int ordering) {
-        this.layerWidth = layerWidth;
+    public LayeredZoneRegionFunction(LayerThickness layerThickness, int ordering) {
+        this.layerThickness = layerThickness;
         this.ordering = ordering;
     }
 
@@ -87,7 +87,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                 .collect(Collectors.toList());
 
         seed = parent.getSeed();
-        layerWidth.initialize(this);
+        layerThickness.initialize(this);
     }
 
     private LayerRange getLayerRange(int x, int z, Region region) {
@@ -106,9 +106,9 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
             for (layerIndex = 0; layerIndex < layers.size(); layerIndex++) {
                 LayeredZoneRegionFunction currentLayer = layers.get(layerIndex);
 
-                int width = currentLayer.layerWidth.get(x, z);
+                int thickness = currentLayer.layerThickness.get(x, z);
 
-                cumulativeDistanceLarge += width;
+                cumulativeDistanceLarge += thickness;
                 if (this.equals(currentLayer)) {
                     if (aboveground) {
                         layerRange = new LayerRange()
@@ -122,7 +122,7 @@ public class LayeredZoneRegionFunction implements ZoneRegionFunction {
                         break;
                     }
                 }
-                cumulativeDistanceSmall += width;
+                cumulativeDistanceSmall += thickness;
             }
 
             if (layers.size() <= 0 || layerRange == null) {

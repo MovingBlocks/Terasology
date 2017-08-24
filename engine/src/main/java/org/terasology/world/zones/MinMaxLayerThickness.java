@@ -20,21 +20,21 @@ import org.terasology.utilities.procedural.BrownianNoise;
 import org.terasology.utilities.procedural.SimplexNoise;
 
 /**
- * A {@link LayerWidth} that picks the width at each point by selecting a value between the minimum and maximum.
+ * A {@link LayerThickness} that picks the thickness at each point by selecting a value between the minimum and maximum.
  *
  * This value is picked base on a noise function, so it translates smoothly between close points.
  */
 @API
-public class MinMaxLayerWidth extends SeededNoiseLayerWidth {
+public class MinMaxLayerThickness extends SeededNoiseLayerThickness {
 
     private final int min;
     private final int max;
 
     /**
-     * @param min the minimum width for the layer
-     * @param max the maximum width for the layer
+     * @param min the minimum thickness for the layer
+     * @param max the maximum thickness for the layer
      */
-    public MinMaxLayerWidth(int min, int max) {
+    public MinMaxLayerThickness(int min, int max) {
         //TODO: make sure that layers at different heights have different noise
         super(seed -> new BrownianNoise(new SimplexNoise(seed), 2));
 

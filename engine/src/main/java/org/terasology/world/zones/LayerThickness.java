@@ -18,16 +18,16 @@ package org.terasology.world.zones;
 import org.terasology.module.sandbox.API;
 
 /**
- * This function is used to determine the width of a {@link LayeredZoneRegionFunction} at each point on the layer.
+ * This function is used to determine the thickness of a {@link LayeredZoneRegionFunction} at each point on the layer.
  */
 @API
 @FunctionalInterface
-public interface LayerWidth {
+public interface LayerThickness {
 
     /**
      * @param x the world x coordinate
      * @param z the world z coordinate
-     * @return the layer's width at the given co-ordinates
+     * @return the layer's thickness at the given co-ordinates
      */
     int get(int x, int z);
 
