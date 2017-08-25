@@ -22,6 +22,8 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.TelemetryConfig;
+import org.terasology.config.facade.TelemetryConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.module.sandbox.API;
@@ -48,6 +50,27 @@ public final class TelemetryUtils {
     }
 
     /**
+     * Fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
+     * This method could be used in the method.
+     * @param metrics Metrics instance in the game context.
+     * @param metricClass The class of metric.
+     * @param context the game context
+     * @param nameSpace The name the class tracking this metric.
+     * @param telemetryConfiguration the telemetryConfiguration adapter which could be used in modules.
+     */
+    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Context context, String nameSpace, TelemetryConfiguration telemetryConfiguration) {
+        Emitter emitter = context.get(Emitter.class);
+        if (emitter != null) {
+            Optional<Metric> optional = metrics.getMetric(metricClass);
+            if (optional.isPresent()) {
+                Metric metric = optional.get();
+                Unstructured unstructured = metric.getUnstructuredMetric();
+                trackMetric(emitter, nameSpace, unstructured, metric, telemetryConfiguration);
+            }
+        }
+    }
+
+    /**
      * fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
      * @param metrics Metrics class in the game context.
      * @param metricClass The class of metric.
@@ -59,9 +82,37 @@ public final class TelemetryUtils {
         Optional<Metric> optional = metrics.getMetric(metricClass);
         if (optional.isPresent()) {
             Metric metric = optional.get();
-            Unstructured unstructuredBlockDestroyed = metric.getUnstructuredMetric();
-            TelemetryUtils.trackMetric(emitter, nameSpace, unstructuredBlockDestroyed, metric, bindingMap);
+            Unstructured unstructured = metric.getUnstructuredMetric();
+            trackMetric(emitter, nameSpace, unstructured, metric, bindingMap);
         }
+    }
+
+    /**
+     * Fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
+     * @param emitter Emitter sending telemetry to the server.
+     * @param nameSpace The name the class tracking this metric.
+     * @param event The new event.
+     * @param metric the Metric class instance that this event belongs to.
+     * @param telemetryConfiguration the telemetryConfiguration adapter which could be used in modules.
+     */
+    public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, TelemetryConfiguration telemetryConfiguration) {
+        AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+            Context context = CoreRegistry.get(Context.class);
+            DisplayDevice display = context.get(DisplayDevice.class);
+            if (telemetryConfiguration.fetchBindingSize() == 0 && display.isHeadless()) {
+                trackMetric(emitter, nameSpace, event);
+            } else if (telemetryConfiguration.fetchBindingSize() != 0) {
+                TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
+                if (telemetryCategory != null) {
+                    if (telemetryConfiguration.containField(telemetryCategory.id())) {
+                        if ((telemetryConfiguration.get(telemetryCategory.id()))) {
+                            trackMetric(emitter, nameSpace, event);
+                        }
+                    }
+                }
+            }
+            return null;
+        });
     }
 
     /**
@@ -74,27 +125,16 @@ public final class TelemetryUtils {
      */
     public static void trackMetric(Emitter emitter, String nameSpace, Unstructured event, Metric metric, Map<String, Boolean> bindingMap) {
         AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            Subject subject = new Subject.SubjectBuilder()
-                    .userId(TelemetryParams.userId)
-                    .ipAddress("anonymous")
-                    .timezone("anonymous")
-                    .build();
-
-            Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
-                    .subject(subject)
-                    .platform(TelemetryParams.PLATFORM_DESKTOP)
-                    .build();
-
             Context context = CoreRegistry.get(Context.class);
             DisplayDevice display = context.get(DisplayDevice.class);
             if (bindingMap.size() == 0 && display.isHeadless()) {
-                tracker.track(event);
+                trackMetric(emitter, nameSpace, event);
             } else if (bindingMap.size() != 0) {
                 TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
                 if (telemetryCategory != null) {
                     if (bindingMap.containsKey(telemetryCategory.id())) {
                         if ((bindingMap.get(telemetryCategory.id()))) {
-                            tracker.track(event);
+                            trackMetric(emitter, nameSpace, event);
                         }
                     }
                 }
@@ -104,7 +144,8 @@ public final class TelemetryUtils {
     }
 
     /**
-     * track a metric.
+     * track a metric without in spite of user's telemetry configuration.
+     * It's rather a method for test.
      * @param emitter Emitter sending telemetry to the server.
      * @param nameSpace The name the class tracking this metric.
      * @param event The new event.

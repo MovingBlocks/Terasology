@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.TelemetryConfig;
+import org.terasology.config.facade.TelemetryConfiguration;
+import org.terasology.config.facade.TelemetryConfigurationImpl;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.telemetry.Metrics;
@@ -69,6 +71,12 @@ public class TelemetrySubSystem implements EngineSubsystem {
     public void postInitialise(Context rootContext) {
 
         metrics.initialise(rootContext);
+
+        // Add the telemetryConfig adapter to context. It could be used in modules.
+        Config config = rootContext.get(Config.class);
+        TelemetryConfig telemetryConfig = config.getTelemetryConfig();
+        TelemetryConfiguration telemetryConfiguration = new TelemetryConfigurationImpl(telemetryConfig);
+        rootContext.put(TelemetryConfiguration.class, telemetryConfiguration);
 
         addTelemetryLogstashAppender(rootContext);
         setTelemetryDestination(rootContext);

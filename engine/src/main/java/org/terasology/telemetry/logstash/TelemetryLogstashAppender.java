@@ -31,13 +31,11 @@ import net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder;
 import net.logstash.logback.stacktrace.ShortenedThrowableConverter;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-import org.terasology.module.sandbox.API;
 
 /**
  * This is a logback Logstash appender that enriches error logs and sent them to the Logstash in server.
  * The constructor has the default configuration of this appender. The destination of this appender will be set when error reporting is enabled.
  */
-@API
 public class TelemetryLogstashAppender extends LogstashTcpSocketAppender {
 
     public static final String TELEMETRY_APPENDER_NAME = "LOGSTASH";

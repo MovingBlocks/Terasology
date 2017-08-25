@@ -106,8 +106,8 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
      * If a new map is added during the game, the authorization functionality could also be used.
      */
     private void refreshBindingMap() {
-        Map<String, Metric> metricsMap = metrics.getClassNameToMetric();
-        for (Metric metric : metricsMap.values()) {
+        Map<String, Metric> classNameToMetricMap = metrics.getClassNameToMetric();
+        for (Metric metric : classNameToMetricMap.values()) {
             TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
             if (!bindingMap.containsKey(telemetryCategory.id())) {
                 bindingMap.put(telemetryCategory.id(), config.getTelemetryConfig().isTelemetryEnabled());

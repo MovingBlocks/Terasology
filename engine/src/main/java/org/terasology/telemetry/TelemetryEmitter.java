@@ -25,7 +25,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.module.sandbox.API;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -36,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  * TelemetryEmitter emit metrics to the telemetry server.
  * @see <a href="https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitters">https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitterss</a>
  */
-@API
 public class TelemetryEmitter extends BatchEmitter {
 
     public static final String DEFAULT_COLLECTOR_PROTOCOL = "http";

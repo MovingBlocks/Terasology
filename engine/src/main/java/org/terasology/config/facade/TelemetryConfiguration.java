@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config;
+package org.terasology.config.facade;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.terasology.module.sandbox.API;
 
 /**
- * This config is used in Telemetry.
- * It gives the user more options such as sending one part of the fields but not the other part.
+ * TelemetryConfiguration is a wrapper for {@link org.terasology.config.TelemetryConfig}.
+ * It provides other modules with necessary telemetry configuration.
  */
-public class MetricsUserPermissionConfig {
+@API
+public interface TelemetryConfiguration {
 
-    private Map<String, Boolean> bindingMap = new HashMap<>();
+    boolean isTelemetryEnabled();
 
-    public Map<String, Boolean> getBindingMap() {
-        return bindingMap;
-    }
+    boolean isErrorReportingEnabled();
 
-    public void setBindingMap(Map<String, Boolean> bindingMap) {
-        this.bindingMap = bindingMap;
-    }
+    int fetchBindingSize();
+
+    Boolean get(String telemetryField);
+
+    boolean containField(String telemetryField);
 }

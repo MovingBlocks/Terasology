@@ -76,7 +76,6 @@ public final class ExternalApiWhitelist {
             .add("com.yourkit.runtime")
             .add("com.bulletphysics.linearmath")
             .add("sun.reflect")
-            .add("com.snowplowanalytics.snowplow.tracker.emitter")
             .add("com.snowplowanalytics.snowplow.tracker.events")
             .add("com.snowplowanalytics.snowplow.tracker.payload")
             .build();
