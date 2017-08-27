@@ -9,6 +9,8 @@ import org.terasology.input.Input;
 import java.util.Collection;
 import java.util.List;
 
+import static java.util.Collections.unmodifiableCollection;
+
 public class BindsConfigurationImpl implements BindsConfiguration {
 
     private Config config;
@@ -54,7 +56,7 @@ public class BindsConfigurationImpl implements BindsConfiguration {
 
     @Override
     public Collection<Input> getBoundInputs() {
-        return config.getBinds().getBoundInputs();
+        return unmodifiableCollection(config.getBinds().getBoundInputs());
     }
 
 }

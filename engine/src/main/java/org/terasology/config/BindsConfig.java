@@ -19,7 +19,6 @@ package org.terasology.config;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonDeserializationContext;
@@ -31,23 +30,27 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
+import org.terasology.input.RegisterBindButton;
 import org.terasology.naming.Name;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
+
 /**
- * User binds configuration. This holds the key/mouse binding for Button Binds.
+ * The binds configuration holds the mapping from binding uris to Inputs.
+ * The {@link SimpleUri} for a binding contains the module from the binding and the id from the binding annotation, 
+ * e.g. from {@link RegisterBindButton}.
  */
 public final class BindsConfig {
 
-    private ListMultimap<SimpleUri, Input> bindUriToInput = ArrayListMultimap.create();
+    private ListMultimap<SimpleUri, Input> uriBoundInputs = ArrayListMultimap.create();
 
     /**
      * Returns true if an input has already been bound to another key
@@ -56,7 +59,7 @@ public final class BindsConfig {
      * @return True if newInput has been bound. False otherwise.
      */
     public boolean isBound(Input newInput) {
-        return newInput != null && bindUriToInput.containsValue(newInput);
+        return newInput != null && uriBoundInputs.containsValue(newInput);
     }
 
     /**
@@ -65,12 +68,12 @@ public final class BindsConfig {
      * @param other The BindsConfig to copy
      */
     public void setBinds(BindsConfig other) {
-        bindUriToInput.clear();
-        bindUriToInput.putAll(other.bindUriToInput);
+        uriBoundInputs.clear();
+        uriBoundInputs.putAll(other.uriBoundInputs);
     }
 
     public List<Input> getBinds(SimpleUri uri) {
-        return bindUriToInput.get(uri);
+        return uriBoundInputs.get(uri);
     }
 
     /**
@@ -81,32 +84,33 @@ public final class BindsConfig {
      * @return Whether the given bind has been registered with the BindsConfig
      */
     public boolean hasBinds(SimpleUri uri) {
-        return !bindUriToInput.get(uri).isEmpty();
+        return !uriBoundInputs.get(uri).isEmpty();
     }
 
     /**
      * Sets the inputs for a given bind, replacing any previous inputs
      *
-     * @param bindUri
-     * @param inputs
      */
-
     public void setBinds(SimpleUri bindUri, Input ... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
 
+    /**
+     * Sets the inputs for a given bind, replacing any previous inputs
+     *
+     */
     public void setBinds(SimpleUri bindUri, Iterable<Input> inputs) {
         Set<Input> uniqueInputs = Sets.newLinkedHashSet(inputs);
 
         // Clear existing usages of the given inputs
-        Iterator<Input> iterator = bindUriToInput.values().iterator();
+        Iterator<Input> iterator = uriBoundInputs.values().iterator();
         while (iterator.hasNext()) {
             Input i = iterator.next();
             if (uniqueInputs.contains(i)) {
                 iterator.remove();
             }
         }
-        bindUriToInput.replaceValues(bindUri, uniqueInputs);
+        uriBoundInputs.replaceValues(bindUri, uniqueInputs);
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
@@ -119,35 +123,39 @@ public final class BindsConfig {
                 SetMultimap<String, Input> map = context.deserialize(entry.getValue(), SetMultimap.class);
                 for (String id : map.keySet()) {
                     SimpleUri uri = new SimpleUri(new Name(entry.getKey()), id);
-                    result.bindUriToInput.putAll(uri, map.get(id));
+                    result.uriBoundInputs.putAll(uri, map.get(id));
                 }
             }
             return result;
         }
 
         @Override
-        public JsonElement serialize(BindsConfig src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(BindsConfig bindsConfig, Type typeOfBindsConfig, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
-            SetMultimap<Name, SimpleUri> bindByModule = HashMultimap.create();
-            for (SimpleUri key : src.bindUriToInput.keySet()) {
-                bindByModule.put(key.getModuleName(), key);
-            }
-            List<Name> sortedModules = Lists.newArrayList(bindByModule.keySet());
-            Collections.sort(sortedModules);
-            for (Name moduleId : sortedModules) {
+            SetMultimap<Name, SimpleUri> bindingByModuleName = listBindingsByModuleName(bindsConfig);
+            List<Name> sortedModuleNames = bindingByModuleName.keySet().stream().sorted().collect(toList());
+            for (Name moduleName : sortedModuleNames) {
                 SetMultimap<String, Input> moduleBinds = HashMultimap.create();
-                for (SimpleUri bindUri : bindByModule.get(moduleId)) {
-                    moduleBinds.putAll(bindUri.getObjectName().toString(), src.bindUriToInput.get(bindUri));
+                for (SimpleUri bindingUri : bindingByModuleName.get(moduleName)) {
+                    moduleBinds.putAll(bindingUri.getObjectName().toString(), bindsConfig.uriBoundInputs.get(bindingUri));
                 }
                 JsonElement map = context.serialize(moduleBinds, SetMultimap.class);
-                result.add(moduleId.toString(), map);
+                result.add(moduleName.toString(), map);
             }
             return result;
+        }
+
+        public SetMultimap<Name, SimpleUri> listBindingsByModuleName(BindsConfig src) {
+            SetMultimap<Name, SimpleUri> bindingByModuleName = HashMultimap.create();
+            for (SimpleUri bindingUri : src.uriBoundInputs.keySet()) {
+                bindingByModuleName.put(bindingUri.getModuleName(), bindingUri);
+            }
+            return bindingByModuleName;
         }
     }
 
     public Collection<Input> getBoundInputs() {
-        return bindUriToInput.values();
+        return uriBoundInputs.values();
     }
 
 }

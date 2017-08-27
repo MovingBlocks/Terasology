@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.unmodifiableCollection;
+
 public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BindsSubsystem.class);
@@ -178,14 +180,14 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private List<Input> fetchDefaultBindings(Class<?> event, BindsConfiguration config) {
         List<Input> defaultInputs = Lists.newArrayList();
-        Collection<Input> values = config.getBoundInputs();
+        Collection<Input> boundInputs = config.getBoundInputs();
         for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
             DefaultBinding defaultBinding = (DefaultBinding) annotation;
-            Input input = defaultBinding.type().getInput(defaultBinding.id());
-            if (!values.contains(input)) {
-                defaultInputs.add(input);
+            Input defaultInput = defaultBinding.type().getInput(defaultBinding.id());
+            if (!boundInputs.contains(defaultInput)) {
+                defaultInputs.add(defaultInput);
             } else {
-                logger.warn("Input {} is already registered, can not use it for event {}", input, event);
+                logger.warn("Input {} is already registered, can not use it as default for event {}", defaultInput, event);
             }
         }
         return defaultInputs;
@@ -425,7 +427,7 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
         @Override
         public Collection<Input> getBoundInputs() {
-            return bindsConfig.getBoundInputs();
+            return unmodifiableCollection(bindsConfig.getBoundInputs());
         }
 
     }

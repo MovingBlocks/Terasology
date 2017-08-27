@@ -19,7 +19,7 @@ public interface InputDeviceConfiguration {
     void setMouseSensitivity(float mouseSensitivity);
 
     /**
-     * Resets the the mouse sensitivity and axis settings from the default configuration.
+    * Resets the the mouse sensitivity and axis settings back to the default values.
      */
     void reset();
 
@@ -29,7 +29,7 @@ public interface InputDeviceConfiguration {
     boolean isMouseYAxisInverted();
 
     /**
-     * Sets the y axis to be inverted.
+     * Sets the y-axis as inverted (true) or resets it back to normal (false).
      */
     void setMouseYAxisInverted(boolean mouseYAxisInverted);
 

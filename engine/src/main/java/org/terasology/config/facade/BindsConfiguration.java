@@ -5,15 +5,17 @@ import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
+import org.terasology.input.RegisterBindButton;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
  * Facade for {@link Config#getBinds()}.
- * The binds configuration holds the mapping from bind uris.
+ * The binds configuration holds the mapping from binding uris to Inputs.
  * The {@link SimpleUri} for a binding contains the module from the binding and the id from the binding annotation, 
- * e.g. {@link RegisterBindButton.
+ * e.g. from {@link RegisterBindButton}.
+ * @see BindsConfig
  */
 public interface BindsConfiguration {
 
@@ -23,12 +25,12 @@ public interface BindsConfiguration {
     boolean isBound(Input newInput);
 
     /**
-     * Sets all bindings to the mappings from the given config.
+     * Sets all bindings to the mappings contained in the given config.
      */
     void setBinds(BindsConfig other);
 
     /**
-     * Returns a list of all input, bound to the given bind uri.
+     * Returns a list of all input, bound to the given uri.
      */
     List<Input> getBinds(SimpleUri uri);
 
@@ -43,20 +45,19 @@ public interface BindsConfiguration {
     boolean hasBinds(SimpleUri uri);
 
     /**
-     * Binds one or more inputs to one bind uri.
-     * If the inputs are used for other uris, they will be removed and used for the new bind uri.
+    * Binds one or more inputs to one uri.
+    * If the inputs are bound to other uris they will be dissociated from them first
      */
     void setBinds(SimpleUri bindUri, Input ... inputs);
 
     /**
-     * Binds one or more inputs to one bind uri.
-     * If the inputs are used for other uris, they will be removed and used for the new bind uri.
+    * Binds one or more inputs to one uri.
+    * If the inputs are bound to other uris they will be dissociated from them first
      */
     void setBinds(SimpleUri bindUri, Iterable<Input> inputs);
 
     /**
-     * Returns a collection with all bound input values. 
-     * Changes to this collection may be visible to the underlying data, therefore it should be used for read-only.
+     * Returns a read-only view of all bound inputs.
      */
     Collection<Input> getBoundInputs();
 
