@@ -20,15 +20,12 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.config.Config;
 import org.terasology.config.PlayerConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 import org.terasology.world.generator.WorldGenerator;
 
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -68,7 +65,7 @@ public final class GameConfigurationMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
+        createTelemetryFieldToValue();
         Map filteredMetricMap = filterMetricMap(bindingMap);
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, filteredMetricMap);
 
@@ -78,12 +75,12 @@ public final class GameConfigurationMetric extends Metric {
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         fetchWorldGenerator();
         fetchNetworkMode();
         fetchConfig();
 
-        return super.getFieldValueMap();
+        return super.createTelemetryFieldToValue();
     }
 
     private void fetchWorldGenerator() {

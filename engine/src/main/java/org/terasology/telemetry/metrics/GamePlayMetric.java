@@ -56,7 +56,7 @@ public final class GamePlayMetric extends Metric {
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
+        createTelemetryFieldToValue();
         Map<String, ?> filteredMetricMap = filterMetricMap(bindingMap);
         SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, filteredMetricMap);
 
@@ -66,16 +66,16 @@ public final class GamePlayMetric extends Metric {
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
             distanceTraveled = gamePlayStatsComponent.distanceTraveled;
             playTimeMinute = (long) gamePlayStatsComponent.playTimeMinute;
-            return super.getFieldValueMap();
+            return super.createTelemetryFieldToValue();
         } else {
-            return metricMap;
+            return super.createTelemetryFieldToValue();
         }
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.terasology.telemetry.logstash;
 
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
@@ -32,7 +31,6 @@ import net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder;
 import net.logstash.logback.stacktrace.ShortenedThrowableConverter;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-
 
 /**
  * This is a logback Logstash appender that enriches error logs and sent them to the Logstash in server.

@@ -23,7 +23,7 @@ import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PORT;
 import static org.terasology.telemetry.TelemetryEmitter.DEFAULT_COLLECTOR_PROTOCOL;
 
 /**
- *  Configuration (authorisation) for telemetry system.
+ * Configuration (authorisation) for telemetry system.
  */
 public class TelemetryConfig {
 

@@ -48,14 +48,13 @@ public final class ModulesMetric extends Metric {
     private Context context;
 
     public ModulesMetric(Context context) {
-
         this.context = context;
     }
 
     @Override
     public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, metricMap);
+        createTelemetryFieldToValue();
+        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, telemetryFieldToValue);
         
         return Unstructured.builder()
                 .eventData(modulesData)
@@ -63,13 +62,13 @@ public final class ModulesMetric extends Metric {
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         updateModules();
-        metricMap = new HashMap();
+        telemetryFieldToValue = new HashMap();
         for (Module module : modules) {
-            metricMap.put(module.getId().toString(), module.getVersion().toString());
+            telemetryFieldToValue.put(module.getId().toString(), module.getVersion().toString());
         }
-        return metricMap;
+        return telemetryFieldToValue;
     }
 
     private void updateModules() {

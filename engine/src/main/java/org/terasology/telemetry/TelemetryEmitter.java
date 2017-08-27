@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * TelemetryEmitter emit metrics to the telemetry server.
  * @see <a href="https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitters">https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitterss</a>
-
  */
 public class TelemetryEmitter extends BatchEmitter {
 
