@@ -155,7 +155,6 @@ public final class TelemetryUtils {
             Subject subject = new Subject.SubjectBuilder()
                     .userId(TelemetryParams.userId)
                     .ipAddress("anonymous")
-                    .timezone("anonymous")
                     .build();
 
             Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)
