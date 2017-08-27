@@ -34,6 +34,7 @@ uniform vec4 lightingSettingsFrag;
 uniform sampler2D textureWater;
 uniform sampler2D textureWaterReflection;
 uniform sampler2D texSceneOpaque;
+uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D textureWaterNormal;
 uniform sampler2D textureWaterNormalAlt;
 
@@ -246,6 +247,14 @@ void main() {
                 color += refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
             }
 
+            //float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
+            //color.r = depthOpaque*0.5+0.5;
+            //color.rgb = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).rgb;
+            //float depth = texture2D(texSceneOpaqueDepth,gl_TexCoord[0].xy).r*2.0-1.0;
+            //float linDepth = (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+            //color.rgb = vec3(linDepth,linDepth,linDepth);
+            // simply use refractionColor which comes from texture loaded fom copyDepthFbo
+            color.rgb = refractionColor.rgb;
             color.a = 1.0;
      } else if (isWater) {
             texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);

@@ -43,6 +43,7 @@ import org.terasology.rendering.dag.nodes.BackdropReflectionNode;
 import org.terasology.rendering.dag.nodes.BloomBlurNode;
 import org.terasology.rendering.dag.nodes.BlurredAmbientOcclusionNode;
 import org.terasology.rendering.dag.nodes.BufferClearingNode;
+import org.terasology.rendering.dag.nodes.CopyDepthNode;
 import org.terasology.rendering.dag.nodes.CopyImageToHMDNode;
 import org.terasology.rendering.dag.nodes.CopyImageToScreenNode;
 import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
@@ -241,6 +242,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         addLightingNodes(renderGraph);
 
+        addCopyDepthNode(renderGraph);
+
         addRefractiveReflectiveNode(renderGraph);
 
         add3dDecorationNodes(renderGraph);
@@ -337,6 +340,11 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         Node applyDeferredLightingNode = new ApplyDeferredLightingNode(context);
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
+    }
+
+    private void addCopyDepthNode(RenderGraph renderGraph) {
+        Node copyDepthNode = new CopyDepthNode(context);
+        renderGraph.addNode(copyDepthNode,"copyDepthNode");
     }
 
     private void addRefractiveReflectiveNode(RenderGraph renderGraph) {
