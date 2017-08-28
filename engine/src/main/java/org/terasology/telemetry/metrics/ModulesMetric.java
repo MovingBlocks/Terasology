@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.Module;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is a metric for game modules in current context.
@@ -52,13 +52,9 @@ public final class ModulesMetric extends Metric {
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
+    public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, telemetryFieldToValue);
-        
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+        return getUnstructuredMetric(SCHEMA_MODULES, telemetryFieldToValue);
     }
 
     @Override

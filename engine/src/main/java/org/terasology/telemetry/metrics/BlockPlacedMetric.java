@@ -17,7 +17,6 @@ package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -26,6 +25,7 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A players statistic metric for blocks placed.
@@ -45,13 +45,9 @@ public final class BlockPlacedMetric extends Metric {
     private LocalPlayer localPlayer;
 
     @Override
-    public Unstructured getUnstructuredMetric() {
+    public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_PLACED, telemetryFieldToValue);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+        return getUnstructuredMetric(SCHEMA_BLOCK_PLACED, telemetryFieldToValue);
     }
 
     @Override

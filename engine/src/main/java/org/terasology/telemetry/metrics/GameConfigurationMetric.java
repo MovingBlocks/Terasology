@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.config.Config;
 import org.terasology.config.PlayerConfig;
 import org.terasology.context.Context;
@@ -27,6 +26,7 @@ import org.terasology.telemetry.TelemetryField;
 import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A metric tracking game configuration such as world generator, network mode,etc.
@@ -64,14 +64,10 @@ public final class GameConfigurationMetric extends Metric {
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
+    public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();
-        Map filteredMetricMap = filterMetricMap(bindingMap);
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, filteredMetricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+        Map<String, Object> filteredMetricMap = filterMetricMap(bindingMap);
+        return getUnstructuredMetric(SCHEMA_GAME_CONFIGURATION, filteredMetricMap);
     }
 
     @Override

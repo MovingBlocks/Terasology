@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -25,6 +24,7 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A player statistic metric for creatures killed in a game.
@@ -35,7 +35,7 @@ import java.util.Map;
 )
 public final class CreatureKilledMetric extends Metric {
 
-    public static final String SCHEMA_MONSTER_KILLED = "iglu:org.terasology/creatureKilled/jsonschema/1-0-0";
+    public static final String SCHEMA_CREATURE_KILLED = "iglu:org.terasology/creatureKilled/jsonschema/1-0-0";
 
     private LocalPlayer localPlayer;
 
@@ -43,13 +43,9 @@ public final class CreatureKilledMetric extends Metric {
     private Map creatureKilledMap;
 
     @Override
-    public Unstructured getUnstructuredMetric() {
+    public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MONSTER_KILLED, telemetryFieldToValue);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+        return getUnstructuredMetric(SCHEMA_CREATURE_KILLED, telemetryFieldToValue);
     }
 
     @Override

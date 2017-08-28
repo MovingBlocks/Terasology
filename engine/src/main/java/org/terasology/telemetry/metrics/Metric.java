@@ -16,6 +16,7 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
+import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -61,7 +63,28 @@ public abstract class Metric {
      * Generates a snowplow unstructured event that the snowplow tracker can track.
      * @return an snowplow unstructured event.
      */
-    public abstract Unstructured getUnstructuredMetric();
+    public abstract Optional<Unstructured> getUnstructuredMetric();
+
+
+    /**
+     * Generates a snowplow unstructured event.
+     * This method helps to implement abstract getUnstructuredMetric method.
+     * You can find example in {@link org.terasology.telemetry.metrics.ModulesMetric} and {@link org.terasology.telemetry.metrics.SystemContextMetric}
+     * @param schema the snowplow event register schema.
+     * @param mapSentToServer the map that contains the data sent to the server.
+     * @return Null option if the mapSentToServer doesn't contain data.
+     */
+    public Optional<Unstructured> getUnstructuredMetric(String schema, Map<String, Object> mapSentToServer) {
+        Optional<Unstructured> optional = Optional.empty();
+        if (!isEmpty()) {
+            SelfDescribingJson modulesData = new SelfDescribingJson(schema, mapSentToServer);
+            Unstructured unstructured =  Unstructured.builder().
+                    eventData(modulesData).
+                    build();
+            optional = Optional.of(unstructured);
+        }
+        return optional;
+    }
 
     /**
      * Fetches all TelemetryFields and create a map associating field's name (key) to field's value (value).
@@ -92,7 +115,7 @@ public abstract class Metric {
      * @param bindingMap the binding map.
      * @return a new metric map that covers the field that the user doesn't want to send by "Disabled Field".
      */
-    protected Map<String, ?> filterMetricMap(Map<String, Boolean> bindingMap) {
+    protected Map<String, Object> filterMetricMap(Map<String, Boolean> bindingMap) {
         TelemetryCategory telemetryCategory = this.getClass().getAnnotation(TelemetryCategory.class);
         Context context = CoreRegistry.get(Context.class);
         DisplayDevice display = context.get(DisplayDevice.class);
@@ -140,5 +163,9 @@ public abstract class Metric {
             }
         }
         return fieldsList;
+    }
+
+    public boolean isEmpty() {
+        return (telemetryFieldToValue.size() == 0);
     }
 }

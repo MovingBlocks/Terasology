@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +26,7 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A game play metric tracking metric such as distance traveled, play time, etc.
@@ -55,14 +55,10 @@ public final class GamePlayMetric extends Metric {
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
+    public Optional<Unstructured> getUnstructuredMetric() {
         createTelemetryFieldToValue();
-        Map<String, ?> filteredMetricMap = filterMetricMap(bindingMap);
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, filteredMetricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+        Map<String, Object> filteredMetricMap = filterMetricMap(bindingMap);
+        return getUnstructuredMetric(SCHEMA_GAMEPLAY, filteredMetricMap);
     }
 
     @Override

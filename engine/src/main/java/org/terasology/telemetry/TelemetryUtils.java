@@ -22,7 +22,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.TelemetryConfig;
 import org.terasology.config.facade.TelemetryConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -64,8 +63,11 @@ public final class TelemetryUtils {
             Optional<Metric> optional = metrics.getMetric(metricClass);
             if (optional.isPresent()) {
                 Metric metric = optional.get();
-                Unstructured unstructured = metric.getUnstructuredMetric();
-                trackMetric(emitter, nameSpace, unstructured, metric, telemetryConfiguration);
+                Optional<Unstructured> optionalUnstructure = metric.getUnstructuredMetric();
+                if (optionalUnstructure.isPresent()) {
+                    Unstructured unstructured = optionalUnstructure.get();
+                    trackMetric(emitter, nameSpace, unstructured, metric, telemetryConfiguration);
+                }
             }
         }
     }
@@ -82,8 +84,11 @@ public final class TelemetryUtils {
         Optional<Metric> optional = metrics.getMetric(metricClass);
         if (optional.isPresent()) {
             Metric metric = optional.get();
-            Unstructured unstructured = metric.getUnstructuredMetric();
-            trackMetric(emitter, nameSpace, unstructured, metric, bindingMap);
+            Optional<Unstructured> unstructuredOptional = metric.getUnstructuredMetric();
+            if (unstructuredOptional.isPresent()) {
+                Unstructured unstructured = unstructuredOptional.get();
+                trackMetric(emitter, nameSpace, unstructured, metric, bindingMap);
+            }
         }
     }
 
