@@ -52,10 +52,10 @@ public class LayeredZoneRegionFunctionTest {
 
     @Before
     public void setup() {
-        parent .addZone(new Zone("Above ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), ABOVE_GROUND)))
-                .addZone(new Zone("Ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), GROUND)))
+        parent.addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), MEDIUM_SKY)))
                 .addZone(new Zone("Low sky", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), LOW_SKY)))
-                .addZone(new Zone("Medium sky", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), MEDIUM_SKY)))
+                .addZone(new Zone("Above ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), ABOVE_GROUND)))
+                .addZone(new Zone("Ground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), GROUND)))
                 .addZone(new Zone("Shallow underground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), SHALLOW_UNDERGROUND)))
                 .addZone(new Zone("Medium underground", new LayeredZoneRegionFunction(new MinMaxLayerThickness(100, 100), MEDIUM_UNDERGROUND)));
         parent.setSeed(12345);
