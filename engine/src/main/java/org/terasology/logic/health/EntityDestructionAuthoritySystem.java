@@ -41,7 +41,7 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
 
     private void recordDestroyed(DestroyEvent event, EntityRef entityRef) {
         EntityRef instigator = event.getInstigator();
-        if(entityRef.hasComponent(BlockComponent.class)) {
+        if (entityRef.hasComponent(BlockComponent.class)) {
             BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
             String blockName = blockComponent.getBlock().getDisplayName();
             if (instigator.hasComponent(GamePlayStatsComponent.class)) {
@@ -63,17 +63,17 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
             String monsterName = entityRef.getParentPrefab().getName();
             if (instigator.hasComponent(GamePlayStatsComponent.class)) {
                 GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
-                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
-                if (monsterKilled.containsKey(monsterName)) {
-                    monsterKilled.put(monsterName, monsterKilled.get(monsterName) + 1);
+                Map<String, Integer> creatureKilled = gamePlayStatsComponent.creatureKilled;
+                if (creatureKilled.containsKey(monsterName)) {
+                    creatureKilled.put(monsterName, creatureKilled.get(monsterName) + 1);
                 } else {
-                    monsterKilled.put(monsterName, 1);
+                    creatureKilled.put(monsterName, 1);
                 }
                 instigator.saveComponent(gamePlayStatsComponent);
             } else {
                 GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
-                Map<String, Integer> monsterKilled = gamePlayStatsComponent.monsterKilled;
-                monsterKilled.put(monsterName, 1);
+                Map<String, Integer> creatureKilled = gamePlayStatsComponent.creatureKilled;
+                creatureKilled.put(monsterName, 1);
                 instigator.addOrSaveComponent(gamePlayStatsComponent);
             }
         }
