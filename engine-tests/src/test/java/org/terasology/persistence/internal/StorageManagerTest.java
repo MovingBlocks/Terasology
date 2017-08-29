@@ -50,7 +50,7 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.chunks.Chunk;
@@ -120,7 +120,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         AssetManager assetManager = context.get(AssetManager.class);
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock"), data, BlockFamilyDefinition.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock2"), data, BlockFamilyDefinition.class);
         testBlock = context.get(BlockManager.class).getBlock("test:testblock");

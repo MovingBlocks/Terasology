@@ -8,7 +8,7 @@
     "attachmentAllowed": false,
     "hardness": 0,
     "displayName": "Air",
-    "rotation": "symmetric",
+    "family": "symmetric",
     "sounds": "none",
     "shape": "engine:none"
 }

@@ -35,6 +35,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.WorldAtlas;
@@ -69,6 +70,7 @@ public class BlockManagerImpl extends BlockManager {
 
     private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
+
     private boolean generateNewIds;
     private AtomicInteger nextId = new AtomicInteger(1);
 
@@ -81,8 +83,8 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     public BlockManagerImpl(WorldAtlas atlas,
-            AssetManager assetManager,
-            boolean generateNewIds) {
+                            AssetManager assetManager,
+                            boolean generateNewIds) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(atlas);
@@ -252,7 +254,12 @@ public class BlockManagerImpl extends BlockManager {
                         block.setId(getNextId());
                     }
                     registerFamily(newFamily.get());
-                } finally {
+                }
+                catch (Exception ex){
+                    logger.error(ex.toString());
+                    logger.error(newFamily.toString());
+                }
+                finally {
                     lock.unlock();
                 }
                 return newFamily.get();

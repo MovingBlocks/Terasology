@@ -1,6 +1,6 @@
 {
     "attachmentAllowed": false,
-    "rotation": "horizontal",
+    "family": "horizontal",
     "climbable": true,
     "penetrable": false,
     "shape": "engine:verticalOffsetPlane",

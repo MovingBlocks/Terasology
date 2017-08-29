@@ -103,7 +103,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
                 if (blockFamily instanceof UpdatesWithNeighboursFamily) {
                     UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
-                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
+                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
                     if (neighborBlock != neighborBlockAfterUpdate) {
                         worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
                     }
