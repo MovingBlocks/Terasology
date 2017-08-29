@@ -120,7 +120,9 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
         if (blockFamily == null)
             return false;
         FreeFormSupported freeFormSupported = blockFamily.getAnnotation(FreeFormSupported.class);
-        return freeFormSupported != null;
+        if(freeFormSupported == null)
+            return false;
+        return freeFormSupported.value();
     }
 
     public void setBlockFamily(String id, Class<? extends AbstractBlockFamily> blockFamily) {
