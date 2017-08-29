@@ -39,7 +39,7 @@ import java.util.Map;
  * family.
  */
 @RegisterBlockFamily("freeform")
-@FreeFormSupported()
+@FreeFormSupported(true)
 public class FreeformFamily extends AbstractBlockFamily {
     public BlockUri uri;
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
