@@ -4,7 +4,7 @@
 {
     "basedOn": "core:wood",
     "attachmentAllowed": false,
-    "rotation": "horizontal",
+    "family": "horizontal",
     // Graphics
     "tiles": {
         "sides": "ChestSides",

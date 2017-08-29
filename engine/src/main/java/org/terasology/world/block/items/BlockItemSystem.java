@@ -93,7 +93,7 @@ public class BlockItemSystem extends BaseComponentSystem {
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
-        Block block = type.getBlockForPlacement(worldProvider, blockEntityRegistry, placementPos, surfaceSide, secondaryDirection);
+        Block block = type.getBlockForPlacement(placementPos, surfaceSide, secondaryDirection);
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.

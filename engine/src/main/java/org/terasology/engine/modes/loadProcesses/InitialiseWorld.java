@@ -35,6 +35,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;

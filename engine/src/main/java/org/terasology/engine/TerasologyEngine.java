@@ -66,7 +66,7 @@ import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -303,8 +303,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
-        rootContext.put(BlockFamilyFactoryRegistry.class, familyFactoryRegistry);
+        DefaultBlockFamilyFactoryRegistry familyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry(rootContext);
+        rootContext.put(BlockFamilyRegistry.class, familyFactoryRegistry);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
         assetTypeManager.registerCoreAssetType(Prefab.class,

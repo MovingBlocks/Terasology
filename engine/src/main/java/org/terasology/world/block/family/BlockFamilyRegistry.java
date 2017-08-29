@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ImmutableSet;
-import org.terasology.input.DefaultBindings;
-import org.terasology.util.Varargs;
-
-import java.lang.annotation.*;
-
-/**
- * A multi-section is a section that are loaded and applied to one or more other sections. Example: The Sides multi-section provides data that applies to the Left, Right,
- * Front and Back sections.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface  MultiSection {
-    String name();
-    String coversSection();
-    String[] appliesToSections();
+@FunctionalInterface
+public interface BlockFamilyRegistry {
+    Class<? extends AbstractBlockFamily> getBlockFamily(String blockFamilyId);
 }

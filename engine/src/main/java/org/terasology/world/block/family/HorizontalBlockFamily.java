@@ -15,52 +15,85 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
+import org.terasology.world.generation.World;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Block group for blocks that can be oriented around the vertical axis.
- *
  */
+@RegisterBlockFamily("horizontal")
+@BlockSections({"front", "left", "right", "back", "top", "bottom"})
+@MultiSections({
+        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front", "left", "right", "back", "top", "bottom"}),
+        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top", "bottom"}),
+        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
-
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private Side archetypeSide;
 
-    /**
-     * @param uri        The asset uri for the block group.
-     * @param blocks     The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
-     * @param categories The set of categories this block family belongs to
-     */
-    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
-        this(uri, Side.FRONT, blocks, categories);
-    }
-
-    public HorizontalBlockFamily(BlockUri uri, Side archetypeSide, Map<Side, Block> blocks, Iterable<String> categories) {
-        super(uri, categories);
-        this.archetypeSide = archetypeSide;
-        for (Side side : Side.horizontalSides()) {
-            Block block = blocks.get(side);
+    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
+        BlockUri uri = null;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
-            this.blocks.put(side, block);
             block.setBlockFamily(this);
             block.setUri(new BlockUri(uri, new Name(side.name())));
+            blocks.put(side, block);
         }
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
+    }
+
+    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+        BlockUri uri = new BlockUri(definition.getUrn());
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
+
+            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            if (block == null) {
+                throw new IllegalArgumentException("Missing block for side: " + side.toString());
+            }
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(uri, new Name(side.name())));
+            blocks.put(side, block);
+        }
+        this.setCategory(definition.getCategories());
+        this.setBlockUri(uri);
+
+    }
+
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
     }
 
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         if (attachmentSide.isHorizontal()) {
             return blocks.get(attachmentSide);
         }
@@ -73,7 +106,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     @Override
     public Block getArchetypeBlock() {
-        return blocks.get(archetypeSide);
+        return blocks.get(this.getArchetypeSide());
     }
 
     @Override
@@ -108,4 +141,6 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
         }
         return null;
     }
+
+
 }
