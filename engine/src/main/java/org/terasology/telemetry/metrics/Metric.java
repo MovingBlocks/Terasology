@@ -20,6 +20,7 @@ import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.facade.TelemetryConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.module.sandbox.API;
@@ -119,15 +120,14 @@ public abstract class Metric {
         TelemetryCategory telemetryCategory = this.getClass().getAnnotation(TelemetryCategory.class);
         Context context = CoreRegistry.get(Context.class);
         DisplayDevice display = context.get(DisplayDevice.class);
-        if (display.isHeadless()) {
+        if (display.isHeadless() || telemetryCategory.isOneMapMetric()) {
             return telemetryFieldToValue;
         }
         Map<String, Object> metricMapAfterPermission = new HashMap<>();
-        for (Object key : telemetryFieldToValue.keySet()) {
-            String fieldName = key.toString();
-            String fieldNamewithID = telemetryCategory.id() + ":" + key.toString();
-            if (bindingMap.containsKey(fieldNamewithID)) {
-                if (bindingMap.get(fieldNamewithID)) {
+        for (String fieldName : telemetryFieldToValue.keySet()) {
+            String fieldNameWithID = telemetryCategory.id() + ":" + fieldName;
+            if (bindingMap.containsKey(fieldNameWithID)) {
+                if (bindingMap.get(fieldNameWithID)) {
                     metricMapAfterPermission.put(fieldName, telemetryFieldToValue.get(fieldName));
                 } else {
                     metricMapAfterPermission.put(fieldName, "Disabled Field");
@@ -135,6 +135,34 @@ public abstract class Metric {
             }
         }
 
+        return metricMapAfterPermission;
+    }
+
+    /**
+     * Filter the metric map by the binding map.
+     * If the user doesn't want the field to be sent, its value will be covered by "Disabled Field".
+     * This method could be used in module since {@link org.terasology.config.facade.TelemetryConfiguration} is exposed to modules
+     * @param telemetryConfiguration the telemetry configuration exposed modules
+     * @return a new metric map that covers the field that the user doesn't want to send by "Disabled Field".
+     */
+    protected Map<String, Object> filterMetricMap(TelemetryConfiguration telemetryConfiguration) {
+        TelemetryCategory telemetryCategory = this.getClass().getAnnotation(TelemetryCategory.class);
+        Context context = CoreRegistry.get(Context.class);
+        DisplayDevice display = context.get(DisplayDevice.class);
+        if (display.isHeadless() || telemetryCategory.isOneMapMetric()) {
+            return telemetryFieldToValue;
+        }
+        Map<String, Object> metricMapAfterPermission = new HashMap<>();
+        for (String fieldName : telemetryFieldToValue.keySet()) {
+            String fieldNameWithID = telemetryCategory.id() + ":" + fieldName;
+            if (telemetryConfiguration.containsField(fieldNameWithID)) {
+                if (telemetryConfiguration.get(fieldNameWithID)) {
+                    metricMapAfterPermission.put(fieldName, telemetryFieldToValue.get(fieldName));
+                } else {
+                    metricMapAfterPermission.put(fieldName, "Disabled Field");
+                }
+            }
+        }
         return metricMapAfterPermission;
     }
 
