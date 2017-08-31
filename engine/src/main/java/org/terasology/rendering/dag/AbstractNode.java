@@ -36,8 +36,6 @@ import java.util.Set;
 public abstract class AbstractNode implements Node {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractNode.class);
 
-    private SimpleUri nodeUri;
-
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private boolean enabled = true;
@@ -95,16 +93,6 @@ public abstract class AbstractNode implements Node {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    @Override
-    public void setUri(SimpleUri nodeUri) {
-        this.nodeUri = nodeUri;
-    }
-
-    @Override
-    public SimpleUri getUri() {
-        return nodeUri;
     }
 
     @Override

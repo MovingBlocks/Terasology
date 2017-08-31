@@ -285,6 +285,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         shadowMapNode = new ShadowMapNode(context);
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
+
+        renderGraph.addEdge(shadowMapClearingNode, shadowMapNode);
     }
 
     private void addReflectionNodes() {
@@ -298,6 +300,10 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node worldReflectionNode = new WorldReflectionNode(context);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:shadowMapNode")), reflectedBufferClearingNode);
+        renderGraph.addEdge(reflectedBufferClearingNode, reflectedBackdropNode);
+        renderGraph.addEdge(reflectedBackdropNode, worldReflectionNode);
     }
 
     private void addSkyNodes() {
@@ -333,6 +339,13 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         label = "hazeFinal";
         HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo, label);
         renderGraph.addNode(hazeFinalNode, label + "Node");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:worldReflectionNode")), reflectedRefractedClearingNode);
+        renderGraph.addEdge(reflectedRefractedClearingNode, lastUpdatedGBufferClearingNode);
+        renderGraph.addEdge(lastUpdatedGBufferClearingNode, staleGBufferClearingNode);
+        renderGraph.addEdge(staleGBufferClearingNode, backdropNode);
+        renderGraph.addEdge(backdropNode, hazeIntermediateNode);
+        renderGraph.addEdge(hazeIntermediateNode, hazeFinalNode);
     }
 
     private void addWorldRenderingNodes() {
@@ -351,23 +364,35 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         // TODO: remove this, including associated method in the RenderSystem interface
         Node firstPersonViewNode = new FirstPersonViewNode(context);
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:hazeFinalNode")), opaqueObjectsNode);
+        renderGraph.addEdge(opaqueObjectsNode, opaqueBlocksNode);
+        renderGraph.addEdge(opaqueBlocksNode, alphaRejectBlocksNode);
+        renderGraph.addEdge(alphaRejectBlocksNode, overlaysNode);
+        renderGraph.addEdge(overlaysNode, firstPersonViewNode);
     }
 
     private void addLightingNodes() {
         Node deferredPointLightsNode = new DeferredPointLightsNode(context);
-        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
+        renderGraph.addNode(deferredPointLightsNode, "deferredPointLightsNode");
 
         Node deferredMainLightNode = new DeferredMainLightNode(context);
         renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
 
         Node applyDeferredLightingNode = new ApplyDeferredLightingNode(context);
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:firstPersonViewNode")), deferredPointLightsNode);
+        renderGraph.addEdge(deferredPointLightsNode, deferredMainLightNode);
+        renderGraph.addEdge(deferredMainLightNode, applyDeferredLightingNode);
     }
 
     private void addRefractiveReflectiveNode() {
         Node chunksRefractiveReflectiveNode = new RefractiveReflectiveBlocksNode(context);
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         // TODO: consider having a non-rendering node for FBO.attachDepthBufferTo() methods
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:applyDeferredLightingNode")), chunksRefractiveReflectiveNode);
     }
 
     private void add3dDecorationNodes() {
@@ -379,6 +404,10 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node blurredAmbientOcclusionNode = new BlurredAmbientOcclusionNode(context);
         renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:chunksRefractiveReflectiveNode")), outlineNode);
+        renderGraph.addEdge(outlineNode, ambientOcclusionNode);
+        renderGraph.addEdge(ambientOcclusionNode, blurredAmbientOcclusionNode);
     }
 
     private void addPrePostProcessingNodes() {
@@ -389,6 +418,9 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node simpleBlendMaterialsNode = new SimpleBlendMaterialsNode(context);
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:blurredAmbientOcclusionNode")), prePostCompositeNode);
+        renderGraph.addEdge(prePostCompositeNode, simpleBlendMaterialsNode);
     }
 
     private void addPostProcessingNodes() {
@@ -470,14 +502,34 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node finalPostProcessingNode = new FinalPostProcessingNode(context);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:simpleBlendMaterialsNode")), lightShaftsNode);
+        renderGraph.addEdge(lightShaftsNode, initialPostProcessingNode);
+        renderGraph.addEdge(initialPostProcessingNode, exposureDownSamplerTo16pixels);
+        renderGraph.addEdge(exposureDownSamplerTo16pixels, exposureDownSamplerTo8pixels);
+        renderGraph.addEdge(exposureDownSamplerTo8pixels, exposureDownSamplerTo4pixels);
+        renderGraph.addEdge(exposureDownSamplerTo4pixels, exposureDownSamplerTo2pixels);
+        renderGraph.addEdge(exposureDownSamplerTo2pixels, exposureDownSamplerTo1pixel);
+        renderGraph.addEdge(exposureDownSamplerTo1pixel, updateExposureNode);
+        renderGraph.addEdge(updateExposureNode, toneMappingNode);
+        renderGraph.addEdge(toneMappingNode, highPassNode);
+        renderGraph.addEdge(highPassNode, halfScaleBlurredBloom);
+        renderGraph.addEdge(halfScaleBlurredBloom, quarterScaleBlurredBloom);
+        renderGraph.addEdge(quarterScaleBlurredBloom, one8thScaleBlurredBloom);
+        renderGraph.addEdge(one8thScaleBlurredBloom, firstLateBlurNode);
+        renderGraph.addEdge(firstLateBlurNode, secondLateBlurNode);
+        renderGraph.addEdge(secondLateBlurNode, finalPostProcessingNode);
     }
 
-    private void addOutputNodes() {
-        Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
-        renderGraph.addNode(copyToVRFrameBufferNode, "outputToVRFrameBufferNode");
+    private void addOutputNodes(RenderGraph renderGraph) {
+        Node outputToVRFrameBufferNode = new OutputToHMDNode(context);
+        renderGraph.addNode(outputToVRFrameBufferNode, "outputToVRFrameBufferNode");
 
-        Node copyImageToScreenNode = new OutputToScreenNode(context);
-        renderGraph.addNode(copyImageToScreenNode, "outputToScreenNode");
+        Node outputToScreenNode = new OutputToScreenNode(context);
+        renderGraph.addNode(outputToScreenNode, "outputToScreenNode");
+
+        renderGraph.addEdge(renderGraph.findNode(new SimpleUri("engine:finalPostProcessingNode")), outputToVRFrameBufferNode);
+        renderGraph.addEdge(outputToVRFrameBufferNode, outputToScreenNode);
     }
 
     @Override

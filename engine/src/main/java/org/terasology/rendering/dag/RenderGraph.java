@@ -15,44 +15,68 @@
  */
 package org.terasology.rendering.dag;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import org.terasology.engine.SimpleUri;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: Add javadocs
  */
 public class RenderGraph { // TODO: add extends DirectedAcyclicGraph<Node>
-    private List<Node> nodes;
-
-    public RenderGraph() {
-        nodes = Lists.newArrayList();
-    }
+    private Map<SimpleUri, Node> nodes = Maps.newHashMap();
+    private Multimap<Node, Node> nodeEdges = HashMultimap.create();
 
     public SimpleUri addNode(Node node, String suggestedUri) {
-        nodes.add(node);
-
         // TODO: make sure URIs are actually unique: if "myModule:blur" is present the node gets the uri "myModule:blur2" instead.
         // TODO: make sure the namespace in the uri is engine-assigned, so that only engine nodes can have the "engine:" namespace - everything else gets the namespace of the module.
         SimpleUri nodeUri = new SimpleUri("engine:" + suggestedUri);
-        node.setUri(nodeUri);
+
+        nodes.put(nodeUri, node);
+
         return nodeUri;
     }
 
-    public Node findNode(SimpleUri nodeUri) {
-        for (Node node: nodes) {
-            if (node.getUri().equals(nodeUri)) {
-                return node;
-            }
+    public boolean removeNode(SimpleUri nodeUri) {
+        if (nodeEdges.containsKey(nodeUri)) {
+            return false;
         }
 
-        return null;
+        nodes.remove(nodeUri);
+
+        return true; // TODO: What if nodeUri does not refer to a Node?
     }
 
-    // TODO: add remove, get, addEdge, removeEdge methods here
+    public Node findNode(SimpleUri nodeUri) {
+        return nodes.get(nodeUri);
+    }
+
+    public void addEdge(Node node1, Node node2) {
+        nodeEdges.put(node1, node2);
+    }
+
+    public boolean removeEdge(Node node1, Node node2) {
+        return nodeEdges.remove(node1, node2);
+    }
 
     public List<Node> getNodesInTopologicalOrder() {
-        return nodes;
+        List<Node> topologicalList = new ArrayList<>();
+        List<Node> nodesToExamine = new ArrayList<>();
+
+        nodesToExamine.add(findNode(new SimpleUri("engine:shadowMapClearingNode"))); // TODO: Find a better way to set first Node.
+        while (!nodesToExamine.isEmpty()) {
+            Node currentNode = nodesToExamine.get(0);
+            topologicalList.add(currentNode);
+            nodesToExamine.addAll(nodeEdges.get(currentNode));
+            nodesToExamine.remove(0);
+        }
+
+        return topologicalList;
     }
 }
