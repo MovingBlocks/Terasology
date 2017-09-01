@@ -77,18 +77,18 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
     @In
     protected BlockEntityRegistry blockEntityRegistry;
 
-    MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    public MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
     }
 
-    MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         blocks = new TByteObjectHashMap<>();
 
-        BlockUri blockUri = new BlockUri(definition.getUrn());
-
         this.registerConnections(basicBlocks);
+
+        BlockUri blockUri = new BlockUri(definition.getUrn());
 
         // Now make sure we have all combinations based on the basic set (above) and rotations
         for (byte connections = 0; connections < 64; connections++) {
@@ -107,6 +107,11 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
         this.setBlockUri(blockUri);
         this.setCategory(definition.getCategories());
     }
+
+    public byte getConnectionSides(){
+        return 64;
+    }
+
 
     protected void registerConnections(TByteObjectMap<String>[] basicBlocks){
         addConnections(basicBlocks, 0, NO_CONNECTIONS);
@@ -128,10 +133,6 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
 
     public Map<String, Byte> getShapeMapping() {
         return DEFAULT_SHAPE_MAPPING;
-    }
-
-    public byte getConnectionSides() {
-        return 0;
     }
 
     private void addConnections(TByteObjectMap<String>[] basicBlocks, int index, String connections) {
@@ -205,7 +206,7 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
         return blocks.get(connections);
     }
 
-    public boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
+    protected boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
         return false;
     }
 
