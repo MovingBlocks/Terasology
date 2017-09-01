@@ -21,7 +21,6 @@ import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
-import org.terasology.logic.behavior.core.compiler.Assembler;
 
 public final class Example {
     private Example() {
@@ -32,12 +31,12 @@ public final class Example {
 
         BehaviorNode node = treeBuilder.fromJson("{ sequence:[ success, success, failure ] }");
         System.out.println(new DefaultBehaviorTreeRunner(node, null).step());
-        System.out.println(new Assembler("Test", node).createInstance(null).step());
+
 
         treeBuilder.registerAction("print", Print.class);
         node = treeBuilder.fromJson("{ sequence:[ success, { print:{msg:world} } ] }");
         System.out.println(new DefaultBehaviorTreeRunner(node, null).step());
-        System.out.println(new Assembler("Test", node).createInstance(null).step());
+
 
         treeBuilder.registerAction("delay", Delay.class);
         Actor actor = new Actor(null);

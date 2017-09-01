@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
-
 /**
  * Succeed always.
  */
@@ -46,9 +44,5 @@ public class SuccessNode extends LeafNode {
 
     }
 
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        gen.push(BehaviorState.SUCCESS.ordinal());
-    }
 
 }

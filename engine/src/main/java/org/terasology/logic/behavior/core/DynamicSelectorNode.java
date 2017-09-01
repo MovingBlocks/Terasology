@@ -16,15 +16,7 @@
 package org.terasology.logic.behavior.core;
 
 
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.terasology.logic.behavior.core.compiler.ClassGenerator;
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
-
 import java.util.BitSet;
-
-import static org.objectweb.asm.commons.GeneratorAdapter.EQ;
 
 
 /**
@@ -79,89 +71,5 @@ public class DynamicSelectorNode extends CompositeNode {
     public void destruct(Actor actor) {
     }
 
-    @Override
-    public void assembleSetup(ClassGenerator gen) {
-        super.assembleSetup(gen);
 
-        int bytes = children.size() / 8;
-        if (children.size() % 8 > 0) {
-            bytes++;
-        }
-        byteFields = new String[bytes];
-        for (int i = 0; i < bytes; i++) {
-            byteFields[i] = gen.generateField(Type.BYTE_TYPE);
-        }
-    }
-
-    private void loadBitCmp(MethodGenerator gen, int index) {
-        int b = index / 8;
-        int bit = index % 8;
-
-        gen.loadThis();
-        gen.loadField(byteFields[b]);
-        gen.push(1 << bit);
-        gen.visitInsn(Opcodes.IAND);
-        gen.push(1 << bit);
-    }
-
-    private void storeBit(MethodGenerator gen, int index) {
-        int b = index / 8;
-        int bit = index % 8;
-
-        gen.loadThis();
-        gen.loadThis();
-        gen.loadField(byteFields[b]);
-        gen.push(1 << bit);
-        gen.visitInsn(Opcodes.IOR);
-        gen.storeField(byteFields[b]);
-    }
-
-    private void resetBit(MethodGenerator gen, int index) {
-        int b = index / 8;
-        int bit = index % 8;
-
-        gen.loadThis();
-        gen.loadThis();
-        gen.loadField(byteFields[b]);
-        gen.push(0xff & (~(1 << bit)));
-        gen.visitInsn(Opcodes.IAND);
-        gen.storeField(byteFields[b]);
-    }
-
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        Label exit = gen.newLabel();
-        Label exitSuccess = gen.newLabel();
-
-        for (int i = 0; i < children.size(); i++) {
-            Label skip = gen.newLabel();
-            BehaviorNode child = children.get(i);
-
-            loadBitCmp(gen, i);
-            gen.ifICmp(EQ, skip);
-            child.assembleConstruct(gen);
-            storeBit(gen, i);
-
-            gen.mark(skip);
-            child.assembleExecute(gen);
-
-            gen.dup();
-            gen.push(BehaviorState.RUNNING.ordinal());
-            gen.ifICmp(EQ, exit);
-
-            child.assembleDestruct(gen);
-            resetBit(gen, i);
-
-            gen.push(BehaviorState.SUCCESS.ordinal());
-            gen.ifICmp(EQ, exitSuccess);
-        }
-
-        gen.push(BehaviorState.FAILURE.ordinal());
-        gen.goTo(exit);
-
-        gen.mark(exitSuccess);
-        gen.push(BehaviorState.SUCCESS.ordinal());
-
-        gen.mark(exit);
-    }
 }

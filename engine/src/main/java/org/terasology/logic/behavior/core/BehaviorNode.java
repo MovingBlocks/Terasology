@@ -20,7 +20,7 @@ import org.terasology.rendering.nui.properties.PropertyProvider;
 /**
  * Nodes, that are part of a behavior tree. Can have a ordered list of children.
  */
-public interface BehaviorNode extends AssemblingBehaviorNode {
+public interface BehaviorNode {
     String getName();
 
     void insertChild(int index, BehaviorNode child);

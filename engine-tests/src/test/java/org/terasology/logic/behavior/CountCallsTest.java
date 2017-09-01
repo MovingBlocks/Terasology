@@ -24,8 +24,6 @@ import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.logic.behavior.core.DelegateNode;
-import org.terasology.logic.behavior.core.compiler.Assembler;
-import org.terasology.logic.behavior.core.compiler.CompiledBehaviorTree;
 
 import java.util.List;
 
@@ -65,21 +63,18 @@ public class CountCallsTest {
 
     public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed, boolean step) {
         BehaviorNode node = fromJson(tree);
-        Assembler asm = new Assembler("Test", node);
-        CompiledBehaviorTree cbt = asm.createInstance(null);
+
 
         node.construct(null);
         List<BehaviorState> actualStates = Lists.newArrayList();
-        List<BehaviorState> cbtStates = Lists.newArrayList();
         for (int i = 0; i < result.size(); i++) {
             BehaviorState state = node.execute(null);
             actualStates.add(state);
-            cbtStates.add(step ? cbt.step() : BehaviorState.values()[cbt.run(0)]);
+
         }
         node.destruct(null);
 
         Assert.assertEquals(result, actualStates);
-        Assert.assertEquals(result, cbtStates);
         Assert.assertEquals(executed, executeCalled);
     }
 

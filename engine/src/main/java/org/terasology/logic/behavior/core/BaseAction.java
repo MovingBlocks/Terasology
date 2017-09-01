@@ -25,6 +25,7 @@ import org.terasology.module.sandbox.API;
 @API
 public abstract class BaseAction implements Action {
     private transient int id;
+    protected transient boolean constructed = false;
 
     @Override
     public void setup() {

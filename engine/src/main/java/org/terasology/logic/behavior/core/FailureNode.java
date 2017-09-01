@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-import org.terasology.logic.behavior.core.compiler.MethodGenerator;
-
 /**
  * Fails always.
  */
@@ -46,8 +44,4 @@ public class FailureNode extends LeafNode {
 
     }
 
-    @Override
-    public void assembleExecute(MethodGenerator gen) {
-        gen.push(BehaviorState.FAILURE.ordinal());
-    }
 }
