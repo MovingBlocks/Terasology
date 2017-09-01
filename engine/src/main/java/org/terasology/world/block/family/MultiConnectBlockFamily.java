@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
-public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
+public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implements BlockNeighborUpdateFamily{
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
 
@@ -77,27 +77,18 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     @In
     protected BlockEntityRegistry blockEntityRegistry;
 
-    UpdatesWithNeighboursFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
     }
 
-    UpdatesWithNeighboursFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         blocks = new TByteObjectHashMap<>();
 
-        addConnections(basicBlocks, 0, NO_CONNECTIONS);
-        addConnections(basicBlocks, 1, ONE_CONNECTION);
-        addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
-        addConnections(basicBlocks, 2, TWO_CONNECTIONS_CORNER);
-        addConnections(basicBlocks, 3, THREE_CONNECTIONS_CORNER);
-        addConnections(basicBlocks, 3, THREE_CONNECTIONS_T);
-        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_CROSS);
-        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_SIDE);
-        addConnections(basicBlocks, 5, FIVE_CONNECTIONS);
-        addConnections(basicBlocks, 6, SIX_CONNECTIONS);
-
         BlockUri blockUri = new BlockUri(definition.getUrn());
+
+        this.registerConnections(basicBlocks);
 
         // Now make sure we have all combinations based on the basic set (above) and rotations
         for (byte connections = 0; connections < 64; connections++) {
@@ -117,11 +108,23 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
         this.setCategory(definition.getCategories());
     }
 
-
-    protected boolean horizontalOnly() {
-        return false;
+    protected void registerConnections(TByteObjectMap<String>[] basicBlocks){
+        addConnections(basicBlocks, 0, NO_CONNECTIONS);
+        addConnections(basicBlocks, 1, ONE_CONNECTION);
+        addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
+        addConnections(basicBlocks, 2, TWO_CONNECTIONS_CORNER);
+        addConnections(basicBlocks, 3, THREE_CONNECTIONS_CORNER);
+        addConnections(basicBlocks, 3, THREE_CONNECTIONS_T);
+        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_CROSS);
+        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_SIDE);
+        addConnections(basicBlocks, 5, FIVE_CONNECTIONS);
+        addConnections(basicBlocks, 6, SIX_CONNECTIONS);
     }
 
+
+    public boolean horizontalOnly() {
+        return false;
+    }
 
     public Map<String, Byte> getShapeMapping() {
         return DEFAULT_SHAPE_MAPPING;
@@ -182,16 +185,6 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public BlockUri getURI() {
-        return null;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return null;
-    }
-
-    @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
@@ -234,13 +227,4 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
         return blocks.valueCollection();
     }
 
-    @Override
-    public Iterable<String> getCategories() {
-        return null;
-    }
-
-    @Override
-    public boolean hasCategory(String category) {
-        return false;
-    }
 }
