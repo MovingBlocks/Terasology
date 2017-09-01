@@ -33,7 +33,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
+import org.terasology.world.block.family.BlockNeighborUpdateFamily;
+import org.terasology.world.block.family.MultiConnectBlockFamily;
 
 import java.util.Set;
 
@@ -101,8 +102,8 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             if (worldProvider.isBlockRelevant(neighborLocation)) {
                 Block neighborBlock = worldProvider.getBlock(neighborLocation);
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
-                if (blockFamily instanceof UpdatesWithNeighboursFamily) {
-                    UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
+                if (blockFamily instanceof BlockNeighborUpdateFamily) {
+                    BlockNeighborUpdateFamily neighboursFamily = (BlockNeighborUpdateFamily) blockFamily;
                     Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
                     if (neighborBlock != neighborBlockAfterUpdate) {
                         worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
