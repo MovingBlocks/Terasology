@@ -159,8 +159,11 @@ public class BlockEntitySystem extends BaseComponentSystem {
             // dust particle effect
             if (entity.hasComponent(LocationComponent.class) && block.isDebrisOnDestroy()) {
                 EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
-                dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition());
-                dustBuilder.build();
+                // TODO: particle system stuff should be split out better - this is effectively a stealth dependency on Core from the engine
+                if (dustBuilder.hasComponent(LocationComponent.class)) {
+                    dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition());
+                    dustBuilder.build();
+                }
             }
 
             // sound to play for destroyed block
