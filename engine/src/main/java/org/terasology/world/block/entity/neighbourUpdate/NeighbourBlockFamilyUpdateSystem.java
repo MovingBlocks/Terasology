@@ -34,7 +34,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockNeighborUpdateFamily;
-import org.terasology.world.block.family.MultiConnectBlockFamily;
+import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.OnBlockItemPlaced;
 
 import java.util.Set;
 
@@ -68,6 +69,16 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         if (largeBlockUpdateCount == 0) {
             notifyNeighboursOfChangedBlocks();
         }
+    }
+
+    @ReceiveEvent(components = {BlockItemComponent.class})
+    public void onPlaceBlock(OnBlockItemPlaced event, EntityRef entity) {
+        BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
+        if (blockComponent == null)
+            return;
+
+        Vector3i targetBlock = blockComponent.getPosition();
+        processUpdateForBlockLocation(targetBlock);
     }
 
 
