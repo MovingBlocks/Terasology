@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 public class ComponentSystemManagerTest {
 
-    private ComponentSystemManager sut;
+    private ComponentSystemManager systemUnderTest;
 
     @Before
     public void setUp() {
@@ -25,35 +25,35 @@ public class ComponentSystemManagerTest {
         EntityManager entityManager = mock(EntityManager.class);
         when(entityManager.getEventSystem()).thenReturn(mock(EventSystem.class));
         when(context.get(EntityManager.class)).thenReturn(entityManager);
-        sut = new ComponentSystemManager(context);
+        systemUnderTest = new ComponentSystemManager(context);
     }
 
     @Test
     public void testRegisterUpdateSubscriberAddsSubscriber() {
         UpdateSubscriberSystem system = mock(UpdateSubscriberSystem.class);
 
-        sut.register(system);
+        systemUnderTest.register(system);
 
-        assertThat(Iterables.size(sut.iterateUpdateSubscribers()), is(1));
+        assertThat(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), is(1));
     }
 
     @Test
     public void testShutdownRemovesUpdateSubscribers() {
         UpdateSubscriberSystem system = mock(UpdateSubscriberSystem.class);
 
-        sut.register(system);
-        sut.shutdown();
+        systemUnderTest.register(system);
+        systemUnderTest.shutdown();
 
-        assertThat(Iterables.size(sut.iterateUpdateSubscribers()), is(0));
+        assertThat(Iterables.size(systemUnderTest.iterateUpdateSubscribers()), is(0));
     }
 
     @Test
     public void testRegisterRenderSystemAddsRenderSubscriber() {
         RenderSystem system = mock(RenderSystem.class);
 
-        sut.register(system);
+        systemUnderTest.register(system);
 
-        assertThat(Iterables.size(sut.iterateRenderSubscribers()), is(1));
+        assertThat(Iterables.size(systemUnderTest.iterateRenderSubscribers()), is(1));
     }
 
     @Test
@@ -61,10 +61,10 @@ public class ComponentSystemManagerTest {
         //see https://github.com/MovingBlocks/Terasology/issues/3087#issuecomment-326409756
         RenderSystem system = mock(RenderSystem.class);
 
-        sut.register(system);
-        sut.shutdown();
+        systemUnderTest.register(system);
+        systemUnderTest.shutdown();
 
-        assertThat(Iterables.size(sut.iterateRenderSubscribers()), is(0));
+        assertThat(Iterables.size(systemUnderTest.iterateRenderSubscribers()), is(0));
     }
 
 }
