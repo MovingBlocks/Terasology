@@ -259,7 +259,7 @@
     "telemetry-block-placed": "telemetry-block-placed",
     "telemetry-game-configuration": "telemetry-game-configuration",
     "telemetry-game-play": "telemetry-game-play",
-    "telemetry-monster-killed": "telemetry-monster-killed",
+    "telemetry-creature-killed": "telemetry-creature-killed",
     "telemetry-system-context": "telemetry-system-context",
     "telemetry-modules": "telemetry-modules",
     "this-language-English": "this-language-English",

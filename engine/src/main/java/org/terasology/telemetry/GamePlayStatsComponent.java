@@ -39,5 +39,5 @@ public class GamePlayStatsComponent implements Component {
     public float playTimeMinute;
 
     @Replicate
-    public Map<String, Integer> monsterKilled = new HashMap<>();
+    public Map<String, Integer> creatureKilled = new HashMap<>();
 }

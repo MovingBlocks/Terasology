@@ -49,7 +49,7 @@ public class TelemetryConfigurationImpl implements TelemetryConfiguration {
         return bindingMap.get(telemetryField);
     }
 
-    public boolean containField(String telemetryField) {
+    public boolean containsField(String telemetryField) {
         Map<String, Boolean> bindingMap = telemetryConfig.getMetricsUserPermissionConfig().getBindingMap();
         return bindingMap.containsKey(telemetryField);
     }
