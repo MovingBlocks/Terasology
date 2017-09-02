@@ -125,6 +125,10 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
     public void process() {
         PerformanceMonitor.startActivity("rendering/initialPostProcessing");
 
+        // Common Shader Parameters
+
+        initialPostMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
+
         // Shader Parameters
 
         initialPostMaterial.setFloat3("inLiquidTint", worldProvider.getBlock(activeCamera.getPosition()).getTint(), true);
