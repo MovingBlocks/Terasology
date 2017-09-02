@@ -39,6 +39,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -156,7 +157,9 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
             if (mountPointComponent != null) {
 
                 if (clientHeldItem.exists()) {
+                    // TODO: Review if more components need to be removed (or more likely: overhaul more substantially)
                     clientHeldItem.removeComponent(MeshComponent.class);
+                    clientHeldItem.removeComponent(LightComponent.class);
                 }
 
                 // remove the location from the old item
