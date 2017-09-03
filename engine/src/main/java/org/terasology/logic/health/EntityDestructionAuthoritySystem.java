@@ -61,20 +61,20 @@ public class EntityDestructionAuthoritySystem extends BaseComponentSystem {
                     instigator.addOrSaveComponent(gamePlayStatsComponent);
                 }
             } else if (entityRef.hasComponent(CharacterComponent.class)) {
-                String monsterName = entityRef.getParentPrefab().getName();
+                String creatureName = entityRef.getParentPrefab().getName();
                 if (instigator.hasComponent(GamePlayStatsComponent.class)) {
                     GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
                     Map<String, Integer> creatureKilled = gamePlayStatsComponent.creatureKilled;
-                    if (creatureKilled.containsKey(monsterName)) {
-                        creatureKilled.put(monsterName, creatureKilled.get(monsterName) + 1);
+                    if (creatureKilled.containsKey(creatureName)) {
+                        creatureKilled.put(creatureName, creatureKilled.get(creatureName) + 1);
                     } else {
-                        creatureKilled.put(monsterName, 1);
+                        creatureKilled.put(creatureName, 1);
                     }
                     instigator.saveComponent(gamePlayStatsComponent);
                 } else {
                     GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
                     Map<String, Integer> creatureKilled = gamePlayStatsComponent.creatureKilled;
-                    creatureKilled.put(monsterName, 1);
+                    creatureKilled.put(creatureName, 1);
                     instigator.addOrSaveComponent(gamePlayStatsComponent);
                 }
             }
