@@ -601,6 +601,12 @@ public class CoreCommands extends BaseComponentSystem {
                     msg.append("=====================================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
+                if(!cmd.getRequiredPermission().isEmpty()) {
+                    msg.append("Required permission level - "+cmd.getRequiredPermission());
+                    msg.append(Console.NEW_LINE);
+                    msg.append("=====================================================================================================================");
+                    msg.append(Console.NEW_LINE);
+                }
 
                 return msg.toString();
             }
