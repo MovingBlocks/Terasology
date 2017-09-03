@@ -16,54 +16,83 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import net.logstash.logback.encoder.org.apache.commons.lang.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * TODO: Add javadocs
  */
-public class RenderGraph { // TODO: add extends DirectedAcyclicGraph<Node>
-    private Map<SimpleUri, Node> nodes = Maps.newHashMap();
-    private Multimap<Node, Node> nodeEdges = HashMultimap.create();
+public class RenderGraph {
+    private static final Logger logger = LoggerFactory.getLogger(RenderGraph.class);
+
+    private Map<SimpleUri, Node> nodeMap = Maps.newHashMap();
+    private Multimap<Node, Node> edgeMap = HashMultimap.create();
 
     public SimpleUri addNode(Node node, String suggestedUri) {
-        // TODO: make sure URIs are actually unique: if "myModule:blur" is present the node gets the uri "myModule:blur2" instead.
-        // TODO: make sure the namespace in the uri is engine-assigned, so that only engine nodes can have the "engine:" namespace - everything else gets the namespace of the module.
+        Validate.notNull(node, "node cannot be null!");
+        Validate.notNull(suggestedUri, "suggestedUri cannot be null!");
+
         SimpleUri nodeUri = new SimpleUri("engine:" + suggestedUri);
 
-        nodes.put(nodeUri, node);
+        if (nodeMap.containsKey(nodeUri)) {
+            int i = 2;
+            while (nodeMap.containsKey(new SimpleUri(nodeUri.toString() + i))) {
+                i++;
+            }
+            nodeUri = new SimpleUri(nodeUri.toString() + i);
+        }
+
+        nodeMap.put(nodeUri, node);
 
         return nodeUri;
     }
 
-    public boolean removeNode(SimpleUri nodeUri) {
-        if (nodeEdges.containsKey(nodeUri)) {
-            return false;
+    public Node removeNode(SimpleUri nodeUri) {
+        Validate.notNull(nodeUri, "nodeUri cannot be null!");
+
+        if (edgeMap.containsKey(nodeUri)) {
+            throw new RuntimeException("The node you are trying to remove is still connected to other nodes in the graph!");
         }
 
-        nodes.remove(nodeUri);
-
-        return true; // TODO: What if nodeUri does not refer to a Node?
+        return nodeMap.remove(nodeUri);
     }
 
     public Node findNode(SimpleUri nodeUri) {
-        return nodes.get(nodeUri);
+        Validate.notNull(nodeUri, "nodeUri cannot be null!");
+
+        return nodeMap.get(nodeUri);
     }
 
-    public void addEdge(Node node1, Node node2) {
-        nodeEdges.put(node1, node2);
+    public boolean connect(Node fromNode, Node toNode) {
+        Validate.notNull(fromNode, "fromNode cannot be null!");
+        Validate.notNull(toNode, "toNode cannot be null!");
+
+        boolean success = edgeMap.put(fromNode, toNode);
+        if (!success) {
+            logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
+        }
+
+        return success;
     }
 
-    public boolean removeEdge(Node node1, Node node2) {
-        return nodeEdges.remove(node1, node2);
+    public boolean disconnect(Node fromNode, Node toNode) {
+        Validate.notNull(fromNode, "fromNode cannot be null!");
+        Validate.notNull(toNode, "toNode cannot be null!");
+
+        return edgeMap.remove(fromNode, toNode);
     }
+
+    // TODO: Add `boolean isFullyFunctional(Node node)`
+
+    // TODO: Add handler methods which the graph uses to communicate changes to a node.
 
     public List<Node> getNodesInTopologicalOrder() {
         List<Node> topologicalList = new ArrayList<>();
@@ -71,10 +100,9 @@ public class RenderGraph { // TODO: add extends DirectedAcyclicGraph<Node>
 
         nodesToExamine.add(findNode(new SimpleUri("engine:shadowMapClearingNode"))); // TODO: Find a better way to set first Node.
         while (!nodesToExamine.isEmpty()) {
-            Node currentNode = nodesToExamine.get(0);
+            Node currentNode = nodesToExamine.remove(0);
             topologicalList.add(currentNode);
-            nodesToExamine.addAll(nodeEdges.get(currentNode));
-            nodesToExamine.remove(0);
+            nodesToExamine.addAll(edgeMap.get(currentNode));
         }
 
         return topologicalList;
