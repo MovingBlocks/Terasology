@@ -1,6 +1,6 @@
 {
     "id" : "CoreSampleGameplay",
-    "version" : "1.4.1-SNAPSHOT",
+    "version" : "1.5.0",
     "displayName" : "Core Gameplay",
     "description" : "Minimal gameplay template. Little content but a few starting items.",
     "dependencies" :
