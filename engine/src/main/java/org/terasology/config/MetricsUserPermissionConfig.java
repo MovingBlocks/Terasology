@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.config;
 
-import org.terasology.module.sandbox.API;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * All telemetry fields should have this annotation.
- * {@link org.terasology.telemetry.metrics.Metric} finds all the telemetry fields & values via this annotation.
+ * This config is used in Telemetry.
+ * It gives the user more options such as sending one part of the fields but not the other part.
  */
-@API
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TelemetryField {
+public class MetricsUserPermissionConfig {
+
+    private Map<String, Boolean> bindingMap = new HashMap<>();
+
+    public Map<String, Boolean> getBindingMap() {
+        return bindingMap;
+    }
+
+    public void setBindingMap(Map<String, Boolean> bindingMap) {
+        this.bindingMap = bindingMap;
+    }
 }

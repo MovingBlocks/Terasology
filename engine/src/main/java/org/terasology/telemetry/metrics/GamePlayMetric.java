@@ -16,7 +16,8 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
+import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -25,17 +26,21 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A game play metric tracking metric such as distance traveled, play time, etc.
  * The stats begin at 0 when a new game starts.
  */
 @TelemetryCategory(id = "gameplay",
-        displayName = "${engine:menu#telemetry-game-play}"
+        displayName = "${engine:menu#telemetry-game-play}",
+        isOneMapMetric = false
 )
 public final class GamePlayMetric extends Metric {
 
     public static final String SCHEMA_GAMEPLAY = "iglu:org.terasology/gamePlay/jsonschema/1-0-0";
+
+    private Map<String, Boolean> bindingMap;
 
     private LocalPlayer localPlayer;
 
@@ -45,30 +50,28 @@ public final class GamePlayMetric extends Metric {
     @TelemetryField
     private long playTimeMinute;
 
-    public GamePlayMetric() {
+    public GamePlayMetric(Context context) {
+        bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAMEPLAY, metricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        Map<String, Object> filteredMetricMap = filterMetricMap(bindingMap);
+        return getUnstructuredMetric(SCHEMA_GAMEPLAY, filteredMetricMap);
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
             distanceTraveled = gamePlayStatsComponent.distanceTraveled;
             playTimeMinute = (long) gamePlayStatsComponent.playTimeMinute;
-            return super.getFieldValueMap();
+            return super.createTelemetryFieldToValue();
         } else {
-            return metricMap;
+            return super.createTelemetryFieldToValue();
         }
     }
 }

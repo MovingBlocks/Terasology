@@ -17,6 +17,7 @@ package org.terasology.telemetry;
 
 import com.google.common.collect.Maps;
 import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -37,21 +38,25 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layers.mainMenu.AddServerPopup;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.RowLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISpace;
 import org.terasology.telemetry.logstash.TelemetryLogstashAppender;
 import org.terasology.telemetry.metrics.Metric;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The metrics menu lists the telemetry field names and values that will be sent to the server.
@@ -83,13 +88,15 @@ public class TelemetryScreen extends CoreScreenLayer {
 
     private final int horizontalSpacing = 12;
 
+    private Map<TelemetryCategory, Class> telemetryCategories;
+
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
         refreshContent();
 
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
-        WidgetUtil.tryBindCheckBoxWithListener(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE),(checkbox) -> {
+        WidgetUtil.tryBindCheckBoxWithListener(this, "telemetryEnabled", BindHelper.bindBeanProperty("telemetryEnabled", config.getTelemetryConfig(), Boolean.TYPE), (checkbox) -> {
             if (config.getTelemetryConfig().isTelemetryEnabled()) {
                 pushAddServerPopupAndStartEmitter();
             }
@@ -99,29 +106,94 @@ public class TelemetryScreen extends CoreScreenLayer {
                 pushAddServerPopupAndStartLogBackAppender();
             } else {
                 TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
-                telemetryLogstashAppender.stop();
+                if (telemetryLogstashAppender != null) {
+                    telemetryLogstashAppender.stop();
+                }
             }
         });
+
+        addEnablingAllTelemetryListener();
     }
 
     @Override
     public void onOpened() {
         super.onOpened();
         refreshContent();
+
+        addGroupEnablingListener();
+    }
+
+    /**
+     * Add a listener to the telemetryEnable checkbox. If the checkbox os enabled/disabled, it will enable/disable all the telemetry field.
+     */
+    private void addEnablingAllTelemetryListener() {
+        UICheckbox uiCheckbox = this.find("telemetryEnabled", UICheckbox.class);
+        if (uiCheckbox != null) {
+            uiCheckbox.subscribe((checkbox) -> {
+                boolean telemetryEnabled = config.getTelemetryConfig().isTelemetryEnabled();
+                Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+                for (Map.Entry<String, Boolean> entry : bindingMap.entrySet()) {
+                    entry.setValue(telemetryEnabled);
+                }
+
+                fetchTelemetryCategoriesFromEnvironment();
+                for (Map.Entry<TelemetryCategory, Class> telemetryCategory : telemetryCategories.entrySet()) {
+                    UICheckbox categoryBox = this.find(telemetryCategory.getKey().id(), UICheckbox.class);
+                    if (categoryBox != null) {
+                        categoryBox.setEnabled(telemetryEnabled);
+                    }
+                    Set<Field> fields = ReflectionUtils.getFields(telemetryCategory.getValue(), ReflectionUtils.withAnnotation(TelemetryField.class));
+                    for (Field field : fields) {
+                        String fieldName = telemetryCategory.getKey().id() + ":" + field.getName();
+                        UICheckbox fieldBox = this.find(fieldName, UICheckbox.class);
+                        if (fieldBox != null) {
+                            fieldBox.setEnabled(telemetryEnabled);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Add a listener to the checkbox in the telemetry category row.
+     * If this checkbox is checked, all the sub telemetry fields will be enabled/disabled.
+     */
+    private void addGroupEnablingListener() {
+        fetchTelemetryCategoriesFromEnvironment();
+        for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
+            if (!telemetryCategory.getKey().isOneMapMetric()) {
+                UICheckbox uiCheckbox = this.find(telemetryCategory.getKey().id(), UICheckbox.class);
+                if (uiCheckbox == null) {
+                    continue;
+                }
+                uiCheckbox.subscribe((checkbox) -> {
+                    Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+                    if (bindingMap.containsKey(telemetryCategory.getKey().id())) {
+                        boolean isGroupEnable = bindingMap.get(telemetryCategory.getKey().id());
+                        Set<Field> fields = ReflectionUtils.getFields(telemetryCategory.getValue(), ReflectionUtils.withAnnotation(TelemetryField.class));
+                        for (Field field : fields) {
+                            String fieldName = telemetryCategory.getKey().id() + ":" + field.getName();
+                            bindingMap.put(fieldName, isGroupEnable);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     private void refreshContent() {
         ColumnLayout mainLayout = new ColumnLayout();
         mainLayout.setHorizontalSpacing(8);
         mainLayout.setVerticalSpacing(8);
-        Map<TelemetryCategory, Class> telemetryCategories = fetchTelemetryCategoriesFromEnvironment();
+        fetchTelemetryCategoriesFromEnvironment();
 
         for (Map.Entry<TelemetryCategory, Class> telemetryCategory: telemetryCategories.entrySet()) {
             Class metricClass = telemetryCategory.getValue();
             Optional<Metric> optional = metrics.getMetric(metricClass);
             if (optional.isPresent()) {
                 Metric metric = optional.get();
-                Map<String, ?> map = metric.getFieldValueMap();
+                Map<String, ?> map = metric.createTelemetryFieldToValue();
                 if (map != null) {
                     addTelemetrySection(telemetryCategory.getKey(), mainLayout, map);
                 }
@@ -129,7 +201,9 @@ public class TelemetryScreen extends CoreScreenLayer {
         }
 
         ScrollableArea area = find("area", ScrollableArea.class);
-        area.setContent(mainLayout);
+        if (area != null) {
+            area.setContent(mainLayout);
+        }
     }
 
     private void pushAddServerPopupAndStartEmitter() {
@@ -167,9 +241,7 @@ public class TelemetryScreen extends CoreScreenLayer {
                 telemetryConfig.setTelemetryServerOwner(item.getOwner());
             }
         });
-        addServerPopup.onCancel((button) -> {
-            config.getTelemetryConfig().setTelemetryEnabled(false);
-        });
+        addServerPopup.onCancel((button) -> config.getTelemetryConfig().setTelemetryEnabled(false));
     }
 
     private void pushAddServerPopupAndStartLogBackAppender() {
@@ -180,7 +252,7 @@ public class TelemetryScreen extends CoreScreenLayer {
         TelemetryConfig telemetryConfig = config.getTelemetryConfig();
         if (telemetryConfig.getErrorReportingDestination() != null) {
             try {
-                URL url = new URL(telemetryConfig.getErrorReportingDestination());
+                URL url = new URL("http://" + telemetryConfig.getErrorReportingDestination());
                 serverInfo = new ServerInfo(telemetryConfig.getErrorReportingServerName(), url.getHost(), url.getPort());
                 serverInfo.setOwner(telemetryConfig.getErrorReportingServerOwner());
             } catch (Exception e) {
@@ -196,26 +268,26 @@ public class TelemetryScreen extends CoreScreenLayer {
         }
         addServerPopup.setServerInfo(serverInfo);
         addServerPopup.onSuccess((item) -> {
-            StringBuilder destinationLogstash = new StringBuilder();
-            destinationLogstash.append(item.getAddress());
-            destinationLogstash.append(":");
-            destinationLogstash.append(item.getPort());
+            String destinationLogstash = item.getAddress() + ":" + item.getPort();
             TelemetryLogstashAppender telemetryLogstashAppender = TelemetryUtils.fetchTelemetryLogstashAppender();
-            telemetryLogstashAppender.addDestination(destinationLogstash.toString());
-            telemetryLogstashAppender.start();
+            if (telemetryLogstashAppender != null) {
+                telemetryLogstashAppender.addDestination(destinationLogstash);
+                telemetryLogstashAppender.start();
+            }
 
             // Save the destination
-            telemetryConfig.setErrorReportingDestination(destinationLogstash.toString());
+            telemetryConfig.setErrorReportingDestination(destinationLogstash);
             telemetryConfig.setErrorReportingServerName(item.getName());
             telemetryConfig.setErrorReportingServerOwner(item.getOwner());
         });
-        addServerPopup.onCancel((button) -> {
-            telemetryConfig.setErrorReportingEnabled(false);
-        });
+        addServerPopup.onCancel((button) -> telemetryConfig.setErrorReportingEnabled(false));
     }
 
-    private Map<TelemetryCategory, Class> fetchTelemetryCategoriesFromEnvironment() {
-        Map<TelemetryCategory, Class> telemetryCategories = Maps.newHashMap();
+    /**
+     * refresh the telemetryCategories map.
+     */
+    private void fetchTelemetryCategoriesFromEnvironment() {
+        telemetryCategories = Maps.newHashMap();
 
         DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
@@ -232,8 +304,6 @@ public class TelemetryScreen extends CoreScreenLayer {
                 }
             }
         }
-
-        return telemetryCategories;
     }
 
     /**
@@ -243,23 +313,54 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param map the map which includes the telemetry field name and value
      */
     private void addTelemetrySection(TelemetryCategory telemetryCategory, ColumnLayout layout, Map<String, ?> map) {
-
         UILabel categoryHeader = new UILabel(translationSystem.translate(telemetryCategory.displayName()));
         categoryHeader.setFamily("subheading");
-        layout.addWidget(categoryHeader);
-        List<Map.Entry> telemetryFields = sortFields(map);
+        UICheckbox uiCheckbox = new UICheckbox(telemetryCategory.id());
+        Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+        if (!bindingMap.containsKey(telemetryCategory.id())) {
+            bindingMap.put(telemetryCategory.id(), config.getTelemetryConfig().isTelemetryEnabled());
+        }
+        Binding<Boolean> binding = getBindingFromBooleanMap(bindingMap, telemetryCategory.id());
+        uiCheckbox.bindChecked(binding);
+        RowLayout newRow = new RowLayout(categoryHeader, new UISpace(), uiCheckbox)
+                .setColumnRatios(0.4f, 0.5f, 0.1f)
+                .setHorizontalSpacing(horizontalSpacing);
+        layout.addWidget(newRow);
+
+        List<Map.Entry<String, ?>> telemetryFields = sortFields(map);
         for (Map.Entry entry : telemetryFields) {
             Object value = entry.getValue();
             if (value == null) {
-                value = "Value Unknown";
+                value = "Value unknown yet";
             }
+            boolean isWithCheckbox = !telemetryCategory.isOneMapMetric();
             if (value instanceof List) {
                 List list = (List) value;
-                addTelemetryField(entry.getKey().toString(), list, layout);
+                addTelemetryField(entry.getKey().toString(), list, layout, isWithCheckbox, telemetryCategory);
             } else {
-                addTelemetryField(entry.getKey().toString(), value, layout);
+                addTelemetryField(entry.getKey().toString(), value, layout, isWithCheckbox, telemetryCategory);
             }
         }
+    }
+
+    /**
+     * Get a binding to a map boolean value.
+     * @param bindingMap the map.
+     * @param fieldName the key associate to the binding value in the map.
+     * @return
+     */
+    private Binding<Boolean> getBindingFromBooleanMap(Map<String, Boolean> bindingMap, String fieldName) {
+        return new Binding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return bindingMap.get(fieldName);
+            }
+
+            @Override
+            public void set(Boolean value) {
+                bindingMap.put(fieldName, value);
+            }
+        };
     }
 
     /**
@@ -267,11 +368,42 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param type the type(name) of the this field
      * @param value the value of this field
      * @param layout the layout where the new line will be added
+     * @param isWithCheckbox whether add a check box in the line
+     * @param telemetryCategory the TelemetryCategory that this field belongs to
      */
-    private void addTelemetryField(String type, Object value, ColumnLayout layout) {
-        RowLayout newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()))
-                .setColumnRatios(0.4f)
-                .setHorizontalSpacing(horizontalSpacing);
+    private void addTelemetryField(String type, Object value, ColumnLayout layout, boolean isWithCheckbox, TelemetryCategory telemetryCategory) {
+        RowLayout newRow;
+        if (isWithCheckbox) {
+            String fieldName = telemetryCategory.id() + ":" + type;
+            UICheckbox uiCheckbox = new UICheckbox(fieldName);
+            Map<String, Boolean> bindingMap = config.getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
+            if (!bindingMap.containsKey(fieldName)) {
+                bindingMap.put(fieldName, config.getTelemetryConfig().isTelemetryEnabled());
+            }
+            Binding<Boolean> binding = getBindingFromBooleanMap(bindingMap, fieldName);
+            uiCheckbox.bindChecked(binding);
+            uiCheckbox.subscribe((checkbox) -> {
+                if (bindingMap.get(fieldName)) {
+                    bindingMap.put(telemetryCategory.id(), true);
+                } else {
+                    Set<Field> fields = ReflectionUtils.getFields(telemetryCategories.get(telemetryCategory), ReflectionUtils.withAnnotation(TelemetryField.class));
+                    boolean isOneEnabled = false;
+                    for (Field field : fields) {
+                        isOneEnabled = isOneEnabled || bindingMap.get(telemetryCategory.id() + ":" + field.getName());
+                    }
+                    if (!isOneEnabled) {
+                        bindingMap.put(telemetryCategory.id(), false);
+                    }
+                }
+            });
+            newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()), uiCheckbox)
+                    .setColumnRatios(0.4f, 0.5f, 0.1f)
+                    .setHorizontalSpacing(horizontalSpacing);
+        } else {
+            newRow = new RowLayout(new UILabel(type), new UILabel(value.toString()))
+                    .setColumnRatios(0.4f, 0.5f)
+                    .setHorizontalSpacing(horizontalSpacing);
+        }
 
         layout.addWidget(newRow);
     }
@@ -282,15 +414,16 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param type the type(name) of the this field
      * @param value the value of this field (a List)
      * @param layout the layout where the new line will be added
+     * @param isWithCheckbox whether add a check box in the line
      */
-    private void addTelemetryField(String type, List value, ColumnLayout layout) {
+    private void addTelemetryField(String type, List value, ColumnLayout layout, boolean isWithCheckbox, TelemetryCategory telemetryCategory) {
         int moduleCount = 1;
         for (Object o : value) {
             StringBuilder sb = new StringBuilder();
             sb.append(type);
             sb.append(" ");
             sb.append(moduleCount);
-            addTelemetryField(sb.toString(), o, layout);
+            addTelemetryField(sb.toString(), o, layout, isWithCheckbox, telemetryCategory);
             moduleCount = moduleCount + 1;
         }
     }
@@ -300,15 +433,9 @@ public class TelemetryScreen extends CoreScreenLayer {
      * @param map the map that will be sorted
      * @return a list of map entry that is ordered by fields' names
      */
-    private List<Map.Entry> sortFields(Map<String, ?> map) {
-        List<Map.Entry> list = new ArrayList<>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry>() {
-            @Override
-            public int compare(Map.Entry o1, Map.Entry o2) {
-                return o1.getKey().toString().compareTo(o2.getKey().toString());
-            }
-        });
-
+    private List<Map.Entry<String, ?>> sortFields(Map<String, ?> map) {
+        List<Map.Entry<String, ?>> list = new ArrayList<>(map.entrySet());
+        list.sort(Comparator.comparing(Map.Entry::getKey));
         return list;
     }
 }

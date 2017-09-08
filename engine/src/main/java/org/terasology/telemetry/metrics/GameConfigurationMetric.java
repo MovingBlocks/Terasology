@@ -16,30 +16,30 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.config.Config;
 import org.terasology.config.PlayerConfig;
 import org.terasology.context.Context;
-import org.terasology.engine.SimpleUri;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 import org.terasology.world.generator.WorldGenerator;
 
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A metric tracking game configuration such as world generator, network mode,etc.
  */
 @TelemetryCategory(id = "gameConfiguration",
-        displayName = "${engine:menu#telemetry-game-configuration}"
+        displayName = "${engine:menu#telemetry-game-configuration}",
+        isOneMapMetric = false
 )
 public final class GameConfigurationMetric extends Metric {
 
     public static final String SCHEMA_GAME_CONFIGURATION = "iglu:org.terasology/gameConfiguration/jsonschema/1-0-0";
+
+    private Map<String, Boolean> bindingMap;
 
     @TelemetryField
     private String worldGenerator;
@@ -60,25 +60,23 @@ public final class GameConfigurationMetric extends Metric {
 
     public GameConfigurationMetric(Context context) {
         this.context = context;
+        bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_GAME_CONFIGURATION, metricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        Map<String, Object> filteredMetricMap = filterMetricMap(bindingMap);
+        return getUnstructuredMetric(SCHEMA_GAME_CONFIGURATION, filteredMetricMap);
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         fetchWorldGenerator();
         fetchNetworkMode();
         fetchConfig();
 
-        return super.getFieldValueMap();
+        return super.createTelemetryFieldToValue();
     }
 
     private void fetchWorldGenerator() {

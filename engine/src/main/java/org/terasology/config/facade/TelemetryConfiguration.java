@@ -13,32 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.telemetry;
+package org.terasology.config.facade;
 
 import org.terasology.module.sandbox.API;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * A new metric class show has this annotation.
- * The {@link org.terasology.telemetry.TelemetryScreen} find telemetry information via this annotation.
+ * TelemetryConfiguration is a wrapper for {@link org.terasology.config.TelemetryConfig}.
+ * It provides other modules with necessary telemetry configuration.
  */
 @API
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface TelemetryCategory {
-    /**
-     * @return The id of the category.
-     */
-    String id();
+public interface TelemetryConfiguration {
 
-    /**
-     * @return The displayable name for this category
-     */
-    String displayName();
+    boolean isTelemetryEnabled();
 
-    boolean isOneMapMetric();
+    boolean isErrorReportingEnabled();
+
+    int fetchBindingSize();
+
+    Boolean get(String telemetryField);
+
+    boolean containsField(String telemetryField);
 }

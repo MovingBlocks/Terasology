@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -25,45 +24,41 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * A player statistic metric for monsters killed in a game.
+ * A player statistic metric for creatures killed in a game.
  */
-@TelemetryCategory(id = "monsterKilled",
-        displayName = "${engine:menu#telemetry-monster-killed}"
+@TelemetryCategory(id = "creatureKilled",
+        displayName = "${engine:menu#telemetry-creature-killed}",
+        isOneMapMetric = true
 )
-public final class MonsterKilledMetric extends Metric {
+public final class CreatureKilledMetric extends Metric {
 
-    public static final String SCHEMA_MONSTER_KILLED = "iglu:org.terasology/monsterKilled/jsonschema/1-0-0";
+    public static final String SCHEMA_CREATURE_KILLED = "iglu:org.terasology/creatureKilled/jsonschema/1-0-0";
 
     private LocalPlayer localPlayer;
 
     @TelemetryField
-    private Map monsterKilledMap;
+    private Map creatureKilledMap;
 
-    public MonsterKilledMetric() {
+    @Override
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        return getUnstructuredMetric(SCHEMA_CREATURE_KILLED, telemetryFieldToValue);
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MONSTER_KILLED, metricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
-    }
-
-    @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            metricMap = gamePlayStatsComponent.monsterKilled;
-            return metricMap;
+            telemetryFieldToValue.clear();
+            telemetryFieldToValue.putAll(gamePlayStatsComponent.creatureKilled);
+            return telemetryFieldToValue;
         } else {
-            return metricMap;
+            return telemetryFieldToValue;
         }
     }
 }

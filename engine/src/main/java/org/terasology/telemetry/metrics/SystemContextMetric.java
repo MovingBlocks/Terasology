@@ -16,8 +16,8 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.lwjgl.opengl.GL11;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.registry.CoreRegistry;
@@ -25,17 +25,20 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is a metric for system context.
  */
 @TelemetryCategory(id = "systemContext",
-        displayName = "${engine:menu#telemetry-system-context}"
+        displayName = "${engine:menu#telemetry-system-context}",
+        isOneMapMetric = false
 )
 public final class SystemContextMetric extends Metric {
 
     public static final String SCHEMA_OS = "iglu:org.terasology/systemContext/jsonschema/1-0-0";
-    private Context context;
+    private Context contextInCoreRegistry;
+    private Map<String, Boolean> bindingMap;
 
     @TelemetryField
     private String osName;
@@ -73,7 +76,8 @@ public final class SystemContextMetric extends Metric {
     @TelemetryField
     private long memoryMaxByte;
 
-    public SystemContextMetric() {
+    public SystemContextMetric(Context context) {
+        bindingMap = context.get(Config.class).getTelemetryConfig().getMetricsUserPermissionConfig().getBindingMap();
 
         osName = System.getProperty("os.name");
         osVersion = System.getProperty("os.version");
@@ -82,8 +86,8 @@ public final class SystemContextMetric extends Metric {
         javaVersion = System.getProperty("java.version");
         jvmName = System.getProperty("java.vm.name");
         jvmVersion = System.getProperty("java.vm.version");
-        context = CoreRegistry.get(Context.class);
-        DisplayDevice display = context.get(DisplayDevice.class);
+        contextInCoreRegistry = CoreRegistry.get(Context.class);
+        DisplayDevice display = contextInCoreRegistry.get(DisplayDevice.class);
         if (!display.isHeadless()) {
             openGLVendor = GL11.glGetString(GL11.GL_VENDOR);
             openGLVersion = GL11.glGetString(GL11.GL_VERSION);
@@ -98,14 +102,9 @@ public final class SystemContextMetric extends Metric {
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-
-        getFieldValueMap();
-
-        SelfDescribingJson systemContextData = new SelfDescribingJson(SCHEMA_OS, metricMap);
-
-        return Unstructured.builder()
-                .eventData(systemContextData)
-                .build();
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        Map<String, Object> filteredMetricMap = filterMetricMap(bindingMap);
+        return getUnstructuredMetric(SCHEMA_OS, filteredMetricMap);
     }
 }

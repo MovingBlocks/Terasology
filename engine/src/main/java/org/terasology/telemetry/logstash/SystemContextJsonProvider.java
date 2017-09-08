@@ -24,10 +24,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.terasology.context.Context;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryUtils;
+import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * SystemContextJsonProvider provides system context information to {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
@@ -50,11 +52,14 @@ public class SystemContextJsonProvider extends AbstractFieldJsonProvider<ILoggin
 
         if (context != null) {
             Metrics metrics = context.get(Metrics.class);
-            SystemContextMetric systemContextMetric = metrics.getSystemContextMetric();
-            Map<String, ?> map = systemContextMetric.getFieldValueMap();
-            Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
+            Optional<Metric> optional = metrics.getMetric(SystemContextMetric.class);
+            if (optional.isPresent()) {
+                Metric systemContextMetric = optional.get();
+                Map<String, ?> map = systemContextMetric.createTelemetryFieldToValue();
+                Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
 
-            JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);
+                JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);
+            }
         }
     }
 

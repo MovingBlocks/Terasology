@@ -24,10 +24,12 @@ import net.logstash.logback.fieldnames.LogstashFieldNames;
 import org.terasology.context.Context;
 import org.terasology.telemetry.Metrics;
 import org.terasology.telemetry.TelemetryUtils;
+import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * ModulesJsonProvider provides game module id and version to {@link org.terasology.telemetry.logstash.TelemetryLogstashAppender}.
@@ -50,11 +52,13 @@ public class ModulesJsonProvider extends AbstractFieldJsonProvider<ILoggingEvent
 
         if (context != null) {
             Metrics metrics = context.get(Metrics.class);
-            ModulesMetric modulesMetric = metrics.getModulesMetric();
-            Map<String, ?> map = modulesMetric.getFieldValueMap();
-            Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
-
-            JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);
+            Optional<Metric> optional = metrics.getMetric(ModulesMetric.class);
+            if (optional.isPresent()) {
+                Metric modulesMetric = optional.get();
+                Map<String, ?> map = modulesMetric.createTelemetryFieldToValue();
+                Map<String, String> stringMap = TelemetryUtils.toStringMap(map);
+                JsonWritingUtils.writeMapStringFields(generator, getFieldName(), stringMap);
+            }
         }
 
     }

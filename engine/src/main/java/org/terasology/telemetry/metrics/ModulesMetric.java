@@ -16,7 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
 import org.terasology.context.Context;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.Module;
@@ -29,13 +28,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This is a metric for game modules in current context.
  * Metric includes module name and module version.
  */
 @TelemetryCategory(id = "modules",
-        displayName = "${engine:menu#telemetry-modules}"
+        displayName = "${engine:menu#telemetry-modules}",
+        isOneMapMetric = true
 )
 public final class ModulesMetric extends Metric {
 
@@ -47,28 +48,23 @@ public final class ModulesMetric extends Metric {
     private Context context;
 
     public ModulesMetric(Context context) {
-
         this.context = context;
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_MODULES, metricMap);
-        
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        return getUnstructuredMetric(SCHEMA_MODULES, telemetryFieldToValue);
     }
 
     @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         updateModules();
-        metricMap = new HashMap();
+        telemetryFieldToValue = new HashMap();
         for (Module module : modules) {
-            metricMap.put(module.getId().toString(), module.getVersion().toString());
+            telemetryFieldToValue.put(module.getId().toString(), module.getVersion().toString());
         }
-        return metricMap;
+        return telemetryFieldToValue;
     }
 
     private void updateModules() {

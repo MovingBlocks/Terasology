@@ -18,6 +18,7 @@ package org.terasology.telemetry;
 import com.snowplowanalytics.snowplow.tracker.DevicePlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.module.sandbox.API;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -27,6 +28,7 @@ import java.util.Base64;
 /**
  * Terasology desktop game parameters for telemetry. They are needed by snowplow stacks.
  */
+@API
 public class TelemetryParams {
 
     public static final String APP_ID_TERASOLOGY = "terasology";

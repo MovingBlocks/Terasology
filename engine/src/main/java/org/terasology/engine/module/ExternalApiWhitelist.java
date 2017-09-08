@@ -76,6 +76,8 @@ public final class ExternalApiWhitelist {
             .add("com.yourkit.runtime")
             .add("com.bulletphysics.linearmath")
             .add("sun.reflect")
+            .add("com.snowplowanalytics.snowplow.tracker.events")
+            .add("com.snowplowanalytics.snowplow.tracker.payload")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()

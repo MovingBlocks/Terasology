@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * TelemetryEmitter emit metrics to the telemetry server.
  * @see <a href="https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitters">https://github.com/snowplow/snowplow/wiki/Java-Tracker#emitterss</a>
-
  */
 public class TelemetryEmitter extends BatchEmitter {
 
@@ -116,7 +115,7 @@ public class TelemetryEmitter extends BatchEmitter {
 
     private static RequestCallback getDefaultRequestCallback() {
 
-        RequestCallback callback = new RequestCallback() {
+        return new RequestCallback() {
 
             public void onSuccess(int successCount) {
                 logger.info("Success sent, successCount: " + successCount);
@@ -126,8 +125,6 @@ public class TelemetryEmitter extends BatchEmitter {
                 logger.warn("Failure, successCount: " + successCount + "\nfailedEvent:\n" + failedEvents.toString());
             }
         };
-
-        return callback;
     }
 
     public void changeUrl(URL url) {

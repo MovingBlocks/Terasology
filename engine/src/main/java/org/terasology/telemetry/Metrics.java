@@ -18,110 +18,110 @@ package org.terasology.telemetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
-import org.terasology.telemetry.metrics.BlockDestroyedMetric;
-import org.terasology.telemetry.metrics.BlockPlacedMetric;
-import org.terasology.telemetry.metrics.GameConfigurationMetric;
-import org.terasology.telemetry.metrics.GamePlayMetric;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ResolutionResult;
+import org.terasology.module.predicates.FromModule;
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
 import org.terasology.telemetry.metrics.Metric;
-import org.terasology.telemetry.metrics.ModulesMetric;
-import org.terasology.telemetry.metrics.MonsterKilledMetric;
-import org.terasology.telemetry.metrics.SystemContextMetric;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Metrics class is similar to {@link org.terasology.config.Config}, it stores the telemetry information.
  * Once a new metric is used, the new metric instance should be added in this class to show the metric value in ui.
  */
+@API
 public class Metrics {
 
     private static final Logger logger = LoggerFactory.getLogger(Metrics.class);
 
-    private SystemContextMetric systemContextMetric;
-
-    private ModulesMetric modulesMetric;
-
-    private GameConfigurationMetric gameConfigurationMetric;
-
-    private BlockDestroyedMetric blockDestroyedMetric;
-
-    private BlockPlacedMetric blockPlacedMetric;
-
-    private GamePlayMetric gamePlayMetric;
-
-    private MonsterKilledMetric monsterKilledMetric;
-
-    public Metrics() {
-
-    }
+    private Map<String, Metric> classNameToMetric = new HashMap<>();
 
     public void initialise(Context context) {
 
-        systemContextMetric = new SystemContextMetric();
-        modulesMetric = new ModulesMetric(context);
-        gameConfigurationMetric = new GameConfigurationMetric(context);
-        blockDestroyedMetric = new BlockDestroyedMetric();
-        blockPlacedMetric = new BlockPlacedMetric();
-        gamePlayMetric = new GamePlayMetric();
-        monsterKilledMetric = new MonsterKilledMetric();
+        Set<Class> metricsClassSet = fetchMetricsClassFromEnvironemnt(context);
+        initializeMetrics(metricsClassSet, context);
+    }
+
+    private Set<Class> fetchMetricsClassFromEnvironemnt(Context context) {
+
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        Set<Class> metricsClassSet = new HashSet<>();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            if (module.isCodeModule()) {
+                ResolutionResult result = resolver.resolve(moduleId);
+                if (result.isSuccess()) {
+                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(TelemetryCategory.class, new FromModule(environment, moduleId))) {
+                            metricsClassSet.add(holdingType);
+                        }
+                    }
+                }
+            }
+        }
+        return metricsClassSet;
+    }
+
+    private void initializeMetrics(Set<Class> metricsClassSet, Context context) {
+
+        for (Class clazz : metricsClassSet) {
+            Constructor[] constructors = clazz.getConstructors();
+            for (Constructor constructor : constructors) {
+                Class[] parameters = constructor.getParameterTypes();
+                try {
+                    Metric metric;
+                    if (parameters.length  == 0) {
+                        metric = (Metric) constructor.newInstance();
+                        classNameToMetric.put(metric.getClass().getName(), metric);
+                    } else if (parameters.length == 1 && parameters[0].equals(Context.class)) {
+                        metric = (Metric) constructor.newInstance(context);
+                        classNameToMetric.put(metric.getClass().getName(), metric);
+                    } else {
+                        logger.warn("Can't initialize the Metric, please initialize it and add it to Metrics:", constructor);
+                    }
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    logger.error("Fail to initialize the metric instance", constructor);
+                }
+            }
+        }
     }
 
     public void refreshAllMetrics() {
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType().getSuperclass() == Metric.class) {
-                try {
-                    Metric metric = (Metric) field.get(this);
-                    metric.getFieldValueMap();
-                } catch (IllegalAccessException e) {
-                    logger.error("The field is not inaccessible: ", e);
-                }
-            }
+        for (Metric metric: classNameToMetric.values()) {
+            metric.createTelemetryFieldToValue();
         }
     }
 
-    public SystemContextMetric getSystemContextMetric() {
-        return systemContextMetric;
+    public Map<String, Metric> getClassNameToMetric() {
+        return classNameToMetric;
     }
 
-    public ModulesMetric getModulesMetric() {
-        return modulesMetric;
-    }
-
-    public GameConfigurationMetric getGameConfigurationMetric() {
-        return gameConfigurationMetric;
-    }
-
-    public BlockDestroyedMetric getBlockDestroyedMetric() {
-        return blockDestroyedMetric;
-    }
-
-    public BlockPlacedMetric getBlockPlacedMetric() {
-        return blockPlacedMetric;
-    }
-
-    public MonsterKilledMetric getMonsterKilledMetric() {
-        return monsterKilledMetric;
-    }
-
-    public GamePlayMetric getGamePlayMetric() {
-        return gamePlayMetric;
-    }
-
+    /**
+     * Get the metric in the context {@link org.terasology.telemetry.Metrics} class.
+     * @param cl the class of the metric class.
+     * @return the metric in the game context.
+     */
     public Optional<Metric> getMetric(Class<?> cl) {
-        Optional<Metric> optional = Optional.ofNullable(null);
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType() == cl) {
-                try {
-                    return Optional.of((Metric) field.get(this));
-                } catch (IllegalAccessException e) {
-                    logger.error("The field is not inaccessible: ", e);
-                }
-            }
-        }
+        return Optional.ofNullable(classNameToMetric.get(cl.getName()));
+    }
 
-        return optional;
+    /**
+     * Add a metric instance to Metrics. This method will only be used when a metric constructor needs specific other than {@link org.terasology.context.Context}
+     * @param metric a new metric that constructor needs some arguments other than {@link org.terasology.context.Context}
+     */
+    public void addMetric(Metric metric) {
+        classNameToMetric.put(metric.getClass().getName(), metric);
     }
 }

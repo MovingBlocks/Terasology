@@ -16,8 +16,6 @@
 package org.terasology.telemetry.metrics;
 
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
-import com.snowplowanalytics.snowplow.tracker.payload.SelfDescribingJson;
-import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
@@ -26,12 +24,14 @@ import org.terasology.telemetry.TelemetryCategory;
 import org.terasology.telemetry.TelemetryField;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A players statistic metric for blocks placed.
  */
 @TelemetryCategory(id = "blockPlaced",
-        displayName = "${engine:menu#telemetry-block-placed}"
+        displayName = "${engine:menu#telemetry-block-placed}",
+        isOneMapMetric = true
 )
 public final class BlockPlacedMetric extends Metric {
 
@@ -43,29 +43,23 @@ public final class BlockPlacedMetric extends Metric {
 
     private LocalPlayer localPlayer;
 
-    public BlockPlacedMetric() {
+    @Override
+    public Optional<Unstructured> getUnstructuredMetric() {
+        createTelemetryFieldToValue();
+        return getUnstructuredMetric(SCHEMA_BLOCK_PLACED, telemetryFieldToValue);
     }
 
     @Override
-    public Unstructured getUnstructuredMetric() {
-        getFieldValueMap();
-        SelfDescribingJson modulesData = new SelfDescribingJson(SCHEMA_BLOCK_PLACED, metricMap);
-
-        return Unstructured.builder()
-                .eventData(modulesData)
-                .build();
-    }
-
-    @Override
-    public Map<String, ?> getFieldValueMap() {
+    public Map<String, ?> createTelemetryFieldToValue() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         EntityRef playerEntity = localPlayer.getCharacterEntity();
         if (playerEntity.hasComponent(GamePlayStatsComponent.class)) {
             GamePlayStatsComponent gamePlayStatsComponent = playerEntity.getComponent(GamePlayStatsComponent.class);
-            metricMap = gamePlayStatsComponent.blockPlacedMap;
-            return metricMap;
+            telemetryFieldToValue.clear();
+            telemetryFieldToValue.putAll(gamePlayStatsComponent.blockPlacedMap);
+            return telemetryFieldToValue;
         } else {
-            return metricMap;
+            return telemetryFieldToValue;
         }
     }
 }
