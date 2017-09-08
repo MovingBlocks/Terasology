@@ -415,7 +415,13 @@ public class SelectModulesScreen extends CoreScreenLayer {
         Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
         while (iter.hasNext()) {
             ModuleSelectionInfo m = iter.next();
-            Module module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            Module module;
+            if(m.isPresent()) {
+                module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());//(m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+            else {
+                module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
             if (selectModulesConfig.isLibraryChecked() && !StandardModuleExtension.isLibraryModule(module)) {
                 iter.remove();
                 continue;
