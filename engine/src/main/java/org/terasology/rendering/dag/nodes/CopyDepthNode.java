@@ -15,76 +15,53 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.context.Context;
-import org.terasology.rendering.cameras.SubmersibleCamera;
-import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.dag.AbstractNode;
+import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
-import static org.lwjgl.opengl.GL11.glViewport;
-import org.terasology.monitoring.PerformanceMonitor;
-import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import org.lwjgl.opengl.Display;
-import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.opengl.FBO.Type;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.engine.SimpleUri;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-import org.terasology.rendering.dag.stateChanges.BindFbo;
-import org.terasology.rendering.dag.stateChanges.SwapGBuffers;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 public class CopyDepthNode extends AbstractNode {
     private static final ResourceUrn COPY_DEPTH_MATERIAL_URN = new ResourceUrn("engine:prog.copyDepth");
-    public static final SimpleUri COPY_DEPTH_FBO_URI = new SimpleUri("engine:fbo.sceneCopyDepth");
+    public static final SimpleUri COPY_DEPTH_FBO_URI = new SimpleUri("engine:fbo.copyDepth");
 
     private FBO lastUpdatedGBuffer;
-    private FBO copyDepthFbo;
-
+    private FBO outputFbo;
     private Material copyDepthMaterial;
-
-    private SubmersibleCamera activeCamera;
 
     public CopyDepthNode(Context context)  {
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
-        copyDepthFbo = requiresFBO(new FBOConfig(COPY_DEPTH_FBO_URI, FULL_SCALE, FBO.Type.HDR).useDepthBuffer(), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(copyDepthFbo));
-        lastUpdatedGBuffer.attachDepthBufferTo(copyDepthFbo);
-
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        outputFbo = requiresFBO(new FBOConfig(COPY_DEPTH_FBO_URI, FULL_SCALE, Type.NO_COLOR).useDepthBuffer(), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(outputFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
 
         addDesiredStateChange(new EnableMaterial(COPY_DEPTH_MATERIAL_URN));
         copyDepthMaterial = getMaterial(COPY_DEPTH_MATERIAL_URN);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture,
-            displayResolutionDependentFBOs, COPY_DEPTH_MATERIAL_URN, "texSceneOpaque"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture,
             displayResolutionDependentFBOs, COPY_DEPTH_MATERIAL_URN, "texSceneOpaqueDepth"));
-
-        //only because water becomes invisible otherwise
-        addDesiredStateChange(new SwapGBuffers(displayResolutionDependentFBOs.getGBufferPair()));
     }
 
     @Override
     public void process()  {
 
         PerformanceMonitor.startActivity("rendering/copyDepth");
-        // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
-        // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
-        // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.
-
-        copyDepthMaterial.setFloat("zNear",activeCamera.getzNear(),true);
-        copyDepthMaterial.setFloat("zFar",activeCamera.getzFar(),true);
-
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
         renderFullscreenQuad();
         PerformanceMonitor.endActivity();
-
     }
 }

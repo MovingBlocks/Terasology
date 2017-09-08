@@ -180,10 +180,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements FBOM
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:waterNormal", CHUNK_MATERIAL_URN, "textureWaterNormal"));
         addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:waterNormalAlt", CHUNK_MATERIAL_URN, "textureWaterNormalAlt"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, REFLECTED_FBO_URI, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "textureWaterReflection"));
-        //addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaque"));
-
-        //changed the fbo from which the color texture is loaded below
-        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, COPY_DEPTH_FBO_URI, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaque"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, ColorTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaque"));
         addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, COPY_DEPTH_FBO_URI, DepthStencilTexture, displayResolutionDependentFBOs, CHUNK_MATERIAL_URN, "texSceneOpaqueDepth"));
         setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
         setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
