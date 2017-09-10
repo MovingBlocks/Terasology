@@ -83,7 +83,7 @@ public class ToneMappingNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/toneMapping");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Specific Shader Parameters
         toneMappingMaterial.setFloat("exposure", screenGrabber.getExposure() * exposureBias, true);

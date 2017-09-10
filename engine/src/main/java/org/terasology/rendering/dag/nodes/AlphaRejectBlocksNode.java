@@ -151,7 +151,7 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/chunksAlphaReject");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
 

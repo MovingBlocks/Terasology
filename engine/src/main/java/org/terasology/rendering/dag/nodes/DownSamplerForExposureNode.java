@@ -41,9 +41,8 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
     public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
 
     public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
-                                                        FBOConfig outputFboConfig, BaseFBOsManager outputFboManager,
-                                                        String label) {
-        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager, label);
+                                                        FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
+        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager);
     }
 
     /**

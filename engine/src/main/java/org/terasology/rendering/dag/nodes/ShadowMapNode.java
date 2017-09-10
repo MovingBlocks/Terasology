@@ -147,7 +147,7 @@ public class ShadowMapNode extends ConditionDependentNode {
     public void process() {
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
-            PerformanceMonitor.startActivity("rendering/shadowMap");
+            PerformanceMonitor.startActivity("rendering/" + getUri());
 
             // Actual Node Processing
 

@@ -160,7 +160,7 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/worldReflection");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 

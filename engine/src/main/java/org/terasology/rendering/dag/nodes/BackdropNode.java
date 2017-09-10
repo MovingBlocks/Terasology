@@ -146,7 +146,7 @@ public class BackdropNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/backdrop");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Common Shader Parameters
 

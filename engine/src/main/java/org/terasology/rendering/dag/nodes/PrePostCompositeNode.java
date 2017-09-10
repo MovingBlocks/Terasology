@@ -158,7 +158,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/prePostComposite");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Shader Parameters
 

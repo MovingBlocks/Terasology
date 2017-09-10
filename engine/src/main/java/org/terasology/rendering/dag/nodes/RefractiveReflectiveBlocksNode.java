@@ -206,7 +206,7 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/RefractiveReflectiveBlocks");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
 

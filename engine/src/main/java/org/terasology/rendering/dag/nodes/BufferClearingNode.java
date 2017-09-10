@@ -67,7 +67,6 @@ public class BufferClearingNode extends AbstractNode {
         } else {
             throw new IllegalArgumentException("Illegal argument(s): see the log for details.");
         }
-
     }
 
 

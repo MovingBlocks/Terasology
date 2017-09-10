@@ -111,7 +111,7 @@ public class LightShaftsNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/lightShafts");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Shader Parameters
 

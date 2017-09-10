@@ -82,7 +82,7 @@ public class FirstPersonViewNode extends ConditionDependentNode implements Wiref
 
     @Override
     public void process() {
-            PerformanceMonitor.startActivity("rendering/firstPersonView");
+            PerformanceMonitor.startActivity("rendering/" + getUri());
 
             GL11.glPushMatrix();
             GL11.glLoadIdentity();

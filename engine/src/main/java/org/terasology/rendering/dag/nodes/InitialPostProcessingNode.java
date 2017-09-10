@@ -123,7 +123,7 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/initialPostProcessing");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Common Shader Parameters
 

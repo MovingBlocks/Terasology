@@ -79,7 +79,7 @@ public class HighPassNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/highpass");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         highPass.setFloat("highPassThreshold", highPassThreshold, true);
 
