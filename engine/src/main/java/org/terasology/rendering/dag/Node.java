@@ -17,6 +17,8 @@ package org.terasology.rendering.dag;
 
 //TODO: consider removing the word "Node" from the name of all Node implementations now that they are in the dag.nodes package.
 
+import org.terasology.engine.SimpleUri;
+
 import java.util.Set;
 
 /**
@@ -33,4 +35,8 @@ public interface Node extends RenderPipelineTask {
     void setEnabled(boolean enabled);
 
     void handleCommand(String command, String... arguments);
+
+    void setUri(SimpleUri nodeUri);
+
+    SimpleUri getUri();
 }

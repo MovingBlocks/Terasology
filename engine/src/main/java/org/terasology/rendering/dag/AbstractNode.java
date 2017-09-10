@@ -39,6 +39,7 @@ public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     private boolean enabled = true;
+    private SimpleUri nodeUri = null;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
@@ -82,7 +83,7 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public String toString() {
-        return String.format("%30s", this.getClass().getSimpleName());
+        return String.format("%s (%s)", getUri(), this.getClass().getSimpleName());
     }
 
     @Override
@@ -97,6 +98,20 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public void handleCommand(String command, String... arguments) { }
+
+    @Override
+    public void setUri(SimpleUri nodeUri) {
+        if (this.nodeUri == null) {
+            this.nodeUri = nodeUri;
+        } else {
+            throw new RuntimeException("Cannot set a Node's URI more than once!");
+        }
+    }
+
+    @Override
+    public SimpleUri getUri() {
+        return nodeUri;
+    }
 
     /**
      * Utility method to conveniently retrieve materials from the Assets system,

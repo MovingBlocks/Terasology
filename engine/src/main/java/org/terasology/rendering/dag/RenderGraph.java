@@ -16,6 +16,7 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import net.logstash.logback.encoder.org.apache.commons.lang.Validate;
@@ -24,8 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * TODO: Add javadocs
@@ -35,6 +38,7 @@ public class RenderGraph {
 
     private Map<SimpleUri, Node> nodeMap = Maps.newHashMap();
     private Multimap<Node, Node> edgeMap = HashMultimap.create();
+    private Multimap<Node, Node> reverseEdgeMap = HashMultimap.create();
 
     public SimpleUri addNode(Node node, String suggestedUri) {
         Validate.notNull(node, "node cannot be null!");
@@ -51,6 +55,7 @@ public class RenderGraph {
         }
 
         nodeMap.put(nodeUri, node);
+        node.setUri(nodeUri);
 
         return nodeUri;
     }
@@ -75,6 +80,7 @@ public class RenderGraph {
         Validate.notNull(fromNode, "fromNode cannot be null!");
         Validate.notNull(toNode, "toNode cannot be null!");
 
+        reverseEdgeMap.put(toNode, fromNode);
         boolean success = edgeMap.put(fromNode, toNode);
         if (!success) {
             logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
@@ -87,6 +93,7 @@ public class RenderGraph {
         Validate.notNull(fromNode, "fromNode cannot be null!");
         Validate.notNull(toNode, "toNode cannot be null!");
 
+        reverseEdgeMap.remove(toNode, fromNode);
         return edgeMap.remove(fromNode, toNode);
     }
 
@@ -96,13 +103,43 @@ public class RenderGraph {
 
     public List<Node> getNodesInTopologicalOrder() {
         List<Node> topologicalList = new ArrayList<>();
-        List<Node> nodesToExamine = new ArrayList<>();
 
-        nodesToExamine.add(findNode(new SimpleUri("engine:shadowMapClearingNode"))); // TODO: Find a better way to set first Node.
+        Map<Node, Integer> inDegreeMap = Maps.newHashMap();
+        List<Node> nodesToExamine = Lists.newArrayList();
+        int visitedNodes = 0;
+
+        // Calculate the in-degree for each node.
+        for (Entry<Node, Collection<Node>> nodeEdgeList : reverseEdgeMap.asMap().entrySet()) {
+            inDegreeMap.put(nodeEdgeList.getKey(), nodeEdgeList.getValue().size());
+        }
+
+        // Add the missing nodes that did not have any edges, and mark them for examination
+        for (Node node : nodeMap.values()) {
+            if (!inDegreeMap.containsKey(node)) {
+                inDegreeMap.put(node, 0);
+                nodesToExamine.add(node);
+            }
+        }
+
         while (!nodesToExamine.isEmpty()) {
             Node currentNode = nodesToExamine.remove(0);
+
+            for (Node adjacentNode : edgeMap.get(currentNode)) {
+                int updatedInDegree = inDegreeMap.get(adjacentNode) - 1;
+                inDegreeMap.put(adjacentNode, updatedInDegree);
+
+                if (updatedInDegree == 0) {
+                    nodesToExamine.add(adjacentNode);
+                }
+            }
+
             topologicalList.add(currentNode);
-            nodesToExamine.addAll(edgeMap.get(currentNode));
+
+            visitedNodes++;
+        }
+
+        if (visitedNodes != nodeMap.size()) {
+            throw new RuntimeException("Topological sorting not possible for the DAG!");
         }
 
         return topologicalList;
