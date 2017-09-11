@@ -54,7 +54,6 @@ import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
-import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
@@ -341,17 +340,12 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node overlaysNode = new OverlaysNode(context);
         renderGraph.addNode(overlaysNode, "overlaysNode");
 
-        // TODO: remove this, including associated method in the RenderSystem interface
-        Node firstPersonViewNode = new FirstPersonViewNode(context);
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
-
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode(new SimpleUri("engine:lastUpdatedGBufferClearingNode"));
 
         renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueObjectsNode);
         renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueBlocksNode);
         renderGraph.connect(lastUpdatedGBufferClearingNode, alphaRejectBlocksNode);
         renderGraph.connect(lastUpdatedGBufferClearingNode, overlaysNode);
-        renderGraph.connect(lastUpdatedGBufferClearingNode, firstPersonViewNode);
     }
 
     private void addLightingNodes(RenderGraph renderGraph) {
@@ -374,7 +368,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node opaqueObjectsNode = renderGraph.findNode(new SimpleUri("engine:opaqueObjectsNode"));
         Node opaqueBlocksNode = renderGraph.findNode(new SimpleUri("engine:opaqueBlocksNode"));
         Node alphaRejectBlocksNode = renderGraph.findNode(new SimpleUri("engine:alphaRejectBlocksNode"));
-        Node firstPersonViewNode = renderGraph.findNode(new SimpleUri("engine:firstPersonViewNode"));
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode(new SimpleUri("engine:lastUpdatedGBufferClearingNode"));
         Node staleGBufferClearingNode = renderGraph.findNode(new SimpleUri("engine:staleGBufferClearingNode"));
 
@@ -383,11 +376,9 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.connect(opaqueObjectsNode, deferredPointLightsNode);
         renderGraph.connect(opaqueBlocksNode, deferredPointLightsNode);
         renderGraph.connect(alphaRejectBlocksNode, deferredPointLightsNode);
-        renderGraph.connect(firstPersonViewNode, deferredPointLightsNode);
         renderGraph.connect(opaqueObjectsNode, deferredMainLightNode);
         renderGraph.connect(opaqueBlocksNode, deferredMainLightNode);
         renderGraph.connect(alphaRejectBlocksNode, deferredMainLightNode);
-        renderGraph.connect(firstPersonViewNode, deferredMainLightNode);
         renderGraph.connect(deferredPointLightsNode, deferredMainLightNode);
         renderGraph.connect(deferredMainLightNode, applyDeferredLightingNode);
         renderGraph.connect(deferredPointLightsNode, applyDeferredLightingNode);
@@ -425,16 +416,13 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node opaqueObjectsNode = renderGraph.findNode(new SimpleUri("engine:opaqueObjectsNode"));
         Node opaqueBlocksNode = renderGraph.findNode(new SimpleUri("engine:opaqueBlocksNode"));
         Node alphaRejectBlocksNode = renderGraph.findNode(new SimpleUri("engine:alphaRejectBlocksNode"));
-        Node firstPersonViewNode = renderGraph.findNode(new SimpleUri("engine:firstPersonViewNode"));
 
         renderGraph.connect(opaqueObjectsNode, outlineNode);
         renderGraph.connect(opaqueBlocksNode, outlineNode);
         renderGraph.connect(alphaRejectBlocksNode, outlineNode);
-        renderGraph.connect(firstPersonViewNode, outlineNode);
         renderGraph.connect(opaqueObjectsNode, ambientOcclusionNode);
         renderGraph.connect(opaqueBlocksNode, ambientOcclusionNode);
         renderGraph.connect(alphaRejectBlocksNode, ambientOcclusionNode);
-        renderGraph.connect(firstPersonViewNode, ambientOcclusionNode);
         renderGraph.connect(ambientOcclusionNode, blurredAmbientOcclusionNode);
     }
 
@@ -450,7 +438,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node opaqueObjectsNode = renderGraph.findNode(new SimpleUri("engine:opaqueObjectsNode"));
         Node opaqueBlocksNode = renderGraph.findNode(new SimpleUri("engine:opaqueBlocksNode"));
         Node alphaRejectBlocksNode = renderGraph.findNode(new SimpleUri("engine:alphaRejectBlocksNode"));
-        Node firstPersonViewNode = renderGraph.findNode(new SimpleUri("engine:firstPersonViewNode"));
         Node overlaysNode = renderGraph.findNode(new SimpleUri("engine:overlaysNode"));
         Node hazeFinalNode = renderGraph.findNode(new SimpleUri("engine:hazeFinalNode"));
         Node chunksRefractiveReflectiveNode = renderGraph.findNode(new SimpleUri("engine:chunksRefractiveReflectiveNode"));
@@ -461,7 +448,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.connect(opaqueObjectsNode, prePostCompositeNode);
         renderGraph.connect(opaqueBlocksNode, prePostCompositeNode);
         renderGraph.connect(alphaRejectBlocksNode, prePostCompositeNode);
-        renderGraph.connect(firstPersonViewNode, prePostCompositeNode);
         renderGraph.connect(overlaysNode, prePostCompositeNode);
         renderGraph.connect(hazeFinalNode, prePostCompositeNode);
         renderGraph.connect(chunksRefractiveReflectiveNode, prePostCompositeNode);

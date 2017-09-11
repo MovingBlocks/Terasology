@@ -40,7 +40,9 @@ public interface RenderSystem extends ComponentSystem {
 
     /**
      * Called when first person objects should be rendered.
+     * Marked for removal in the near future.
      */
+    @Deprecated
     void renderFirstPerson();
 
     /**
