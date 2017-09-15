@@ -725,6 +725,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
+        renderGraph.dispose();
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
         SetViewportToSizeOf.disposeDefaultInstance();
     }

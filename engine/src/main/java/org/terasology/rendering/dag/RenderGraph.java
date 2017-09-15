@@ -144,4 +144,9 @@ public class RenderGraph {
 
         return topologicalList;
     }
+
+    public void dispose() {
+        nodeMap.clear();
+        edgeMap.clear();
+    }
 }
