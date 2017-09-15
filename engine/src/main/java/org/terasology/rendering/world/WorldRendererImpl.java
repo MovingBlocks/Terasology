@@ -93,6 +93,7 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_16X16_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_1X1_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_2X2_CONFIG;
@@ -387,6 +388,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node opaqueObjectsNode = renderGraph.findNode(new SimpleUri("engine:opaqueObjectsNode"));
         Node opaqueBlocksNode = renderGraph.findNode(new SimpleUri("engine:opaqueBlocksNode"));
         Node alphaRejectBlocksNode = renderGraph.findNode(new SimpleUri("engine:alphaRejectBlocksNode"));
+        Node applyDeferredLightingNode = renderGraph.findNode(new SimpleUri("engine:applyDeferredLightingNode"));
 
         renderGraph.connect(opaqueObjectsNode, outlineNode);
         renderGraph.connect(opaqueBlocksNode, outlineNode);
@@ -394,6 +396,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.connect(opaqueObjectsNode, ambientOcclusionNode);
         renderGraph.connect(opaqueBlocksNode, ambientOcclusionNode);
         renderGraph.connect(alphaRejectBlocksNode, ambientOcclusionNode);
+        // TODO: At this stage, it is unclear -why- this connection is required, we just know that it's required. Investigate.
+        renderGraph.connect(applyDeferredLightingNode, ambientOcclusionNode);
         renderGraph.connect(ambientOcclusionNode, blurredAmbientOcclusionNode);
     }
 
@@ -690,6 +694,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         // there could be potentially other places, i.e. in the UI code. In the rendering engine we'd like
         // to eventually rely on a default OpenGL state.
         glDisable(GL_CULL_FACE);
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        glViewport(0, 0, lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height());
         //glDisable(GL_DEPTH_TEST);
         //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
         //glDepthFunc(GL_LESS);
