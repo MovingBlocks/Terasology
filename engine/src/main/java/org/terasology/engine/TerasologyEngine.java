@@ -303,7 +303,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initAssets() {
-        BlockFamilyRegistryImpl familyFactoryRegistry = new BlockFamilyRegistryImpl(rootContext);
+        BlockFamilyRegistryImpl familyFactoryRegistry = new BlockFamilyRegistryImpl();
         rootContext.put(BlockFamilyRegistry.class, familyFactoryRegistry);
 
         // cast lambdas explicitly to avoid inconsistent compiler behavior wrt. type inference
