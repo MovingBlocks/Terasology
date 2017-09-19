@@ -216,7 +216,7 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
         assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        BlockFamilyRegistryImpl blockFamilyFactoryRegistry = new BlockFamilyRegistryImpl(context);
+        BlockFamilyRegistryImpl blockFamilyFactoryRegistry = new BlockFamilyRegistryImpl();
         blockFamilyFactoryRegistry.setBlockFamily("horizontal", HorizontalBlockFamily.class);
         blockFamilyFactoryRegistry.setBlockFamily("alignToSurface", AttachedToSurfaceFamily.class);
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
