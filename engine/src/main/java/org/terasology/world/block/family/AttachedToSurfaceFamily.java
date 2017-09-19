@@ -78,18 +78,18 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         for (Side side : Side.values()) {
             Block block = blockMap.get(side);
             if (block != null) {
-                this.blocks.put(side, block);
+                blocks.put(side, block);
                 block.setBlockFamily(this);
                 block.setUri(new BlockUri(definition.getUrn(), new Name(side.name())));
             }
         }
-        if (this.blocks.containsKey(Side.TOP)) {
-            archetype = this.blocks.get(Side.TOP);
+        if (blocks.containsKey(Side.TOP)) {
+            archetype = blocks.get(Side.TOP);
         } else {
-            archetype = this.blocks.get(Side.FRONT);
+            archetype = blocks.get(Side.FRONT);
         }
-        this.setBlockUri(new BlockUri(definition.getUrn()));
-        this.setCategory(definition.getCategories());
+        setBlockUri(new BlockUri(definition.getUrn()));
+        setCategory(definition.getCategories());
     }
 
     @Override

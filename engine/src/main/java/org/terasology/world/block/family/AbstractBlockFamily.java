@@ -32,10 +32,10 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     private BlockUri uri;
     private Set<String> categories = Sets.newHashSet();
 
-    public AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
     }
 
-    public AbstractBlockFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
+    protected AbstractBlockFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
     }
 
     protected void setCategory(Iterable<String> categories) {

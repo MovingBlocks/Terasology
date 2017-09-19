@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import gnu.trove.iterator.TByteObjectIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
@@ -38,7 +40,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
-public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implements BlockNeighborUpdateFamily{
+public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
+    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
 
@@ -217,6 +220,7 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
                 byte connections = Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
                 return blocks.get(connections);
             } catch (IllegalArgumentException e) {
+                logger.error("can't find block with URI: {}",blockUri,e);
                 return null;
             }
         }
