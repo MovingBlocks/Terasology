@@ -43,7 +43,14 @@ import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
-import org.terasology.world.block.family.*;
+import org.terasology.world.block.family.AbstractBlockFamily;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.BlockFamilyRegistryImpl;
+import org.terasology.world.block.family.FreeformFamily;
+import org.terasology.world.block.family.HorizontalBlockFamily;
+import org.terasology.world.block.family.MultiSection;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
@@ -135,7 +142,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             // Deserialize everything
             BlockFamilyDefinitionData result = new BlockFamilyDefinitionData(base);
             setBoolean(result::setTemplate, jsonObject, "template");
-//            setObject(result::setFamilyFactory, jsonObject, "rotation", BlockFamilyFactory.class, context);
             setObject(result::setBlockFamily,jsonObject,"family", Class.class, context);
             setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
 
@@ -143,7 +149,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
 
             if (result.getBlockFamily() != null) {
-                for (MultiSection multiSection : DefaultBlockFamilyFactoryRegistry.getMultiSections(result.getBlockFamily())) {
+                for (MultiSection multiSection : BlockFamilyRegistryImpl.getMultiSections(result.getBlockFamily())) {
                     if (jsonObject.has(multiSection.name()) && jsonObject.get(multiSection.name()).isJsonObject()) {
                         JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.name());
                         for (String section : multiSection.appliesToSections()) {
@@ -157,7 +163,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                         }
                     }
                 }
-                for (String section : DefaultBlockFamilyFactoryRegistry.getSections(result.getBlockFamily())) {
+                for (String section : BlockFamilyRegistryImpl.getSections(result.getBlockFamily())) {
                     if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
                         SectionDefinitionData sectionData = result.getSections().get(section);
                         if (sectionData == null) {

@@ -256,8 +256,7 @@ public class BlockManagerImpl extends BlockManager {
                     registerFamily(newFamily.get());
                 }
                 catch (Exception ex){
-                    logger.error(ex.toString());
-                    logger.error(newFamily.toString());
+                    logger.error("Failed to register block familiy '{}'",newFamily,ex);
                 }
                 finally {
                     lock.unlock();

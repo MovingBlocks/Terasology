@@ -17,6 +17,8 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -41,6 +43,8 @@ import java.util.Map;
 @RegisterBlockFamily("freeform")
 @FreeFormSupported(true)
 public class FreeformFamily extends AbstractBlockFamily {
+    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
+
     public BlockUri uri;
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block block = null;
@@ -115,6 +119,7 @@ public class FreeformFamily extends AbstractBlockFamily {
                     Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
                     return blocks.get(side);
                 } catch (IllegalArgumentException e) {
+                    logger.error("can't find block with URI: {}",blockUri,e);
                     return null;
                 }
             }

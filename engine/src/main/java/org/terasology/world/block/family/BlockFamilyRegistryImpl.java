@@ -18,30 +18,19 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.util.reflection.ClassFactory;
 import org.terasology.util.reflection.ParameterProvider;
 import org.terasology.util.reflection.SimpleClassFactory;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultBlockFamilyFactoryRegistry.class);
-    private Context context;
-
-
+public class BlockFamilyRegistryImpl implements BlockFamilyRegistry {
+    private static final Logger logger = LoggerFactory.getLogger(BlockFamilyRegistryImpl.class);
     private Map<String, Class<? extends AbstractBlockFamily>> registryMap = Maps.newHashMap();
-
-    public DefaultBlockFamilyFactoryRegistry(Context context) {
-        this.context = context;
-    }
 
     public static BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily, BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
         try {
