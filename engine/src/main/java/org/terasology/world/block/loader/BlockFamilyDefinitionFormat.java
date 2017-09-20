@@ -44,11 +44,9 @@ import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.family.AbstractBlockFamily;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyRegistry;
-import org.terasology.world.block.family.BlockFamilyRegistryImpl;
 import org.terasology.world.block.family.FreeformFamily;
-import org.terasology.world.block.family.HorizontalBlockFamily;
+import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.family.MultiSection;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
@@ -102,7 +100,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                     if (data.getBaseSection().getShape().isCollisionYawSymmetric()) {
                         data.setBlockFamily(SymmetricFamily.class);
                     } else {
-                        data.setBlockFamily(HorizontalBlockFamily.class);
+                        data.setBlockFamily(HorizontalFamily.class);
                     }
                 } else if (data.getBlockFamily() == null) {
                     data.setBlockFamily(FreeformFamily.class);
@@ -149,7 +147,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
 
             if (result.getBlockFamily() != null) {
-                for (MultiSection multiSection : BlockFamilyRegistryImpl.getMultiSections(result.getBlockFamily())) {
+                for (MultiSection multiSection : BlockFamilyRegistry.getMultiSections(result.getBlockFamily())) {
                     if (jsonObject.has(multiSection.name()) && jsonObject.get(multiSection.name()).isJsonObject()) {
                         JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.name());
                         for (String section : multiSection.appliesToSections()) {
@@ -163,7 +161,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                         }
                     }
                 }
-                for (String section : BlockFamilyRegistryImpl.getSections(result.getBlockFamily())) {
+                for (String section : BlockFamilyRegistry.getSections(result.getBlockFamily())) {
                     if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
                         SectionDefinitionData sectionData = result.getSections().get(section);
                         if (sectionData == null) {

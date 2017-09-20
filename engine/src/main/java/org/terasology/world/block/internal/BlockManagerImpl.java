@@ -256,6 +256,8 @@ public class BlockManagerImpl extends BlockManager {
                     registerFamily(newFamily.get());
                 }
                 catch (Exception ex){
+                    // A family can fail to register if the block is missing uri or list of categories,
+                    // but can fail to register if the family throws an error for any reason
                     logger.error("Failed to register block familiy '{}'",newFamily,ex);
                 }
                 finally {

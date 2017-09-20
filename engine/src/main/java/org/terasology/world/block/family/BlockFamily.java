@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A collection of blocks that are all different rotations of the same core block.
+ * A collection of blocks that are all different blocks
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
  *

@@ -38,10 +38,10 @@ import java.util.Map;
         @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front", "left", "right", "back", "top", "bottom"}),
         @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top", "bottom"}),
         @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
-public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
+public class HorizontalFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
-    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    public HorizontalFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
         BlockUri uri = null;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
@@ -63,7 +63,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
         this.setCategory(definition.getCategories());
     }
 
-    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public HorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         BlockUri uri = new BlockUri(definition.getUrn());
         for (Rotation rot : Rotation.horizontalRotations()) {
