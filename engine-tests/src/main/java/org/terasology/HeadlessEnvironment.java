@@ -96,8 +96,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AttachedToSurfaceFamily;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistryImpl;
-import org.terasology.world.block.family.HorizontalBlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -216,8 +216,8 @@ public class HeadlessEnvironment extends Environment {
         assetTypeManager.registerCoreAssetType(StaticSound.class, NullSound::new, "sounds");
         assetTypeManager.registerCoreAssetType(StreamingSound.class, NullStreamingSound::new, "music");
 
-        BlockFamilyRegistryImpl blockFamilyFactoryRegistry = new BlockFamilyRegistryImpl();
-        blockFamilyFactoryRegistry.setBlockFamily("horizontal", HorizontalBlockFamily.class);
+        BlockFamilyRegistry blockFamilyFactoryRegistry = new BlockFamilyRegistry();
+        blockFamilyFactoryRegistry.setBlockFamily("horizontal", HorizontalFamily.class);
         blockFamilyFactoryRegistry.setBlockFamily("alignToSurface", AttachedToSurfaceFamily.class);
         assetTypeManager.registerCoreFormat(BlockFamilyDefinition.class,
                 new BlockFamilyDefinitionFormat(assetTypeManager.getAssetManager(), blockFamilyFactoryRegistry));

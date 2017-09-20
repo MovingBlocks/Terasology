@@ -50,7 +50,6 @@ import org.terasology.utilities.ReflectionUtil;
 import org.terasology.world.block.family.AbstractBlockFamily;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyRegistry;
-import org.terasology.world.block.family.BlockFamilyRegistryImpl;
 import org.terasology.world.block.family.RegisterBlockFamily;
 
 /**
@@ -100,7 +99,7 @@ public final class EnvironmentSwitchHandler {
         registerTypeHandlers(context, typeSerializationLibrary, moduleManager.getEnvironment());
 
         BlockFamilyRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyRegistry.class);
-        loadFamilies((BlockFamilyRegistryImpl) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
+        loadFamilies((BlockFamilyRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
@@ -175,7 +174,7 @@ public final class EnvironmentSwitchHandler {
         }
     }
 
-    private static void loadFamilies(BlockFamilyRegistryImpl registry, ModuleEnvironment environment) {
+    private static void loadFamilies(BlockFamilyRegistry registry, ModuleEnvironment environment) {
         registry.clear();
         for(Class<?> blockFamily : environment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
             if (!BlockFamily.class.isAssignableFrom(blockFamily)) {

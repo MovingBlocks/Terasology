@@ -51,7 +51,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.HorizontalBlockFamily;
+import org.terasology.world.block.family.HorizontalFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
@@ -143,7 +143,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     private BlockFamily createBlockFamily(String urn, Prefab prefab, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(HorizontalBlockFamily.class);
+        data.setBlockFamily(HorizontalFamily.class);
         data.getBaseSection().getEntity().setKeepActive(true);
         data.getBaseSection().getEntity().setPrefab(prefab);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);

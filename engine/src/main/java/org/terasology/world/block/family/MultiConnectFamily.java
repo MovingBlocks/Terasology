@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
-public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
+public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
     private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
@@ -80,11 +80,11 @@ public abstract class MultiConnectBlockFamily extends AbstractBlockFamily implem
     @In
     protected BlockEntityRegistry blockEntityRegistry;
 
-    public MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
     }
 
-    public MultiConnectBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         blocks = new TByteObjectHashMap<>();

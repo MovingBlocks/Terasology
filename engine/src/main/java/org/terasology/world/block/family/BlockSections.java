@@ -25,6 +25,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
+/**
+ * Describes the sections that a block can use such as top, left, right, bottom
+ * but other sections can be used.
+ * <p>
+ *     Each section will override the existing values on the base block when that family section is used. look in
+ *     deserializeSectionDefinitionData under BlockFamilyDefinitionFormat for properties that get override by the
+ *     the BlockSection
+ * </p>
+ */
 public @interface BlockSections {
     String[] value();
 }
