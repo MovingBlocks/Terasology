@@ -18,13 +18,17 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.world.WorldProvider;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -34,7 +38,7 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 /**
  * Simple default camera.
  */
-public class PerspectiveCamera extends SubmersibleCamera {
+public class PerspectiveCamera extends SubmersibleCamera implements PropertyChangeListener {
     // Values used for smoothing
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
@@ -53,6 +57,8 @@ public class PerspectiveCamera extends SubmersibleCamera {
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         super(worldProvider, renderingConfig);
         this.cameraSettings = renderingConfig.getCameraSettings();
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        display.subscribe(this);
     }
 
     @Override
@@ -188,5 +194,11 @@ public class PerspectiveCamera extends SubmersibleCamera {
         float fovY = (float) (2 * Math.atan2(Math.tan(0.5 * fov * TeraMath.DEG_TO_RAD), aspectRatio));
 
         return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("displayResolution")) {
+            createPerspectiveProjectionMatrix(cachedFov, zNear, zFar);
+        }
     }
 }
