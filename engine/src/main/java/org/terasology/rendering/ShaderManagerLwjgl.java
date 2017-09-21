@@ -108,6 +108,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         addShaderProgram("lightGeometryPass");
         addShaderProgram("ssaoBlur");
         addShaderProgram("copyDepth");
+        addShaderProgram("convertDepthToRGB");
     }
 
     @Override
