@@ -24,13 +24,16 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.opengl.SwappableFBO;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
+public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
     public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
 
     private SwappableFBO gBufferPair;
@@ -88,16 +91,10 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
 
     /**
      * Invoked before real-rendering starts
-     * TODO: how about completely removing this, and make Display observable and this FBM as an observer
+     * TODO: Completely remove this.
      */
     public void update() {
         updateFullScale();
-
-        FBO readOnlyGBuffer = gBufferPair.getStaleFbo();
-        if (readOnlyGBuffer.dimensions().areDifferentFrom(fullScale)) {
-            regenerateFbos();
-            notifySubscribers();
-        }
     }
 
     private void regenerateFbos() {
@@ -118,5 +115,14 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
 
     public SwappableFBO getGBufferPair() {
         return gBufferPair;
+    }
+
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("displayResolution")) {
+            regenerateFbos();
+            notifySubscribers();
+        }
+
+        // TODO: What if user changes "scale" ? Subscribe to renderingConfig to handle it.
     }
 }
