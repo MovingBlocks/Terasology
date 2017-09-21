@@ -22,6 +22,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -29,7 +30,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-public class LwjglDisplayDevice implements DisplayDevice {
+public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
 
     private RenderingConfig config;
 
@@ -121,5 +122,12 @@ public class LwjglDisplayDevice implements DisplayDevice {
     public void prepareToRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
+    }
+
+    public void update() {
+        if (Display.wasResized()) {
+            glViewport(0, 0, Display.getWidth(), Display.getHeight());
+            propertyChangeSupport.firePropertyChange("displayResolution", 0, 1);
+        }
     }
 }
