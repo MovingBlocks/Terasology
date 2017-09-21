@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
+import static org.terasology.rendering.dag.nodes.ConvertDepthToRGBNode.DEPTH_TO_RGB_FBO_URI;
 
 // TODO: Future work should not only "think" in terms of a DAG-like rendering pipeline
 // TODO: but actually implement one, see https://github.com/MovingBlocks/Terasology/issues/1741
@@ -102,7 +103,8 @@ public class ScreenGrabber {
             displayResolutionDependentFBOs = CoreRegistry.get(DisplayResolutionDependentFBOs.class);
         }
 
-        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        //FBO sceneFinalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
+        FBO sceneFinalFbo = displayResolutionDependentFBOs.get(DEPTH_TO_RGB_FBO_URI);
 
         final ByteBuffer buffer = sceneFinalFbo.getColorBufferRawData();
         if (buffer == null) {

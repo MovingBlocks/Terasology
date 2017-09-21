@@ -266,7 +266,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         addCopyDepthNode(renderGraph);
 
-        //addConvertDepthToRGBNode(renderGraph);
+        addConvertDepthToRGBNode(renderGraph);
 
         addRefractiveReflectiveNode(renderGraph);
 
