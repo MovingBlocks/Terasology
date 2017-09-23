@@ -1,0 +1,101 @@
+{
+    "type": "filePickerPopup",
+    "skin": "popup",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UIBox",
+                "layoutInfo": {
+                    "width": 500,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-vertical-center": {}
+                },
+                "content": {
+                    "type": "ColumnLayout",
+                    "columns": 1,
+                    "verticalSpacing": 8,
+                    "contents": [
+                        {
+                            "type": "UILabel",
+                            "id": "title",
+                            "text": "Choose a file",
+                            "family": "title"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "id": "gotoParent",
+                                    "text": "Parent"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "id": "gotoRoot",
+                                    "text": "Root"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "id": "gotoHome",
+                                    "text": "Home"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "ScrollableArea",
+                            "content": {
+                                "type": "UIList",
+                                "id": "directoryContentsList"
+                            }
+                        },
+                        {
+                            "type": "RowLayout",
+                            "id": "fileNameRowLayout",
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "File name: ",
+                                    "family": "option-grid",
+                                    "layoutInfo": {
+                                        "relativeWidth": 0.3
+                                    }
+                                },
+                                {
+                                    "type": "UIText",
+                                    "id": "fileName"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
+                            "text": "Full path: ",
+                            "id": "filePath"
+                        },
+                        {
+                            "type": "UISpace",
+                            "size": [1, 16]
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 16,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-ok}",
+                                    "id": "ok"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "${engine:menu#dialog-cancel}",
+                                    "id": "cancel"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
