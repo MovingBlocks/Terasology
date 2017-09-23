@@ -362,6 +362,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(button -> sortedModules.stream()
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
+            /*
 
             localOnlyCheckbox = find("localOnly", UICheckbox.class);
             localOnlyCheckbox.subscribe(e -> {
@@ -371,6 +372,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             advancedFilter.subscribe(e -> {
                 filterModules();
             });
+            */
         }
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
         WidgetUtil.trySubscribe(this, "advancedFilter", w -> {
