@@ -144,13 +144,12 @@ public class ScreenGrabber {
     }
 
     /**
-     * Returns true if the rendering engine is not in the process of taking a screenshot.
-     * Returns false if a screenshot is being taken.
+     * Returns true if the rendering engine is in the process of taking a screenshot.
+     * Returns false if a screenshot is not being taken.
      *
-     * @return true if no screenshot is being taken, false otherwise
+     * @return true if a screenshot is being taken, false otherwise
      */
-    // for code readability it make sense to have this method rather than its opposite.
-    public boolean isNotTakingScreenshot() {
-        return !isTakingScreenshot;
+    public boolean isTakingScreenshot() {
+        return isTakingScreenshot;
     }
 }

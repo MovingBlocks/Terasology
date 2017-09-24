@@ -154,7 +154,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         renderFullscreenQuad();
 
-        if (!screenGrabber.isNotTakingScreenshot()) {
+        if (!screenGrabber.isTakingScreenshot()) {
             screenGrabber.saveScreenshot();
         }
 

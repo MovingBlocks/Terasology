@@ -98,19 +98,19 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
      * TODO: Completely remove this, once we have a better way to handle screenshots.
      */
     public void update() {
-        if (screenGrabber.isNotTakingScreenshot()) {
+        if (screenGrabber.isTakingScreenshot()) {
+            fullScale.set(renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight()));
+            regenerateFbos();
+
+            wasTakingScreenshotLastFrame = true;
+        } else {
             if (wasTakingScreenshotLastFrame) {
                 updateFullScale();
                 regenerateFbos();
 
                 wasTakingScreenshotLastFrame = false;
             }
-        } else {
-            fullScale.set(renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                            renderingConfig.getScreenshotSize().getHeight(Display.getHeight()));
-            regenerateFbos();
-
-            wasTakingScreenshotLastFrame = true;
         }
     }
 
