@@ -680,7 +680,6 @@ public final class FBO {
             return new Dimensions(width / divisor, height / divisor);
         }
 
-
         public Dimensions multiplyBy(float multiplier) {
             int w = (int) (width * multiplier);
             int h = (int) (height * multiplier);
@@ -737,6 +736,25 @@ public final class FBO {
          */
         public int height() {
             return this.height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param width An integer representing the new width.
+         * @param height An integer representing the new height.
+         */
+        public void set(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param other A Dimension to use the width and height from.
+         */
+        public void set(Dimensions other) {
+            this.width = other.width;
+            this.height = other.height;
         }
     }
 }

@@ -31,6 +31,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
+    public static final String DISPLAY_RESOLUTION_CHANGE = "displayResolutionChange";
 
     private RenderingConfig config;
 
@@ -127,7 +128,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
     public void update() {
         if (Display.wasResized()) {
             glViewport(0, 0, Display.getWidth(), Display.getHeight());
-            propertyChangeSupport.firePropertyChange("displayResolution", 0, 1);
+            propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
         }
     }
 }

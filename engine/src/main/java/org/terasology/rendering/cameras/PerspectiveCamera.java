@@ -57,6 +57,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
         super(worldProvider, renderingConfig);
         this.cameraSettings = renderingConfig.getCameraSettings();
+
+        // TODO: Switch to context.
         DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
         display.subscribe(this);
     }
@@ -198,7 +200,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("displayResolution")) {
-            createPerspectiveProjectionMatrix(cachedFov, zNear, zFar);
+            cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
+            updateMatrices();
         }
     }
 }

@@ -18,6 +18,8 @@ package org.terasology.rendering.opengl.fbms;
 import org.lwjgl.opengl.Display;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -27,6 +29,8 @@ import org.terasology.rendering.opengl.SwappableFBO;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import static org.terasology.config.RenderingConfig.FBO_SCALE;
+import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
@@ -38,13 +42,21 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
 
     private SwappableFBO gBufferPair;
 
-    private FBO.Dimensions fullScale;
+    private FBO.Dimensions fullScale = new FBO.Dimensions(-1, -1);
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
+
+    private boolean wasTakingScreenshotLastFrame = false;
 
     public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
+
+        renderingConfig.subscribe(FBO_SCALE, this);
+
+        // TODO: Switch to context.
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        display.subscribe(this);
 
         updateFullScale();
         generateDefaultFBOs();
@@ -77,24 +89,29 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     }
 
     private void updateFullScale() {
-        if (screenGrabber.isNotTakingScreenshot()) {
-            fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
-        } else {
-            fullScale = new FBO.Dimensions(
-                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
-            );
-        }
-
+        fullScale.set(Display.getWidth(), Display.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
     /**
      * Invoked before real-rendering starts
-     * TODO: Completely remove this.
+     * TODO: Completely remove this, once we have a better way to handle screenshots.
      */
     public void update() {
-        updateFullScale();
+        if (screenGrabber.isNotTakingScreenshot()) {
+            if (wasTakingScreenshotLastFrame) {
+                updateFullScale();
+                regenerateFbos();
+
+                wasTakingScreenshotLastFrame = false;
+            }
+        } else {
+            fullScale.set(renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
+                            renderingConfig.getScreenshotSize().getHeight(Display.getHeight()));
+            regenerateFbos();
+
+            wasTakingScreenshotLastFrame = true;
+        }
     }
 
     private void regenerateFbos() {
@@ -103,6 +120,8 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
             fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
             FBO.recreate(get(urn), getFboConfig(urn));
         }
+
+        notifySubscribers();
    }
 
     private void disposeAllFbos() {
@@ -118,11 +137,9 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("displayResolution")) {
+        if (evt.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE) || evt.getPropertyName().equals(FBO_SCALE)) {
+            updateFullScale();
             regenerateFbos();
-            notifySubscribers();
         }
-
-        // TODO: What if user changes "scale" ? Subscribe to renderingConfig to handle it.
     }
 }
