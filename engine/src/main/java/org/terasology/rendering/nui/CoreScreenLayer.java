@@ -78,6 +78,17 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     @Override
     public void onOpened() {
         animationSystem.triggerFromPrev();
+        onScreenOpened();
+    }
+
+    /**
+     * Lifecycle method called when this screen is displayed under any circumstance.
+     * <p>
+     * This differs from {@link #onOpened} and {@link #onShow} in that it is called both when the
+     * screen is first opened (as {@code onOpened}) as well as when a screen previously opened
+     * (e.g., a parent menu in the menu system) is returned to (as {@code onShow}).
+     */
+    public void onScreenOpened() {
     }
 
     @Override
@@ -129,6 +140,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     @Override
     public void onShow() {
         animationSystem.triggerFromNext();
+        onScreenOpened();
     }
 
     @Override
