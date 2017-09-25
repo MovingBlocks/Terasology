@@ -366,13 +366,12 @@ public class UIText extends CoreWidget {
                         eventHandled = true;
                     }
                 }
-                if(event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER){
+                if (event.getKey() == Keyboard.Key.ENTER || event.getKey() == Keyboard.Key.NUMPAD_ENTER) {
                     for (ActivateEventListener listener : activationListeners) {
                         listener.onActivated(this);
                     }
                     eventHandled = true;
-                }
-                else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
+                } else if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
                     String fullText = text.get();
                     String before = fullText.substring(0, Math.min(getCursorPosition(), selectionStart));
                     String after = fullText.substring(Math.max(getCursorPosition(), selectionStart));
@@ -456,8 +455,8 @@ public class UIText extends CoreWidget {
                         }
                         case KeyId.ENTER:
                         case KeyId.NUMPAD_ENTER: {
-                            if (event.getKeyboard().isKeyDown(Keyboard.Key.LEFT_SHIFT.getId()) ||
-                                    event.getKeyboard().isKeyDown(Keyboard.Key.RIGHT_SHIFT.getId())) {
+                            if (event.getKeyboard().isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())
+                                    || event.getKeyboard().isKeyDown(Keyboard.Key.RIGHT_SHIFT.getId())) {
                                 if (multiline) {
                                     setText(fullText + "\n");
                                     increaseCursorPosition(1);

@@ -23,7 +23,6 @@ import org.terasology.context.Context;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import javax.imageio.ImageIO;

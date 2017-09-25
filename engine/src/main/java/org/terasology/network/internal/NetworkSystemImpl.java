@@ -756,11 +756,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     /**
      * Sets the context within which this system should operate
-     * @param context
+     * @param stateContext
      */
     @Override
-    public void setStateContext(Context context) {
-        this.context = context;
+    public void setStateContext(Context stateContext) {
+        this.context = stateContext;
     }
 
     void removeKickedClient(NetClient client) {

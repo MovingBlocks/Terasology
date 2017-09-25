@@ -20,7 +20,6 @@ import org.terasology.math.geom.Rect2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
 /**

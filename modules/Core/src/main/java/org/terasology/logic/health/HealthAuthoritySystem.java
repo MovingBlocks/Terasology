@@ -68,6 +68,9 @@ import org.terasology.utilities.random.Random;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthAuthoritySystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
+
     @In
     private EntityManager entityManager;
 
@@ -75,8 +78,6 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     private org.terasology.engine.Time time;
 
     private Random random = new FastRandom();
-
-    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
 
     @Override
     public void update(float delta) {

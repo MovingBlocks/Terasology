@@ -40,7 +40,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.FloatBuffer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -68,7 +68,7 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
 
     private Material material;
 
-    private LinkedHashMap<EntityRef, RegionOutlineComponent> entityToRegionOutlineMap = Maps.newLinkedHashMap();
+    private Map<EntityRef, RegionOutlineComponent> entityToRegionOutlineMap = Maps.newLinkedHashMap();
 
     @Override
     public void initialise() {

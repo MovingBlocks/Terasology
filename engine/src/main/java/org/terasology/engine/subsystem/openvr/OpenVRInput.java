@@ -26,13 +26,13 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 
 public class OpenVRInput implements EngineSubsystem {
 
+    Config config;
+
     private Context context;
 
     private OpenVRProvider vrProvider;
 
     private OpenVRControllers controllerDevice;
-
-    Config config;
 
     /**
      * Get the name of this subsystem.

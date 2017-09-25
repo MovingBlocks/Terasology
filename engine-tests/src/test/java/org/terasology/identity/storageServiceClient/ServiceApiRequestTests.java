@@ -30,7 +30,24 @@ import static org.mockito.Mockito.when;
 
 public class ServiceApiRequestTests {
 
-    static class DummySerializableObject {
+    @Test
+    public void testRequest() throws IOException, StorageServiceException {
+        Gson gson = new Gson();
+        HttpURLConnection mockedConn = mock(HttpURLConnection.class);
+        ByteArrayOutputStream receivedRequest = new ByteArrayOutputStream();
+        ByteArrayInputStream response = new ByteArrayInputStream("{\"fieldA\":\"response\", \"fieldB\": 1}".getBytes());
+
+        when(mockedConn.getOutputStream()).thenReturn(receivedRequest);
+        when(mockedConn.getInputStream()).thenReturn(response);
+        when(mockedConn.getResponseCode()).thenReturn(200);
+
+        DummySerializableObject reqData = new DummySerializableObject("request", 0);
+        DummySerializableObject resData = ServiceApiRequest.request(mockedConn, HttpMethod.GET, null, reqData, DummySerializableObject.class);
+        assertEquals(gson.toJson(reqData), receivedRequest.toString());
+        assertEquals(new DummySerializableObject("response", 1), resData);
+    }
+
+    static final class DummySerializableObject {
         private String fieldA;
         private int fieldB;
 
@@ -47,22 +64,5 @@ public class ServiceApiRequestTests {
             DummySerializableObject o = (DummySerializableObject) other;
             return fieldA.equals(o.fieldA) && fieldB == o.fieldB;
         }
-    }
-
-    @Test
-    public void testRequest() throws IOException, StorageServiceException {
-        Gson gson = new Gson();
-        HttpURLConnection mockedConn = mock(HttpURLConnection.class);
-        ByteArrayOutputStream receivedRequest = new ByteArrayOutputStream();
-        ByteArrayInputStream response = new ByteArrayInputStream("{\"fieldA\":\"response\", \"fieldB\": 1}".getBytes());
-
-        when(mockedConn.getOutputStream()).thenReturn(receivedRequest);
-        when(mockedConn.getInputStream()).thenReturn(response);
-        when(mockedConn.getResponseCode()).thenReturn(200);
-
-        DummySerializableObject reqData = new DummySerializableObject("request", 0);
-        DummySerializableObject resData = ServiceApiRequest.request(mockedConn, HttpMethod.GET, null, reqData, DummySerializableObject.class);
-        assertEquals(gson.toJson(reqData), receivedRequest.toString());
-        assertEquals(new DummySerializableObject("response", 1), resData);
     }
 }

@@ -134,11 +134,11 @@ public class InjectionHelperTest {
 
     //test classes and interfaces for injection
 
-    private static interface ServiceA {
+    private interface ServiceA {
 
     }
 
-    private static interface ServiceB {
+    private interface ServiceB {
 
     }
 

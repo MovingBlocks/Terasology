@@ -70,10 +70,10 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    private float aberrationOffsetX = 0;
+    private float aberrationOffsetX;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    private float aberrationOffsetY = 0;
+    private float aberrationOffsetY;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
     private float bloomFactor = 0.5f;

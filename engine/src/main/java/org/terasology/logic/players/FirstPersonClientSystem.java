@@ -260,7 +260,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @Override
     public void preSave() {
-        if (clientHeldItem != EntityRef.NULL){
+        if (clientHeldItem != EntityRef.NULL) {
             clientHeldItem.destroy();
         }
     }

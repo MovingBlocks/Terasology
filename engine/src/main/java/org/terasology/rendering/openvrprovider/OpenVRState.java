@@ -38,7 +38,7 @@ public class OpenVRState {
     // In the head frame
     private Matrix4f[] eyePoses = new Matrix4f[2];
     private Matrix4f[] projectionMatrices = new Matrix4f[2];
-    private float groundPlaneYOffset = 0.0f;
+    private float groundPlaneYOffset;
 
     // In the tracking system intertial frame
     private Matrix4f headPose = OpenVRUtil.createIdentityMatrix4f();
@@ -95,11 +95,11 @@ public class OpenVRState {
     void setHeadPose(HmdMatrix34_t inputPose) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, headPose);
         headPose = new Matrix4f(
-                                1,0,0,0,
-                                0,1,0,0,
-                                0,0,1,0,
-                                0,groundPlaneYOffset,0,1
-                        ).mul(headPose);
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, groundPlaneYOffset, 0, 1
+        ).mul(headPose);
     }
 
     void setEyePoseWRTHead(HmdMatrix34_t inputPose, int nIndex) {
@@ -109,10 +109,10 @@ public class OpenVRState {
     void setControllerPose(HmdMatrix34_t inputPose, int nIndex) {
         OpenVRUtil.setSteamVRMatrix3ToMatrix4f(inputPose, controllerPose[nIndex]);
         controllerPose[nIndex] = new Matrix4f(
-                1,0,0,0,
-                0,1,0,0,
-                0,0,1,0,
-                0,groundPlaneYOffset,0,1
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, groundPlaneYOffset, 0, 1
         ).mul(controllerPose[nIndex]);
         for (ControllerListener listener : controllerListeners) {
             listener.poseChanged(controllerPose[nIndex], nIndex);

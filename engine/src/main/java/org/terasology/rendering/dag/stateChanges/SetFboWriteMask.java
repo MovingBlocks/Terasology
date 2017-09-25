@@ -74,8 +74,9 @@ public final class SetFboWriteMask implements StateChange {
 
     @Override
     public StateChange getDefaultInstance() {
-        if (defaultInstance == null)
+        if (defaultInstance == null) {
             defaultInstance = new SetFboWriteMask(fbo);
+        }
         return defaultInstance;
     }
 

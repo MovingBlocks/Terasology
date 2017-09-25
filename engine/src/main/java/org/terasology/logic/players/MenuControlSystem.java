@@ -27,7 +27,6 @@ import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;

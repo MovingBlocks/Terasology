@@ -29,7 +29,7 @@ import java.util.Base64;
  * Terasology desktop game parameters for telemetry. They are needed by snowplow stacks.
  */
 @API
-public class TelemetryParams {
+public final class TelemetryParams {
 
     public static final String APP_ID_TERASOLOGY = "terasology";
 
@@ -54,5 +54,12 @@ public class TelemetryParams {
         } catch (Exception e) {
             logger.error("Exception when getting MAC address", e);
         }
+    }
+
+    /**
+     * Private constructor to hide the implicit public one for the util class.
+     */
+    private TelemetryParams() {
+
     }
 }

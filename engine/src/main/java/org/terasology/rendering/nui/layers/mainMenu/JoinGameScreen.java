@@ -487,8 +487,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     triggerBackAnimation();
                     return true;
                 }
-            }
-            else if (event.getKey() == Keyboard.Key.R) {
+            } else if (event.getKey() == Keyboard.Key.R) {
                 refresh();
             }
         }
