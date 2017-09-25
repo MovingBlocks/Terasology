@@ -15,52 +15,105 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.filePicker;
 
-import com.google.common.collect.Lists;
+import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class FilePickerPopup extends CoreScreenLayer {
 
+
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:filePickerPopup!instance");
+
     private Path currentPath;
-    private List<Path> directoryContentsList;
+    private UIList<String> directoryContentsList;
 
     @Override
     public void initialise() {
-        setCurrentDirectoryRoot();
-        WidgetUtil.trySubscribe(this, "gotoParent", button -> setCurrentDirectory(currentPath.getParent()));
+        WidgetUtil.trySubscribe(this, "gotoParent", button -> setCurrentDirectoryParent());
         WidgetUtil.trySubscribe(this, "gotoRoot", button -> setCurrentDirectoryRoot());
         WidgetUtil.trySubscribe(this, "gotoHome", button -> setCurrentDirectory(Paths.get(System.getProperty("user.home"))));
-        UIList<Path> directoryContentsListWidget = find("directoryContentsList", UIList.class);
-        directoryContentsListWidget.bindList(new ReadOnlyBinding<List<Path>>() {
+
+        find("gotoParent", UIButton.class).bindEnabled(new ReadOnlyBinding<Boolean>() {
             @Override
-            public List<Path> get() {
-                return directoryContentsList;
+            public Boolean get() {
+                return currentPath != null;
             }
         });
-        directoryContentsListWidget.subscribe((widget, item) -> setCurrentDirectory(item));
+        find("currentPath", UILabel.class).bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                return currentPath == null ? "File system roots" : pathToString(currentPath, false);
+            }
+        });
+
+        directoryContentsList = find("directoryContentsList", UIList.class);
+        directoryContentsList.subscribeSelection((widget, item) -> handleItemSelection(item));
+        setCurrentDirectoryRoot();
+    }
+
+    private String pathToString(Path value, boolean nameOnly) {
+        String pathAsString = (nameOnly && value.getNameCount() != 0 ? value.getFileName() : value).toString();
+        String separator = value.getFileSystem().getSeparator();
+        return !pathAsString.endsWith(separator) && Files.isDirectory(value) ? pathAsString + separator : pathAsString;
+    }
+
+    private void loadDirectoryContents(Stream<Path> contents) {
+        directoryContentsList.setList(contents
+                .map(path -> pathToString(path, true))
+                .collect(Collectors.toList()));
     }
 
     private void setCurrentDirectoryRoot() {
         currentPath = null;
-        directoryContentsList = Lists.newArrayList(FileSystems.getDefault().getRootDirectories());
+        loadDirectoryContents(StreamSupport.stream(FileSystems.getDefault().getRootDirectories().spliterator(), true));
+    }
+
+    private void setCurrentDirectoryParent() {
+        if (currentPath != null) {
+            if (currentPath.getParent() != null) {
+                setCurrentDirectory(currentPath.getParent());
+            } else {
+                setCurrentDirectoryRoot();
+            }
+        }
+    }
+
+    private void handleItemSelection(String item) {
+        Path path = currentPath == null ? Paths.get(item) : currentPath.resolve(item);
+        if (Files.isDirectory(path)) {
+            setCurrentDirectory(path);
+        } else {
+            // TODO: handle file selection
+        }
     }
 
     private void setCurrentDirectory(Path newPath) {
-        currentPath = newPath;
         try {
-            directoryContentsList = Files.list(currentPath).collect(Collectors.toList());
+            loadDirectoryContents(Files.list(newPath));
+            currentPath = newPath;
+        } catch (AccessDeniedException ex) {
+            showDirectoryAccessErrorMessage("Access denied to " + newPath);
         } catch (IOException ex) {
-            setCurrentDirectoryRoot();
+            showDirectoryAccessErrorMessage(ex.toString());
         }
+    }
+
+    private void showDirectoryAccessErrorMessage(String message) {
+        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to change directory", message);
     }
 }

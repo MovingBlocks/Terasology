@@ -44,6 +44,10 @@
                             ]
                         },
                         {
+                            "type": "UILabel",
+                            "id": "currentPath"
+                        },
+                        {
                             "type": "ScrollableArea",
                             "content": {
                                 "type": "UIList",
