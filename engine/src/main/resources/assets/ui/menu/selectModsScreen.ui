@@ -86,193 +86,118 @@
                 },
                 "contents": [
                     {
-
-                            "type": "RelativeLayout",
-                            "contents": [
-                                {
-                                    "type": "RowLayout",
-                                    "contents": [
-                                        {
-                                            "type": "UICheckbox",
-                                            "id":"libraryCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "id": "library",
-                                            "text": "Library",
-                                            "enabled": true,
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46,
-                                                "position-left":{
-                                                    "target":"LEFT",
-                                                    "widget":"libraryCheckbox"
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "assetCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Asset ",
-                                            "id": "asset",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "type": "RowLayout",
-                                    "contents": [
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "assetCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Asset ",
-                                            "id": "asset",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        },
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "worldCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "World ",
-                                            "id": "world",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "type": "RowLayout",
-                                    "contents": [
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "specialCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Special",
-                                            "id": "special",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        },
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "augmentationCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Augmentation",
-                                            "id": "augmentation",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "type": "RowLayout",
-                                    "family":"AdvanceFilter",
-                                    "contents": [
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "gameplayCheckbox",
-                                            "family": "option-grid",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Gameplay",
-                                            "id": "gameplay",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-                                        },
-                                        {
-                                            "type": "UICheckbox",
-                                            "id": "localOnly",
-                                            "enabled": true,
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.04
-                                            }
-                                        },
-                                        {
-                                            "type": "UILabel",
-                                            "text": "Local Only",
-                                            "layoutInfo": {
-                                                "relativeWidth": 0.46
-                                            }
-
-                                        }
-                                    ],
-                                    "layoutInfo":{
-                                        "position-bottom": {
-                                            "target": "TOP",
-                                            "widget": "applyButton",
-                                            "offset": 8
-                                        }
+                        "type":"RelativeLayout",
+                        "family":"AdvanceFilter",
+                        "contents": [
+                            {
+                                "type":"ColumnLayout",
+                                "id":"advanceFilterItems",
+                                "columns":4,
+                                "column-widths":[0.05,0.45,0.05,0.45],
+                                "verticalSpacing": 8,
+                                "horizontalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UICheckbox",
+                                        "id":"libraryCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "library",
+                                        "text": "Library"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "assetCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Asset ",
+                                        "id": "asset"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "worldCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "World ",
+                                        "id": "world"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "specialCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Special",
+                                        "id": "special"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "augmentationCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Augmentation",
+                                        "id": "augmentation"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "gameplayCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Gameplay",
+                                        "id": "gameplay"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "localOnlyCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Local Only",
+                                        "id": "localOnly"
                                     }
-                                },
-                                {
-                                    "type": "RowLayout",
-                                    "id": "applyButton",
-                                    "horizontalSpacing": 8,
-                                    "contents": [
-                                        {
-                                            "type": "UIButton",
-                                            "id": "applyFilter",
-                                            "text": "Apply Filter"
-                                        }
-                                    ],
-                                    "layoutInfo": {
-                                        "width": 250,
-                                        "height": 24,
-                                        "position-horizontal-center": {},
-                                        "position-bottom": {
-                                            "target": "BOTTOM"
-                                        }
+                                ],
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP"
                                     }
                                 }
-
-                            ]
-                        },
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "activateFilterButtons",
+                                "horizontalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "activateFilter",
+                                        "text": "Activate Filter"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "width": 250,
+                                    "height": 24,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
+                                    }
+                                }
+                            }
+                        ]
+                    },
                     {
                         "type": "RelativeLayout",
                         "family": "description",
