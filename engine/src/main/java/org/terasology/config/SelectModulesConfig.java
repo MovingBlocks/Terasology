@@ -23,7 +23,6 @@ public class SelectModulesConfig {
     private boolean isGameplayChecked;
     private boolean isAugmentationChecked;
     private boolean isSpecialChecked;
-    private boolean isAdvanceFilterChecked;
     private boolean isLocalOnlyChecked;
 
     public boolean isChecked() {
@@ -80,14 +79,6 @@ public class SelectModulesConfig {
 
     public void setIsWorldChecked(boolean value) {
         this.isWorldChecked = value;
-    }
-
-    public boolean isAdvanceFilterChecked() {
-        return isAdvanceFilterChecked;
-    }
-
-    public void setIsAdvanceFilterChecked(Boolean value) {
-        this.isAdvanceFilterChecked = value;
     }
 
     public boolean isLocalOnlyChecked() {
