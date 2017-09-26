@@ -178,7 +178,7 @@
                             },
                             {
                                 "type": "RowLayout",
-                                "id": "activateFilterButtons",
+                                "id": "activateFilterButton",
                                 "horizontalSpacing": 8,
                                 "contents": [
                                     {

@@ -24,6 +24,7 @@ public class SelectModulesConfig {
     private boolean isAugmentationChecked;
     private boolean isSpecialChecked;
     private boolean isAdvanceFilterChecked;
+    private boolean isLocalOnlyChecked;
 
     public boolean isChecked() {
         return isChecked;
@@ -87,5 +88,13 @@ public class SelectModulesConfig {
 
     public void setIsAdvanceFilterChecked(Boolean value) {
         this.isAdvanceFilterChecked = value;
+    }
+
+    public boolean isLocalOnlyChecked() {
+        return isLocalOnlyChecked;
+    }
+
+    public void setIsLocalOnlyChecked(Boolean value) {
+        this.isLocalOnlyChecked = value;
     }
 }
