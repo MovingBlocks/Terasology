@@ -49,6 +49,7 @@
                         },
                         {
                             "type": "ScrollableArea",
+                            "preferredHeight": 350,
                             "content": {
                                 "type": "UIList",
                                 "id": "directoryContentsList"
