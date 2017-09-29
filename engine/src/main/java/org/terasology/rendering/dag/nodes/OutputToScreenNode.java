@@ -53,8 +53,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
 
-        WorldRenderer renderer = context.get(WorldRenderer.class);
-        requiresCondition(() -> renderer.getCurrentRenderStage() == MONO || renderer.getCurrentRenderStage() == LEFT_EYE);
+        requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
         addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
 
