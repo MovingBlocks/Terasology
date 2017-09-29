@@ -61,7 +61,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         EngineEntityManager entityManager = getEntityManager();
         EngineTime time = mock(EngineTime.class);
         NetworkSystem server = new NetworkSystemImpl(time, context);
-        server.setStateContext(context);
+        server.setContext(context);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, context.get(EventLibrary.class), null);
         server.host(7777, true);
@@ -69,7 +69,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         Thread.sleep(500);
 
         NetworkSystem client = new NetworkSystemImpl(time, context);
-        client.setStateContext(context);
+        client.setContext(context);
         netSystems.add(client);
         client.join("localhost", 7777);
 
@@ -88,7 +88,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         EntityRef entity = entityManager.create(netComp);
         EngineTime time = mock(EngineTime.class);
         NetworkSystem server = new NetworkSystemImpl(time, context);
-        server.setStateContext(context);
+        server.setContext(context);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, context.get(EventLibrary.class), null);
         server.host(7777, true);
