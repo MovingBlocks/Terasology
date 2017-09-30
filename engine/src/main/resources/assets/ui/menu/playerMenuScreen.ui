@@ -77,6 +77,26 @@
                         },
                         {
                             "type": "UILabel",
+                            "text": "Multiplayer identities:"
+                        },
+                        {
+                            "type": "RowLayout",
+                            "horizontalSpacing": 10,
+                            "contents": [
+                                {
+                                    "type": "UIButton",
+                                    "text": "Import...",
+                                    "id": "importIdentities"
+                                },
+                                {
+                                    "type": "UIButton",
+                                    "text": "Export...",
+                                    "id": "exportIdentities"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "UILabel",
                             "text": "${engine:menu#storage-service}:"
                         },
                         {

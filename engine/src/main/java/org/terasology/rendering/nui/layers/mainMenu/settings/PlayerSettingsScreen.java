@@ -175,6 +175,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
+        WidgetUtil.trySubscribe(this, "importIdentities", button -> IdentityUtils.importIdentities(config.getSecurity(), getManager()));
+        WidgetUtil.trySubscribe(this, "exportIdentities", button -> IdentityUtils.exportIdentities(config.getSecurity(), getManager()));
+
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {
                 ThreeButtonPopup logoutPopup = getManager().pushScreen(ThreeButtonPopup.ASSET_URI, ThreeButtonPopup.class);

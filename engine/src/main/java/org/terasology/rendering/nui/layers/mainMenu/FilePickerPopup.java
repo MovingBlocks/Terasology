@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu.filePicker;
+package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -46,6 +46,7 @@ public class FilePickerPopup extends CoreScreenLayer {
 
     private String fileName = "";
     private Path currentPath;
+    private ScrollableArea directoryContentsScroller;
     private UIList<String> directoryContentsList;
     private Consumer<Path> okHandler = (path) -> { };
 
@@ -53,11 +54,15 @@ public class FilePickerPopup extends CoreScreenLayer {
         this.okHandler = okHandler;
     }
 
+    public void setTitle(String title) {
+        find("title", UILabel.class).setText(title);
+    }
+
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "gotoParent", button -> setCurrentDirectoryParent());
         WidgetUtil.trySubscribe(this, "gotoRoot", button -> setCurrentDirectoryRoot());
-        WidgetUtil.trySubscribe(this, "gotoHome", button -> setCurrentDirectory(Paths.get(System.getProperty("user.home"))));
+        WidgetUtil.trySubscribe(this, "gotoHome", button -> setCurrentDirectoryHome());
 
         find("gotoParent", UIButton.class).bindEnabled(new ReadOnlyBinding<Boolean>() {
             @Override
@@ -89,9 +94,10 @@ public class FilePickerPopup extends CoreScreenLayer {
                         : isValidFilename(fileName) ? "Full path to file: " + getPathToFile().toString() : "Invalid file name";
             }
         });
+        directoryContentsScroller = find("directoryContentsScroller", ScrollableArea.class);
         directoryContentsList = find("directoryContentsList", UIList.class);
         directoryContentsList.subscribeSelection((widget, item) -> handleItemSelection(item));
-        setCurrentDirectoryRoot();
+        setCurrentDirectoryHome();
 
         UIButton ok = find("ok", UIButton.class);
         ok.bindEnabled(new ReadOnlyBinding<Boolean>() {
@@ -139,11 +145,16 @@ public class FilePickerPopup extends CoreScreenLayer {
         directoryContentsList.setList(contents
                 .map(path -> pathToString(path, true))
                 .collect(Collectors.toList()));
+        directoryContentsScroller.moveToTop();
     }
 
     private void setCurrentDirectoryRoot() {
         currentPath = null;
         loadDirectoryContents(StreamSupport.stream(FileSystems.getDefault().getRootDirectories().spliterator(), true));
+    }
+
+    private void setCurrentDirectoryHome() {
+        setCurrentDirectory(Paths.get(System.getProperty("user.home")));
     }
 
     private void setCurrentDirectoryParent() {
