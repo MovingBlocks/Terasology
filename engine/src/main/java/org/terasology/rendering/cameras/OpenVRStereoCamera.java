@@ -250,8 +250,8 @@ public class OpenVRStereoCamera extends SubmersibleCamera {
 
         // set camera orientation
         Vector4f vecQuaternion = OpenVRUtil.convertToQuaternion(leftEyePose);
-        Quaternionf quaternion = new Quaternionf(vecQuaternion.x,vecQuaternion.y,vecQuaternion.z,vecQuaternion.w);
-        setOrientation(new Quat4f(quaternion.x,quaternion.y,quaternion.z,quaternion.w));
+        Quaternionf quaternion = new Quaternionf(vecQuaternion.x, vecQuaternion.y, vecQuaternion.z, vecQuaternion.w);
+        setOrientation(new Quat4f(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
 
 
         leftEyePose = leftEyePose.invert(); // view matrix is inverse of pose matrix

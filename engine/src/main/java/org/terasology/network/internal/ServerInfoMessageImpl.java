@@ -87,8 +87,7 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
-    public int getOnlinePlayersAmount()
-    {
+    public int getOnlinePlayersAmount() {
         return info.getOnlinePlayersAmount();
     }
 

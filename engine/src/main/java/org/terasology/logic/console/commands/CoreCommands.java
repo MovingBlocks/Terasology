@@ -81,10 +81,7 @@ import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -533,8 +530,7 @@ public class CoreCommands extends BaseComponentSystem {
             //TODO: i18n
             if (networkSystem.getMode().isServer()) {
                 return "Your player is running on the server";
-            }
-            else {
+            } else {
                 return "Please make sure you are connected to an online server (singleplayer doesn't count)";
             }
         }
@@ -601,8 +597,8 @@ public class CoreCommands extends BaseComponentSystem {
                     msg.append("=====================================================================================================================");
                     msg.append(Console.NEW_LINE);
                 }
-                if(!cmd.getRequiredPermission().isEmpty()) {
-                    msg.append("Required permission level - "+cmd.getRequiredPermission());
+                if (!cmd.getRequiredPermission().isEmpty()) {
+                    msg.append("Required permission level - " + cmd.getRequiredPermission());
                     msg.append(Console.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Console.NEW_LINE);
@@ -626,7 +622,7 @@ public class CoreCommands extends BaseComponentSystem {
      */
     @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
-        WorldRendererImpl worldRendererImpl = (WorldRendererImpl)worldRenderer;
+        WorldRendererImpl worldRendererImpl = (WorldRendererImpl) worldRenderer;
         worldRendererImpl.recompileShaders();
     }
 }

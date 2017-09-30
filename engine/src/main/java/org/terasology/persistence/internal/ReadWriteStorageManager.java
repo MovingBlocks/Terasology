@@ -379,8 +379,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         checkSaveTransactionAndClearUpIfItIsDone();
         if (saveRequested) {
             startSaving();
-        }
-        else if (isSavingNecessary()){
+        } else if (isSavingNecessary()) {
             startAutoSaving();
         }
 

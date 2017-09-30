@@ -58,7 +58,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
 
     //== public ========================================================================================================
 
-    public ParticleUpdaterImpl(final Physics physics) {
+    ParticleUpdaterImpl(final Physics physics) {
         this.physics = physics;
     }
 

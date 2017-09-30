@@ -59,7 +59,6 @@ import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;

@@ -66,7 +66,7 @@ public final class OpenVRProvider {
     private static boolean headIsTracking;
     private static OpenVRProvider instance;
 
-    private static final OpenVRState vrState = new OpenVRState();
+    private static final OpenVRState VR_STATE = new OpenVRState();
 
     // TextureIDs of framebuffers for each eye
     private final VRTextureBounds_t texBounds = new VRTextureBounds_t();
@@ -94,7 +94,7 @@ public final class OpenVRProvider {
      * @return the VR state.
      */
     public OpenVRState getState() {
-        return vrState;
+        return VR_STATE;
     }
 
     /**
@@ -286,7 +286,7 @@ public final class OpenVRProvider {
                 vrSystem.GetControllerState.apply(controllerDeviceIndex[handIndex], inputStateRefernceArray[handIndex]);
                 inputStateRefernceArray[handIndex].read();
                 controllerStateReference[handIndex] = inputStateRefernceArray[handIndex];
-                vrState.updateControllerButtonState(controllerStateReference);
+                VR_STATE.updateControllerButtonState(controllerStateReference);
             }
         }
     }
@@ -449,15 +449,15 @@ public final class OpenVRProvider {
         if (hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].bPoseIsValid != 0) {
             for (int nEye = 0; nEye < 2; nEye++) {
                 HmdMatrix34_t matPose = vrSystem.GetEyeToHeadTransform.apply(nEye);
-                vrState.setEyePoseWRTHead(matPose, nEye);
+                VR_STATE.setEyePoseWRTHead(matPose, nEye);
                 HmdMatrix44_t matProjection =
                         vrSystem.GetProjectionMatrix.apply(nEye,
                                 nearClip,
                                 farClip,
                                 JOpenVRLibrary.EGraphicsAPIConvention.EGraphicsAPIConvention_API_OpenGL);
-                vrState.setProjectionMatrix(matProjection, nEye);
+                VR_STATE.setProjectionMatrix(matProjection, nEye);
             }
-            vrState.setHeadPose(hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
+            VR_STATE.setHeadPose(hmdTrackedDevicePoses[JOpenVRLibrary.k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
             headIsTracking = true;
         } else {
             headIsTracking = false;
@@ -468,7 +468,7 @@ public final class OpenVRProvider {
         for (int handIndex = 0; handIndex < 2; handIndex++) {
             if (controllerDeviceIndex[handIndex] != -1) {
                 controllerTracking[handIndex] = true;
-                vrState.setControllerPose(hmdTrackedDevicePoses[controllerDeviceIndex[handIndex]].mDeviceToAbsoluteTracking, handIndex);
+                VR_STATE.setControllerPose(hmdTrackedDevicePoses[controllerDeviceIndex[handIndex]].mDeviceToAbsoluteTracking, handIndex);
             } else {
                 controllerTracking[handIndex] = false;
             }

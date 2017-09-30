@@ -40,6 +40,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean add(Setting setting) {
         SimpleUri id = setting.getId();
 
@@ -58,6 +59,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean remove(SimpleUri id) {
         Setting setting = get(id);
 
@@ -76,6 +78,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id) {
         return (Setting<V>) settingMap.get(id);
@@ -84,6 +87,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean contains(SimpleUri id) {
         return settingMap.containsKey(id);
     }

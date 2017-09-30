@@ -72,10 +72,10 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  */
 public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
     public static final SimpleUri SSAO_FBO_URI = new SimpleUri("engine:fbo.ssao");
-    private static final ResourceUrn SSAO_MATERIAL_URN = new ResourceUrn("engine:prog.ssao");
-    private static final float NOISE_TEXEL_SIZE = 0.25f;
     public static final int SSAO_KERNEL_ELEMENTS = 32;
     public static final int SSAO_NOISE_SIZE = 4;
+    private static final ResourceUrn SSAO_MATERIAL_URN = new ResourceUrn("engine:prog.ssao");
+    private static final float NOISE_TEXEL_SIZE = 0.25f;
 
     private Material ssaoMaterial;
     private float outputFboWidth;

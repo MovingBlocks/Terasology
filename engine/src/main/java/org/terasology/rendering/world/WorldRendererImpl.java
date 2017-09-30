@@ -119,6 +119,13 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 @RegisterSystem
 public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
+    /*
+     * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
+     * It's not, so for now, we use this factor to adjust for the disparity.
+     */
+    private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
+    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
+
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
     private final Context context;
@@ -127,12 +134,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private final RenderableWorld renderableWorld;
     private final ShaderManager shaderManager;
     private final SubmersibleCamera playerCamera;
-
-    /*
-    * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
-    * It's not, so for now, we use this factor to adjust for the disparity.
-     */
-    private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
 
     // TODO: @In
     private final OpenVRProvider vrProvider;
@@ -156,8 +157,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-
-    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
 
     // Required for ComponentSystem to register the system (via @RegisterSystem).
     // @RegisterSystem requires a default constructor, and since we have final variables in the class,
@@ -718,7 +717,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     public void shutdown() { }
 
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value = "arguments") final String... arguments) {
         Node node = renderGraph.findNode(new SimpleUri(nodeUri));
         if (node == null) {
             throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));

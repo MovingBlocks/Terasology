@@ -31,7 +31,6 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.debug.DebugProperties;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;

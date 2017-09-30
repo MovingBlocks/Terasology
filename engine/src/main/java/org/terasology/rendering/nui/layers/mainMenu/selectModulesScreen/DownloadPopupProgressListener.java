@@ -23,7 +23,7 @@ final class DownloadPopupProgressListener implements MultiFileTransferProgressLi
     private static final String POPUP_TITLE = "Downloading required modules, please wait...";
     private WaitPopup popup;
 
-    public DownloadPopupProgressListener(WaitPopup popup) {
+    DownloadPopupProgressListener(WaitPopup popup) {
         this.popup = popup;
     }
 

@@ -75,7 +75,7 @@ public class ConsoleScreen extends CoreScreenLayer {
         });
         commandLine.subscribe(widget -> {
             String text = commandLine.getText();
-            if(StringUtils.isNotBlank(text)) {
+            if (StringUtils.isNotBlank(text)) {
                 console.execute(text, localPlayer.getClientEntity());
             }
             scrollArea.moveToBottom();
