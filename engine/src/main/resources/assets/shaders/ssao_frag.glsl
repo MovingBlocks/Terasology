@@ -60,7 +60,7 @@ void main() {
     const float maxDepthDifference = 1;
 
     for (int i=0; i<SSAO_KERNEL_ELEMENTS; ++i) {
-        samplePosition = (tbn * ssaoSamples[i]) * ssaoRad + viewSpacePos;
+        samplePosition = (tbn * ssaoSamples[i]) * ssaoRadius + viewSpacePos;
 
         offset = vec4(samplePosition.x, samplePosition.y, samplePosition.z, 1.0);
         offset = projMatrix * offset;
@@ -75,7 +75,7 @@ void main() {
         if (depthDifference > maxDepthDifference) {
         	rangeCheck = 0;
         } else {
-        	rangeCheck = smoothstep(0.0, 1.0, ssaoRad / depthDifference);
+        	rangeCheck = smoothstep(0.0, 1.0, ssaoRadius / depthDifference);
         }
 
         occlusion += step(samplePosition.z, sampleDepth) * rangeCheck;
