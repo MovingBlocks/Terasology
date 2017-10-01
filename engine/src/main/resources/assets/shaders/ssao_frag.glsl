@@ -68,7 +68,11 @@ void main() {
         // TODO: Holy... frustum ray and linearized depth - please!
         sampleDepth = reconstructViewPos(texture2D(texDepth, offset.xy).r * 2.0 - 1.0, gl_TexCoord[0].xy, invProjMatrix).z;
 
-        rangeCheck = smoothstep(0.0, 1.0, 0.25 * ssaoRad / abs(viewSpacePos.z - sampleDepth));
+        rangeCheck = smoothstep(0.0, 1.0, ssaoRad / abs(viewSpacePos.z - sampleDepth));
+        const float maxDepthDifference = 2;
+        if (abs(viewSpacePos.z - sampleDepth) > maxDepthDifference) {
+        	rangeCheck = 0;
+        }
         occlusion += step(samplePosition.z, sampleDepth) * rangeCheck;
 
         samplesTaken += 1.0;
