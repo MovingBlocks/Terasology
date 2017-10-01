@@ -19,7 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
@@ -42,21 +42,19 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
 
     private SwappableFBO gBufferPair;
 
-    private FBO.Dimensions fullScale = new FBO.Dimensions(-1, -1);
+    private FBO.Dimensions fullScale = new FBO.Dimensions();
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
     private boolean wasTakingScreenshotLastFrame = false;
 
-    public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber) {
+    public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
 
         renderingConfig.subscribe(FBO_SCALE, this);
 
-        // TODO: Switch to context.
-        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
-        display.subscribe(this);
+        displayDevice.subscribe(this);
 
         updateFullScale();
         generateDefaultFBOs();
@@ -89,28 +87,27 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     }
 
     private void updateFullScale() {
-        fullScale.set(Display.getWidth(), Display.getHeight());
+        fullScale.setDimensions(Display.getWidth(), Display.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
     /**
      * Invoked before real-rendering starts
-     * TODO: Completely remove this, once we have a better way to handle screenshots.
-     */
+    */
     public void update() {
         if (screenGrabber.isTakingScreenshot()) {
-            fullScale.set(renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight()));
+            ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
+            // TODO: Remove dependency on Display
+            fullScale.setDimensions(screenshotSize.getWidth(Display.getWidth()),
+                                    screenshotSize.getHeight(Display.getHeight()));
             regenerateFbos();
 
             wasTakingScreenshotLastFrame = true;
-        } else {
-            if (wasTakingScreenshotLastFrame) {
-                updateFullScale();
-                regenerateFbos();
+        } else if (wasTakingScreenshotLastFrame) {
+            updateFullScale();
+            regenerateFbos();
 
-                wasTakingScreenshotLastFrame = false;
-            }
+            wasTakingScreenshotLastFrame = false;
         }
     }
 
@@ -136,8 +133,8 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
         return gBufferPair;
     }
 
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE) || evt.getPropertyName().equals(FBO_SCALE)) {
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE) || propertyChangeEvent.getPropertyName().equals(FBO_SCALE)) {
             updateFullScale();
             regenerateFbos();
         }

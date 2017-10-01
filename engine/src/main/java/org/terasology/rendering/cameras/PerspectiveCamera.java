@@ -54,13 +54,11 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
 
     private Vector3f tempRightVector = new Vector3f();
 
-    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig) {
+    public PerspectiveCamera(WorldProvider worldProvider, RenderingConfig renderingConfig, DisplayDevice displayDevice) {
         super(worldProvider, renderingConfig);
         this.cameraSettings = renderingConfig.getCameraSettings();
 
-        // TODO: Switch to context.
-        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
-        display.subscribe(this);
+        displayDevice.subscribe(this);
     }
 
     @Override
@@ -198,8 +196,8 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         return MatrixUtils.createPerspectiveProjectionMatrix(fovY, aspectRatio, zNear, zFar);
     }
 
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("displayResolution")) {
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        if (propertyChangeEvent.getPropertyName().equals("displayResolution")) {
             cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
             updateMatrices();
         }
