@@ -32,6 +32,7 @@ import com.google.gson.JsonSerializer;
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.FlexibleConfigManager;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
@@ -41,6 +42,7 @@ import org.terasology.naming.Name;
 import org.terasology.naming.Version;
 import org.terasology.naming.gson.NameTypeAdapter;
 import org.terasology.naming.gson.VersionTypeAdapter;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.SetMultimapTypeAdapter;
@@ -143,6 +145,8 @@ public final class Config {
         } catch (IOException e) {
             logger.error("Failed to save config", e);
         }
+
+        CoreRegistry.get(FlexibleConfigManager.class).save();
     }
 
     public void loadDefaults() {

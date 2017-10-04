@@ -79,4 +79,7 @@ class MockSetting<T> implements Setting<T> {
     public boolean hasSubscribers() {
         return isSubscribedTo;
     }
+
+    @Override
+    public void setValueFromString(String valueString) { }
 }

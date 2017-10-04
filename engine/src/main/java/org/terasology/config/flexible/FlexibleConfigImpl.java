@@ -16,11 +16,13 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * {@inheritDoc}
@@ -29,6 +31,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
 
     private Map<SimpleUri, Setting> settingMap;
+    private Map<SimpleUri, String> unusedSettings;
 
     /**
      * Creates a new {@link FlexibleConfigImpl} instance.
@@ -52,7 +55,14 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
+        if (unusedSettings != null) {
+            if (unusedSettings.containsKey(id)) {
+                setting.setValueFromString(unusedSettings.remove(id));
+            }
+        }
+
         settingMap.put(id, setting);
+
         return true;
     }
 
@@ -91,4 +101,53 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     public boolean contains(SimpleUri id) {
         return settingMap.containsKey(id);
     }
+
+    @Override
+    public void setUnusedSettings(Map<SimpleUri, String> unusedSettings) {
+        this.unusedSettings = unusedSettings;
+    }
+
+    @Override
+    public Map<SimpleUri, String> getUnusedSettings() {
+        return unusedSettings;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        JsonObject jsonObject = new JsonObject();
+
+        for (Entry<SimpleUri, Setting> entry : settingMap.entrySet()) {
+            Setting setting = entry.getValue();
+            if (!setting.getValue().equals(setting.getDefaultValue())) {
+                jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
+            }
+        }
+
+        // Add all the non-default settings that were not used in this session
+        if (unusedSettings != null) {
+            for (Entry<SimpleUri, String> unusedSettings : unusedSettings.entrySet()) {
+                jsonObject.addProperty(unusedSettings.getKey().toString(), unusedSettings.getValue());
+            }
+        }
+
+        return jsonObject;
+    }
+
+    /*
+    public static class Adapter implements JsonSerializer<FlexibleConfigImpl> {
+        @Override
+        public JsonElement serialize(FlexibleConfigImpl flexibleConfigImpl, Type T, JsonSerializationContext jsonSerializationContext) {
+            JsonObject jsonObject = new JsonObject();
+
+            for (Entry<SimpleUri, Setting> entry : flexibleConfigImpl.settingMap.entrySet()) {
+                Setting setting = entry.getValue();
+                if (!setting.getValue().equals(setting.getDefaultValue())) {
+                    jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
+                }
+            }
+
+            return jsonObject;
+        }
+    }
+    */
 }

@@ -96,4 +96,9 @@ public interface Setting<T> {
      * Returns a boolean stating whether this {@link Setting} has any subscribers.
      */
     boolean hasSubscribers();
+
+    /**
+     * Parses the String based on the type of this {@link Setting}, and sets it.
+     */
+    void setValueFromString(String valueString);
 }

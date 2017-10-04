@@ -15,7 +15,10 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.gson.JsonObject;
 import org.terasology.engine.SimpleUri;
+
+import java.util.Map;
 
 /**
  * Stores multiple {@link Setting} instances that can be retrieved using their id.
@@ -54,4 +57,10 @@ public interface FlexibleConfig {
      * Returns a boolean stating whether the config contains a {@link Setting} with the given id.
      */
     boolean contains(SimpleUri id);
+
+    void setUnusedSettings(Map<SimpleUri, String> unusedValues);
+
+    Map<SimpleUri, String> getUnusedSettings();
+
+    JsonObject toJson();
 }

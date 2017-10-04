@@ -24,6 +24,7 @@ import org.terasology.config.facade.BindsConfigurationImpl;
 import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.config.facade.InputDeviceConfigurationImpl;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.identity.CertificateGenerator;
@@ -49,6 +50,15 @@ public class ConfigurationSubsystem implements EngineSubsystem {
     public void preInitialise(Context rootContext) {
         config = new Config();
         config.load();
+
+        FlexibleConfigManager flexibleConfigManager = new FlexibleConfigManagerImpl();
+        rootContext.put(FlexibleConfigManager.class, flexibleConfigManager);
+
+        FlexibleConfig renderingFlexibleConfig = new FlexibleConfigImpl();
+        flexibleConfigManager.addFlexibleConfig(new SimpleUri("engine:rendering"), renderingFlexibleConfig);
+
+        flexibleConfigManager.load();
+        // Add settings to RenderingFC
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
         if (serverPortProperty != null) {
