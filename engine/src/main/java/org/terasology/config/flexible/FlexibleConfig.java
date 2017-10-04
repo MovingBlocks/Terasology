@@ -58,9 +58,9 @@ public interface FlexibleConfig {
      */
     boolean contains(SimpleUri id);
 
-    void setUnusedSettings(Map<SimpleUri, String> unusedValues);
+    void setUnusedSettings(Map<SimpleUri, String> unusedSettings);
 
     Map<SimpleUri, String> getUnusedSettings();
 
-    JsonObject toJson();
+    Map<SimpleUri, Setting> getActiveSettings();
 }

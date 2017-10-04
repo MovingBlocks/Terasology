@@ -113,24 +113,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     }
 
     @Override
-    public JsonObject toJson() {
-        JsonObject jsonObject = new JsonObject();
-
-        for (Entry<SimpleUri, Setting> entry : settingMap.entrySet()) {
-            Setting setting = entry.getValue();
-            if (!setting.getValue().equals(setting.getDefaultValue())) {
-                jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
-            }
-        }
-
-        // Add all the non-default settings that were not used in this session
-        if (unusedSettings != null) {
-            for (Entry<SimpleUri, String> unusedSettings : unusedSettings.entrySet()) {
-                jsonObject.addProperty(unusedSettings.getKey().toString(), unusedSettings.getValue());
-            }
-        }
-
-        return jsonObject;
+    public Map<SimpleUri, Setting> getActiveSettings() {
+        return settingMap;
     }
 
     /*

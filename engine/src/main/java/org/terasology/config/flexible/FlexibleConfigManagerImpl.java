@@ -18,6 +18,7 @@ package org.terasology.config.flexible;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -101,7 +101,26 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
             FlexibleConfig flexibleConfig = entry.getValue();
 
             try (BufferedWriter writer = Files.newBufferedWriter(getPathForFlexibleConfig(flexibleConfigUri), TerasologyConstants.CHARSET)) {
-                getGson().toJson(flexibleConfig.toJson(), writer);
+                JsonObject jsonObject = new JsonObject();
+
+                Map<SimpleUri, Setting> settingMap = flexibleConfig.getActiveSettings();
+                Map<SimpleUri, String> unusedSettings = flexibleConfig.getUnusedSettings();
+
+                for (Entry<SimpleUri, Setting> activeSetting : settingMap.entrySet()) {
+                    Setting setting = activeSetting.getValue();
+                    if (!setting.getValue().equals(setting.getDefaultValue())) {
+                        jsonObject.addProperty(activeSetting.getKey().toString(), setting.getValue().toString());
+                    }
+                }
+
+                // Add all the non-default settings that were not used in this session
+                if (unusedSettings != null) {
+                    for (Entry<SimpleUri, String> unusedSetting : unusedSettings.entrySet()) {
+                        jsonObject.addProperty(unusedSetting.getKey().toString(), unusedSetting.getValue());
+                    }
+                }
+
+                getGson().toJson(jsonObject, writer);
             } catch (IOException e) {
                 logger.error("Failed to save config", e);
             }
