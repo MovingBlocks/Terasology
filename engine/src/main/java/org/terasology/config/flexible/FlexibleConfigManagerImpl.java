@@ -38,8 +38,6 @@ import java.util.Map.Entry;
 public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(FlexibleConfigManager.class);
 
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
 
@@ -72,25 +70,9 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
             FlexibleConfig flexibleConfig = entry.getValue();
 
             try (Reader reader = Files.newBufferedReader(getPathForFlexibleConfig(flexibleConfigUri), TerasologyConstants.CHARSET)) {
-                JsonReader jsonReader = new JsonReader(reader);
-
-                Map<SimpleUri, String> unusedSettings = Maps.newHashMap();
-
-                if (jsonReader.hasNext()) {
-                    jsonReader.beginObject();
-
-                    while (jsonReader.hasNext()) {
-                        SimpleUri id = new SimpleUri(jsonReader.nextName());
-                        String value = jsonReader.nextString();
-                        unusedSettings.put(id, value);
-                    }
-
-                    jsonReader.endObject();
-                }
-
-                flexibleConfig.setUnusedSettings(unusedSettings);
+                flexibleConfig.load(reader);
             } catch (IOException e) {
-                logger.error("Failed to load config file {}, falling back on default config");
+                // TODO: Handle exception
             }
         }
     }
@@ -102,26 +84,7 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
             FlexibleConfig flexibleConfig = entry.getValue();
 
             try (BufferedWriter writer = Files.newBufferedWriter(getPathForFlexibleConfig(flexibleConfigUri), TerasologyConstants.CHARSET)) {
-                JsonObject jsonObject = new JsonObject();
-
-                Map<SimpleUri, Setting> settingMap = flexibleConfig.getActiveSettings();
-                Map<SimpleUri, String> unusedSettings = flexibleConfig.getUnusedSettings();
-
-                for (Entry<SimpleUri, Setting> activeSetting : settingMap.entrySet()) {
-                    Setting setting = activeSetting.getValue();
-                    if (!setting.getValue().equals(setting.getDefaultValue())) {
-                        jsonObject.addProperty(activeSetting.getKey().toString(), setting.getValue().toString());
-                    }
-                }
-
-                // Add all the non-default settings that were not used in this session
-                if (unusedSettings != null) {
-                    for (Entry<SimpleUri, String> unusedSetting : unusedSettings.entrySet()) {
-                        jsonObject.addProperty(unusedSetting.getKey().toString(), unusedSetting.getValue());
-                    }
-                }
-
-                gson.toJson(jsonObject, writer);
+                flexibleConfig.save(writer);
             } catch (IOException e) {
                 logger.error("Failed to save config", e);
             }
@@ -137,7 +100,11 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     }
 
     private Path getPathForFlexibleConfig(SimpleUri flexibleConfigUri) {
-        Path filePath = PathManager.getInstance().getHomePath().resolve("configs").resolve(flexibleConfigUri.getModuleName().toString()).resolve(flexibleConfigUri.getObjectName().toString() + ".cfg");
+        Path filePath = PathManager.getInstance()
+                                        .getHomePath()
+                                        .resolve("configs")
+                                        .resolve(flexibleConfigUri.getModuleName().toString())
+                                        .resolve(flexibleConfigUri.getObjectName().toString() + ".cfg");
         ensureDirectoryExists(filePath);
         return filePath;
     }

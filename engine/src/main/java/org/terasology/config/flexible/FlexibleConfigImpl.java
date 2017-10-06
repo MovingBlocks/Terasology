@@ -16,11 +16,17 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -28,15 +34,17 @@ import java.util.Map;
  */
 public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private Map<SimpleUri, Setting> settingMap;
-    private Map<SimpleUri, String> unusedSettings;
+    private Map<SimpleUri, Setting> settings;
+    private Map<SimpleUri, String> temporarilyParkedSettings;
 
     /**
      * Creates a new {@link FlexibleConfigImpl} instance.
      */
     public FlexibleConfigImpl() {
-        this.settingMap = Maps.newHashMap();
+        this.settings = Maps.newHashMap();
+        this.temporarilyParkedSettings = Maps.newHashMap();
     }
 
     /**
@@ -54,13 +62,13 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
-        if (unusedSettings != null) {
-            if (unusedSettings.containsKey(id)) {
-                setting.setValueFromString(unusedSettings.remove(id));
+        if (temporarilyParkedSettings != null) {
+            if (temporarilyParkedSettings.containsKey(id)) {
+                setting.setValueFromString(temporarilyParkedSettings.remove(id));
             }
         }
 
-        settingMap.put(id, setting);
+        settings.put(id, setting);
 
         return true;
     }
@@ -80,7 +88,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
-        settingMap.remove(id);
+        settings.remove(id);
         return true;
     }
 
@@ -90,7 +98,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     @Override
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id) {
-        return (Setting<V>) settingMap.get(id);
+        return (Setting<V>) settings.get(id);
     }
 
     /**
@@ -98,21 +106,47 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     public boolean contains(SimpleUri id) {
-        return settingMap.containsKey(id);
+        return settings.containsKey(id);
     }
 
     @Override
-    public void setUnusedSettings(Map<SimpleUri, String> unusedSettings) {
-        this.unusedSettings = unusedSettings;
+    public Map<SimpleUri, Setting> getSettings() {
+        return settings;
     }
 
     @Override
-    public Map<SimpleUri, String> getUnusedSettings() {
-        return unusedSettings;
+    public void save(Writer writer) {
+        JsonObject jsonObject = new JsonObject();
+
+        for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
+            Setting setting = entry.getValue();
+            if (!setting.getValue().equals(setting.getDefaultValue())) {
+                jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
+            }
+        }
+
+        // Add any temporarily parked setting that hasn't been used in this session of the application.
+        for (Map.Entry<SimpleUri, String> entry : temporarilyParkedSettings.entrySet()) {
+            jsonObject.addProperty(entry.getKey().toString(), entry.getValue());
+        }
+
+        gson.toJson(jsonObject, writer);
     }
 
     @Override
-    public Map<SimpleUri, Setting> getActiveSettings() {
-        return settingMap;
+    public void load(Reader reader) {
+        try (JsonReader jsonReader = new JsonReader(reader)) {
+            jsonReader.beginObject();
+
+            while (jsonReader.hasNext()) {
+                SimpleUri id = new SimpleUri(jsonReader.nextName());
+                String value = jsonReader.nextString();
+                temporarilyParkedSettings.put(id, value);
+            }
+
+            jsonReader.endObject();
+        } catch (Exception e) {
+            // TODO: Handle exception
+        }
     }
 }

@@ -48,7 +48,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
     @Override
     public void preInitialise(Context rootContext) {
-        config = new Config();
+        config = new Config(rootContext);
         config.load();
 
         FlexibleConfigManager flexibleConfigManager = new FlexibleConfigManagerImpl();

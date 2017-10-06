@@ -18,6 +18,8 @@ package org.terasology.config.flexible;
 import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -58,9 +60,9 @@ public interface FlexibleConfig {
      */
     boolean contains(SimpleUri id);
 
-    void setUnusedSettings(Map<SimpleUri, String> unusedSettings);
+    Map<SimpleUri, Setting> getSettings();
 
-    Map<SimpleUri, String> getUnusedSettings();
+    void save(Writer writer);
 
-    Map<SimpleUri, Setting> getActiveSettings();
+    void load(Reader reader);
 }
