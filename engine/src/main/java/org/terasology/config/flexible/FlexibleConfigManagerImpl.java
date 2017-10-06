@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
@@ -37,7 +38,7 @@ import java.util.Map.Entry;
 public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     private static final Logger logger = LoggerFactory.getLogger(FlexibleConfigManager.class);
 
-    private static Gson gson;
+    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
@@ -120,7 +121,7 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
                     }
                 }
 
-                getGson().toJson(jsonObject, writer);
+                gson.toJson(jsonObject, writer);
             } catch (IOException e) {
                 logger.error("Failed to save config", e);
             }
@@ -139,13 +140,5 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
         Path filePath = PathManager.getInstance().getHomePath().resolve("configs").resolve(flexibleConfigUri.getModuleName().toString()).resolve(flexibleConfigUri.getObjectName().toString() + ".cfg");
         ensureDirectoryExists(filePath);
         return filePath;
-    }
-
-    private Gson getGson() {
-        if (gson == null) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-
-        return gson;
     }
 }
