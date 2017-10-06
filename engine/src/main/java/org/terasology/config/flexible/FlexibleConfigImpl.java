@@ -16,13 +16,12 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * {@inheritDoc}
@@ -116,22 +115,4 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     public Map<SimpleUri, Setting> getActiveSettings() {
         return settingMap;
     }
-
-    /*
-    public static class Adapter implements JsonSerializer<FlexibleConfigImpl> {
-        @Override
-        public JsonElement serialize(FlexibleConfigImpl flexibleConfigImpl, Type T, JsonSerializationContext jsonSerializationContext) {
-            JsonObject jsonObject = new JsonObject();
-
-            for (Entry<SimpleUri, Setting> entry : flexibleConfigImpl.settingMap.entrySet()) {
-                Setting setting = entry.getValue();
-                if (!setting.getValue().equals(setting.getDefaultValue())) {
-                    jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
-                }
-            }
-
-            return jsonObject;
-        }
-    }
-    */
 }

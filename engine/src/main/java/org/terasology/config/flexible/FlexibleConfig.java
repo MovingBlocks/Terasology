@@ -15,7 +15,7 @@
  */
 package org.terasology.config.flexible;
 
-import com.google.gson.JsonObject;
+import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.util.Map;

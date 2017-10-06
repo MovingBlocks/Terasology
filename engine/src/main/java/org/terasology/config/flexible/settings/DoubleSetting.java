@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.settings;
 
+import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
-public interface FlexibleConfigManager {
-    void addFlexibleConfig(SimpleUri flexibleConfigUri, FlexibleConfig flexibleConfig);
+public class DoubleSetting extends SettingImpl<Double> {
+    public DoubleSetting(SimpleUri id, Double defaultValue) {
+        super(id, defaultValue);
+    }
 
-    void removeFlexibleConfig(SimpleUri flexibleConfigUri);
+    public DoubleSetting(SimpleUri id, Double defaultValue, SettingValueValidator<Double> validator) {
+        super(id, defaultValue, validator);
+    }
 
-    FlexibleConfig getFlexibleConfig(SimpleUri flexibleConfigUri);
-
-    void load();
-
-    void save();
+    @Override
+    public void setValueFromString(String valueString) {
+        value = Double.parseDouble(valueString);
+    }
 }

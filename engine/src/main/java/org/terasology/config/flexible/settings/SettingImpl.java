@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.settings;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
@@ -27,7 +23,6 @@ import org.terasology.engine.SimpleUri;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.Set;
 
@@ -44,7 +39,7 @@ public class SettingImpl<T> implements Setting<T> {
 
     private final T defaultValue;
 
-    private T value;
+    protected T value;
 
     private String humanReadableName;
 
@@ -215,7 +210,6 @@ public class SettingImpl<T> implements Setting<T> {
         return description;
     }
 
-    @Override
     public void setValueFromString(String valueString) {
         if (value instanceof Integer) {
             value = (T)(Integer)Integer.parseInt(valueString);
