@@ -31,7 +31,7 @@ public enum StandardCollisionGroup implements CollisionGroup {
     WORLD((short) 0b01000000),
     LIQUID((short) 0b10000000),
     ALL((short) 0b11111111);
-
+// I have no idea what this is, add some comments
     private short flag;
 
      StandardCollisionGroup(short flag) {
