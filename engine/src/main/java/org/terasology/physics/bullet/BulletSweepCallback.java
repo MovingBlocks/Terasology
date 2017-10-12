@@ -16,15 +16,13 @@
 
 package org.terasology.physics.bullet;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestConvexResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.LocalConvexResult;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
-import org.terasology.math.VecMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.SweepCallback;
 
@@ -36,13 +34,13 @@ import org.terasology.physics.engine.SweepCallback;
  */
 public class BulletSweepCallback extends ClosestConvexResultCallback implements SweepCallback {
     protected btCollisionObject me;
-    protected final Vector3 up;
+    protected final Vector3f up;
     protected float minSlopeDot;
 
     public BulletSweepCallback(btCollisionObject me, Vector3f up, float minSlopeDot) {
-        super(Vector3.Zero,Vector3.Zero);
+        super(Vector3f.zero(),Vector3f.zero());
         this.me = me;
-        this.up = new Vector3(up.x, up.y, up.z);
+        this.up = new Vector3f(up.x, up.y, up.z);
         this.minSlopeDot = minSlopeDot;
     }
 
@@ -56,44 +54,44 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
 
     @Override
     public float calculateAverageSlope(float originalSlope, float checkingOffset) {
-        Vector3 contactPoint = Vector3.Zero;
+        Vector3f contactPoint = Vector3f.zero();
         this.getHitPointWorld(contactPoint);
         float slope = 1f;
         boolean foundSlope = false;
-        Vector3 fromWorld = new Vector3(contactPoint);
+        Vector3f fromWorld = new Vector3f(contactPoint);
         fromWorld.y += 0.2f;
-        Vector3 toWorld = new Vector3(contactPoint);
+        Vector3f toWorld = new Vector3f(contactPoint);
         toWorld.y -= 0.2f;
         ClosestRayResultCallback rayResult = new ClosestRayResultCallback(fromWorld,toWorld);
 
-        Matrix4 from = new Matrix4(fromWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        Matrix4 to = new Matrix4(toWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        Matrix4 targetTransform = this.getHitCollisionObject().getWorldTransform();
+        Matrix4f from = new Matrix4f(Quat4f.IDENTITY,fromWorld, 1.0f);
+        Matrix4f to = new Matrix4f(Quat4f.IDENTITY,toWorld, 1.0f);
+        Matrix4f targetTransform = this.getHitCollisionObject().getWorldTransform();
         btDiscreteDynamicsWorld.rayTestSingle(from,to,this.getHitCollisionObject(),this.getHitCollisionObject().getCollisionShape(),targetTransform,rayResult);
         if (rayResult.hasHit()) {
             foundSlope = true;
-            Vector3 result = new Vector3();
+            Vector3f result = new Vector3f();
             rayResult.getHitNormalWorld(result);
-            slope = Math.min(slope,result.dot(Vector3.Y));
+            slope = Math.min(slope,result.dot(Vector3f.up()));
         }
 
-        Vector3 secondTraceOffset = new Vector3();
+        Vector3f secondTraceOffset = new Vector3f();
         this.getHitNormalWorld(secondTraceOffset);
         secondTraceOffset.y = 0;
-        secondTraceOffset.nor();
-        secondTraceOffset.scl(checkingOffset);
+        secondTraceOffset.normalize();
+        secondTraceOffset.scale(checkingOffset);
         fromWorld.add(secondTraceOffset);
         toWorld.add(secondTraceOffset);
         rayResult = new ClosestRayResultCallback(fromWorld, toWorld);
-        from = new Matrix4(fromWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        to = new Matrix4(toWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
+        from = new Matrix4f(Quat4f.IDENTITY,fromWorld,1.0f);
+        to = new Matrix4f(Quat4f.IDENTITY,toWorld, 1.0f);
         targetTransform = this.getHitCollisionObject().getWorldTransform();
         btDiscreteDynamicsWorld.rayTestSingle(from, to, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             foundSlope = true;
-            Vector3 hitNormal = Vector3.Zero;
+            Vector3f hitNormal = Vector3f.zero();
             rayResult.getHitNormalWorld(hitNormal);
-            slope = Math.min(slope, hitNormal.dot(Vector3.Y));
+            slope = Math.min(slope, hitNormal.dot(Vector3f.up()));
         }
         if (!foundSlope) {
             slope = originalSlope;
@@ -103,16 +101,16 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
 
     @Override
     public Vector3f getHitNormalWorld() {
-        Vector3 result = Vector3.Zero;
+        Vector3f result = Vector3f.zero();
         this.getHitNormalWorld(result);
-        return VecMath.from(result);
+        return result;
     }
 
     @Override
     public Vector3f getHitPointWorld() {
-        Vector3 result = Vector3.Zero;
+        Vector3f result = Vector3f.zero();
         this.getHitPointWorld(result);
-        return VecMath.from(result);
+        return result;
     }
 
 
@@ -121,42 +119,42 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
         boolean moveUpStep;
         boolean hitStep = false;
         float stepSlope = 1f;
-        Vector3 lookAheadOffset = new Vector3(direction.x, direction.y, direction.z);
+        Vector3f lookAheadOffset = new Vector3f(direction.x, direction.y, direction.z);
         lookAheadOffset.y = 0;
-        lookAheadOffset.nor();
-        lookAheadOffset.scl(checkForwardDistance);
-        Vector3 fromWorld = Vector3.Zero;
+        lookAheadOffset.normalize();
+        lookAheadOffset.scale(checkForwardDistance);
+        Vector3f fromWorld = Vector3f.zero();
         this.getHitPointWorld(fromWorld);
 
         fromWorld.y += stepHeight + 0.05f;
         fromWorld.add(lookAheadOffset);
-        Vector3 toWorld = Vector3.Zero;
+        Vector3f toWorld = Vector3f.zero();
         this.getHitPointWorld(toWorld);
         toWorld.y -= 0.05f;
         toWorld.add(lookAheadOffset);
         ClosestRayResultCallback rayResult = new ClosestRayResultCallback(fromWorld, toWorld);
-        Matrix4 transformFrom = new Matrix4(fromWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        Matrix4 transformTo = new Matrix4(toWorld, new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        Matrix4 targetTransform = this.getHitCollisionObject().getWorldTransform();
+        Matrix4f transformFrom = new Matrix4f(Quat4f.IDENTITY,fromWorld, 1.0f);
+        Matrix4f transformTo = new Matrix4f(Quat4f.IDENTITY,toWorld, 1.0f);
+        Matrix4f targetTransform = this.getHitCollisionObject().getWorldTransform();
         btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
-            Vector3 hitNormal = Vector3.Zero;
+            Vector3f hitNormal = Vector3f.zero();
             rayResult.getHitNormalWorld(hitNormal);
-            stepSlope = hitNormal.dot(new Vector3(0, 1, 0));
+            stepSlope = hitNormal.dot(Vector3f.up());
         }
         fromWorld.add(lookAheadOffset);
         toWorld.add(lookAheadOffset);
         rayResult = new ClosestRayResultCallback(fromWorld, toWorld);
-        transformFrom = new Matrix4(fromWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
-        transformTo = new Matrix4(toWorld,new Quaternion(0, 0, 0, 1), new Vector3(1,1,1));
+        transformFrom = new Matrix4f(Quat4f.IDENTITY,fromWorld, 1.0f);
+        transformTo = new Matrix4f(Quat4f.IDENTITY,toWorld, 1.0f);
         targetTransform = this.getHitCollisionObject().getWorldTransform();
         btDiscreteDynamicsWorld.rayTestSingle(transformFrom, transformTo, this.getHitCollisionObject(), this.getHitCollisionObject().getCollisionShape(), targetTransform, rayResult);
         if (rayResult.hasHit()) {
             hitStep = true;
-            Vector3 hitNormal = Vector3.Zero;
+            Vector3f hitNormal = Vector3f.zero();
             rayResult.getHitNormalWorld(hitNormal);
-            stepSlope = Math.min(stepSlope, hitNormal.dot(new Vector3(0, 1, 0)));
+            stepSlope = Math.min(stepSlope, hitNormal.dot(Vector3f.up()));
         }
         moveUpStep = hitStep && stepSlope >= slopeFactor;
         return moveUpStep;

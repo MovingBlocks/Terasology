@@ -16,19 +16,15 @@
 
 package org.terasology.physics.engine;
 
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelContentProvider;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
 import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.VecMath;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-
-import java.util.HashSet;
 
 /**
  * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.

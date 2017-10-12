@@ -29,6 +29,7 @@ repositories {
     jcenter()
     mavenCentral()
 
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
         if (rootProject.hasProperty("alternativeResolutionRepo")) {

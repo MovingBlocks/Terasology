@@ -15,9 +15,6 @@
  */
 package org.terasology.rendering.logic;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.nio.FloatBuffer;
@@ -40,7 +37,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -205,7 +201,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
 
-                    Matrix4 matrixWorldSpace = new Matrix4( VecMath.to(worldPos),VecMath.to(worldRot),new Vector3(worldScale,worldScale,worldScale));
+                    Matrix4f matrixWorldSpace = new Matrix4f( worldRot,worldPos,worldScale);
                    // transWorldSpace.set(matrixWorldSpace);
 
                     Vector3f worldPositionCameraSpace = new Vector3f();

@@ -15,14 +15,13 @@
  */
 package org.terasology.world.block;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
 
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -30,7 +29,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
@@ -628,14 +626,14 @@ public final class Block {
         collisionShape = shape;
         collisionOffset = offset;
 
-        Matrix4 t =  new Matrix4(VecMath.to(offset),new Quaternion(0,0,0,1),new Vector3(1,1,1));
+        Matrix4f t =  new Matrix4f(Quat4f.IDENTITY,offset,1.0f);
 
-        Vector3 min = new Vector3();
-        Vector3 max = new Vector3();
+        Vector3f min = new Vector3f();
+        Vector3f max = new Vector3f();
         shape.getAabb(t, min, max);
 
 
-        bounds = AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        bounds = AABB.createMinMax(min, max);
     }
 
     public btCollisionShape getCollisionShape() {

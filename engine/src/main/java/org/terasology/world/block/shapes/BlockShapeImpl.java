@@ -16,23 +16,26 @@
 package org.terasology.world.block.shapes;
 
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.*;
-import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
-import com.badlogic.gdx.physics.bullet.linearmath.btVector3Array;
-import com.badlogic.gdx.physics.bullet.linearmath.btVector3FloatData;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShapeChild;
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.*;
+import org.terasology.math.Pitch;
+import org.terasology.math.Roll;
+import org.terasology.math.Rotation;
+import org.terasology.math.Side;
+import org.terasology.math.Yaw;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.Map;
@@ -122,13 +125,14 @@ public class BlockShapeImpl extends BlockShape {
 
     private btCollisionShape rotate(btCollisionShape shape, Quat4f rot) {
 
-        Matrix4 transform = new Matrix4(new Vector3(),VecMath.to(rot),new Vector3(1,1,1));
-
+        Matrix4f transform = new Matrix4f(rot,Vector3f.zero(),1.0f);
         if (shape instanceof btBoxShape) {
             btBoxShape box = (btBoxShape) shape;
-            Vector3 halfExtentsWithMargin = new Vector3(box.getHalfExtentsWithMargin());
+            Vector3f halfExtentsWithMargin = new Vector3f(box.getHalfExtentsWithMargin());
 
-            VecMath.to(rot).transform(halfExtentsWithMargin);
+
+            //TODO: need to fix
+           // VecMath.to(rot).transform(halfExtentsWithMargin);
             halfExtentsWithMargin.x = Math.abs(halfExtentsWithMargin.x);
             halfExtentsWithMargin.y = Math.abs(halfExtentsWithMargin.y);
             halfExtentsWithMargin.z = Math.abs(halfExtentsWithMargin.z);
@@ -142,7 +146,7 @@ public class BlockShapeImpl extends BlockShape {
             for(int i = 0; i < compound.getNumChildShapes(); i++)
             {
                 btCollisionShape rotatedChild =  rotate(compound.getChildShape(i),rot);
-                newShape.addChildShape(new Matrix4(VecMath.to(Rotation.none().getQuat4f())),rotatedChild);
+                newShape.addChildShape(new Matrix4f(Rotation.none().getQuat4f(),Vector3f.zero(),1.0f),rotatedChild);
             }
             return newShape;
         } else if (shape instanceof btConvexHullShape) {
@@ -150,7 +154,11 @@ public class BlockShapeImpl extends BlockShape {
 
             FloatBuffer buffer = BufferUtils.createFloatBuffer(convexHull.getNumPoints() * 3);
             for (int i = 0; i < convexHull.getNumPoints(); i++){
-                Vector3 vertex = convexHull.getScaledPoint(i).mul(transform);
+
+                Vector3f vertex= convexHull.getScaledPoint(i);
+                transform.transformPoint(vertex);
+
+                // transform.transformPoint(convexHull.getScaledPoint(i).mul(transform);
                 buffer.put(vertex.x);
                 buffer.put(vertex.y);
                 buffer.put(vertex.z);

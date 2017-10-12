@@ -15,12 +15,9 @@
  */
 package org.terasology.physics.engine;
 
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelContentProvider;
 import com.badlogic.gdx.physics.bullet.collision.btVoxelInfo;
 import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
-import org.terasology.math.VecMath;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 

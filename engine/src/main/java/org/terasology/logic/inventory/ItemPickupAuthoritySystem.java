@@ -16,9 +16,7 @@
 
 package org.terasology.logic.inventory;
 
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.bulletphysics.collision.shapes.BoxShape;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -31,7 +29,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
@@ -92,11 +90,11 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
                                                  BoxShapeComponent boxShapeComponent) {
         BlockFamily blockFamily = blockItemComponent.blockFamily;
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof btBoxShape) {
-            Vector3 extents = ((btBoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin();
+            Vector3f extents = ((btBoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin();
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
-            boxShapeComponent.extents.set(VecMath.from(extents));
+            boxShapeComponent.extents.set(extents);
             itemEntity.saveComponent(boxShapeComponent);
         }
     }

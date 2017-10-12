@@ -16,17 +16,12 @@
 
 package org.terasology.physics.bullet;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.linearmath.LinearMathJNI;
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-
-import javax.vecmath.Matrix4f;
 
 /**
  * This motion state is used to connect rigid body entities to their rigid body in the bullet physics engine.
@@ -49,18 +44,20 @@ public class EntityMotionState extends btMotionState {
     }
 
     @Override
-    public void getWorldTransform(Matrix4 worldTrans) {
+    public void getWorldTransform(Matrix4f worldTrans) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         Vector3f location = loc.getWorldPosition();
-        worldTrans.set(new Vector3(location.x,location.y,location.z),VecMath.to(loc.getWorldRotation()));
+        worldTrans.set(new Matrix4f(loc.getWorldRotation(),location,1.0f));
     }
 
     @Override
-    public void setWorldTransform(Matrix4 transform) {
+    public void setWorldTransform(Matrix4f transform) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            loc.setWorldPosition(VecMath.from(transform.getTranslation(Vector3.Zero)));
-            loc.setWorldRotation(VecMath.from(transform.getRotation(new Quaternion())));
+            loc.setWorldPosition(transform.getTranslation());
+            Quat4f rotation = new Quat4f();
+            rotation.set(transform);
+            loc.setWorldRotation(rotation);
         }
     }
 

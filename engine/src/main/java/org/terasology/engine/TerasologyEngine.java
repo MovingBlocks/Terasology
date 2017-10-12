@@ -16,10 +16,7 @@
 
 package org.terasology.engine;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.utils.GdxNativesLoader;
-import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
@@ -45,10 +42,10 @@ import org.terasology.engine.subsystem.common.GameSubsystem;
 import org.terasology.engine.subsystem.common.MonitoringSubsystem;
 import org.terasology.engine.subsystem.common.NetworkSubsystem;
 import org.terasology.engine.subsystem.common.PhysicsSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
-import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -182,7 +179,6 @@ public class TerasologyEngine implements GameEngine {
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {
             //need to fix
-            GdxNativesLoader.load();
             Bullet.init();
 
             logger.info("Initializing Terasology...");
