@@ -66,8 +66,8 @@ public final class IdentityUtils {
             }
             checkNextConflict(securityConfig, nuiManager, newIdentities.entrySet().iterator(), () -> {
                 newIdentities.forEach(securityConfig::addIdentity);
-                nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("Import multiplayer identities", "Identities have been imported.");
+                nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Import multiplayer identities",
+                        newIdentities.isEmpty() ? "The selected file does not contain any new identity." : "Successfully imported " + newIdentities.size() + " identities.");
             });
         });
     }
@@ -81,19 +81,25 @@ public final class IdentityUtils {
             ClientIdentity newClient = entry.getValue();
             ClientIdentity oldClient = securityConfig.getIdentity(server);
             if (oldClient != null) {
-                ThreeButtonPopup popup = nuiManager.pushScreen(ThreeButtonPopup.ASSET_URI, ThreeButtonPopup.class);
-                popup.setMessage("Conflict importing multiplayer identities", "For the server with ID " + server.getId()
-                        + ", a local identity with client ID " + oldClient.getPlayerPublicCertificate().getId() + "exists, "
-                        + "but the file which is being imported contains an identity for the same server with client ID " + newClient.getPlayerPublicCertificate().getId()
-                        + ". Please choose an option.");
-
-                popup.setLeftButton("Import (overwrite local)", next);
-                popup.setCenterButton("Skip (keep local)", () -> {
+                Runnable skip = () -> {
                     newIdentities.remove();
                     next.run();
-                });
-                popup.setRightButton("Cancel import", () -> nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                                .setMessage("Import multiplayer identities", "Operation has been cancelled, no identities have been imported."));
+                };
+
+                if (newClient.getPlayerPublicCertificate().equals(oldClient.getPlayerPublicCertificate())) {
+                    skip.run();
+                } else {
+                    ThreeButtonPopup popup = nuiManager.pushScreen(ThreeButtonPopup.ASSET_URI, ThreeButtonPopup.class);
+                    popup.setMessage("Conflict importing multiplayer identities", "For the server with ID " + server.getId()
+                            + ", a local identity with client ID " + oldClient.getPlayerPublicCertificate().getId() + " exists, "
+                            + "but the file which is being imported contains an identity for the same server with client ID " + newClient.getPlayerPublicCertificate().getId()
+                            + ". Please choose an option.");
+
+                    popup.setLeftButton("Import (overwrite local)", next);
+                    popup.setCenterButton("Skip (keep local)", skip);
+                    popup.setRightButton("Cancel import", () -> nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Import multiplayer identities", "Operation has been cancelled, no identities have been imported."));
+                }
             } else {
                 next.run();
             }

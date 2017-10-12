@@ -32,6 +32,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -144,6 +145,7 @@ public class FilePickerPopup extends CoreScreenLayer {
     private void loadDirectoryContents(Stream<Path> contents) {
         directoryContentsList.setList(contents
                 .map(path -> pathToString(path, true))
+                .sorted(Comparator.comparing(String::toLowerCase)) // sort by name (case insensitive string natural order)
                 .collect(Collectors.toList()));
         directoryContentsScroller.moveToTop();
     }
