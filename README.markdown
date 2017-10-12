@@ -38,7 +38,7 @@ For more information about playing like hot keys or server hosting see the [dedi
 We have gone to great lengths to make developing and modding Terasology as easy as possible. We use Gradle to automate just about everything. As long as you have a [Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) running from source is a two step process:
 
 * Clone the code or download a zip
-* Run `gradlew game` (on Unixes, including Mac OS X, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory 
+* Run `gradlew game` (on Unixes, including macOS, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory 
 
 That's really it! If you want the project set up in IntelliJ (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
 
