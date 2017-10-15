@@ -81,6 +81,9 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                             && joinStatus.getStatus() != JoinStatus.Status.FAILED) {
                         joinStatus.setErrorMessage("Server stopped responding.");
                         channel.close();
+                        if(server.getRemoteAddress().startsWith("localhost")) {
+                            logger.error("Could not find all the modules in /modules folder locally");
+                        }
                         logger.error("Server timeout threshold of {} ms exceeded.", timeoutThreshold);
                     }
                 }
