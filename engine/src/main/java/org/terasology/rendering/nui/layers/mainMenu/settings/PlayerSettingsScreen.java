@@ -20,6 +20,7 @@ import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.math.DoubleMath;
+import org.terasology.context.Context;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.identity.storageServiceClient.StorageServiceWorkerStatus;
 import org.terasology.rendering.nui.layers.mainMenu.StorageServiceLoginPopup;
@@ -59,6 +60,8 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:PlayerMenuScreen");
 
+    @In
+    private Context context;
     @In
     private Config config;
     @In
@@ -175,8 +178,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
-        WidgetUtil.trySubscribe(this, "importIdentities", button -> IdentityUtils.importIdentities(config.getSecurity(), getManager()));
-        WidgetUtil.trySubscribe(this, "exportIdentities", button -> IdentityUtils.exportIdentities(config.getSecurity(), getManager()));
+        IdentityIOHelper identityIOHelper = new IdentityIOHelper(context);
+        WidgetUtil.trySubscribe(this, "importIdentities", button -> identityIOHelper.importIdentities());
+        WidgetUtil.trySubscribe(this, "exportIdentities", button -> identityIOHelper.exportIdentities());
 
         WidgetUtil.trySubscribe(this, "storageServiceAction", widget -> {
             if (storageService.getStatus() == StorageServiceWorkerStatus.LOGGED_IN) {

@@ -20,7 +20,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.terasology.config.Config;
 import org.terasology.config.SecurityConfig;
+import org.terasology.context.Context;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.identity.ClientIdentity;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.identity.storageServiceClient.BigIntegerBase64Serializer;
@@ -40,7 +43,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.Map;
 
-public final class IdentityUtils {
+public final class IdentityIOHelper {
 
     private static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(BigInteger.class, BigIntegerBase64Serializer.getInstance())
@@ -49,32 +52,44 @@ public final class IdentityUtils {
             .create();
     private static final Type MAP_TYPE = new TypeToken<Map<PublicIdentityCertificate, ClientIdentity>>() { }.getType();
 
-    private IdentityUtils() {
+    private final SecurityConfig securityConfig;
+    private final NUIManager nuiManager;
+    private final TranslationSystem translationSystem;
+    private final String importPopupTitle;
+    private final String exportPopupTitle;
+
+    public IdentityIOHelper(Context context) {
+        securityConfig = context.get(Config.class).getSecurity();
+        nuiManager = context.get(NUIManager.class);
+        translationSystem = context.get(TranslationSystem.class);
+        importPopupTitle = translationSystem.translate("${engine:menu#identity-import}");
+        exportPopupTitle = translationSystem.translate("${engine:menu#identity-export}");
     }
 
-    public static void importIdentities(SecurityConfig securityConfig, NUIManager nuiManager) {
+    public void importIdentities() {
         FilePickerPopup filePicker = nuiManager.pushScreen(FilePickerPopup.ASSET_URI, FilePickerPopup.class);
-        filePicker.setTitle("Import multiplayer identities");
+        filePicker.setTitle(importPopupTitle);
         filePicker.setOkHandler(path -> {
             Map<PublicIdentityCertificate, ClientIdentity> newIdentities;
             try (BufferedReader reader = Files.newBufferedReader(path)) {
                 newIdentities = GSON.fromJson(reader, MAP_TYPE);
             } catch (IOException | JsonIOException | JsonSyntaxException ex) {
                 nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                        .setMessage("Failed to import identities", ex.toString());
+                        .setMessage(translationSystem.translate("${engine:menu#identity-import-failed}"), ex.toString());
                 return;
             }
-            checkNextConflict(securityConfig, nuiManager, newIdentities.entrySet().iterator(), () -> {
+            checkNextConflict(newIdentities.entrySet().iterator(), () -> {
                 newIdentities.forEach(securityConfig::addIdentity);
-                nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Import multiplayer identities",
-                        newIdentities.isEmpty() ? "The selected file does not contain any new identity." : "Successfully imported " + newIdentities.size() + " identities.");
+                nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                        .setMessage(importPopupTitle, newIdentities.isEmpty()
+                                ? translationSystem.translate("${engine:menu#identity-import-no-new}")
+                                : String.format(translationSystem.translate("${engine:menu#identity-import-ok}"), newIdentities.size()));
             });
         });
     }
 
-    private static void checkNextConflict(SecurityConfig securityConfig, NUIManager nuiManager,
-                                          Iterator<Map.Entry<PublicIdentityCertificate, ClientIdentity>> newIdentities, Runnable onCompletion) {
-        Runnable next = () -> checkNextConflict(securityConfig, nuiManager, newIdentities, onCompletion);
+    private void checkNextConflict(Iterator<Map.Entry<PublicIdentityCertificate, ClientIdentity>> newIdentities, Runnable onCompletion) {
+        Runnable next = () -> checkNextConflict(newIdentities, onCompletion);
         if (newIdentities.hasNext()) {
             Map.Entry<PublicIdentityCertificate, ClientIdentity> entry = newIdentities.next();
             PublicIdentityCertificate server = entry.getKey();
@@ -90,15 +105,14 @@ public final class IdentityUtils {
                     skip.run();
                 } else {
                     ThreeButtonPopup popup = nuiManager.pushScreen(ThreeButtonPopup.ASSET_URI, ThreeButtonPopup.class);
-                    popup.setMessage("Conflict importing multiplayer identities", "For the server with ID " + server.getId()
-                            + ", a local identity with client ID " + oldClient.getPlayerPublicCertificate().getId() + " exists, "
-                            + "but the file which is being imported contains an identity for the same server with client ID " + newClient.getPlayerPublicCertificate().getId()
-                            + ". Please choose an option.");
+                    popup.setMessage(importPopupTitle, String.format(translationSystem.translate("${engine:menu#identity-import-conflict}"),
+                            server.getId(), oldClient.getPlayerPublicCertificate().getId(), newClient.getPlayerPublicCertificate().getId()));
 
-                    popup.setLeftButton("Import (overwrite local)", next);
-                    popup.setCenterButton("Skip (keep local)", skip);
-                    popup.setRightButton("Cancel import", () -> nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage("Import multiplayer identities", "Operation has been cancelled, no identities have been imported."));
+                    popup.setLeftButton(translationSystem.translate("${engine:menu#identity-import-overwrite}"), next);
+                    popup.setCenterButton(translationSystem.translate("${engine:menu#identity-import-skip}"), skip);
+                    popup.setRightButton(translationSystem.translate("${engine:menu#identity-import-cancel}"),
+                            () -> nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                    .setMessage(importPopupTitle, translationSystem.translate("${engine:menu#identity-import-cancelled}")));
                 }
             } else {
                 next.run();
@@ -108,25 +122,25 @@ public final class IdentityUtils {
         }
     }
 
-    public static void exportIdentities(SecurityConfig securityConfig, NUIManager nuiManager) {
-        String popupTitle = "Export multiplayer identities";
+    public void exportIdentities() {
         FilePickerPopup filePicker = nuiManager.pushScreen(FilePickerPopup.ASSET_URI, FilePickerPopup.class);
-        filePicker.setTitle(popupTitle);
+        filePicker.setTitle(exportPopupTitle);
         filePicker.setOkHandler(path -> {
             Runnable action = () -> {
+                Map<PublicIdentityCertificate, ClientIdentity> identities = securityConfig.getAllIdentities();
                 try (BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE)) {
-                    GSON.toJson(securityConfig.getAllIdentities(), MAP_TYPE, writer);
-                    nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage(popupTitle, "Exported identities to " + path.toString());
+                    GSON.toJson(identities, MAP_TYPE, writer);
+                    nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(exportPopupTitle,
+                            String.format(translationSystem.translate("${engine:menu#identity-export-ok}"), identities.size(), path.toString()));
                 } catch (IOException | JsonIOException ex) {
                     nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage("Failed to export identities", ex.toString());
+                            .setMessage(translationSystem.translate("${engine:menu#identity-export-fail}"), ex.toString());
                 }
             };
 
             if (Files.exists(path)) {
                 ConfirmPopup confirm = nuiManager.pushScreen(ConfirmPopup.ASSET_URI, ConfirmPopup.class);
-                confirm.setMessage(popupTitle, "File " + path.toString() + " already exists. Do you want to overwrite it?");
+                confirm.setMessage(exportPopupTitle, String.format(translationSystem.translate("${engine:menu#existing-file-warning}"), path.toString()));
                 confirm.setOkHandler(action);
             } else {
                 action.run();

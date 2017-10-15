@@ -85,12 +85,12 @@
                             "contents": [
                                 {
                                     "type": "UIButton",
-                                    "text": "Import...",
+                                    "text": "${engine:menu#player-settings-identities-import}",
                                     "id": "importIdentities"
                                 },
                                 {
                                     "type": "UIButton",
-                                    "text": "Export...",
+                                    "text": "${engine:menu#player-settings-identities-export}",
                                     "id": "exportIdentities"
                                 }
                             ]

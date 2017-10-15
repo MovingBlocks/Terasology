@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -40,10 +42,12 @@ import java.util.stream.StreamSupport;
 
 public class FilePickerPopup extends CoreScreenLayer {
 
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:filePickerPopup!instance");
     // credit: https://stackoverflow.com/a/894133
     private static final char[] ILLEGAL_FILENAME_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
+
+    @In
+    private TranslationSystem translationSystem;
 
     private String fileName = "";
     private Path currentPath;
@@ -74,7 +78,7 @@ public class FilePickerPopup extends CoreScreenLayer {
         find("currentPath", UILabel.class).bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                return currentPath == null ? "File system roots" : pathToString(currentPath, false);
+                return currentPath == null ? translationSystem.translate("${engine:menu#file-picker-roots-title}") : pathToString(currentPath, false);
             }
         });
         find("fileName", UIText.class).bindText(new Binding<String>() {
@@ -91,8 +95,13 @@ public class FilePickerPopup extends CoreScreenLayer {
         find("filePath", UILabel.class).bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                return currentPath == null ? "Invalid location"
-                        : isValidFilename(fileName) ? "Full path to file: " + getPathToFile().toString() : "Invalid file name";
+                if (currentPath == null) {
+                    return translationSystem.translate("${engine:menu#file-picker-invalid-location}");
+                } else {
+                    return isValidFilename(fileName)
+                            ? translationSystem.translate("") + getPathToFile().toString()
+                            : translationSystem.translate("${engine:menu#file-picker-invalid-file-name}");
+                }
             }
         });
         directoryContentsScroller = find("directoryContentsScroller", ScrollableArea.class);
@@ -183,13 +192,13 @@ public class FilePickerPopup extends CoreScreenLayer {
             loadDirectoryContents(Files.list(newPath));
             currentPath = newPath;
         } catch (AccessDeniedException ex) {
-            showDirectoryAccessErrorMessage("Access denied to " + newPath);
+            showDirectoryAccessErrorMessage(translationSystem.translate("${engine:menu#file-picker-access-denied-to}") + newPath);
         } catch (IOException ex) {
             showDirectoryAccessErrorMessage(ex.toString());
         }
     }
 
     private void showDirectoryAccessErrorMessage(String message) {
-        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to change directory", message);
+        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage(translationSystem.translate("${engine:menu#file-picker-cant-change-dir}"), message);
     }
 }

@@ -20,7 +20,7 @@
                         {
                             "type": "UILabel",
                             "id": "title",
-                            "text": "Choose a file",
+                            "text": "${engine:menu#file-picker-title}",
                             "family": "title"
                         },
                         {
@@ -29,17 +29,17 @@
                                 {
                                     "type": "UIButton",
                                     "id": "gotoParent",
-                                    "text": "Parent"
+                                    "text": "${engine:menu#file-picker-parent}"
                                 },
                                 {
                                     "type": "UIButton",
                                     "id": "gotoRoot",
-                                    "text": "Root"
+                                    "text": "${engine:menu#file-picker-root}"
                                 },
                                 {
                                     "type": "UIButton",
                                     "id": "gotoHome",
-                                    "text": "Home"
+                                    "text": "${engine:menu#file-picker-home}"
                                 }
                             ]
                         },
@@ -62,7 +62,7 @@
                             "contents": [
                                 {
                                     "type": "UILabel",
-                                    "text": "File name: ",
+                                    "text": "${engine:menu#file-picker-file-name}",
                                     "family": "option-grid",
                                     "layoutInfo": {
                                         "relativeWidth": 0.3
@@ -76,7 +76,7 @@
                         },
                         {
                             "type": "UILabel",
-                            "text": "Full path: ",
+                            "text": "${engine:menu#file-picker-full-path}",
                             "id": "filePath"
                         },
                         {
