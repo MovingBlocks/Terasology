@@ -36,16 +36,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private Map<SimpleUri, Setting> settings;
-    private Map<SimpleUri, String> temporarilyParkedSettings;
-
-    /**
-     * Creates a new {@link FlexibleConfigImpl} instance.
-     */
-    public FlexibleConfigImpl() {
-        this.settings = Maps.newHashMap();
-        this.temporarilyParkedSettings = Maps.newHashMap();
-    }
+    private Map<SimpleUri, Setting> settings = Maps.newHashMap();
+    private Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
 
     /**
      * {@inheritDoc}

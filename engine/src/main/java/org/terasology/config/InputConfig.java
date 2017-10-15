@@ -33,8 +33,10 @@ public class InputConfig {
         this.mouseSensitivity = mouseSensitivity;
     }
 
-    public void reset() {
-        Config defaultConfig = new Config();
+    public void reset(Context context) {
+        binds.setBinds(BindsConfig.createDefault(context));
+
+        Config defaultConfig = new Config(context);
         defaultConfig.loadDefaults();
         InputConfig defaultInputConfig = defaultConfig.getInput();
 

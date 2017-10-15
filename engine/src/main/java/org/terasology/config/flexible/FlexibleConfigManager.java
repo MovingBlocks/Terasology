@@ -18,11 +18,11 @@ package org.terasology.config.flexible;
 import org.terasology.engine.SimpleUri;
 
 public interface FlexibleConfigManager {
-    void addFlexibleConfig(SimpleUri flexibleConfigUri, FlexibleConfig flexibleConfig);
+    void addConfig(SimpleUri configUri, FlexibleConfig config) throws RuntimeException;
 
-    void removeFlexibleConfig(SimpleUri flexibleConfigUri);
+    FlexibleConfig removeConfig(SimpleUri configUri);
 
-    FlexibleConfig getFlexibleConfig(SimpleUri flexibleConfigUri);
+    FlexibleConfig getConfig(SimpleUri configUri);
 
     void load();
 

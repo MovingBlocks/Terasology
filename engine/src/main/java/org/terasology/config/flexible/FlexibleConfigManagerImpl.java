@@ -16,13 +16,8 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
@@ -40,27 +35,23 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
 
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
-
     @Override
-    public void addFlexibleConfig(SimpleUri flexibleConfigUri, FlexibleConfig flexibleConfig) {
-        if (flexibleConfigs.containsKey(flexibleConfigUri)) {
-            throw new RuntimeException("Attempting to add another config with the URI " + flexibleConfigUri);
+    public void addConfig(SimpleUri configUri, FlexibleConfig config) {
+        if (flexibleConfigs.containsKey(configUri)) {
+            throw new RuntimeException("Attempting to add another config with id " + configUri);
         }
 
-        flexibleConfigs.put(flexibleConfigUri, flexibleConfig);
+        flexibleConfigs.put(configUri, config);
     }
 
     @Override
-    public void removeFlexibleConfig(SimpleUri flexibleConfigUri) {
-        if (!flexibleConfigs.containsKey(flexibleConfigUri)) {
-            throw new RuntimeException("Attempting to delete non-existent config with the URI " + flexibleConfigUri);
-        }
-
+    public FlexibleConfig removeConfig(SimpleUri configUri) {
+        return flexibleConfigs.remove(configUri);
     }
 
     @Override
-    public FlexibleConfig getFlexibleConfig(SimpleUri flexibleConfigUri) {
-        return flexibleConfigs.get(flexibleConfigUri);
+    public FlexibleConfig getConfig(SimpleUri configUri) {
+        return flexibleConfigs.get(configUri);
     }
 
     @Override
