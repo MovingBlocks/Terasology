@@ -54,7 +54,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
 
         renderingConfig.subscribe(FBO_SCALE, this);
 
-        displayDevice.subscribe(this);
+        displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
 
         updateFullScale();
         generateDefaultFBOs();
@@ -95,15 +95,17 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
      * Invoked before real-rendering starts
     */
     public void update() {
-        if (screenGrabber.isTakingScreenshot()) {
-            ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
-            // TODO: Remove dependency on Display
-            fullScale.setDimensions(screenshotSize.getWidth(Display.getWidth()),
-                                    screenshotSize.getHeight(Display.getHeight()));
-            regenerateFbos();
+        if (!screenGrabber.isTakingScreenshot()) {
+            if (wasTakingScreenshotLastFrame) {
+                ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
+                // TODO: Remove dependency on Display
+                fullScale.setDimensions(screenshotSize.getWidth(Display.getWidth()),
+                        screenshotSize.getHeight(Display.getHeight()));
+                regenerateFbos();
 
-            wasTakingScreenshotLastFrame = true;
-        } else if (wasTakingScreenshotLastFrame) {
+                wasTakingScreenshotLastFrame = true;
+            }
+        } else {
             updateFullScale();
             regenerateFbos();
 

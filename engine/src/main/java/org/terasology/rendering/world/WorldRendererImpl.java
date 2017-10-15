@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import javafx.stage.Screen;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;

@@ -129,7 +129,8 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
         if (Display.wasResized()) {
             glViewport(0, 0, Display.getWidth(), Display.getHeight());
             propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
-            // Note that the "old" and "new" values (0 and 1) in the above call aren't actually used.
+            // Note that the "old" and "new" values (0 and 1) in the above call aren't actually
+            // used: they are only necessary to ensure that the event is fired up correctly.
         }
     }
 }
