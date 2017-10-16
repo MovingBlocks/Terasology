@@ -28,11 +28,13 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyInfo;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleLoader;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
@@ -58,6 +60,9 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -236,8 +241,23 @@ public class CreateGameScreen extends CoreScreenLayer {
                     }
                     return;
                 }
+                String moduleName;
+                Path regularFilePath;
                 for (Module module : result.getModules()) {
-                    gameManifest.addModule(module.getId(), module.getVersion());
+                    if(loadingAsServer) {
+                        moduleName = String.format("%s-%s.jar", module.getId(), module.getVersion());
+                        regularFilePath = PathManager.getInstance().getHomeModPath().normalize().resolve(moduleName);
+                        if(Files.isDirectory(module.getLocations().get(0)) && !Files.isRegularFile(regularFilePath) && !module.getId().toString().startsWith("engine")) {
+                            logger.info("The module {} could not be loaded from /modules. Try running \"gradlew jar\"",module.getId());
+                        }
+                        else {
+                            gameManifest.addModule(module.getId(), module.getVersion());
+                        }
+                    }
+                    else {
+                        gameManifest.addModule(module.getId(), module.getVersion());
+                    }
+
                 }
 
                 float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
