@@ -34,6 +34,7 @@ import java.util.LinkedList;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
 
 /**
  * Simple default camera.
@@ -58,7 +59,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
         super(worldProvider, renderingConfig);
         this.cameraSettings = renderingConfig.getCameraSettings();
 
-        displayDevice.subscribe(this);
+        displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
     }
 
     @Override
@@ -197,7 +198,7 @@ public class PerspectiveCamera extends SubmersibleCamera implements PropertyChan
     }
 
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-        if (propertyChangeEvent.getPropertyName().equals("displayResolution")) {
+        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE)) {
             cachedFov = -1; // Invalidate the cache, so that matrices get regenerated.
             updateMatrices();
         }
