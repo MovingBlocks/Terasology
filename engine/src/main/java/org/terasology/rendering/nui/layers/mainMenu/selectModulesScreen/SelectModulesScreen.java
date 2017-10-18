@@ -364,120 +364,151 @@ public class SelectModulesScreen extends CoreScreenLayer {
             }
 
             UICheckbox libraryCheckBox = find("libraryCheckbox", UICheckbox.class);
-            libraryCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isLibraryChecked();
-                        }
+            libraryCheckBox.setChecked(selectModulesConfig.isLibraryChecked());
+            libraryCheckBox.subscribe(e -> {
+                libraryCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isLibraryChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsLibraryChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsLibraryChecked(value);
 
+                            }
                         }
-                    }
-            );
+                );
+            });
 
             UICheckbox assetCheckBox = find("assetCheckbox", UICheckbox.class);
-            assetCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isAssetplayChecked();
-                        }
+            assetCheckBox.setChecked(selectModulesConfig.isAssetplayChecked());
+            assetCheckBox.subscribe(e -> {
+                assetCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isAssetplayChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsAssetplayChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsAssetplayChecked(value);
 
+                            }
                         }
-                    }
-            );
+                );
+            });
 
             UICheckbox worldCheckBox = find("worldCheckbox", UICheckbox.class);
-            worldCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isWorldChecked();
-                        }
+            worldCheckBox.setChecked(selectModulesConfig.isWorldChecked());
+            worldCheckBox.subscribe(e -> {
+                worldCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isWorldChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsWorldChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsWorldChecked(value);
 
+                            }
                         }
-                    }
-            );
+                );
+            });
 
             UICheckbox gameplayCheckBox = find("gameplayCheckbox", UICheckbox.class);
-            gameplayCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isGameplayChecked();
-                        }
+            gameplayCheckBox.setChecked(selectModulesConfig.isGameplayChecked());
+            gameplayCheckBox.subscribe(e -> {
+                gameplayCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isGameplayChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsGameplayChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsGameplayChecked(value);
 
+                            }
                         }
-                    }
-            );
+                );
+            });
 
             UICheckbox augmentationCheckBox = find("augmentationCheckbox", UICheckbox.class);
-            augmentationCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isAugmentationChecked();
-                        }
+            augmentationCheckBox.setChecked(selectModulesConfig.isAugmentationChecked());
+            augmentationCheckBox.subscribe(e -> {
+                augmentationCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isAugmentationChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsAugmentationChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsAugmentationChecked(value);
 
+                            }
                         }
-                    }
-            );
+                );
+
+            });
 
             UICheckbox specialCheckBox = find("specialCheckbox", UICheckbox.class);
-            specialCheckBox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isSpecialChecked();
-                        }
+            specialCheckBox.setChecked(selectModulesConfig.isSpecialChecked());
+            specialCheckBox.subscribe(e ->{
+                specialCheckBox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isSpecialChecked();
+                            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsSpecialChecked(value);
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsSpecialChecked(value);
+                            }
                         }
-                    }
-            );
+                );
+            });
 
             localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
-            localOnlyCheckbox.bindChecked(
-                    new Binding<Boolean>() {
-                        @Override
-                        public Boolean get() {
-                            return selectModulesConfig.isLocalOnlyChecked();
+            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+            localOnlyCheckbox.subscribe(e -> {
+                localOnlyCheckbox.bindChecked(
+                        new Binding<Boolean>() {
+                            @Override
+                            public Boolean get() {
+                                filterModules();
+                                return selectModulesConfig.isLocalOnlyChecked();
+                            }
+
+                            @Override
+                            public void set(Boolean value) {
+                                selectModulesConfig.setIsLocalOnlyChecked(value);
+
+                            }
                         }
-
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsLocalOnlyChecked(value);
-
-                        }
-                    }
-            );
-
+                );
+            });
+            filterModules();
+            /**
             activateAdvancedFilter = find("activateFilter", UIButton.class);
             activateAdvancedFilter.subscribe(e -> {
                 filterModules();
             });
+             */
 
 
         }
