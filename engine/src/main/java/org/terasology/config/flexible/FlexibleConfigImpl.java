@@ -36,8 +36,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private Map<SimpleUri, Setting> settings = Maps.newHashMap();
-    private Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
+    private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
+    private final Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
 
     /**
      * {@inheritDoc}
@@ -54,10 +54,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
-        if (temporarilyParkedSettings != null) {
-            if (temporarilyParkedSettings.containsKey(id)) {
-                setting.setValueFromString(temporarilyParkedSettings.remove(id));
-            }
+        if (temporarilyParkedSettings.containsKey(id)) {
+            setting.setValueFromString(temporarilyParkedSettings.remove(id));
         }
 
         settings.put(id, setting);
@@ -138,7 +136,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
             jsonReader.endObject();
         } catch (Exception e) {
-            // TODO: Handle exception
+            throw new RuntimeException("Error parsing config file!");
         }
     }
 }

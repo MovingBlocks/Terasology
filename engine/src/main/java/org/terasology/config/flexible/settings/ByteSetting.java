@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.settings;
 
+import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
-public interface FlexibleConfigManager {
-    void addConfig(SimpleUri configId, FlexibleConfig config) throws RuntimeException;
+public class ByteSetting extends SettingImpl<Byte> {
+    public ByteSetting(SimpleUri id, Byte defaultValue) {
+        super(id, defaultValue);
+    }
 
-    FlexibleConfig removeConfig(SimpleUri configId);
+    public ByteSetting(SimpleUri id, Byte defaultValue, SettingValueValidator<Byte> validator) {
+        super(id, defaultValue, validator);
+    }
 
-    FlexibleConfig getConfig(SimpleUri configId);
-
-    void load();
-
-    void save();
+    @Override
+    public void setValueFromString(String valueString) {
+        value = Byte.parseByte(valueString);
+    }
 }

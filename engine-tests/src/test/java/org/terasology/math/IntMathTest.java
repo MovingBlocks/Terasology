@@ -37,7 +37,7 @@ public class IntMathTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Config config = new Config();
+        Config config = new Config(null);
         CoreRegistry.setContext(new ContextImpl());
         CoreRegistry.put(Config.class, config);
     }

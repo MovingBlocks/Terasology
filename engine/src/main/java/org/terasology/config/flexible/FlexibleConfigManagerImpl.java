@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,34 +37,37 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
     @Override
-    public void addConfig(SimpleUri configUri, FlexibleConfig config) {
-        if (flexibleConfigs.containsKey(configUri)) {
-            throw new RuntimeException("Attempting to add another config with id " + configUri);
+    public void addConfig(SimpleUri configId, FlexibleConfig config) {
+        if (flexibleConfigs.containsKey(configId)) {
+            throw new RuntimeException("Attempting to add another config with id " + configId);
         }
 
-        flexibleConfigs.put(configUri, config);
+        flexibleConfigs.put(configId, config);
     }
 
     @Override
-    public FlexibleConfig removeConfig(SimpleUri configUri) {
-        return flexibleConfigs.remove(configUri);
+    public FlexibleConfig removeConfig(SimpleUri configId) {
+        return flexibleConfigs.remove(configId);
     }
 
     @Override
-    public FlexibleConfig getConfig(SimpleUri configUri) {
-        return flexibleConfigs.get(configUri);
+    public FlexibleConfig getConfig(SimpleUri configId) {
+        return flexibleConfigs.get(configId);
     }
 
     @Override
     public void load() {
         for (Entry<SimpleUri, FlexibleConfig> entry : flexibleConfigs.entrySet()) {
-            SimpleUri flexibleConfigUri = entry.getKey();
+            SimpleUri flexibleConfigId = entry.getKey();
             FlexibleConfig flexibleConfig = entry.getValue();
 
-            try (Reader reader = Files.newBufferedReader(getPathForFlexibleConfig(flexibleConfigUri), TerasologyConstants.CHARSET)) {
+            try (Reader reader = Files.newBufferedReader(getPathForFlexibleConfig(flexibleConfigId), TerasologyConstants.CHARSET)) {
                 flexibleConfig.load(reader);
+            } catch (NoSuchFileException e) {
+                // The config does not exist, so the default values will be used.
+                // Silently ignore the exception.
             } catch (IOException e) {
-                // TODO: Handle exception
+                throw new RuntimeException("Exception loading config file for configId " + entry.getKey());
             }
         }
     }
@@ -71,10 +75,10 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     @Override
     public void save() {
         for (Entry<SimpleUri, FlexibleConfig> entry : flexibleConfigs.entrySet()) {
-            SimpleUri flexibleConfigUri = entry.getKey();
+            SimpleUri flexibleConfigId = entry.getKey();
             FlexibleConfig flexibleConfig = entry.getValue();
 
-            try (BufferedWriter writer = Files.newBufferedWriter(getPathForFlexibleConfig(flexibleConfigUri), TerasologyConstants.CHARSET)) {
+            try (BufferedWriter writer = Files.newBufferedWriter(getPathForFlexibleConfig(flexibleConfigId), TerasologyConstants.CHARSET)) {
                 flexibleConfig.save(writer);
             } catch (IOException e) {
                 logger.error("Failed to save config", e);
@@ -90,12 +94,12 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
         }
     }
 
-    private Path getPathForFlexibleConfig(SimpleUri flexibleConfigUri) {
+    private Path getPathForFlexibleConfig(SimpleUri flexibleConfigId) {
         Path filePath = PathManager.getInstance()
                                         .getHomePath()
                                         .resolve("configs")
-                                        .resolve(flexibleConfigUri.getModuleName().toString())
-                                        .resolve(flexibleConfigUri.getObjectName().toString() + ".cfg");
+                                        .resolve(flexibleConfigId.getModuleName().toString())
+                                        .resolve(flexibleConfigId.getObjectName().toString() + ".cfg");
         ensureDirectoryExists(filePath);
         return filePath;
     }

@@ -34,7 +34,7 @@ public class ChunkMathTest {
     @Test
     public void testRegionPositions() {
         CoreRegistry.setContext(new ContextImpl());
-        CoreRegistry.put(Config.class, new Config());
+        CoreRegistry.put(Config.class, new Config(null));
 
         assertEquals(1, ChunkMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0))).length);
         assertEquals(1, ChunkMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31))).length);
