@@ -17,14 +17,46 @@ package org.terasology.config.flexible;
 
 import org.terasology.engine.SimpleUri;
 
+/**
+ * Stores multiple {@link FlexibleConfig} instances that can be retrieved using their id.
+ * Also responsible for overseeing their serialization - to and from - disk.
+ */
 public interface FlexibleConfigManager {
+    /**
+     * Adds the given {@link FlexibleConfig} to this manager.
+     * This method throws a RuntimeException if a FlexibleConfig with the given id already exists.
+     *
+     * @param configId A SimpleUri that effectively becomes the id of the config.
+     * @param config The config that is to be added.
+     * @throws RuntimeException
+     */
     void addConfig(SimpleUri configId, FlexibleConfig config) throws RuntimeException;
 
+    /**
+     * Removes the config associated with the given id, and returns it.
+     *
+     * @param configId The id of the config to remove.
+     * @return The config associated with the given id, and null if no config is associated with the given id.
+     */
     FlexibleConfig removeConfig(SimpleUri configId);
 
+    /**
+     * Retrieves the config associated with the given id.
+     *
+     * @param configId The id of the config to retrieve.
+     * @return The config associated with the given id.
+     */
     FlexibleConfig getConfig(SimpleUri configId);
 
+    /**
+     * Iterates over all the configs registered with this manager, and loads the
+     * settings stored in them.
+     */
     void load();
 
+    /**
+     * Iterates over all the configs registered with this manager, and saves the
+     * settings stored in them.
+     */
     void save();
 }

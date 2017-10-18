@@ -60,9 +60,32 @@ public interface FlexibleConfig {
      */
     boolean contains(SimpleUri id);
 
+    /**
+     * Returns a map of all the settings, allowing iteration of all the settings.
+     *
+     * @return A map containing all the settings, along with their id.
+     */
     Map<SimpleUri, Setting> getSettings();
 
+    /**
+     * Saves the values of all settings having non-default values, to enable persistence across sessions.
+     *
+     * All the non-default values that were not used in this session and are still "parked" are also
+     * saved as-is, to be used later.
+     *
+     * @param writer A writer that will serve as the destination of settings.
+     */
     void save(Writer writer);
 
+    /**
+     * Loads the values of the settings having non-default values, to enable persistence across sessions.
+     *
+     * All the non-default values are loaded and "parked" till the actual setting is added to the config,
+     * and which point they are "unparked" and parsed, replacing the default value of the setting.
+     *
+     * Note that this function should be called before adding any settings to the FlexibleConfig.
+     *
+     * @param reader A reader that will serve as the source of the settings.
+     */
     void load(Reader reader);
 }
