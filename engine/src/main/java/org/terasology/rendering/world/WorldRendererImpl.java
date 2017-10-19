@@ -19,6 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -214,11 +215,11 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
                         GROUND_PLANE_HEIGHT_DISPARITY  - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
-                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
+                playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
                 currentRenderingStage = RenderingStage.MONO;
             }
         } else {
-            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig);
+            playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
             currentRenderingStage = RenderingStage.MONO;
         }
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
@@ -232,10 +233,11 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     private void initRenderingSupport() {
-        context.put(ScreenGrabber.class, new ScreenGrabber(context));
+        ScreenGrabber screenGrabber = new ScreenGrabber(context);
+        context.put(ScreenGrabber.class, screenGrabber);
 
         immutableFBOs = new ImmutableFBOs();
-        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context.get(Config.class).getRendering(), context.get(ScreenGrabber.class));
+        displayResolutionDependentFBOs = new DisplayResolutionDependentFBOs(context.get(Config.class).getRendering(), screenGrabber, context.get(DisplayDevice.class));
         shadowMapResolutionDependentFBOs = new ShadowMapResolutionDependentFBOs();
 
         context.put(DisplayResolutionDependentFBOs.class, displayResolutionDependentFBOs);

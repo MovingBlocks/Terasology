@@ -651,6 +651,14 @@ public final class FBO {
         private int height;
 
         /**
+         * Default Constructor - returns a Dimensions object.
+         */
+        public Dimensions() {
+            this.width = 0;
+            this.height = 0;
+        }
+
+        /**
          * Standard Constructor - returns a Dimensions object.
          *
          * @param width An integer, representing the width of the FBO in pixels.
@@ -679,7 +687,6 @@ public final class FBO {
         public Dimensions dividedBy(int divisor) {
             return new Dimensions(width / divisor, height / divisor);
         }
-
 
         public Dimensions multiplyBy(float multiplier) {
             int w = (int) (width * multiplier);
@@ -737,6 +744,25 @@ public final class FBO {
          */
         public int height() {
             return this.height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param width An integer representing the new width.
+         * @param height An integer representing the new height.
+         */
+        public void setDimensions(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param other A Dimension to use the width and height from.
+         */
+        public void setDimensions(Dimensions other) {
+            this.width = other.width;
+            this.height = other.height;
         }
     }
 }
