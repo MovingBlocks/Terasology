@@ -180,8 +180,44 @@ if (args.length == 0) {
             break
         case "create":
             println "We're doing a create"
-            String someParam = getUserString("Please enter a thing")
-            println "User return was: $someParam"
+            String name = ""
+
+            // Get new module's name
+            if (args.length > 2) {
+              println "Received more than one argument. Aborting."
+              break
+            } else if (args.length == 2) {
+              name = args[1]
+            } else {
+              name = getUserString("Enter module name: ")
+            }
+            println "User wants to create a module named: $name"
+
+            // Check if the module already exists. If not, create the module directory
+            File targetDir = new File("modules/$name")
+            if (targetDir.exists()) {
+              println "Target directory already exists. Aborting."
+              break
+            }
+            println "Creating target directory"
+            targetDir.mkdir()
+
+            // Add gitignore
+            println "Creating .gitignore"
+            File gitignore = new File(targetDir, ".gitignore")
+            def gitignoreText = new File("templates/.gitignore").text
+            gitignore << gitignoreText
+
+            // Add module.txt
+            println "Creating module.txt"
+            File moduleManifest = new File(targetDir, "module.txt")
+            def moduleText = new File("templates/module.txt").text
+            moduleManifest << moduleText.replaceAll('MODULENAME', name)
+
+            // Initialize git
+            Grgit.init dir: targetDir, bare: false
+
+            println "Created module named $name"
             break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
