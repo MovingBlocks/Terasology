@@ -254,6 +254,7 @@ public class BlockManagerImpl extends BlockManager {
                         block.setId(getNextId());
                     }
                     registerFamily(newFamily.get());
+
                 }
                 catch (Exception ex){
                     // A family can fail to register if the block is missing uri or list of categories,

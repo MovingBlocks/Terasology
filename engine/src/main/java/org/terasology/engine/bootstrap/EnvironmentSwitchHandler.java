@@ -178,7 +178,7 @@ public final class EnvironmentSwitchHandler {
         registry.clear();
         for(Class<?> blockFamily : environment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
             if (!BlockFamily.class.isAssignableFrom(blockFamily)) {
-                logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamily.getSimpleName());
+                logger.error("Cannot load {}, must be a subclass of BlockFamily", blockFamily.getSimpleName());
                 continue;
             }
             RegisterBlockFamily registerInfo = blockFamily.getAnnotation(RegisterBlockFamily.class);
