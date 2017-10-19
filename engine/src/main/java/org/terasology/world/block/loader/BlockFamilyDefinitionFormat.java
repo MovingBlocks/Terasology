@@ -65,6 +65,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
+ * Defines the format used to parse .block files
  */
 public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFamilyDefinitionData> {
 
