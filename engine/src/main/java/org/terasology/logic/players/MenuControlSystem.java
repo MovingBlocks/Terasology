@@ -73,6 +73,7 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void onPlayerDeath(PlayerDeathEvent event, EntityRef character) {
         EntityRef client = character.getComponent(CharacterComponent.class).controller;
         if (client.getComponent(ClientComponent.class).local) {
+            nuiManager.removeOverlay("engine:onlinePlayersOverlay");
             nuiManager.pushScreen("engine:deathScreen");
             if (event.damageTypeName != null) {
                 ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.instigatorName, event.damageTypeName);
