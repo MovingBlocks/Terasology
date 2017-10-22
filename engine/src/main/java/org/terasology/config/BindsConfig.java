@@ -30,7 +30,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.RegisterBindButton;
+import org.terasology.input.binds.movement.ForwardsButton;
 import org.terasology.naming.Name;
 
 import java.lang.reflect.Type;
@@ -45,8 +48,13 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * The binds configuration holds the mapping from binding uris to Inputs.
- * The {@link SimpleUri} for a binding contains the module from the binding and the id from the binding annotation, 
- * e.g. from {@link RegisterBindButton}.
+ * The {@link SimpleUri} for a binding contains the module id where the binding is defined and the id from the binding annotation, 
+ * e.g. from {@link RegisterBindButton} as object name.
+ * <p>
+ * One example for a binding-input combination is the {@link ForwardsButton} 
+ * which is defined in the engine with the id <code>forwards</code>.
+ * The default input binding for the forward movement is the W-Key.
+ * Therefore the binds for <code>engine:forwards</code> would contain an {@link Input} object with type {@link InputType#KEY} and id {@link KeyId.W}.
  */
 public final class BindsConfig {
 

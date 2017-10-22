@@ -30,7 +30,7 @@ public interface BindsConfiguration {
     void setBinds(BindsConfig other);
 
     /**
-     * Returns a list of all input, bound to the given uri.
+     * Returns a list of all inputs, bound to the given uri.
      */
     List<Input> getBinds(SimpleUri uri);
 
