@@ -57,7 +57,7 @@ public class TreeTests {
         CoreRegistry.setContext(context);
 
         // Needed only as long as #1536 is unresolved
-        context.put(Config.class, new Config());
+        context.put(Config.class, new Config(null));
 
         blockManager = Mockito.mock(BlockManager.class);
         Block air = blockManager.getBlock(BlockManager.AIR_ID);
