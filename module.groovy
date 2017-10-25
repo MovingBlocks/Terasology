@@ -62,7 +62,7 @@ def retrieveModule(String module, boolean recurse) {
         // TODO: Temporary until build.gradle gets removed from module directories (pending Cervator work)
         File targetBuildGradle = new File(targetDir, 'build.gradle')
         targetBuildGradle.delete()
-        targetBuildGradle << new File('modules/Core/build.gradle').text
+        targetBuildGradle << new File('templates/build.gradle').text
 
         File moduleManifest = new File(targetDir, 'module.txt')
         if (!moduleManifest.exists()) {
@@ -114,6 +114,43 @@ String[] readModuleDependencies(File targetModuleInfo) {
 }
 
 /**
+ * Creates a new module with the given name and adds the necessary .gitignore,
+ * build.gradle and module.txt files.
+ * @param name the name of the module to be created
+ */
+def createModule(String name) {
+    // Check if the module already exists. If not, create the module directory
+    File targetDir = new File("modules/$name")
+    if (targetDir.exists()) {
+        println "Target directory already exists. Aborting."
+        return
+    }
+    println "Creating target directory"
+    targetDir.mkdir()
+
+    // Add gitignore
+    println "Creating .gitignore"
+    File gitignore = new File(targetDir, ".gitignore")
+    def gitignoreText = new File("templates/.gitignore").text
+    gitignore << gitignoreText
+
+    // Add build.gradle (temporary until it gets removed)
+    println "Creating build.gradle"
+    File buildGradle = new File(targetDir, "build.gradle")
+    def buildGradleText = new File("templates/build.gradle").text
+    buildGradle << buildGradleText
+
+    // Add module.txt
+    println "Creating module.txt"
+    File moduleManifest = new File(targetDir, "module.txt")
+    def moduleText = new File("templates/module.txt").text
+    moduleManifest << moduleText.replaceAll('MODULENAME', name)
+
+    // Initialize git
+    Grgit.init dir: targetDir, bare: false
+}
+
+/**
  * Accepts input from the user, showing a descriptive prompt.
  * @param prompt the prompt to show the user
  */
@@ -133,6 +170,7 @@ def printUsage() {
     println "Utility script for interacting with modules. Available sub commands:"
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
+    println "- 'create' - creates a new module"
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
     println "*NOTE*: Module names are case sensitive"
@@ -193,29 +231,7 @@ if (args.length == 0) {
             }
             println "User wants to create a module named: $name"
 
-            // Check if the module already exists. If not, create the module directory
-            File targetDir = new File("modules/$name")
-            if (targetDir.exists()) {
-              println "Target directory already exists. Aborting."
-              break
-            }
-            println "Creating target directory"
-            targetDir.mkdir()
-
-            // Add gitignore
-            println "Creating .gitignore"
-            File gitignore = new File(targetDir, ".gitignore")
-            def gitignoreText = new File("templates/.gitignore").text
-            gitignore << gitignoreText
-
-            // Add module.txt
-            println "Creating module.txt"
-            File moduleManifest = new File(targetDir, "module.txt")
-            def moduleText = new File("templates/module.txt").text
-            moduleManifest << moduleText.replaceAll('MODULENAME', name)
-
-            // Initialize git
-            Grgit.init dir: targetDir, bare: false
+            createModule(name)
 
             println "Created module named $name"
             break
