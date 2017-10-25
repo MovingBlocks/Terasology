@@ -21,8 +21,10 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
+import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -36,7 +38,7 @@ import static org.terasology.rendering.dag.AbstractNode.getMaterial;
 /**
  * Sets a texture attached to an FBO as the input for a material.
  */
-public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber {
+public class SetInputTextureFromFbo implements StateChange, PropertyChangeListener {
     // depthStencilRboId is a possible FBO attachment but is not covered by a case here
     // as it wouldn't work with the glBindTexture(TEXTURE_2D, ...) call.
     public enum FboTexturesTypes {
@@ -80,8 +82,8 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
 
         this.material = getMaterial(materialUrn);
 
-        update(); // Cheeky way to initialise textureId
-        fboManager.subscribe(this);
+        propertyChange(null); // Cheeky way to initialise textureId
+        fboManager.subscribe(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION, this);
     }
 
     /**
@@ -108,7 +110,7 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
 
         this.material = getMaterial(materialUrn);
 
-        update(); // Cheeky way to initialise textureId
+        propertyChange(null); // Cheeky way to initialise textureId
         fboManager.subscribe(this);
     }
 
@@ -154,7 +156,8 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
      * This method refreshes the task's reference to the FBO attachment, so that they are always up to date.
      */
     @Override
-    public void update() {
+    public void propertyChange(PropertyChangeEvent event) {
+        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION
         textureId = fetchTextureId();
     }
 

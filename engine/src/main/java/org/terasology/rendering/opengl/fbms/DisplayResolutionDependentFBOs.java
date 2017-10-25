@@ -39,6 +39,8 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
     public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
+    public static final String PRE_FBO_REGENERATION = "preFboRegeneration";
+    public static final String POST_FBO_REGENERATION = "postFboRegeneration";
 
     private SwappableFBO gBufferPair;
 
@@ -114,13 +116,18 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     }
 
     private void regenerateFbos() {
+        propertyChangeSupport.firePropertyChange(PRE_FBO_REGENERATION, 0, 1);
+
         for (SimpleUri urn : fboConfigs.keySet()) {
             FBOConfig fboConfig = getFboConfig(urn);
             fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
             FBO.recreate(get(urn), getFboConfig(urn));
         }
 
-        notifySubscribers();
+        propertyChangeSupport.firePropertyChange(POST_FBO_REGENERATION, 0, 1);
+
+        // Note that the "old" and "new" values (0 and 1) in the above calls aren't actually
+        // used: they are only necessary to ensure that the event is fired up correctly.
    }
 
     private void disposeAllFbos() {

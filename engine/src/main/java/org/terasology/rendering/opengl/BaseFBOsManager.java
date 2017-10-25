@@ -16,16 +16,12 @@
 package org.terasology.rendering.opengl;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.utilities.subscribables.Subscribable;
 
 /**
  * TODO: Add javadocs
  */
-public interface BaseFBOsManager {
-
-    boolean subscribe(FBOManagerSubscriber subscriber);
-
-    boolean unsubscribe(FBOManagerSubscriber subscriber);
-
+public interface BaseFBOsManager extends Subscribable {
     void release(SimpleUri fboName);
 
     FBO request(FBOConfig fboConfig);

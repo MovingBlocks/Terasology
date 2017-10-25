@@ -29,8 +29,10 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.dag.nodes.AmbientOcclusionNode.SSAO_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -52,7 +54,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
-public class BlurredAmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class BlurredAmbientOcclusionNode extends ConditionDependentNode implements PropertyChangeListener {
     public static final SimpleUri SSAO_BLURRED_FBO_URI = new SimpleUri("engine:fbo.ssaoBlurred");
     private static final ResourceUrn SSAO_BLURRED_MATERIAL_URN = new ResourceUrn("engine:prog.ssaoBlur");
 
@@ -77,8 +79,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
         ssaoBlurredFbo = requiresFBO(new FBOConfig(SSAO_BLURRED_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(ssaoBlurredFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoBlurredFbo));
-        update(); // Cheeky way to initialise outputFboWidth, outputFboHeight
-        displayResolutionDependentFBOs.subscribe(this);
+        propertyChange(null); // Cheeky way to initialise outputFboWidth, outputFboHeight
+        displayResolutionDependentFBOs.subscribe(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION, this);
 
         addDesiredStateChange(new SetInputTextureFromFbo(0, SSAO_FBO_URI, ColorTexture,
                 displayResolutionDependentFBOs, SSAO_BLURRED_MATERIAL_URN, "tex"));
@@ -103,7 +105,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     }
 
     @Override
-    public void update() {
+    public void propertyChange(PropertyChangeEvent event) {
+        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION
         outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }
