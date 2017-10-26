@@ -245,7 +245,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         }
 
         WidgetUtil.tryBindCheckbox(this, "menu-animations", BindHelper.bindBeanProperty("animatedMenu", config.getRendering(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("vrSupport", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateGrass", BindHelper.bindBeanProperty("animateGrass", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "animateWater", BindHelper.bindBeanProperty("animateWater", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "volumetricFog", BindHelper.bindBeanProperty("volumetricFog", config.getRendering(), Boolean.TYPE));
@@ -270,9 +270,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             WidgetUtil.trySubscribe(this, "fovReset", widget -> fovSlider.setValue(100.0f));
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> {
-            saveSettings();
-        });
+        WidgetUtil.trySubscribe(this, "close", button -> saveSettings());
     }
 
 
