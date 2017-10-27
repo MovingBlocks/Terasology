@@ -28,8 +28,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
 import org.terasology.network.ClientComponent;
@@ -171,16 +170,10 @@ public class DebugControlSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = CharacterComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
+    public void onMouseX(MouseAxisEvent event, EntityRef entity) {
         if (!mouseGrabbed) {
             event.consume();
         }
     }
 
-    @ReceiveEvent(components = CharacterComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        if (!mouseGrabbed) {
-            event.consume();
-        }
-    }
 }

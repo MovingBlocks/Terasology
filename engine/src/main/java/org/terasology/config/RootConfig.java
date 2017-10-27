@@ -31,6 +31,7 @@ public final class RootConfig {
     private PlayerConfig player = new PlayerConfig();
     private PermissionConfig permission = new PermissionConfig();
     private InputConfig input = new InputConfig();
+    private BindsConfig binds = new BindsConfig();
     private AudioConfig audio = new AudioConfig();
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
@@ -53,11 +54,12 @@ public final class RootConfig {
         return permission;
     }
 
-    /**
-     * @return Input configuration (mostly binds)
-     */
     public InputConfig getInput() {
         return input;
+    }
+
+    public BindsConfig getBinds() {
+        return binds;
     }
 
     public ModuleConfig getDefaultModSelection() {

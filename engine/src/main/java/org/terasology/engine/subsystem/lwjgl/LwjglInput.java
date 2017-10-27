@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.JInputControllerDevice;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
@@ -79,8 +80,8 @@ public class LwjglInput extends BaseLwjglSubsystem {
     }
 
     private void updateInputConfig() {
-        Config config = context.get(Config.class);
-        config.getInput().getBinds().updateForChangedMods(context);
-        config.save();
+        BindsManager bindsManager = context.get(BindsManager.class);
+        bindsManager.updateConfigWithDefaultBinds();
+        bindsManager.saveBindsConfig();
     }
 }
