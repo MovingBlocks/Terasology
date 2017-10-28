@@ -151,6 +151,30 @@ def createModule(String name) {
 }
 
 /**
+ * Update a given module.
+ * @param name the name of the module to update
+ */
+def updateModule(String name) {
+    println "Attempting to update module $name"
+    File targetDir = new File("modules/$name")
+    if (!targetDir.exists()) {
+        println "Module \"$name\" not found"
+        return
+    }
+
+    def moduleGit = Grgit.open(dir: targetDir)
+    def clean = moduleGit.status().clean
+    println "Is \"$name\" clean? $clean"
+    if (!clean) {
+        println "Module has uncommitted changes. Aborting."
+        return
+    }
+
+    println "Updating module $name"
+    moduleGit.pull remote: "origin", branch: "master"
+}
+
+/**
  * Accepts input from the user, showing a descriptive prompt.
  * @param prompt the prompt to show the user
  */
@@ -234,6 +258,33 @@ if (args.length == 0) {
             createModule(name)
 
             println "Created module named $name"
+            break
+        case "update":
+            println "We're updating modules"
+            String[] moduleList = []
+            if (args.length == 1) {
+                // User hasn't supplied any module names, so ask
+                def moduleString = getUserString('Enter Module Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
+                // Split it on whitespace
+                moduleList = moduleString.split("\\s+")
+            } else {
+                // User has supplied one or more module names, so pass them forward (skipping the "get" arg)
+                moduleList = args.drop(1)
+            }
+            println "List of modules to update: $moduleList"
+            for (String module: moduleList) {
+                updateModule(module)
+            }
+            break
+        case "update-all":
+            println "We're updating all modules"
+            println "List of modules:"
+            new File("modules").eachDir() { dir ->
+                String moduleName = dir.getPath().substring(8)
+                if (!excludedDependencies.contains(moduleName)) {
+                    updateModule(moduleName)
+                }
+            }
             break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
