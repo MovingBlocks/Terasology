@@ -171,7 +171,7 @@ def updateModule(String name) {
     }
 
     println "Updating module $name"
-    moduleGit.pull remote: "origin", branch: "master"
+    moduleGit.pull remote: "origin"
 }
 
 /**
