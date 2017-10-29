@@ -103,16 +103,7 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
      */
     public SetInputTextureFromFbo(int textureSlot, SimpleUri fboUri, FboTexturesTypes textureType, BaseFBOsManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
-        this.textureSlot = textureSlot;
-        this.textureType = textureType;
-        this.fbo = fboManager.get(fboUri);
-        this.materialUrn = materialUrn;
-        this.shaderParameterName = shaderParameterName;
-
-        this.material = getMaterial(materialUrn);
-
-        propertyChange(null); // Cheeky way to initialise textureId
-        fboManager.subscribe(this);
+        this(textureSlot, fboManager.get(fboUri), textureType, fboManager, materialUrn, shaderParameterName);
     }
 
     private SetInputTextureFromFbo(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
