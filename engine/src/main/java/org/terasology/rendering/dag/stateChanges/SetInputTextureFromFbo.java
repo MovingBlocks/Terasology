@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
 
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
@@ -83,7 +84,7 @@ public class SetInputTextureFromFbo implements StateChange, PropertyChangeListen
         this.material = getMaterial(materialUrn);
 
         propertyChange(null); // Cheeky way to initialise textureId
-        fboManager.subscribe(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION, this);
+        fboManager.subscribe(POST_FBO_REGENERATION, this);
     }
 
     /**

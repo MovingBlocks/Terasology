@@ -208,7 +208,6 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
             normalMappingIsEnabled = renderingConfig.isNormalMapping();
             if (normalMappingIsEnabled) {

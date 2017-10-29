@@ -195,7 +195,6 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.LOCAL_REFLECTIONS)) {
             localReflectionsAreEnabled = renderingConfig.isLocalReflections();
             if (localReflectionsAreEnabled) {

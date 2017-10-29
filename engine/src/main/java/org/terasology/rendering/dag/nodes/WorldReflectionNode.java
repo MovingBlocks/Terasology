@@ -218,7 +218,6 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.REFLECTIVE_WATER)) {
             requiresCondition(() -> renderingConfig.isReflectiveWater());
         } else if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {

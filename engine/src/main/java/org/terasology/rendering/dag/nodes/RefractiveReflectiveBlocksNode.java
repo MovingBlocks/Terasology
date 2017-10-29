@@ -49,6 +49,8 @@ import java.beans.PropertyChangeListener;
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.PRE_FBO_REGENERATION;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTIVE;
 
 /**
@@ -156,8 +158,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
         refractiveReflectiveFbo = requiresFBO(new FBOConfig(REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer(), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(refractiveReflectiveFbo));
         lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
-        displayResolutionDependentFBOs.subscribe(DisplayResolutionDependentFBOs.PRE_FBO_REGENERATION, this);
-        displayResolutionDependentFBOs.subscribe(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION, this);
+        displayResolutionDependentFBOs.subscribe(PRE_FBO_REGENERATION, this);
+        displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
@@ -279,13 +281,14 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals(DisplayResolutionDependentFBOs.PRE_FBO_REGENERATION)) {
+        String propertyName = event.getPropertyName();
+
+        if (propertyName.equals(PRE_FBO_REGENERATION)) {
             refractiveReflectiveFbo.detachDepthBuffer();
-        } else if (event.getPropertyName().equals(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION)) {
+        } else if (propertyName.equals(POST_FBO_REGENERATION)) {
             lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
         } else { // Else: One of the settings was changed, handle the event and refresh the task list.
-            // This method is only called when oldValue != newValue.
-            if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
+            if (propertyName.equals(RenderingConfig.NORMAL_MAPPING)) {
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
@@ -298,16 +301,16 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
                         removeDesiredStateChange(setTerrainHeightInputTexture);
                     }
                 }
-            } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
-                parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
+            } else if (propertyName.equals(RenderingConfig.PARALLAX_MAPPING)) {
                 if (normalMappingIsEnabled) {
+                    parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
                     if (parallaxMappingIsEnabled) {
                         addDesiredStateChange(setTerrainHeightInputTexture);
                     } else {
                         removeDesiredStateChange(setTerrainHeightInputTexture);
                     }
                 }
-            } else if (event.getPropertyName().equals(RenderingConfig.ANIMATE_WATER)) {
+            } else if (propertyName.equals(RenderingConfig.ANIMATE_WATER)) {
                 animatedWaterIsEnabled = renderingConfig.isAnimateWater();
             } // else: no other cases are possible - see subscribe operations in initialize().
 

@@ -163,7 +163,6 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.FILM_GRAIN)) {
             isFilmGrainEnabled = renderingConfig.isFilmGrain();
             if (isFilmGrainEnabled) {

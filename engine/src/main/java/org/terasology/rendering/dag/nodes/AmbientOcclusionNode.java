@@ -53,6 +53,7 @@ import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.F
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
 
 /**
  * Instances of this node work in tandem with instances of the BlurredAmbientOcclusionNode class.
@@ -114,7 +115,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
         addDesiredStateChange(new BindFbo(ssaoFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
         propertyChange(null); // Cheeky way to initialise outputFboWidth, outputFboHeight
-        displayResolutionDependentFBOs.subscribe(DisplayResolutionDependentFBOs.POST_FBO_REGENERATION, this);
+        displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
 
         // TODO: check for input textures brought in by the material
 
@@ -158,7 +159,8 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION
+        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION,
+        // which means there is no need to check or process the event object.
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }

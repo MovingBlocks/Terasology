@@ -217,7 +217,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
             normalMappingIsEnabled = renderingConfig.isNormalMapping();
             if (normalMappingIsEnabled) {

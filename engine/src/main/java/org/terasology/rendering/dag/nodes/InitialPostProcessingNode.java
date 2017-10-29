@@ -148,7 +148,6 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
         if (event.getPropertyName().equals(RenderingConfig.BLOOM)) {
             bloomIsEnabled = renderingConfig.isBloom();
             if (bloomIsEnabled) {
