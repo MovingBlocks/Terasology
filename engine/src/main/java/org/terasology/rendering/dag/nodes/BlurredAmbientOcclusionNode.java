@@ -109,6 +109,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
     public void propertyChange(PropertyChangeEvent event) {
         // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION,
         // which means there is no need to check or process the event object.
+        outputFboWidth = ssaoBlurredFbo.width();
         outputFboHeight = ssaoBlurredFbo.height();
     }
 }
