@@ -148,21 +148,29 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        if (event.getPropertyName().equals(RenderingConfig.BLOOM)) {
-            bloomIsEnabled = renderingConfig.isBloom();
-            if (bloomIsEnabled) {
-                addDesiredStateChange(setBloomInputTexture);
-            } else {
-                removeDesiredStateChange(setBloomInputTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.LIGHT_SHAFTS)) {
-            lightShaftsAreEnabled = renderingConfig.isLightShafts();
-            if (lightShaftsAreEnabled) {
-                addDesiredStateChange(setLightShaftsInputTexture);
-            } else {
-                removeDesiredStateChange(setLightShaftsInputTexture);
-            }
-        } // else: no other cases are possible - see subscribe operations in initialize().
+        String propertyName = event.getPropertyName();
+
+        switch (propertyName) {
+            case RenderingConfig.BLOOM:
+                bloomIsEnabled = renderingConfig.isBloom();
+                if (bloomIsEnabled) {
+                    addDesiredStateChange(setBloomInputTexture);
+                } else {
+                    removeDesiredStateChange(setBloomInputTexture);
+                }
+                break;
+
+            case RenderingConfig.LIGHT_SHAFTS:
+                lightShaftsAreEnabled = renderingConfig.isLightShafts();
+                if (lightShaftsAreEnabled) {
+                    addDesiredStateChange(setLightShaftsInputTexture);
+                } else {
+                    removeDesiredStateChange(setLightShaftsInputTexture);
+                }
+                break;
+
+            // default: no other cases are possible - see subscribe operations in initialize().
+        }
 
         worldRenderer.requestTaskListRefresh();
     }

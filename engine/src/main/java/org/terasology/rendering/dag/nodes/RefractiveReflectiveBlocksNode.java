@@ -283,12 +283,16 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     public void propertyChange(PropertyChangeEvent event) {
         String propertyName = event.getPropertyName();
 
-        if (propertyName.equals(PRE_FBO_REGENERATION)) {
-            refractiveReflectiveFbo.detachDepthBuffer();
-        } else if (propertyName.equals(POST_FBO_REGENERATION)) {
-            lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
-        } else { // Else: One of the settings was changed, handle the event and refresh the task list.
-            if (propertyName.equals(RenderingConfig.NORMAL_MAPPING)) {
+        switch (propertyName) {
+            case PRE_FBO_REGENERATION:
+                refractiveReflectiveFbo.detachDepthBuffer();
+                return;
+
+            case POST_FBO_REGENERATION:
+                lastUpdatedGBuffer.attachDepthBufferTo(refractiveReflectiveFbo);
+                return;
+
+            case RenderingConfig.NORMAL_MAPPING:
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
@@ -301,7 +305,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
                         removeDesiredStateChange(setTerrainHeightInputTexture);
                     }
                 }
-            } else if (propertyName.equals(RenderingConfig.PARALLAX_MAPPING)) {
+                break;
+
+            case RenderingConfig.PARALLAX_MAPPING:
                 if (normalMappingIsEnabled) {
                     parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
                     if (parallaxMappingIsEnabled) {
@@ -310,11 +316,15 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
                         removeDesiredStateChange(setTerrainHeightInputTexture);
                     }
                 }
-            } else if (propertyName.equals(RenderingConfig.ANIMATE_WATER)) {
-                animatedWaterIsEnabled = renderingConfig.isAnimateWater();
-            } // else: no other cases are possible - see subscribe operations in initialize().
+                break;
 
-            worldRenderer.requestTaskListRefresh();
+            case RenderingConfig.ANIMATE_WATER:
+                animatedWaterIsEnabled = renderingConfig.isAnimateWater();
+                break;
+
+            // default: no other cases are possible - see subscribe operations in initialize().
         }
+
+        worldRenderer.requestTaskListRefresh();
     }
 }
