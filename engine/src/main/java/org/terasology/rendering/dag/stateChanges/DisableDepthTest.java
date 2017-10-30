@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import org.terasology.rendering.dag.StateChange;
+
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 
 /**
  * Disables OpenGL depth testing.

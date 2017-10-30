@@ -21,7 +21,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
