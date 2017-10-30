@@ -239,6 +239,18 @@ public final class FBO {
     }
 
     /**
+     * Detaches the depth attachments of this FBO.
+     */
+    public void detachDepthBuffer() {
+        bind();
+
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, 0, 0);
+
+        unbind();
+    }
+
+    /**
      * Properly disposes of the underlying FrameBuffer and its attachments,
      * effectively freeing memory on the graphic adapter.
      */

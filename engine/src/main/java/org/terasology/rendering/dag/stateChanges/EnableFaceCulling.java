@@ -15,8 +15,9 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import org.terasology.rendering.dag.StateChange;
+
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 
 /**
  * Enables OpenGL's Face Culling.
