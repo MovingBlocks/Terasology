@@ -195,6 +195,8 @@ def printUsage() {
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
     println "- 'create' - creates a new module"
+    println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
+    println "- 'update-all' - updates all local modules"
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
     println "*NOTE*: Module names are case sensitive"
