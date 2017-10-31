@@ -16,6 +16,7 @@
 
 package org.terasology.world.block.items;
 
+import org.terasology.telemetry.GamePlayStatsComponent;
 import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
@@ -43,6 +44,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
+
+import java.util.Map;
 
 /**
  */
@@ -103,9 +106,30 @@ public class BlockItemSystem extends BaseComponentSystem {
                     event.consume();
                 }
             }
+            recordBlockPlaced(event, type);
             event.getInstigator().send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
         } else {
             event.consume();
+        }
+    }
+
+    private void recordBlockPlaced(ActivateEvent event, BlockFamily block) {
+        EntityRef instigator = event.getInstigator();
+        String blockName = block.getDisplayName();
+        if (instigator.hasComponent(GamePlayStatsComponent.class)) {
+            GamePlayStatsComponent gamePlayStatsComponent = instigator.getComponent(GamePlayStatsComponent.class);
+            Map<String, Integer> blockPlacedMap = gamePlayStatsComponent.blockPlacedMap;
+            if (blockPlacedMap.containsKey(blockName)) {
+                blockPlacedMap.put(blockName, blockPlacedMap.get(blockName) + 1);
+            } else {
+                blockPlacedMap.put(blockName, 1);
+            }
+            instigator.saveComponent(gamePlayStatsComponent);
+        } else {
+            GamePlayStatsComponent gamePlayStatsComponent = new GamePlayStatsComponent();
+            Map<String, Integer> blockPlacedMap = gamePlayStatsComponent.blockPlacedMap;
+            blockPlacedMap.put(blockName, 1);
+            instigator.addOrSaveComponent(gamePlayStatsComponent);
         }
     }
 

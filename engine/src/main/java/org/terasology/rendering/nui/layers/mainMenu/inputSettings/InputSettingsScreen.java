@@ -20,11 +20,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.BindsConfig;
-import org.terasology.config.Config;
 import org.terasology.config.ControllerConfig.ControllerInfo;
+import org.terasology.config.facade.InputDeviceConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Input;
@@ -68,7 +69,10 @@ public class InputSettingsScreen extends CoreScreenLayer {
     private int horizontalSpacing = 12;
 
     @In
-    private Config config;
+    private InputDeviceConfiguration inputDeviceConfiguration;
+
+    @In
+    private BindsManager bindsManager;
 
     @In
     private ModuleManager moduleManager;
@@ -91,12 +95,12 @@ public class InputSettingsScreen extends CoreScreenLayer {
         mainLayout.setFamily("option-grid");
 
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
-        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
+        mouseSensitivity.bindValue(BindHelper.bindBeanProperty("mouseSensitivity", inputDeviceConfiguration, Float.TYPE));
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
         UICheckbox mouseInverted = new UICheckbox("mouseYAxisInverted");
-        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
+        mouseInverted.bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", inputDeviceConfiguration, Boolean.TYPE));
 
         mainLayout.addWidget(new UILabel("mouseLabel", "subheading", translationSystem.translate("${engine:menu#category-mouse}")));
         mainLayout.addWidget(new RowLayout(new UILabel(translationSystem.translate("${engine:menu#mouse-sensitivity}") + ":"), mouseSensitivity)
@@ -142,14 +146,17 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         List<String> controllers = inputSystem.getControllerDevice().getControllers();
         for (String name : controllers) {
-            ControllerInfo cfg = config.getInput().getControllers().getController(name);
+            ControllerInfo cfg = inputDeviceConfiguration.getController(name);
             addInputSection(mainLayout, name, cfg);
         }
 
         ScrollableArea area = find("area", ScrollableArea.class);
         area.setContent(mainLayout);
 
-        WidgetUtil.trySubscribe(this, "reset", button -> config.getInput().reset(context));
+        WidgetUtil.trySubscribe(this, "reset", button -> {
+            inputDeviceConfiguration.reset();
+            bindsManager.getBindsConfig().setBinds(bindsManager.getDefaultBindsConfig());
+        });
         WidgetUtil.trySubscribe(this, "back", button -> triggerBackAnimation());
     }
 
@@ -173,7 +180,6 @@ public class InputSettingsScreen extends CoreScreenLayer {
                     }
                 }
             }
-
 
             List<ExtensionBind> extensionBindList = Lists.newArrayList();
             for (Map.Entry<SimpleUri, RegisterBindButton> bind : inputsById.entrySet()) {
@@ -238,7 +244,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
     }
 
     private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
-        BindsConfig bindConfig = config.getInput().getBinds();
+        BindsConfig bindConfig = bindsManager.getBindsConfig();
         List<Input> binds = bindConfig.getBinds(uri);
         UIButton primaryInputBind = new UIButton();
         primaryInputBind.bindText(new BindingText(binds, 0));
@@ -260,7 +266,7 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
     @Override
     public void onClosed() {
-        config.getInput().getBinds().applyBinds(inputSystem, moduleManager);
+        bindsManager.registerBinds();
     }
 
     @Override
@@ -325,6 +331,5 @@ public class InputSettingsScreen extends CoreScreenLayer {
             return Objects.hash(uri, bind.description());
         }
     }
-
 
 }

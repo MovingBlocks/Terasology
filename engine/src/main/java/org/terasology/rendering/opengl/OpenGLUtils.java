@@ -18,17 +18,26 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
-import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public final class OpenGLUtils {
     private static int displayListQuad = -1;
@@ -58,66 +67,6 @@ public final class OpenGLUtils {
         }
 
         GL11.glLoadMatrix(model);
-    }
-
-    /**
-     * Sets the viewport of the currently bound FBO to the dimensions of the FBO
-     * given as parameter.
-     *
-     * @param fbo The FBO whose dimensions will be matched by the viewport of the currently bound FBO.
-     */
-    public static void setViewportToSizeOf(FBO fbo) {
-        glViewport(0, 0, fbo.width(), fbo.height());
-    }
-
-    /**
-     * Unbinds any currently bound FBO and binds the default Frame Buffer,
-     * which is usually the Display (be it the full screen or a window).
-     */
-    public static void bindDisplay() {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    }
-
-
-    /**
-     * Once an FBO is bound, opengl commands will act on it, i.e. by drawing on it.
-     * Meanwhile shaders might output not just colors but additional per-pixel data. This method establishes on which
-     * of an FBOs attachments, subsequent opengl commands and shaders will draw on.
-     *
-     * @param fbo         The FBO holding the attachments to be set or unset for drawing.
-     * @param color       If True the color buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param normal      If True the normal buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     * @param lightBuffer If True the light buffer is set as drawable. If false subsequent commands and shaders won't be able to draw on it.
-     */
-    // TODO: verify if this can become part of the FBO.bind() method.
-    public static void setRenderBufferMask(FBO fbo, boolean color, boolean normal, boolean lightBuffer) {
-        if (fbo == null) {
-            return;
-        }
-
-        int attachmentId = 0;
-
-        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-
-        if (fbo.colorBufferTextureId != 0) {
-            if (color) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.normalsBufferTextureId != 0) {
-            if (normal) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-            }
-            attachmentId++;
-        }
-        if (fbo.lightBufferTextureId != 0 && lightBuffer) {
-                bufferIds.put(GL_COLOR_ATTACHMENT0_EXT + attachmentId);
-        }
-
-        bufferIds.flip();
-
-        GL20.glDrawBuffers(bufferIds);
     }
 
     /**

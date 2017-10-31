@@ -26,7 +26,7 @@ public class MultiSection {
     private final String name;
     private final ImmutableSet<String> appliesToSections;
 
-    public MultiSection(String name, String coversSection, String ... otherSections) {
+    public MultiSection(String name, String coversSection, String... otherSections) {
         this.name = name;
         this.appliesToSections = Varargs.combineToSet(coversSection, otherSections);
     }

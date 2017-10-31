@@ -17,6 +17,9 @@
 package org.terasology.input;
 
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 
 /**
  */
@@ -84,5 +87,50 @@ public interface BindableButton {
      * @param subscriber
      */
     void unsubscribe(BindButtonSubscriber subscriber);
+
+    /**
+     * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
+     * state, so that the overall state of the bind can be tracked.
+     *
+     * @param pressed Is the changing
+     * @param delta The length of the current frame
+     * @param inputEntities The entities which receive the input events
+     * @param target The current camera target
+     * @param targetBlockPos The current targeted block position
+     * @param hitPosition The current hit position
+     * @param hitNormal The current hit normal
+     * @param initialKeyConsumed Has the changing button's event already been consumed
+     * @param gameTimeInMs The game time in milliseconds.
+     * @return Whether the button's event has been consumed
+     */
+    public boolean updateBindState(Input input,
+                                   boolean pressed,
+                                   float delta,
+                                   EntityRef[] inputEntities,
+                                   EntityRef target,
+                                   Vector3i targetBlockPos,
+                                   Vector3f hitPosition,
+                                   Vector3f hitNormal,
+                                   boolean initialKeyConsumed,
+                                   long gameTimeInMs);
+
+    /**
+     * Updates this bind. If the binding is repeating, this will trigger the binding event with the {@link ButtonState#REPEAT} state.
+     *
+     * @param inputEntities The entities which receive the input events
+     * @param delta The length of the current frame
+     * @param target The current camera target
+     * @param targetBlockPos The current targeted block position
+     * @param hitPosition The current hit position
+     * @param hitNormal The current hit normal
+     * @param gameTimeInMs The game time in milliseconds.
+     */
+    public void update(EntityRef[] inputEntities,
+                       float delta,
+                       EntityRef target,
+                       Vector3i targetBlockPos,
+                       Vector3f hitPosition,
+                       Vector3f hitNormal,
+                       long gameTimeInMs);
 
 }

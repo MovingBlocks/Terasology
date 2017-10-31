@@ -100,7 +100,7 @@ public class RenderTaskListGeneratorTest {
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class AlphaNode extends AbstractNode {
-        public AlphaNode() {
+        AlphaNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
@@ -110,7 +110,7 @@ public class RenderTaskListGeneratorTest {
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class BravoNode extends AbstractNode {
-        public BravoNode() {
+        BravoNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
@@ -120,7 +120,7 @@ public class RenderTaskListGeneratorTest {
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class CharlieNode extends AbstractNode {
-        public CharlieNode() {
+        CharlieNode() {
             addDesiredStateChange(new SetName("foo"));
         }
 
@@ -130,7 +130,7 @@ public class RenderTaskListGeneratorTest {
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class DeltaNode extends AbstractNode {
-        public DeltaNode() {
+        DeltaNode() {
             addDesiredStateChange(new SetName("delta"));
         }
 
@@ -140,7 +140,7 @@ public class RenderTaskListGeneratorTest {
 
     @SuppressWarnings("static-access") // actual node classes are not meant to be static
     private class EchoNode extends AbstractNode {
-        public EchoNode() { }
+        EchoNode() { }
 
         @Override
         public void process() { }

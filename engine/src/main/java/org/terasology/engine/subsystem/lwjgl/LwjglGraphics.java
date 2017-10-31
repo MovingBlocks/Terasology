@@ -165,15 +165,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
         currentState.render();
 
-        if (Display.wasResized()) {
-            glViewport(0, 0, Display.getWidth(), Display.getHeight());
-        }
+        lwjglDisplay.update();
 
         if (lwjglDisplay.isCloseRequested()) {
             engine.shutdown();
         }
-
-
     }
 
     @Override

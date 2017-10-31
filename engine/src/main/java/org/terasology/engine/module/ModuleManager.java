@@ -30,6 +30,8 @@ public interface ModuleManager {
 
     ModuleRegistry getRegistry();
 
+    ModuleInstallManager getInstallManager();
+
     ModuleEnvironment getEnvironment();
 
     ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary);

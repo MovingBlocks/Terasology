@@ -32,7 +32,7 @@ import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
-import org.terasology.rendering.dag.stateChanges.SetInputTexture;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -45,7 +45,6 @@ import org.terasology.world.chunks.RenderableChunk;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_REJECT;
 
 /**
@@ -60,7 +59,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.ALPHA_RE
  * the color stored in the frame buffer and the resulting color overwrites the previously stored one.
  */
 public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapable, PropertyChangeListener {
-    private static final ResourceUrn CHUNK_MATERIAL = new ResourceUrn("engine:prog.chunk");
+    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private WorldRenderer worldRenderer;
     private RenderQueuesHelper renderQueues;
@@ -97,11 +96,11 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
-        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
-        chunkMaterial = getMaterial(CHUNK_MATERIAL);
+        chunkMaterial = getMaterial(CHUNK_MATERIAL_URN);
 
         renderingConfig = context.get(Config.class).getRendering();
         normalMappingIsEnabled = renderingConfig.isNormalMapping();
@@ -110,11 +109,11 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         renderingConfig.subscribe(RenderingConfig.PARALLAX_MAPPING, this);
 
         int textureSlot = 0;
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:terrain", CHUNK_MATERIAL, "textureAtlas"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:effects", CHUNK_MATERIAL, "textureEffects"));
-        addDesiredStateChange(new SetInputTexture(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL, "textureLava"));
-        setTerrainNormalsInputTexture = new SetInputTexture(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL, "textureAtlasNormal");
-        setTerrainHeightInputTexture = new SetInputTexture(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL, "textureAtlasHeight");
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:terrain", CHUNK_MATERIAL_URN, "textureAtlas"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:effects", CHUNK_MATERIAL_URN, "textureEffects"));
+        addDesiredStateChange(new SetInputTexture2D(textureSlot++, "engine:lavaStill", CHUNK_MATERIAL_URN, "textureLava"));
+        setTerrainNormalsInputTexture = new SetInputTexture2D(textureSlot++, "engine:terrainNormal", CHUNK_MATERIAL_URN, "textureAtlasNormal");
+        setTerrainHeightInputTexture = new SetInputTexture2D(textureSlot, "engine:terrainHeight", CHUNK_MATERIAL_URN, "textureAtlasHeight");
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);
@@ -209,30 +208,36 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
-        if (event.getPropertyName().equals(RenderingConfig.NORMAL_MAPPING)) {
-            normalMappingIsEnabled = renderingConfig.isNormalMapping();
-            if (normalMappingIsEnabled) {
-                addDesiredStateChange(setTerrainNormalsInputTexture);
-                if (parallaxMappingIsEnabled) {
-                    addDesiredStateChange(setTerrainHeightInputTexture);
-                }
-            } else {
-                removeDesiredStateChange(setTerrainNormalsInputTexture);
-                if (parallaxMappingIsEnabled) {
-                    removeDesiredStateChange(setTerrainHeightInputTexture);
-                }
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.PARALLAX_MAPPING)) {
-            parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
-            if (normalMappingIsEnabled) {
-                if (parallaxMappingIsEnabled) {
-                    addDesiredStateChange(setTerrainHeightInputTexture);
+        String propertyName = event.getPropertyName();
+
+        switch (propertyName) {
+            case RenderingConfig.NORMAL_MAPPING:
+                normalMappingIsEnabled = renderingConfig.isNormalMapping();
+                if (normalMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainNormalsInputTexture);
+                    if (parallaxMappingIsEnabled) {
+                        addDesiredStateChange(setTerrainHeightInputTexture);
+                    }
                 } else {
-                    removeDesiredStateChange(setTerrainHeightInputTexture);
+                    removeDesiredStateChange(setTerrainNormalsInputTexture);
+                    if (parallaxMappingIsEnabled) {
+                        removeDesiredStateChange(setTerrainHeightInputTexture);
+                    }
                 }
-            }
-        } // else: no other cases are possible - see subscribe operations in initialize().
+                break;
+            case RenderingConfig.PARALLAX_MAPPING:
+                parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
+                if (normalMappingIsEnabled) {
+                    if (parallaxMappingIsEnabled) {
+                        addDesiredStateChange(setTerrainHeightInputTexture);
+                    } else {
+                        removeDesiredStateChange(setTerrainHeightInputTexture);
+                    }
+                }
+                break;
+
+            // default: no other cases are possible - see subscribe operations in initialize().
+        }
 
         worldRenderer.requestTaskListRefresh();
     }

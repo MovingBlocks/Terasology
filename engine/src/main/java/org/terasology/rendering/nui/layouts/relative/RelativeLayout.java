@@ -67,6 +67,13 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         cachedRegions.remove(info);
     }
 
+    @Override
+    public void removeAllWidgets() {
+        contentLookup.clear();
+        contents.clear();
+        cachedRegions.clear();
+    }
+
     public void addWidget(UIWidget widget, HorizontalHint horizontal, VerticalHint vertical) {
         addWidget(widget, new RelativeLayoutHint(horizontal, vertical));
     }

@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
 
 class MockSetting<T> implements Setting<T> {
     private final SimpleUri id;
-    private boolean isSubscribedTo = false;
+    private boolean isSubscribedTo;
 
     MockSetting(SimpleUri id) {
         this.id = id;

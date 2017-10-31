@@ -16,7 +16,7 @@
 
 uniform vec4 ssaoSettings;
 #define ssaoStrength ssaoSettings.x
-#define ssaoRad ssaoSettings.y
+#define ssaoRadius ssaoSettings.y
 
 uniform vec2 texelSize;
 uniform vec2 noiseTexelSize;
@@ -54,21 +54,30 @@ void main() {
     float occlusion = 0.0;
     float sampleDepth = 0.0;
     float rangeCheck = 0.0;
-    vec3 samplePosition = vec3(0.0, 0.0, 0.0);
+    vec3 samplePosition = vec3(0.0);
+    vec4 offset = vec4(0.0);
     float samplesTaken = 0.0;
+    const float maxDepthDifference = 1;
 
     for (int i=0; i<SSAO_KERNEL_ELEMENTS; ++i) {
-        samplePosition = (tbn * ssaoSamples[i]) * ssaoRad + viewSpacePos;
+        samplePosition = (tbn * ssaoSamples[i]) * ssaoRadius + viewSpacePos;
 
-        vec4 offset = vec4(samplePosition.x, samplePosition.y, samplePosition.z, 1.0);
+        offset = vec4(samplePosition.x, samplePosition.y, samplePosition.z, 1.0);
         offset = projMatrix * offset;
         offset.xy /= offset.w;
         offset.xy = offset.xy * vec2(0.5) + vec2(0.5);
 
         // TODO: Holy... frustum ray and linearized depth - please!
         sampleDepth = reconstructViewPos(texture2D(texDepth, offset.xy).r * 2.0 - 1.0, gl_TexCoord[0].xy, invProjMatrix).z;
+        float depthDifference = abs(viewSpacePos.z - sampleDepth);
 
-        rangeCheck = smoothstep(0.0, 1.0, ssaoRad / abs(viewSpacePos.z - sampleDepth));
+        float rangeCheck;
+        if (depthDifference > maxDepthDifference) {
+        	rangeCheck = 0;
+        } else {
+        	rangeCheck = smoothstep(0.0, 1.0, ssaoRadius / depthDifference);
+        }
+
         occlusion += step(samplePosition.z, sampleDepth) * rangeCheck;
 
         samplesTaken += 1.0;

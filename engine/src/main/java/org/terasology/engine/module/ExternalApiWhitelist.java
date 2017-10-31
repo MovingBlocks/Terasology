@@ -46,6 +46,7 @@ public final class ExternalApiWhitelist {
             .add("java.awt")
             .add("java.awt.geom")
             .add("java.awt.image")
+            .add("jdk.internal.reflect")
             .add("com.google.common.annotations")
             .add("com.google.common.cache")
             .add("com.google.common.collect")
@@ -76,6 +77,8 @@ public final class ExternalApiWhitelist {
             .add("com.yourkit.runtime")
             .add("com.bulletphysics.linearmath")
             .add("sun.reflect")
+            .add("com.snowplowanalytics.snowplow.tracker.events")
+            .add("com.snowplowanalytics.snowplow.tracker.payload")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()

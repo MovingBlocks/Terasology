@@ -19,7 +19,6 @@ package org.terasology.config;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonDeserializationContext;
@@ -29,51 +28,37 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.BindableAxis;
-import org.terasology.input.BindableButton;
-import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
-import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard.KeyId;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.input.RegisterRealBindAxis;
-import org.terasology.input.events.AxisEvent;
-import org.terasology.input.events.ButtonEvent;
-import org.terasology.module.DependencyResolver;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.module.ResolutionResult;
-import org.terasology.module.predicates.FromModule;
+import org.terasology.input.binds.movement.ForwardsButton;
 import org.terasology.naming.Name;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-import java.util.Collections;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 /**
- * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
- *
+ * The binds configuration holds the mapping from binding uris to Inputs.
+ * The {@link SimpleUri} for a binding contains the module id where the binding is defined and the id from the binding annotation, 
+ * e.g. from {@link RegisterBindButton} as object name.
+ * <p>
+ * One example for a binding-input combination is the {@link ForwardsButton} 
+ * which is defined in the engine with the id <code>forwards</code>.
+ * The default input binding for the forward movement is the W-Key.
+ * Therefore the binds for <code>engine:forwards</code> would contain an {@link Input} object with type {@link InputType#KEY} and id {@link KeyId.W}.
  */
 public final class BindsConfig {
-    private static final Logger logger = LoggerFactory.getLogger(BindsConfig.class);
 
-    private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
-
-    public BindsConfig() {
-    }
+    private ListMultimap<SimpleUri, Input> uriBoundInputs = ArrayListMultimap.create();
 
     /**
      * Returns true if an input has already been bound to another key
@@ -82,7 +67,7 @@ public final class BindsConfig {
      * @return True if newInput has been bound. False otherwise.
      */
     public boolean isBound(Input newInput) {
-        return newInput != null && data.containsValue(newInput) ;
+        return newInput != null && uriBoundInputs.containsValue(newInput);
     }
 
     /**
@@ -91,12 +76,12 @@ public final class BindsConfig {
      * @param other The BindsConfig to copy
      */
     public void setBinds(BindsConfig other) {
-        data.clear();
-        data.putAll(other.data);
+        uriBoundInputs.clear();
+        uriBoundInputs.putAll(other.uriBoundInputs);
     }
 
     public List<Input> getBinds(SimpleUri uri) {
-        return data.get(uri);
+        return uriBoundInputs.get(uri);
     }
 
     /**
@@ -107,216 +92,33 @@ public final class BindsConfig {
      * @return Whether the given bind has been registered with the BindsConfig
      */
     public boolean hasBinds(SimpleUri uri) {
-        return !data.get(uri).isEmpty();
+        return !uriBoundInputs.get(uri).isEmpty();
     }
 
     /**
      * Sets the inputs for a given bind, replacing any previous inputs
      *
-     * @param bindUri
-     * @param inputs
      */
-
-    public void setBinds(SimpleUri bindUri, Input... inputs) {
+    public void setBinds(SimpleUri bindUri, Input ... inputs) {
         setBinds(bindUri, Arrays.asList(inputs));
     }
 
+    /**
+     * Sets the inputs for a given bind, replacing any previous inputs
+     *
+     */
     public void setBinds(SimpleUri bindUri, Iterable<Input> inputs) {
         Set<Input> uniqueInputs = Sets.newLinkedHashSet(inputs);
 
         // Clear existing usages of the given inputs
-        Iterator<Input> iterator = data.values().iterator();
+        Iterator<Input> iterator = uriBoundInputs.values().iterator();
         while (iterator.hasNext()) {
             Input i = iterator.next();
             if (uniqueInputs.contains(i)) {
                 iterator.remove();
             }
         }
-        data.replaceValues(bindUri, uniqueInputs);
-    }
-
-    /**
-     * @return A new BindsConfig, with inputs set from the DefaultBinding annotations on bind classes
-     */
-    public static BindsConfig createDefault(Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        BindsConfig config = new BindsConfig();
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        FromModule filter = new FromModule(environment, moduleId);
-                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
-                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        config.addButtonDefaultsFor(moduleId, buttons);
-                        config.addAxisDefaultsFor(moduleId, axes);
-                    }
-                }
-            }
-        }
-        return config;
-    }
-
-    /**
-     * Updates a config with any binds that it may be missing, through reflection over RegisterBindButton annotations
-     */
-    public void updateForChangedMods(Context context) {
-        ModuleManager moduleManager = context.get(ModuleManager.class);
-        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
-                ResolutionResult result = resolver.resolve(moduleId);
-                if (result.isSuccess()) {
-                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
-                        FromModule filter = new FromModule(environment, moduleId);
-                        Iterable<Class<?>> buttons = environment.getTypesAnnotatedWith(RegisterBindButton.class, filter);
-                        Iterable<Class<?>> axes = environment.getTypesAnnotatedWith(RegisterRealBindAxis.class, filter);
-                        updateButtonInputsFor(moduleId, buttons);
-                        updateAxisInputsFor(moduleId, axes);
-                    }
-                }
-            }
-        }
-    }
-
-    private void updateButtonInputsFor(Name moduleId, Iterable<Class<?>> classes) {
-        for (Class<?> buttonEvent : classes) {
-            if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
-                SimpleUri bindUri = new SimpleUri(moduleId, info.id());
-                if (!hasBinds(bindUri)) {
-                    addBind(moduleId, buttonEvent, info.id());
-                }
-            }
-        }
-    }
-
-    private void updateAxisInputsFor(Name moduleId, Iterable<Class<?>> classes) {
-        for (Class<?> axisEvent : classes) {
-            if (AxisEvent.class.isAssignableFrom(axisEvent)) {
-                RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
-                SimpleUri bindUri = new SimpleUri(moduleId, info.id());
-                if (!hasBinds(bindUri)) {
-                    addBind(moduleId, axisEvent, info.id());
-                }
-            }
-        }
-    }
-
-    private void addButtonDefaultsFor(Name moduleId, Iterable<Class<?>> classes) {
-        for (Class<?> buttonEvent : classes) {
-            if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
-                addBind(moduleId, buttonEvent, info.id());
-            }
-        }
-    }
-
-    private void addAxisDefaultsFor(Name moduleId, Iterable<Class<?>> classes) {
-        for (Class<?> axisEvent : classes) {
-            if (AxisEvent.class.isAssignableFrom(axisEvent)) {
-                RegisterRealBindAxis info = axisEvent.getAnnotation(RegisterRealBindAxis.class);
-                addBind(moduleId, axisEvent, info.id());
-            }
-        }
-    }
-
-    private void addBind(Name moduleName, Class<?> event, String id) {
-        List<Input> defaultInputs = Lists.newArrayList();
-        for (Annotation annotation : event.getAnnotationsByType(DefaultBinding.class)) {
-            DefaultBinding defaultBinding = (DefaultBinding) annotation;
-            Input input = defaultBinding.type().getInput(defaultBinding.id());
-            if (!data.values().contains(input)) {
-                defaultInputs.add(input);
-            }
-        }
-        SimpleUri bindUri = new SimpleUri(moduleName, id);
-        setBinds(bindUri, defaultInputs);
-    }
-
-    public void applyBinds(InputSystem inputSystem, ModuleManager moduleManager) {
-        inputSystem.clearBinds();
-        ModuleEnvironment env = moduleManager.getEnvironment();
-        registerButtonBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindButton.class));
-        registerAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterBindAxis.class));
-        registerRealAxisBinds(inputSystem, env, env.getTypesAnnotatedWith(RegisterRealBindAxis.class));
-    }
-
-    private void registerAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class<?> registerBindClass : classes) {
-            RegisterBindAxis info = registerBindClass.getAnnotation(RegisterBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
-            SimpleUri id = new SimpleUri(moduleId, info.id());
-            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
-                BindableButton positiveButton = inputSystem.getBindButton(new SimpleUri(info.positiveButton()));
-                BindableButton negativeButton = inputSystem.getBindButton(new SimpleUri(info.negativeButton()));
-                if (positiveButton == null) {
-                    logger.warn("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
-                    continue;
-                }
-                if (negativeButton == null) {
-                    logger.warn("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
-                    continue;
-                }
-                try {
-                    BindableAxis bindAxis = inputSystem.registerBindAxis(id.toString(), (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
-                    bindAxis.setSendEventMode(info.eventMode());
-                    logger.debug("Registered axis bind: {}", id);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("Failed to register axis bind \"{}\"", id, e);
-                }
-            } else {
-                logger.error("Failed to register axis bind \"{}\", does not extend BindAxisEvent", id);
-            }
-        }
-    }
-
-    private void registerRealAxisBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class<?> registerBindClass : classes) {
-            RegisterRealBindAxis info = registerBindClass.getAnnotation(RegisterRealBindAxis.class);
-            Name moduleId = environment.getModuleProviding(registerBindClass);
-            SimpleUri id = new SimpleUri(moduleId, info.id());
-            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
-                try {
-                    BindAxisEvent instance = (BindAxisEvent) registerBindClass.newInstance();
-                    BindableAxis bindAxis = inputSystem.registerRealBindAxis(id.toString(), instance);
-                    bindAxis.setSendEventMode(info.eventMode());
-                    for (Input input : getBinds(id)) {
-                        inputSystem.linkAxisToInput(input, id);
-                    }
-                    logger.debug("Registered axis bind: {}", id);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("Failed to register axis bind \"{}\"", id, e);
-                }
-            } else {
-                logger.error("Failed to register axis bind \"{}\", does not extend BindAxisEvent", id);
-            }
-        }
-    }
-
-    private void registerButtonBinds(InputSystem inputSystem, ModuleEnvironment environment, Iterable<Class<?>> classes) {
-        for (Class<?> registerBindClass : classes) {
-            RegisterBindButton info = registerBindClass.getAnnotation(RegisterBindButton.class);
-            SimpleUri bindUri = new SimpleUri(environment.getModuleProviding(registerBindClass), info.id());
-            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
-                try {
-                    BindableButton bindButton = inputSystem.registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
-                    bindButton.setMode(info.mode());
-                    bindButton.setRepeating(info.repeating());
-
-                    getBinds(bindUri).stream().filter(input -> input != null).forEach(input ->
-                            inputSystem.linkBindButtonToInput(input, bindUri));
-
-                    logger.debug("Registered button bind: {}", bindUri);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("Failed to register button bind \"{}\"", e);
-                }
-            } else {
-                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
-            }
-        }
+        uriBoundInputs.replaceValues(bindUri, uniqueInputs);
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
@@ -329,31 +131,39 @@ public final class BindsConfig {
                 SetMultimap<String, Input> map = context.deserialize(entry.getValue(), SetMultimap.class);
                 for (String id : map.keySet()) {
                     SimpleUri uri = new SimpleUri(new Name(entry.getKey()), id);
-                    result.data.putAll(uri, map.get(id));
+                    result.uriBoundInputs.putAll(uri, map.get(id));
                 }
             }
             return result;
         }
 
         @Override
-        public JsonElement serialize(BindsConfig src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(BindsConfig bindsConfig, Type typeOfBindsConfig, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
-            SetMultimap<Name, SimpleUri> bindByModule = HashMultimap.create();
-            for (SimpleUri key : src.data.keySet()) {
-                bindByModule.put(key.getModuleName(), key);
-            }
-            List<Name> sortedModules = Lists.newArrayList(bindByModule.keySet());
-            Collections.sort(sortedModules);
-            for (Name moduleId : sortedModules) {
+            SetMultimap<Name, SimpleUri> bindingByModuleName = listBindingsByModuleName(bindsConfig);
+            List<Name> sortedModuleNames = bindingByModuleName.keySet().stream().sorted().collect(toList());
+            for (Name moduleName : sortedModuleNames) {
                 SetMultimap<String, Input> moduleBinds = HashMultimap.create();
-                for (SimpleUri bindUri : bindByModule.get(moduleId)) {
-                    moduleBinds.putAll(bindUri.getObjectName().toString(), src.data.get(bindUri));
+                for (SimpleUri bindingUri : bindingByModuleName.get(moduleName)) {
+                    moduleBinds.putAll(bindingUri.getObjectName().toString(), bindsConfig.uriBoundInputs.get(bindingUri));
                 }
                 JsonElement map = context.serialize(moduleBinds, SetMultimap.class);
-                result.add(moduleId.toString(), map);
+                result.add(moduleName.toString(), map);
             }
             return result;
         }
+
+        public SetMultimap<Name, SimpleUri> listBindingsByModuleName(BindsConfig src) {
+            SetMultimap<Name, SimpleUri> bindingByModuleName = HashMultimap.create();
+            for (SimpleUri bindingUri : src.uriBoundInputs.keySet()) {
+                bindingByModuleName.put(bindingUri.getModuleName(), bindingUri);
+            }
+            return bindingByModuleName;
+        }
+    }
+
+    public Collection<Input> getBoundInputs() {
+        return uriBoundInputs.values();
     }
 
 }

@@ -175,6 +175,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             characterComp.controller = entity;
             character.saveComponent(characterComp);
             character.setOwner(entity);
+            if (!character.hasComponent(AliveCharacterComponent.class)) {
+                character.addComponent(new AliveCharacterComponent());
+            }
             Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
         } else {
             character.destroy();
@@ -209,7 +212,13 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_CRITICAL, components = {ClientComponent.class})
     public void setSpawnLocationOnRespawnRequest(RespawnRequestEvent event, EntityRef entity) {
-        Vector3f spawnPosition = worldGenerator.getSpawnPosition(entity);
+        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
+        Vector3f spawnPosition;
+        if (clientInfo.hasComponent(StaticSpawnLocationComponent.class)) {
+            spawnPosition = clientInfo.getComponent(StaticSpawnLocationComponent.class).position;
+        } else {
+            spawnPosition = worldGenerator.getSpawnPosition(entity);
+        }
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(spawnPosition);
         loc.setLocalRotation(new Quat4f());  // reset rotation

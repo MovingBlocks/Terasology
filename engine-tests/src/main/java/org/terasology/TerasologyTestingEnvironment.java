@@ -70,9 +70,9 @@ public abstract class TerasologyTestingEnvironment {
 
     private static HeadlessEnvironment env;
 
+    protected EngineTime mockTime;
     private EngineEntityManager engineEntityManager;
     private ComponentSystemManager componentSystemManager;
-    protected EngineTime mockTime;
 
     @BeforeClass
     public static void setupEnvironment() throws Exception {

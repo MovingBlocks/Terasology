@@ -16,8 +16,9 @@
 package org.terasology.engine.subsystem;
 
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.utilities.subscribables.Subscribable;
 
-public interface DisplayDevice {
+public interface DisplayDevice extends Subscribable {
 
     boolean hasFocus();
 
@@ -43,5 +44,7 @@ public interface DisplayDevice {
 
     // TODO: another method that possibly doesn't need to exist, but I need to check with Immortius on this
     void prepareToRender();
+
+    void update();
 
 }

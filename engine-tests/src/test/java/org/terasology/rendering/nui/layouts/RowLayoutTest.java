@@ -89,15 +89,15 @@ public class RowLayoutTest {
 
         //Width split according to the relative widths of the widgets
         // Gets 4/10 of the entire area
-        final int WIDTH_1 = CANVAS_WIDTH * 4 / 10;
+        final int width1 = CANVAS_WIDTH * 4 / 10;
         // Gets 1/2 of the entire area
-        final int WIDTH_2 = CANVAS_WIDTH / 2;
+        final int width2 = CANVAS_WIDTH / 2;
         // Gets 1/10 of the entire area
-        final int WIDTH_3 = CANVAS_WIDTH / 10;
+        final int width3 = CANVAS_WIDTH / 10;
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, WIDTH_1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(WIDTH_1, 0, WIDTH_2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(WIDTH_1 + WIDTH_2, 0, WIDTH_3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 
     @Test
@@ -137,12 +137,12 @@ public class RowLayoutTest {
         rowLayout.onDraw(canvas);
 
         //Width first determined for widget with relative width, then split equally among remaining widgets
-        final int WIDTH_1 = CANVAS_WIDTH / 2;
-        final int WIDTH_2 = (CANVAS_WIDTH - WIDTH_1) / 2;
-        final int WIDTH_3 = (CANVAS_WIDTH - WIDTH_1) / 2;
+        final int width1 = CANVAS_WIDTH / 2;
+        final int width2 = (CANVAS_WIDTH - width1) / 2;
+        final int width3 = (CANVAS_WIDTH - width1) / 2;
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, WIDTH_1, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(WIDTH_1, 0, WIDTH_2, CANVAS_HEIGHT));
-        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(WIDTH_1 + WIDTH_2, 0, WIDTH_3, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, width1, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(width1, 0, width2, CANVAS_HEIGHT));
+        verify(canvas).drawWidget(itemAt1x3, Rect2i.createFromMinAndSize(width1 + width2, 0, width3, CANVAS_HEIGHT));
     }
 }

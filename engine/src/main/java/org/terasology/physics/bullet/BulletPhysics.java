@@ -710,15 +710,9 @@ public class BulletPhysics implements PhysicsEngine {
                     if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
                     }
-                    else if(((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof Vector3i){
-                        otherEntity = blockEntityRegistry.getEntityAt((Vector3i)((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer());
-                    }
                 } else {
                     if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
-                    }
-                    else if(((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof Vector3i){
-                        otherEntity = blockEntityRegistry.getEntityAt((Vector3i)((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer());
                     }
                 }
                 if (otherEntity == null || otherEntity == EntityRef.NULL) {
@@ -933,6 +927,7 @@ public class BulletPhysics implements PhysicsEngine {
             BulletSweepCallback callback = new BulletSweepCallback(collider, new org.terasology.math.geom.Vector3f(0, 1, 0), slopeFactor);
             callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
             callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
+            callback.collisionFilterMask = (short) (callback.collisionFilterMask & (~StandardCollisionGroup.SENSOR.getFlag()));
             collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
             return callback;
         }

@@ -155,7 +155,7 @@ public class ItemCommands extends BaseComponentSystem {
 
         List<String> items = Lists.newArrayList();
         for (String item : listItems(null).split("\n")) {
-            if(item.contains(searched.toLowerCase())) {
+            if (item.contains(searched.toLowerCase())) {
                 items.add(item);
             }
         }

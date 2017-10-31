@@ -83,7 +83,7 @@ public class ComponentSystemManager {
             }
             Name moduleId = environment.getModuleProviding(type);
             RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode, isHeadless) && areOptionalRequirementsContained(registerInfo,environment)) {
+            if (registerInfo.value().isValidFor(netMode, isHeadless) && areOptionalRequirementsContained(registerInfo, environment)) {
                 systemsByModule.put(moduleId, type);
             }
         }
@@ -109,8 +109,8 @@ public class ComponentSystemManager {
         if (registerSystem.requiresOptional().length == 0) {
             return true;
         }
-        for (String moduleName :registerSystem.requiresOptional()) {
-            if(environment.get(new Name(moduleName)) == null) {
+        for (String moduleName : registerSystem.requiresOptional()) {
+            if (environment.get(new Name(moduleName)) == null) {
                 return false;
             }
         }
@@ -187,5 +187,7 @@ public class ComponentSystemManager {
         for (ComponentSystem system : iterateAll()) {
             system.shutdown();
         }
+        updateSubscribers.clear();
+        renderSubscribers.clear();
     }
 }

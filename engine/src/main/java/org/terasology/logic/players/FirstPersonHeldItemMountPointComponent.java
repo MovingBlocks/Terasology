@@ -30,7 +30,6 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
  * Only used by the client side so that held items can be positioned in line with the camera
  */
 public class FirstPersonHeldItemMountPointComponent implements Component, ControllerListener {
-    private boolean trackingDataReceived = false;
 
     @Owns
     public EntityRef mountPointEntity = EntityRef.NULL;
@@ -41,12 +40,14 @@ public class FirstPersonHeldItemMountPointComponent implements Component, Contro
 
     // TODO: @In
     private final OpenVRProvider vrProvider = OpenVRProvider.getInstance();
+    private boolean trackingDataReceived;
+
 
     // The hand/tool models seem to have an origin other than the pivot point. This is a best-effort correction,
     // in the form of a 4x4 homogeneous transformation matrix
     private Matrix4f toolAdjustmentMatrix = new Matrix4f(
             1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, (float) Math.cos(230.* TeraMath.DEG_TO_RAD), (float) Math.sin(230. * TeraMath.DEG_TO_RAD), 0.0f,
+            0.0f, (float) Math.cos(230. * TeraMath.DEG_TO_RAD), (float) Math.sin(230. * TeraMath.DEG_TO_RAD), 0.0f,
             0.0f, (float) -Math.sin(230. * TeraMath.DEG_TO_RAD), (float) Math.cos(230. * TeraMath.DEG_TO_RAD), 0.0f,
             0.0f, -0.05f, -0.2f, 1.0f
     );

@@ -16,7 +16,10 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.Asset;
+import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
@@ -34,26 +37,35 @@ import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
 import org.terasology.module.sandbox.StandardPermissionProviderFactory;
+import org.terasology.naming.Name;
+
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Policy;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ModuleManagerImpl implements ModuleManager {
 
+public class ModuleManagerImpl implements ModuleManager {
+    private static final Logger logger = LoggerFactory.getLogger(ModuleManagerImpl.class);
     private StandardPermissionProviderFactory permissionProviderFactory = new StandardPermissionProviderFactory();
 
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
     private ModuleMetadataJsonAdapter metadataReader;
+    private ModuleInstallManager installManager;
 
-    public ModuleManagerImpl() {
+    public ModuleManagerImpl(String masterServerAddress) {
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -70,6 +82,9 @@ public class ModuleManagerImpl implements ModuleManager {
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
+
+        loadModulesFromClassPath();
+
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         scanner.scan(registry, PathManager.getInstance().getModulePaths());
@@ -83,6 +98,66 @@ public class ModuleManagerImpl implements ModuleManager {
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
+        installManager = new ModuleInstallManager(this, masterServerAddress);
+    }
+
+    public ModuleManagerImpl(Config config) {
+        this(config.getNetwork().getMasterServer());
+    }
+
+    /**
+     * Overrides modules in modules/ with those specified via -classpath in the JVM
+     */
+    private void loadModulesFromClassPath() {
+        // Only attempt this if we're using the standard URLClassLoader
+        if (ClassLoader.getSystemClassLoader() instanceof URLClassLoader) {
+            URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            ModuleLoader loader = new ModuleLoader(metadataReader);
+            Enumeration<URL> moduleInfosInClassPath;
+            loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
+            // We're looking for jars on the classpath with a module.txt
+            try {
+                moduleInfosInClassPath = urlClassLoader.findResources(TerasologyConstants.MODULE_INFO_FILENAME.toString());
+            } catch (IOException e) {
+                logger.warn("Failed to search for classpath modules: {}", e);
+                return;
+            }
+
+            for (URL url : Collections.list(moduleInfosInClassPath)) {
+                if (!url.getProtocol().equalsIgnoreCase("jar")) {
+                    continue;
+                }
+
+                try {
+                    Reader reader = new InputStreamReader(url.openStream(), TerasologyConstants.CHARSET);
+                    ModuleMetadata metaData = metadataReader.read(reader);
+                    String displayName = metaData.getDisplayName().toString();
+                    Name id = metaData.getId();
+
+                    // if the display name is empty or the id is null, this probably isn't a Terasology module
+                    if (null == id || displayName.equalsIgnoreCase("")) {
+                        logger.warn("Found a module-like JAR on the class path with no id or display name. Skipping");
+                        logger.warn("{}", url);
+                    }
+
+                    logger.info("Loading module {} from class path at {}", displayName, url.getFile());
+
+                    // the url contains a protocol, and points to the module.txt
+                    // we need to trim both of those away to get the module's path
+                    Path path = Paths.get(url.getFile()
+                            .replace("file:", "")
+                            .replace("!/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
+                            .replace("/" + TerasologyConstants.MODULE_INFO_FILENAME, "")
+                    );
+
+                    Module module = loader.load(path);
+                    registry.add(module);
+                } catch (IOException e) {
+                    logger.warn("Failed to load module.txt for classpath module {}", url);
+                }
+            }
+        }
     }
 
     private void setupSandbox() {
@@ -104,6 +179,11 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public ModuleRegistry getRegistry() {
         return registry;
+    }
+
+    @Override
+    public ModuleInstallManager getInstallManager() {
+        return installManager;
     }
 
     @Override

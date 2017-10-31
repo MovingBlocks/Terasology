@@ -50,12 +50,6 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     protected static final String PARTICLE_MATERIAL_URI = "engine:prog.particle";
 
-    @In
-    WorldRenderer worldRenderer;
-
-    @In
-    ParticleSystemManager particleSystemManager;
-
     /**
      * Vertices of a unit quad on the xy plane, centered on the origin.
      * Vertices are in counter-clockwise order starting from the bottom right vertex.
@@ -68,6 +62,11 @@ public class SpriteParticleRenderer implements RenderSystem {
             -0.5f, +0.5f, 0.0f,
             -0.5f, -0.5f, 0.0f
     };
+    @In
+    WorldRenderer worldRenderer;
+
+    @In
+    ParticleSystemManager particleSystemManager;
 
     private DisplayList drawUnitQuad;
 
@@ -209,7 +208,7 @@ public class SpriteParticleRenderer implements RenderSystem {
         private static final int DISPOSED = 0;
         private int id;
 
-        public DisplayList(Runnable commands) {
+        DisplayList(Runnable commands) {
             id = glGenLists(1);
             glNewList(id, GL11.GL_COMPILE);
             commands.run();

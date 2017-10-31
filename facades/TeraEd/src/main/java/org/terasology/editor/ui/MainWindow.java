@@ -17,17 +17,9 @@ package org.terasology.editor.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.assets.management.AssetManager;
-import org.terasology.context.Context;
 import org.terasology.editor.TeraEd;
-import org.terasology.editor.properties.PropertyProvider;
-import org.terasology.editor.properties.ReflectionProvider;
 import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.modes.GameState;
-import org.terasology.engine.modes.StateIngame;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.opengl.GLSLMaterial;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -131,6 +123,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     }
 
     public void onStateChange() {
+        /*
         shaderPropertyMenuEntries.clear();
         shaderPropertiesMenu.removeAll();
         GameState gameState = engine.getState();
@@ -156,8 +149,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
                 }
             }
         }
-
-
+        */
     }
 
     @Override

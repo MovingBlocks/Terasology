@@ -36,7 +36,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -143,8 +142,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent
-    public void onPlayerDeath(PlayerDeathEvent event, EntityRef client) {
-        EntityRef character = client.getComponent(ClientComponent.class).character;
+    public void onPlayerDeath(PlayerDeathEvent event, EntityRef character) {
         CharacterSoundComponent characterSounds = character.getComponent(CharacterSoundComponent.class);
         if (characterSounds.deathSounds.size() > 0) {
             StaticSound sound = random.nextItem(characterSounds.deathSounds);

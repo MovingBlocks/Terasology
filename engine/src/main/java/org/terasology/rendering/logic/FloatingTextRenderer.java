@@ -106,8 +106,9 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
 
             int textWidth = 0;
             for (String singleLine : linesOfText) {
-                if (font.getWidth(singleLine) > textWidth)
+                if (font.getWidth(singleLine) > textWidth) {
                     textWidth = font.getWidth(singleLine);
+                }
             }
 
             FontMeshBuilder meshBuilder = new FontMeshBuilder(underlineMaterial);

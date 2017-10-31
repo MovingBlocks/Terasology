@@ -33,6 +33,7 @@ import org.terasology.registry.In;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This system implement the server ping to clients on need base.
@@ -49,11 +50,11 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
     @In
     private LocalPlayer localPlayer;
 
-    private HashMap<EntityRef, Instant> startMap = new HashMap<>();
+    private Map<EntityRef, Instant> startMap = new HashMap<>();
 
-    private HashMap<EntityRef, Instant> endMap = new HashMap<>();
+    private Map<EntityRef, Instant> endMap = new HashMap<>();
 
-    private HashMap<EntityRef, Long> pingMap = new HashMap<>();
+    private Map<EntityRef, Long> pingMap = new HashMap<>();
 
     private Instant lastPingTime;
 
@@ -78,8 +79,8 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
                     // send ping only if client replied the last ping
                     Instant lastPingFromClient = endMap.get(client);
                     Instant lastPingToClient = startMap.get(client);
-                    // Only happens when server doesn't receive ping back yet 
-                    if (lastPingFromClient!= null && lastPingToClient!=null && lastPingFromClient.isBefore(lastPingToClient)) {
+                    // Only happens when server doesn't receive ping back yet
+                    if (lastPingFromClient != null && lastPingToClient != null && lastPingFromClient.isBefore(lastPingToClient)) {
                         continue;
                     }
 
@@ -88,7 +89,7 @@ public class ServerPingSystem extends BaseComponentSystem implements UpdateSubsc
                     client.send(new PingFromServerEvent());
                 }
             }
-            
+
             //update ping data for all clients
             for (EntityRef client : entityManager.getEntitiesWith(PingSubscriberComponent.class)) {
                 PingStockComponent pingStockComponent;

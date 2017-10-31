@@ -31,12 +31,6 @@ public final class KeyboardAction {
         this.inputChar = inputChar;
     }
 
-    public KeyboardAction(Input input, int delta, char inputChar) {
-        this.input = input;
-        this.state = ButtonState.DOWN;
-        this.inputChar = inputChar;
-    }
-
     /**
      * @return The type of input involved in this action (mouse button/mouse wheel)
      */

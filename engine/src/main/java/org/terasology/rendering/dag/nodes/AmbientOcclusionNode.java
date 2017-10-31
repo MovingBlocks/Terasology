@@ -15,23 +15,45 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import org.lwjgl.BufferUtils;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
+import org.terasology.engine.SimpleUri;
+import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.Assets;
+import org.terasology.utilities.random.FastRandom;
+import org.terasology.utilities.random.Random;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.util.Optional;
+
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
 
 /**
  * Instances of this node work in tandem with instances of the BlurredAmbientOcclusionNode class.
@@ -50,38 +72,63 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
-public class AmbientOcclusionNode extends ConditionDependentNode implements FBOManagerSubscriber {
-    public static final ResourceUrn SSAO_FBO = new ResourceUrn("engine:ssao");
-    private static final ResourceUrn SSAO_MATERIAL = new ResourceUrn("engine:prog.ssao");
+public class AmbientOcclusionNode extends ConditionDependentNode implements PropertyChangeListener {
+    public static final SimpleUri SSAO_FBO_URI = new SimpleUri("engine:fbo.ssao");
+    public static final int SSAO_KERNEL_ELEMENTS = 32;
+    public static final int SSAO_NOISE_SIZE = 4;
+    private static final ResourceUrn SSAO_MATERIAL_URN = new ResourceUrn("engine:prog.ssao");
     private static final float NOISE_TEXEL_SIZE = 0.25f;
-
-    private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
 
     private Material ssaoMaterial;
     private float outputFboWidth;
     private float outputFboHeight;
 
     @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.01f, max = 12.0f)
+    private float ssaoStrength = 1.75f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.1f, max = 25.0f)
+    private float ssaoRad = 1.5f;
+
     private FBO ssaoFbo;
+
+    private Camera activeCamera;
+
+    private final Random randomGenerator = new FastRandom();
+
+    private FloatBuffer ssaoSamples;
 
     public AmbientOcclusionNode(Context context) {
         super(context);
+
+        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
         requiresCondition(renderingConfig::isSsao);
 
-        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL));
-        ssaoMaterial = getMaterial(SSAO_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(SSAO_MATERIAL_URN));
+        ssaoMaterial = getMaterial(SSAO_MATERIAL_URN);
 
-        displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        requiresFBO(new FBOConfig(SSAO_FBO, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
-        addDesiredStateChange(new BindFbo(SSAO_FBO, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetViewportToSizeOf(SSAO_FBO, displayResolutionDependentFBOs));
-        update(); // Cheeky way to initialise ssaoFbo, outputFboWidth, outputFboHeight
-        displayResolutionDependentFBOs.subscribe(this);
+        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+        ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
+        addDesiredStateChange(new BindFbo(ssaoFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
+        propertyChange(null); // Cheeky way to initialise outputFboWidth, outputFboHeight
+        displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
 
         // TODO: check for input textures brought in by the material
+
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+
+        int texId = 0;
+        addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(texId++, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, SSAO_MATERIAL_URN, "texNormals"));
+        addDesiredStateChange(new SetInputTexture2D(texId, generateNoiseTexture().getId(), SSAO_MATERIAL_URN, "texNoise"));
+
+        if (ssaoSamples == null) {
+            createSamplesBuffer();
+        }
     }
 
     /**
@@ -95,8 +142,15 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     public void process() {
         PerformanceMonitor.startActivity("rendering/ambientOcclusion");
 
+        ssaoMaterial.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
+
+        ssaoMaterial.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
+        ssaoMaterial.setMatrix4("projMatrix", activeCamera.getProjectionMatrix(), true);
+
         ssaoMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
         ssaoMaterial.setFloat2("noiseTexelSize", NOISE_TEXEL_SIZE, NOISE_TEXEL_SIZE, true);
+
+        ssaoMaterial.setFloat3("ssaoSamples", ssaoSamples);
 
         renderFullscreenQuad();
 
@@ -104,9 +158,57 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements FBOM
     }
 
     @Override
-    public void update() {
-        ssaoFbo = displayResolutionDependentFBOs.get(SSAO_FBO);
+    public void propertyChange(PropertyChangeEvent event) {
+        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION,
+        // which means there is no need to check or process the event object.
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
+    }
+
+    private void createSamplesBuffer() {
+        ssaoSamples = BufferUtils.createFloatBuffer(SSAO_KERNEL_ELEMENTS * 3);
+
+        for (int i = 0; i < SSAO_KERNEL_ELEMENTS; ++i) {
+            Vector3f vec = new Vector3f();
+            vec.x = randomGenerator.nextFloat(-1.0f, 1.0f);
+            vec.y = randomGenerator.nextFloat(-1.0f, 1.0f);
+            vec.z = randomGenerator.nextFloat();
+
+            vec.normalize();
+            vec.scale(randomGenerator.nextFloat(0.0f, 1.0f));
+            float scale = i / (float) SSAO_KERNEL_ELEMENTS;
+            scale = TeraMath.lerp(0.25f, 1.0f, scale * scale);
+
+            vec.scale(scale);
+
+            ssaoSamples.put(vec.x);
+            ssaoSamples.put(vec.y);
+            ssaoSamples.put(vec.z);
+        }
+
+        ssaoSamples.flip();
+    }
+
+    private Texture generateNoiseTexture() {
+        Optional<Texture> texture = Assets.getTexture("engine:ssaoNoise");
+        if (!texture.isPresent()) {
+            ByteBuffer noiseValues = BufferUtils.createByteBuffer(SSAO_NOISE_SIZE * SSAO_NOISE_SIZE * 4);
+
+            for (int i = 0; i < SSAO_NOISE_SIZE * SSAO_NOISE_SIZE; ++i) {
+                Vector3f noiseVector = new Vector3f(randomGenerator.nextFloat(-1.0f, 1.0f), randomGenerator.nextFloat(-1.0f, 1.0f), 0.0f);
+                noiseVector.normalize();
+
+                noiseValues.put((byte) ((noiseVector.x * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) ((noiseVector.y * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) ((noiseVector.z * 0.5 + 0.5) * 255.0f));
+                noiseValues.put((byte) 0x0);
+            }
+
+            noiseValues.flip();
+
+            return Assets.generateAsset(new ResourceUrn("engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE,
+                    new ByteBuffer[]{noiseValues}, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST), Texture.class);
+        }
+        return texture.get();
     }
 }

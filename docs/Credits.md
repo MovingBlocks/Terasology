@@ -203,7 +203,10 @@ Contributors
  [njd5475](https://github.com/njd5475),
  [Owl-A](https://github.com/Owl-A),
  [niksoc](https://github.com/niksoc),
- [TheFlash98](https://github.com/TheFlash98)
+ [TheFlash98](https://github.com/TheFlash98),
+ [Dane99](https://github.com/Dane99),
+ [Derpthemeus](https://github.com/Derpthemeus),
+ [Aaron Harris](https://github.com/aaron-harris)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

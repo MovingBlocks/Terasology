@@ -211,7 +211,7 @@ public abstract class Camera {
      * @return the orientation direction, a quaternion.
      */
     public Quat4f getOrientation() {
-        return new Quat4f(viewingDirection,viewingAngle);
+        return new Quat4f(viewingDirection, viewingAngle);
     }
 
     /**

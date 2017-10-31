@@ -15,11 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
 import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2d;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -29,7 +25,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.utilities.Assets;
 
 /**
  * A radial menu widget
@@ -90,15 +85,15 @@ public class UIRadialRing extends CoreWidget {
     }
 
     private void initialise(Canvas canvas) {
-        final double CIRCLE_TO_SQUARE = 0.707106781;
+        final double circleToSquare = 0.707106781;
         Rect2i region = canvas.getRegion();
 
         int sectionWidth = region.width() / 4;
         double offset = sectionWidth * 1.5;
         radius = sectionWidth * 2;
         sectionAngle = (Math.PI * 2) / sections.length;
-        int infoSquareSize = (int) (radius * CIRCLE_TO_SQUARE);
-        int sectionSquareSize = (int) (sectionWidth * CIRCLE_TO_SQUARE);
+        int infoSquareSize = (int) (radius * circleToSquare);
+        int sectionSquareSize = (int) (sectionWidth * circleToSquare);
         Rect2i infoRegion = Rect2i.createFromMinAndSize(
                 sectionWidth + infoSquareSize / 4,
                 sectionWidth + infoSquareSize / 4,

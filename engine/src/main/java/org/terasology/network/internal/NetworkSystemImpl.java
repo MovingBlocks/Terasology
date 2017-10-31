@@ -759,7 +759,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
      * @param context
      */
     @Override
-    public void setStateContext(Context context) {
+    public void setContext(Context context) {
         this.context = context;
     }
 

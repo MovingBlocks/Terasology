@@ -87,8 +87,7 @@ public class ChatScreen extends CoreScreenLayer {
                 NotificationOverlay overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
                 overlay.setVisible(true);
                 nuiManager.closeScreen(this);
-            }
-            else{
+            } else {
                 commandLine.setText("");
                 nuiManager.closeScreen(this);
             }
