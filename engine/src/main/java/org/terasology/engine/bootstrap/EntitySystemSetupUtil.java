@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,6 @@ import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
-import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -85,7 +84,6 @@ public final class EntitySystemSetupUtil {
      * <li>{@link EventLibrary}</li>
      * <li>{@link PrefabManager}</li>
      * <li>{@link EventSystem}</li>
-     * <li>{@link NodesClassLibrary}</li>
      * </ul>
      */
     public static void addEntityManagementRelatedClasses(Context context) {
@@ -118,10 +116,7 @@ public final class EntitySystemSetupUtil {
         // TODO: Review - NodeClassLibrary related to the UI for behaviours. Should not be here and probably not even in the CoreRegistry
         context.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
-        // Behaviour Trees Node Library
-        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(context);
-        context.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan(environment);
+
 
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);

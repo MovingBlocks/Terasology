@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,42 +24,11 @@ import org.terasology.context.Context;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
-import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
-import org.terasology.engine.modes.loadProcesses.CacheBlocks;
-import org.terasology.engine.modes.loadProcesses.CacheTextures;
-import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
-import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
-import org.terasology.engine.modes.loadProcesses.EnsureSaveGameConsistency;
-import org.terasology.engine.modes.loadProcesses.InitialiseBlockTypeEntities;
-import org.terasology.engine.modes.loadProcesses.InitialiseCommandSystem;
-import org.terasology.engine.modes.loadProcesses.InitialiseComponentSystemManager;
-import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
-import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
-import org.terasology.engine.modes.loadProcesses.InitialisePhysics;
-import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
-import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
-import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
-import org.terasology.engine.modes.loadProcesses.InitialiseWorldGenerator;
-import org.terasology.engine.modes.loadProcesses.JoinServer;
-import org.terasology.engine.modes.loadProcesses.LoadEntities;
-import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
-import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
-import org.terasology.engine.modes.loadProcesses.PrepareWorld;
-import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
-import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
-import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
-import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
-import org.terasology.engine.modes.loadProcesses.RegisterMods;
-import org.terasology.engine.modes.loadProcesses.RegisterSystems;
-import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
-import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
-import org.terasology.engine.modes.loadProcesses.StartServer;
+import org.terasology.engine.modes.loadProcesses.*;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -90,9 +59,6 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for server or single player games
-     *
-     * @param gameManifest
-     * @param netMode
      */
     public StateLoading(GameManifest gameManifest, NetworkMode netMode) {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
@@ -103,8 +69,6 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for client of multiplayer game
-     *
-     * @param joinStatus
      */
     public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();

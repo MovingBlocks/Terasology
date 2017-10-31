@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,18 +18,12 @@ package org.terasology.logic.behavior.asset;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.logic.behavior.BehaviorNodeFactory;
-import org.terasology.logic.behavior.nui.RenderableNode;
-import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.behavior.core.BehaviorNode;
 import org.terasology.module.sandbox.API;
 
-import java.util.List;
-
 /**
- * Behavior tree asset. Can be loaded and saved into json.
- * <br><br>
- * This asset keeps track of the tree of Nodes and the associated RenderableNodes. If there are no RenderableNodes,
- * the helper class will generate and layout some.
+ * Behavior tree asset. Can be loaded and saved into json. Actors should never run the nodes behind a asset directly.
+ * Instead, use a runner which operates on copies, so actors can share one tree asset.
  *
  */
 @API
@@ -47,33 +41,12 @@ public class BehaviorTree extends Asset<BehaviorTreeData> {
         reload(data);
     }
 
-//    public BehaviorTree(AssetUri uri, BehaviorTreeData data) {
-//        super(uri);
-//        this.data = data;
-//    }
-
-    public Node getRoot() {
+    public BehaviorNode getRoot() {
         return data.getRoot();
     }
 
     public BehaviorTreeData getData() {
         return data;
-    }
-
-    public RenderableNode getRenderableNode(Node node) {
-        return data.getRenderableNode(node);
-    }
-
-    public List<RenderableNode> getRenderableNodes(BehaviorNodeFactory factory) {
-        if (!data.hasRenderable()) {
-            data.createRenderable(factory);
-            layout(null);
-        }
-        return data.getRenderableNodes();
-    }
-
-    public void layout(RenderableNode start) {
-        data.layout(start);
     }
 
     @Override
@@ -86,9 +59,4 @@ public class BehaviorTree extends Asset<BehaviorTreeData> {
         this.data = newData;
     }
 
-    public RenderableNode createNode(Node node, BehaviorNodeFactory factory) {
-        RenderableNode renderable = data.createRenderable(node, factory);
-        data.layout(renderable);
-        return renderable;
     }
-}
