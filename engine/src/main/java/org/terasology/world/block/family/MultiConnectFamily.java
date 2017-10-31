@@ -114,12 +114,12 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         this.setCategory(definition.getCategories());
     }
 
-    public byte getConnectionSides(){
+    public byte getConnectionSides() {
         return 64;
     }
 
 
-    protected void registerConnections(TByteObjectMap<String>[] basicBlocks){
+    protected void registerConnections(TByteObjectMap<String>[] basicBlocks) {
         addConnections(basicBlocks, 0, NO_CONNECTIONS);
         addConnections(basicBlocks, 1, ONE_CONNECTION);
         addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
@@ -223,7 +223,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
                 byte connections = Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
                 return blocks.get(connections);
             } catch (IllegalArgumentException e) {
-                logger.error("can't find block with URI: {}",blockUri,e);
+                logger.error("can't find block with URI: {}", blockUri, e);
                 return null;
             }
         }
