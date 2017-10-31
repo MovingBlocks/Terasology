@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;

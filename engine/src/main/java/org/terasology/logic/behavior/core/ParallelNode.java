@@ -21,11 +21,10 @@ package org.terasology.logic.behavior.core;
 public class ParallelNode extends CompositeNode {
 
     private enum Policy {
-        RequireOne,
-        RequireAll
+        REQUIRE_ONE, REQUIRE_ALL
     }
 
-    private Policy policy = Policy.RequireOne;
+    private Policy policy = Policy.REQUIRE_ONE;
 
     @Override
     public String getName() {
@@ -60,9 +59,17 @@ public class ParallelNode extends CompositeNode {
                 successCounter++;
             }
         }
-        return policy == Policy.RequireAll ?
-                successCounter == children.size() ? BehaviorState.SUCCESS : BehaviorState.RUNNING :
-                successCounter > 0 ? BehaviorState.SUCCESS : BehaviorState.RUNNING;
+        return checkSuccess(successCounter);
+    }
+
+    public BehaviorState checkSuccess(int successCounter) {
+        if (policy == Policy.REQUIRE_ALL && successCounter == children.size()) {
+            return BehaviorState.SUCCESS;
+        }
+        if (policy == Policy.REQUIRE_ONE && successCounter > 0) {
+            return BehaviorState.SUCCESS;
+        }
+        return BehaviorState.RUNNING;
     }
 
     @Override

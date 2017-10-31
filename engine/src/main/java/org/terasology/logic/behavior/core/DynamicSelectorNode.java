@@ -15,16 +15,13 @@
  */
 package org.terasology.logic.behavior.core;
 
-
 import java.util.BitSet;
-
 
 /**
  * Works like a normal selector but each update tick, all children are checked for state changes.
  */
 public class DynamicSelectorNode extends CompositeNode {
     private BitSet constructed;
-    private String[] byteFields;
 
     @Override
     public String getName() {
@@ -70,6 +67,5 @@ public class DynamicSelectorNode extends CompositeNode {
     @Override
     public void destruct(Actor actor) {
     }
-
 
 }

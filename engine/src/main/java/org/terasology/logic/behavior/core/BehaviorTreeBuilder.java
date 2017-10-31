@@ -16,7 +16,6 @@
 package org.terasology.logic.behavior.core;
 
 import com.google.common.collect.Maps;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -32,17 +31,16 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.apache.commons.codec.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
@@ -65,9 +63,6 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
 
     private Map<String, Class<? extends Action>> actions = Maps.newHashMap();
     private Map<String, Class<? extends Action>> decorators = Maps.newHashMap();
-
-    @In
-    private PrefabManager prefabManager;
 
     private Gson gson;
 
@@ -107,7 +102,7 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
 
     public BehaviorNode fromJson(InputStream json) {
         initGson();
-        return gson.fromJson(new InputStreamReader(json), BehaviorNode.class);
+        return gson.fromJson(new InputStreamReader(json, Charsets.UTF_8), BehaviorNode.class);
     }
 
     public void registerAction(String name, Class<? extends Action> action) {
@@ -146,7 +141,8 @@ public class BehaviorTreeBuilder implements JsonDeserializer<BehaviorNode>, Json
                 public BehaviorTree read(JsonReader in) throws IOException {
                     String uri = in.nextString();
                     AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-                    return assetManager.getAsset(new ResourceUrn(uri), BehaviorTree.class).orElse(assetManager.getAsset(new ResourceUrn("Behaviors:fallback"), BehaviorTree.class).get());
+                    return assetManager.getAsset(new ResourceUrn(uri), BehaviorTree.class)
+                            .orElse(assetManager.getAsset(new ResourceUrn("Behaviors:fallback"), BehaviorTree.class).get());
 
                 }
             });

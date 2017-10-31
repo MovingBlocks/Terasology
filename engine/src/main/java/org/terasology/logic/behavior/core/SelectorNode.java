@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-
 import java.util.Iterator;
 
 /**
@@ -24,7 +23,6 @@ import java.util.Iterator;
 public class SelectorNode extends CompositeNode {
     private Iterator<BehaviorNode> iterator;
     private BehaviorNode current;
-    private String reentry;
 
     @Override
     public String getName() {
@@ -77,6 +75,5 @@ public class SelectorNode extends CompositeNode {
     @Override
     public void destruct(Actor actor) {
     }
-
 
 }

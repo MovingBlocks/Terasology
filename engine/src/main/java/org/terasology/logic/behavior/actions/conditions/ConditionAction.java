@@ -26,11 +26,8 @@ import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
 import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.properties.TextField;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Condition leaf node.
@@ -53,10 +50,10 @@ public class ConditionAction extends BaseAction {
     protected String[] values;
 
     @In
-    ModuleManager moduleManager;
+    private ModuleManager moduleManager;
 
     @In
-    ComponentLibrary componentLibrary;
+    private ComponentLibrary componentLibrary;
 
     @Override
     public void construct(Actor actor) {
@@ -83,13 +80,10 @@ public class ConditionAction extends BaseAction {
     protected boolean condition(Actor actor) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
         boolean passing = true;
 
-        if (componentAbsent != null) {
-            if (actor.hasComponent(componentLibrary.resolve(componentAbsent).getType())) {
-                passing = false;
-            }
+        if (componentAbsent != null && actor.hasComponent(componentLibrary.resolve(componentAbsent).getType())) {
+            passing = false;
         }
         if (componentPresent != null) {
-
 
             Component component = actor.getComponent(componentLibrary.resolve(componentPresent).getType());
             if (component == null) {
@@ -191,19 +185,19 @@ public class ConditionAction extends BaseAction {
 
                                     // Null check
                                     case "exists":
-                                        if(fieldValue instanceof EntityRef && fieldValue == EntityRef.NULL) {
+                                        if (fieldValue instanceof EntityRef && fieldValue == EntityRef.NULL) {
                                             passing = false;
                                         }
                                         break;
                                     // Collection checks
                                     case "empty":
                                         if (fieldValue instanceof Collection) {
-                                            passing = ((Collection) fieldValue).isEmpty();
+                                            passing = ((Collection<?>) fieldValue).isEmpty();
                                         }
                                         break;
                                     case "nonEmpty":
                                         if (fieldValue instanceof Collection) {
-                                            passing = !((Collection) fieldValue).isEmpty();
+                                            passing = !((Collection<?>) fieldValue).isEmpty();
                                         }
                                         break;
 

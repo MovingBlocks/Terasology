@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.behavior;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.actions.Print;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
@@ -23,6 +25,9 @@ import org.terasology.logic.behavior.core.BehaviorState;
 import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 
 public final class Example {
+
+    private static final Logger logger = LoggerFactory.getLogger(Example.class);
+
     private Example() {
     }
 
@@ -30,13 +35,11 @@ public final class Example {
         BehaviorTreeBuilder treeBuilder = new BehaviorTreeBuilder();
 
         BehaviorNode node = treeBuilder.fromJson("{ sequence:[ success, success, failure ] }");
-        System.out.println(new DefaultBehaviorTreeRunner(node, null).step());
-
+        logger.info("{}", new DefaultBehaviorTreeRunner(node, null).step());
 
         treeBuilder.registerAction("print", Print.class);
         node = treeBuilder.fromJson("{ sequence:[ success, { print:{msg:world} } ] }");
-        System.out.println(new DefaultBehaviorTreeRunner(node, null).step());
-
+        logger.info("{}", new DefaultBehaviorTreeRunner(node, null).step());
 
         treeBuilder.registerAction("delay", Delay.class);
         Actor actor = new Actor(null);
@@ -47,13 +50,13 @@ public final class Example {
             tree.step();
         }
 
-        System.out.println();
         treeBuilder.registerDecorator("repeat", Repeat.class);
         actor = new Actor(null);
         actor.setDelta(0.1f);
         node = treeBuilder.fromJson("{ sequence:[ " +
-                "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } " +
-                "] }");
+                                    "{repeat :{ count:5, child:{print:{msg:x}}}}, success, { delay:{duration:1}}, { print:{msg:Hello} }, { delay:{duration:1}}, { print:{msg:World} } "
+                                    +
+                                    "] }");
         tree = new DefaultBehaviorTreeRunner(node, actor);
         for (int i = 0; i < 100; i++) {
             tree.step();
@@ -72,7 +75,7 @@ public final class Example {
 
         @Override
         public BehaviorState modify(Actor actor, BehaviorState result) {
-            System.out.print(".");
+            logger.info(".");
             float timeRemaining = actor.getValue(getId());
             timeRemaining -= actor.getDelta();
             actor.setValue(getId(), timeRemaining);

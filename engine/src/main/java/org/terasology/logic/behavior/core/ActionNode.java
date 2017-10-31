@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
-
 /**
  * An action node uses a associated Action to control the result state.
  * It is a leaf node - it cannot have any children.
@@ -66,7 +65,7 @@ public class ActionNode implements BehaviorNode {
         if (action != null) {
             try {
                 action.construct(actor);
-            } catch (Exception e){
+            } catch (Exception e) {
                 logger.info("Exception while running construct() of action {} from entity {}:", action, actor.getEntity());
             }
         }
@@ -128,7 +127,5 @@ public class ActionNode implements BehaviorNode {
     public int getMaxChildren() {
         return 0;
     }
-
-
 
 }

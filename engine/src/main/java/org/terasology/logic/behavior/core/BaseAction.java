@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.behavior.core;
 
-
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.module.sandbox.API;
 
@@ -25,7 +24,7 @@ import org.terasology.module.sandbox.API;
 @API
 public abstract class BaseAction implements Action {
     private transient int id;
-    protected transient boolean constructed = false;
+    protected transient boolean constructed;
 
     @Override
     public void setup() {

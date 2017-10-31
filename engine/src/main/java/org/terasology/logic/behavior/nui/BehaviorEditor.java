@@ -22,8 +22,6 @@ import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.DefaultBehaviorTreeRunner;
@@ -36,7 +34,12 @@ import org.terasology.logic.behavior.core.Visitor;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
@@ -55,7 +58,6 @@ import java.util.Map;
  * (Ideally the logic would be moved to the BehaviorEditorScreen instead)
  */
 public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTreeRunner.Callback {
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorEditor.class);
     private Port activeConnectionStart;
     private RenderableNode selectedNode;
     private RenderableNode newNode;
@@ -100,7 +102,6 @@ public class BehaviorEditor extends ZoomableLayout implements DefaultBehaviorTre
     public BehaviorEditor(String id) {
         super(id);
     }
-
 
     public void initialize(Context context) {
         this.behaviorNodeFactory = context.get(BehaviorNodeFactory.class);

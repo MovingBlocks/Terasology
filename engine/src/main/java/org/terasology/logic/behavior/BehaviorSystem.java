@@ -16,8 +16,6 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -37,7 +35,6 @@ import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeFormat;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorNode;
-import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -50,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Behavior tree system
@@ -64,20 +60,14 @@ import java.util.stream.Collectors;
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final Name BEHAVIORS = new Name("Behaviors");
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     @In
     private EntityManager entityManager;
     @In
     private PrefabManager prefabManager;
     @In
     private AssetManager assetManager;
-    @In
-    private BehaviorTreeBuilder treeBuilder;
 
     private List<BehaviorTree> trees = Lists.newArrayList();
-
-    private EntityRef dummy;
-
 
     @Override
     public void initialise() {
@@ -174,6 +164,5 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             }
         }
     }
-
 
 }

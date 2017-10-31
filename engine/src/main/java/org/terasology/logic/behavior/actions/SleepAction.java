@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior.actions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BaseAction;
@@ -31,14 +29,12 @@ import org.terasology.rendering.nui.properties.Range;
 @API
 @BehaviorAction(name = "sleep")
 public class SleepAction extends BaseAction {
-    static Logger logger = LoggerFactory.getLogger(SleepAction.class);
 
     @Range(min = 0, max = 20)
     private float time;
 
     @Override
     public void construct(Actor actor) {
-//        logger.info("Construct running for entity {} id {}", actor.getEntity(), getId());
         actor.setValue(getId(), time);
     }
 

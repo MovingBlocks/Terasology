@@ -122,7 +122,7 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
 
-        float delta = input.getDelta() + lastState.getTime() - ( time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
+        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
         if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);

@@ -17,8 +17,6 @@ package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -63,7 +61,6 @@ import java.util.stream.Collectors;
 @RegisterSystem
 @Share(BehaviorNodeFactory.class)
 public class BehaviorNodeFactory extends BaseComponentSystem {
-    private static final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
 
     private static final Comparator<BehaviorNodeComponent> COMPARE_BY_NAME = Comparator.comparing(o -> o.name);
 

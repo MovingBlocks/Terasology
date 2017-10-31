@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.behavior;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.core.Actor;
 import org.terasology.logic.behavior.core.BehaviorTreeRunner;
@@ -30,7 +28,6 @@ import org.terasology.module.sandbox.API;
  */
 @API
 public class Interpreter {
-    private static final Logger logger = LoggerFactory.getLogger(Interpreter.class);
 
     private Actor actor;
     private BehaviorTreeRunner treeRunner;
@@ -58,8 +55,8 @@ public class Interpreter {
         actor.setDelta(delta);
         if (treeRunner == null && tree != null) {
             treeRunner = new DefaultBehaviorTreeRunner(tree, actor, callback);
-//        Assembler assembler = new Assembler("Test", tree.getRoot());
-//        treeRunner = assembler.createInstance(actor);
+            //        Assembler assembler = new Assembler("Test", tree.getRoot());
+            //        treeRunner = assembler.createInstance(actor);
         }
         if (treeRunner != null) {
             treeRunner.step();
@@ -78,8 +75,12 @@ public class Interpreter {
         return tree;
     }
 
+    @Override
     public String toString() {
-        return actor.hasComponent(DisplayNameComponent.class) ? actor.getComponent(DisplayNameComponent.class).name : "unnamed " + actor.getEntity().getParentPrefab().getName();
+        if (actor.hasComponent(DisplayNameComponent.class)) {
+            return actor.getComponent(DisplayNameComponent.class).name;
+        }
+        return "unnamed " + actor.getEntity().getParentPrefab().getName();
     }
 
     public void pause() {

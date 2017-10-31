@@ -19,14 +19,12 @@ import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.generation.impl.EntityBufferImpl;
@@ -50,11 +48,11 @@ public class MapWorldProvider implements WorldProviderCore {
     private Map<Vector3i, Block> blocks = Maps.newHashMap();
     private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
     private WorldGenerator worldGenerator;
-    private BlockManagerImpl blockManager;
+    private BlockManager blockManager;
     private BiomeManager biomeManager;
     private EntityBufferImpl entityBuffer;
 
-    public MapWorldProvider(WorldGenerator worldGenerator, BlockManagerImpl blockManager, BiomeManager biomeManager) {
+    public MapWorldProvider(WorldGenerator worldGenerator, BlockManager blockManager, BiomeManager biomeManager) {
         this.worldGenerator = worldGenerator;
         this.blockManager = blockManager;
         this.biomeManager = biomeManager;
@@ -110,7 +108,6 @@ public class MapWorldProvider implements WorldProviderCore {
         if (block != null) {
             return block;
         }
-
 
         // TODO block & biome manager
         Vector3i chunkPos = ChunkMath.calcChunkPos(pos);

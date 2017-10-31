@@ -15,13 +15,7 @@
  */
 package org.terasology.logic.behavior.core;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentFieldUri;
@@ -34,7 +28,8 @@ import org.terasology.module.sandbox.API;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 
-import com.google.common.collect.Maps;
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * The actor is a decorated entity, which can act on a behavior tree using an Interpreter.
@@ -54,7 +49,6 @@ public class Actor {
     private final Map<Integer, Object> dataMap = Maps.newHashMap();
 
     private float delta;
-
 
     public Actor(EntityRef entity) {
         this.entity = entity;

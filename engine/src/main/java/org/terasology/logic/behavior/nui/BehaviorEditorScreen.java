@@ -42,7 +42,7 @@ import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIList;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
@@ -287,8 +287,8 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             entityProperties.clear();
             for (Component component : entity.iterateComponents()) {
                 String name = component.getClass().getSimpleName().replace("Component", "");
-                List<Property<?, ?>> properties = provider.createProperties(component);
-                entityProperties.addProperties(name, properties);
+                List<Property<?, ?>> componentProperties = provider.createProperties(component);
+                entityProperties.addProperties(name, componentProperties);
             }
             selectedInterpreter.setCallback(behaviorEditor);
         }

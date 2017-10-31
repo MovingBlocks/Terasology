@@ -17,11 +17,8 @@ package org.terasology.logic.behavior.actions.conditions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
 import org.terasology.logic.behavior.BehaviorAction;
 import org.terasology.logic.behavior.core.Actor;
-import org.terasology.logic.behavior.core.BaseAction;
-import org.terasology.logic.behavior.core.BehaviorState;
 
 /**
  * Condition decorator node.
@@ -38,7 +35,6 @@ import org.terasology.logic.behavior.core.BehaviorState;
 public class GuardAction extends ConditionAction {
 
     private static final Logger logger = LoggerFactory.getLogger(org.terasology.logic.behavior.actions.conditions.GuardAction.class);
-
 
     @Override
     public boolean prune(Actor actor) {
@@ -58,4 +54,3 @@ public class GuardAction extends ConditionAction {
     }
 
 }
-

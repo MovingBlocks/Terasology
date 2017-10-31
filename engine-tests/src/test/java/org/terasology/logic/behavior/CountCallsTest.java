@@ -49,7 +49,7 @@ public class CountCallsTest {
             }
         };
         gsonBuilder.registerTypeAdapter(BehaviorNode.class, builder);
-//        gsonBuilder.registerTypeAdapter(Action.class, new InheritanceAdapter<Action>("delay", Delay.class));
+        //        gsonBuilder.registerTypeAdapter(Action.class, new InheritanceAdapter<Action>("delay", Delay.class));
     }
 
     public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed) {
@@ -63,7 +63,6 @@ public class CountCallsTest {
 
     public void assertBT(String tree, List<BehaviorState> result, List<Integer> executed, boolean step) {
         BehaviorNode node = fromJson(tree);
-
 
         node.construct(null);
         List<BehaviorState> actualStates = Lists.newArrayList();
@@ -85,7 +84,7 @@ public class CountCallsTest {
     private class CountDelegate extends DelegateNode {
         private int id;
 
-        public CountDelegate(BehaviorNode delegate) {
+        CountDelegate(BehaviorNode delegate) {
             super(delegate);
             id = nextId2;
             nextId2++;
