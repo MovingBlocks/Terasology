@@ -74,8 +74,9 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     @ReceiveEvent(components = {BlockItemComponent.class})
     public void onPlaceBlock(OnBlockItemPlaced event, EntityRef entity) {
         BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
-        if (blockComponent == null)
+        if (blockComponent == null) {
             return;
+        }
 
         Vector3i targetBlock = blockComponent.getPosition();
         processUpdateForBlockLocation(targetBlock);

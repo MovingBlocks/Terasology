@@ -73,12 +73,10 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
     private final AssetManager assetManager;
     private final Gson gson;
-    private final BlockFamilyRegistry blockFamilyRegistry;
 
     public BlockFamilyDefinitionFormat(AssetManager assetManager, BlockFamilyRegistry blockFamilyRegistry) {
         super("block");
         this.assetManager = assetManager;
-        this.blockFamilyRegistry = blockFamilyRegistry;
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new AssetTypeAdapterFactory(assetManager))

@@ -113,16 +113,15 @@ public class FreeformFamily extends AbstractBlockFamily {
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {
-        if (block == null) {
-            if (getURI().equals(blockUri.getFamilyUri())) {
-                try {
-                    Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
-                    return blocks.get(side);
-                } catch (IllegalArgumentException e) {
-                    logger.error("can't find block with URI: {}",blockUri,e);
-                    return null;
-                }
+        if (block == null && getURI().equals(blockUri.getFamilyUri())) {
+            try {
+                Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
+                return blocks.get(side);
+            } catch (IllegalArgumentException e) {
+                logger.error("can't find block with URI: {}", blockUri, e);
+                return null;
             }
+
         }
         return block;
     }

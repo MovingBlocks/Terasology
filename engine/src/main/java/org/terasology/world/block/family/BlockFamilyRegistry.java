@@ -40,6 +40,7 @@ public class BlockFamilyRegistry {
 
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
+     *
      * @param blockFamily
      * @param blockFamilyDefinition
      * @param blockBuilderHelper
@@ -60,19 +61,19 @@ public class BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
-            if(result.getURI() == null)
+            if (result.getURI() == null)
                 throw new Exception("Family Is missng a BlockUri");
 
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
-            e.printStackTrace();
         }
         return null;
     }
 
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
+     *
      * @param blockFamily
      * @param blockFamilyDefinition
      * @param blockBuilderHelper
@@ -97,13 +98,12 @@ public class BlockFamilyRegistry {
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
 
-            if(result.getURI() == null)
+            if (result.getURI() == null)
                 throw new Exception("Family Is missng a BlockUri");
 
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
-            e.printStackTrace();
         }
         return null;
     }
@@ -131,13 +131,14 @@ public class BlockFamilyRegistry {
         if (blockFamily == null)
             return false;
         FreeFormSupported freeFormSupported = blockFamily.getAnnotation(FreeFormSupported.class);
-        if(freeFormSupported == null)
+        if (freeFormSupported == null)
             return false;
         return freeFormSupported.value();
     }
 
     /**
      * attach the block to the registry
+     *
      * @param id
      * @param blockFamily
      */
@@ -147,6 +148,7 @@ public class BlockFamilyRegistry {
 
     /**
      * returns the class representing the block family based off the registered id.
+     *
      * @param blockFamilyId
      * @return
      */
