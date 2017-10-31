@@ -16,6 +16,8 @@
 package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.audio.StaticSound;
@@ -59,6 +61,8 @@ import java.util.Optional;
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorSystem.class);
     public static final Name BEHAVIORS = new Name("Behaviors");
     @In
     private EntityManager entityManager;
@@ -74,8 +78,12 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         List<ResourceUrn> uris = Lists.newArrayList();
         uris.addAll(new ArrayList<>(assetManager.getAvailableAssets(StaticSound.class)));
         for (ResourceUrn uri : assetManager.getAvailableAssets(BehaviorTree.class)) {
-            Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
-            asset.ifPresent(behaviorTree -> trees.add(behaviorTree));
+            try {
+                Optional<BehaviorTree> asset = assetManager.getAsset(uri, BehaviorTree.class);
+                asset.ifPresent(behaviorTree -> trees.add(behaviorTree));
+            } catch (RuntimeException e) {
+                logger.info("Failed to load behavior tree asset {}.", uri, e);
+            }
         }
     }
 
