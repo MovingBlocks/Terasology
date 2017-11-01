@@ -15,16 +15,11 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
-import org.terasology.registry.In;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
@@ -33,7 +28,6 @@ import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  */

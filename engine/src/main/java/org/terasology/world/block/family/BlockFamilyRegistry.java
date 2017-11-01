@@ -37,7 +37,7 @@ import java.util.Optional;
 public class BlockFamilyRegistry {
     private static final Logger logger = LoggerFactory.getLogger(BlockFamilyRegistry.class);
     private Map<String, Class<? extends AbstractBlockFamily>> registryMap = Maps.newHashMap();
-
+    
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
      *
@@ -61,16 +61,17 @@ public class BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
-            if (result.getURI() == null)
+            if (result.getURI() == null) {
                 throw new Exception("Family Is missng a BlockUri");
-
+            }
+    
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
         }
         return null;
     }
-
+    
     /**
      * Create a family based on the type and instantiate from the the family definition of the block and builder
      *
@@ -97,45 +98,50 @@ public class BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
-
-            if (result.getURI() == null)
+    
+            if (result.getURI() == null) {
                 throw new Exception("Family Is missng a BlockUri");
-
+            }
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
         }
         return null;
     }
-
-
+    
+    
     public static String[] getSections(Class<? extends AbstractBlockFamily> blockFamily) {
-        if (blockFamily == null)
+        if (blockFamily == null) {
             return new String[]{};
+        }
         BlockSections sections = blockFamily.getAnnotation(BlockSections.class);
         if (sections == null)
             return new String[]{};
         return sections.value();
     }
-
+    
     public static MultiSection[] getMultiSections(Class<? extends AbstractBlockFamily> blockFamily) {
-        if (blockFamily == null)
+        if (blockFamily == null) {
             return new MultiSection[]{};
+        }
         MultiSections sections = blockFamily.getAnnotation(MultiSections.class);
-        if (sections == null)
+        if (sections == null) {
             return new MultiSection[]{};
+        }
         return sections.value();
     }
-
+    
     public static boolean isFreeformSupported(Class<? extends AbstractBlockFamily> blockFamily) {
-        if (blockFamily == null)
+        if (blockFamily == null) {
             return false;
+        }
         FreeFormSupported freeFormSupported = blockFamily.getAnnotation(FreeFormSupported.class);
-        if (freeFormSupported == null)
+        if (freeFormSupported == null) {
             return false;
+        }
         return freeFormSupported.value();
     }
-
+    
     /**
      * attach the block to the registry
      *
@@ -145,7 +151,7 @@ public class BlockFamilyRegistry {
     public void setBlockFamily(String id, Class<? extends AbstractBlockFamily> blockFamily) {
         registryMap.put(id.toLowerCase(), blockFamily);
     }
-
+    
     /**
      * returns the class representing the block family based off the registered id.
      *
@@ -158,7 +164,7 @@ public class BlockFamilyRegistry {
         }
         return registryMap.get(blockFamilyId.toLowerCase());
     }
-
+    
     public void clear() {
         registryMap.clear();
     }

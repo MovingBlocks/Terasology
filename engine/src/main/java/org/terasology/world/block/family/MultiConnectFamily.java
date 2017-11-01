@@ -44,10 +44,6 @@ import java.util.stream.Collectors;
 
 @BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
 public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
-    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
-    private Block archetypeBlock;
-    private TByteObjectMap<Block> blocks;
-
     public static final String NO_CONNECTIONS = "no_connections";
     public static final String ONE_CONNECTION = "one_connection";
     public static final String TWO_CONNECTIONS_LINE = "line_connection";
@@ -58,7 +54,17 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
-
+    
+    @In
+    protected WorldProvider worldProvider;
+    
+    @In
+    protected BlockEntityRegistry blockEntityRegistry;
+    
+    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
+    private Block archetypeBlock;
+    private TByteObjectMap<Block> blocks;
+    
     private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
             .put(NO_CONNECTIONS, (byte) 0)
             .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
@@ -75,14 +81,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
             .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
             .put(SIX_CONNECTIONS, (byte) 63)
             .build();
-
-
-    @In
-    protected WorldProvider worldProvider;
-
-    @In
-    protected BlockEntityRegistry blockEntityRegistry;
-
+    
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
     }
