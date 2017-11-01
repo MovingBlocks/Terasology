@@ -234,7 +234,7 @@ public class KinematicCharacterMover implements CharacterMover {
             state.getVelocity().y = 0;
             state.setMode((newClimbing) ? MovementMode.CLIMBING : isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
         }
-        if (state.getMode() == MovementMode.WALKING || state.getMode() == MovementMode.CROUCHING){
+        if (state.getMode() == MovementMode.WALKING || state.getMode() == MovementMode.CROUCHING) {
             state.setMode(isCrouching ? MovementMode.CROUCHING : MovementMode.WALKING);
         }
     }

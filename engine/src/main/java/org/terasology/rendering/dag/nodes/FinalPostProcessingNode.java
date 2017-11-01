@@ -154,7 +154,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
         renderFullscreenQuad();
 
-        if (!screenGrabber.isNotTakingScreenshot()) {
+        if (screenGrabber.isTakingScreenshot()) {
             screenGrabber.saveScreenshot();
         }
 
@@ -163,23 +163,30 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
-        if (event.getPropertyName().equals(RenderingConfig.FILM_GRAIN)) {
-            isFilmGrainEnabled = renderingConfig.isFilmGrain();
-            if (isFilmGrainEnabled) {
-                addDesiredStateChange(setNoiseTexture);
-            } else {
-                removeDesiredStateChange(setNoiseTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.MOTION_BLUR)) {
-            isMotionBlurEnabled = renderingConfig.isMotionBlur();
-        } else if (event.getPropertyName().equals(RenderingConfig.BLUR_INTENSITY)) {
-            if (renderingConfig.getBlurIntensity() != 0) {
-                addDesiredStateChange(setBlurTexture);
-            } else {
-                removeDesiredStateChange(setBlurTexture);
-            }
-        } // else: no other cases are possible - see subscribe operations in initialize().
+        String propertyName = event.getPropertyName();
+
+        switch (propertyName) {
+            case RenderingConfig.FILM_GRAIN:
+                isFilmGrainEnabled = renderingConfig.isFilmGrain();
+                if (isFilmGrainEnabled) {
+                    addDesiredStateChange(setNoiseTexture);
+                } else {
+                    removeDesiredStateChange(setNoiseTexture);
+                }
+                break;
+
+            case RenderingConfig.MOTION_BLUR:
+                isMotionBlurEnabled = renderingConfig.isMotionBlur();
+                break;
+
+            case RenderingConfig.BLUR_INTENSITY:
+                if (renderingConfig.getBlurIntensity() != 0) {
+                    addDesiredStateChange(setBlurTexture);
+                } else {
+                    removeDesiredStateChange(setBlurTexture);
+                }
+                break;
+        }
 
         worldRenderer.requestTaskListRefresh();
     }

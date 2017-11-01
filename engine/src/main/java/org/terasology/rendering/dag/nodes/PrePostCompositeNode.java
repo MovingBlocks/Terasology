@@ -195,38 +195,51 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // This method is only called when oldValue != newValue.
-        if (event.getPropertyName().equals(RenderingConfig.LOCAL_REFLECTIONS)) {
-            localReflectionsAreEnabled = renderingConfig.isLocalReflections();
-            if (localReflectionsAreEnabled) {
-                addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
-            } else {
-                removeDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.SSAO)) {
-            ssaoIsEnabled = renderingConfig.isSsao();
-            if (ssaoIsEnabled) {
-                addDesiredStateChange(setSsaoInputTexture);
-            } else {
-                removeDesiredStateChange(setSsaoInputTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.OUTLINE)) {
-            outlineIsEnabled = renderingConfig.isOutline();
-            if (outlineIsEnabled) {
-                addDesiredStateChange(setEdgesInputTexture);
-            } else {
-                removeDesiredStateChange(setEdgesInputTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.INSCATTERING)) {
-            hazeIsEnabled = renderingConfig.isInscattering();
-            if (hazeIsEnabled) {
-                addDesiredStateChange(setHazeInputTexture);
-            } else {
-                removeDesiredStateChange(setHazeInputTexture);
-            }
-        } else if (event.getPropertyName().equals(RenderingConfig.VOLUMETRIC_FOG)) {
-            volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
-        } // else: no other cases are possible - see subscribe operations in initialize().
+        String propertyName = event.getPropertyName();
+
+        switch (propertyName) {
+            case RenderingConfig.LOCAL_REFLECTIONS:
+                localReflectionsAreEnabled = renderingConfig.isLocalReflections();
+                if (localReflectionsAreEnabled) {
+                    addDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
+                } else {
+                    removeDesiredStateChange(setReflectiveRefractiveNormalsInputTexture);
+                }
+                break;
+
+            case RenderingConfig.SSAO:
+                ssaoIsEnabled = renderingConfig.isSsao();
+                if (ssaoIsEnabled) {
+                    addDesiredStateChange(setSsaoInputTexture);
+                } else {
+                    removeDesiredStateChange(setSsaoInputTexture);
+                }
+                break;
+
+            case RenderingConfig.OUTLINE:
+                outlineIsEnabled = renderingConfig.isOutline();
+                if (outlineIsEnabled) {
+                    addDesiredStateChange(setEdgesInputTexture);
+                } else {
+                    removeDesiredStateChange(setEdgesInputTexture);
+                }
+                break;
+
+            case RenderingConfig.INSCATTERING:
+                hazeIsEnabled = renderingConfig.isInscattering();
+                if (hazeIsEnabled) {
+                    addDesiredStateChange(setHazeInputTexture);
+                } else {
+                    removeDesiredStateChange(setHazeInputTexture);
+                }
+                break;
+
+            case RenderingConfig.VOLUMETRIC_FOG:
+                volumetricFogIsEnabled = renderingConfig.isVolumetricFog();
+                break;
+
+            // default: no other cases are possible - see subscribe operations in initialize().
+        }
 
         worldRenderer.requestTaskListRefresh();
     }

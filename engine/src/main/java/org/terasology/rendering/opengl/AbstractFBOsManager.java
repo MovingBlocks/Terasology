@@ -17,13 +17,12 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
+
+import java.util.Map;
 
 /**
  * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
@@ -65,13 +64,11 @@ import org.terasology.engine.SimpleUri;
 /**
  * TODO: fix above, add javadocs
  */
-public abstract class AbstractFBOsManager implements BaseFBOsManager {
+public abstract class AbstractFBOsManager extends AbstractSubscribable implements BaseFBOsManager {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
     protected Map<SimpleUri, FBOConfig> fboConfigs = Maps.newHashMap();
     protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
     protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();
-
-    private List<FBOManagerSubscriber> fboManagerSubscribers = new ArrayList<>();
 
     protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
@@ -88,13 +85,6 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         fboConfigs.put(fboConfig.getName(), fboConfig);
         return fbo;
     }
-
-    protected void notifySubscribers() {
-        for (FBOManagerSubscriber subscriber : fboManagerSubscribers) {
-            subscriber.update();
-        }
-    }
-
 
     protected void retain(SimpleUri resourceUrn) {
         if (fboUsageCountMap.containsKey(resourceUrn)) {
@@ -245,35 +235,5 @@ public abstract class AbstractFBOsManager implements BaseFBOsManager {
         }
 
         return fboConfig;
-    }
-
-    /**
-     * Adds a given FBOManagerSubscriber to the subscription list, notifying it of any changes to the FBOs.
-     *
-     * Note that an object cannot re-subscribe.
-     *
-     * @param subscriber An FBOManagerSubscriber that wants to subscribe
-     * @return a boolean indicating whether the subscription succeeded.
-     */
-    @Override
-    public boolean subscribe(FBOManagerSubscriber subscriber) {
-        // Iterate through all existing fboManagerSubscribers, and refuse to subscribe if the given subscriber has already subscribed
-        for (FBOManagerSubscriber fboManagerSubscriber: fboManagerSubscribers) {
-            if (fboManagerSubscriber == subscriber) {
-                return false;
-            }
-        }
-        return fboManagerSubscribers.add(subscriber);
-    }
-
-    /**
-     * TODO: add javadocs
-     *
-     * @param subscriber
-     * @return
-     */
-    @Override
-    public boolean unsubscribe(FBOManagerSubscriber subscriber) {
-        return fboManagerSubscribers.remove(subscriber);
     }
 }

@@ -47,6 +47,10 @@ public class ScrollableArea extends CoreLayout {
     private boolean verticalScrollbar = true;
     @LayoutConfig
     private boolean horizontalScrollbar;
+    @LayoutConfig
+    private Integer preferredWidth;
+    @LayoutConfig
+    private Integer preferredHeight;
 
     private UIScrollbar verticalBar = new UIScrollbar(true);
     private UIScrollbar horizontalBar = new UIScrollbar(false);
@@ -178,7 +182,8 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return canvas.calculatePreferredSize(content);
+        Vector2i pf = canvas.calculatePreferredSize(content);
+        return  new Vector2i(preferredWidth == null ? pf.x : preferredWidth, preferredHeight == null ? pf.y : preferredHeight);
     }
 
     @Override

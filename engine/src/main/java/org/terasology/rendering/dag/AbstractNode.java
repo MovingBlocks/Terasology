@@ -17,9 +17,6 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import java.util.Map;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -29,6 +26,9 @@ import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.utilities.Assets;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: Add javadocs

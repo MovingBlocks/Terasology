@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.dag.nodes;
 
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;

@@ -60,7 +60,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
  * The shader also procedurally adds a main light (sun/moon) in the form of a blurred disc.
  */
 public class BackdropNode extends AbstractNode implements WireframeCapable {
-    private final static ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
+    private static final ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
     private static final int SLICES = 16;
     private static final int STACKS = 128;
     private static final int RADIUS = 1024;

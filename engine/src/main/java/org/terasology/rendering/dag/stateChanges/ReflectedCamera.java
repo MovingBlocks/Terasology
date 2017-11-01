@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import java.util.Objects;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.dag.RenderPipelineTask;
 import org.terasology.rendering.dag.StateChange;
+
+import java.util.Objects;
 
 /**
  * Sets or resets the reflected flag of a given camera.
@@ -47,7 +47,7 @@ public class ReflectedCamera implements StateChange {
         this.camera = camera;
         this.reflected = reflected;
 
-        if (reflected == false) {
+        if (!reflected) {
             this.defaultInstance = this;
         }
     }

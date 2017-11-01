@@ -17,10 +17,11 @@ package org.terasology.rendering.dag.stateChanges;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.StateChange;
+
+import java.util.Map;
+
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;

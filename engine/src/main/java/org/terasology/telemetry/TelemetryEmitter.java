@@ -51,38 +51,12 @@ public class TelemetryEmitter extends BatchEmitter {
 
     private long closeTimeout = 5;
 
-    public abstract static class Builder<T extends Builder<T>> extends BatchEmitter.Builder<T> {
-
-        public TelemetryEmitter build() {
-
-            URL url = getDefaultCollectorURL(DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT);
-            HttpClientAdapter httpClientAdapter = getDefaultAdapter(url);
-            this.httpClientAdapter(httpClientAdapter);
-
-            RequestCallback  requestCallback = getDefaultRequestCallback();
-            this.requestCallback(requestCallback);
-
-            // TODO: use the proper bufferSize, bufferSize 1 for test
-            this.bufferSize(1);
-
-            return new TelemetryEmitter(this);
-        }
-    }
-
-    private static class Builder2 extends Builder<Builder2> {
-
-        @Override
-        protected Builder2 self() {
-            return this;
-        }
+    protected TelemetryEmitter(Builder<?> builder) {
+        super(builder);
     }
 
     public static Builder<?> builder() {
         return new Builder2();
-    }
-
-    protected TelemetryEmitter(Builder<?> builder) {
-        super(builder);
     }
 
     public static URL getDefaultCollectorURL(String protocol, String host, int port) {
@@ -150,6 +124,32 @@ public class TelemetryEmitter extends BatchEmitter {
                 executor.shutdownNow();
                 Thread.currentThread().interrupt();
             }
+        }
+    }
+
+    public abstract static class Builder<T extends Builder<T>> extends BatchEmitter.Builder<T> {
+
+        public TelemetryEmitter build() {
+
+            URL url = getDefaultCollectorURL(DEFAULT_COLLECTOR_PROTOCOL, DEFAULT_COLLECTOR_HOST, DEFAULT_COLLECTOR_PORT);
+            HttpClientAdapter httpClientAdapter = getDefaultAdapter(url);
+            this.httpClientAdapter(httpClientAdapter);
+
+            RequestCallback  requestCallback = getDefaultRequestCallback();
+            this.requestCallback(requestCallback);
+
+            // TODO: use the proper bufferSize, bufferSize 1 for test
+            this.bufferSize(1);
+
+            return new TelemetryEmitter(this);
+        }
+    }
+
+    private static class Builder2 extends Builder<Builder2> {
+
+        @Override
+        protected Builder2 self() {
+            return this;
         }
     }
 }

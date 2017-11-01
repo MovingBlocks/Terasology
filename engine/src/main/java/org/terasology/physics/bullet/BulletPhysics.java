@@ -927,7 +927,7 @@ public class BulletPhysics implements PhysicsEngine {
             BulletSweepCallback callback = new BulletSweepCallback(collider, new org.terasology.math.geom.Vector3f(0, 1, 0), slopeFactor);
             callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
             callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
-            callback.collisionFilterMask = (short)(callback.collisionFilterMask & (~StandardCollisionGroup.SENSOR.getFlag()));
+            callback.collisionFilterMask = (short) (callback.collisionFilterMask & (~StandardCollisionGroup.SENSOR.getFlag()));
             collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
             return callback;
         }

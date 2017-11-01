@@ -74,11 +74,12 @@ public final class Config {
         return config.getPermission();
     }
 
-    /**
-     * @return Input configuration (mostly binds)
-     */
     public InputConfig getInput() {
         return config.getInput();
+    }
+
+    public BindsConfig getBinds() {
+        return config.getBinds();
     }
 
     public ModuleConfig getDefaultModSelection() {

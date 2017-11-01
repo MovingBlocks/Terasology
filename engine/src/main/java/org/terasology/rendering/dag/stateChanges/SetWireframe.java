@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.dag.stateChanges;
 
-import java.util.Objects;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.dag.StateChange;
+
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;

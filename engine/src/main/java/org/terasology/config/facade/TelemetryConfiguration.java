@@ -32,5 +32,5 @@ public interface TelemetryConfiguration {
 
     Boolean get(String telemetryField);
 
-    boolean containField(String telemetryField);
+    boolean containsField(String telemetryField);
 }

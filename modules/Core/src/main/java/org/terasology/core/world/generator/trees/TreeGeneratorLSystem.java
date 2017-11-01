@@ -16,7 +16,6 @@
 package org.terasology.core.world.generator.trees;
 
 import org.terasology.math.LSystemRule;
-import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;

@@ -31,7 +31,7 @@ import org.terasology.telemetry.metrics.GameConfigurationMetric;
 import org.terasology.telemetry.metrics.GamePlayMetric;
 import org.terasology.telemetry.metrics.Metric;
 import org.terasology.telemetry.metrics.ModulesMetric;
-import org.terasology.telemetry.metrics.MonsterKilledMetric;
+import org.terasology.telemetry.metrics.CreatureKilledMetric;
 import org.terasology.telemetry.metrics.SystemContextMetric;
 
 import java.time.Duration;
@@ -182,7 +182,7 @@ public class TelemetrySystem extends BaseComponentSystem implements UpdateSubscr
             TelemetryUtils.fetchMetricAndSend(metrics, BlockPlacedMetric.class, emitter, trackerNamespace, bindingMap);
             TelemetryUtils.fetchMetricAndSend(metrics, BlockDestroyedMetric.class, emitter, trackerNamespace, bindingMap);
             TelemetryUtils.fetchMetricAndSend(metrics, GameConfigurationMetric.class, emitter, trackerNamespace, bindingMap);
-            TelemetryUtils.fetchMetricAndSend(metrics, MonsterKilledMetric.class, emitter, trackerNamespace, bindingMap);
+            TelemetryUtils.fetchMetricAndSend(metrics, CreatureKilledMetric.class, emitter, trackerNamespace, bindingMap);
             TelemetryUtils.fetchMetricAndSend(metrics, GamePlayMetric.class, emitter, trackerNamespace, bindingMap);
         }
     }

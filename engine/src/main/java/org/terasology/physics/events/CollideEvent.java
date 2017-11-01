@@ -31,7 +31,6 @@ public class CollideEvent extends AbstractConsumableEvent {
     private float penetration;
     private Vector3f normal;
 
-
     public CollideEvent(EntityRef other, Vector3f entityContactPoint, Vector3f otherEntityContactPoint, float penetration, Vector3f normal) {
         this.otherEntity = other;
         this.normal = normal;
@@ -40,10 +39,22 @@ public class CollideEvent extends AbstractConsumableEvent {
         this.penetration = penetration;
     }
 
-    public  Vector3f getNormal(){return  normal;}
-    public  Vector3f getEntityContactPoint(){return  entityContactPoint;}
-    public  Vector3f getOtherEntityContactPoint(){return otherEntityContactPoint;}
-    public  float getPenetration(){return  penetration;}
+    public Vector3f getNormal() {
+        return normal;
+    }
+
+    public Vector3f getEntityContactPoint() {
+        return entityContactPoint;
+    }
+
+    public Vector3f getOtherEntityContactPoint() {
+        return otherEntityContactPoint;
+    }
+
+    public float getPenetration() {
+        return penetration;
+    }
+
     public EntityRef getOtherEntity() {
         return otherEntity;
     }

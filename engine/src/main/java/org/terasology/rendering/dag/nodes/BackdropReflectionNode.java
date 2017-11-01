@@ -61,7 +61,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  */
 public class BackdropReflectionNode extends AbstractNode {
     public static final SimpleUri REFLECTED_FBO_URI = new SimpleUri("engine:fbo.sceneReflected");
-    private final static ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
+    private static final ResourceUrn SKY_MATERIAL_URN = new ResourceUrn("engine:prog.sky");
     private static final int RADIUS = 1024;
     private static final int SLICES = 16;
     private static final int STACKS = 128;

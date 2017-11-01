@@ -211,7 +211,6 @@ public class TerasologyEngine implements GameEngine {
             throw e;
         }
 
-
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
     }
@@ -264,6 +263,7 @@ public class TerasologyEngine implements GameEngine {
      */
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
+            changeStatus(() -> "Post-Initialising " + subsystem.getName() + " subsystem");
             subsystem.postInitialise(rootContext);
         }
     }
@@ -396,7 +396,9 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (tick()) { /* do nothing */ }
+        while (tick()) {
+            /* do nothing */
+        }
         PerformanceMonitor.endActivity();
     }
 
@@ -420,7 +422,7 @@ public class TerasologyEngine implements GameEngine {
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
         CoreRegistry.setContext(currentState.getContext());
-        rootContext.get(NetworkSystem.class).setStateContext(currentState.getContext());
+        rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
             try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {

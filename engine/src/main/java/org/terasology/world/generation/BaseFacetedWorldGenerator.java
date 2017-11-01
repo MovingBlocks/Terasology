@@ -22,10 +22,11 @@ import org.terasology.world.generator.WorldGenerator;
 
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
+    protected WorldBuilder worldBuilder;
+
     private final SimpleUri uri;
 
     private String worldSeed;
-    protected WorldBuilder worldBuilder;
     private World world;
 
     private FacetedWorldConfigurator configurator;

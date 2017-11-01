@@ -126,7 +126,8 @@ public class Border3D {
     }
 
     /**
-     * Checks if the fields of the instance are the same as the object passed in the parameters. It compares the size of the Border3D and returns true of all sizes are the same.
+     * Checks if the fields of the instance are the same as the object passed in the parameters. It compares the size of the Border3D and returns true of all sizes are the
+     * same.
      */
     @Override
     public boolean equals(Object obj) {

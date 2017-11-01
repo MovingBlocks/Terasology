@@ -19,6 +19,10 @@ import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.facade.BindsConfiguration;
+import org.terasology.config.facade.BindsConfigurationImpl;
+import org.terasology.config.facade.InputDeviceConfiguration;
+import org.terasology.config.facade.InputDeviceConfigurationImpl;
 import org.terasology.context.Context;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -63,7 +67,11 @@ public class ConfigurationSubsystem implements EngineSubsystem {
 
         // TODO: Move to display subsystem
         logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+
         rootContext.put(Config.class, config);
+        //add facades
+        rootContext.put(InputDeviceConfiguration.class, new InputDeviceConfigurationImpl(config));
+        rootContext.put(BindsConfiguration.class, new BindsConfigurationImpl(config));
     }
 
     @Override

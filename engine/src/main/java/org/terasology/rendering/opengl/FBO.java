@@ -239,6 +239,18 @@ public final class FBO {
     }
 
     /**
+     * Detaches the depth attachments of this FBO.
+     */
+    public void detachDepthBuffer() {
+        bind();
+
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, 0, 0);
+
+        unbind();
+    }
+
+    /**
      * Properly disposes of the underlying FrameBuffer and its attachments,
      * effectively freeing memory on the graphic adapter.
      */
@@ -651,6 +663,14 @@ public final class FBO {
         private int height;
 
         /**
+         * Default Constructor - returns a Dimensions object.
+         */
+        public Dimensions() {
+            this.width = 0;
+            this.height = 0;
+        }
+
+        /**
          * Standard Constructor - returns a Dimensions object.
          *
          * @param width An integer, representing the width of the FBO in pixels.
@@ -679,7 +699,6 @@ public final class FBO {
         public Dimensions dividedBy(int divisor) {
             return new Dimensions(width / divisor, height / divisor);
         }
-
 
         public Dimensions multiplyBy(float multiplier) {
             int w = (int) (width * multiplier);
@@ -737,6 +756,25 @@ public final class FBO {
          */
         public int height() {
             return this.height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param width An integer representing the new width.
+         * @param height An integer representing the new height.
+         */
+        public void setDimensions(int width, int height) {
+            this.width = width;
+            this.height = height;
+        }
+
+        /**
+         * Updates the dimensions.
+         * @param other A Dimension to use the width and height from.
+         */
+        public void setDimensions(Dimensions other) {
+            this.width = other.width;
+            this.height = other.height;
         }
     }
 }

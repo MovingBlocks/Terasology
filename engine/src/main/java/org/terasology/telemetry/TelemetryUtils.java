@@ -22,7 +22,6 @@ import com.snowplowanalytics.snowplow.tracker.emitter.Emitter;
 import com.snowplowanalytics.snowplow.tracker.events.Unstructured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.TelemetryConfig;
 import org.terasology.config.facade.TelemetryConfiguration;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -50,23 +49,28 @@ public final class TelemetryUtils {
     }
 
     /**
-     * Fetch metric in {@link org.terasology.telemetry.Metrics} and send to the server.
-     * This method could be used in the method.
-     * @param metrics Metrics instance in the game context.
-     * @param metricClass The class of metric.
-     * @param context the game context
+     * Fetch metric in {@link org.terasology.context.Context} and send to the server.
+     * This method could be used in the modules.
+     * @param context The game context
+     * @param metricClass The class of the metric which we want to track
      * @param nameSpace The name the class tracking this metric.
-     * @param telemetryConfiguration the telemetryConfiguration adapter which could be used in modules.
      */
-    public static void fetchMetricAndSend(Metrics metrics, Class metricClass, Context context, String nameSpace, TelemetryConfiguration telemetryConfiguration) {
+    public static void fetchMetricAndSend(Context context, Class metricClass, String nameSpace) {
         Emitter emitter = context.get(Emitter.class);
-        if (emitter != null) {
-            Optional<Metric> optional = metrics.getMetric(metricClass);
-            if (optional.isPresent()) {
-                Metric metric = optional.get();
-                Unstructured unstructured = metric.getUnstructuredMetric();
-                trackMetric(emitter, nameSpace, unstructured, metric, telemetryConfiguration);
+        Metrics metrics = context.get(Metrics.class);
+        TelemetryConfiguration telemetryConfiguration = context.get(TelemetryConfiguration.class);
+        if (emitter != null && metrics != null && telemetryConfiguration != null) {
+            Optional<Metric> metricOptional = metrics.getMetric(metricClass);
+            if (metricOptional.isPresent()) {
+                Metric metric = metricOptional.get();
+                Optional<Unstructured> unstructuredOptional = metric.getUnstructuredMetric();
+                if (unstructuredOptional.isPresent()) {
+                    Unstructured unstructured = unstructuredOptional.get();
+                    trackMetric(emitter, nameSpace, unstructured, metric, telemetryConfiguration);
+                }
             }
+        } else {
+            logger.error("Emitter or metrics or telemetryConfiguration is not in context");
         }
     }
 
@@ -82,8 +86,11 @@ public final class TelemetryUtils {
         Optional<Metric> optional = metrics.getMetric(metricClass);
         if (optional.isPresent()) {
             Metric metric = optional.get();
-            Unstructured unstructured = metric.getUnstructuredMetric();
-            trackMetric(emitter, nameSpace, unstructured, metric, bindingMap);
+            Optional<Unstructured> unstructuredOptional = metric.getUnstructuredMetric();
+            if (unstructuredOptional.isPresent()) {
+                Unstructured unstructured = unstructuredOptional.get();
+                trackMetric(emitter, nameSpace, unstructured, metric, bindingMap);
+            }
         }
     }
 
@@ -104,7 +111,7 @@ public final class TelemetryUtils {
             } else if (telemetryConfiguration.fetchBindingSize() != 0) {
                 TelemetryCategory telemetryCategory = metric.getClass().getAnnotation(TelemetryCategory.class);
                 if (telemetryCategory != null) {
-                    if (telemetryConfiguration.containField(telemetryCategory.id())) {
+                    if (telemetryConfiguration.containsField(telemetryCategory.id())) {
                         if ((telemetryConfiguration.get(telemetryCategory.id()))) {
                             trackMetric(emitter, nameSpace, event);
                         }
@@ -155,7 +162,6 @@ public final class TelemetryUtils {
             Subject subject = new Subject.SubjectBuilder()
                     .userId(TelemetryParams.userId)
                     .ipAddress("anonymous")
-                    .timezone("anonymous")
                     .build();
 
             Tracker tracker = new Tracker.TrackerBuilder(emitter, nameSpace, TelemetryParams.APP_ID_TERASOLOGY)

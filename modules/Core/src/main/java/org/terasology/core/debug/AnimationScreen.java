@@ -62,7 +62,7 @@ public class AnimationScreen extends CoreScreenLayer {
         entityDropdown = find("entityDropdown", UIDropdownScrollable.class);
         logger.info("Number of available skeletal meshes: " + assetManager.getAvailableAssets(SkeletalMesh.class).size());
         ArrayList skeletalMesh = new ArrayList(assetManager.getAvailableAssets(SkeletalMesh.class));
-        if (entityDropdown != null ) {
+        if (entityDropdown != null) {
             entityDropdown.setOptions(skeletalMesh);
         }
         animationSpeedSlider = find("entityAnimationSpeedSlider", UISlider.class);

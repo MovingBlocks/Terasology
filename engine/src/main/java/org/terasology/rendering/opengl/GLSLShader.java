@@ -30,7 +30,6 @@ import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
-import org.terasology.config.RenderingDebugConfig;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;

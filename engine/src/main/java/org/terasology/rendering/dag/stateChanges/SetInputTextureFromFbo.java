@@ -21,8 +21,9 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -30,13 +31,14 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.terasology.rendering.dag.AbstractNode.getMaterial;
+import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.POST_FBO_REGENERATION;
 
 // TODO: split this class into two - one for opengl's global state change and one for the specific material state change.
 
 /**
  * Sets a texture attached to an FBO as the input for a material.
  */
-public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber {
+public class SetInputTextureFromFbo implements StateChange, PropertyChangeListener {
     // depthStencilRboId is a possible FBO attachment but is not covered by a case here
     // as it wouldn't work with the glBindTexture(TEXTURE_2D, ...) call.
     public enum FboTexturesTypes {
@@ -80,8 +82,8 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
 
         this.material = getMaterial(materialUrn);
 
-        update(); // Cheeky way to initialise textureId
-        fboManager.subscribe(this);
+        propertyChange(null); // Cheeky way to initialise textureId
+        fboManager.subscribe(POST_FBO_REGENERATION, this);
     }
 
     /**
@@ -100,16 +102,7 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
      */
     public SetInputTextureFromFbo(int textureSlot, SimpleUri fboUri, FboTexturesTypes textureType, BaseFBOsManager fboManager,
                                   ResourceUrn materialUrn, String shaderParameterName) {
-        this.textureSlot = textureSlot;
-        this.textureType = textureType;
-        this.fbo = fboManager.get(fboUri);
-        this.materialUrn = materialUrn;
-        this.shaderParameterName = shaderParameterName;
-
-        this.material = getMaterial(materialUrn);
-
-        update(); // Cheeky way to initialise textureId
-        fboManager.subscribe(this);
+        this(textureSlot, fboManager.get(fboUri), textureType, fboManager, materialUrn, shaderParameterName);
     }
 
     private SetInputTextureFromFbo(int textureSlot, ResourceUrn materialUrn, String shaderParameterName) {
@@ -154,7 +147,8 @@ public class SetInputTextureFromFbo implements StateChange, FBOManagerSubscriber
      * This method refreshes the task's reference to the FBO attachment, so that they are always up to date.
      */
     @Override
-    public void update() {
+    public void propertyChange(PropertyChangeEvent event) {
+        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION
         textureId = fetchTextureId();
     }
 

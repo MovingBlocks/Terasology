@@ -133,7 +133,7 @@ import static org.mockito.Mockito.when;
  */
 public class HeadlessEnvironment extends Environment {
 
-    protected static final WorldTime worldTime = new WorldTimeImpl();
+    protected static final WorldTime WORLD_TIME = new WorldTimeImpl();
     private static final Logger logger = LoggerFactory.getLogger(HeadlessEnvironment.class);
 
     /**
@@ -314,7 +314,7 @@ public class HeadlessEnvironment extends Environment {
     protected void setupWorldProvider() {
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
-        when(worldProvider.getTime()).thenReturn(worldTime);
+        when(worldProvider.getTime()).thenReturn(WORLD_TIME);
         context.put(WorldProvider.class, worldProvider);
     }
 
