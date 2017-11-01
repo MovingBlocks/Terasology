@@ -18,17 +18,8 @@ package org.terasology.world.block.family;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.shapes.BlockShape;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A collection of blocks that are all different blocks

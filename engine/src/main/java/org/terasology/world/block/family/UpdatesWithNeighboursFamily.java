@@ -21,7 +21,7 @@ import org.terasology.world.block.Block;
 /**
  * Interface for Block family that gets updated by a change in a neighbor block.
  */
-public interface UpdatesWithNeighboursFamily extends BlockFamily{
+public interface UpdatesWithNeighboursFamily extends BlockFamily {
     /**
      * Update called when a neighbor block changes
      **/

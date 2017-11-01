@@ -23,8 +23,6 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
@@ -32,7 +30,6 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -45,9 +42,8 @@ import java.util.Map;
 public class FreeformFamily extends AbstractBlockFamily {
     private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
 
-    public BlockUri uri;
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private Block block = null;
+    private Block block;
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
@@ -64,7 +60,7 @@ public class FreeformFamily extends AbstractBlockFamily {
         } else {
             for (Rotation rot : Rotation.horizontalRotations()) {
                 Side side = rot.rotate(Side.FRONT);
-                Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
+                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
                 if (block == null) {
                     throw new IllegalArgumentException("Missing block for side: " + side.toString());
                 }
