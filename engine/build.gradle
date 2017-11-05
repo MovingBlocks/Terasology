@@ -117,18 +117,24 @@ dependencies {
     // Small-time 3rd party libs we've stored in our Artifactory for access
     compile group: 'ec.util', name: 'MersenneTwister', version: '20'
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
+    
+    // telemetry
+    compile (group: 'com.snowplowanalytics', name: 'snowplow-java-tracker', version :'0.8.0'){
+        exclude group:'org.slf4j',module:'slf4j-simple'
+    }
+    compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.10'
 
     // Our developed libs
-    compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.2'
-    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.2'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '5.1.3'
+    compile group: 'org.terasology', name: 'gestalt-asset-core', version: '5.1.3'
     compile group: 'org.terasology', name: 'TeraMath', version: '1.4.0'
-    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
+    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.3.1'
     compile group: 'org.terasology', name: 'splash-screen', version: '1.0.2'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.21'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
@@ -150,7 +156,7 @@ dependencies {
         compile project(':libs:CrashReporter:cr-terasology')
     } else {
         println "*** Setting a CrashReporter binary dependency, not present as source"
-        compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.0.1'
+        compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     }
 }
 

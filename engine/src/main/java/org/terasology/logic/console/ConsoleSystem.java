@@ -24,22 +24,41 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
+import org.terasology.logic.console.ui.NotificationOverlay;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
+
     @In
     private Console console;
 
     @In
     private NUIManager nuiManager;
 
+    private NotificationOverlay overlay;
+
+    @Override
+    public void initialise() {
+        overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
+        console.subscribe((Message message) -> {
+            if (!nuiManager.isOpen("engine:console")) {
+                // make sure the message isn't already shown in the chat overlay
+                if (message.getType() != CoreMessageType.CHAT && message.getType() != CoreMessageType.NOTIFICATION
+                        || !nuiManager.isOpen("engine:chat")) {
+                    overlay.setVisible(true);
+                }
+            }
+        });
+    }
+
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             nuiManager.toggleScreen("engine:console");
+            overlay.setVisible(false);
             event.consume();
         }
     }

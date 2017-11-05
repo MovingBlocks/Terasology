@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,36 +15,50 @@
  */
 package org.terasology.entitySystem.systems;
 
-/**
- */
 public interface ComponentSystem {
     /**
-     * Called to initialise the system. This occurs after injection, but before other systems are necessarily initialised, so they should not be interacted with
+     * Called to initialise the system. This occurs after injection, but before other systems are necessarily initialised, so they should not be interacted with.
      */
     void initialise();
 
     /**
-     * Called after all systems are initialised, but before the game is loaded
+     * Called after all systems are initialised, but before the game is loaded.
      */
     void preBegin();
 
     /**
-     * Called after the game is loaded, right before first frame
+     * Called after the game is loaded, right before first frame.
      */
     void postBegin();
 
     /**
-     * Called before the game is saved (this may be after shutdown)
+     * Called before the game is auto-saved.
+     * TODO: Implemented as default method to avoid violating API. May want to review / revise when retrofitting gestalt-entity v6+
+     */
+    default void preAutoSave() {
+
+    }
+
+    /**
+     * Called after the game is auto-saved.
+     * TODO: Implemented as default method to avoid violating API. May want to review / revise when retrofitting gestalt-entity v6+
+     */
+    default void postAutoSave() {
+
+    }
+
+    /**
+     * Called before the game is saved (this may be after shutdown).
      */
     void preSave();
 
     /**
-     * Called after the game is saved
+     * Called after the game is saved.
      */
     void postSave();
 
     /**
-     * Called right before the game is shut down
+     * Called right before the game is shut down.
      */
     void shutdown();
 }

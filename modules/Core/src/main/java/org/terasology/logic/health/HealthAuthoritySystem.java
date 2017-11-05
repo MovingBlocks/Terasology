@@ -40,6 +40,7 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.players.event.OnPlayerRespawnedEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
@@ -67,6 +68,9 @@ import org.terasology.utilities.random.Random;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class HealthAuthoritySystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
+
     @In
     private EntityManager entityManager;
 
@@ -74,8 +78,6 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
     private org.terasology.engine.Time time;
 
     private Random random = new FastRandom();
-
-    private static final Logger logger = LoggerFactory.getLogger(HealthAuthoritySystem.class);
 
     @Override
     public void update(float delta) {
@@ -173,7 +175,6 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
         if ((health != null) && !ghost) {
             int damagedAmount = health.currentHealth - Math.max(health.currentHealth - damageAmount, 0);
             health.currentHealth -= damagedAmount;
-            logger.info(String.valueOf(damageAmount) + " damage of type " + damageType);
             health.nextRegenTick = time.getGameTimeInMs() + TeraMath.floorToInt(health.waitBeforeRegen * 1000);
             entity.saveComponent(health);
             entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));
@@ -299,5 +300,11 @@ public class HealthAuthoritySystem extends BaseComponentSystem implements Update
             entity.saveComponent(characterSounds);
 
         }
+    }
+
+    @ReceiveEvent
+    public void onRespawn(OnPlayerRespawnedEvent event, EntityRef entity, HealthComponent healthComponent) {
+        healthComponent.currentHealth = healthComponent.maxHealth;
+        entity.saveComponent(healthComponent);
     }
 }

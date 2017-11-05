@@ -30,6 +30,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.game.GameManifest;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -66,6 +67,8 @@ public class StateIngame implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
+    private StorageServiceWorker storageServiceWorker;
+    private Console console;
     private Context context;
 
     /* GAME LOOP */
@@ -93,6 +96,8 @@ public class StateIngame implements GameState {
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = context.get(NetworkSystem.class);
         storageManager = context.get(StorageManager.class);
+        storageServiceWorker = context.get(StorageServiceWorker.class);
+        console = context.get(Console.class);
 
         // Show or hide the HUD according to the settings
         nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
@@ -104,8 +109,9 @@ public class StateIngame implements GameState {
 
         if (networkSystem.getMode() == NetworkMode.CLIENT) {
             String motd = networkSystem.getServer().getInfo().getMOTD();
-            if (motd != null && motd.length() != 0)
+            if (motd != null && motd.length() != 0) {
                 nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Server MOTD", motd);
+            }
         }
     }
 
@@ -149,7 +155,7 @@ public class StateIngame implements GameState {
         if (oldEnvironment != null) {
             oldEnvironment.close();
         }
-        context.get(Console.class).dispose();
+        console.dispose();
         GameThread.clearWaitingProcesses();
 
         /*
@@ -179,6 +185,8 @@ public class StateIngame implements GameState {
 
 
         updateUserInterface(delta);
+
+        storageServiceWorker.flushNotificationsToConsole(console);
     }
 
 

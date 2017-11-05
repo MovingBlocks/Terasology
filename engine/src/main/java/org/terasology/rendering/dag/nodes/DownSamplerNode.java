@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.opengl.FBOManagerSubscriber;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -36,14 +35,11 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * Instances of this class take the content of the color attachment of an input FBO
  * and downsamples it into the color attachment of a smaller output FBO.
  */
-public class DownSamplerNode extends ConditionDependentNode implements FBOManagerSubscriber {
+public class DownSamplerNode extends ConditionDependentNode {
     private static final String TEXTURE_NAME = "tex";
-    private static final int SLOT_0 = 0;
-    private static final ResourceUrn DOWN_SAMPLER_MATERIAL = new ResourceUrn("engine:prog.downSampler");
+    private static final ResourceUrn DOWN_SAMPLER_MATERIAL_URN = new ResourceUrn("engine:prog.downSampler");
 
     private String label;
-    private BaseFBOsManager outputFboManager;
-    private ResourceUrn outputFboUrn;
     private FBO outputFbo;
     private Material downSampler;
 
@@ -61,23 +57,18 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
                                             String label) {
         super(context);
 
-        this.outputFboManager = outputFboManager;
-        this.outputFboUrn = outputFboConfig.getName();
+        FBO inputFbo = requiresFBO(inputFboConfig, inputFboManager);
+        outputFbo = requiresFBO(outputFboConfig, outputFboManager);
 
-        requiresFBO(inputFboConfig, inputFboManager);
-        requiresFBO(outputFboConfig, outputFboManager);
-
-        addDesiredStateChange(new BindFbo(outputFboUrn, outputFboManager));
-        addDesiredStateChange(new SetViewportToSizeOf(outputFboUrn, outputFboManager));
-        addDesiredStateChange(new SetInputTextureFromFbo(SLOT_0, inputFboConfig.getName(), ColorTexture, inputFboManager,
-                DOWN_SAMPLER_MATERIAL, TEXTURE_NAME));
-        update(); // Cheeky way to initialise outputFbo
-        outputFboManager.subscribe(this);
+        addDesiredStateChange(new BindFbo(outputFbo));
+        addDesiredStateChange(new SetViewportToSizeOf(outputFbo));
+        addDesiredStateChange(new SetInputTextureFromFbo(0, inputFbo, ColorTexture, inputFboManager,
+                DOWN_SAMPLER_MATERIAL_URN, TEXTURE_NAME));
 
         setupConditions(context);
 
-        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL));
-        downSampler = getMaterial(DOWN_SAMPLER_MATERIAL);
+        addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL_URN));
+        downSampler = getMaterial(DOWN_SAMPLER_MATERIAL_URN);
 
         this.label = label;
     }
@@ -101,10 +92,5 @@ public class DownSamplerNode extends ConditionDependentNode implements FBOManage
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void update() {
-        outputFbo = outputFboManager.get(outputFboUrn);
     }
 }

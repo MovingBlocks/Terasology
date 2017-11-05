@@ -152,6 +152,54 @@
                                     "height": 24,
                                     "position-horizontal-center": {},
                                     "position-bottom": {
+                                        "target": "TOP",
+                                        "widget": "checkBoxes",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "checkBoxes",
+                                "horizontalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "localOnly",
+                                        "enabled": true,
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.11
+                                        }
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Local Only",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.3
+                                        }
+
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "library",
+                                        "enabled": false,
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.11
+                                        }
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Show Library/API",
+                                        "layoutInfo": {
+                                            "relativeWidth": 0.48
+                                        },
+                                        "enabled": false
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "height": 24,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
                                         "target": "BOTTOM"
                                     }
                                 }

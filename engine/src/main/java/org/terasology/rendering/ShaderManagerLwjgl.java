@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.registry.CoreRegistry;
@@ -31,25 +32,6 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.rendering.shader.ShaderParameters;
-import org.terasology.rendering.shader.ShaderParametersBlock;
-import org.terasology.rendering.shader.ShaderParametersChunk;
-import org.terasology.rendering.shader.ShaderParametersDebug;
-import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersInitialPost;
-import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
-import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
-import org.terasology.rendering.shader.ShaderParametersLightShafts;
-import org.terasology.rendering.shader.ShaderParametersOcDistortion;
-import org.terasology.rendering.shader.ShaderParametersParticle;
-import org.terasology.rendering.shader.ShaderParametersPost;
-import org.terasology.rendering.shader.ShaderParametersPrePostComposite;
-import org.terasology.rendering.shader.ShaderParametersSSAO;
-import org.terasology.rendering.shader.ShaderParametersShadowMap;
-import org.terasology.rendering.shader.ShaderParametersSky;
-import org.terasology.rendering.shader.ShaderParametersSobel;
-import org.terasology.rendering.shader.ShaderParametersToneMapping;
-import org.terasology.utilities.Assets;
 
 import java.util.Optional;
 import java.util.Set;
@@ -60,7 +42,6 @@ import static com.google.common.base.Preconditions.checkState;
  * Provides support for loading and applying shaders.
  */
 public class ShaderManagerLwjgl implements ShaderManager {
-
     private static final Logger logger = LoggerFactory.getLogger(ShaderManagerLwjgl.class);
 
     private GLSLMaterial activeMaterial;
@@ -105,31 +86,27 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     @Override
     public void initShaders() {
-        defaultShaderProgram = prepareAndStoreShaderProgramInstance("default", new ShaderParametersDefault());
-        defaultTexturedShaderProgram = prepareAndStoreShaderProgramInstance("defaultTextured", new ShaderParametersDefault());
+        defaultShaderProgram = addShaderProgram("default");
+        defaultTexturedShaderProgram = addShaderProgram("defaultTextured");
 
         // TODO: Find a better way to do this
-        prepareAndStoreShaderProgramInstance("post", new ShaderParametersPost());
-        prepareAndStoreShaderProgramInstance("ssao", new ShaderParametersSSAO());
-        prepareAndStoreShaderProgramInstance("lightShafts", new ShaderParametersLightShafts());
-        prepareAndStoreShaderProgramInstance("sobel", new ShaderParametersSobel());
-        prepareAndStoreShaderProgramInstance("initialPost", new ShaderParametersInitialPost());
-        prepareAndStoreShaderProgramInstance("prePostComposite", new ShaderParametersPrePostComposite());
-        prepareAndStoreShaderProgramInstance("highPass", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("blur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("downSampler", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("toneMapping", new ShaderParametersToneMapping());
-        prepareAndStoreShaderProgramInstance("sky", new ShaderParametersSky());
-        prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
-        prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
-        prepareAndStoreShaderProgramInstance("block", new ShaderParametersBlock());
-        prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersShadowMap());
-        prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
-        prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
-        prepareAndStoreShaderProgramInstance("lightBufferPass", new ShaderParametersLightBufferPass());
-        prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
-        prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
+        addShaderProgram("post");
+        addShaderProgram("ssao");
+        addShaderProgram("lightShafts");
+        addShaderProgram("sobel");
+        addShaderProgram("initialPost");
+        addShaderProgram("prePostComposite");
+        addShaderProgram("highPass");
+        addShaderProgram("blur");
+        addShaderProgram("downSampler");
+        addShaderProgram("toneMapping");
+        addShaderProgram("sky");
+        addShaderProgram("chunk");
+        addShaderProgram("particle");
+        addShaderProgram("shadowMap");
+        addShaderProgram("lightBufferPass");
+        addShaderProgram("lightGeometryPass");
+        addShaderProgram("ssaoBlur");
     }
 
     @Override
@@ -167,14 +144,13 @@ public class ShaderManagerLwjgl implements ShaderManager {
         activeMaterial = null;
     }
 
-    @SuppressWarnings("unused")  // this is actually used, I'm not sure why the Jenkins Static Analyses says it's unused.
-    private GLSLMaterial prepareAndStoreShaderProgramInstance(String title, ShaderParameters params) {
+    // TODO: discuss having a `public removeShaderProgram`, to dispose shader programs no longer in use by any node
+    public GLSLMaterial addShaderProgram(String title) {
         String uri = "engine:" + title;
         Optional<? extends Shader> shader = Assets.getShader(uri);
         checkState(shader.isPresent(), "Failed to resolve %s", uri);
         shader.get().recompile();
         GLSLMaterial material = (GLSLMaterial) Assets.generateAsset(new ResourceUrn("engine:prog." + title), new MaterialData(shader.get()), Material.class);
-        material.setShaderParameters(params);
         progamaticShaders.add(material);
 
         return material;
@@ -201,5 +177,4 @@ public class ShaderManagerLwjgl implements ShaderManager {
         GL20.glUseProgram(0);
         activeMaterial = null;
     }
-
 }

@@ -17,8 +17,9 @@ package org.terasology.engine.subsystem.headless.device;
 
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
 
-public class HeadlessDisplayDevice implements DisplayDevice {
+public class HeadlessDisplayDevice extends AbstractSubscribable implements DisplayDevice {
 
     public HeadlessDisplayDevice() {
     }
@@ -63,5 +64,9 @@ public class HeadlessDisplayDevice implements DisplayDevice {
 
     @Override
     public void prepareToRender() {
+    }
+
+    @Override
+    public void update() {
     }
 }

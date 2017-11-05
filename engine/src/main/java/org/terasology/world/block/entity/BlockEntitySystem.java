@@ -18,6 +18,7 @@ package org.terasology.world.block.entity;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -155,6 +156,17 @@ public class BlockEntitySystem extends BaseComponentSystem {
         BlockDamageModifierComponent blockDamageModifierComponent = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
         // TODO: Configurable via block definition
         if (blockDamageModifierComponent == null || !blockDamageModifierComponent.skipPerBlockEffects) {
+            // dust particle effect
+            if (entity.hasComponent(LocationComponent.class) && block.isDebrisOnDestroy()) {
+                EntityBuilder dustBuilder = entityManager.newBuilder("core:dustEffect");
+                // TODO: particle system stuff should be split out better - this is effectively a stealth dependency on Core from the engine
+                if (dustBuilder.hasComponent(LocationComponent.class)) {
+                    dustBuilder.getComponent(LocationComponent.class).setWorldPosition(entity.getComponent(LocationComponent.class).getWorldPosition());
+                    dustBuilder.build();
+                }
+            }
+
+            // sound to play for destroyed block
             BlockSounds sounds = block.getSounds();
             if (!sounds.getDestroySounds().isEmpty()) {
                 StaticSound sound = random.nextItem(sounds.getDestroySounds());

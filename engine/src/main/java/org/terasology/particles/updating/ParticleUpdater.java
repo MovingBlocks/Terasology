@@ -45,9 +45,9 @@ public interface ParticleUpdater {
      * @param registeredAffectorFunctions  The list of affector functions to use when processing the given system's affectors.
      * @param registeredGeneratorFunctions The list of generator functions to use when processing the given system's generators.
      */
-    void configureEmitter(final ParticleEmitterComponent emitter,
-                          final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                          final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
+    void configureEmitter(ParticleEmitterComponent emitter,
+                          BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
+                          BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
 
     void update(float delta);
 

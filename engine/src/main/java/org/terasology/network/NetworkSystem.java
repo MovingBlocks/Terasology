@@ -67,5 +67,5 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     void forceDisconnect(Client client);
 
-    void setStateContext(Context context);
+    void setContext(Context context);
 }

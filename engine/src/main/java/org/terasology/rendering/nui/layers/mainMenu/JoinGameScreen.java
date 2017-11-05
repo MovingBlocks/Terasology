@@ -29,6 +29,7 @@ import org.terasology.engine.GameThread;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.identity.storageServiceClient.StorageServiceWorker;
 import org.terasology.input.Keyboard;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.NameVersion;
@@ -87,6 +88,9 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private TranslationSystem translationSystem;
+
+    @In
+    private StorageServiceWorker storageServiceWorker;
 
     private Map<ServerInfo, Future<ServerInfoMessage>> extInfo = new HashMap<>();
 
@@ -158,6 +162,10 @@ public class JoinGameScreen extends CoreScreenLayer {
 
         if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
+        }
+
+        if (storageServiceWorker.hasConflictingIdentities()) {
+            new IdentityConflictHelper(storageServiceWorker, getManager(), translationSystem).runSolver();
         }
     }
 
@@ -473,8 +481,15 @@ public class JoinGameScreen extends CoreScreenLayer {
     }
 
     public boolean onKeyEvent(NUIKeyEvent event) {
-        if (event.isDown() && event.getKey() == Keyboard.Key.R) {
-            refresh();
+        if (event.isDown()) {
+            if (event.getKey() == Keyboard.Key.ESCAPE) {
+                if (isEscapeToCloseAllowed()) {
+                    triggerBackAnimation();
+                    return true;
+                }
+            } else if (event.getKey() == Keyboard.Key.R) {
+                refresh();
+            }
         }
         return false;
     }

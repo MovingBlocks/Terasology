@@ -456,10 +456,11 @@ public class BulletPhysics implements PhysicsEngine {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
+            CollisionGroup collisionGroup = trigger.collisionGroup;
             PairCachingGhostObject triggerObj = createCollider(
                     VecMath.to(location.getWorldPosition()),
                     shape,
-                    StandardCollisionGroup.SENSOR.getFlag(),
+                    collisionGroup.getFlag(),
                     combineGroups(detectGroups),
                     CollisionFlags.NO_CONTACT_RESPONSE);
             triggerObj.setUserPointer(entity);
@@ -714,7 +715,7 @@ public class BulletPhysics implements PhysicsEngine {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
                     }
                 }
-                if (otherEntity == null) {
+                if (otherEntity == null || otherEntity == EntityRef.NULL) {
                     continue;
                 }
                 BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);
@@ -926,6 +927,7 @@ public class BulletPhysics implements PhysicsEngine {
             BulletSweepCallback callback = new BulletSweepCallback(collider, new org.terasology.math.geom.Vector3f(0, 1, 0), slopeFactor);
             callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
             callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
+            callback.collisionFilterMask = (short) (callback.collisionFilterMask & (~StandardCollisionGroup.SENSOR.getFlag()));
             collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);
             return callback;
         }

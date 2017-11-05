@@ -46,6 +46,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.SelectModulesScreen;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIDropdownScrollable;

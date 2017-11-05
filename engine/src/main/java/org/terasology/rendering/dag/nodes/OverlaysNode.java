@@ -22,7 +22,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
@@ -33,8 +33,6 @@ import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
-
 /**
  * This nodes renders overlays, i.e. the black lines highlighting a nearby block the user can interact with.
  *
@@ -42,12 +40,11 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * must take advantage of the RenderSystem.renderOverlay() method, which is called in process().
  */
 public class OverlaysNode extends AbstractNode implements WireframeCapable {
-    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL = new ResourceUrn("engine:prog.defaultTextured");
+    private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private ComponentSystemManager componentSystemManager;
     private WorldRenderer worldRenderer;
 
-    private Camera playerCamera;
     private SetWireframe wireframeStateChange;
 
     public OverlaysNode(Context context) {
@@ -58,12 +55,12 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
         new WireframeTrigger(renderingDebugConfig, this);
 
         worldRenderer = context.get(WorldRenderer.class);
-        playerCamera = worldRenderer.getActiveCamera();
+        SubmersibleCamera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
 
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, context.get(DisplayResolutionDependentFBOs.class)));
+        addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
-        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL));
+        addDesiredStateChange(new EnableMaterial(DEFAULT_TEXTURED_MATERIAL_URN));
     }
 
     /**

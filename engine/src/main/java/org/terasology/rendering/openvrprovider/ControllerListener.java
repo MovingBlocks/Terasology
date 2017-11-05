@@ -39,12 +39,12 @@ public interface ControllerListener {
      * @param stateAfter - the controller state after the change.
      * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
      */
-    public void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex);
+    void buttonStateChanged(VRControllerState_t stateBefore, VRControllerState_t stateAfter, int handIndex);
 
     /**
      * Override this method with a handler for whenever the pose of the OpenVR controller changes.
      * @param pose - the pose of the controller at the point of update, a 4x4 homogenous transformation matrix.
      * @param handIndex - the hand index of the affected controller, an integer. 0 for the left hand, 1 for the right.
      */
-    public void poseChanged(Matrix4f pose, int handIndex);
+    void poseChanged(Matrix4f pose, int handIndex);
 }

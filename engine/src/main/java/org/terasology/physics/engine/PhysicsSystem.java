@@ -55,6 +55,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 
+import com.google.common.collect.Lists;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -242,12 +244,52 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
         for (CollisionPair pair : collisionPairs) {
             if (pair.b.exists()) {
-                pair.a.send(new CollideEvent(pair.b,pair.pointA,pair.pointB,pair.distance,pair.normal));
+                short bCollisionGroup = getCollisionGroupFlag(pair.b);
+                short aCollidesWith = getCollidesWithGroupFlag(pair.a);
+                if ((bCollisionGroup & aCollidesWith) != 0
+                        || (pair.b.hasComponent(BlockComponent.class) && !pair.a.hasComponent(BlockComponent.class))) {
+                    pair.a.send(new CollideEvent(pair.b, pair.pointA, pair.pointB, pair.distance, pair.normal));
+                }
             }
             if (pair.a.exists()) {
-                pair.b.send(new CollideEvent(pair.a,pair.pointB,pair.pointA,pair.distance,new Vector3f(pair.normal).invert()));
+                short aCollisionGroup = getCollisionGroupFlag(pair.a);
+                short bCollidesWith = getCollidesWithGroupFlag(pair.b);
+                if ((aCollisionGroup & bCollidesWith) != 0
+                        || (pair.a.hasComponent(BlockComponent.class) && !pair.b.hasComponent(BlockComponent.class))) {
+                    pair.b.send(new CollideEvent(pair.a, pair.pointB, pair.pointA, pair.distance, new Vector3f(pair.normal).invert()));
+                }
             }
         }
+    }
+
+    private short getCollisionGroupFlag(EntityRef entity) {
+        CollisionGroup collisionGroup = StandardCollisionGroup.NONE;
+        if (entity.hasComponent(TriggerComponent.class)) {
+            TriggerComponent entityTrigger = entity.getComponent(TriggerComponent.class);
+            collisionGroup = entityTrigger.collisionGroup;
+        } else if (entity.hasComponent(RigidBodyComponent.class)) {
+            RigidBodyComponent entityRigidBody = entity.getComponent(RigidBodyComponent.class);
+            collisionGroup = entityRigidBody.collisionGroup;
+        }
+        return collisionGroup.getFlag();
+    }
+
+    private short getCollidesWithGroupFlag(EntityRef entity) {
+        List<CollisionGroup> collidesWithGroup = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.NONE);
+        if (entity.hasComponent(TriggerComponent.class)) {
+            TriggerComponent entityTrigger = entity.getComponent(TriggerComponent.class);
+            collidesWithGroup = entityTrigger.detectGroups;
+        } else if (entity.hasComponent(RigidBodyComponent.class)) {
+            RigidBodyComponent entityRigidBody = entity.getComponent(RigidBodyComponent.class);
+            collidesWithGroup = entityRigidBody.collidesWith;
+        }
+        short flag = 0;
+        Iterator<CollisionGroup> iter = collidesWithGroup.iterator();
+        while (iter.hasNext()) {
+            CollisionGroup group = iter.next();
+            flag |= group.getFlag();
+        }
+        return flag;
     }
 
     private void sendSyncMessages() {
@@ -289,7 +331,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         Vector3f normal;
 
 
-        public CollisionPair(EntityRef a, EntityRef b,Vector3f pointA, Vector3f pointb, float distance, Vector3f normal) {
+        public CollisionPair(EntityRef a, EntityRef b, Vector3f pointA, Vector3f pointb, float distance, Vector3f normal) {
             this.a = a;
             this.b = b;
             this.pointA = pointA;

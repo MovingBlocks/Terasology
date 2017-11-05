@@ -68,6 +68,11 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
         widgetList.remove(widget);
     }
 
+    @Override
+    public void removeAllWidgets() {
+        widgetList.clear();
+    }
+
     public int getRows() {
         return rows;
     }
@@ -81,7 +86,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
         }
     }
 
-    public void setRowHeights(float ... heights) {
+    public void setRowHeights(float... heights) {
         if (heights.length > rows) {
             throw new IllegalArgumentException("More heights than rows");
         }

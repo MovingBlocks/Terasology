@@ -37,14 +37,16 @@ import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.characters.events.OnItemUseEvent;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.health.BeforeDestroyEvent;
 import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.PlayerCharacterComponent;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -82,14 +84,26 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private BlockEntityRegistry blockRegistry;
 
-    @ReceiveEvent(components = {CharacterComponent.class})
-    public void onDeath(DoDestroyEvent event, EntityRef entity) {
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+    @ReceiveEvent
+    public void beforeDestroy(BeforeDestroyEvent event, EntityRef character, CharacterComponent characterComponent, AliveCharacterComponent aliveCharacterComponent) {
+        if (character.hasComponent(PlayerCharacterComponent.class)) {
+            // Consume the BeforeDestroyEvent so that the DoDestroy event is never sent for player entities
+            event.consume();
+            // PlayerDeathEvent only sent to the client for the player entity.
+            PlayerDeathEvent playerDeathEvent = new PlayerDeathEvent();
+            //Store the details of the death in the event for display on the death screen
+            playerDeathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
+            playerDeathEvent.instigatorName = getInstigatorName(event.getInstigator());
+            character.send(playerDeathEvent);
+        }
+
+        // DeathEvent sent to client for any character entity.
         DeathEvent deathEvent = new DeathEvent();
-        //Store the details of the death in the event for display on the death screen
         deathEvent.damageTypeName = getDamageTypeName(event.getDamageType());
         deathEvent.instigatorName = getInstigatorName(event.getInstigator());
-        character.controller.send(deathEvent);
+        characterComponent.controller.send(deathEvent);
+
+        character.removeComponent(AliveCharacterComponent.class);
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);

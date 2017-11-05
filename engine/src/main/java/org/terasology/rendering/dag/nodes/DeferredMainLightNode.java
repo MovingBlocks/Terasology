@@ -16,6 +16,8 @@
 package org.terasology.rendering.dag.nodes;
 
 import org.terasology.assets.ResourceUrn;
+import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -23,6 +25,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
 import org.terasology.rendering.dag.stateChanges.DisableDepthTest;
@@ -30,14 +33,22 @@ import org.terasology.rendering.dag.stateChanges.EnableBlending;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetBlendFunction;
 import org.terasology.rendering.dag.stateChanges.SetFboWriteMask;
+import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
+import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.logic.LightComponent;
+import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
+import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.terasology.rendering.dag.nodes.ShadowMapNode.SHADOW_MAP_FBO_URI;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.LightAccumulationTexture;
+import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.NormalsTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
-import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.READONLY_GBUFFER;
 
 // TODO: have this node and the shadowmap node handle multiple directional lights
 
@@ -53,20 +64,36 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  * light up the 3d scene.
  */
 public class DeferredMainLightNode extends AbstractNode {
-    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL = new ResourceUrn("engine:prog.lightGeometryPass");
+    private static final ResourceUrn LIGHT_GEOMETRY_MATERIAL_URN = new ResourceUrn("engine:prog.lightGeometryPass");
 
     private BackdropProvider backdropProvider;
+    private RenderingConfig renderingConfig;
+    private WorldProvider worldProvider;
 
     private LightComponent mainLightComponent = new LightComponent();
-    private Camera playerCamera;
+
     private Material lightGeometryMaterial;
+
+    private SubmersibleCamera activeCamera;
+    private Camera lightCamera;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f cameraPosition;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f activeCameraToLightSpace = new Vector3f();
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f mainLightInViewSpace = new Vector3f();
 
     public DeferredMainLightNode(Context context) {
         backdropProvider = context.get(BackdropProvider.class);
-        playerCamera = context.get(WorldRenderer.class).getActiveCamera();
+        renderingConfig = context.get(Config.class).getRendering();
+        worldProvider = context.get(WorldProvider.class);
 
-        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL));
-        lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL);
+        WorldRenderer worldRenderer = context.get(WorldRenderer.class);
+        activeCamera = worldRenderer.getActiveCamera();
+        lightCamera = worldRenderer.getLightCamera();
+
+        addDesiredStateChange(new EnableMaterial(LIGHT_GEOMETRY_MATERIAL_URN));
+        lightGeometryMaterial = getMaterial(LIGHT_GEOMETRY_MATERIAL_URN);
 
         addDesiredStateChange(new DisableDepthTest());
 
@@ -74,10 +101,25 @@ public class DeferredMainLightNode extends AbstractNode {
         addDesiredStateChange(new SetBlendFunction(GL_ONE, GL_ONE_MINUS_SRC_COLOR));
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        addDesiredStateChange(new BindFbo(READONLY_GBUFFER, displayResolutionDependentFBOs));
-        addDesiredStateChange(new SetFboWriteMask(false, false, true, READONLY_GBUFFER, displayResolutionDependentFBOs));
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        // TODO: make sure to read from the lastUpdatedGBuffer and write to the staleGBuffer.
+        addDesiredStateChange(new BindFbo(lastUpdatedGBuffer));
+        addDesiredStateChange(new SetFboWriteMask(lastUpdatedGBuffer, false, false, true));
 
         initMainDirectionalLight();
+
+        ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs = context.get(ShadowMapResolutionDependentFBOs.class);
+        int textureSlot = 0;
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, DepthStencilTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueDepth"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, NormalsTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueNormals"));
+        addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, lastUpdatedGBuffer, LightAccumulationTexture, displayResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneOpaqueLightBuffer"));
+        if (renderingConfig.isDynamicShadows()) {
+            addDesiredStateChange(new SetInputTextureFromFbo(textureSlot++, SHADOW_MAP_FBO_URI, DepthStencilTexture, shadowMapResolutionDependentFBOs, LIGHT_GEOMETRY_MATERIAL_URN, "texSceneShadowMap"));
+
+            if (renderingConfig.isCloudShadows()) {
+                addDesiredStateChange(new SetInputTexture2D(textureSlot, "engine:perlinNoiseTileable", LIGHT_GEOMETRY_MATERIAL_URN, "texSceneClouds"));
+            }
+        }
     }
 
     // TODO: one day the main light (sun/moon) should be just another light in the scene.
@@ -96,21 +138,51 @@ public class DeferredMainLightNode extends AbstractNode {
     public void process() {
         PerformanceMonitor.startActivity("rendering/mainLightGeometry");
 
-        // Note: no need to set a camera here: the render takes place
-        // with a default opengl camera and the quad is in front of it - I think.
-
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 
-        lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
-                mainLightComponent.lightColorDiffuse.y, mainLightComponent.lightColorDiffuse.z, true);
-        lightGeometryMaterial.setFloat3("lightColorAmbient", mainLightComponent.lightColorAmbient.x,
-                mainLightComponent.lightColorAmbient.y, mainLightComponent.lightColorAmbient.z, true);
-        lightGeometryMaterial.setFloat3("lightProperties", mainLightComponent.lightAmbientIntensity,
-                mainLightComponent.lightDiffuseIntensity, mainLightComponent.lightSpecularPower, true);
+        // Common Shader Parameters
 
-        Vector3f mainLightInViewSpace = new Vector3f(backdropProvider.getSunDirection(true));
-        playerCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
-        lightGeometryMaterial.setFloat3("lightViewPos", mainLightInViewSpace.x, mainLightInViewSpace.y, mainLightInViewSpace.z, true);
+        lightGeometryMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
+
+        // Specific Shader Parameters
+
+        cameraPosition = activeCamera.getPosition();
+        activeCameraToLightSpace.sub(cameraPosition, lightCamera.getPosition());
+        mainLightInViewSpace = backdropProvider.getSunDirection(true);
+        activeCamera.getViewMatrix().transformPoint(mainLightInViewSpace);
+
+        // TODO: This is necessary right now because activateFeature removes all material parameters.
+        // TODO: Remove this explicit binding once we get rid of activateFeature, or find a way to retain parameters through it.
+        lightGeometryMaterial.setInt("texSceneOpaqueDepth", 0, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueNormals", 1, true);
+        lightGeometryMaterial.setInt("texSceneOpaqueLightBuffer", 2, true);
+        if (renderingConfig.isDynamicShadows()) {
+            lightGeometryMaterial.setInt("texSceneShadowMap", 3, true);
+            if (renderingConfig.isCloudShadows()) {
+                lightGeometryMaterial.setInt("texSceneClouds", 4, true);
+                lightGeometryMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+                lightGeometryMaterial.setFloat3("cameraPosition", cameraPosition, true);
+            }
+        }
+
+        if (renderingConfig.isDynamicShadows()) {
+            lightGeometryMaterial.setMatrix4("lightViewProjMatrix", lightCamera.getViewProjectionMatrix(), true);
+            lightGeometryMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+            lightGeometryMaterial.setFloat3("activeCameraToLightSpace", activeCameraToLightSpace, true);
+        }
+
+        // Note: no need to set a camera here: the render takes place
+        // with a default opengl camera and the quad is in front of it.
+
+        lightGeometryMaterial.setFloat3("lightViewPos", mainLightInViewSpace, true);
+        lightGeometryMaterial.setFloat3("lightColorDiffuse", mainLightComponent.lightColorDiffuse.x,
+            mainLightComponent.lightColorDiffuse.y, mainLightComponent.lightColorDiffuse.z, true);
+        lightGeometryMaterial.setFloat3("lightColorAmbient", mainLightComponent.lightColorAmbient.x,
+            mainLightComponent.lightColorAmbient.y, mainLightComponent.lightColorAmbient.z, true);
+        lightGeometryMaterial.setFloat3("lightProperties", mainLightComponent.lightAmbientIntensity,
+            mainLightComponent.lightDiffuseIntensity, mainLightComponent.lightSpecularPower, true);
+
+        // Actual Node Processing
 
         renderFullscreenQuad(); // renders the light.
 

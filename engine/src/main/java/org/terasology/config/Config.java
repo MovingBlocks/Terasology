@@ -74,11 +74,12 @@ public final class Config {
         return config.getPermission();
     }
 
-    /**
-     * @return Input configuration (mostly binds)
-     */
     public InputConfig getInput() {
         return config.getInput();
+    }
+
+    public BindsConfig getBinds() {
+        return config.getBinds();
     }
 
     public ModuleConfig getDefaultModSelection() {
@@ -117,8 +118,20 @@ public final class Config {
         return config.getNuiEditor();
     }
 
+    public IdentityStorageServiceConfig getIdentityStorageService() {
+        return config.getIdentityStorageService();
+    }
+
+    public TelemetryConfig getTelemetryConfig() {
+        return config.getTelemetryConfig();
+    }
+
     public String renderConfigAsJson(Object configObject) {
         return createGson().toJsonTree(configObject).toString();
+    }
+
+    public SelectModulesConfig getSelectModulesConfig() {
+        return config.getSelectModulesConfig();
     }
 
     /**

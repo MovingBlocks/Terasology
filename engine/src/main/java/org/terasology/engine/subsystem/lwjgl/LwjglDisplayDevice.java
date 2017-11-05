@@ -22,6 +22,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.utilities.subscribables.AbstractSubscribable;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -29,7 +30,8 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
 
-public class LwjglDisplayDevice implements DisplayDevice {
+public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
+    public static final String DISPLAY_RESOLUTION_CHANGE = "displayResolutionChange";
 
     private RenderingConfig config;
 
@@ -121,5 +123,14 @@ public class LwjglDisplayDevice implements DisplayDevice {
     public void prepareToRender() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
+    }
+
+    public void update() {
+        if (Display.wasResized()) {
+            glViewport(0, 0, Display.getWidth(), Display.getHeight());
+            propertyChangeSupport.firePropertyChange(DISPLAY_RESOLUTION_CHANGE, 0, 1);
+            // Note that the "old" and "new" values (0 and 1) in the above call aren't actually
+            // used: they are only necessary to ensure that the event is fired up correctly.
+        }
     }
 }

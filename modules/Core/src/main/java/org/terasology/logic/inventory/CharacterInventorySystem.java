@@ -16,7 +16,7 @@
 
 package org.terasology.logic.inventory;
 
-import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
@@ -238,7 +238,7 @@ public class CharacterInventorySystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(netFilter = RegisterMode.CLIENT)
-    public void onPlayerDeath(DeathEvent event, EntityRef entity) {
+    public void onPlayerDeath(PlayerDeathEvent event, EntityRef entity) {
         resetDropMark();
     }
 

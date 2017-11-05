@@ -18,15 +18,14 @@ package org.terasology.core.logic.door;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -38,6 +37,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.utilities.Assets;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 /**
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class DoorSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
 
@@ -133,7 +133,7 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.getWorldEntity().send(blockEvent);
 
         if (!blockEvent.isConsumed()) {
-            EntityRef newDoor = entityManager.create("DoorRegion");
+            EntityRef newDoor = entityManager.create(door.doorRegionPrefab);
             entity.removeComponent(MeshComponent.class);
             newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
             Vector3f doorCenter = bottomBlockPos.toVector3f();
@@ -147,6 +147,7 @@ public class DoorSystem extends BaseComponentSystem {
             newDoor.send(new PlaySoundEvent(Assets.getSound("engine:PlaceBlock").get(), 0.5f));
             logger.info("Closed Side: {}", newDoorComp.closedSide);
             logger.info("Open Side: {}", newDoorComp.openSide);
+            newDoor.send(new DoorPlacedEvent(event.getInstigator()));
         }
     }
 
@@ -182,18 +183,43 @@ public class DoorSystem extends BaseComponentSystem {
     @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
     public void onFrob(ActivateEvent event, EntityRef entity) {
         DoorComponent door = entity.getComponent(DoorComponent.class);
-        Side newSide = (door.isOpen) ? door.closedSide : door.openSide;
+        if (door.isOpen) {
+            event.getInstigator().send(new CloseDoorEvent(entity));
+        } else {
+            event.getInstigator().send(new OpenDoorEvent(entity));
+        }
+    }
+
+    @ReceiveEvent
+    public void closeDoor(CloseDoorEvent event, EntityRef player) {
+        EntityRef entity = event.getDoorEntity();
+        DoorComponent door = entity.getComponent(DoorComponent.class);
+        Side newSide = door.closedSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
-        StaticSound sound = (door.isOpen) ? door.closeSound : door.openSound;
-        if (sound != null) {
-            entity.send(new PlaySoundEvent(sound, 1f));
+        if (door.closeSound != null) {
+            entity.send(new PlaySoundEvent(door.closeSound, 1f));
         }
-
-        door.isOpen = !door.isOpen;
+        door.isOpen = false;
         entity.saveComponent(door);
+    }
+
+    @ReceiveEvent
+    public void openDoor(OpenDoorEvent event, EntityRef player) {
+        EntityRef entity = event.getDoorEntity();
+        DoorComponent door = entity.getComponent(DoorComponent.class);
+        Side newSide = door.openSide;
+        BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
+        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
+        worldProvider.setBlock(regionComp.region.min(), bottomBlock);
+        Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
+        worldProvider.setBlock(regionComp.region.max(), topBlock);
+        if (door.openSound != null) {
+            entity.send(new PlaySoundEvent(door.openSound, 1f));
+        }
+        door.isOpen = true;
     }
 }

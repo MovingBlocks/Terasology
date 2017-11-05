@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.AssetFactory;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
+import org.terasology.config.Config;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
@@ -44,6 +45,7 @@ import org.terasology.engine.subsystem.common.PhysicsSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManagerSubsystem;
 import org.terasology.engine.subsystem.common.TimeSubsystem;
 import org.terasology.engine.subsystem.common.WorldGenerationSubsystem;
+import org.terasology.engine.subsystem.common.TelemetrySubSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -168,6 +170,7 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new WorldGenerationSubsystem());
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
+        this.allSubsystems.add(new TelemetrySubSystem());
     }
 
     public void initialize() {
@@ -208,7 +211,6 @@ public class TerasologyEngine implements GameEngine {
             cleanup();
             throw e;
         }
-
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
@@ -262,6 +264,7 @@ public class TerasologyEngine implements GameEngine {
      */
     private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
+            changeStatus(() -> "Post-Initialising " + subsystem.getName() + " subsystem");
             subsystem.postInitialise(rootContext);
         }
     }
@@ -281,7 +284,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        ModuleManager moduleManager = new ModuleManagerImpl();
+        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class));
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
@@ -394,7 +397,9 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (tick()) { /* do nothing */ }
+        while (tick()) {
+            /* do nothing */
+        }
         PerformanceMonitor.endActivity();
     }
 
@@ -418,7 +423,7 @@ public class TerasologyEngine implements GameEngine {
 
         Iterator<Float> updateCycles = timeSubsystem.getEngineTime().tick();
         CoreRegistry.setContext(currentState.getContext());
-        rootContext.get(NetworkSystem.class).setStateContext(currentState.getContext());
+        rootContext.get(NetworkSystem.class).setContext(currentState.getContext());
 
         for (EngineSubsystem subsystem : allSubsystems) {
             try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getName() + " PreUpdate")) {

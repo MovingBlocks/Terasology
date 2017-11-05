@@ -26,7 +26,8 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.OnlinePlayersButton;
 import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.binds.general.ScreenshotButton;
-import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -68,9 +69,11 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {ClientComponent.class})
-    public void onDeath(DeathEvent event, EntityRef entity) {
-        if (entity.getComponent(ClientComponent.class).local) {
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void onPlayerDeath(PlayerDeathEvent event, EntityRef character) {
+        EntityRef client = character.getComponent(CharacterComponent.class).controller;
+        if (client.getComponent(ClientComponent.class).local) {
+            nuiManager.removeOverlay("engine:onlinePlayersOverlay");
             nuiManager.pushScreen("engine:deathScreen");
             if (event.damageTypeName != null) {
                 ((DeathScreen) nuiManager.getScreen("engine:deathScreen")).setDeathDetails(event.instigatorName, event.damageTypeName);

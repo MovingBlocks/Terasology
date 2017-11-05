@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.terasology.config.BindsConfig;
-import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -65,13 +64,4 @@ public class InputConfigBinding implements Binding<Input> {
         config.setBinds(bindUri, binds);
     }
 
-    public void reset(Context context) {
-        BindsConfig defaultBindings = BindsConfig.createDefault(context);
-        set(Iterators.get(defaultBindings.getBinds(bindUri).iterator(), position, null));
-    }
-
-    public Input getDefault(Context context) {
-        BindsConfig defaultBindings = BindsConfig.createDefault(context);
-        return Iterators.get(defaultBindings.getBinds(bindUri).iterator(), position, null);
-    }
 }

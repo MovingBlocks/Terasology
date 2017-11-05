@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -25,6 +26,8 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 
+import java.util.List;
+
 /**
  * A check-box. Hovering is supported.
  */
@@ -33,12 +36,18 @@ public class UICheckbox extends CoreWidget {
 
     private Binding<Boolean> active = new DefaultBinding<>(false);
 
+    /**
+     * A {@link List} of listeners subscribed to this checkbox
+     */
+    private List<ActivateEventListener> listeners = Lists.newArrayList();
+
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
         public boolean onMouseClick(NUIMouseClickEvent event) {
             if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
                 active.set(!active.get());
+                activate();
                 return true;
             }
             return false;
@@ -97,5 +106,32 @@ public class UICheckbox extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return Vector2i.zero();
+    }
+
+    /**
+     * Called when this {@code UICheckbox} is pressed to activate all subscribed listeners.
+     */
+    private void activate() {
+        for (ActivateEventListener listener : listeners) {
+            listener.onActivated(this);
+        }
+    }
+
+    /**
+     * Subscribes a listener that is called whenever this {@code UICheckBox} is activated.
+     *
+     * @param listener The {@link ActivateEventListener} to be subscribed
+     */
+    public void subscribe(ActivateEventListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Unsubscribes a listener from this {@code UICheckBox}.
+     *
+     * @param listener The {@code ActivateEventListener}to be unsubscribed
+     */
+    public void unsubscribe(ActivateEventListener listener) {
+        listeners.remove(listener);
     }
 }

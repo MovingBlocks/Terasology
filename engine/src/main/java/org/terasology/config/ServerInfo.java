@@ -16,8 +16,16 @@
 package org.terasology.config;
 
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
 
 public class ServerInfo {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServerInfo.class);
+
     private String name;
     private String address;
     private String owner;
@@ -122,5 +130,21 @@ public class ServerInfo {
     public String toString() {
         return "ServerInfo [name=" + name + ", address=" + address + ", port=" + port +
                 ", owner=" + owner + ", active=" + active + "]";
+    }
+
+    /**
+     * @param protocol the protocol the server uses
+     * @return the URL of the server
+     */
+    public Optional<URL> getURL(String protocol) {
+        Optional<URL> optional;
+        try {
+            URL url = new URL(protocol, getAddress(), getPort(), "");
+            optional = Optional.of(url);
+        } catch (MalformedURLException e) {
+            logger.error("Telemetry server URL mal formed", e);
+            optional = Optional.ofNullable(null);
+        }
+        return optional;
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.ui;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
@@ -75,7 +76,7 @@ public class ChatScreen extends CoreScreenLayer {
         commandLine.subscribe(widget -> {
             String text = commandLine.getText();
 
-            if (!text.isEmpty()) {
+            if (StringUtils.isNotBlank(text)) {
                 String command = "say";
                 List<String> params = Collections.singletonList(text);
 
@@ -83,8 +84,11 @@ public class ChatScreen extends CoreScreenLayer {
                 console.execute(new Name(command), params, localPlayer.getClientEntity());
                 commandLine.setText("");
                 scrollArea.moveToBottom();
-                MiniChatOverlay overlay = nuiManager.addOverlay("engine:minichatOverlay", MiniChatOverlay.class);
+                NotificationOverlay overlay = nuiManager.addOverlay(NotificationOverlay.ASSET_URI, NotificationOverlay.class);
                 overlay.setVisible(true);
+                nuiManager.closeScreen(this);
+            } else {
+                commandLine.setText("");
                 nuiManager.closeScreen(this);
             }
         });

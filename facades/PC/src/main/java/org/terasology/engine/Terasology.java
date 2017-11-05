@@ -27,6 +27,7 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.common.ConfigurationSubsystem;
 import org.terasology.engine.subsystem.common.ThreadManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationSubsystem;
+import org.terasology.engine.subsystem.config.BindsSubsystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
@@ -373,6 +374,7 @@ public final class Terasology {
                     .add(new LwjglGraphics())
                     .add(new LwjglTimer())
                     .add(new LwjglInput())
+                    .add(new BindsSubsystem())
                     .add(new OpenVRInput());
         }
         builder.add(new HibernationSubsystem());

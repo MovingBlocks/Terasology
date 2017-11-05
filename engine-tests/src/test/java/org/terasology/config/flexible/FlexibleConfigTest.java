@@ -137,7 +137,8 @@ public class FlexibleConfigTest {
             SimpleUri id = new SimpleUri("engine-tests:TestSetting");
             Setting setting = new MockSetting(id);
             config.add(setting);
-            setting.subscribe(propertyChangeEvent -> {});
+            setting.subscribe(propertyChangeEvent -> {
+            });
 
             assertFalse(config.remove(id));
         }

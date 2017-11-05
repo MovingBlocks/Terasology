@@ -1,0 +1,117 @@
+{
+    "type": "engine:telemetryScreen",
+    "skin": "mainmenu",
+    "contents": {
+        "type": "RelativeLayout",
+        "contents": [
+            {
+                "type": "UIImage",
+                "image": "engine:terasology",
+                "id": "title",
+                "layoutInfo": {
+                    "width": 512,
+                    "height": 128,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "family": "title",
+                "text": "${engine:menu#telemetry-menu}",
+                "id": "subtitle",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title"
+                    }
+                }
+            },
+            {
+                "type": "UILabel",
+                "text": "${engine:menu#telemetry-description}",
+                "id": "description",
+                "layoutInfo": {
+                    "width": 800,
+                    "height": 24,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "subtitle"
+                    }
+                }
+            },
+            {
+                "type": "ScrollableArea",
+                "verticalScrollbar": true,
+                "id": "area",
+                "layoutInfo": {
+                    "width": 800,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 16,
+                        "widget": "description"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "offset": 8,
+                        "widget": "checkBox"
+                    }
+                }
+            },
+            {
+                  "type": "RowLayout",
+                  "horizontalSpacing": 0,
+                  "id": "checkBox",
+                  "contents": [
+                      {
+                          "type": "UILabel",
+                          "text": "${engine:menu#enable-telemetry}"
+                      },
+                      {
+                          "type": "UICheckbox",
+                          "id": "telemetryEnabled"
+                      },
+                      {
+                          "type": "UILabel",
+                          "text": "${engine:menu#enable-error-reporting}"
+                      },
+                      {
+                          "type": "UICheckbox",
+                          "id": "errorReportingEnabled"
+                      }
+                  ],
+                  "layoutInfo": {
+                    "width": 800,
+                    "height": 32,
+                    "position-bottom": {
+                        "target": "TOP",
+                        "offset": 8,
+                        "widget":"back"
+                    },
+                    "position-horizontal-center": {}
+                  }
+            },
+            {
+                "type": "UIButton",
+                "id": "back",
+                "text": "${engine:menu#back}",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 16
+                    }
+                }
+            }
+        ]
+    }
+}

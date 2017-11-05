@@ -16,10 +16,10 @@
 package org.terasology.logic.players;
 
 import org.terasology.assets.ResourceUrn;
-import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
+import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -45,8 +45,8 @@ import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
 import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.binds.movement.VerticalRealMovementAxis;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseAxisEvent.MouseAxis;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterHeldItemComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
@@ -104,17 +104,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @In
     private InputSystem inputSystem;
 
-    private BindsConfig bindsConfig;
+    @In
+    private BindsManager bindsManager;
+
     private float bobFactor;
     private float lastStepDelta;
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean isAutoMove = false;
+    private boolean isAutoMove;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
     private boolean crouchPerDefault = false;
     private boolean crouch = false;
+
     private boolean jump;
     private float lookPitch;
     private float lookPitchDelta;
@@ -129,7 +132,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private int inputSequenceNumber = 1;
 
     private AABB aabb;
-
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -189,8 +191,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // To check if a valid key has been assigned, either primary or secondary and return it
     private Input getValidKey(List<Input> inputs) {
-        for(Input input: inputs) {
-            if(input != null) {
+        for (Input input : inputs) {
+            if (input != null) {
                 return input;
             }
         }
@@ -202,9 +204,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * This cancels the simulated repeated key stroke for the forward input button.
      */
     private void stopAutoMove() {
-        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             inputSystem.cancelSimulatedKeyStroke(forwardKey);
             isAutoMove = false;
         }
@@ -217,10 +219,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      */
     private void startAutoMove() {
         isAutoMove = false;
-        bindsConfig = config.getInput().getBinds();
-        List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
+        List<Input> inputs = bindsManager.getBindsConfig().getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             isAutoMove = true;
             inputSystem.simulateSingleKeyStroke(forwardKey);
             inputSystem.simulateRepeatedKeyStroke(forwardKey);
@@ -250,14 +251,13 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = CharacterComponent.class)
-    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        lookYawDelta = event.getValue();
-        event.consume();
-    }
-
-    @ReceiveEvent(components = CharacterComponent.class)
-    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        lookPitchDelta = event.getValue();
+    public void onMouseMove(MouseAxisEvent event, EntityRef entity) {
+        MouseAxis axis = event.getMouseAxis();
+        if (axis == MouseAxis.X) {
+            lookYawDelta = event.getValue();
+        } else if (axis == MouseAxis.Y) {
+            lookPitchDelta = event.getValue();
+        }
         event.consume();
     }
 
@@ -286,7 +286,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = event.getValue();
-        if(relativeMovement.z == 0f && isAutoMove) {
+        if (relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
         }
         event.consume();

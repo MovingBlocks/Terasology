@@ -16,21 +16,22 @@
 
 package org.terasology.input.events;
 
-
 /**
+ * Event when the mouse moved along one axis.
+ * If the mouse moved diagonal, this will be reflected in two separate events.
  */
 public class MouseAxisEvent extends AxisEvent {
 
+    private static MouseAxisEvent event = new MouseAxisEvent(MouseAxis.X, 0, 0);
+
     public enum MouseAxis {
-        X,
-        Y;
+        X, Y;
     }
 
     private float value;
     private MouseAxis mouseAxis;
 
-
-    public MouseAxisEvent(MouseAxis axis, float value, float delta) {
+    protected MouseAxisEvent(MouseAxis axis, float value, float delta) {
         super(delta);
         this.mouseAxis = axis;
         this.value = value;
@@ -43,5 +44,12 @@ public class MouseAxisEvent extends AxisEvent {
     @Override
     public float getValue() {
         return value;
+    }
+
+    public static MouseAxisEvent create(MouseAxis axis, float value, float delta) {
+        event.reset(delta);
+        event.mouseAxis = axis;
+        event.value = value;
+        return event;
     }
 }

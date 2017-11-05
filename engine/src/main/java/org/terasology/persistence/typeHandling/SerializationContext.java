@@ -41,7 +41,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array of strings.
      */
-    PersistedData create(String ... values);
+    PersistedData create(String... values);
 
     /**
      * Serializes a collection of strings. Null values will be stripped.
@@ -62,7 +62,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array of floats
      */
-    PersistedData create(float ... values);
+    PersistedData create(float... values);
 
     /**
      * Serializes a collection of floats
@@ -83,7 +83,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array of integers
      */
-    PersistedData create(int ... values);
+    PersistedData create(int... values);
 
     /**
      * Serializes a collection of integers
@@ -104,7 +104,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array of longs
      */
-    PersistedData create(long ... values);
+    PersistedData create(long... values);
 
     /**
      * Serializes a collection of longs
@@ -125,7 +125,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array of booleans
      */
-    PersistedData create(boolean ... values);
+    PersistedData create(boolean... values);
 
     /**
      * Serializes a single double
@@ -139,7 +139,7 @@ public interface SerializationContext {
      * @param values
      * @return A serialized array double
      */
-    PersistedData create(double ... values);
+    PersistedData create(double... values);
 
     /**
      * Serializes a collection of doubles
@@ -167,7 +167,7 @@ public interface SerializationContext {
      * @param values
      * @return
      */
-    PersistedData create(PersistedData ... values);
+    PersistedData create(PersistedData... values);
 
     /**
      * Serializes a collection of values

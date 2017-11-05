@@ -69,7 +69,7 @@ public final class RenderTaskListGenerator {
                 }
 
                 // printing out process() statement
-                logger.info(String.format("%s", node.toString()));
+                logger.info(String.format("%s: process()", node.toString()));
             }
         }
     }
@@ -150,7 +150,10 @@ public final class RenderTaskListGenerator {
                     if (!requestedStateChanges.contains(key)) {
                         // This StateChange was not requested by the current Node, so we reset it.
                         requestedStateChanges.remove(key);
-                        taskList.add(stateChange.getDefaultInstance());
+                        StateChange resetTask = stateChange.getDefaultInstance();
+                        if (resetTask != null) {
+                            taskList.add(resetTask);
+                        }
                         iterator.remove();
                     }
                     // Else: The StateChange was requested by the current Node, so do nothing.
@@ -216,7 +219,7 @@ public final class RenderTaskListGenerator {
      * Instances of this class are intended to be inserted in the Render Task List.
      *
      * If the content of the task list is printed out by the logger, instances of this class
-     * visually separate the tasks releated to a node from those of the previous one.
+     * visually separate the tasks related to a node from those of the previous one.
      */
     private class MarkerTask implements RenderPipelineTask {
 

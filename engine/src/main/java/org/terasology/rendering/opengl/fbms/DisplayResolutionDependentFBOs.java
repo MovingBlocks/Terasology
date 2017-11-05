@@ -16,48 +16,66 @@
 package org.terasology.rendering.opengl.fbms;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.assets.ResourceUrn;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 import org.terasology.rendering.opengl.AbstractFBOsManager;
-import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
-
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.SwappableFBO;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import static org.terasology.config.RenderingConfig.FBO_SCALE;
+import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE;
+import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
  * TODO: Add javadocs
  * TODO: Better naming
  */
-public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
-    public static final ResourceUrn READONLY_GBUFFER = new ResourceUrn("engine:sceneOpaque");
-    public static final ResourceUrn WRITEONLY_GBUFFER = new ResourceUrn("engine:sceneOpaquePingPong");
-    public static final ResourceUrn FINAL_BUFFER = new ResourceUrn("engine:sceneFinal");
+public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
+    public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
+    public static final String PRE_FBO_REGENERATION = "preFboRegeneration";
+    public static final String POST_FBO_REGENERATION = "postFboRegeneration";
 
-    private FBO.Dimensions fullScale;
+    private SwappableFBO gBufferPair;
+
+    private FBO.Dimensions fullScale = new FBO.Dimensions();
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
-    public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber) {
+    private boolean wasTakingScreenshotLastFrame = false;
+
+    public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
+
+        renderingConfig.subscribe(FBO_SCALE, this);
+
+        displayDevice.subscribe(DISPLAY_RESOLUTION_CHANGE, this);
 
         updateFullScale();
         generateDefaultFBOs();
     }
 
     private void generateDefaultFBOs() {
-        generateWithDimensions(new FBOConfig(READONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer1 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer1"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
-        generateWithDimensions(new FBOConfig(WRITEONLY_GBUFFER, FULL_SCALE, FBO.Type.HDR)
+        FBO gBuffer2 = generateWithDimensions(new FBOConfig(new SimpleUri("engine:fbo.gBuffer2"), FULL_SCALE, FBO.Type.HDR)
                 .useDepthBuffer().useNormalBuffer().useLightBuffer().useStencilBuffer(), fullScale);
         generateWithDimensions(new FBOConfig(FINAL_BUFFER, FULL_SCALE, FBO.Type.DEFAULT), fullScale);
+
+        gBufferPair = new SwappableFBO(gBuffer1, gBuffer2);
     }
 
     @Override
     public FBO request(FBOConfig fboConfig) {
         FBO fbo;
-        ResourceUrn fboName = fboConfig.getName();
+        SimpleUri fboName = fboConfig.getName();
         if (fboConfigs.containsKey(fboName)) {
             if (!fboConfig.equals(fboConfigs.get(fboName))) {
                 throw new IllegalArgumentException("Requested FBO is already available with different configuration");
@@ -71,51 +89,63 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager {
     }
 
     private void updateFullScale() {
-        if (screenGrabber.isNotTakingScreenshot()) {
-            fullScale = new FBO.Dimensions(Display.getWidth(), Display.getHeight());
-        } else {
-            fullScale = new FBO.Dimensions(
-                    renderingConfig.getScreenshotSize().getWidth(Display.getWidth()),
-                    renderingConfig.getScreenshotSize().getHeight(Display.getHeight())
-            );
-        }
-
+        fullScale.setDimensions(Display.getWidth(), Display.getHeight());
         fullScale.multiplySelfBy(renderingConfig.getFboScale() / 100f);
     }
 
     /**
      * Invoked before real-rendering starts
-     * TODO: how about completely removing this, and make Display observable and this FBM as an observer
-     */
+    */
     public void update() {
-        updateFullScale();
+        if (!screenGrabber.isTakingScreenshot()) {
+            if (wasTakingScreenshotLastFrame) {
+                updateFullScale();
+                regenerateFbos();
 
-        FBO sceneOpaqueFbo = get(READONLY_GBUFFER);
-        if (sceneOpaqueFbo.dimensions().areDifferentFrom(fullScale)) {
-            disposeAllFBOs();
-            createFBOs();
-            notifySubscribers();
+                wasTakingScreenshotLastFrame = false;
+            }
+        } else {
+            ScreenshotSize screenshotSize = renderingConfig.getScreenshotSize();
+            // TODO: Remove dependency on Display
+            fullScale.setDimensions(screenshotSize.getWidth(Display.getWidth()),
+                    screenshotSize.getHeight(Display.getHeight()));
+            regenerateFbos();
+
+            wasTakingScreenshotLastFrame = true;
         }
     }
 
-    private void disposeAllFBOs() {
-        for (ResourceUrn urn : fboConfigs.keySet()) {
+    private void regenerateFbos() {
+        propertyChangeSupport.firePropertyChange(PRE_FBO_REGENERATION, 0, 1);
+
+        for (SimpleUri urn : fboConfigs.keySet()) {
+            FBOConfig fboConfig = getFboConfig(urn);
+            fboConfig.setDimensions(fullScale.multiplyBy(fboConfig.getScale()));
+            FBO.recreate(get(urn), getFboConfig(urn));
+        }
+
+        propertyChangeSupport.firePropertyChange(POST_FBO_REGENERATION, 0, 1);
+
+        // Note that the "old" and "new" values (0 and 1) in the above calls aren't actually
+        // used: they are only necessary to ensure that the event is fired up correctly.
+   }
+
+    private void disposeAllFbos() {
+        // TODO: This should be public, and should be called while disposing an object of this class, to prevent leaks.
+        for (SimpleUri urn : fboConfigs.keySet()) {
             fboLookup.get(urn).dispose();
         }
         fboLookup.clear();
     }
 
-    private void createFBOs() {
-        for (FBOConfig fboConfig : fboConfigs.values()) {
-            generateWithDimensions(fboConfig, fullScale.multiplyBy(fboConfig.getScale()));
-        }
+    public SwappableFBO getGBufferPair() {
+        return gBufferPair;
     }
 
-    // TODO: Pairing FBOs for swapping functionality
-    public void swapReadWriteBuffers() {
-        FBO fbo = get(READONLY_GBUFFER);
-        fboLookup.put(READONLY_GBUFFER, get(WRITEONLY_GBUFFER));
-        fboLookup.put(WRITEONLY_GBUFFER, fbo);
-        notifySubscribers();
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE) || propertyChangeEvent.getPropertyName().equals(FBO_SCALE)) {
+            updateFullScale();
+            regenerateFbos();
+        }
     }
 }
