@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -36,11 +37,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.logic.VisualComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 @RegisterSystem(RegisterMode.CLIENT)
@@ -99,7 +97,6 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         if (localPlayer.getClientEntity().equals(entityRef) && localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
             CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null) {
-                // special case of sending in null so that the initial load works
                 linkHeldItemLocationForLocalPlayer(characterHeldItemComponent.selectedItem);
             }
         }
@@ -165,25 +162,18 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
                 }
 
                 // create client side held item entity
-                currentHeldItem = entityManager.create(newHeldItem.getParentPrefab());
+                currentHeldItem = entityManager.create();
 
-                // add the current item's visual elements
-                LightComponent lightComponent = newHeldItem.getComponent(LightComponent.class);
-                if (lightComponent != null) {
-                    currentHeldItem.addOrSaveComponent(lightComponent);
-                }
-                MeshComponent meshComponent = newHeldItem.getComponent(MeshComponent.class);
-                if (meshComponent != null) {
-                    currentHeldItem.addOrSaveComponent(meshComponent);
+                // add the visually relevant components
+                for (Component component : newHeldItem.iterateComponents()) {
+                    if (component instanceof VisualComponent) {
+                        currentHeldItem.addComponent(component);
+                    }
                 }
 
-                // remove network-component to prohibit replicating the client-side held entity to other clients
-                // also remove rigid-body-component to prohibit the held item falling to the ground
-                currentHeldItem.removeComponent(NetworkComponent.class);
-                currentHeldItem.removeComponent(RigidBodyComponent.class);
-
-                currentHeldItem.addOrSaveComponent(new LocationComponent());
-                currentHeldItem.addOrSaveComponent(new ItemIsHeldComponent());
+                // ensure world location is set
+                currentHeldItem.addComponent(new LocationComponent());
+                currentHeldItem.addComponent(new ItemIsHeldComponent());
 
                 FirstPersonHeldItemTransformComponent heldItemTransformComponent = currentHeldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
                 if (heldItemTransformComponent == null) {

@@ -15,13 +15,12 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.rendering.nui.Color;
 
 /**
  * Makes the game render the specified text at the current location of the enitity.
  */
-public class FloatingTextComponent implements Component {
+public class FloatingTextComponent implements VisualComponent {
     public String text;
     public Color textColor = Color.WHITE;
     public Color textShadowColor = Color.BLACK;
