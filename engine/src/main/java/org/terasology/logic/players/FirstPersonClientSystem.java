@@ -206,7 +206,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         // ensure that there are no lingering items that are marked as still held. This situation happens with client side predicted items
         for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsHeldComponent.class)) {
             if (!entityRef.equals(currentHeldItem) && !entityRef.equals(handEntity)) {
-                entityRef.removeComponent(ItemIsHeldComponent.class);
+                entityRef.destroy();
             }
         }
 
