@@ -22,6 +22,7 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -34,6 +35,9 @@ public class UIImage extends CoreWidget {
 
     @LayoutConfig
     private Binding<Color> tint = new DefaultBinding<>(Color.WHITE);
+
+    @LayoutConfig
+    private boolean ignoreAspectRatio = false;
 
     public UIImage() {
     }
@@ -51,10 +55,23 @@ public class UIImage extends CoreWidget {
         this.image.set(image);
     }
 
+    public UIImage(String id, TextureRegion image, boolean ignoreAspectRatio) {
+        super(id);
+        this.image.set(image);
+        this.ignoreAspectRatio = ignoreAspectRatio;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (image.get() != null) {
-            canvas.drawTexture(image.get(), tint.get());
+            if (ignoreAspectRatio) {
+                ScaleMode scaleMode = canvas.getCurrentStyle().getTextureScaleMode();
+                canvas.getCurrentStyle().setTextureScaleMode(ScaleMode.STRETCH);
+                canvas.drawTexture(image.get(), tint.get());
+                canvas.getCurrentStyle().setTextureScaleMode(scaleMode);
+            } else {
+                canvas.drawTexture(image.get(), tint.get());
+            }
         }
     }
 
