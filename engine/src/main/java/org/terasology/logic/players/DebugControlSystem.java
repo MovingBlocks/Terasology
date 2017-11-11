@@ -16,6 +16,9 @@
 
 package org.terasology.logic.players;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -31,6 +34,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.debug.DebugProperties;
+import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -51,8 +55,8 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
-
-    private DebugOverlay overlay;
+    
+    private DebugOverlay overlay;    
 
     private boolean mouseGrabbed = true;
 
@@ -74,24 +78,45 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
     }
 
+    /**
+     * Increases view distance upon receiving an increase view distance event.
+     * @param button The button or key pressed to increase view distance.
+     * @param entity The entity corresponding to event.
+     */
     @ReceiveEvent(components = ClientComponent.class)
     public void onIncreaseViewDistance(IncreaseViewDistanceButton button, EntityRef entity) {
         int viewDistance = config.getRendering().getViewDistance().getIndex();
         int maxViewDistance = ViewDistance.values().length - 1;
-
+        
+        //Ensuring that the view distance does not exceed its maximum value.
         if (viewDistance != maxViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((viewDistance + 1)));
+            ViewDistance greaterViewDistance = ViewDistance.forIndex(viewDistance + 1);
+            config.getRendering().setViewDistance(greaterViewDistance);
+            fireChangeEvent("View distance increased to " + greaterViewDistance.toString() + ".", Arrays.asList(entity));	
+            //Presenting user with a warning if the view distance is set higher than recommended.
+            if (greaterViewDistance == ViewDistance.MEGA || greaterViewDistance == ViewDistance.EXTREME) {
+            	fireChangeEvent("Warning: Setting view distance to " + greaterViewDistance.toString() 
+            	                    + " may result in performance issues.", Arrays.asList(entity));
+            }
         }
         button.consume();
     }
 
+    /**
+     * Decreases view distance upon receiving a decrease view distance event.
+     * @param button The button or key pressed to decrease view distance.
+     * @param entity The entity corresponding to event.
+     */
     @ReceiveEvent(components = ClientComponent.class)
     public void onDecreaseViewDistance(DecreaseViewDistanceButton button, EntityRef entity) {
         int viewDistance = config.getRendering().getViewDistance().getIndex();
         int minViewDistance = 0;
-
+        
+        //Ensuring that the view distance does not fall below its minimum value.
         if (viewDistance != minViewDistance) {
-            config.getRendering().setViewDistance(ViewDistance.forIndex((viewDistance - 1)));
+            ViewDistance lesserViewDistance = ViewDistance.forIndex(viewDistance - 1);
+            config.getRendering().setViewDistance(lesserViewDistance);
+            fireChangeEvent("View distance decreased to " + lesserViewDistance.toString() + ".", Arrays.asList(entity));
         }
         button.consume();
     }
@@ -174,6 +199,18 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (!mouseGrabbed) {
             event.consume();
         }
+    }
+    
+    
+    /**
+     * Fires notification events upon changes to debug parameters.
+     * @param message Notification event message.
+     * @param entity  Entities which will receive the notification event.
+     */
+	private void fireChangeEvent(String message, List<EntityRef> entities) {
+    	for (EntityRef client : entities) {
+    		client.send(new NotificationMessageEvent(message, client));
+    	}
     }
 
 }
