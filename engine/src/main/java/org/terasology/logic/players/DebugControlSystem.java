@@ -21,12 +21,15 @@ import java.util.List;
 
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.i18n.TranslationSystem;
+import org.terasology.i18n.TranslationSystemImpl;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
 import org.terasology.input.events.KeyDownEvent;
@@ -49,20 +52,26 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private WorldProvider world;
-
+    
     @In
     private Config config;
+    
+    @In
+    private Context context;
 
     @In
     private NUIManager nuiManager;
     
-    private DebugOverlay overlay;    
-
+    private DebugOverlay overlay;
+    
+    private TranslationSystem translationSystem;
+    
     private boolean mouseGrabbed = true;
 
     @Override
     public void initialise() {
         overlay = nuiManager.addOverlay("engine:debugOverlay", DebugOverlay.class);
+        translationSystem = new TranslationSystemImpl(context);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -81,7 +90,7 @@ public class DebugControlSystem extends BaseComponentSystem {
     /**
      * Increases view distance upon receiving an increase view distance event.
      * @param button The button or key pressed to increase view distance.
-     * @param entity The entity corresponding to event.
+     * @param entity The player entity that triggered the view distance increase.
      */
     @ReceiveEvent(components = ClientComponent.class)
     public void onIncreaseViewDistance(IncreaseViewDistanceButton button, EntityRef entity) {
@@ -91,13 +100,14 @@ public class DebugControlSystem extends BaseComponentSystem {
         //Ensuring that the view distance does not exceed its maximum value.
         if (viewDistance != maxViewDistance) {
             ViewDistance greaterViewDistance = ViewDistance.forIndex(viewDistance + 1);
-            config.getRendering().setViewDistance(greaterViewDistance);
-            fireChangeEvent("View distance increased to " + greaterViewDistance.toString() + ".", Arrays.asList(entity));	
+            String greaterViewDistanceStr = translationSystem.translate(greaterViewDistance.toString());
+            fireChangeEvent("Increasing view distance to " + greaterViewDistanceStr + ".", Arrays.asList(entity));
             //Presenting user with a warning if the view distance is set higher than recommended.
             if (greaterViewDistance == ViewDistance.MEGA || greaterViewDistance == ViewDistance.EXTREME) {
-            	fireChangeEvent("Warning: Setting view distance to " + greaterViewDistance.toString() 
+                fireChangeEvent("Warning: Increasing view distance to " + greaterViewDistanceStr
             	                    + " may result in performance issues.", Arrays.asList(entity));
             }
+            config.getRendering().setViewDistance(greaterViewDistance);
         }
         button.consume();
     }
@@ -105,7 +115,7 @@ public class DebugControlSystem extends BaseComponentSystem {
     /**
      * Decreases view distance upon receiving a decrease view distance event.
      * @param button The button or key pressed to decrease view distance.
-     * @param entity The entity corresponding to event.
+     * @param entity The player entity that triggered the view distance decrease.
      */
     @ReceiveEvent(components = ClientComponent.class)
     public void onDecreaseViewDistance(DecreaseViewDistanceButton button, EntityRef entity) {
@@ -115,8 +125,9 @@ public class DebugControlSystem extends BaseComponentSystem {
         //Ensuring that the view distance does not fall below its minimum value.
         if (viewDistance != minViewDistance) {
             ViewDistance lesserViewDistance = ViewDistance.forIndex(viewDistance - 1);
+            String lesserViewDistanceStr = translationSystem.translate(lesserViewDistance.toString());
+            fireChangeEvent("Decreasing view distance to " + lesserViewDistanceStr + ".", Arrays.asList(entity));
             config.getRendering().setViewDistance(lesserViewDistance);
-            fireChangeEvent("View distance decreased to " + lesserViewDistance.toString() + ".", Arrays.asList(entity));
         }
         button.consume();
     }
@@ -199,8 +210,7 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (!mouseGrabbed) {
             event.consume();
         }
-    }
-    
+    }   
     
     /**
      * Fires notification events upon changes to debug parameters.
