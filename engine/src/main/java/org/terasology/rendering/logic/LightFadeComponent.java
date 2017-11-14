@@ -15,12 +15,11 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 
 /**
  */
-public final class LightFadeComponent implements Component {
+public final class LightFadeComponent implements VisualComponent {
 
     @Replicate
     public float targetDiffuseIntensity = 1.0f;

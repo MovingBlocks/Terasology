@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import org.terasology.engine.Time;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -36,11 +37,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.logic.VisualComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
 @RegisterSystem(RegisterMode.CLIENT)
@@ -61,9 +59,6 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     // the item from the inventory synchronized with the server
     private EntityRef currentHeldItem = EntityRef.NULL;
-
-    // the client side entity representing the hold item
-    private EntityRef clientHeldItem = EntityRef.NULL;
 
     private EntityRef getHandEntity() {
         if (handEntity == null) {
@@ -102,8 +97,7 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
         if (localPlayer.getClientEntity().equals(entityRef) && localPlayer.getCharacterEntity().exists() && localPlayer.getCameraEntity().exists()) {
             CharacterHeldItemComponent characterHeldItemComponent = localPlayer.getCharacterEntity().getComponent(CharacterHeldItemComponent.class);
             if (characterHeldItemComponent != null) {
-                // special case of sending in null so that the initial load works
-                linkHeldItemLocationForLocalPlayer(characterHeldItemComponent.selectedItem, null);
+                linkHeldItemLocationForLocalPlayer(characterHeldItemComponent.selectedItem);
             }
         }
     }
@@ -129,18 +123,16 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     @ReceiveEvent
     public void onHeldItemActivated(OnActivatedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
-            EntityRef oldHeldItem = currentHeldItem;
-            currentHeldItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForLocalPlayer(currentHeldItem, oldHeldItem);
+            EntityRef newItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(newItem);
         }
     }
 
     @ReceiveEvent
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
-            EntityRef oldHeldItem = currentHeldItem;
-            currentHeldItem = heldItemComponent.selectedItem;
-            linkHeldItemLocationForLocalPlayer(currentHeldItem, oldHeldItem);
+            EntityRef newItem = heldItemComponent.selectedItem;
+            linkHeldItemLocationForLocalPlayer(newItem);
         }
     }
 
@@ -150,60 +142,52 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
      * <p>Detaches old held item and removes it's components. Adds components to new held item and
      * attaches it to the mount point entity.</p>
      */
-    private void linkHeldItemLocationForLocalPlayer(EntityRef newItem, EntityRef oldItem) {
-        if (!newItem.equals(oldItem)) {
+    private void linkHeldItemLocationForLocalPlayer(EntityRef newItem) {
+        if (!newItem.equals(currentHeldItem)) {
             EntityRef camera = localPlayer.getCameraEntity();
             FirstPersonHeldItemMountPointComponent mountPointComponent = camera.getComponent(FirstPersonHeldItemMountPointComponent.class);
             if (mountPointComponent != null) {
 
-                if (clientHeldItem.exists()) {
-                    // TODO: Review if more components need to be removed (or more likely: overhaul more substantially)
-                    clientHeldItem.removeComponent(MeshComponent.class);
-                    clientHeldItem.removeComponent(LightComponent.class);
-                }
-
-                // remove the location from the old item
-                if (oldItem != null && oldItem.exists()) {
-                    oldItem.removeComponent(ItemIsHeldComponent.class);
-                } else {
-                    getHandEntity().removeComponent(ItemIsHeldComponent.class);
+                //currentHeldItem is at this point the old item
+                if (currentHeldItem != EntityRef.NULL) {
+                    currentHeldItem.destroy();
                 }
 
                 // use the hand if there is no new item
-                EntityRef heldItem;
-                if (!newItem.exists()) {
-                    heldItem = getHandEntity();
+                EntityRef newHeldItem;
+                if (newItem == EntityRef.NULL) {
+                    newHeldItem = getHandEntity();
                 } else {
-                    heldItem = newItem;
+                    newHeldItem = newItem;
                 }
 
                 // create client side held item entity
-                clientHeldItem = heldItem.copy();
+                currentHeldItem = entityManager.create();
 
-                // remove network-component to prohibit replicating the client-side held entity to other clients
-                // also remove rigid-body-component to prohibit the held item falling to the ground
-                clientHeldItem.removeComponent(NetworkComponent.class);
-                clientHeldItem.removeComponent(RigidBodyComponent.class);
-
-                clientHeldItem.addOrSaveComponent(new LocationComponent());
-
-                heldItem.addOrSaveComponent(new ItemIsHeldComponent());
-
-                FirstPersonHeldItemTransformComponent heldItemTransformComponent = clientHeldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
-                if (heldItemTransformComponent == null) {
-                    heldItemTransformComponent = new FirstPersonHeldItemTransformComponent();
-                    clientHeldItem.addComponent(heldItemTransformComponent);
+                // add the visually relevant components
+                for (Component component : newHeldItem.iterateComponents()) {
+                    if (component instanceof VisualComponent) {
+                        currentHeldItem.addComponent(component);
+                    }
                 }
 
-                Location.attachChild(mountPointComponent.mountPointEntity, clientHeldItem,
+                // ensure world location is set
+                currentHeldItem.addComponent(new LocationComponent());
+                currentHeldItem.addComponent(new ItemIsHeldComponent());
+
+                FirstPersonHeldItemTransformComponent heldItemTransformComponent = currentHeldItem.getComponent(FirstPersonHeldItemTransformComponent.class);
+                if (heldItemTransformComponent == null) {
+                    heldItemTransformComponent = new FirstPersonHeldItemTransformComponent();
+                    currentHeldItem.addComponent(heldItemTransformComponent);
+                }
+
+                Location.attachChild(mountPointComponent.mountPointEntity, currentHeldItem,
                         heldItemTransformComponent.translate,
                         new Quat4f(
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.y,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.x,
                                 TeraMath.DEG_TO_RAD * heldItemTransformComponent.rotateDegrees.z),
                         heldItemTransformComponent.scale);
-
-                currentHeldItem = clientHeldItem;
             }
         }
     }
@@ -215,14 +199,14 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     public void update(float delta) {
 
         // ensure empty hand is shown if no item is hold at the moment
-        if (!currentHeldItem.exists() && clientHeldItem != getHandEntity()) {
-            linkHeldItemLocationForLocalPlayer(currentHeldItem, null);
+        if (!currentHeldItem.exists() && currentHeldItem != getHandEntity()) {
+            linkHeldItemLocationForLocalPlayer(getHandEntity());
         }
 
         // ensure that there are no lingering items that are marked as still held. This situation happens with client side predicted items
         for (EntityRef entityRef : entityManager.getEntitiesWith(ItemIsHeldComponent.class)) {
             if (!entityRef.equals(currentHeldItem) && !entityRef.equals(handEntity)) {
-                entityRef.removeComponent(ItemIsHeldComponent.class);
+                entityRef.destroy();
             }
         }
 
@@ -260,8 +244,8 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
 
     @Override
     public void preSave() {
-        if (clientHeldItem != EntityRef.NULL) {
-            clientHeldItem.destroy();
+        if (currentHeldItem != EntityRef.NULL) {
+            currentHeldItem.destroy();
         }
     }
 }

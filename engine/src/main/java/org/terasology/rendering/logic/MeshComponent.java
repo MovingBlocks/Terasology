@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.logic;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -25,7 +24,7 @@ import org.terasology.world.block.ForceBlockActive;
 /**
  */
 @ForceBlockActive
-public final class MeshComponent implements Component {
+public final class MeshComponent implements VisualComponent {
 
     @Replicate
     public Mesh mesh;

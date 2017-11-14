@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.players;
 
-import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.rendering.logic.VisualComponent;
 
-public class FirstPersonHeldItemTransformComponent implements Component {
+public class FirstPersonHeldItemTransformComponent implements VisualComponent {
     public Vector3f rotateDegrees = Vector3f.zero();
     public Vector3f translate = Vector3f.zero();
     public float scale = 1f;
