@@ -225,7 +225,7 @@ public class UIList<T> extends CoreWidget {
     }
 
     /**
-     * Subscribe an event listener to be called then an item is selected.
+     * Subscribe an event listener to be called when an item is selected.
      *
      * @param eventListener The event listener to add.
      */
