@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
@@ -83,6 +84,11 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         refreshList(gameList);
         gameList.subscribe((widget, item) -> loadGame(item));
+        gameList.subscribeSelection((widget, item) -> {
+            for (String targetId : new String[]{"load", "delete"}) {
+                find(targetId, UIButton.class).setEnabled(true);
+            }
+        });
 
         CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
         WidgetUtil.trySubscribe(this, "create", button -> {
