@@ -241,6 +241,16 @@ public class EventSystemImpl implements EventSystem {
                 }
             }
         }
+
+        if (0 == componentTypes.length) {
+            Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
+            while (eventHandlerIterator.hasNext()) {
+                EventHandlerInfo eventHandler = eventHandlerIterator.next();
+                if (eventHandler.getHandler().equals(eventReceiver)) {
+                    eventHandlerIterator.remove();
+                }
+            }
+        }
     }
 
     @Override

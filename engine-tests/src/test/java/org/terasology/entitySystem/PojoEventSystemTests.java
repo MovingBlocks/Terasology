@@ -23,8 +23,10 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.event.internal.EventReceiver;
 import org.terasology.entitySystem.event.internal.EventSystemImpl;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -197,6 +199,19 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.unfilteredEvents.size());
     }
 
+    @Test
+    public void testEventReceiverRegistration() {
+        TestEventReceiver receiver = new TestEventReceiver();
+        eventSystem.registerEventReceiver(receiver, TestEvent.class);
+
+        entity.send(new TestEvent());
+        assertEquals(1, receiver.eventList.size());
+
+        eventSystem.unregisterEventReceiver(receiver, TestEvent.class);
+        entity.send(new TestEvent());
+        assertEquals(1, receiver.eventList.size());
+    }
+
     private static class TestEvent extends AbstractConsumableEvent {
 
     }
@@ -318,5 +333,13 @@ public class PojoEventSystemTests {
         }
     }
 
+    public static class TestEventReceiver implements EventReceiver<TestEvent> {
+        List<Event> eventList = Lists.newArrayList();
+
+        @Override
+        public void onEvent(TestEvent event, EntityRef entity) {
+            eventList.add(event);
+        }
+    }
 
 }
