@@ -92,11 +92,51 @@
                             {
                                 "type":"ColumnLayout",
                                 "id":"advanceFilterItems",
-                                "columns":4,
-                                "column-widths":[0.05,0.45,0.05,0.45],
-                                "verticalSpacing": 8,
-                                "horizontalSpacing": 8,
+                                "columns":2,
+                                "column-widths":[0.1,0.90],
+                                "verticalSpacing": 4,
+                                "horizontalSpacing": -32 ,
                                 "contents": [
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "localOnlyCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Local Only",
+                                        "id": "localOnly"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "gameplayCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Gameplay",
+                                        "id": "gameplay"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "worldCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "World ",
+                                        "id": "world"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
+                                        "id": "augmentationCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Augmentation",
+                                        "id": "augmentation"
+                                    },
                                     {
                                         "type": "UICheckbox",
                                         "id":"libraryCheckbox",
@@ -119,16 +159,6 @@
                                     },
                                     {
                                         "type": "UICheckbox",
-                                        "id": "worldCheckbox",
-                                        "family": "option-grid"
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "text": "World ",
-                                        "id": "world"
-                                    },
-                                    {
-                                        "type": "UICheckbox",
                                         "id": "specialCheckbox",
                                         "family": "option-grid"
                                     },
@@ -136,36 +166,6 @@
                                         "type": "UILabel",
                                         "text": "Special",
                                         "id": "special"
-                                    },
-                                    {
-                                        "type": "UICheckbox",
-                                        "id": "augmentationCheckbox",
-                                        "family": "option-grid"
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "text": "Augmentation",
-                                        "id": "augmentation"
-                                    },
-                                    {
-                                        "type": "UICheckbox",
-                                        "id": "gameplayCheckbox",
-                                        "family": "option-grid"
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "text": "Gameplay",
-                                        "id": "gameplay"
-                                    },
-                                    {
-                                        "type": "UICheckbox",
-                                        "id": "localOnlyCheckbox",
-                                        "family": "option-grid"
-                                    },
-                                    {
-                                        "type": "UILabel",
-                                        "text": "Local Only",
-                                        "id": "localOnly"
                                     }
                                 ],
                                 "layoutInfo": {
