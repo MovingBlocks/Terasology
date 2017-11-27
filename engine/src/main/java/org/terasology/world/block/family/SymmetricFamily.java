@@ -17,35 +17,53 @@ package org.terasology.world.block.family;
 
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
- *
  */
+@RegisterBlockFamily("symmetric")
 public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily(BlockUri uri, Block block) {
-        this(uri, block, Collections.<String>emptyList());
-    }
+    public SymmetricFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
+        block = blockBuilder.constructSimpleBlock(definition, shape);
+        BlockUri uri;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
 
-    public SymmetricFamily(BlockUri uri, Block block, Iterable<String> categories) {
-        super(uri, categories);
-        this.block = block;
         block.setBlockFamily(this);
         block.setUri(uri);
+
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
     }
 
+    public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+        BlockUri uri = new BlockUri(definition.getUrn());
+
+        block = blockBuilder.constructSimpleBlock(definition);
+        block.setBlockFamily(this);
+        block.setUri(uri);
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
+    }
+
+
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         return block;
     }
 
@@ -53,6 +71,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     public Block getArchetypeBlock() {
         return block;
     }
+
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {

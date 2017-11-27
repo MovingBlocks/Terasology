@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,25 @@
  */
 package org.terasology.world.block.family;
 
+
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegisterBlockFamilyFactory {
-    String value();
+@Inherited
+/**
+ * Describes the sections that a block can use such as top, left, right, bottom
+ * but other sections can be used.
+ * <p>
+ *     Each section will override the existing values on the base block when that family section is used. look in
+ *     deserializeSectionDefinitionData under BlockFamilyDefinitionFormat for properties that get override by the
+ *     the BlockSection
+ * </p>
+ */
+public @interface BlockSections {
+    String[] value();
 }

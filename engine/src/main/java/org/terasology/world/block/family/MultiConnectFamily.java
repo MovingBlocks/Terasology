@@ -16,28 +16,34 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TByteObjectIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
+import org.terasology.registry.In;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyFactory {
+@BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
+public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
     public static final String NO_CONNECTIONS = "no_connections";
     public static final String ONE_CONNECTION = "one_connection";
     public static final String TWO_CONNECTIONS_LINE = "line_connection";
@@ -48,19 +54,17 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
-
-    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of(
-            NO_CONNECTIONS,
-            ONE_CONNECTION,
-            TWO_CONNECTIONS_LINE,
-            TWO_CONNECTIONS_CORNER,
-            THREE_CONNECTIONS_CORNER,
-            THREE_CONNECTIONS_T,
-            FOUR_CONNECTIONS_CROSS,
-            FOUR_CONNECTIONS_SIDE,
-            FIVE_CONNECTIONS,
-            SIX_CONNECTIONS);
-
+    
+    @In
+    protected WorldProvider worldProvider;
+    
+    @In
+    protected BlockEntityRegistry blockEntityRegistry;
+    
+    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
+    private Block archetypeBlock;
+    private TByteObjectMap<Block> blocks;
+    
     private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
             .put(NO_CONNECTIONS, (byte) 0)
             .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
@@ -77,30 +81,44 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
             .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
             .put(SIX_CONNECTIONS, (byte) 63)
             .build();
-
-    private ConnectionCondition connectionCondition;
-    private byte connectionSides;
-    private boolean horizontalOnly;
-    private Map<String, Byte> shapeMapping;
-
-
-    protected UpdatesWithNeighboursFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides) {
-        this(connectionCondition, connectionSides, DEFAULT_SHAPE_MAPPING, false);
+    
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
     }
 
-    protected UpdatesWithNeighboursFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides,
-                                                 Map<String, Byte> shapeMapping, boolean horizontalOnly) {
-        this.connectionCondition = connectionCondition;
-        this.connectionSides = connectionSides;
-        this.shapeMapping = shapeMapping;
-        this.horizontalOnly = horizontalOnly;
-    }
-
-    @Override
-    public BlockFamily createBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
-        TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
+        blocks = new TByteObjectHashMap<>();
 
+        this.registerConnections(basicBlocks);
+
+        BlockUri blockUri = new BlockUri(definition.getUrn());
+
+        // Now make sure we have all combinations based on the basic set (above) and rotations
+        for (byte connections = 0; connections < 64; connections++) {
+            // Only the allowed connections should be created
+            if ((connections & getConnectionSides()) == connections) {
+                Block block = constructBlockForConnections(connections, blockBuilder, definition, basicBlocks);
+                if (block == null) {
+                    throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
+                }
+                block.setUri(new BlockUri(blockUri, new Name(String.valueOf(connections))));
+                block.setBlockFamily(this);
+                blocks.put(connections, block);
+            }
+        }
+        this.archetypeBlock = blocks.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
+        this.setBlockUri(blockUri);
+        this.setCategory(definition.getCategories());
+    }
+
+    public byte getConnectionSides() {
+        return 64;
+    }
+
+
+    protected void registerConnections(TByteObjectMap<String>[] basicBlocks) {
         addConnections(basicBlocks, 0, NO_CONNECTIONS);
         addConnections(basicBlocks, 1, ONE_CONNECTION);
         addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
@@ -111,36 +129,27 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         addConnections(basicBlocks, 4, FOUR_CONNECTIONS_SIDE);
         addConnections(basicBlocks, 5, FIVE_CONNECTIONS);
         addConnections(basicBlocks, 6, SIX_CONNECTIONS);
+    }
 
-        BlockUri blockUri = new BlockUri(definition.getUrn());
 
-        // Now make sure we have all combinations based on the basic set (above) and rotations
-        for (byte connections = 0; connections < 64; connections++) {
-            // Only the allowed connections should be created
-            if ((connections & connectionSides) == connections) {
-                Block block = constructBlockForConnections(connections, blockBuilder, definition, basicBlocks);
-                if (block == null) {
-                    throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
-                }
-                block.setUri(new BlockUri(blockUri, new Name(String.valueOf(connections))));
-                blocksForConnections.put(connections, block);
-            }
-        }
+    public boolean horizontalOnly() {
+        return false;
+    }
 
-        final Block archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
-        return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, definition.getCategories(),
-                archetypeBlock, blocksForConnections, connectionSides);
+    public Map<String, Byte> getShapeMapping() {
+        return DEFAULT_SHAPE_MAPPING;
     }
 
     private void addConnections(TByteObjectMap<String>[] basicBlocks, int index, String connections) {
         if (basicBlocks[index] == null) {
             basicBlocks[index] = new TByteObjectHashMap<>();
         }
-        Byte val = shapeMapping.get(connections);
+        Byte val = getShapeMapping().get(connections);
         if (val != null) {
-            basicBlocks[index].put(shapeMapping.get(connections), connections);
+            basicBlocks[index].put(getShapeMapping().get(connections), connections);
         }
     }
+
 
     private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
                                                BlockFamilyDefinition definition, TByteObjectMap<String>[] basicBlocks) {
@@ -162,7 +171,7 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     private Rotation getRotationToAchieve(byte source, byte target) {
         Collection<Side> originalSides = SideBitFlag.getSides(source);
 
-        Iterable<Rotation> rotations = horizontalOnly ? Rotation.horizontalRotations() : Rotation.values();
+        Iterable<Rotation> rotations = horizontalOnly() ? Rotation.horizontalRotations() : Rotation.values();
         for (Rotation rot : rotations) {
             Set<Side> transformedSides = Sets.newHashSet();
             transformedSides.addAll(originalSides.stream().map(rot::rotate).collect(Collectors.toList()));
@@ -175,9 +184,54 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         return null;
     }
 
+
     @Override
-    public Set<String> getSectionNames() {
-        return BLOCK_NAMES;
+    public Block getArchetypeBlock() {
+        return archetypeBlock;
+    }
+
+    @Override
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+        byte connections = 0;
+        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
+            if (this.connectionCondition(location, connectSide)) {
+                connections += SideBitFlag.getSide(connectSide);
+            }
+        }
+        return blocks.get(connections);
+    }
+
+    public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
+        byte connections = 0;
+        for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
+            if (this.connectionCondition(location, connectSide)) {
+                connections += SideBitFlag.getSide(connectSide);
+            }
+        }
+        return blocks.get(connections);
+    }
+
+    protected boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
+        return false;
+    }
+
+    @Override
+    public Block getBlockFor(BlockUri blockUri) {
+        if (getURI().equals(blockUri.getFamilyUri())) {
+            try {
+                byte connections = Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
+                return blocks.get(connections);
+            } catch (IllegalArgumentException e) {
+                logger.error("can't find block with URI: {}", blockUri, e);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Iterable<Block> getBlocks() {
+        return blocks.valueCollection();
     }
 
 }

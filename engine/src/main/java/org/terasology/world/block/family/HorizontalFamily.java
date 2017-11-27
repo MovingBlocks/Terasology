@@ -30,70 +30,77 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * Block group for blocks that can be oriented around the vertical axis.
  */
-@RegisterBlockFamily("attachedToSurface")
+@RegisterBlockFamily("horizontal")
 @BlockSections({"front", "left", "right", "back", "top", "bottom"})
 @MultiSections({
         @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front", "left", "right", "back", "top", "bottom"}),
         @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top", "bottom"}),
         @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
-public class AttachedToSurfaceFamily extends AbstractBlockFamily {
-
-
+public class HorizontalFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private Block archetype;
 
-    public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    public HorizontalFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-        throw new UnsupportedOperationException("Freeform blocks not supported");
+        BlockUri uri = null;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            if (block == null) {
+                throw new IllegalArgumentException("Missing block for side: " + side.toString());
+            }
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(uri, new Name(side.name())));
+            blocks.put(side, block);
+        }
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
     }
 
-    public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public HorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
+        BlockUri uri = new BlockUri(definition.getUrn());
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
 
-        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-        if (definition.getData().hasSection("top")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "top");
-            block.setDirection(Side.TOP);
-            blockMap.put(Side.TOP, block);
-        }
-        if (definition.getData().hasSection("front")) {
-            for (Rotation rot : Rotation.horizontalRotations()) {
-                Side side = rot.rotate(Side.FRONT);
-                blockMap.put(side, blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot));
+            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            if (block == null) {
+                throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(uri, new Name(side.name())));
+            blocks.put(side, block);
         }
-        if (definition.getData().hasSection("bottom")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "bottom");
-            block.setDirection(Side.BOTTOM);
-            blockMap.put(Side.BOTTOM, block);
-        }
+        this.setCategory(definition.getCategories());
+        this.setBlockUri(uri);
 
-        for (Side side : Side.values()) {
-            Block block = blockMap.get(side);
-            if (block != null) {
-                blocks.put(side, block);
-                block.setBlockFamily(this);
-                block.setUri(new BlockUri(definition.getUrn(), new Name(side.name())));
-            }
-        }
-        if (blocks.containsKey(Side.TOP)) {
-            archetype = blocks.get(Side.TOP);
-        } else {
-            archetype = blocks.get(Side.FRONT);
-        }
-        setBlockUri(new BlockUri(definition.getUrn()));
-        setCategory(definition.getCategories());
+    }
+
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
     }
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        return blocks.get(attachmentSide);
+        if (attachmentSide.isHorizontal()) {
+            return blocks.get(attachmentSide);
+        }
+        if (direction != null) {
+            return blocks.get(direction);
+        } else {
+            return blocks.get(Side.FRONT);
+        }
     }
 
     @Override
     public Block getArchetypeBlock() {
-        return archetype;
+        return blocks.get(this.getArchetypeSide());
     }
 
     @Override
@@ -114,13 +121,20 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         return blocks.values();
     }
 
-    public Side getSideAttachedTo(Block block) {
+    @Override
+    public Block getBlockForSide(Side side) {
+        return blocks.get(side);
+    }
+
+    @Override
+    public Side getSide(Block block) {
         for (Map.Entry<Side, Block> sideBlockEntry : blocks.entrySet()) {
-            if (sideBlockEntry.getValue().equals(block)) {
+            if (block == sideBlockEntry.getValue()) {
                 return sideBlockEntry.getKey();
             }
         }
         return null;
     }
+
 
 }
