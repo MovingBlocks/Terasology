@@ -87,51 +87,14 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
     }
 
-    /**
-     * Increases view distance upon receiving an increase view distance event.
-     * @param button The button or key pressed to increase view distance.
-     * @param entity The player entity that triggered the view distance increase.
-     */
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onIncreaseViewDistance(IncreaseViewDistanceButton button, EntityRef entity) {
-        int viewDistance = config.getRendering().getViewDistance().getIndex();
-        int maxViewDistance = ViewDistance.values().length - 1;
-        
-        //Ensuring that the view distance does not exceed its maximum value.
-        if (viewDistance != maxViewDistance) {
-            ViewDistance greaterViewDistance = ViewDistance.forIndex(viewDistance + 1);
-            String greaterViewDistanceStr = translationSystem.translate(greaterViewDistance.toString());
-            fireChangeEvent("Increasing view distance to " + greaterViewDistanceStr + ".", Arrays.asList(entity));
-            //Presenting user with a warning if the view distance is set higher than recommended.
-            if (greaterViewDistance == ViewDistance.MEGA || greaterViewDistance == ViewDistance.EXTREME) {
-                fireChangeEvent("Warning: Increasing view distance to " + greaterViewDistanceStr
-            	                    + " may result in performance issues.", Arrays.asList(entity));
-            }
-            config.getRendering().setViewDistance(greaterViewDistance);
-        }
-        button.consume();
-    }
 
     /**
-     * Decreases view distance upon receiving a decrease view distance event.
-     * @param button The button or key pressed to decrease view distance.
-     * @param entity The player entity that triggered the view distance decrease.
+     * Creates illusion of time flying by if correspondig key is held down.
+     * Up / Down : Increases / Decreases time of day by 0.005 per keystroke.
+     * Right / left : Increases / Decreases time of day by 0.02 per keystroke.
+     * @param event
+     * @param entity
      */
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onDecreaseViewDistance(DecreaseViewDistanceButton button, EntityRef entity) {
-        int viewDistance = config.getRendering().getViewDistance().getIndex();
-        int minViewDistance = 0;
-        
-        //Ensuring that the view distance does not fall below its minimum value.
-        if (viewDistance != minViewDistance) {
-            ViewDistance lesserViewDistance = ViewDistance.forIndex(viewDistance - 1);
-            String lesserViewDistanceStr = translationSystem.translate(lesserViewDistance.toString());
-            fireChangeEvent("Decreasing view distance to " + lesserViewDistanceStr + ".", Arrays.asList(entity));
-            config.getRendering().setViewDistance(lesserViewDistance);
-        }
-        button.consume();
-    }
-
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
