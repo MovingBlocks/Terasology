@@ -98,7 +98,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private Future<Void> remoteModuleRegistryUpdater;
     private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
-    private UIButton activateAdvancedFilter;
     private ResettableUIText moduleSearch;
 
     @Override
@@ -366,151 +365,63 @@ public class SelectModulesScreen extends CoreScreenLayer {
             UICheckbox libraryCheckBox = find("libraryCheckbox", UICheckbox.class);
             libraryCheckBox.setChecked(selectModulesConfig.isLibraryChecked());
             libraryCheckBox.subscribe(e -> {
-                libraryCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isLibraryChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsLibraryChecked(value);
-
-                            }
-                        }
-                );
+                libraryCheckBox.setChecked(!selectModulesConfig.isLibraryChecked());
+                selectModulesConfig.setIsLibraryChecked(!selectModulesConfig.isLibraryChecked());
+                filterModules();
             });
 
             UICheckbox assetCheckBox = find("assetCheckbox", UICheckbox.class);
             assetCheckBox.setChecked(selectModulesConfig.isAssetplayChecked());
             assetCheckBox.subscribe(e -> {
-                assetCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isAssetplayChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsAssetplayChecked(value);
-
-                            }
-                        }
-                );
+                assetCheckBox.setChecked(!selectModulesConfig.isAssetplayChecked());
+                selectModulesConfig.setIsAssetplayChecked(!selectModulesConfig.isAssetplayChecked());
+                filterModules();
             });
 
             UICheckbox worldCheckBox = find("worldCheckbox", UICheckbox.class);
             worldCheckBox.setChecked(selectModulesConfig.isWorldChecked());
             worldCheckBox.subscribe(e -> {
-                worldCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isWorldChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsWorldChecked(value);
-
-                            }
-                        }
-                );
+                worldCheckBox.setChecked(!selectModulesConfig.isWorldChecked());
+                selectModulesConfig.setIsWorldChecked(!selectModulesConfig.isWorldChecked());
+                filterModules();
             });
 
             UICheckbox gameplayCheckBox = find("gameplayCheckbox", UICheckbox.class);
             gameplayCheckBox.setChecked(selectModulesConfig.isGameplayChecked());
             gameplayCheckBox.subscribe(e -> {
-                gameplayCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isGameplayChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsGameplayChecked(value);
-
-                            }
-                        }
-                );
+                gameplayCheckBox.setChecked(!selectModulesConfig.isGameplayChecked());
+                selectModulesConfig.setIsGameplayChecked(!selectModulesConfig.isGameplayChecked());
+                filterModules();
             });
 
             UICheckbox augmentationCheckBox = find("augmentationCheckbox", UICheckbox.class);
             augmentationCheckBox.setChecked(selectModulesConfig.isAugmentationChecked());
             augmentationCheckBox.subscribe(e -> {
-                augmentationCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isAugmentationChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsAugmentationChecked(value);
-
-                            }
-                        }
-                );
-
+                augmentationCheckBox.setChecked(!selectModulesConfig.isAugmentationChecked());
+                selectModulesConfig.setIsAugmentationChecked(!selectModulesConfig.isAugmentationChecked());
+                filterModules();
             });
 
             UICheckbox specialCheckBox = find("specialCheckbox", UICheckbox.class);
             specialCheckBox.setChecked(selectModulesConfig.isSpecialChecked());
             specialCheckBox.subscribe(e ->{
-                specialCheckBox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isSpecialChecked();
-                            }
+                specialCheckBox.setChecked(!selectModulesConfig.isSpecialChecked());
+                selectModulesConfig.setIsSpecialChecked(!selectModulesConfig.isSpecialChecked());
+                filterModules();
+            });
 
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsSpecialChecked(value);
-                            }
-                        }
-                );
+            UIButton activateFilter = find("activateFilter", UIButton.class);
+            activateFilter.subscribe(e ->{
+                filterModules();
             });
 
             localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
             localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
             localOnlyCheckbox.subscribe(e -> {
-                localOnlyCheckbox.bindChecked(
-                        new Binding<Boolean>() {
-                            @Override
-                            public Boolean get() {
-                                filterModules();
-                                return selectModulesConfig.isLocalOnlyChecked();
-                            }
-
-                            @Override
-                            public void set(Boolean value) {
-                                selectModulesConfig.setIsLocalOnlyChecked(value);
-
-                            }
-                        }
-                );
-            });
-            filterModules();
-            /**
-            activateAdvancedFilter = find("activateFilter", UIButton.class);
-            activateAdvancedFilter.subscribe(e -> {
+                localOnlyCheckbox.setChecked(!selectModulesConfig.isLocalOnlyChecked());
+                selectModulesConfig.setIsLocalOnlyChecked(!selectModulesConfig.isLocalOnlyChecked());
                 filterModules();
             });
-             */
-
-
         }
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
@@ -518,7 +429,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
      private void filterModules() {
         sortedModules.clear();
         sortedModules.addAll(allSortedModules);
-        advancedModuleFilter();
+        if(selectModulesConfig.isAssetplayChecked() || selectModulesConfig.isAugmentationChecked() || selectModulesConfig.isGameplayChecked() || selectModulesConfig.isSpecialChecked() || selectModulesConfig.isWorldChecked() || selectModulesConfig.isLibraryChecked()) {
+            advancedModuleFilter();
+        }
          if (selectModulesConfig.isLocalOnlyChecked()) {
             localModuleFilter();
         }
@@ -556,29 +469,31 @@ public class SelectModulesScreen extends CoreScreenLayer {
             else {
                 module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
             }
-            if (selectModulesConfig.isLibraryChecked() && !StandardModuleExtension.isLibraryModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isLibraryChecked() && StandardModuleExtension.isLibraryModule(module)) {
                 continue;
             }
-            if (selectModulesConfig.isAssetplayChecked() && !StandardModuleExtension.isAssetplayModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isAssetplayChecked() && StandardModuleExtension.isAssetplayModule(module)) {
                 continue;
             }
-            if (selectModulesConfig.isWorldChecked() && !StandardModuleExtension.isWorldModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isWorldChecked() && StandardModuleExtension.isWorldModule(module)) {
                 continue;
             }
-            if (selectModulesConfig.isGameplayChecked() && !StandardModuleExtension.isGameplayModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isGameplayChecked() && StandardModuleExtension.isGameplayModule(module)) {
                 continue;
             }
-            if (selectModulesConfig.isSpecialChecked() && !StandardModuleExtension.isSpecialModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isSpecialChecked() && StandardModuleExtension.isSpecialModule(module)) {
                 continue;
             }
-            if (selectModulesConfig.isAugmentationChecked() && !StandardModuleExtension.isAugmentationModule(module)) {
-                iter.remove();
+
+            if(selectModulesConfig.isAugmentationChecked() && StandardModuleExtension.isAugmentationModule(module)) {
+                continue;
             }
+            iter.remove();
         }
     }
 
