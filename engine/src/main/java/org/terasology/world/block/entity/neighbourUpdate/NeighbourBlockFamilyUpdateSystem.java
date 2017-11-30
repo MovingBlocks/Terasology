@@ -71,8 +71,13 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         }
     }
 
-    @ReceiveEvent(components = {BlockItemComponent.class})
-    public void onPlaceBlock(OnBlockItemPlaced event, EntityRef entity) {
+    /**
+     * notifies the adjacent block families when a block is placed next to them
+     * @param event
+     * @param entity
+     */
+    @ReceiveEvent
+    public void OnBlockPlaced(OnBlockItemPlaced event, EntityRef entity) {
         BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
         if (blockComponent == null) {
             return;
