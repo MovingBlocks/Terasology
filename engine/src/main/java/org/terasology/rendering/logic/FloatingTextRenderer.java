@@ -94,7 +94,6 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             // If the FloatingTextComponent is meant to be occluded, enable depth tests
             if (floatingText.isOccluded) {
                 glEnable(GL_DEPTH_TEST);
-                glDepthFunc(GL_LESS);
             } else {
                 glDisable(GL_DEPTH_TEST);
             }
