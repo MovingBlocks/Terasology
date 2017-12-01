@@ -43,13 +43,7 @@ import org.terasology.world.WorldProvider;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScaled;
-import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.*;
 
 
 @RegisterSystem(RegisterMode.CLIENT)
@@ -82,8 +76,6 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     private void render(Iterable<EntityRef> floatingTextEntities) {
-        glDisable(GL_DEPTH_TEST);
-
         Vector3f cameraPosition = camera.getPosition();
 
         for (EntityRef entity : floatingTextEntities) {
@@ -98,6 +90,14 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             }
 
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
+
+            // If the FloatingTextComponent is meant to be occluded, enable depth tests
+            if (floatingText.isOccluded) {
+                glEnable(GL_DEPTH_TEST);
+                glDepthFunc(GL_LESS);
+            } else {
+                glDisable(GL_DEPTH_TEST);
+            }
 
             String[] linesOfText = floatingText.text.split("\n");
             Color baseColor = floatingText.textColor;
