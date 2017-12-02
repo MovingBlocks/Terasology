@@ -97,13 +97,6 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
 
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
 
-            // If the FloatingTextComponent is meant to be occluded, enable depth tests
-            if (floatingText.isOverlay) {
-                glEnable(GL_DEPTH_TEST);
-            } else {
-                glDisable(GL_DEPTH_TEST);
-            }
-
             String[] linesOfText = floatingText.text.split("\n");
             Color baseColor = floatingText.textColor;
             Color shadowColor = floatingText.textShadowColor;
@@ -125,6 +118,11 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                                 shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
+
+            if (floatingText.isOverlay) {
+                glDisable(GL_DEPTH_TEST);
+            }
+
             glPushMatrix();
 
             float scale = METER_PER_PIXEL * floatingText.scale;
@@ -146,8 +144,12 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             }
 
             glPopMatrix();
+
+            // Revert to default state
+            if (floatingText.isOverlay) {
+                glEnable(GL_DEPTH_TEST);
+            }
         }
-        glEnable(GL_DEPTH_TEST);
     }
 
     private void diposeMeshMap(Map<Material, Mesh> meshMap) {
