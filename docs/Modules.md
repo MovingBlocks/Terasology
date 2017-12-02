@@ -17,6 +17,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 *Note about "Tutorial" modules:* These are more likely for some time to be for developers/modders to learn about different kinds of content and systems, not for players to actually learn stuff in-game. That's usually handled by actual content modules including their own in-game help system.
 
 * [AdditionalFruits](https://github.com/Terasology/AdditionalFruits) - container module for more fruits
+* [AdditionalRails](https://github.com/Terasology/AdditionalRails) - container module for more rails
 * [AdditionalVegetables](https://github.com/Terasology/AdditionalVegetables) - container module for more vegetables
 * [AdditionalWorlds](https://github.com/Terasology/AdditionalWorlds) - container module for more worlds
 * [AdvancedBehaviors](https://github.com/Terasology/AdvancedBehaviors) - adds behavior trees and logic for NPCs!
