@@ -92,8 +92,7 @@ public class DebugControlSystem extends BaseComponentSystem {
      * Creates illusion of time flying by if correspondig key is held down.
      * Up / Down : Increases / Decreases time of day by 0.005 per keystroke.
      * Right / left : Increases / Decreases time of day by 0.02 per keystroke.
-     * @param event
-     * @param entity
+     * @param entity The player entity that triggered the time change.
      */
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
@@ -173,17 +172,6 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (!mouseGrabbed) {
             event.consume();
         }
-    }   
-    
-    /**
-     * Fires notification events upon changes to debug parameters.
-     * @param message Notification event message.
-     * @param entity  Entities which will receive the notification event.
-     */
-	private void fireChangeEvent(String message, List<EntityRef> entities) {
-    	for (EntityRef client : entities) {
-    		client.send(new NotificationMessageEvent(message, client));
-    	}
     }
 
 }
