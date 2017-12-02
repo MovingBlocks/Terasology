@@ -49,7 +49,6 @@ public final class ExternalApiWhitelist {
             // sub-packages of root for scala-lib: https://www.scala-lang.org/api/current/ 
             .add("scala.collection")
             .add("scala.concurrent")
-            .add("scala.io")
             .add("scala.math")
             .add("scala.sys")
             .add("scala.util")
