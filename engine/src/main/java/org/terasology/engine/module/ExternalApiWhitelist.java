@@ -46,6 +46,14 @@ public final class ExternalApiWhitelist {
             .add("java.awt")
             .add("java.awt.geom")
             .add("java.awt.image")
+            // sub-packages of root for scala-lib: https://www.scala-lang.org/api/current/ 
+            .add("scala.collection")
+            .add("scala.concurrent")
+            .add("scala.io")
+            .add("scala.math")
+            .add("scala.sys")
+            .add("scala.util")
+            // end of scala-lib packages
             .add("jdk.internal.reflect")
             .add("com.google.common.annotations")
             .add("com.google.common.cache")
