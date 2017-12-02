@@ -98,7 +98,7 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             FloatingTextComponent floatingText = entity.getComponent(FloatingTextComponent.class);
 
             // If the FloatingTextComponent is meant to be occluded, enable depth tests
-            if (floatingText.isOccluded) {
+            if (floatingText.isOverlay) {
                 glEnable(GL_DEPTH_TEST);
             } else {
                 glDisable(GL_DEPTH_TEST);
