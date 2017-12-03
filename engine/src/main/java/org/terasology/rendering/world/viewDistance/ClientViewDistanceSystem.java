@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.context.Context;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -27,17 +28,12 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.i18n.TranslationSystemImpl;
-import org.terasology.input.binds.general.HideHUDButton;
-import org.terasology.input.events.KeyDownEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.Keyboard;
 import org.terasology.logic.notifications.NotificationMessageEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeListener;
@@ -50,6 +46,9 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
 
     @In
     private Config config;
+
+    @In
+    private Context context;
 
     @In
     private WorldRenderer worldRenderer;
@@ -69,6 +68,8 @@ public class ClientViewDistanceSystem extends BaseComponentSystem {
             }
         };
         config.getRendering().subscribe(propertyChangeListener);
+
+        translationSystem = new TranslationSystemImpl(context);
     }
 
     public void onChangeViewDistanceChange() {
