@@ -89,6 +89,11 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
                                                  BlockItemComponent blockItemComponent,
                                                  BoxShapeComponent boxShapeComponent) {
         BlockFamily blockFamily = blockItemComponent.blockFamily;
+
+        if (blockFamily == null) {
+            return;
+        }
+
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape) {
             javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());
             extents.scale(2.0f);
