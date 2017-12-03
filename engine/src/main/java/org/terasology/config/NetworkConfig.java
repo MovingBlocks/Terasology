@@ -20,6 +20,9 @@ import com.google.common.collect.Lists;
 
 import org.terasology.engine.TerasologyConstants;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,7 +73,25 @@ public class NetworkConfig {
     }
 
     public String getServerMOTD() {
-        return serverMOTD;
+        try{
+            StringBuffer mOTD = new StringBuffer();
+
+            FileReader reader = new FileReader("motd.md");
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+            while((line = bufferedReader.readLine()) != null){
+                mOTD.append(line);
+            }
+
+            serverMOTD =  mOTD.toString();
+
+            return serverMOTD;
+
+        }
+        catch(IOException e) {
+            return serverMOTD;
+        }
     }
 
     public void setServerMOTD(String serverMOTD) {
