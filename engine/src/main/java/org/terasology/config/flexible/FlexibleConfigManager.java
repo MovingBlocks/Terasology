@@ -49,14 +49,12 @@ public interface FlexibleConfigManager {
     FlexibleConfig getConfig(SimpleUri configId);
 
     /**
-     * Iterates over all the configs registered with this manager, and loads the
-     * settings stored in them.
+     * Iterates over all the configs added to this manager, and loads the settings stored in them.
      */
-    void load();
+    void loadAllConfigs();
 
     /**
-     * Iterates over all the configs registered with this manager, and saves the
-     * settings stored in them.
+     * Iterates over all the configs added to this manager, and saves the settings stored in them.
      */
-    void save();
+    void saveAllConfigs();
 }

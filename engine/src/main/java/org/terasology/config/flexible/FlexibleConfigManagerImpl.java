@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
-    private static final Logger logger = LoggerFactory.getLogger(FlexibleConfigManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlexibleConfigManagerImpl.class);
 
     private Map<SimpleUri, FlexibleConfig> flexibleConfigs = Maps.newHashMap();
 
@@ -56,24 +56,25 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
     }
 
     @Override
-    public void load() {
+    public void loadAllConfigs() {
         for (Entry<SimpleUri, FlexibleConfig> entry : flexibleConfigs.entrySet()) {
             SimpleUri flexibleConfigId = entry.getKey();
             FlexibleConfig flexibleConfig = entry.getValue();
 
-            try (Reader reader = Files.newBufferedReader(getPathForFlexibleConfig(flexibleConfigId), TerasologyConstants.CHARSET)) {
-                flexibleConfig.load(reader);
-            } catch (NoSuchFileException e) {
-                // The config does not exist, so the default values will be used.
-                // Silently ignore the exception.
-            } catch (IOException e) {
-                throw new RuntimeException("Exception loading config file for configId " + entry.getKey());
-            }
+            Path configPath = getPathForFlexibleConfig(flexibleConfigId);
+            if (Files.exists(configPath)) {
+                try (Reader reader = Files.newBufferedReader(configPath, TerasologyConstants.CHARSET)) {
+                    flexibleConfig.load(reader);
+                } catch(IOException e){
+                    throw new RuntimeException("Exception loading config file for configId " + entry.getKey());
+                }
+            } // else: The config does not exist, so the default values will be used.
+
         }
     }
 
     @Override
-    public void save() {
+    public void saveAllConfigs() {
         for (Entry<SimpleUri, FlexibleConfig> entry : flexibleConfigs.entrySet()) {
             SimpleUri flexibleConfigId = entry.getKey();
             FlexibleConfig flexibleConfig = entry.getValue();

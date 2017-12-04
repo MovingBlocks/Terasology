@@ -57,7 +57,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         FlexibleConfig renderingFlexibleConfig = new FlexibleConfigImpl();
         flexibleConfigManager.addConfig(new SimpleUri("engine:rendering"), renderingFlexibleConfig);
 
-        flexibleConfigManager.load();
+        flexibleConfigManager.loadAllConfigs();
         // Add settings to RenderingFC
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);

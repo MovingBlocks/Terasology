@@ -152,7 +152,7 @@ public final class Config {
             logger.error("Failed to save config", e);
         }
 
-        context.get(FlexibleConfigManager.class).save();
+        context.get(FlexibleConfigManager.class).saveAllConfigs();
     }
 
     public void loadDefaults() {
