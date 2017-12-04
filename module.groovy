@@ -3,6 +3,8 @@
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group='org.ajoberstar', module='grgit', version='1.9.3')
 import org.ajoberstar.grgit.Grgit
+import org.ajoberstar.grgit.Remote
+
 
 import groovy.json.JsonSlurper
 
@@ -187,16 +189,56 @@ def getUserString (String prompt) {
 }
 
 /**
+ *List all remotes of a module.
+ */
+ def remotelist(String name) {
+	 
+	 def rgit = Grgit.open(dir: "modules/$name")
+	 def remote = rgit.remote.list()
+	  x = 1
+	 for (Remote item : remote){
+		println (x + " " + item.name + " " + "(" + item.url + ")")
+		x += 1
+	 }
+ }
+ 
+ /**
+ *Add a remote.
+ */
+ def remoteadd(String modname, String name, String URL){
+	
+		def rgit = Grgit.open(dir: "modules/$modname")
+		def remote = rgit.remote.list()
+		def rcheck = remote.find { it.name == "$name" }
+		if(!rcheck){
+		 rgit.remote.add(name: "$name" , url: "$URL")
+		}
+		else {
+		 println "Remote already exists"
+		}
+	
+ }
+ 
+ def remote(String[] modules, String name) {
+    for (String module : modules) {
+        remoteadd(module, name, "https://gitub.com/$name/$module/")
+    }
+}
+
+/**
  * Simply prints usage information.
  */
 def printUsage() {
     println ""
     println "Utility script for interacting with modules. Available sub commands:"
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
+	println "        - use '-remote' to specify the name for the remotes of the newly cloned modules. PLEASE TEST THIS"
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local modules"
+	println "- 'add-remote (module) (name) (URL)' - adds a remote (name) with url (URL) to modules/(module) TESTING ONLY"
+    println "- 'list-remotes (module)' - lists all remotes for (module) TESTING ONLY"
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
     println "*NOTE*: Module names are case sensitive"
@@ -238,7 +280,21 @@ if (args.length == 0) {
                 // User has supplied one or more module names, so pass them forward (skipping the "get" arg)
                 def adjustedArgs = args.drop(1)
                 println "Adjusted args: $adjustedArgs"
-                retrieve adjustedArgs, recurse
+				for (String item : args){
+				if (item == "-remote"){
+					String hint = args.join(" ")
+					String[] adjustedArgs2 = hint.split('-remote')
+					String[] adjustedFinal = adjustedArgs2[0].split("\\s+")
+					def adjustedFinal2 = adjustedFinal.drop(1)
+					def old = adjustedArgs2[1]
+					println "$old"
+					println "$adjustedFinal2"
+					retrieve adjustedFinal2, recurse
+					remote adjustedFinal2, old.trim()
+				}
+				}			
+				
+                
             }
             println "All done retrieving requested modules: $modulesRetrieved"
             break
@@ -288,6 +344,18 @@ if (args.length == 0) {
                 }
             }
             break
+		case "add-remote":
+			modname = args[1]
+			name = args[2]
+			url = args[3]
+			println "Adding Remotes for $modname module."
+			remoteadd(modname,name,url)
+			break
+		case "list-remotes":
+			name = args[1]
+			println "Listing Remotes for $name module."
+			remotelist(name)
+			break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
     }
