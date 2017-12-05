@@ -5,7 +5,6 @@
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Remote
 
-
 import groovy.json.JsonSlurper
 
 // Grab override properties from the gradle.properties file (shared with various Gradle commands)
@@ -279,7 +278,7 @@ if (args.length == 0) {
             } else {
                 // User has supplied one or more module names, so pass them forward (skipping the "get" arg)
                 def adjustedArgs = args.drop(1)
-                println "Adjusted args: $adjustedArgs"
+                // Check for '-remote' and act accordingly.
 				for (String item : args){
 				if (item == "-remote"){
 					String hint = args.join(" ")
@@ -292,6 +291,8 @@ if (args.length == 0) {
 					retrieve adjustedFinal2, recurse
 					remote adjustedFinal2, old.trim()
 				}
+				// If '-remote' not present then check for '/' syntax. LEFT TO BE DONE
+				
 				}			
 				
                 
