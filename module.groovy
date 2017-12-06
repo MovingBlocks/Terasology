@@ -219,8 +219,17 @@ def getUserString (String prompt) {
 	
  }
  
+ def remoteAddAuto(String moduleName, String remoteName){
+	 def module_rep_Name = getUserString("Enter Name for the Module in $remoteName Repository (default - $moduleName)")
+		if (module_rep_Name == ""){
+			module_rep_Name = moduleName
+		}
+	remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$module_rep_Name"+".git")	
+ }
+ 
  def remote(String[] modules, String name) {
     for (String module : modules) {
+		
         remoteAdd(module, name, "https://gitub.com/$name/$module"+".git")
     }
 }
@@ -237,7 +246,7 @@ def printUsage() {
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local modules"
-	println "- 'add-remote (module) (name) (URL)' - adds a remote (name) with url (URL) to modules/(module) "
+	println "- 'add-remote (module) (name)' - adds a remote (name) to modules/(module) "
     println "- 'list-remotes (module)' - lists all remotes for (module) "
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
@@ -380,16 +389,15 @@ if (args.length == 0) {
             }
             break
 		case "add-remote":
-			if (args.length == 4){
+			if (args.length == 3){
 			moduleName = args[1]
 			remoteName = args[2]
-			url = args[3]
 			println "Adding Remotes for $moduleName module."
-			remoteAdd(moduleName,remoteName,url)
+			remoteAddAuto(moduleName,remoteName)
 			}
 			else {
 				println "Incorrect Syntax"
-				println "Usage: 'add-remote (module) (name) (URL)' - adds a remote (name) with url (URL) to modules/(module) "
+				println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) "
     
 			}
 			break
