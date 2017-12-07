@@ -236,16 +236,6 @@ def remote(String[] modules, String name) {
     }
 }
 
-def lstremote() {
-    def remoteGit = Grgit.open(dir: "modules/Sample")
-
-    Grgit.lsremote() {
-        heads = true
-        tags = true
-        remote = 'Sample'
-    }
-}
-
 /**
  * Simply prints usage information.
  */
@@ -419,9 +409,6 @@ if (args.length == 0) {
                 println "Incorrect Syntax"
                 println "Usage: 'list-remotes (module)' - lists all remotes for (module)"
             }
-            break
-        case "lsremote":
-            lstremote()
             break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
