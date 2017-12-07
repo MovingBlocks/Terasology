@@ -20,8 +20,6 @@ import org.terasology.context.Context;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleImpl;
 
-/**
- */
 public class InitialiseCommandSystem extends SingleStepLoadProcess {
 
     private Context context;
