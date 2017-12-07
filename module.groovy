@@ -191,7 +191,11 @@ def getUserString (String prompt) {
  *List all remotes of a module.
  */
  def remoteList(String moduleName) {
-	 
+	 File moduleExistence = new File("modules/$moduleName")
+        if (!moduleExistence.exists()) {
+            println "Module $moduleName not found. Run gradlew module get $moduleName"
+            return
+        }
 	 def remoteGit = Grgit.open(dir: "modules/$moduleName")
 	 def remote = remoteGit.remote.list()
 	  x = 1
@@ -205,7 +209,11 @@ def getUserString (String prompt) {
  *Add a remote.
  */
  def remoteAdd(String moduleName, String remoteName, String URL){
-	
+	    File moduleExistence = new File("modules/$moduleName")
+        if (!moduleExistence.exists()) {
+            println "Module $moduleName not found. Run gradlew module get $moduleName"
+            return
+        }
 		def remoteGit = Grgit.open(dir: "modules/$moduleName")
 		def remote = remoteGit.remote.list()
 		def check = remote.find { it.name == "$remoteName" }
@@ -220,11 +228,7 @@ def getUserString (String prompt) {
  }
  
  def remoteAddAuto(String moduleName, String remoteName){
-	 def module_rep_Name = getUserString("Enter Name for the Module in $remoteName Repository (default - $moduleName)")
-		if (module_rep_Name == ""){
-			module_rep_Name = moduleName
-		}
-	remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$module_rep_Name"+".git")	
+	remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$moduleName"+".git")	
  }
  
  def remote(String[] modules, String name) {
@@ -232,6 +236,20 @@ def getUserString (String prompt) {
 		
         remoteAdd(module, name, "https://gitub.com/$name/$module"+".git")
     }
+}
+def lstremote(){
+	
+	def remoteGit = Grgit.open(dir: "modules/Sample")
+	
+	Grgit.lsremote(){
+		
+  heads = true
+  tags = true
+  remote = 'Sample'
+	}
+
+	
+
 }
 
 /**
@@ -246,7 +264,8 @@ def printUsage() {
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local modules"
-	println "- 'add-remote (module) (name)' - adds a remote (name) to modules/(module) "
+	println "- 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with the default URL."
+	println "- 'add-remote (module) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (module)' - lists all remotes for (module) "
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
@@ -390,14 +409,22 @@ if (args.length == 0) {
             break
 		case "add-remote":
 			if (args.length == 3){
-			moduleName = args[1]
-			remoteName = args[2]
-			println "Adding Remotes for $moduleName module."
-			remoteAddAuto(moduleName,remoteName)
+				moduleName = args[1]
+				remoteName = args[2]
+				println "Adding Remote for $moduleName module."
+				remoteAddAuto(moduleName,remoteName)
+			}
+			else if (args.length == 4){
+				moduleName = args[1]
+				remoteName = args[2]
+				url = args[3]
+				println "Adding Remote for $moduleName module."
+				remoteAdd(moduleName,remoteName,url)
 			}
 			else {
 				println "Incorrect Syntax"
-				println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) "
+				println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with default URL."
+				println "       'add-remote (module) (name)' - adds a remote to the module with the given URL."
     
 			}
 			break
@@ -411,6 +438,9 @@ if (args.length == 0) {
 				println "Incorrect Syntax"
 			println "Usage: 'list-remotes (module)' - lists all remotes for (module)"
 			}
+			break
+		case "lsremote":
+			lstremote()
 			break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
