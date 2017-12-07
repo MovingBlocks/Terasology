@@ -37,6 +37,14 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Multi-Connect family describes a block family that will connect to other neighboring blocks.
+ *
+ * examples:
+ * - Rail Segments
+ * - Cables
+ * - Fence
+ */
 public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
     private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
 
@@ -61,8 +69,18 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     }
 
+    /**
+     * A condition that identifies which sides are valid to connect to
+     * @param blockLocation
+     * @param connectSide
+     * @return
+     */
     protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
 
+    /**
+     * Sides that are valid to connect to using SideBitFlag
+     * @return
+     */
     public abstract byte getConnectionSides();
 
     public abstract boolean horizontalOnly();
