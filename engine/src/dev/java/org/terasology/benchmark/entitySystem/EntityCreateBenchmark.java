@@ -27,9 +27,6 @@ import org.terasology.world.block.BlockComponent;
 
 import java.util.List;
 
-/**
- *
- */
 public class EntityCreateBenchmark extends AbstractBenchmark {
 
     private List<List<Component>> rawEntityData;
