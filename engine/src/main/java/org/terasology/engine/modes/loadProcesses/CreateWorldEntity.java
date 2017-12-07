@@ -31,8 +31,6 @@ import org.terasology.world.generator.WorldGenerator;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- */
 public class CreateWorldEntity extends SingleStepLoadProcess {
 
     private final Context context;
