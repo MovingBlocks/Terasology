@@ -1,7 +1,7 @@
 // We use GrGit for interacting with Git. This gets a hold of it as a dependency like Gradle would
 // TODO: Consider if we should do something to fix/suppress the SLF4J warning that gets logged on first usage?
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
-@Grab(group='org.ajoberstar', module='grgit', version='1.9.3')
+@Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Remote
 
@@ -179,77 +179,71 @@ def updateModule(String name) {
  * Accepts input from the user, showing a descriptive prompt.
  * @param prompt the prompt to show the user
  */
-def getUserString (String prompt) {
-    println ('\n*** ' + prompt + '\n')
+def getUserString(String prompt) {
+    println('\n*** ' + prompt + '\n')
 
-    def reader = new BufferedReader(new InputStreamReader(System.in)) // Note: Do not close reader, it will close System.in (Big no-no)
+    def reader = new BufferedReader(new InputStreamReader(System.in))
+    // Note: Do not close reader, it will close System.in (Big no-no)
 
     return reader.readLine()
 }
 
 /**
- *List all remotes of a module.
+ * List all remotes of a module.
  */
- def remoteList(String moduleName) {
-	 File moduleExistence = new File("modules/$moduleName")
-        if (!moduleExistence.exists()) {
-            println "Module $moduleName not found. Run gradlew module get $moduleName"
-            return
-        }
-	 def remoteGit = Grgit.open(dir: "modules/$moduleName")
-	 def remote = remoteGit.remote.list()
-	  x = 1
-	 for (Remote item : remote){
-		println (x + " " + item.name + " " + "(" + item.url + ")")
-		x += 1
-	 }
- }
- 
- /**
- *Add a remote.
- */
- def remoteAdd(String moduleName, String remoteName, String URL){
-	    File moduleExistence = new File("modules/$moduleName")
-        if (!moduleExistence.exists()) {
-            println "Module $moduleName not found. Run gradlew module get $moduleName"
-            return
-        }
-		def remoteGit = Grgit.open(dir: "modules/$moduleName")
-		def remote = remoteGit.remote.list()
-		def check = remote.find { it.name == "$remoteName" }
-		if(!check){
-		 remoteGit.remote.add(name: "$remoteName" , url: "$URL")
-		 println "Successfully added remote $remoteName for $moduleName"
-		}
-		else {
-		 println "Remote already exists"
-		}
-	
- }
- 
- def remoteAddAuto(String moduleName, String remoteName){
-	remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$moduleName"+".git")	
- }
- 
- def remote(String[] modules, String name) {
-    for (String module : modules) {
-		
-        remoteAdd(module, name, "https://gitub.com/$name/$module"+".git")
+def remoteList(String moduleName) {
+    File moduleExistence = new File("modules/$moduleName")
+    if (!moduleExistence.exists()) {
+        println "Module $moduleName not found. Run gradlew module get $moduleName"
+        return
+    }
+    def remoteGit = Grgit.open(dir: "modules/$moduleName")
+    def remote = remoteGit.remote.list()
+    x = 1
+    for (Remote item : remote) {
+        println(x + " " + item.name + " " + "(" + item.url + ")")
+        x += 1
     }
 }
-def lstremote(){
-	
-	def remoteGit = Grgit.open(dir: "modules/Sample")
-	
-	Grgit.lsremote(){
-		
-  heads = true
-  tags = true
-  remote = 'Sample'
-	}
 
-	
+/**
+ * Add a remote.
+ */
+def remoteAdd(String moduleName, String remoteName, String URL) {
+    File moduleExistence = new File("modules/$moduleName")
+    if (!moduleExistence.exists()) {
+        println "Module $moduleName not found. Run gradlew module get $moduleName"
+        return
+    }
+    def remoteGit = Grgit.open(dir: "modules/$moduleName")
+    def remote = remoteGit.remote.list()
+    def check = remote.find { it.name == "$remoteName" }
+    if (!check) {
+        remoteGit.remote.add(name: "$remoteName", url: "$URL")
+        println "Successfully added remote $remoteName for $moduleName"
+    } else {
+        println "Remote already exists"
+    }
+}
 
+def remoteAddAuto(String moduleName, String remoteName) {
+    remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$moduleName" + ".git")
+}
+
+def remote(String[] modules, String name) {
+    for (String module : modules) {
+        remoteAdd(module, name, "https://gitub.com/$name/$module" + ".git")
+    }
+}
+
+def lstremote() {
+    def remoteGit = Grgit.open(dir: "modules/Sample")
+
+    Grgit.lsremote() {
+        heads = true
+        tags = true
+        remote = 'Sample'
+    }
 }
 
 /**
@@ -259,13 +253,13 @@ def printUsage() {
     println ""
     println "Utility script for interacting with modules. Available sub commands:"
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
-	println "        - use '-remote' to specify the name for the remotes of the newly cloned modules. "
+    println "        - use '-remote' to specify the name for the remotes of the newly cloned modules. "
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local modules"
-	println "- 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with the default URL."
-	println "- 'add-remote (module) (name) (URL)' - adds a remote with the given URL"
+    println "- 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with the default URL."
+    println "- 'add-remote (module) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (module)' - lists all remotes for (module) "
     println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
@@ -278,6 +272,7 @@ def printUsage() {
     println "A gradle.properties file (one exists under '/templates' in an engine workspace) can provide such overrides"
     println ""
 }
+
 //For proper fuctionality of get and remote (IGNORE)
 def remote_get_check = "False"
 
@@ -294,7 +289,7 @@ if (args.length == 0) {
         case "recurse":
             recurse = true
             println "We're retrieving recursively (all the things depended on too)"
-            // We just fall through here to the get logic after setting a boolean
+        // We just fall through here to the get logic after setting a boolean
         //noinspection GroovyFallthrough
         case "get":
             println "Preparing to get one or more modules"
@@ -307,59 +302,49 @@ if (args.length == 0) {
                 println "Now in an array: $moduleList"
                 retrieve moduleList, recurse
             } else {
-                
                 // Check for '-remote' and act accordingly.
-				
-				for (String item : args){
-				if (item == "-remote"){
-					String joint = args.join(" ")
-					String[] names = joint.split('-remote')
-					String[] moduleNames = names[0].split("\\s+")
-					def moduleNamesFinal = moduleNames.drop(1)
-					
-				    if (!(names.length == 2)){
-						// User did not specify the remote name, so ask for it.
-						def newName = getUserString('Enter Name for the Remote (no spaces)')
-                        println "Remote Name: $newName"
-						def remoteName = newName
-						retrieve moduleNamesFinal, recurse
-					    remote moduleNamesFinal, remoteName
-						println "All done retrieving requested modules: $moduleNamesFinal"
-						break
-					}
-					else {
-						def remoteName = names[1]
-						String[] checklist = remoteName.split("\\s+")
-						if (checklist.length == 2){
-						retrieve moduleNamesFinal, recurse
-					    remote moduleNamesFinal, remoteName.trim()
-						println "All done retrieving requested modules: $moduleNamesFinal"
-						}
-						else {
-							println "Please input one remote name only (no spaces)."
-						}
-					}
-					
-                break
-				}
-				
-				// If '-remote' not present then check for '/' syntax. LEFT TO BE DONE
-				
-				for (String item2 : args)
-					if (item2 == "-remote"){
-						remote_get_check = "True"
-					}
-				
-				}
-				//If no '-remote' is specified (normal operation)
-				if (!(remote_get_check == "True")){
-					def adjustedArgs = args.drop(1)
-					println "Retrieving: $adjustedArgs"
-					retrieve adjustedArgs, recurse
-				}
-				
+                for (String item : args) {
+                    if (item == "-remote") {
+                        String joint = args.join(" ")
+                        String[] names = joint.split('-remote')
+                        String[] moduleNames = names[0].split("\\s+")
+                        def moduleNamesFinal = moduleNames.drop(1)
+
+                        if (!(names.length == 2)) {
+                            // User did not specify the remote name, so ask for it.
+                            def newName = getUserString('Enter Name for the Remote (no spaces)')
+                            println "Remote Name: $newName"
+                            def remoteName = newName
+                            retrieve moduleNamesFinal, recurse
+                            remote moduleNamesFinal, remoteName
+                            println "All done retrieving requested modules: $moduleNamesFinal"
+                            break
+                        } else {
+                            def remoteName = names[1]
+                            String[] checklist = remoteName.split("\\s+")
+                            if (checklist.length == 2) {
+                                retrieve moduleNamesFinal, recurse
+                                remote moduleNamesFinal, remoteName.trim()
+                                println "All done retrieving requested modules: $moduleNamesFinal"
+                            } else {
+                                println "Please input one remote name only (no spaces)."
+                            }
+                        }
+                        break
+                    }
+                    // If '-remote' not present then check for '/' syntax. LEFT TO BE DONE
+                    for (String item2 : args)
+                        if (item2 == "-remote") {
+                            remote_get_check = "True"
+                        }
+                }
+                //If no '-remote' is specified (normal operation)
+                if (!(remote_get_check == "True")) {
+                    def adjustedArgs = args.drop(1)
+                    println "Retrieving: $adjustedArgs"
+                    retrieve adjustedArgs, recurse
+                }
             }
-            
             break
         case "create":
             println "We're doing a create"
@@ -367,12 +352,12 @@ if (args.length == 0) {
 
             // Get new module's name
             if (args.length > 2) {
-              println "Received more than one argument. Aborting."
-              break
+                println "Received more than one argument. Aborting."
+                break
             } else if (args.length == 2) {
-              name = args[1]
+                name = args[1]
             } else {
-              name = getUserString("Enter module name: ")
+                name = getUserString("Enter module name: ")
             }
             println "User wants to create a module named: $name"
 
@@ -393,7 +378,7 @@ if (args.length == 0) {
                 moduleList = args.drop(1)
             }
             println "List of modules to update: $moduleList"
-            for (String module: moduleList) {
+            for (String module : moduleList) {
                 updateModule(module)
             }
             break
@@ -407,41 +392,37 @@ if (args.length == 0) {
                 }
             }
             break
-		case "add-remote":
-			if (args.length == 3){
-				moduleName = args[1]
-				remoteName = args[2]
-				println "Adding Remote for $moduleName module."
-				remoteAddAuto(moduleName,remoteName)
-			}
-			else if (args.length == 4){
-				moduleName = args[1]
-				remoteName = args[2]
-				url = args[3]
-				println "Adding Remote for $moduleName module."
-				remoteAdd(moduleName,remoteName,url)
-			}
-			else {
-				println "Incorrect Syntax"
-				println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with default URL."
-				println "       'add-remote (module) (name)' - adds a remote to the module with the given URL."
-    
-			}
-			break
-		case "list-remotes":
-			if (args.length == 2){
-			moduleName = args[1]
-			println "Listing Remotes for $moduleName module."
-			remoteList(moduleName)
-			}
-	        else{
-				println "Incorrect Syntax"
-			println "Usage: 'list-remotes (module)' - lists all remotes for (module)"
-			}
-			break
-		case "lsremote":
-			lstremote()
-			break
+        case "add-remote":
+            if (args.length == 3) {
+                moduleName = args[1]
+                remoteName = args[2]
+                println "Adding Remote for $moduleName module."
+                remoteAddAuto(moduleName, remoteName)
+            } else if (args.length == 4) {
+                moduleName = args[1]
+                remoteName = args[2]
+                url = args[3]
+                println "Adding Remote for $moduleName module."
+                remoteAdd(moduleName, remoteName, url)
+            } else {
+                println "Incorrect Syntax"
+                println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with default URL."
+                println "       'add-remote (module) (name)' - adds a remote to the module with the given URL."
+            }
+            break
+        case "list-remotes":
+            if (args.length == 2) {
+                moduleName = args[1]
+                println "Listing Remotes for $moduleName module."
+                remoteList(moduleName)
+            } else {
+                println "Incorrect Syntax"
+                println "Usage: 'list-remotes (module)' - lists all remotes for (module)"
+            }
+            break
+        case "lsremote":
+            lstremote()
+            break
         default:
             println "UNRECOGNIZED COMMAND - please try again or use 'groovyw module usage' for help"
     }
