@@ -196,7 +196,7 @@ public class InjectionHelperTest {
         }
     }
 
-    public static class ConstructorA_AB {
+    public static class ConstructorAAB {
         private ServiceA serviceA;
 
         private ServiceB serviceB;
