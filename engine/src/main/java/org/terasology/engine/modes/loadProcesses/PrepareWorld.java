@@ -22,8 +22,6 @@ import org.terasology.engine.Time;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
-/**
- */
 public class PrepareWorld implements LoadProcess {
 
     private final Context context;
