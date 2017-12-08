@@ -83,8 +83,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      */
     public abstract byte getConnectionSides();
 
-    public abstract boolean horizontalOnly();
-
     @Override
     public abstract Block getArchetypeBlock();
 
