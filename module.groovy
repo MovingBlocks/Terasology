@@ -26,6 +26,19 @@ modulesRetrieved = []
 excludedDependencies = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
 
 /**
+ * Accepts input from the user, showing a descriptive prompt.
+ * @param prompt the prompt to show the user
+ */
+def getUserString(String prompt) {
+    println('\n*** ' + prompt + '\n')
+
+    def reader = new BufferedReader(new InputStreamReader(System.in))
+    // Note: Do not close reader, it will close System.in (Big no-no)
+
+    return reader.readLine()
+}
+
+/**
  * Primary entry point for retrieving modules, kicks off recursively if needed.
  * @param modules the modules we want to retrieve
  * @param recurse whether to also retrieve dependencies of the desired modules
@@ -184,19 +197,6 @@ def updateModule(String name) {
 }
 
 /**
- * Accepts input from the user, showing a descriptive prompt.
- * @param prompt the prompt to show the user
- */
-def getUserString(String prompt) {
-    println('\n*** ' + prompt + '\n')
-
-    def reader = new BufferedReader(new InputStreamReader(System.in))
-    // Note: Do not close reader, it will close System.in (Big no-no)
-
-    return reader.readLine()
-}
-
-/**
  * List all existing Git remotes for a given module.
  * @param moduleName the module to list remotes for
  */
@@ -214,6 +214,27 @@ def listRemotes(String moduleName) {
         x += 1
     }
 }
+
+/**
+ * Add new Git remotes for the given modules, all using the same remote name.
+ * @param modules the modules to add remotes for
+ * @param name the name to use for all the Git remotes
+ */
+def addRemotes(String[] modules, String name) {
+    for (String module : modules) {
+        addRemote(module, name)
+    }
+}
+
+/**
+ * Add a new Git remote for the given module, deducing a standard URL to the repo.
+ * @param moduleName the module to add the remote for
+ * @param remoteName the name to give the new remote
+ */
+def addRemote(String moduleName, String remoteName) {
+    addRemote(moduleName, remoteName, "https://github.com/$remoteName/$moduleName" + ".git")
+}
+
 
 /**
  * Add a new Git remote for the given module.
@@ -236,26 +257,6 @@ def addRemote(String moduleName, String remoteName, String URL) {
         println "Successfully added remote $remoteName for $moduleName"
     } else {
         println "Remote already exists"
-    }
-}
-
-/**
- * Add a new Git remote for the given module, deducing a standard URL to the repo.
- * @param moduleName the module to add the remote for
- * @param remoteName the name to give the new remote
- */
-def addRemote(String moduleName, String remoteName) {
-    addRemote(moduleName, remoteName, "https://github.com/$remoteName/$moduleName" + ".git")
-}
-
-/**
- * Add new Git remotes for the given modules, all using the same remote name.
- * @param modules the modules to add remotes for
- * @param name the name to use for all the Git remotes
- */
-def addRemotes(String[] modules, String name) {
-    for (String module : modules) {
-        addRemote(module, name)
     }
 }
 
