@@ -124,11 +124,11 @@ String[] readModuleDependencies(File targetModuleInfo) {
 /**
  * Creates a new module with the given name and adds the necessary .gitignore,
  * build.gradle and module.txt files.
- * @param name the name of the module to be created
+ * @param moduleName the name of the module to be created
  */
-def createModule(String name) {
+def createModule(String moduleName) {
     // Check if the module already exists. If not, create the module directory
-    File targetDir = new File("modules/$name")
+    File targetDir = new File("modules/$moduleName")
     if (targetDir.exists()) {
         println "Target directory already exists. Aborting."
         return
@@ -152,10 +152,11 @@ def createModule(String name) {
     println "Creating module.txt"
     File moduleManifest = new File(targetDir, "module.txt")
     def moduleText = new File("templates/module.txt").text
-    moduleManifest << moduleText.replaceAll('MODULENAME', name)
+    moduleManifest << moduleText.replaceAll('MODULENAME', moduleName)
 
     // Initialize git
     Grgit.init dir: targetDir, bare: false
+    addRemote(moduleName, "origin", "https://github.com/Terasology/${moduleName}.git")
 }
 
 /**
@@ -357,7 +358,7 @@ if (args.length == 0) {
             break
         case "create":
             println "We're doing a create"
-            String name = ""
+            String name
 
             // Get new module's name
             if (args.length > 2) {
@@ -376,7 +377,7 @@ if (args.length == 0) {
             break
         case "update":
             println "We're updating modules"
-            String[] moduleList = []
+            String[] moduleList
             if (args.length == 1) {
                 // User hasn't supplied any module names, so ask
                 def moduleString = getUserString('Enter Module Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
