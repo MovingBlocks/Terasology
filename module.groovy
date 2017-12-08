@@ -189,12 +189,13 @@ def getUserString(String prompt) {
 }
 
 /**
- * List all remotes of a module.
+ * List all existing Git remotes for a given module.
+ * @param moduleName the module to list remotes for
  */
-def remoteList(String moduleName) {
+def listRemotes(String moduleName) {
     File moduleExistence = new File("modules/$moduleName")
     if (!moduleExistence.exists()) {
-        println "Module $moduleName not found. Run gradlew module get $moduleName"
+        println "Module '$moduleName' not found. Typo? Or run 'groovyw module get $moduleName' first"
         return
     }
     def remoteGit = Grgit.open(dir: "modules/$moduleName")
@@ -207,12 +208,16 @@ def remoteList(String moduleName) {
 }
 
 /**
- * Add a remote.
+ * Add a new Git remote for the given module.
+ * @param moduleName the module to add the remote for
+ * @param remoteName the name to give the new remote
+ * @param URL address to the remote Git repo
  */
-def remoteAdd(String moduleName, String remoteName, String URL) {
-    File moduleExistence = new File("modules/$moduleName")
-    if (!moduleExistence.exists()) {
-        println "Module $moduleName not found. Run gradlew module get $moduleName"
+
+def addRemote(String moduleName, String remoteName, String URL) {
+    File targetModule = new File("modules/$moduleName")
+    if (!targetModule.exists()) {
+        println "Module '$moduleName' not found. Typo? Or run 'groovyw module get $moduleName' first"
         return
     }
     def remoteGit = Grgit.open(dir: "modules/$moduleName")
@@ -226,13 +231,23 @@ def remoteAdd(String moduleName, String remoteName, String URL) {
     }
 }
 
-def remoteAddAuto(String moduleName, String remoteName) {
-    remoteAdd(moduleName, remoteName, "https://gitub.com/$remoteName/$moduleName" + ".git")
+/**
+ * Add a new Git remote for the given module, deducing a standard URL to the repo.
+ * @param moduleName the module to add the remote for
+ * @param remoteName the name to give the new remote
+ */
+def addRemote(String moduleName, String remoteName) {
+    addRemote(moduleName, remoteName, "https://github.com/$remoteName/$moduleName" + ".git")
 }
 
-def remote(String[] modules, String name) {
+/**
+ * Add new Git remotes for the given modules, all using the same remote name.
+ * @param modules the modules to add remotes for
+ * @param name the name to use for all the Git remotes
+ */
+def addRemotes(String[] modules, String name) {
     for (String module : modules) {
-        remoteAdd(module, name, "https://gitub.com/$name/$module" + ".git")
+        addRemote(module, name)
     }
 }
 
@@ -243,7 +258,7 @@ def printUsage() {
     println ""
     println "Utility script for interacting with modules. Available sub commands:"
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
-    println "        - use '-remote' to specify the name for the remotes of the newly cloned modules. "
+    println "        - add '-remote [someRemote]' to define an additional remote for the newly cloned module(s). "
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
@@ -306,7 +321,7 @@ if (args.length == 0) {
                             println "Remote Name: $newName"
                             def remoteName = newName
                             retrieve moduleNamesFinal, recurse
-                            remote moduleNamesFinal, remoteName
+                            addRemotes moduleNamesFinal, remoteName
                             println "All done retrieving requested modules: $moduleNamesFinal"
                             break
                         } else {
@@ -314,7 +329,7 @@ if (args.length == 0) {
                             String[] checklist = remoteName.split("\\s+")
                             if (checklist.length == 2) {
                                 retrieve moduleNamesFinal, recurse
-                                remote moduleNamesFinal, remoteName.trim()
+                                addRemotes moduleNamesFinal, remoteName.trim()
                                 println "All done retrieving requested modules: $moduleNamesFinal"
                             } else {
                                 println "Please input one remote name only (no spaces)."
@@ -386,25 +401,25 @@ if (args.length == 0) {
             if (args.length == 3) {
                 moduleName = args[1]
                 remoteName = args[2]
-                println "Adding Remote for $moduleName module."
-                remoteAddAuto(moduleName, remoteName)
+                println "Adding Remote for module $moduleName"
+                addRemote(moduleName, remoteName)
             } else if (args.length == 4) {
                 moduleName = args[1]
                 remoteName = args[2]
                 url = args[3]
-                println "Adding Remote for $moduleName module."
-                remoteAdd(moduleName, remoteName, url)
+                println "Adding Remote for module $moduleName"
+                addRemote(moduleName, remoteName, url)
             } else {
                 println "Incorrect Syntax"
                 println "Usage: 'add-remote (module) (name)' - adds a remote (name) to modules/(module) with default URL."
-                println "       'add-remote (module) (name)' - adds a remote to the module with the given URL."
+                println "       'add-remote (module) (name) (url)' - adds a remote to the module with the given URL."
             }
             break
         case "list-remotes":
             if (args.length == 2) {
                 moduleName = args[1]
-                println "Listing Remotes for $moduleName module."
-                remoteList(moduleName)
+                println "Listing Remotes for module $moduleName"
+                listRemotes(moduleName)
             } else {
                 println "Incorrect Syntax"
                 println "Usage: 'list-remotes (module)' - lists all remotes for (module)"
