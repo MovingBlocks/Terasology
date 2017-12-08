@@ -57,7 +57,14 @@ def retrieveModule(String module, boolean recurse) {
     } else {
         println "Retrieving module $module - if it doesn't appear to exist (typo for instance) you'll get an auth prompt (in case it is private)"
         //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
-        Grgit.clone dir: targetDir, uri: "https://github.com/$githubHome/${module}.git"
+        if (githubHome != "Terasology") {
+            println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the Terasology remote as 'origin'"
+            Grgit.clone dir: targetDir, uri: "https://github.com/$githubHome/${module}.git", remote: githubHome
+            addRemote(module, "origin", "https://github.com/Terasology/${module}.git")
+        } else {
+            Grgit.clone dir: targetDir, uri: "https://github.com/$githubHome/${module}.git"
+        }
+
         modulesRetrieved << module
 
         // TODO: Temporary until build.gradle gets removed from module directories (pending Cervator work)
@@ -258,7 +265,6 @@ def printUsage() {
     println ""
     println "Utility script for interacting with modules. Available sub commands:"
     println "- 'get' - retrieves one or more modules in source form (separate with spaces)"
-    println "        - add '-remote [someRemote]' to define an additional remote for the newly cloned module(s). "
     println "- 'recurse' - retrieves the given module(s) *and* their dependencies in source form"
     println "- 'create' - creates a new module"
     println "- 'update' - updates a module (git pulls latest from current origin, if workspace is clean"
@@ -267,7 +273,12 @@ def printUsage() {
     println "- 'add-remote (module) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (module)' - lists all remotes for (module) "
     println ""
+    println "Available flags"
+    println "-remote [someRemote]' to clone from an alternative remote, also adding the Terasology repo as 'origin'"
+    println "       Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties."
+    println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
+    println ""
     println "*NOTE*: Module names are case sensitive"
     println ""
     println "If you omit further arguments beyond the sub command you'll be prompted for details"
@@ -278,8 +289,38 @@ def printUsage() {
     println ""
 }
 
-//For proper fuctionality of get and remote (IGNORE)
-def remote_get_check = "False"
+/**
+ * Considers given arguments for the presence of a custom remote, setting that up right if found, tidying up the arguments.
+ * @param arguments the args passed into the script
+ * @return the adjusted arguments without any found custom remote details and the commmand name itself (get or recurse)
+ */
+def processCustomRemote(String[] arguments) {
+    println "Going to look for and process remotes out of args if present - current: " + arguments
+
+    def remoteArg = arguments.findLastIndexOf { it == "-remote" }
+
+    // If we find the remote arg go ahead and process it then remove the related arguments
+    if (remoteArg != -1) {
+        println "The remote arg was in position $remoteArg and the value is " + arguments[remoteArg]
+
+        // If the user didn't we can tell by simply checking the number of elements vs where "-remote" was
+        if (arguments.length == (remoteArg + 1)) {
+            println "The user didn't supply a remote arg, gotta ask for one"
+            githubHome = getUserString('Enter Name for the Remote (no spaces)')
+            // Drop the "-remote" so the arguments string gets cleaner
+            arguments = arguments.dropRight(1)
+            println "Dropped one arg from arguments which is now: " + arguments
+        } else {
+            githubHome = arguments[remoteArg + 1]
+            // Drop the "-remote" as well as the value the user supplied
+            arguments = arguments.dropRight(2)
+            println "Dropped two args from arguments which is now: " + arguments
+        }
+    }
+
+    println "Done with -remote if it was there, removing the first argument to leave only modules"
+    return arguments.drop(1)
+}
 
 // Main bit of logic handling the entry points to this script - defers actual work to dedicated methods
 //println "Args: $args"
@@ -307,48 +348,11 @@ if (args.length == 0) {
                 println "Now in an array: $moduleList"
                 retrieve moduleList, recurse
             } else {
-                // Check for '-remote' and act accordingly.
-                for (String item : args) {
-                    if (item == "-remote") {
-                        String joint = args.join(" ")
-                        String[] names = joint.split('-remote')
-                        String[] moduleNames = names[0].split("\\s+")
-                        def moduleNamesFinal = moduleNames.drop(1)
-
-                        if (!(names.length == 2)) {
-                            // User did not specify the remote name, so ask for it.
-                            def newName = getUserString('Enter Name for the Remote (no spaces)')
-                            println "Remote Name: $newName"
-                            def remoteName = newName
-                            retrieve moduleNamesFinal, recurse
-                            addRemotes moduleNamesFinal, remoteName
-                            println "All done retrieving requested modules: $moduleNamesFinal"
-                            break
-                        } else {
-                            def remoteName = names[1]
-                            String[] checklist = remoteName.split("\\s+")
-                            if (checklist.length == 2) {
-                                retrieve moduleNamesFinal, recurse
-                                addRemotes moduleNamesFinal, remoteName.trim()
-                                println "All done retrieving requested modules: $moduleNamesFinal"
-                            } else {
-                                println "Please input one remote name only (no spaces)."
-                            }
-                        }
-                        break
-                    }
-                    // If '-remote' not present then check for '/' syntax. LEFT TO BE DONE
-                    for (String item2 : args)
-                        if (item2 == "-remote") {
-                            remote_get_check = "True"
-                        }
-                }
-                //If no '-remote' is specified (normal operation)
-                if (!(remote_get_check == "True")) {
-                    def adjustedArgs = args.drop(1)
-                    println "Retrieving: $adjustedArgs"
-                    retrieve adjustedArgs, recurse
-                }
+                // First see if the user included "-remote" and process that if so. Expect a clean array back
+                println "Before processing custom remote: " + args
+                args = processCustomRemote(args)
+                println "After processing custom remote: " + args
+                retrieve args, recurse
             }
             break
         case "create":
