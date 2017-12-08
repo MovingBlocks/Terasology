@@ -289,8 +289,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     private void addReflectionNodes() {
         FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
-        BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs,
-                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode reflectedBufferClearingNode =
+                new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
 
         Node reflectedBackdropNode = new BackdropReflectionNode(context);
@@ -302,35 +302,33 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     private void addSkyNodes() {
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
-        BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs,
-                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode reflectedRefractedClearingNode =
+                new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
         FBOConfig gBuffer1Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer1")); // TODO: Remove the hard coded value here
         FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
 
-        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs,
-                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        BufferClearingNode lastUpdatedGBufferClearingNode =
+                new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(lastUpdatedGBufferClearingNode, "gBuffer1ClearingNode");
 
-        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs,
-                GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        BufferClearingNode staleGBufferClearingNode =
+                new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(staleGBufferClearingNode, "gBuffer2ClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs1 = context.get(DisplayResolutionDependentFBOs.class);
-
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeIntermediateFbo = displayResolutionDependentFBOs1.request(hazeIntermediateConfig);
+        FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
 
         String label = "hazeIntermediate";
-        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs1.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo, label);
+        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo, label);
         renderGraph.addNode(hazeIntermediateNode, label + "Node");
 
         FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeFinalFbo = displayResolutionDependentFBOs1.request(hazeFinalConfig);
+        FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
 
         label = "hazeFinal";
         HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo, label);
@@ -403,13 +401,13 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
         String label = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs,
-                FBO_16X16_CONFIG, immutableFBOs, label);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels =
+                new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
         renderGraph.addNode(exposureDownSamplerTo16pixels, label + "Node");
 
         label = "downSampling_16x16px_to_8x8px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo8pixels = new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs,
-                FBO_8X8_CONFIG, immutableFBOs, label);
+        DownSamplerForExposureNode exposureDownSamplerTo8pixels =
+                new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, label);
         renderGraph.addNode(exposureDownSamplerTo8pixels, label + "Node");
 
         label = "downSampling_8x8px_to_4x4px_forExposure";
