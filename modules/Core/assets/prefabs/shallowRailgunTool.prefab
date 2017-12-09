@@ -10,14 +10,5 @@
     "TunnelAction": {
         "damageType": "core:NonDestructiveExplosiveDamage",
         "maxDestroyedBlocks": 300
-    },
-    "PlaySoundAction": {
-        "sounds": [
-            "Explode1",
-            "Explode2",
-            "Explode3",
-            "Explode4",
-            "Explode5"
-        ]
     }
 }
