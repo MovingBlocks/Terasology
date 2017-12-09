@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.actions;
 
+import com.google.common.collect.Lists;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,11 +32,15 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+
+import java.util.List;
+import java.util.Optional;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TunnelAction extends BaseComponentSystem {
@@ -50,13 +57,23 @@ public class TunnelAction extends BaseComponentSystem {
     private EntityManager entityManager;
 
     private Random random = new FastRandom();
+    private List<Optional<StaticSound>> explosionSounds = Lists.newArrayList();
 
     @Override
     public void initialise() {
+        explosionSounds.add(Assets.getSound("core:explode1"));
+        explosionSounds.add(Assets.getSound("core:explode2"));
+        explosionSounds.add(Assets.getSound("core:explode3"));
+        explosionSounds.add(Assets.getSound("core:explode4"));
+        explosionSounds.add(Assets.getSound("core:explode5"));
     }
 
     @Override
     public void shutdown() {
+    }
+
+    private StaticSound getRandomExplosionSound() {
+        return explosionSounds.get(random.nextInt(0, explosionSounds.size() - 1)).get();
     }
 
     @ReceiveEvent
@@ -101,6 +118,7 @@ public class TunnelAction extends BaseComponentSystem {
                         }
                         if (random.nextFloat() < tunnelActionComponent.thoroughness) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
+                            blockEntity.send(new PlaySoundEvent(getRandomExplosionSound(), 1.0f));
                             blockEntity.send(new DoDamageEvent(tunnelActionComponent.damageAmount, tunnelActionComponent.damageType));
                         }
 
