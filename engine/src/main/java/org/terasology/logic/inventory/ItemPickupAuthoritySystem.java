@@ -17,6 +17,8 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -44,6 +46,8 @@ import org.terasology.world.block.items.BlockItemComponent;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemPickupAuthoritySystem extends BaseComponentSystem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItemPickupAuthoritySystem.class);
+
     @In
     private EntitySystemLibrary library;
 
@@ -91,6 +95,7 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         BlockFamily blockFamily = blockItemComponent.blockFamily;
 
         if (blockFamily == null) {
+            LOGGER.warn("Prefab " + itemEntity.getParentPrefab().getName() + " does not have a block family");
             return;
         }
 
