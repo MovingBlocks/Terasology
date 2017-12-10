@@ -109,11 +109,11 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
 
 /**
  * Renders the 3D world, including background, overlays and first person/in hand objects. 2D UI elements are dealt with elsewhere.
- *
+ * <p>
  * This implementation includes support for OpenVR, through which HTC Vive and Oculus Rift is supported.
- *
+ * <p>
  * This implementation works closely with a number of support objects, in particular:
- *
+ * <p>
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
@@ -177,18 +177,18 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     /**
      * Instantiates a WorldRenderer implementation.
-     *
+     * <p>
      * This particular implementation works as deferred shader. The scene is rendered multiple times per frame
      * in a number of separate passes (each stored in GPU buffers) and the passes are combined throughout the
      * rendering pipeline to calculate per-pixel lighting and other effects.
-     *
+     * <p>
      * Transparencies are handled through alpha rejection (i.e. ground plants) and alpha-based blending.
      * An exception to this is water, which is handled separately to allow for reflections and refractions, if enabled.
-     *
+     * <p>
      * By the time it is fully instantiated this implementation is already connected to all the support objects
      * it requires and is ready to render via the render(RenderingStage) method.
      *
-     * @param context a context object, to obtain instances of classes such as the rendering config.
+     * @param context    a context object, to obtain instances of classes such as the rendering config.
      * @param bufferPool a GLBufferPool, to be passed to the RenderableWorld instance used by this implementation.
      */
     public WorldRendererImpl(Context context, GLBufferPool bufferPool) {
@@ -212,7 +212,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
                 * in match.
                  */
                 vrProvider.getState().setGroundPlaneYOffset(
-                        GROUND_PLANE_HEIGHT_DISPARITY  - context.get(Config.class).getPlayer().getEyeHeight());
+                        GROUND_PLANE_HEIGHT_DISPARITY - context.get(Config.class).getPlayer().getEyeHeight());
                 currentRenderingStage = RenderingStage.LEFT_EYE;
             } else {
                 playerCamera = new PerspectiveCamera(worldProvider, renderingConfig, context.get(DisplayDevice.class));
@@ -253,32 +253,32 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     private void initRenderGraph() {
-        addShadowMapNodes(renderGraph);
+        addShadowMapNodes();
 
-        addReflectionNodes(renderGraph);
+        addReflectionNodes();
 
-        addSkyNodes(renderGraph);
+        addSkyNodes();
 
-        addWorldRenderingNodes(renderGraph);
+        addWorldRenderingNodes();
 
-        addLightingNodes(renderGraph);
+        addLightingNodes();
 
-        addRefractiveReflectiveNode(renderGraph);
+        addRefractiveReflectiveNode();
 
-        add3dDecorationNodes(renderGraph);
+        add3dDecorationNodes();
 
-        addPrePostProcessingNodes(renderGraph);
+        addPrePostProcessingNodes();
 
-        addPostProcessingNodes(renderGraph);
+        addPostProcessingNodes();
 
-        addOutputNodes(renderGraph);
+        addOutputNodes();
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 
-    private void addShadowMapNodes(RenderGraph renderGraph) {
+    private void addShadowMapNodes() {
         FBOConfig shadowMapConfig = new FBOConfig(ShadowMapNode.SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer();
         BufferClearingNode shadowMapClearingNode = new BufferClearingNode(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
@@ -287,9 +287,10 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
     }
 
-    private void addReflectionNodes(RenderGraph renderGraph) {
+    private void addReflectionNodes() {
         FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
-        BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode reflectedBufferClearingNode =
+                new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
 
         Node reflectedBackdropNode = new BackdropReflectionNode(context);
@@ -299,24 +300,25 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
     }
 
-    private void addSkyNodes(RenderGraph renderGraph) {
+    private void addSkyNodes() {
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
-        BufferClearingNode reflectedRefractedClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode reflectedRefractedClearingNode =
+                new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
 
         FBOConfig gBuffer1Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer1")); // TODO: Remove the hard coded value here
         FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
 
-        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        BufferClearingNode lastUpdatedGBufferClearingNode =
+                new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(lastUpdatedGBufferClearingNode, "gBuffer1ClearingNode");
 
-        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        BufferClearingNode staleGBufferClearingNode =
+                new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         renderGraph.addNode(staleGBufferClearingNode, "gBuffer2ClearingNode");
 
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
-
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
         FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
@@ -333,7 +335,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(hazeFinalNode, label + "Node");
     }
 
-    private void addWorldRenderingNodes(RenderGraph renderGraph) {
+    private void addWorldRenderingNodes() {
         Node opaqueObjectsNode = new OpaqueObjectsNode(context);
         renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
 
@@ -351,7 +353,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
     }
 
-    private void addLightingNodes(RenderGraph renderGraph) {
+    private void addLightingNodes() {
         Node deferredPointLightsNode = new DeferredPointLightsNode(context);
         renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
 
@@ -362,13 +364,13 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
     }
 
-    private void addRefractiveReflectiveNode(RenderGraph renderGraph) {
+    private void addRefractiveReflectiveNode() {
         Node chunksRefractiveReflectiveNode = new RefractiveReflectiveBlocksNode(context);
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
         // TODO: consider having a non-rendering node for FBO.attachDepthBufferTo() methods
     }
 
-    private void add3dDecorationNodes(RenderGraph renderGraph) {
+    private void add3dDecorationNodes() {
         Node outlineNode = new OutlineNode(context);
         renderGraph.addNode(outlineNode, "outlineNode");
 
@@ -379,7 +381,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
     }
 
-    private void addPrePostProcessingNodes(RenderGraph renderGraph) {
+    private void addPrePostProcessingNodes() {
         // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
         // and then it's 2D post-processing all the way to the image shown on the display.
         Node prePostCompositeNode = new PrePostCompositeNode(context);
@@ -389,7 +391,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
     }
 
-    private void addPostProcessingNodes(RenderGraph renderGraph) {
+    private void addPostProcessingNodes() {
         // Post-Processing proper: tone mapping, light shafts, bloom and blur passes
         Node lightShaftsNode = new LightShaftsNode(context);
         renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
@@ -399,11 +401,13 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
         String label = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels =
+                new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
         renderGraph.addNode(exposureDownSamplerTo16pixels, label + "Node");
 
         label = "downSampling_16x16px_to_8x8px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo8pixels = new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, label);
+        DownSamplerForExposureNode exposureDownSamplerTo8pixels =
+                new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, label);
         renderGraph.addNode(exposureDownSamplerTo8pixels, label + "Node");
 
         label = "downSampling_8x8px_to_4x4px_forExposure";
@@ -427,8 +431,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         // Bloom Effect: one high-pass filter and three blur passes
         Node highPassNode = new HighPassNode(context);
         renderGraph.addNode(highPassNode, "highPassNode");
-
-        DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
         FBOConfig halfScaleBloomConfig = new FBOConfig(BloomBlurNode.HALF_SCALE_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO halfScaleBloomFbo = displayResolutionDependentFBOs.request(halfScaleBloomConfig);
@@ -470,7 +472,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
     }
 
-    private void addOutputNodes(RenderGraph renderGraph) {
+    private void addOutputNodes() {
         Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
         renderGraph.addNode(copyToVRFrameBufferNode, "outputToVRFrameBufferNode");
 
@@ -530,7 +532,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         currentRenderingStage = renderingStage;
 
-        if ((currentRenderingStage == RenderingStage.MONO) || (currentRenderingStage == RenderingStage.LEFT_EYE)) {
+        if (currentRenderingStage == RenderingStage.MONO || currentRenderingStage == RenderingStage.LEFT_EYE) {
             isFirstRenderingStageForCurrentFrame = true;
         } else {
             isFirstRenderingStageForCurrentFrame = false;
@@ -569,10 +571,10 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
      * TODO: update javadocs
      * This method triggers the execution of the rendering pipeline and, eventually, sends the output to the display
      * or to a file, when grabbing a screenshot.
-     *
+     * <p>
      * In this particular implementation this method can be called once per frame, when rendering to a standard display,
      * or twice, each time with a different rendering stage, when rendering to the head mounted display.
-     *
+     * <p>
      * PerformanceMonitor.startActivity/endActivity statements are used in this method and in those it executes,
      * to provide statistics regarding the ongoing rendering and its individual steps (i.e. rendering shadows,
      * reflections, 2D filters...).
@@ -701,25 +703,32 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     @Override
-    public void initialise() { }
+    public void initialise() {
+    }
 
     @Override
-    public void preBegin() { }
+    public void preBegin() {
+    }
 
     @Override
-    public void postBegin() { }
+    public void postBegin() {
+    }
 
     @Override
-    public void preSave() { }
+    public void preSave() {
+    }
 
     @Override
-    public void postSave() { }
+    public void postSave() {
+    }
 
     @Override
-    public void shutdown() { }
+    public void shutdown() {
+    }
 
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value = "arguments") final String... arguments) {
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command,
+                               @CommandParam(value = "arguments") final String... arguments) {
         Node node = renderGraph.findNode(new SimpleUri(nodeUri));
         if (node == null) {
             throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));

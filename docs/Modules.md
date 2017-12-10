@@ -17,6 +17,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 *Note about "Tutorial" modules:* These are more likely for some time to be for developers/modders to learn about different kinds of content and systems, not for players to actually learn stuff in-game. That's usually handled by actual content modules including their own in-game help system.
 
 * [AdditionalFruits](https://github.com/Terasology/AdditionalFruits) - container module for more fruits
+* [AdditionalRails](https://github.com/Terasology/AdditionalRails) - container module for more rails
 * [AdditionalVegetables](https://github.com/Terasology/AdditionalVegetables) - container module for more vegetables
 * [AdditionalWorlds](https://github.com/Terasology/AdditionalWorlds) - container module for more worlds
 * [AdvancedBehaviors](https://github.com/Terasology/AdvancedBehaviors) - adds behavior trees and logic for NPCs!
@@ -26,6 +27,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Anatomy](https://github.com/Terasology/Anatomy) - an anatomical system meant to provide an alternative to typical HP only systems
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
+* [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key

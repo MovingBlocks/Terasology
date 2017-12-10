@@ -82,8 +82,6 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     private void render(Iterable<EntityRef> floatingTextEntities) {
-        glDisable(GL_DEPTH_TEST);
-
         Vector3f cameraPosition = camera.getPosition();
 
         for (EntityRef entity : floatingTextEntities) {
@@ -120,6 +118,11 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
                                 shadowColor, underline);
                 entityMeshCache.put(entity, meshMap);
             }
+
+            if (floatingText.isOverlay) {
+                glDisable(GL_DEPTH_TEST);
+            }
+
             glPushMatrix();
 
             float scale = METER_PER_PIXEL * floatingText.scale;
@@ -141,8 +144,12 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
             }
 
             glPopMatrix();
+
+            // Revert to default state
+            if (floatingText.isOverlay) {
+                glEnable(GL_DEPTH_TEST);
+            }
         }
-        glEnable(GL_DEPTH_TEST);
     }
 
     private void diposeMeshMap(Map<Material, Mesh> meshMap) {

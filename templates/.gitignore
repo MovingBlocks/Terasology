@@ -10,4 +10,8 @@ build.gradle
 .project
 .settings
 bin/
+
 build/
+
+# MacOS Specific
+.DS_Store
