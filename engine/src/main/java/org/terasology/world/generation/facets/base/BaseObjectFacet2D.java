@@ -26,11 +26,12 @@ import java.lang.reflect.Array;
 
 /**
  */
-public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements ObjectFacet2D<T> {
+public abstract class BaseObjectFacet2D<T extends U, U> extends BaseFacet2D implements ObjectFacet2D<T> {
 
     private T[] data;
 
-    public BaseObjectFacet2D(Region3i targetRegion, Border3D border, Class<T> objectType) {
+    @SuppressWarnings("unchecked")
+    public BaseObjectFacet2D(Region3i targetRegion, Border3D border, Class<U> objectType) {
         super(targetRegion, border);
         Vector2i size = getRelativeRegion().size();
         this.data = (T[]) Array.newInstance(objectType, size.x * size.y);

@@ -26,7 +26,11 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.SpawnHeightFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.base.OptionalFacet2D;
+
+import java.util.Optional;
 
 public abstract class AbstractSpawner implements Spawner {
 
@@ -48,10 +52,12 @@ public abstract class AbstractSpawner implements Spawner {
         Region worldRegion = world.getWorldData(spawnArea);
 
         // check if generation uses sea level and surface height facets
-        SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-
-        if (surfaceHeightFacet == null) {
-            throw new IllegalStateException("surface height facet not found");
+        OptionalFacet2D spawnHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
+        if (spawnHeightFacet == null) {
+            spawnHeightFacet = worldRegion.getFacet(SpawnHeightFacet.class);
+            if (spawnHeightFacet == null) {
+                throw new IllegalStateException("Surface or spawn height facet not found");
+            }
         }
 
         SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
@@ -60,7 +66,11 @@ public abstract class AbstractSpawner implements Spawner {
         int spiralRad = searchRadius / 2 - 1;
         SpiralIterable spiral = SpiralIterable.clockwise(pos).maxRadius(spiralRad).scale(2).build();
         for (BaseVector2i test : spiral) {
-            float val = surfaceHeightFacet.getWorld(test.getX(), test.getY());
+            Optional<Float> opt = spawnHeightFacet.getOptionalWorld(test.getX(), test.getY());
+            if (!opt.isPresent()) {
+                continue;
+            }
+            float val = opt.get();
             int height = TeraMath.floorToInt(val);
             if (height >= seaLevel) {
                 return new Vector3f(test.getX(), height, test.getY());
@@ -68,7 +78,15 @@ public abstract class AbstractSpawner implements Spawner {
         }
 
         // nothing above sea level found
-        float y = surfaceHeightFacet.getWorld(pos.getX(), pos.getY());
-        return new Vector3f(pos.getX(), y, pos.getY());
+        for (BaseVector2i test : spiral) {
+            Optional<Float> opt = spawnHeightFacet.getOptionalWorld(test.getX(), test.getY());
+            if (!opt.isPresent()) {
+                continue;
+            }
+            float val = opt.get();
+            return new Vector3f(test.getX(), TeraMath.floorToInt(val), test.getY());
+        }
+
+        throw new IllegalStateException("No valid spawn locations");
     }
 }

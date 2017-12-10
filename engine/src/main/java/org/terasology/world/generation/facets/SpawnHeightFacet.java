@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,18 @@ package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
 import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
+import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
 import org.terasology.world.generation.facets.base.OptionalFacet2D;
 
 import java.util.Optional;
 
-/**
- */
-public class SurfaceHeightFacet extends BaseFieldFacet2D implements OptionalFacet2D {
-    public SurfaceHeightFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border);
+public class SpawnHeightFacet extends BaseObjectFacet2D<Optional<Float>, Optional> implements OptionalFacet2D {
+    public SpawnHeightFacet(Region3i region, Border3D border) {
+        super(region, border, Optional.class);
     }
 
     @Override
     public Optional<Float> getOptionalWorld(int x, int y) {
-        return Optional.of(getWorld(x, y));
+        return getWorld(x, y);
     }
 }

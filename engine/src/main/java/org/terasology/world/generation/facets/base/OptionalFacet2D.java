@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.facets;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import java.util.Optional;
 
-/**
- */
-public class BiomeFacet extends BaseObjectFacet2D<Biome, Biome> {
-    public BiomeFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border, Biome.class);
-    }
+public interface OptionalFacet2D {
+    Optional<Float> getOptionalWorld(int x, int y);
 }
