@@ -21,8 +21,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.typeEntity.BlockTypeEntityGenerator;
 
-/**
- */
 public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
 
     private final Context context;

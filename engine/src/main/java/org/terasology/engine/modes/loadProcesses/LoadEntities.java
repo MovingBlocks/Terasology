@@ -25,8 +25,6 @@ import org.terasology.persistence.StorageManager;
 
 import java.io.IOException;
 
-/**
- */
 public class LoadEntities extends SingleStepLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadEntities.class);
