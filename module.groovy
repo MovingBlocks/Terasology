@@ -39,6 +39,21 @@ def getUserString(String prompt) {
 }
 
 /**
+ * Tests a URL via a HEAD request (no body) to see if it is valid
+ * @param url the URL to test
+ * @return boolean indicating whether the URL is valid (code 200) or not
+ */
+boolean isUrlValid(String url) {
+    def code = new URL(url).openConnection().with {
+        requestMethod = 'HEAD'
+        connect()
+        responseCode
+    }
+    println "Response code for $url is: " + code
+    return code.toString() == "200"
+}
+
+/**
  * Primary entry point for retrieving modules, kicks off recursively if needed.
  * @param modules the modules we want to retrieve
  * @param recurse whether to also retrieve dependencies of the desired modules
@@ -46,7 +61,7 @@ def getUserString(String prompt) {
 def retrieve(String[] modules, boolean recurse) {
     println "Now inside retrieve, user (recursively? $recurse) wants: $modules"
     for (String module : modules) {
-        println "Starting loop for module $module, are we recursing? $recurse"
+        println "Starting retrieval for module $module, are we recursing? $recurse"
         println "Modules retrieved so far: $modulesRetrieved"
         retrieveModule(module, recurse)
         //println "Modules retrieved after recent addition(s): modulesRetrieved"
@@ -68,17 +83,26 @@ def retrieveModule(String module, boolean recurse) {
     } else if (modulesRetrieved.contains(module)) {
         println "We already retrieved $module - skipping"
     } else {
-        println "Retrieving module $module - if it doesn't appear to exist (typo for instance) you'll get an auth prompt (in case it is private)"
-        //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
+        // Immediately note the given module as retrieved, since if any failure occurs we don't want to retry
+        modulesRetrieved << module
+        def targetUrl = "https://github.com/$githubHome/${module}"
+        if (!isUrlValid(targetUrl)) {
+            println "Can't retrieve module from $targetUrl - URL appears invalid. Typo? Not created yet?"
+            return
+        }
+        println "Retrieving module $module from $targetUrl"
+
+        // Prepare to clone the target repo, adding a secondary remote if it isn't already hosted under the Terasology org
         if (githubHome != "Terasology") {
             println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the Terasology remote as 'origin'"
-            Grgit.clone dir: targetDir, uri: "https://github.com/$githubHome/${module}.git", remote: githubHome
+            //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
+            Grgit.clone dir: targetDir, uri: targetUrl, remote: githubHome
+            println "Primary clone operation complete, about to add the 'origin' remote"
             addRemote(module, "origin", "https://github.com/Terasology/${module}.git")
         } else {
-            Grgit.clone dir: targetDir, uri: "https://github.com/$githubHome/${module}.git"
+            //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
+            Grgit.clone dir: targetDir, uri: targetUrl
         }
-
-        modulesRetrieved << module
 
         // TODO: Temporary until build.gradle gets removed from module directories (pending Cervator work)
         File targetBuildGradle = new File(targetDir, 'build.gradle')
@@ -253,8 +277,13 @@ def addRemote(String moduleName, String remoteName, String URL) {
     def remote = remoteGit.remote.list()
     def check = remote.find { it.name == "$remoteName" }
     if (!check) {
-        remoteGit.remote.add(name: "$remoteName", url: "$URL")
-        println "Successfully added remote $remoteName for $moduleName"
+        if (isUrlValid(URL)) {
+            remoteGit.remote.add(name: "$remoteName", url: "$URL")
+            println "Successfully added remote $remoteName for $moduleName - doing a 'git fetch'"
+            remoteGit.fetch remote: remoteName
+        } else {
+            println "Unable to add remote '$remoteName' - URL $URL failed a test lookup. Typo? Not created yet?"
+        }
     } else {
         println "Remote already exists"
     }
