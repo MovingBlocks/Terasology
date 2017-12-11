@@ -23,6 +23,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AdvancedBehaviors](https://github.com/Terasology/AdvancedBehaviors) - adds behavior trees and logic for NPCs!
 * [AdventureAssets](https://github.com/Terasology/AdventureAssets) - a set of assets for adventure time!
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
+* [AlchemyPlantGenerator](https://github.com/Terasology/AlchemyPlantGenerator) - a world plugin that'll seed the plants used by Alchemy into a given plugin-capable world
 * [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
 * [Anatomy](https://github.com/Terasology/Anatomy) - an anatomical system meant to provide an alternative to typical HP only systems
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
@@ -44,6 +45,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [ClimateConditions](https://github.com/Terasology/ClimateConditions) - A library module for managing temperature, humidity, and other climate factors
 * [CombatSystem](https://github.com/Terasology/CombatSystem) - an advanced physics-based combat system
 * [CommonWorld](https://github.com/Terasology/CommonWorld) - general world generation utility module
+* [Compass](https://github.com/Terasology/Compass) - a simple compass
 * [ComputerMonitors](https://github.com/Terasology/ComputerMonitors) - allows for the creation of functional multi-block monitors in-game - ModularComputers puts them to work!
 * [Cooking](https://github.com/Terasology/Cooking) - cook stuff!
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
