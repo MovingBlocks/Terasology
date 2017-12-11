@@ -144,7 +144,7 @@ tasks.addRule("Pattern: fetchMeta<ID>") { String taskName ->
 
             // Repo name is the dynamic part of the task name
             def repo = (taskName - 'fetchMeta')
-            def parentDir = 'meta'
+            def parentDir = 'metas'
 
             // Default GitHub account to use. Supply with -PgithubMetaAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MetaTerasology'
@@ -185,7 +185,7 @@ tasks.addRule("Pattern: createMeta<ID>") { String taskName ->
 
             // Repo name is the dynamic part of the task name + "Meta" appended in the case of meta-modules
             def repo = (taskName - 'createMeta')
-            def parentDir = 'meta'
+            def parentDir = 'metas'
 
             // Default GitHub account to use. Supply with -PgithubMetaAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MetaTerasology'
