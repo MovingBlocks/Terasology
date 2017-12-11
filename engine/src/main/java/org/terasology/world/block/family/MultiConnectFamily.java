@@ -56,12 +56,25 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
 
     protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
     
+    /**
+     * Constructor for a block with a specified shape
+     * 
+     * @param definition Family definition
+     * @param shape The shape of the block
+     * @param blockBuilder The builder to make the blocks for the family
+     */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
         this.setBlockUri(new BlockUri(definition.getUrn()));
         this.setCategory(definition.getCategories());
     }
 
+    /**
+     * Constructor for a regular block
+     * 
+     * @param definition Family definition
+     * @param blockBuilder The builder to make the blocks for the family
+     */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         this.setBlockUri(new BlockUri(definition.getUrn()));
@@ -70,23 +83,41 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     }
 
     /**
-     * A condition that identifies which sides are valid to connect to
-     * @param blockLocation
-     * @param connectSide
-     * @return
+     * A condition to return true if the block should have a connection on the given side
+     * 
+     * @param blockLocation The position of the block in question
+     * @param connectSide The side to determine connection for
+     * 
+     * @return A boolean indicating if the block should connect on the given side
      */
     protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
 
     /**
-     * Sides that are valid to connect to using SideBitFlag
-     * @return
+     * The sides of the block that can be connected to.
+     * Example: In a family like RomanColumn, this method only returns SideBitFlag.getSides(Side.TOP, Side.BOTTOM)
+     * because a column should only connect on the top and bottom.
+     * Example 2: In the signalling module, this returns all of the possible sides because a cable can connect in any direction.
+     * 
+     * @return The sides of the block that can be connected to
      */
     public abstract byte getConnectionSides();
 
+    /**
+     * @return Which block should be shown in the player's inventory. The "default" block.
+     */
     @Override
     public abstract Block getArchetypeBlock();
 
-
+    /**
+     * 
+     * @param root The root block URI of the family
+     * @param definition The definition of the block family as passed down from the engine
+     * @param blockBuilder The block builder to make the blocks in the family
+     * @param name The name of the section of the block to be registered, ex: "no_connections"
+     * @param sides A byte representing the sides which should be connected for this block
+     * @param rotations All of the ways the block should be rotated
+     * @return All of the rotations possible for the block with the given sides
+     */
     public Set<Block> registerBlock(BlockUri root,BlockFamilyDefinition definition,final BlockBuilderHelper blockBuilder,String name,byte sides,Iterable<Rotation> rotations){
         Set<Block> result = Sets.newLinkedHashSet();
         for(Rotation rotation: rotations)
@@ -105,7 +136,16 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return result;
     }
 
-
+    /**
+     * Using the location of the block, the side the block is being attached to and the direction the block is being placed in,
+     * determine what block should be placed.
+     * 
+     * @param location The location of where the block will be placed
+     * @param attachmentSide The side that the new block is being placed on
+     * @param direction The direction the block is being placed in
+     * 
+     * @return The block from the family to be placed
+     */
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
@@ -117,6 +157,15 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return blocks.get(connections);
     }
 
+    /**
+     * Update the block then a neighbor changes
+     * 
+     * @param location The location of the block
+     * @param What the block was before the neighbor updated
+     * 
+     * @return The block from the family to be placed
+     */
+    @Override
     public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
@@ -127,7 +176,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return blocks.get(connections);
     }
 
-
+    /**
+     * @return A block from the family for a given URI
+     */
     @Override
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
@@ -142,6 +193,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return null;
     }
 
+    /**
+     * @return An iterable of the registered blocks
+     */
     @Override
     public Iterable<Block> getBlocks() {
         return blocks.valueCollection();
