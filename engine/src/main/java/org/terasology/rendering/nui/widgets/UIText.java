@@ -63,16 +63,6 @@ public class UIText extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 
     private static final float BLINK_RATE = 0.25f;
-    /** The text contained by the text box. */
-    @LayoutConfig
-    protected Binding<String> text = new DefaultBinding<>("");
-
-    /* The placeholder hint text. */
-    @LayoutConfig
-    private String hintText = "";
-
-    /* Whether the box is currently showing the hint text. */
-    private boolean isShowingHintText = true;
 
     /** Whether the content needs to be displayed on multiple lines. */
     @LayoutConfig
@@ -81,9 +71,6 @@ public class UIText extends CoreWidget {
     /** Whether the text box is read-only. */
     @LayoutConfig
     protected boolean readOnly;
-
-    @LayoutConfig
-    private boolean passwordMode;
 
     /** The position of the cursor in the text box. */
     protected int cursorPosition;
@@ -108,6 +95,10 @@ public class UIText extends CoreWidget {
 
     /** The number of characters between the start of the text in the widget and the current position of the cursor. */
     protected int offset;
+
+    /** The text contained by the text box. */
+    @LayoutConfig
+    protected Binding<String> text = new DefaultBinding<>("");
 
     /**
      * The interaction listener of the widget. This handles how the widget reacts to different stimuli from the user.
@@ -158,6 +149,16 @@ public class UIText extends CoreWidget {
             }
         }
     };
+
+    /* The placeholder hint text. */
+    @LayoutConfig
+    private String hintText = "";
+
+    /* Whether the box is currently showing the hint text. */
+    private boolean isShowingHintText = true;
+
+    @LayoutConfig
+    private boolean passwordMode;
 
     private float blinkCounter;
 

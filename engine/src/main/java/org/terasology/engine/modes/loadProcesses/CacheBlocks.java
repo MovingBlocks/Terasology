@@ -22,8 +22,6 @@ import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Iterator;
 
-/**
- */
 public class CacheBlocks extends StepBasedLoadProcess {
 
     private final Context context;

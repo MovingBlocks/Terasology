@@ -70,7 +70,6 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.REFRACTI
  */
 public class RefractiveReflectiveBlocksNode extends AbstractNode implements PropertyChangeListener {
     public static final SimpleUri REFRACTIVE_REFLECTIVE_FBO_URI = new SimpleUri("engine:fbo.sceneReflectiveRefractive");
-    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     // TODO: rename to more meaningful/precise variable names, like waveAmplitude or waveHeight.
     @SuppressWarnings("FieldCanBeLocal")
@@ -94,6 +93,8 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 5.0f)
     public static float waterOffsetY;
+
+    private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
     
     private RenderQueuesHelper renderQueues;
     private WorldRenderer worldRenderer;

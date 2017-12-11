@@ -48,7 +48,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
     private RenderingConfig renderingConfig;
     private ScreenGrabber screenGrabber;
 
-    private boolean wasTakingScreenshotLastFrame = false;
+    private boolean wasTakingScreenshotLastFrame;
 
     public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
