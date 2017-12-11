@@ -92,8 +92,8 @@ def retrieveModule(String module, boolean recurse) {
             println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the Terasology remote as 'origin'"
             //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
             Grgit.clone dir: targetDir, uri: targetUrl, remote: githubHome
-            println "Primary clone operation complete, about to add the 'origin' remote"
-            addRemote(module, "origin", "https://github.com/Terasology/${module}.git")
+            println "Primary clone operation complete, about to add the 'origin' remote for the Terasology org address"
+            addRemote(module, "origin", "https://github.com/Terasology/${module}")
         } else {
             //noinspection GroovyAssignabilityCheck - GrGit has its own .clone but a warning gets issued for Object.clone
             Grgit.clone dir: targetDir, uri: targetUrl
@@ -272,12 +272,14 @@ def addRemote(String moduleName, String remoteName, String url) {
     def remote = remoteGit.remote.list()
     def check = remote.find { it.name == "$remoteName" }
     if (!check) {
+        // Always add the remote whether it exists or not
+        remoteGit.remote.add(name: "$remoteName", url: "$url")
+        // But then do a validation check to advise the user and do a fetch if it is valid
         if (isUrlValid(url)) {
-            remoteGit.remote.add(name: "$remoteName", url: "$url")
-            println "Successfully added remote $remoteName for $moduleName - doing a 'git fetch'"
+            println "Successfully added remote '$remoteName' for '$moduleName' - doing a 'git fetch'"
             remoteGit.fetch remote: remoteName
         } else {
-            println "Unable to add remote '$remoteName' - URL $url failed a test lookup. Typo? Not created yet?"
+            println "Added the remote '$remoteName' for module '$moduleName' - but the URL $url failed a test lookup. Typo? Not created yet?"
         }
     } else {
         println "Remote already exists"
