@@ -12,12 +12,9 @@ Properties properties = new Properties()
 new File("gradle.properties").withInputStream {
     properties.load(it)
 }
-//println "Properties: " + properties
 
 // Groovy Elvis operator woo! Defaults to "Terasology" if an override isn't set
 githubHome = properties.alternativeGithubHome ?: "Terasology"
-
-//println "githubHome is: $githubHome"
 
 // For keeping a list of modules retrieved so far
 modulesRetrieved = []
@@ -49,7 +46,6 @@ boolean isUrlValid(String url) {
         connect()
         responseCode
     }
-    println "Response code for $url is: " + code
     return code.toString() == "200"
 }
 
@@ -64,7 +60,6 @@ def retrieve(String[] modules, boolean recurse) {
         println "Starting retrieval for module $module, are we recursing? $recurse"
         println "Modules retrieved so far: $modulesRetrieved"
         retrieveModule(module, recurse)
-        //println "Modules retrieved after recent addition(s): modulesRetrieved"
     }
 }
 
@@ -267,7 +262,7 @@ def addRemote(String moduleName, String remoteName) {
  * @param URL address to the remote Git repo
  */
 
-def addRemote(String moduleName, String remoteName, String URL) {
+def addRemote(String moduleName, String remoteName, String url) {
     File targetModule = new File("modules/$moduleName")
     if (!targetModule.exists()) {
         println "Module '$moduleName' not found. Typo? Or run 'groovyw module get $moduleName' first"
@@ -277,16 +272,40 @@ def addRemote(String moduleName, String remoteName, String URL) {
     def remote = remoteGit.remote.list()
     def check = remote.find { it.name == "$remoteName" }
     if (!check) {
-        if (isUrlValid(URL)) {
-            remoteGit.remote.add(name: "$remoteName", url: "$URL")
+        if (isUrlValid(url)) {
+            remoteGit.remote.add(name: "$remoteName", url: "$url")
             println "Successfully added remote $remoteName for $moduleName - doing a 'git fetch'"
             remoteGit.fetch remote: remoteName
         } else {
-            println "Unable to add remote '$remoteName' - URL $URL failed a test lookup. Typo? Not created yet?"
+            println "Unable to add remote '$remoteName' - URL $url failed a test lookup. Typo? Not created yet?"
         }
     } else {
         println "Remote already exists"
     }
+}
+
+/**
+ * Considers given arguments for the presence of a custom remote, setting that up right if found, tidying up the arguments.
+ * @param arguments the args passed into the script
+ * @return the adjusted arguments without any found custom remote details and the commmand name itself (get or recurse)
+ */
+def processCustomRemote(String[] arguments) {
+    def remoteArg = arguments.findLastIndexOf { it == "-remote" }
+
+    // If we find the remote arg go ahead and process it then remove the related arguments
+    if (remoteArg != -1) {
+        // If the user didn't we can tell by simply checking the number of elements vs where "-remote" was
+        if (arguments.length == (remoteArg + 1)) {
+            githubHome = getUserString('Enter Name for the Remote (no spaces)')
+            // Drop the "-remote" so the arguments string gets cleaner
+            arguments = arguments.dropRight(1)
+        } else {
+            githubHome = arguments[remoteArg + 1]
+            // Drop the "-remote" as well as the value the user supplied
+            arguments = arguments.dropRight(2)
+        }
+    }
+    return arguments.drop(1)
 }
 
 /**
@@ -320,39 +339,6 @@ def printUsage() {
     println ""
 }
 
-/**
- * Considers given arguments for the presence of a custom remote, setting that up right if found, tidying up the arguments.
- * @param arguments the args passed into the script
- * @return the adjusted arguments without any found custom remote details and the commmand name itself (get or recurse)
- */
-def processCustomRemote(String[] arguments) {
-    println "Going to look for and process remotes out of args if present - current: " + arguments
-
-    def remoteArg = arguments.findLastIndexOf { it == "-remote" }
-
-    // If we find the remote arg go ahead and process it then remove the related arguments
-    if (remoteArg != -1) {
-        println "The remote arg was in position $remoteArg and the value is " + arguments[remoteArg]
-
-        // If the user didn't we can tell by simply checking the number of elements vs where "-remote" was
-        if (arguments.length == (remoteArg + 1)) {
-            println "The user didn't supply a remote arg, gotta ask for one"
-            githubHome = getUserString('Enter Name for the Remote (no spaces)')
-            // Drop the "-remote" so the arguments string gets cleaner
-            arguments = arguments.dropRight(1)
-            println "Dropped one arg from arguments which is now: " + arguments
-        } else {
-            githubHome = arguments[remoteArg + 1]
-            // Drop the "-remote" as well as the value the user supplied
-            arguments = arguments.dropRight(2)
-            println "Dropped two args from arguments which is now: " + arguments
-        }
-    }
-
-    println "Done with -remote if it was there, removing the first argument to leave only modules"
-    return arguments.drop(1)
-}
-
 // Main bit of logic handling the entry points to this script - defers actual work to dedicated methods
 //println "Args: $args"
 if (args.length == 0) {
@@ -376,13 +362,10 @@ if (args.length == 0) {
                 println "User wants: $moduleString"
                 // Split it on whitespace
                 String[] moduleList = moduleString.split("\\s+")
-                println "Now in an array: $moduleList"
                 retrieve moduleList, recurse
             } else {
                 // First see if the user included "-remote" and process that if so. Expect a clean array back
-                println "Before processing custom remote: " + args
                 args = processCustomRemote(args)
-                println "After processing custom remote: " + args
                 retrieve args, recurse
             }
             break
