@@ -24,11 +24,10 @@ import org.terasology.engine.SimpleUri;
 public interface FlexibleConfigManager {
     /**
      * Adds the given {@link FlexibleConfig} to this manager.
-     * This method throws a RuntimeException if a FlexibleConfig with the given id already exists.
      *
      * @param configId A SimpleUri that effectively becomes the id of the config.
      * @param config The config that is to be added.
-     * @throws RuntimeException
+     * @throws RuntimeException if a FlexibleConfig with the given id already exists.
      */
     void addConfig(SimpleUri configId, FlexibleConfig config) throws RuntimeException;
 
@@ -44,7 +43,7 @@ public interface FlexibleConfigManager {
      * Retrieves the config associated with the given id.
      *
      * @param configId The id of the config to retrieve.
-     * @return The config associated with the given id.
+     * @return The config associated with the given id, or null if no config is associated with the given id.
      */
     FlexibleConfig getConfig(SimpleUri configId);
 
