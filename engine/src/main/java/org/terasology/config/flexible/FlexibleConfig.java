@@ -80,10 +80,12 @@ public interface FlexibleConfig {
     /**
      * Loads the values of the settings having non-default values, to enable persistence across sessions.
      *
-     * All the non-default values are loaded and "parked" till the actual setting is added to the config,
-     * and which point they are "unparked" and parsed, replacing the default value of the setting.
+     * All the non-default values are loaded and "parked", initially remaining inaccessible. 
+     * Once a Setting object is added to the config, a corresponding non-default value is sought 
+     * among the parked values. If one is found it is parsed and stored in the Setting object.
      *
-     * Note that this function should be called before adding any settings to the FlexibleConfig.
+     * Note that this function should be called -before- adding any settings to the FlexibleConfig. 
+     * Otherwise any corresponding parked value will never be loaded.
      *
      * @param reader A reader that will serve as the source of the settings.
      */
