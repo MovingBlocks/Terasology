@@ -19,7 +19,7 @@ import org.terasology.engine.SimpleUri;
 
 /**
  * Stores multiple {@link FlexibleConfig} instances that can be retrieved using their id.
- * Also responsible for overseeing their serialization - to and from - disk.
+ * Also responsible for coordinating their serialization - to and from - disk.
  */
 public interface FlexibleConfigManager {
     /**
