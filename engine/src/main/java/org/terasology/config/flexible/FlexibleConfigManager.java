@@ -36,7 +36,7 @@ public interface FlexibleConfigManager {
      * Removes the config associated with the given id, and returns it.
      *
      * @param configId The id of the config to remove.
-     * @return The config associated with the given id, and null if no config is associated with the given id.
+     * @return The config associated with the given id, or null if no config is associated with the given id.
      */
     FlexibleConfig removeConfig(SimpleUri configId);
 
