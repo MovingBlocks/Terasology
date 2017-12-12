@@ -15,9 +15,7 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import gnu.trove.iterator.TByteObjectIterator;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.slf4j.Logger;
@@ -36,160 +34,118 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-@BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
+/**
+ * Multi-Connect family describes a block family that will connect to other neighboring blocks.
+ *
+ * examples:
+ * - Rail Segments
+ * - Cables
+ * - Fence
+ */
 public abstract class MultiConnectFamily extends AbstractBlockFamily implements UpdatesWithNeighboursFamily {
-    public static final String NO_CONNECTIONS = "no_connections";
-    public static final String ONE_CONNECTION = "one_connection";
-    public static final String TWO_CONNECTIONS_LINE = "line_connection";
-    public static final String TWO_CONNECTIONS_CORNER = "2d_corner";
-    public static final String THREE_CONNECTIONS_CORNER = "3d_corner";
-    public static final String THREE_CONNECTIONS_T = "2d_t";
-    public static final String FOUR_CONNECTIONS_CROSS = "cross";
-    public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
-    public static final String FIVE_CONNECTIONS = "five_connections";
-    public static final String SIX_CONNECTIONS = "all";
-    
+    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
+
     @In
     protected WorldProvider worldProvider;
     
     @In
     protected BlockEntityRegistry blockEntityRegistry;
+
+    protected TByteObjectMap<Block> blocks = new TByteObjectHashMap<>();
     
-    private static final Logger logger = LoggerFactory.getLogger(FreeformFamily.class);
-    private Block archetypeBlock;
-    private TByteObjectMap<Block> blocks;
-    
-    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
-            .put(NO_CONNECTIONS, (byte) 0)
-            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
-
-            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
-            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
-
-            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
-            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
-
-            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
-            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
-
-            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
-            .put(SIX_CONNECTIONS, (byte) 63)
-            .build();
-    
+    /**
+     * Constructor for a block with a specified shape
+     * 
+     * @param definition Family definition
+     * @param shape The shape of the block
+     * @param blockBuilder The builder to make the blocks for the family
+     */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-    }
-
-    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
-        TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
-        blocks = new TByteObjectHashMap<>();
-
-        this.registerConnections(basicBlocks);
-
-        BlockUri blockUri = new BlockUri(definition.getUrn());
-
-        // Now make sure we have all combinations based on the basic set (above) and rotations
-        for (byte connections = 0; connections < 64; connections++) {
-            // Only the allowed connections should be created
-            if ((connections & getConnectionSides()) == connections) {
-                Block block = constructBlockForConnections(connections, blockBuilder, definition, basicBlocks);
-                if (block == null) {
-                    throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
-                }
-                block.setUri(new BlockUri(blockUri, new Name(String.valueOf(connections))));
-                block.setBlockFamily(this);
-                blocks.put(connections, block);
-            }
-        }
-        this.archetypeBlock = blocks.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
-        this.setBlockUri(blockUri);
+        this.setBlockUri(new BlockUri(definition.getUrn()));
         this.setCategory(definition.getCategories());
     }
 
-    public byte getConnectionSides() {
-        return 64;
+    /**
+     * Constructor for a regular block
+     * 
+     * @param definition Family definition
+     * @param blockBuilder The builder to make the blocks for the family
+     */
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+        this.setBlockUri(new BlockUri(definition.getUrn()));
+        this.setCategory(definition.getCategories());
+
     }
 
+    /**
+     * A condition to return true if the block should have a connection on the given side
+     * 
+     * @param blockLocation The position of the block in question
+     * @param connectSide The side to determine connection for
+     * 
+     * @return A boolean indicating if the block should connect on the given side
+     */
+    protected abstract boolean connectionCondition(Vector3i blockLocation, Side connectSide);
 
-    protected void registerConnections(TByteObjectMap<String>[] basicBlocks) {
-        addConnections(basicBlocks, 0, NO_CONNECTIONS);
-        addConnections(basicBlocks, 1, ONE_CONNECTION);
-        addConnections(basicBlocks, 2, TWO_CONNECTIONS_LINE);
-        addConnections(basicBlocks, 2, TWO_CONNECTIONS_CORNER);
-        addConnections(basicBlocks, 3, THREE_CONNECTIONS_CORNER);
-        addConnections(basicBlocks, 3, THREE_CONNECTIONS_T);
-        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_CROSS);
-        addConnections(basicBlocks, 4, FOUR_CONNECTIONS_SIDE);
-        addConnections(basicBlocks, 5, FIVE_CONNECTIONS);
-        addConnections(basicBlocks, 6, SIX_CONNECTIONS);
-    }
+    /**
+     * The sides of the block that can be connected to.
+     * Example: In a family like RomanColumn, this method only returns SideBitFlag.getSides(Side.TOP, Side.BOTTOM)
+     * because a column should only connect on the top and bottom.
+     * Example 2: In the signalling module, this returns all of the possible sides because a cable can connect in any direction.
+     * 
+     * @return The sides of the block that can be connected to
+     */
+    public abstract byte getConnectionSides();
 
-
-    public boolean horizontalOnly() {
-        return false;
-    }
-
-    public Map<String, Byte> getShapeMapping() {
-        return DEFAULT_SHAPE_MAPPING;
-    }
-
-    private void addConnections(TByteObjectMap<String>[] basicBlocks, int index, String connections) {
-        if (basicBlocks[index] == null) {
-            basicBlocks[index] = new TByteObjectHashMap<>();
-        }
-        Byte val = getShapeMapping().get(connections);
-        if (val != null) {
-            basicBlocks[index].put(getShapeMapping().get(connections), connections);
-        }
-    }
-
-
-    private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
-                                               BlockFamilyDefinition definition, TByteObjectMap<String>[] basicBlocks) {
-        int connectionCount = SideBitFlag.getSides(connections).size();
-        TByteObjectMap<String> possibleBlockDefinitions = basicBlocks[connectionCount];
-        final TByteObjectIterator<String> blockDefinitionIterator = possibleBlockDefinitions.iterator();
-        while (blockDefinitionIterator.hasNext()) {
-            blockDefinitionIterator.advance();
-            final byte originalConnections = blockDefinitionIterator.key();
-            final String section = blockDefinitionIterator.value();
-            Rotation rot = getRotationToAchieve(originalConnections, connections);
-            if (rot != null) {
-                return blockBuilder.constructTransformedBlock(definition, section, rot);
-            }
-        }
-        return null;
-    }
-
-    private Rotation getRotationToAchieve(byte source, byte target) {
-        Collection<Side> originalSides = SideBitFlag.getSides(source);
-
-        Iterable<Rotation> rotations = horizontalOnly() ? Rotation.horizontalRotations() : Rotation.values();
-        for (Rotation rot : rotations) {
-            Set<Side> transformedSides = Sets.newHashSet();
-            transformedSides.addAll(originalSides.stream().map(rot::rotate).collect(Collectors.toList()));
-
-            byte transformedSide = SideBitFlag.getSides(transformedSides);
-            if (transformedSide == target) {
-                return rot;
-            }
-        }
-        return null;
-    }
-
-
+    /**
+     * @return Which block should be shown in the player's inventory. The "default" block.
+     */
     @Override
-    public Block getArchetypeBlock() {
-        return archetypeBlock;
+    public abstract Block getArchetypeBlock();
+
+    /**
+     * 
+     * @param root The root block URI of the family
+     * @param definition The definition of the block family as passed down from the engine
+     * @param blockBuilder The block builder to make the blocks in the family
+     * @param name The name of the section of the block to be registered, ex: "no_connections"
+     * @param sides A byte representing the sides which should be connected for this block
+     * @param rotations All of the ways the block should be rotated
+     * @return All of the rotations possible for the block with the given sides
+     */
+    public Set<Block> registerBlock(BlockUri root,BlockFamilyDefinition definition,final BlockBuilderHelper blockBuilder,String name,byte sides,Iterable<Rotation> rotations){
+        Set<Block> result = Sets.newLinkedHashSet();
+        for(Rotation rotation: rotations)
+        {
+            byte sideBits = 0;
+            for(Side side : SideBitFlag.getSides(sides)){
+                sideBits += SideBitFlag.getSide(rotation.rotate(side));
+            }
+            Block block = blockBuilder.constructTransformedBlock(definition,name,rotation);
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(root,new Name(String.valueOf(sideBits))));
+
+            blocks.put(sideBits,block);
+            result.add(block);
+        }
+        return result;
     }
 
+    /**
+     * Using the location of the block, the side the block is being attached to and the direction the block is being placed in,
+     * determine what block should be placed.
+     * 
+     * @param location The location of where the block will be placed
+     * @param attachmentSide The side that the new block is being placed on
+     * @param direction The direction the block is being placed in
+     * 
+     * @return The block from the family to be placed
+     */
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
@@ -201,6 +157,15 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return blocks.get(connections);
     }
 
+    /**
+     * Update the block then a neighbor changes
+     * 
+     * @param location The location of the block
+     * @param What the block was before the neighbor updated
+     * 
+     * @return The block from the family to be placed
+     */
+    @Override
     public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
@@ -211,10 +176,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return blocks.get(connections);
     }
 
-    protected boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
-        return false;
-    }
-
+    /**
+     * @return A block from the family for a given URI
+     */
     @Override
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
@@ -229,6 +193,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return null;
     }
 
+    /**
+     * @return An iterable of the registered blocks
+     */
     @Override
     public Iterable<Block> getBlocks() {
         return blocks.valueCollection();
