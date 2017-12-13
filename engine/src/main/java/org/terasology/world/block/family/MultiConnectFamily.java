@@ -65,8 +65,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-        this.setBlockUri(new BlockUri(definition.getUrn()));
-        this.setCategory(definition.getCategories());
     }
 
     /**
@@ -77,9 +75,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      */
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
-        this.setBlockUri(new BlockUri(definition.getUrn()));
-        this.setCategory(definition.getCategories());
-
     }
 
     /**
@@ -118,19 +113,16 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @param rotations All of the ways the block should be rotated
      * @return All of the rotations possible for the block with the given sides
      */
-    public Set<Block> registerBlock(BlockUri root,BlockFamilyDefinition definition,final BlockBuilderHelper blockBuilder,String name,byte sides,Iterable<Rotation> rotations){
+    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder, String name, byte sides, Iterable<Rotation> rotations) {
         Set<Block> result = Sets.newLinkedHashSet();
-        for(Rotation rotation: rotations)
-        {
+        for (Rotation rotation: rotations) {
             byte sideBits = 0;
-            for(Side side : SideBitFlag.getSides(sides)){
+            for (Side side : SideBitFlag.getSides(sides)) {
                 sideBits += SideBitFlag.getSide(rotation.rotate(side));
             }
-            Block block = blockBuilder.constructTransformedBlock(definition,name,rotation);
-            block.setBlockFamily(this);
-            block.setUri(new BlockUri(root,new Name(String.valueOf(sideBits))));
+            Block block = blockBuilder.constructTransformedBlock(definition, name, rotation, new BlockUri(root, new Name(String.valueOf(sideBits))), this);
 
-            blocks.put(sideBits,block);
+            blocks.put(sideBits, block);
             result.add(block);
         }
         return result;
@@ -161,7 +153,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * Update the block then a neighbor changes
      * 
      * @param location The location of the block
-     * @param What the block was before the neighbor updated
+     * @param oldBlock What the block was before the neighbor updated
      * 
      * @return The block from the family to be placed
      */

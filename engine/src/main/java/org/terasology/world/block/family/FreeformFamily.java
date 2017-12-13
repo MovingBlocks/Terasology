@@ -54,24 +54,19 @@ public class FreeformFamily extends AbstractBlockFamily {
             uri = new BlockUri(definition.getUrn(), shape.getUrn());
         }
         if (shape.isCollisionYawSymmetric()) {
-            block = blockBuilder.constructSimpleBlock(definition, shape);
-            block.setBlockFamily(this);
-            block.setUri(uri);
+            block = blockBuilder.constructSimpleBlock(definition, shape, uri, this);
         } else {
             for (Rotation rot : Rotation.horizontalRotations()) {
                 Side side = rot.rotate(Side.FRONT);
-                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
+                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot, new BlockUri(uri, new Name(side.name())), this);
                 if (block == null) {
                     throw new IllegalArgumentException("Missing block for side: " + side.toString());
                 }
-                block.setBlockFamily(this);
-                block.setUri(new BlockUri(uri, new Name(side.name())));
                 blocks.put(side, block);
             }
         }
 
-        this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
+        setBlockUri(uri);
     }
 
     public FreeformFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {

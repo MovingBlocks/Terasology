@@ -29,8 +29,6 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- */
 @RegisterBlockFamily("attachedToSurface")
 @BlockSections({"front", "left", "right", "back", "top", "bottom"})
 @MultiSections({
@@ -53,18 +51,19 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (definition.getData().hasSection("top")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "top");
+            Block block = blockBuilder.constructSimpleBlock(definition, "top", new BlockUri(definition.getUrn(), new Name(Side.TOP.name())), this);
             block.setDirection(Side.TOP);
             blockMap.put(Side.TOP, block);
         }
         if (definition.getData().hasSection("front")) {
             for (Rotation rot : Rotation.horizontalRotations()) {
                 Side side = rot.rotate(Side.FRONT);
-                blockMap.put(side, blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot));
+                blockMap.put(side, blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot,
+                        new BlockUri(definition.getUrn(), new Name(side.name())), this));
             }
         }
         if (definition.getData().hasSection("bottom")) {
-            Block block = blockBuilder.constructSimpleBlock(definition, "bottom");
+            Block block = blockBuilder.constructSimpleBlock(definition, "bottom", new BlockUri(definition.getUrn(), new Name(Side.BOTTOM.name())), this);
             block.setDirection(Side.BOTTOM);
             blockMap.put(Side.BOTTOM, block);
         }
@@ -73,8 +72,6 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
             Block block = blockMap.get(side);
             if (block != null) {
                 blocks.put(side, block);
-                block.setBlockFamily(this);
-                block.setUri(new BlockUri(definition.getUrn(), new Name(side.name())));
             }
         }
         if (blocks.containsKey(Side.TOP)) {
@@ -82,8 +79,6 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         } else {
             archetype = blocks.get(Side.FRONT);
         }
-        setBlockUri(new BlockUri(definition.getUrn()));
-        setCategory(definition.getCategories());
     }
 
     @Override
