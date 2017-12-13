@@ -31,19 +31,23 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     private Set<String> categories = Sets.newHashSet();
 
     protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        setBlockUri(new BlockUri(definition.getUrn()));
+        setCategory(definition.getCategories());
     }
 
-    protected AbstractBlockFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
+    protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        setBlockUri(new BlockUri(definition.getUrn()));
+        setCategory(definition.getCategories());
     }
 
-    protected void setCategory(Iterable<String> categories) {
-        for (String category : categories) {
+    protected void setCategory(Iterable<String> newCategories) {
+        for (String category : newCategories) {
             this.categories.add(category.toLowerCase(Locale.ENGLISH));
         }
     }
 
-    protected void setBlockUri(BlockUri uri) {
-        this.uri = uri;
+    protected void setBlockUri(BlockUri newUri) {
+        uri = newUri;
     }
 
 
