@@ -34,7 +34,7 @@ public class InputConfig {
     }
 
     public void reset() {
-        Config defaultConfig = new Config();
+        Config defaultConfig = new Config(null);
         defaultConfig.loadDefaults();
         InputConfig defaultInputConfig = defaultConfig.getInput();
 
