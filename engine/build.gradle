@@ -3,6 +3,7 @@
 // Get the gradle versioneye plugin from the plugins.gradle.org repo
 plugins {
     id "org.standardout.versioneye" version "1.1.0"
+    id "net.ltgt.errorprone" version "0.0.13"
 }
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
