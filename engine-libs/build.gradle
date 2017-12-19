@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
+    }
+}
+
+subprojects {
+    apply from: "$rootDir/config/gradle/artifactory.gradle"
+    apply plugin: 'java'
+    apply plugin: 'info.solidsoft.pitest'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+
+        // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
+        maven {
+            url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+        }
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.13.0'
+    }
+
+    pitest {
+        threads = 4
+
+        failWhenNoMutations = false
+        outputFormats = ['XML', 'HTML']
+        mutationThreshold = 90
+        coverageThreshold = 95
+    }
+
+    build.dependsOn "pitest"
+}

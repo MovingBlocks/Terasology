@@ -39,6 +39,7 @@ facades/PC/PC.iml
 facades/TeraEd/TeraEd.iml
 engine/engine.iml
 engine-tests/engine-tests.iml
+engine-libs/entity-system/entity-system.iml
 /*.iml
 /*.ipr
 /*.iws
