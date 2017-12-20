@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
+
 public class NetworkConfig {
 
     private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", TerasologyConstants.DEFAULT_PORT));
@@ -73,14 +72,14 @@ public class NetworkConfig {
     }
 
     public String getServerMOTD() {
-        try{
+        try {
             StringBuffer mOTD = new StringBuffer();
 
             FileReader reader = new FileReader("motd.md");
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             String line;
-            while((line = bufferedReader.readLine()) != null){
+            while ((line = bufferedReader.readLine()) != null) {
                 mOTD.append(line);
             }
 
@@ -88,8 +87,7 @@ public class NetworkConfig {
 
             return serverMOTD;
 
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             return serverMOTD;
         }
     }

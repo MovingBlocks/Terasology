@@ -15638,33 +15638,18 @@ public final class NetData {
      * <code>optional string MOTD = 19;</code>
      */
     public java.lang.String getMOTD() {
-      try{
-        StringBuffer mOTD = new StringBuffer();
 
-        FileReader reader = new FileReader("motd.md");
-        BufferedReader bufferedReader = new BufferedReader(reader);
-
-        String line;
-        while((line = bufferedReader.readLine()) != null){
-          mOTD.append(line);
+      java.lang.Object ref = mOTD_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          mOTD_ = s;
         }
-
-        return mOTD.toString();
-
-      }
-      catch(IOException e) {
-        java.lang.Object ref = mOTD_;
-        if (ref instanceof java.lang.String) {
-          return (java.lang.String) ref;
-        } else {
-          com.google.protobuf.ByteString bs =
-                  (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            mOTD_ = s;
-          }
-          return s;
-        }
+        return s;
       }
     }
     /**
