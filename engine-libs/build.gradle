@@ -11,6 +11,7 @@ subprojects {
     apply from: "$rootDir/config/gradle/artifactory.gradle"
     apply plugin: 'java'
     apply plugin: 'info.solidsoft.pitest'
+    apply plugin: 'checkstyle'
 
     repositories {
         jcenter()
@@ -24,6 +25,7 @@ subprojects {
 
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'org.assertj', name: 'assertj-core', version: '1.0.0'
         testCompile group: 'org.mockito', name: 'mockito-core', version: '2.13.0'
     }
 
@@ -34,6 +36,11 @@ subprojects {
         outputFormats = ['XML', 'HTML']
         mutationThreshold = 90
         coverageThreshold = 95
+    }
+
+    checkstyle {
+        ignoreFailures = false
+        configFile = new File(rootDir, 'engine-libs/checkstyle.xml')
     }
 
     build.dependsOn "pitest"
