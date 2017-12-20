@@ -15,27 +15,15 @@
  */
 package org.terasology.entitySystem;
 
-/**
- */
 public interface ComponentContainer {
 
-    /**
-     * @param component
-     * @return If this has a component of the given type
-     */
     boolean hasComponent(Class<? extends Component> component);
 
     /**
-     * @param componentClass
-     * @param <T>
+     * @param componentClass The component class
      * @return The requested component, or null if the this doesn't have a component of this type
      */
     <T extends Component> T getComponent(Class<T> componentClass);
 
-    /**
-     * Iterates over all the components this entity has
-     *
-     * @return
-     */
     Iterable<Component> iterateComponents();
 }
