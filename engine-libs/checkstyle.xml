@@ -12,6 +12,7 @@
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile">
          <property name="fileExtensions" value="java,gradle,xml,txt,prefab"/>
+        <property name="lineSeparator" value="lf_cr_crlf"/>
     </module>
 
     <!-- Checks that there are no tab characters ('\t') in the source code. -->
@@ -26,29 +27,29 @@
     <!-- ***************** --> 
     <!-- Checks that a source file begins with a specified header. --> 
     <module name="RegexpHeader">
-        <property name="severity" value="warning"/>
-        <property name="header" value="/*\n * Copyright 20\\d\\d MovingBlocks\n *\n * Licensed under the Apache License, Version 2.0"/>
+        <property name="severity" value="error"/>
+        <property name="header" value="/*\n * Copyright 20\d\d MovingBlocks\n *\n * Licensed under the Apache License, Version 2.0"/>
         <property name="fileExtensions" value="java"/>
     </module>
   
     <!-- Disallow author names and auto-generated tags -->
     <!-- TODO: replace with proper JavaDoc checks as soon as they work properly. See checkstyle#952 -->
     <module name="RegexpSingleline">
-        <property name="severity" value="warning"/>
+        <property name="severity" value="error"/>
         <property name="format" value="Created with"/>
         <property name="ignoreCase" value="true"/>
         <property name="fileExtensions" value="java"/>
         <property name="message" value="Auto-generated message 'Created With' is not allowed"/>
     </module>
     <module name="RegexpSingleline">
-        <property name="severity" value="warning"/>
+        <property name="severity" value="error"/>
         <property name="format" value="Created by"/>
         <property name="ignoreCase" value="true"/>
         <property name="fileExtensions" value="java"/>
         <property name="message" value="Auto-generated message 'Created By' is not allowed"/>
     </module>
     <module name="RegexpSingleline">
-        <property name="severity" value="warning"/>
+        <property name="severity" value="error"/>
         <property name="format" value="^\s*\*\s*@author"/>
         <property name="fileExtensions" value="java"/>
         <property name="message" value="Author tags are not allowed"/>
@@ -56,7 +57,7 @@
     
     <!-- Disallow empty JavaDoc -->
     <module name="RegexpMultiline">
-        <property name="severity" value="warning" />
+        <property name="severity" value="error" />
         <property name="format" value="(\/\*\*)(\s|\*)*(\*\/)" />
         <property name="fileExtensions" value="java" />
         <property name="message" value="Empty JavaDoc" />
@@ -103,7 +104,7 @@
         <!-- Checks that there are no import statements that use the * notation. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#AvoidStarImport -->
         <module name="AvoidStarImport">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
             <!-- allow starred static member imports -->
             <property name="allowStaticMemberImports" value="true"/>
             <property name="excludes" value="java.awt,javax.swing"/>
@@ -111,12 +112,12 @@
         <!-- Checks for redundant import statements. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->
         <module name="RedundantImport">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks for unused import statements. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#UnusedImports -->
         <module name="UnusedImports">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks for banned packages, sun.* by default. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#IllegalImport -->
@@ -126,7 +127,7 @@
         <!-- See http://checkstyle.sourceforge.net/config_sizes.html -->
         <!-- ************************** -->
         <module name="LineLength">        
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
             <property name="max" value="175"/>
         </module>
         <!-- Checks for the number of types declared at the outer (or root) level in a file. -->
@@ -137,44 +138,44 @@
         <!-- ********************** -->
         <!-- Checks the padding of an empty for iterator; that is whether a space is required at an empty for iterator, or such spaces are forbidden. -->
         <module name="EmptyForIteratorPad">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks the padding between the identifier of a method definition, constructor definition, method call, or constructor invocation; and the left parenthesis of the parameter list. -->
         <module name="MethodParamPad">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks that there is no whitespace after a token. -->
         <module name="NoWhitespaceAfter">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks that there is no whitespace before a token. -->
         <module name="NoWhitespaceBefore">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks line wrapping for operators. -->
         <module name="OperatorWrap">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
             <property name="tokens" value="BAND,BOR,BSR,BXOR,COLON,DIV,EQUAL,GE,GT,LAND,LE,LITERAL_INSTANCEOF,LOR,LT,MINUS,MOD,NOT_EQUAL,QUESTION,SL,SR,STAR"/>
         </module>
         <!-- Checks that the whitespace around the Generic tokens < and > is correct to the typical convention. -->
         <module name="GenericWhitespace">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks the policy on the padding of parentheses. -->
         <module name="ParenPad">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks the policy on the padding of parentheses for typecasts. -->
         <module name="TypecastParenPad">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks that a token is followed by whitespace. -->
         <module name="WhitespaceAfter">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks that a token is surrounded by whitespace. -->
         <module name="WhitespaceAround">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
             <!-- We skip RCURLY because a false positive when it appears in annotations -->
             <property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN"/>
         </module>
@@ -188,7 +189,7 @@
         <!-- Checks for redundant modifiers -->
         <!-- See http://checkstyle.sourceforge.net/config_modifier.html#RedundantModifier -->
         <module name="RedundantModifier">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
 
         <!-- Checks for blocks -->
@@ -197,13 +198,13 @@
         <!-- Finds nested blocks, i.e. blocks that are used freely in the code. -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#AvoidNestedBlocks -->
         <module name="AvoidNestedBlocks">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
             <property name="allowInSwitchCase" value="true"/>
         </module>
         <!-- Checks for empty blocks. -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#EmptyBlock -->
         <module name="EmptyBlock">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks for the placement of left curly braces ('{') for code blocks. Default: eol -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#LeftCurly -->
@@ -235,33 +236,33 @@
         <module name="ModifiedControlVariable"/>
         <!-- Checks for overly complicated boolean expressions. -->
         <module name="SimplifyBooleanExpression">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks for overly complicated boolean return statements. -->
         <module name="SimplifyBooleanReturn">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks that string literals are not used with == or !=.  -->
         <module name="StringLiteralEquality"/>
         <!-- This check can be used to ensure that types are not declared to be thrown. Declaring to throw java.lang.Error or java.lang.RuntimeException is almost never acceptable. -->
         <module name="IllegalThrows">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Ensure a class is has a package declaration, and (optionally) whether the package name matches the directory name for the source file. -->
         <module name="PackageDeclaration"/>
         <!-- Checks that particular class are never used as types in variable declarations, return values or parameters. Includes a pattern check that by default disallows abstract classes. -->
         <module name="IllegalType">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks for the order of the parts of a class. -->
         <module name="DeclarationOrder">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Disallow assignment of parameters. -->
         <module name="ParameterAssignment"/>
         <!-- Checks if any class or object member explicitly initialized to default for its type value. -->
         <module name="ExplicitInitialization">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Check that the default is after all the cases in a switch statement. -->
         <module name="DefaultComesLast"/>
@@ -278,26 +279,26 @@
         <!-- Checks visibility of class members. Only static final members may be public. -->
         <!--
         <module name="VisibilityModifier">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         -->
         <!-- Checks that a class which has only private constructors is declared as final. -->
         <module name="FinalClass">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Make sure that utility classes (classes that contain only static methods or fields in their API) do not have a public constructor. -->
         <module name="HideUtilityClassConstructor">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Use Interfaces only to define types. -->
         <module name="InterfaceIsType">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Ensures that exceptions are immutable. -->
         <module name="MutableException"/>
         <!-- Check nested (internal) classes/interfaces are declared at the bottom of the class after all method and field declarations. -->
         <module name="InnerTypeLast">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
 
         <!-- Miscellaneous other checks -->
@@ -306,7 +307,7 @@
         <!-- Checks the style of array type definitions. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#ArrayTypeStyle -->
         <module name="ArrayTypeStyle">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Checks correct indentation of Java Code. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#Indentation -->
@@ -326,15 +327,15 @@
         <!-- ********************** -->
         <!-- This check controls the style with the usage of annotations. -->
         <module name="AnnotationUseStyle">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Verifies that both the java.lang.Deprecated annotation is present and the @deprecated Javadoc tag is present when either is present. -->
         <module name="MissingDeprecated">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
         <!-- Verifies that the java.lang.Override annotation is present when the {@inheritDoc} javadoc tag is present. -->
         <module name="MissingOverride">
-            <property name="severity" value="warning"/>
+            <property name="severity" value="error"/>
         </module>
     </module>
 </module>
