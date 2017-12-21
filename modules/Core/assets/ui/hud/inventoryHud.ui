@@ -78,6 +78,21 @@
                     "position-horizontal-center": {},
                     "position-vertical-center": {}
                 }
+            },
+            {
+                "type": "UIText",
+                "id": "toolTipText",
+                "text-align-horizontal": "center",
+                "text": "",
+                "layoutInfo": {
+                    "width": 150,
+                    "position-bottom": {
+                        "offset": -400
+                    },
+                    "position-right": {
+                        "offset": 50
+                    }
+                }
             }
         ]
     }

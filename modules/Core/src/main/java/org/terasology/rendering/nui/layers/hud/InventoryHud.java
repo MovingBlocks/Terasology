@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 package org.terasology.rendering.nui.layers.hud;
+import java.lang.*;
 
+import org.lwjgl.Sys;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
+import org.terasology.rendering.nui.widgets.UIText;
 
 public class InventoryHud extends CoreHudWidget {
 
@@ -32,6 +36,7 @@ public class InventoryHud extends CoreHudWidget {
     private Time time;
 
     private UICrosshair crosshair;
+    private UIText toolTipText;
 
     @Override
     public void initialise() {
@@ -44,8 +49,9 @@ public class InventoryHud extends CoreHudWidget {
                 }
             });
         }
-
         crosshair = find("crosshair", UICrosshair.class);
+        toolTipText = find("toolTipText", UIText.class);
+        toolTipText.bindText(new CurrentSlotItem(localPlayer));
     }
 
     public void setChargeAmount(float amount) {
@@ -67,6 +73,23 @@ public class InventoryHud extends CoreHudWidget {
         public Boolean get() {
             SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             return component != null && component.slot == slot;
+        }
+    }
+
+    public class CurrentSlotItem extends ReadOnlyBinding<String> {
+        private LocalPlayer localPlayer;
+
+        private CurrentSlotItem (LocalPlayer localPlayer) {
+            this.localPlayer = localPlayer;
+        }
+        @Override
+        public String get() {
+            SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
+            for (InventoryCell cell : findAll(InventoryCell.class)) {
+                if (cell.getTargetItem().getComponent(DisplayNameComponent.class) != null && cell.getTargetSlot() == component.slot)
+                    return cell.getTargetItem().getComponent(DisplayNameComponent.class).name;
+            }
+            return "";
         }
     }
 }
