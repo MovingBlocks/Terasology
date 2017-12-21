@@ -67,7 +67,6 @@ def retrieveLib(String lib) {
         targetBuildGradle.delete()
         targetBuildGradle << new File('templates/build.gradle').text
         }
-    }
 }
 
 def createLib(String libName) {
