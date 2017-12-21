@@ -140,9 +140,7 @@ if (args.length == 0) {
                 name = getUserString("Enter library name: ")
             }
             println "User wants to create a library named: $name"
-
             createLib(name)
-
             println "Created library named $name"
             break
         default:
