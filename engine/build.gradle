@@ -89,7 +89,7 @@ configurations.all {
 dependencies {
 
     // engine libs
-    project(':engine-libs:entity-system')
+    compile project(':engine-libs:entity-system')
 
     // Storage and networking
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
