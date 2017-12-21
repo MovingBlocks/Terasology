@@ -46,13 +46,13 @@ public interface FieldSerializeCheck<T> extends DeserializeFieldCheck {
      */
      final class NullCheck<T> implements FieldSerializeCheck<T> {
 
-        private static final NullCheck INSTANCE = new NullCheck();
+        private static final FieldSerializeCheck.NullCheck INSTANCE = new FieldSerializeCheck.NullCheck();
 
         private NullCheck() {
         }
 
         @SuppressWarnings("unchecked")
-        public static <T> NullCheck<T> newInstance() {
+        public static <T> FieldSerializeCheck.NullCheck<T> newInstance() {
             return INSTANCE;
         }
 
