@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 package org.terasology.rendering.nui.layers.hud;
-import java.lang.*;
 
-import org.lwjgl.Sys;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -49,6 +47,7 @@ public class InventoryHud extends CoreHudWidget {
                 }
             });
         }
+
         crosshair = find("crosshair", UICrosshair.class);
         toolTipText = find("toolTipText", UIText.class);
         toolTipText.bindText(new CurrentSlotItem(localPlayer));

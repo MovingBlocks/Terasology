@@ -82,7 +82,6 @@
             {
                 "type": "UIText",
                 "id": "toolTipText",
-                "text-align-horizontal": "center",
                 "text": "",
                 "layoutInfo": {
                     "width": 150,
