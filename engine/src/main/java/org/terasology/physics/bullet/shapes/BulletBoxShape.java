@@ -16,8 +16,6 @@
 package org.terasology.physics.bullet.shapes;
 
 import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.linearmath.Transform;
-import org.terasology.math.AABB;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -27,13 +25,21 @@ public class BulletBoxShape extends BulletCollisionShape implements org.terasolo
     private final BoxShape boxShape;
 
     public BulletBoxShape(Vector3f halfExtents) {
-        boxShape = new BoxShape(VecMath.to(halfExtents));
+        this(VecMath.to(halfExtents));
+    }
+
+    private BulletBoxShape(javax.vecmath.Vector3f halfExtents) {
+        boxShape = new BoxShape(halfExtents);
         underlyingShape = boxShape;
     }
 
     @Override
     public CollisionShape rotate(Quat4f rot) {
-        return null;
+        javax.vecmath.Vector3f halfExtentsWithMargin =
+                boxShape.getHalfExtentsWithMargin(new javax.vecmath.Vector3f());
+        com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), halfExtentsWithMargin, halfExtentsWithMargin);
+        halfExtentsWithMargin.absolute();
+        return new BulletBoxShape(halfExtentsWithMargin);
     }
 
     @Override
