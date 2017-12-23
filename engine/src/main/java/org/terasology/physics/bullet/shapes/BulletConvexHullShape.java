@@ -39,8 +39,17 @@ public class BulletConvexHullShape extends BulletCollisionShape implements org.t
         underlyingShape = convexHullShape;
     }
 
+    private BulletConvexHullShape(ObjectArrayList<javax.vecmath.Vector3f> vertexList) {
+        convexHullShape = new ConvexHullShape(vertexList);
+        underlyingShape = convexHullShape;
+    }
+
     @Override
     public CollisionShape rotate(Quat4f rot) {
-        return null;
+        ObjectArrayList<javax.vecmath.Vector3f> transformedVerts = new ObjectArrayList<>();
+        for (javax.vecmath.Vector3f vert : convexHullShape.getPoints()) {
+            transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));
+        }
+        return new BulletConvexHullShape(transformedVerts);
     }
 }
