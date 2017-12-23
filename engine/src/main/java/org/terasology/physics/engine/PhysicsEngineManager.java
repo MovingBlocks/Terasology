@@ -15,6 +15,7 @@
  */
 package org.terasology.physics.engine;
 
+import com.bulletphysics.BulletGlobals;
 import org.terasology.context.Context;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
@@ -23,6 +24,7 @@ import org.terasology.world.WorldProvider;
 
 public final class PhysicsEngineManager {
     public static final CollisionShapeFactory COLLISION_SHAPE_FACTORY = new BulletCollisionShapeFactory();
+    public static final float EPSILON = BulletGlobals.SIMD_EPSILON;
 
     public static PhysicsEngine getNewPhysicsEngine(Context context) {
         return new BulletPhysics(context.get(WorldProvider.class));
