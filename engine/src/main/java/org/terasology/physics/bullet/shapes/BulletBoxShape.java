@@ -35,4 +35,10 @@ public class BulletBoxShape extends BulletCollisionShape implements org.terasolo
     public CollisionShape rotate(Quat4f rot) {
         return null;
     }
+
+    @Override
+    public Vector3f getHalfExtentsWithoutMargin(Vector3f vector3f) {
+        javax.vecmath.Vector3f out = new javax.vecmath.Vector3f();
+        return VecMath.from(boxShape.getHalfExtentsWithoutMargin(out));
+    }
 }

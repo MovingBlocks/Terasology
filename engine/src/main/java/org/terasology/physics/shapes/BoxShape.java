@@ -15,5 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
+import org.terasology.math.geom.Vector3f;
+
 public interface BoxShape extends CollisionShape {
+    Vector3f getHalfExtentsWithoutMargin(Vector3f vector3f);
 }

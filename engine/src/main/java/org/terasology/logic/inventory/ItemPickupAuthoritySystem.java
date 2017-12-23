@@ -16,6 +16,7 @@
 
 package org.terasology.logic.inventory;
 
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.shapes.BoxShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,12 +101,12 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         }
 
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape) {
-            javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());
+            Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new Vector3f());
             extents.scale(2.0f);
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
-            boxShapeComponent.extents.set(VecMath.from(extents));
+            boxShapeComponent.extents.set(extents);
             itemEntity.saveComponent(boxShapeComponent);
         }
     }
