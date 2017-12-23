@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.shapes;
+package org.terasology.math;
 
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
-public abstract class CollisionShape {
-    public abstract AABB getAABB(Transform transform);
+public class Transform {
+    public final Vector3f origin;
+    public final Quat4f rotation;
+    public float scale;
 
-    public abstract CollisionShape rotate(Quat4f rot);
+    public Transform(Vector3f origin, Quat4f rotation, float scale) {
+        this.origin = origin;
+        this.rotation = rotation;
+        this.scale = scale;
+    }
 }

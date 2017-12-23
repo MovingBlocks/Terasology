@@ -15,8 +15,9 @@
  */
 package org.terasology.world.block;
 
+import org.terasology.math.Transform;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
 
 import org.terasology.utilities.Assets;
@@ -26,7 +27,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.math.geom.Vector4f;
@@ -623,7 +623,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        bounds = shape.getAABB();
+        bounds = shape.getAABB(new Transform(offset, new Quat4f(0, 0, 0, 1), 1.0f));
     }
 
     public CollisionShape getCollisionShape() {
