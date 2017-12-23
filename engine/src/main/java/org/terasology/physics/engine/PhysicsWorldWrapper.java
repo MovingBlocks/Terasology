@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
@@ -74,8 +75,8 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         }
 
         @Override
-        public CollisionShape getCollisionShape() {
-            return shape;
+        public com.bulletphysics.collision.shapes.CollisionShape getCollisionShape() {
+            return ((BulletCollisionShape) shape).underlyingShape;
         }
 
         @Override
