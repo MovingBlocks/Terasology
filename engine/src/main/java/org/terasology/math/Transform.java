@@ -15,6 +15,7 @@
  */
 package org.terasology.math;
 
+import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -27,5 +28,19 @@ public class Transform {
         this.origin = origin;
         this.rotation = rotation;
         this.scale = scale;
+    }
+
+    public Matrix3f getBasis() {
+        Matrix3f basis = new Matrix3f();
+
+        basis.set(rotation);
+        basis.mul(scale);
+
+        return basis;
+    }
+
+    public void transform(Vector3f v) {
+        getBasis().transform(v);
+        v.add(origin);
     }
 }

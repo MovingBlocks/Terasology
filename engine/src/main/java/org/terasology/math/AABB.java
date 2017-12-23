@@ -166,9 +166,7 @@ public final class AABB {
         localCenter.add(min);
         localCenter.mul(0.5f);
 
-        Matrix3f absBasis = new Matrix3f();
-        absBasis.set(transform.rotation);
-        absBasis.mul(transform.scale);
+        Matrix3f absBasis = transform.getBasis();
 
         absBasis.m00 = Math.abs(absBasis.m00);
         absBasis.m01 = Math.abs(absBasis.m01);
