@@ -63,6 +63,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.engine.CharacterCollider;
@@ -73,6 +74,7 @@ import org.terasology.physics.engine.PhysicsWorldWrapper;
 import org.terasology.physics.engine.RigidBody;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CollisionShapeFactory;
 import org.terasology.physics.shapes.CylinderShapeComponent;
 import org.terasology.physics.shapes.HullShapeComponent;
 import org.terasology.physics.shapes.SphereShapeComponent;
@@ -102,6 +104,8 @@ public class BulletPhysics implements PhysicsEngine {
 
     private final Deque<RigidBodyRequest> insertionQueue = Lists.newLinkedList();
     private final Deque<BulletRigidBody> removalQueue = Lists.newLinkedList();
+
+    private final BulletCollisionShapeFactory collisionShapeFactory = new BulletCollisionShapeFactory();
 
     private final CollisionDispatcher dispatcher;
     private final BroadphaseInterface broadphase;
@@ -439,6 +443,11 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public float getEpsilon() {
         return BulletGlobals.SIMD_EPSILON;
+    }
+
+    @Override
+    public CollisionShapeFactory getCollisionShapeFactory() {
+        return collisionShapeFactory;
     }
 
     //*******************Private helper methods**************************\\

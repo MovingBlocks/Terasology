@@ -15,5 +15,5 @@
  */
 package org.terasology.physics.shapes;
 
-public abstract class ConvexHullShape extends CollisionShape {
+public interface ConvexHullShape extends CollisionShape {
 }

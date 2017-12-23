@@ -13,14 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.shapes;
+package org.terasology.physics.bullet.shapes;
 
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.linearmath.Transform;
 import org.terasology.math.AABB;
-import org.terasology.math.Transform;
+import org.terasology.math.VecMath;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.physics.shapes.CollisionShape;
 
-public interface CollisionShape {
-    AABB getAABB(Transform transform);
+public class BulletBoxShape extends BulletCollisionShape implements org.terasology.physics.shapes.BoxShape {
+    private final BoxShape boxShape;
 
-    CollisionShape rotate(Quat4f rot);
+    public BulletBoxShape(Vector3f halfExtents) {
+        boxShape = new BoxShape(VecMath.to(halfExtents));
+        underlyingShape = boxShape;
+    }
+
+    @Override
+    public CollisionShape rotate(Quat4f rot) {
+        return null;
+    }
 }

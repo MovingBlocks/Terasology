@@ -15,5 +15,5 @@
  */
 package org.terasology.physics.shapes;
 
-public abstract class SphereShape extends CollisionShape {
+public interface SphereShape extends CollisionShape {
 }

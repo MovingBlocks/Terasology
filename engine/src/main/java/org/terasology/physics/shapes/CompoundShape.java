@@ -15,8 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
-import com.bulletphysics.linearmath.Transform;
+import org.terasology.math.Transform;
 
-public abstract class CompoundShape extends CollisionShape {
-    public abstract void addChildShape(Transform transform, CollisionShape collisionShape);
+public interface CompoundShape extends CollisionShape {
+    void addChildShape(Transform transform, CollisionShape collisionShape);
 }

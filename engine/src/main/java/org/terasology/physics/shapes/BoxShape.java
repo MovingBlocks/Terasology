@@ -15,5 +15,5 @@
  */
 package org.terasology.physics.shapes;
 
-public abstract class BoxShape extends CollisionShape {
+public interface BoxShape extends CollisionShape {
 }

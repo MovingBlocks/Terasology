@@ -16,7 +16,6 @@
 
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -34,6 +33,7 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
+import org.terasology.math.Transform;
 import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
@@ -213,7 +213,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             CompoundShape collisionShape = physicsEngine.getCollisionShapeFactory().compoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
+                Transform transform = new Transform(collider.offset, Rotation.none().getQuat4f(), 1.0f);
                 collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);

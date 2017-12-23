@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.shapes;
+package org.terasology.physics.bullet.shapes;
 
-import org.terasology.math.AABB;
-import org.terasology.math.Transform;
+import com.bulletphysics.collision.shapes.SphereShape;
 import org.terasology.math.geom.Quat4f;
+import org.terasology.physics.shapes.CollisionShape;
 
-public interface CollisionShape {
-    AABB getAABB(Transform transform);
+public class BulletSphereShape extends BulletCollisionShape implements org.terasology.physics.shapes.SphereShape {
+    private final SphereShape sphereShape;
 
-    CollisionShape rotate(Quat4f rot);
+    public BulletSphereShape(float radius) {
+        sphereShape = new SphereShape(radius);
+        underlyingShape = sphereShape;
+    }
+
+    @Override
+    public CollisionShape rotate(Quat4f rot) {
+        return null;
+    }
 }
