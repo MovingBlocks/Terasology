@@ -19,13 +19,26 @@ import com.bulletphysics.BulletGlobals;
 import org.terasology.context.Context;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.physics.bullet.shapes.BulletCollisionShapeFactory;
+import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CollisionShapeFactory;
 import org.terasology.world.WorldProvider;
 
+/**
+ * Centralizes the various components of the physics engine. To change the physics engine used, this class
+ * should ideally be the only one modified.
+ */
 public final class PhysicsEngineManager {
+    /**
+     * The {@link CollisionShapeFactory} that can be used to create a {@link CollisionShape}.
+     */
     public static final CollisionShapeFactory COLLISION_SHAPE_FACTORY = new BulletCollisionShapeFactory();
     public static final float EPSILON = BulletGlobals.SIMD_EPSILON;
 
+    /**
+     * Create a new {@link PhysicsEngine} instance.
+     * @param context
+     * @return
+     */
     public static PhysicsEngine getNewPhysicsEngine(Context context) {
         return new BulletPhysics(context.get(WorldProvider.class));
     }
