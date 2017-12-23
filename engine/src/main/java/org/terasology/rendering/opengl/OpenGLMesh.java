@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.opengl;
 
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
@@ -33,6 +32,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
+import org.terasology.math.Transform;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
@@ -187,7 +188,7 @@ public class OpenGLMesh extends Mesh {
         int n = 0;
         int c = 0;
         for (int v = 0; v < data.getVertices().size(); v += VERTEX_SIZE) {
-            javax.vecmath.Vector3f vert = new javax.vecmath.Vector3f(data.getVertices().get(v), data.getVertices().get(v + 1), data.getVertices().get(v + 2));
+            Vector3f vert = new Vector3f(data.getVertices().get(v), data.getVertices().get(v + 1), data.getVertices().get(v + 2));
             transform.transform(vert);
             vertexData.add(vert.x);
             vertexData.add(vert.y);
@@ -198,7 +199,7 @@ public class OpenGLMesh extends Mesh {
             for (int i = 0; i < TEX_COORD_1_SIZE; ++i) {
                 vertexData.add(data.getTexCoord1().get(uv2 + i));
             }
-            javax.vecmath.Vector3f norm = new javax.vecmath.Vector3f(data.getNormals().get(n), data.getNormals().get(n + 1), data.getNormals().get(n + 2));
+            Vector3f norm = new Vector3f(data.getNormals().get(n), data.getNormals().get(n + 1), data.getNormals().get(n + 2));
             normalTransform.transform(norm);
             vertexData.add(norm.x);
             vertexData.add(norm.y);
