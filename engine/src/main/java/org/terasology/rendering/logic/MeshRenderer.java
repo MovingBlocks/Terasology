@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.logic;
 
-import com.bulletphysics.linearmath.Transform;
+import org.terasology.math.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.nio.FloatBuffer;
@@ -171,7 +171,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Transform transWorldSpace = new Transform();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -203,8 +202,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
 
-                    javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
-                    transWorldSpace.set(matrixWorldSpace);
+                    Transform transWorldSpace = new Transform(worldPos, worldRot, worldScale);
 
                     Vector3f worldPositionCameraSpace = new Vector3f();
                     worldPositionCameraSpace.sub(worldPos, cameraPosition);
