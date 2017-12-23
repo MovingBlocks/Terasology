@@ -131,7 +131,14 @@ public class BlockEntitySystem extends BaseComponentSystem {
             entity.send(new OnBlockToItem(item));
 
             if (shouldDropToWorld(event, block, blockDamageModifierComponent, item)) {
-                processDropping(item, location, blockDamageModifierComponent.impulsePower);
+                float impulsePower;
+                if (blockDamageModifierComponent != null) {
+                    impulsePower = blockDamageModifierComponent.impulsePower;
+                } else {
+                    impulsePower = 0;
+                }
+                
+                processDropping(item, location, impulsePower);
             }
         }
     }
