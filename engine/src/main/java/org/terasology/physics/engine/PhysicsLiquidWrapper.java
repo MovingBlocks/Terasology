@@ -15,7 +15,7 @@
  */
 package org.terasology.physics.engine;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
+import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
 import org.terasology.math.VecMath;

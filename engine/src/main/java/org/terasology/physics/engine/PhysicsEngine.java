@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.Physics;
+import org.terasology.physics.shapes.CollisionShapeFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -81,6 +82,13 @@ public interface PhysicsEngine extends Physics {
      * @return The simulation epsilon.
      */
     float getEpsilon();
+
+    /**
+     * Returns a {@link CollisionShapeFactory} that can be used to create collision shapes.
+     *
+     * @return The {@link CollisionShapeFactory}.
+     */
+    CollisionShapeFactory getCollisionShapeFactory();
 
     /**
      * @return A set with all entities that have a rigidBody that is active in

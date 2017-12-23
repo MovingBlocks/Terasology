@@ -15,8 +15,8 @@
  */
 package org.terasology.world.block.shape;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
+import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.ConvexHullShape;
 import com.bulletphysics.util.ObjectArrayList;
 import org.junit.Assert;
 import org.junit.Before;

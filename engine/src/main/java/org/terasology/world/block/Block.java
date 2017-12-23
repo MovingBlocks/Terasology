@@ -15,7 +15,7 @@
  */
 package org.terasology.world.block;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
+import org.terasology.physics.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
 
@@ -623,12 +623,7 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        Transform t = new Transform(new javax.vecmath.Matrix4f(new javax.vecmath.Quat4f(0, 0, 0, 1), VecMath.to(offset), 1.0f));
-        javax.vecmath.Vector3f min = new javax.vecmath.Vector3f();
-        javax.vecmath.Vector3f max = new javax.vecmath.Vector3f();
-        shape.getAabb(t, min, max);
-
-        bounds = AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        bounds = shape.getAABB();
     }
 
     public CollisionShape getCollisionShape() {

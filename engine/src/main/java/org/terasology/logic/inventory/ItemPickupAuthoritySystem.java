@@ -16,7 +16,7 @@
 
 package org.terasology.logic.inventory;
 
-import com.bulletphysics.collision.shapes.BoxShape;
+import org.terasology.physics.shapes.BoxShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
