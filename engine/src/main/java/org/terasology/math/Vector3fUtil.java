@@ -56,9 +56,11 @@ public final class Vector3fUtil {
     }
 
     public static Vector3f safeNormalize(Vector3f v, Vector3f out) {
+        final float EPSILON = 0.000001f;
+
         out.set(v);
         out.normalize();
-        if (out.length() < PhysicsEngineManager.EPSILON) {
+        if (out.length() < EPSILON) {
             out.set(0, 0, 0);
         }
         return out;

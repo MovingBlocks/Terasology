@@ -32,7 +32,6 @@ public final class PhysicsEngineManager {
      * The {@link CollisionShapeFactory} that can be used to create a {@link CollisionShape}.
      */
     public static final CollisionShapeFactory COLLISION_SHAPE_FACTORY = new BulletCollisionShapeFactory();
-    public static final float EPSILON = BulletGlobals.SIMD_EPSILON;
 
     /**
      * Create a new {@link PhysicsEngine} instance.
