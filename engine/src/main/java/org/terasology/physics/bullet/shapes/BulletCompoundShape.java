@@ -37,6 +37,7 @@ public class BulletCompoundShape extends BulletCollisionShape implements org.ter
 
     private BulletCompoundShape(CompoundShape compoundShape) {
         this.compoundShape = compoundShape;
+        underlyingShape = compoundShape;
 
         childList = new ArrayList<>();
     }
