@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.shapes;
+package org.terasology.physics.components.shapes;
 
 import org.terasology.entitySystem.Component;
 
 /**
  */
-public class CapsuleShapeComponent implements Component {
+public class SphereShapeComponent implements Component {
     public float radius = 0.5f;
-    public float height = 1.0f;
 }

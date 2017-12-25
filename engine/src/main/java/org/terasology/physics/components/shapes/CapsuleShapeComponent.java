@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.shapes;
+package org.terasology.physics.components.shapes;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.rendering.assets.mesh.Mesh;
 
 /**
  */
-public class HullShapeComponent implements Component {
-    public Mesh sourceMesh;
+public class CapsuleShapeComponent implements Component {
+    public float radius = 0.5f;
+    public float height = 1.0f;
 }

@@ -35,7 +35,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.VecMath;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
-import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.components.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;

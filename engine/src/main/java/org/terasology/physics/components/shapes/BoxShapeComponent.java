@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics.shapes;
+package org.terasology.physics.components.shapes;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.geom.Vector3f;
