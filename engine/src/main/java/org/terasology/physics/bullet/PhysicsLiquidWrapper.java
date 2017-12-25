@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.physics.engine;
+package org.terasology.physics.bullet;
 
 import org.terasology.physics.bullet.shapes.BulletCollisionShape;
 import org.terasology.physics.shapes.CollisionShape;
@@ -27,28 +26,25 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 /**
- * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
- *
  */
-public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
-
+public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
     private WorldProvider world;
 
-    public PhysicsWorldWrapper(WorldProvider world) {
+    public PhysicsLiquidWrapper(WorldProvider world) {
         this.world = world;
     }
 
     @Override
     public VoxelInfo getCollisionShapeAt(int x, int y, int z) {
         Block block = world.getBlock(x, y, z);
-        return new TeraVoxelInfo(block, block.isTargetable(), !block.isPenetrable(), new Vector3i(x, y, z));
+        return new LiquidVoxelInfo(block, new Vector3i(x, y, z));
     }
 
     public void dispose() {
         world = null;
     }
 
-    private static class TeraVoxelInfo implements VoxelInfo {
+    private static class LiquidVoxelInfo implements VoxelInfo {
 
         private boolean colliding;
         private boolean blocking;
@@ -56,11 +52,11 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         private Vector3i position;
         private Vector3f offset;
 
-         TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
+         LiquidVoxelInfo(Block block, Vector3i position) {
             this.shape = block.getCollisionShape();
             this.offset = block.getCollisionOffset();
-            this.colliding = shape != null && colliding;
-            this.blocking = shape != null && blocking;
+            this.colliding = block.isLiquid();
+            this.blocking = false;
             this.position = position;
         }
 
@@ -76,7 +72,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
         @Override
         public com.bulletphysics.collision.shapes.CollisionShape getCollisionShape() {
-            return ((BulletCollisionShape) shape).underlyingShape;
+             return ((BulletCollisionShape) shape).underlyingShape;
         }
 
         @Override
