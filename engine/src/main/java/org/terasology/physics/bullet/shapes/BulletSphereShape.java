@@ -29,6 +29,6 @@ public class BulletSphereShape extends BulletCollisionShape implements org.teras
 
     @Override
     public CollisionShape rotate(Quat4f rot) {
-        return null;
+        return this;
     }
 }
