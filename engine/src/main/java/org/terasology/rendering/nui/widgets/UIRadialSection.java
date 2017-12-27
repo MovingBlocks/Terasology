@@ -42,7 +42,7 @@ public class UIRadialSection extends CoreWidget {
     private Boolean isSelected = false;
     private List<ActivateEventListener> listeners;
 
-    //TODO: Use bindings in future. Currently broken. @rzats is investigating this.
+    //TODO: Use bindings in future. Previously used bindings were throwing some exceptions not even allowing to open the screen with UIRadialRing, so this is a quick fix - conversion from binded properties to standard ones.
     @LayoutConfig
     private TextureRegion icon;
     @LayoutConfig
@@ -120,7 +120,6 @@ public class UIRadialSection extends CoreWidget {
         isSelected = selected;
     }
 
-    //TODO: Use bindings in future. Currently broken.
     /**
      * Sets info widget
      */

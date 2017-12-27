@@ -35,7 +35,6 @@ import java.util.List;
  * A radial menu widget
  */
 public class UIRadialRing extends CoreWidget {
-    private static final Logger logger = LoggerFactory.getLogger(UIRadialRing.class);
 
     @LayoutConfig
     private List<UIRadialSection> sections = new ArrayList<>();
