@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.settings;
 
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
@@ -96,4 +96,9 @@ public interface Setting<T> {
      * Returns a boolean stating whether this {@link Setting} has any subscribers.
      */
     boolean hasSubscribers();
+
+    /**
+     * Parses the String based on the type of this {@link Setting}, and sets it.
+     */
+    void setValueFromString(String valueString);
 }

@@ -15,7 +15,12 @@
  */
 package org.terasology.config.flexible;
 
+import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * Stores multiple {@link Setting} instances that can be retrieved using their id.
@@ -54,4 +59,35 @@ public interface FlexibleConfig {
      * Returns a boolean stating whether the config contains a {@link Setting} with the given id.
      */
     boolean contains(SimpleUri id);
+
+    /**
+     * Returns a map of all the settings, allowing iteration of all the settings.
+     *
+     * @return A map containing all the settings, along with their id.
+     */
+    Map<SimpleUri, Setting> getSettings();
+
+    /**
+     * Saves the values of all settings having non-default values, to enable persistence across sessions.
+     *
+     * All the non-default values that were not used in this session and are still "parked" are also
+     * saved as-is, to be used later.
+     *
+     * @param writer A writer that will serve as the destination of settings.
+     */
+    void save(Writer writer);
+
+    /**
+     * Loads the values of the settings having non-default values, to enable persistence across sessions.
+     *
+     * All the non-default values are loaded and "parked", initially remaining inaccessible. 
+     * Once a Setting object is added to the config, a corresponding non-default value is sought 
+     * among the parked values. If one is found it is parsed and stored in the Setting object.
+     *
+     * Note that this function should be called -before- adding any settings to the FlexibleConfig. 
+     * Otherwise any corresponding parked value will never be loaded.
+     *
+     * @param reader A reader that will serve as the source of the settings.
+     */
+    void load(Reader reader);
 }

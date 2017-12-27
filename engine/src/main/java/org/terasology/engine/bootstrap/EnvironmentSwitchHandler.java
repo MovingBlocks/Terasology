@@ -64,6 +64,7 @@ public final class EnvironmentSwitchHandler {
     public EnvironmentSwitchHandler() {
     }
 
+    @SuppressWarnings("unchecked")
     public void handleSwitchToGameEnvironment(Context context) {
         ModuleManager moduleManager = context.get(ModuleManager.class);
 
@@ -75,11 +76,7 @@ public final class EnvironmentSwitchHandler {
             }
             Class<?> targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
             if (targetType != null) {
-                try {
-                    copyStrategyLibrary.register(targetType, copyStrategy.newInstance());
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("Cannot register CopyStrategy '{}' - failed to instantiate", copyStrategy, e);
-                }
+                registerCopyStrategy(copyStrategyLibrary, targetType, copyStrategy);
             } else {
                 logger.error("Cannot register CopyStrategy '{}' - unable to determine target type", copyStrategy);
             }
@@ -107,7 +104,7 @@ public final class EnvironmentSwitchHandler {
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
         /*
-         * The registring of the prefab formats is done in this method, because it needs to be done before
+         * The registering of the prefab formats is done in this method, because it needs to be done before
          * the environment of the asset manager gets changed.
          *
          * It can't be done before this method gets called because the ComponentLibrary isn't
@@ -121,6 +118,14 @@ public final class EnvironmentSwitchHandler {
 
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
 
+    }
+
+    private <T, U extends CopyStrategy<T>> void registerCopyStrategy(CopyStrategyLibrary copyStrategyLibrary, Class<T> type, Class<U> strategy) {
+        try {
+            copyStrategyLibrary.register(type, strategy.newInstance());
+        } catch (InstantiationException | IllegalAccessException e) {
+            logger.error("Cannot register CopyStrategy '{}' - failed to instantiate", strategy, e);
+        }
     }
 
     /**
@@ -153,7 +158,7 @@ public final class EnvironmentSwitchHandler {
     }
 
 
-    public void handleSwitchToEmptyEnivronment(Context context) {
+    public void handleSwitchToEmptyEnvironment(Context context) {
         ModuleEnvironment environment = context.get(ModuleManager.class).getEnvironment();
         cheapAssetManagerUpdate(context, environment);
     }

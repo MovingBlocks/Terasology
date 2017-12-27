@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import org.terasology.config.flexible.settings.Setting;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -79,4 +80,7 @@ class MockSetting<T> implements Setting<T> {
     public boolean hasSubscribers() {
         return isSubscribedTo;
     }
+
+    @Override
+    public void setValueFromString(String valueString) { }
 }
