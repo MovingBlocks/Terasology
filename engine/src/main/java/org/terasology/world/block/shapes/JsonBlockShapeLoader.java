@@ -34,17 +34,12 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
-import org.terasology.math.VecMath;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.PhysicsEngineManager;
-import org.terasology.physics.shapes.BoxShape;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
-import org.terasology.physics.shapes.SphereShape;
-import org.terasology.registry.In;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
@@ -122,7 +117,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonObject collisionInfo = shapeObj.get(COLLISION).getAsJsonObject();
                 processCollision(context, shape, collisionInfo);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.defaultCube());
+                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.unitCube());
                 shape.setCollisionSymmetric(true);
             }
             return shape;
@@ -159,7 +154,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.defaultCube());
+                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.unitCube());
                 shape.setCollisionSymmetric(true);
             }
         }
@@ -201,7 +196,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionShape(colliders.get(0).collisionShape);
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.defaultCube());
+                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.unitCube());
                 shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }

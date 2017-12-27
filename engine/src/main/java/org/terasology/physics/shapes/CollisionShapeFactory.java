@@ -24,7 +24,7 @@ public interface CollisionShapeFactory {
 
     ConvexHullShape convexHull(List<Vector3f> vertices);
 
-    default BoxShape defaultCube() {
+    default BoxShape unitCube() {
         return box(Vector3f.one());
     }
 
