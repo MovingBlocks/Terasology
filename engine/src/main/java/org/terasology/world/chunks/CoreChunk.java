@@ -49,7 +49,11 @@ public interface CoreChunk {
 
     Biome setBiome(int x, int y, int z, Biome biome);
 
+    Biome setBiome(BaseVector3i pos, Biome biome);
+
     Biome getBiome(int x, int y, int z);
+
+    Biome getBiome(BaseVector3i pos);
 
     void setLiquid(BaseVector3i pos, LiquidData state);
 

@@ -51,7 +51,6 @@ import java.text.DecimalFormat;
  * <br><br>
  * Chunks are tessellated on creation and saved to vertex arrays. From those VBOs are generated
  * which are then used for the actual rendering process.
- *
  */
 public class ChunkImpl implements Chunk {
 
@@ -266,6 +265,11 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public Biome getBiome(BaseVector3i pos) {
+        return getBiome(pos.x(), pos.y(), pos.z());
+    }
+
+    @Override
     public Biome setBiome(int x, int y, int z, Biome biome) {
         if (biomeData == biomeDataSnapshot) {
             biomeData = biomeData.copy();
@@ -273,6 +277,11 @@ public class ChunkImpl implements Chunk {
         short shortId = biomeManager.getBiomeShortId(biome);
         short previousShortId = (short) biomeData.set(x, y, z, shortId);
         return biomeManager.getBiomeByShortId(previousShortId);
+    }
+
+    @Override
+    public Biome setBiome(BaseVector3i pos, Biome biome) {
+        return setBiome(pos.x(), pos.y(), pos.z(), biome);
     }
 
     @Override
