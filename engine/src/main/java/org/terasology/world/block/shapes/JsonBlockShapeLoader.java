@@ -36,7 +36,6 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.engine.PhysicsEngineManager;
 import org.terasology.physics.shapes.CollisionShape;
 import org.terasology.physics.shapes.CompoundShape;
 import org.terasology.physics.shapes.ConvexHullShape;
@@ -50,6 +49,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static org.terasology.physics.engine.PhysicsEngineManager.COLLISION_SHAPE_FACTORY;
 
 /**
  */
@@ -117,7 +118,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonObject collisionInfo = shapeObj.get(COLLISION).getAsJsonObject();
                 processCollision(context, shape, collisionInfo);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewUnitCube());
+                shape.setCollisionShape(COLLISION_SHAPE_FACTORY.getNewUnitCube());
                 shape.setCollisionSymmetric(true);
             }
             return shape;
@@ -147,14 +148,14 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
                 List<Vector3f> verts = buildVertList(shape);
-                ConvexHullShape convexHull = PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewConvexHull(verts);
+                ConvexHullShape convexHull = COLLISION_SHAPE_FACTORY.getNewConvexHull(verts);
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
                     && collisionInfo.get(COLLIDERS).getAsJsonArray().size() > 0) {
                 JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewUnitCube());
+                shape.setCollisionShape(COLLISION_SHAPE_FACTORY.getNewUnitCube());
                 shape.setCollisionSymmetric(true);
             }
         }
@@ -196,14 +197,14 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionShape(colliders.get(0).collisionShape);
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
-                shape.setCollisionShape(PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewUnitCube());
+                shape.setCollisionShape(COLLISION_SHAPE_FACTORY.getNewUnitCube());
                 shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
         }
 
         private ColliderInfo processCompoundShape(List<ColliderInfo> colliders) {
-            CompoundShape collisionShape = PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewCompoundShape();
+            CompoundShape collisionShape = COLLISION_SHAPE_FACTORY.getNewCompoundShape();
 
             for (ColliderInfo collider : colliders) {
                 Transform transform = new Transform(collider.offset, Rotation.none().getQuat4f(), 1.0f);
@@ -223,7 +224,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
             extent.absolute();
 
-            return new ColliderInfo(offset, PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewBox(extent));
+            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewBox(extent));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {
@@ -233,7 +234,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 throw new JsonParseException("Sphere Collider missing position");
             }
 
-            return new ColliderInfo(offset, PhysicsEngineManager.COLLISION_SHAPE_FACTORY.getNewSphere(radius));
+            return new ColliderInfo(offset, COLLISION_SHAPE_FACTORY.getNewSphere(radius));
         }
 
         private static class ColliderInfo {
