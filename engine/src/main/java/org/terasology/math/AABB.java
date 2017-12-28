@@ -34,6 +34,8 @@ import java.util.List;
  */
 public final class AABB {
 
+    public static final float DEFAULT_MARGIN = 0.01f;
+    public static final float HALVING_FACTOR = 0.5f;
     private final Vector3f min;
     private final Vector3f max;
 
@@ -111,14 +113,14 @@ public final class AABB {
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
-        dimensions.scale(0.5f);
+        dimensions.scale(HALVING_FACTOR);
         return dimensions;
     }
 
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
-        dimensions.scale(0.5f);
+        dimensions.scale(HALVING_FACTOR);
         return dimensions;
     }
 
@@ -149,14 +151,14 @@ public final class AABB {
     }
 
     public AABB transform(Transform transform) {
-        return transform(transform, 0.01f);
+        return transform(transform, DEFAULT_MARGIN);
     }
 
     public AABB transform(Transform transform, float margin) {
-        // Courtesy of TeraBullet
+        // Adaptation of AabbUtil2.transformAabb in the TeraBullet
         Vector3f localHalfExtents = new Vector3f();
         localHalfExtents.sub(max, min);
-        localHalfExtents.mul(0.5f);
+        localHalfExtents.mul(HALVING_FACTOR);
 
         localHalfExtents.x += margin;
         localHalfExtents.y += margin;
@@ -164,7 +166,7 @@ public final class AABB {
 
         Vector3f localCenter = new Vector3f(max);
         localCenter.add(min);
-        localCenter.mul(0.5f);
+        localCenter.mul(HALVING_FACTOR);
 
         Matrix3f absBasis = transform.getBasis();
 
