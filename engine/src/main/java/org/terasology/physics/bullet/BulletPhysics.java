@@ -72,7 +72,6 @@ import org.terasology.physics.engine.PhysicsSystem;
 import org.terasology.physics.engine.RigidBody;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
 import org.terasology.physics.components.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CollisionShapeFactory;
 import org.terasology.physics.components.shapes.CylinderShapeComponent;
 import org.terasology.physics.components.shapes.HullShapeComponent;
 import org.terasology.physics.components.shapes.SphereShapeComponent;
@@ -441,11 +440,6 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public float getEpsilon() {
         return BulletGlobals.SIMD_EPSILON;
-    }
-
-    @Override
-    public CollisionShapeFactory getCollisionShapeFactory() {
-        return collisionShapeFactory;
     }
 
     //*******************Private helper methods**************************\\

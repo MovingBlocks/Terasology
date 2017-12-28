@@ -84,13 +84,6 @@ public interface PhysicsEngine extends Physics {
     float getEpsilon();
 
     /**
-     * Returns a {@link CollisionShapeFactory} that can be used to create collision shapes.
-     *
-     * @return The {@link CollisionShapeFactory}.
-     */
-    CollisionShapeFactory getCollisionShapeFactory();
-
-    /**
      * @return A set with all entities that have a rigidBody that is active in
      *         the physics engine. A new set is created that is not backed by this class.
      */
