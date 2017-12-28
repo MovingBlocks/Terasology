@@ -26,22 +26,22 @@ import java.util.List;
 
 public class BulletCollisionShapeFactory implements CollisionShapeFactory {
     @Override
-    public BoxShape box(Vector3f extents) {
+    public BoxShape getNewBox(Vector3f extents) {
         return new BulletBoxShape(extents.mul(0.5f));
     }
 
     @Override
-    public ConvexHullShape convexHull(List<Vector3f> vertices) {
+    public ConvexHullShape getNewConvexHull(List<Vector3f> vertices) {
         return new BulletConvexHullShape(vertices);
     }
 
     @Override
-    public CompoundShape compoundShape() {
+    public CompoundShape getNewCompoundShape() {
         return new BulletCompoundShape();
     }
 
     @Override
-    public SphereShape sphere(float radius) {
+    public SphereShape getNewSphere(float radius) {
         return new BulletSphereShape(radius);
     }
 }

@@ -20,15 +20,15 @@ import org.terasology.math.geom.Vector3f;
 import java.util.List;
 
 public interface CollisionShapeFactory {
-    BoxShape box(Vector3f extents);
+    BoxShape getNewBox(Vector3f extents);
 
-    ConvexHullShape convexHull(List<Vector3f> vertices);
+    ConvexHullShape getNewConvexHull(List<Vector3f> vertices);
 
-    default BoxShape unitCube() {
-        return box(Vector3f.one());
+    default BoxShape getNewUnitCube() {
+        return getNewBox(Vector3f.one());
     }
 
-    CompoundShape compoundShape();
+    CompoundShape getNewCompoundShape();
 
-    SphereShape sphere(float radius);
+    SphereShape getNewSphere(float radius);
 }
