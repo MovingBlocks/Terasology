@@ -16,8 +16,6 @@
 
 package org.terasology.logic.inventory;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.physics.shapes.BoxShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -32,10 +30,11 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.DropItemEvent;
 import org.terasology.logic.inventory.events.GiveItemEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.VecMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
-import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.components.shapes.BoxShapeComponent;
+import org.terasology.physics.events.CollideEvent;
+import org.terasology.physics.shapes.BoxShape;
 import org.terasology.registry.In;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
@@ -101,7 +100,8 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
         }
 
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape) {
-            Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new Vector3f());
+            BoxShape collisionShape = (BoxShape) blockFamily.getArchetypeBlock().getCollisionShape();
+            Vector3f extents = collisionShape.getHalfExtentsWithoutMargin(new Vector3f());
             extents.scale(2.0f);
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
