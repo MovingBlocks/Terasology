@@ -292,7 +292,7 @@ def performAction(String[] arguments , boolean recurse , String type){
       }
       println "User wants to create a $displayName named: $name"
 
-      createModule(name)
+      createItem(name)
 
       println "Created $displayName named $name"
       break
