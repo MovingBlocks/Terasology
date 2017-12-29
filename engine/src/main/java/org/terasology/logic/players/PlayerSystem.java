@@ -46,6 +46,7 @@ import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
@@ -68,6 +69,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     private ChunkProvider chunkProvider;
     @In
     private NetworkSystem networkSystem;
+    @In
+    private NUIManager nuiManager;
     private List<SpawningClientInfo> clientsPreparingToSpawn = Lists.newArrayList();
     private List<SpawningClientInfo> clientsPreparingToRespawn = Lists.newArrayList();
 
@@ -176,6 +179,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             character.saveComponent(characterComp);
             character.setOwner(entity);
             if (!character.hasComponent(AliveCharacterComponent.class)) {
+                nuiManager.pushScreen("engine:deathScreen");
                 character.addComponent(new AliveCharacterComponent());
             }
             Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
