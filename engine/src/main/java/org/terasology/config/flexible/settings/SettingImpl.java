@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible;
+package org.terasology.config.flexible.settings;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class SettingImpl<T> implements Setting<T> {
 
     private final T defaultValue;
 
-    private T value;
+    protected T value;
 
     private String humanReadableName;
 
@@ -77,13 +77,13 @@ public class SettingImpl<T> implements Setting<T> {
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
-
-        this.subscribers = null;
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
-        for (PropertyChangeListener subscriber : subscribers) {
-            subscriber.propertyChange(event);
+        if (subscribers != null) {
+            for (PropertyChangeListener subscriber : subscribers) {
+                subscriber.propertyChange(event);
+            }
         }
     }
 
@@ -208,5 +208,19 @@ public class SettingImpl<T> implements Setting<T> {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    public void setValueFromString(String valueString) {
+        if (value instanceof Integer) {
+            value = (T)(Integer)Integer.parseInt(valueString);
+        } else if (value instanceof Float) {
+            value = (T)(Float)Float.parseFloat(valueString);
+        } else if (value instanceof Double) {
+            value = (T)(Double)Double.parseDouble(valueString);
+        } else if (value instanceof String) {
+            value = (T)valueString;
+        } else {
+            throw new RuntimeException("Cannot convert string to type " + value.getClass().getSimpleName());
+        }
     }
 }

@@ -268,7 +268,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupConfig() {
-        Config config = new Config();
+        Config config = new Config(context);
         config.loadDefaults();
         context.put(Config.class, config);
     }
