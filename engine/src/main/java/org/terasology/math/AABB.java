@@ -155,7 +155,7 @@ public final class AABB {
     }
 
     public AABB transform(Transform transform, float margin) {
-        // Adaptation of AabbUtil2.transformAabb in the TeraBullet
+        // Adaptation of method AabbUtil2.transformAabb from the TeraBullet library.
         Vector3f localHalfExtents = new Vector3f();
         localHalfExtents.sub(max, min);
         localHalfExtents.mul(HALVING_FACTOR);
