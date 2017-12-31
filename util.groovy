@@ -9,36 +9,38 @@ Properties properties = new Properties()
 new File("gradle.properties").withInputStream {
     properties.load(it)
 }
-
+//Looking for alternative Github Home (Meta) in gradle properties.
+def githubHome=properties.alternativeGithubHome ?: githubRepo
+//Looking for alternative Github Home (Meta) in gradle properties.
+def githubMetaHome=properties.alternativeGithubMetaHome ?: "MetaTerasology"
 /**
  * Default settings for modules.
  * githubRepo stores the Repository name.
  * targetDirectory stores the working directory.
- * displayName is used to generalize the script.
+ * itemType is used to generalize the script.
  */
 githubRepo="Terasology"
 targetDirectory="modules"
-displayName="Module"
-//Main Logic for changing githubRepo, targetDirectory & displayName
+itemType="Module"
+//Main Logic for changing githubRepo, targetDirectory & itemType
 def initialize(String type) {
 
   if (type == "meta") {
     githubRepo="MetaTerasology"
     targetDirectory="metas"
-    displayName="Meta"
+    itemType="Meta"
   }
   else if (type == "lib") {
     githubRepo="MovingBlocks"
     targetDirectory="libs"
-    displayName="Library"
+    itemType="Library"
   }
   else if (type == "facade") {
     githubRepo="MovingBlocks"
     targetDirectory="facades"
-    displayName="Facade"
+    itemType="Facade"
   }
-  //Looking for alternative Github Home in gradle properties.
-  githubHome=properties.alternativeGithubHome ?: githubRepo
+githubHome=properties.alternativeGithubHome ?: githubRepo
 }
 
 // For keeping a list of items retrieved so far
@@ -53,9 +55,7 @@ excludedDependencies = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGa
  */
 def getUserString(String prompt) {
     println('\n*** ' + prompt + '\n')
-
     def reader = new BufferedReader(new InputStreamReader(System.in))
-
     return reader.readLine()
 }
 
@@ -81,7 +81,7 @@ boolean isUrlValid(String url) {
 def retrieve(String[] items, boolean recurse) {
     println "Now inside retrieve, user (recursively? $recurse) wants: $items"
     for (String itemName : items) {
-        println "Starting retrieval for $displayName $itemName, are we recursing? $recurse"
+        println "Starting retrieval for $itemType $itemName, are we recursing? $recurse"
         println "Retrieved so far: $itemsRetrieved"
         retrieveItem(itemName, recurse)
     }
@@ -95,30 +95,28 @@ def retrieve(String[] items, boolean recurse) {
 def retrieveItem(String itemName, boolean recurse) {
 
     File targetDir = new File("$targetDirectory"+"/$itemName")
-    println "Request to retrieve $displayName $itemName would store it at $targetDir - exists? " + targetDir.exists()
-
+    println "Request to retrieve $itemType $itemName would store it at $targetDir - exists? " + targetDir.exists()
     if (targetDir.exists()) {
-        println "That $displayName already had an existing directory locally. If something is wrong with it please delete and try again"
+        println "That $itemType already had an existing directory locally. If something is wrong with it please delete and try again"
         itemsRetrieved << itemName
     } else if (itemsRetrieved.contains(itemName)) {
         println "We already retrieved $itemName - skipping"
     } else {
         itemsRetrieved << itemName
-
         //Special Logic for target URLs. If type is facade, 'Facade' is used as prefix. Same for  Libraries and 'Tera'.
         def targetUrl = "https://github.com/${githubHome}/${itemName}"
-        if (displayName=="Library"){
+        if (itemType=="Library"){
           targetUrl = "https://github.com/${githubHome}/Tera${itemName}"
         }
-        else if (displayName=="Facade"){
+        else if (itemType=="Facade"){
           targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
         }
 
         if (!isUrlValid(targetUrl)) {
-            println "Can't retrieve $displayName from $targetUrl - URL appears invalid. Typo? Not created yet?"
+            println "Can't retrieve $itemType from $targetUrl - URL appears invalid. Typo? Not created yet?"
             return
         }
-        println "Retrieving $displayName $itemName from $targetUrl"
+        println "Retrieving $itemType $itemName from $targetUrl"
 
         if (githubHome != githubRepo) {
             println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the $githubRepo remote as 'origin'"
@@ -205,12 +203,18 @@ def createItem(String itemName) {
     File gitignore = new File(targetDir, ".gitignore")
     def gitignoreText = new File("templates/.gitignore").text
     gitignore << gitignoreText
-
-    println "Creating build.gradle"
-    File buildGradle = new File(targetDir, "build.gradle")
-    def buildGradleText = new File("templates/build.gradle").text
-    buildGradle << buildGradleText
-
+    //If the type is facade, facades.gradle is created else build.gradle is created.
+    if (targetDirectory=="facades"){
+        println "Creating facades.gradle"
+        File facadesGradle = new File(targetDir, "facades.gradle")
+        def facadesGradleText = new File("templates/facades.gradle").text
+        facadesGradle << facadesGradleText
+    } else {
+        println "Creating build.gradle"
+        File buildGradle = new File(targetDir, "build.gradle")
+        def buildGradleText = new File("templates/build.gradle").text
+        buildGradle << buildGradleText
+    }
     //If the type is module, module.text is created.
     if (targetDirectory=="modules"){
         println "Creating module.txt"
@@ -228,23 +232,23 @@ def createItem(String itemName) {
  * @param itemName the name of the item to update
  */
 def updateItem(String itemName) {
-    println "Attempting to update $displayName $itemName"
+    println "Attempting to update $itemType $itemName"
     File targetDir = new File("${targetDirectory}/${itemName}")
     if (!targetDir.exists()) {
-        println "$displayName \"$itemName\" not found"
+        println "$itemType \"$itemName\" not found"
         return
     }
 
-    def moduleGit = Grgit.open(dir: targetDir)
-    def clean = moduleGit.status().clean
+    def itemGit = Grgit.open(dir: targetDir)
+    def clean = itemGit.status().clean
     println "Is \"$itemName\" clean? $clean"
     if (!clean) {
-        println "$displayName has uncommitted changes. Aborting."
+        println "$itemType has uncommitted changes. Aborting."
         return
     }
 
-    println "Updating module $itemName"
-    moduleGit.pull remote: "origin"
+    println "Updating $itemType $itemName"
+    itemGit.pull remote: "origin"
 }
 
 /**
@@ -254,7 +258,7 @@ def updateItem(String itemName) {
 def listRemotes(String itemName) {
     File moduleExistence = new File("${targetDirectory}/$itemName")
     if (!moduleExistence.exists()) {
-        println "$displayName '$itemName' not found. Typo? Or run 'groovyw util $displayName get $itemName' first"
+        println "$itemType '$itemName' not found. Typo? Or run 'groovyw util $itemType get $itemName' first"
         return
     }
     def remoteGit = Grgit.open(dir: "${targetDirectory}/${itemName}")
@@ -295,7 +299,7 @@ def addRemote(String itemName, String remoteName) {
 def addRemote(String itemName, String remoteName, String url) {
     File targetModule = new File("${targetDirectory}/${itemName}")
     if (!targetModule.exists()) {
-        println "$displayName '$itemName' not found. Typo? Or run 'groovyw util $displayName get $itemName' first"
+        println "$itemType '$itemName' not found. Typo? Or run 'groovyw util $itemType get $itemName' first"
         return
     }
     def remoteGit = Grgit.open(dir: "${targetDirectory}/${itemName}")
@@ -307,7 +311,7 @@ def addRemote(String itemName, String remoteName, String url) {
             println "Successfully added remote '$remoteName' for '$itemName' - doing a 'git fetch'"
             remoteGit.fetch remote: remoteName
         } else {
-            println "Added the remote '$remoteName' for $displayName '$itemName' - but the URL $url failed a test lookup. Typo? Not created yet?"
+            println "Added the remote '$remoteName' for $itemType '$itemName' - but the URL $url failed a test lookup. Typo? Not created yet?"
         }
     } else {
         println "Remote already exists"
@@ -353,9 +357,9 @@ def performAction(String[] arguments , String type){
         recurse = true
         println "We're retrieving recursively (all the things depended on too)"
     case "get":
-        println "Preparing to get $displayName"
+        println "Preparing to get $itemType"
         if (arguments.length == 1) {
-            def itemString = getUserString("Enter $displayName Name(s - separate multiple with spaces, CapiTaliZation MatterS): ")
+            def itemString = getUserString("Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ")
             println "User wants: $itemString"
             String[] itemList = itemString.split("\\s+")
             retrieve itemList, recurse
@@ -373,19 +377,19 @@ def performAction(String[] arguments , String type){
         } else if (arguments.length == 2) {
             name = arguments[1]
         } else {
-            name = getUserString("Enter $displayName name: ")
+            name = getUserString("Enter $itemType name: ")
         }
-        println "User wants to create a $displayName named: $name"
+        println "User wants to create a $itemType named: $name"
 
         createItem(name)
 
-        println "Created $displayName named $name"
+        println "Created $itemType named $name"
         break
     case "update":
-        println "We're updating $displayName"
+        println "We're updating $itemType"
         String[] itemList
         if (arguments.length == 1) {
-            def itemString = getUserString('Enter $displayName Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
+            def itemString = getUserString('Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
             itemList = itemString.split("\\s+")
         } else {
             itemList = arguments.drop(1)
@@ -396,7 +400,7 @@ def performAction(String[] arguments , String type){
         }
         break
     case "update-all":
-        println "We're updating every $displayName"
+        println "We're updating every $itemType"
         println "List:"
         new File(targetDirectory).eachDir() { dir ->
             String itemName = dir.getPath().substring(8)
@@ -409,28 +413,28 @@ def performAction(String[] arguments , String type){
           if (arguments.length == 3) {
             itemName = arguments[1]
             remoteName = arguments[2]
-            println "Adding Remote for $displayName $itemName"
+            println "Adding Remote for $itemType $itemName"
             addRemote(itemName, remoteName)
         } else if (arguments.length == 4) {
             itemName = arguments[1]
             remoteName = arguments[2]
             url = arguments[3]
-            println "Adding Remote for $displayName $itemName"
+            println "Adding Remote for $itemType $itemName"
             addRemote(itemName, remoteName, url)
         } else {
             println "Incorrect Syntax"
-            println "Usage: 'add-remote (${displayName}) (name)' - adds a remote (name) to the ${displayName} with default URL."
-            println "       'add-remote (${displayName}) (name) (url)' - adds a remote (name) to the ${displayName} with the given URL."
+            println "Usage: 'add-remote (${itemType}) (name)' - adds a remote (name) to the ${itemType} with default URL."
+            println "       'add-remote (${itemType}) (name) (url)' - adds a remote (name) to the ${itemType} with the given URL."
         }
         break
      case "list-remotes":
         if (arguments.length == 2) {
             itemName = args[2]
-            println "Listing Remotes for $displayName $itemName"
+            println "Listing Remotes for $itemType $itemName"
             listRemotes(itemName)
         } else {
             println "Incorrect Syntax"
-            println "Usage: 'list-remotes (${displayName})' - lists all remotes for (${displayName})"
+            println "Usage: 'list-remotes (${itemType})' - lists all remotes for (${itemType})"
         }
         break
      default:
