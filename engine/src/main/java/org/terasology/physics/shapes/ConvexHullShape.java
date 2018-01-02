@@ -15,5 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
+/**
+ * Represents a convex hull collision entity in the physics engine.
+ */
 public interface ConvexHullShape extends CollisionShape {
 }

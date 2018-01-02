@@ -15,5 +15,8 @@
  */
 package org.terasology.physics.shapes;
 
+/**
+ * Represents a sphere shaped collision entity in the physics engine.
+ */
 public interface SphereShape extends CollisionShape {
 }
