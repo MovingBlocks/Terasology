@@ -4,15 +4,6 @@ import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Remote
 import groovy.json.JsonSlurper
 
-//Load gradlew properties to check for github settings.
-Properties properties = new Properties()
-new File("gradle.properties").withInputStream {
-    properties.load(it)
-}
-//Looking for alternative Github Home (Meta) in gradle properties.
-def githubHome=properties.alternativeGithubHome ?: githubRepo
-//Looking for alternative Github Home (Meta) in gradle properties.
-def githubMetaHome=properties.alternativeGithubMetaHome ?: "MetaTerasology"
 /**
  * Default settings for modules.
  * githubRepo stores the Repository name.
@@ -22,25 +13,37 @@ def githubMetaHome=properties.alternativeGithubMetaHome ?: "MetaTerasology"
 githubRepo="Terasology"
 targetDirectory="modules"
 itemType="Module"
-//Main Logic for changing githubRepo, targetDirectory & itemType
-def initialize(String type) {
-
-  if (type == "meta") {
-    githubRepo="MetaTerasology"
-    targetDirectory="metas"
-    itemType="Meta"
-  }
-  else if (type == "lib") {
-    githubRepo="MovingBlocks"
-    targetDirectory="libs"
-    itemType="Library"
-  }
-  else if (type == "facade") {
-    githubRepo="MovingBlocks"
-    targetDirectory="facades"
-    itemType="Facade"
-  }
-githubHome=properties.alternativeGithubHome ?: githubRepo
+gitHubHome="Terasology"
+/**
+ * Main logic for changing the item type.
+ * @param type the type to be initialized
+ */
+ def initialize(String type) {
+    //Load gradlew properties to check for github settings.
+    Properties properties = new Properties()
+    new File("gradle.properties").withInputStream {
+        properties.load(it)
+    }
+    if (type == "meta") {
+        githubRepo="MetaTerasology"
+        targetDirectory="metas"
+        itemType="Meta"
+        //Looking for alternative Github Home (Meta) in gradle properties.
+        githubHome=properties.alternativeGithubMetaHome ?: githubRepo
+    } else {
+        if (type == "lib") {
+            githubRepo="MovingBlocks"
+            targetDirectory="libs"
+            itemType="Library"
+        }
+        else if (type == "facade") {
+            githubRepo="MovingBlocks"
+            targetDirectory="facades"
+            itemType="Facade"
+        }
+        //Looking for alternative Github Home in gradle properties.
+        githubHome=properties.alternativeGithubHome ?: githubRepo
+    }
 }
 
 // For keeping a list of items retrieved so far
@@ -93,7 +96,6 @@ def retrieve(String[] items, boolean recurse) {
  * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve)
  */
 def retrieveItem(String itemName, boolean recurse) {
-
     File targetDir = new File("$targetDirectory"+"/$itemName")
     println "Request to retrieve $itemType $itemName would store it at $targetDir - exists? " + targetDir.exists()
     if (targetDir.exists()) {
@@ -106,18 +108,16 @@ def retrieveItem(String itemName, boolean recurse) {
         //Special Logic for target URLs. If type is facade, 'Facade' is used as prefix. Same for  Libraries and 'Tera'.
         def targetUrl = "https://github.com/${githubHome}/${itemName}"
         if (itemType=="Library"){
-          targetUrl = "https://github.com/${githubHome}/Tera${itemName}"
+            targetUrl = "https://github.com/${githubHome}/Tera${itemName}"
         }
         else if (itemType=="Facade"){
-          targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
+            targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
         }
-
         if (!isUrlValid(targetUrl)) {
             println "Can't retrieve $itemType from $targetUrl - URL appears invalid. Typo? Not created yet?"
             return
         }
         println "Retrieving $itemType $itemName from $targetUrl"
-
         if (githubHome != githubRepo) {
             println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the $githubRepo remote as 'origin'"
             Grgit.clone dir: targetDir, uri: targetUrl, remote: githubHome
@@ -126,11 +126,9 @@ def retrieveItem(String itemName, boolean recurse) {
         } else {
             Grgit.clone dir: targetDir, uri: targetUrl
         }
-
         File targetBuildGradle = new File(targetDir, 'build.gradle')
         targetBuildGradle.delete()
         targetBuildGradle << new File('templates/build.gradle').text
-
         //If the type is module, module.text is retrieved.
         if(targetDirectory=="modules") {
             File moduleManifest = new File(targetDir, 'module.txt')
@@ -139,7 +137,6 @@ def retrieveItem(String itemName, boolean recurse) {
                 moduleManifest << moduleText.replaceAll('MODULENAME', module)
                 println "WARNING: Module $module did not have a module.txt! One was created, please review and submit to GitHub"
             }
-
             //This is only for modules.
             if (recurse) {
                 def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
@@ -170,7 +167,6 @@ String[] readModuleDependencies(File targetModuleInfo) {
         println "The module info file did not appear to exist - can't calculate dependencies"
         return qualifiedDependencies
     }
-
     def slurper = new JsonSlurper()
     def moduleConfig = slurper.parseText(targetModuleInfo.text)
     for (dependency in moduleConfig.dependencies) {
@@ -198,7 +194,6 @@ def createItem(String itemName) {
     }
     println "Creating target directory"
     targetDir.mkdir()
-
     println "Creating .gitignore"
     File gitignore = new File(targetDir, ".gitignore")
     def gitignoreText = new File("templates/.gitignore").text
@@ -222,7 +217,6 @@ def createItem(String itemName) {
         def moduleText = new File("templates/module.txt").text
         moduleManifest << moduleText.replaceAll('MODULENAME', itemName)
     }
-
     Grgit.init dir: targetDir, bare: false
     addRemote(itemName, "origin", "https://github.com/${githubRepo}/${itemName}.git")
 }
@@ -238,7 +232,6 @@ def updateItem(String itemName) {
         println "$itemType \"$itemName\" not found"
         return
     }
-
     def itemGit = Grgit.open(dir: targetDir)
     def clean = itemGit.status().clean
     println "Is \"$itemName\" clean? $clean"
@@ -325,7 +318,6 @@ def addRemote(String itemName, String remoteName, String url) {
  */
 def processCustomRemote(String[] arguments) {
     def remoteArg = arguments.findLastIndexOf { it == "-remote" }
-
     if (remoteArg != -1) {
         if (arguments.length == (remoteArg + 1)) {
             githubHome = getUserString('Enter Name for the Remote (no spaces)')
@@ -344,104 +336,101 @@ def processCustomRemote(String[] arguments) {
  * @param type the type of command  : module, meta, facade or lib
  */
 def performAction(String[] arguments , String type){
-  if(arguments.length == 0){
-    printUsage()
-  } else {
+    if(arguments.length == 0){
+        printUsage()
+    } else {
+    //Configuring the script for the type of command.
+    initialize(type)
 
-  //Configuring the script for the type of command.
-  initialize(type)
-
-  def recurse = false
-  switch(arguments[0]) {
-    case "recurse":
-        recurse = true
-        println "We're retrieving recursively (all the things depended on too)"
-    case "get":
-        println "Preparing to get $itemType"
-        if (arguments.length == 1) {
-            def itemString = getUserString("Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ")
-            println "User wants: $itemString"
-            String[] itemList = itemString.split("\\s+")
-            retrieve itemList, recurse
-        } else {
-            arguments = processCustomRemote(arguments)
-            retrieve arguments, recurse
+    def recurse = false
+    switch(arguments[0]) {
+      case "recurse":
+          recurse = true
+          println "We're retrieving recursively (all the things depended on too)"
+      case "get":
+          println "Preparing to get $itemType"
+          if (arguments.length == 1) {
+              def itemString = getUserString("Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ")
+              println "User wants: $itemString"
+              String[] itemList = itemString.split("\\s+")
+              retrieve itemList, recurse
+          } else {
+              arguments = processCustomRemote(arguments)
+              retrieve arguments, recurse
+          }
+          break
+      case "create":
+          println "We're doing a create"
+          String name
+          if (arguments.length > 2) {
+              println "Received more than one argument. Aborting."
+              break
+          } else if (arguments.length == 2) {
+              name = arguments[1]
+          } else {
+              name = getUserString("Enter $itemType name: ")
+          }
+          println "User wants to create a $itemType named: $name"
+          createItem(name)
+          println "Created $itemType named $name"
+          break
+      case "update":
+          println "We're updating $itemType"
+          String[] itemList
+          if (arguments.length == 1) {
+              def itemString = getUserString('Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
+              itemList = itemString.split("\\s+")
+          } else {
+              itemList = arguments.drop(1)
+          }
+          println "List of items to update: $itemList"
+          for (String item : itemList) {
+              updateItem(item)
+          }
+          break
+      case "update-all":
+          println "We're updating every $itemType"
+          println "List:"
+          new File(targetDirectory).eachDir() { dir ->
+              String itemName = dir.getPath().substring(8)
+              if (!excludedDependencies.contains(itemName)) {
+                  updateItem(itemName)
+              }
+          }
+          break
+      case "add-remote":
+            if (arguments.length == 3) {
+              itemName = arguments[1]
+              remoteName = arguments[2]
+              println "Adding Remote for $itemType $itemName"
+              addRemote(itemName, remoteName)
+          } else if (arguments.length == 4) {
+              itemName = arguments[1]
+              remoteName = arguments[2]
+              url = arguments[3]
+              println "Adding Remote for $itemType $itemName"
+              addRemote(itemName, remoteName, url)
+          } else {
+              println "Incorrect Syntax"
+              println "Usage: 'add-remote (${itemType}) (name)' - adds a remote (name) to the ${itemType} with default URL."
+              println "       'add-remote (${itemType}) (name) (url)' - adds a remote (name) to the ${itemType} with the given URL."
+          }
+          break
+       case "list-remotes":
+          if (arguments.length == 2) {
+              itemName = args[2]
+              println "Listing Remotes for $itemType $itemName"
+              listRemotes(itemName)
+          } else {
+              println "Incorrect Syntax"
+              println "Usage: 'list-remotes (${itemType})' - lists all remotes for (${itemType})"
+          }
+          break
+       default:
+          println "UNRECOGNIZED COMMAND - please try again or use 'groovyw util usage' for help"
         }
-        break
-    case "create":
-        println "We're doing a create"
-        String name
-        if (arguments.length > 2) {
-            println "Received more than one argument. Aborting."
-            break
-        } else if (arguments.length == 2) {
-            name = arguments[1]
-        } else {
-            name = getUserString("Enter $itemType name: ")
-        }
-        println "User wants to create a $itemType named: $name"
-
-        createItem(name)
-
-        println "Created $itemType named $name"
-        break
-    case "update":
-        println "We're updating $itemType"
-        String[] itemList
-        if (arguments.length == 1) {
-            def itemString = getUserString('Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
-            itemList = itemString.split("\\s+")
-        } else {
-            itemList = arguments.drop(1)
-        }
-        println "List of items to update: $itemList"
-        for (String item : itemList) {
-            updateItem(item)
-        }
-        break
-    case "update-all":
-        println "We're updating every $itemType"
-        println "List:"
-        new File(targetDirectory).eachDir() { dir ->
-            String itemName = dir.getPath().substring(8)
-            if (!excludedDependencies.contains(itemName)) {
-                updateItem(itemName)
-            }
-        }
-        break
-    case "add-remote":
-          if (arguments.length == 3) {
-            itemName = arguments[1]
-            remoteName = arguments[2]
-            println "Adding Remote for $itemType $itemName"
-            addRemote(itemName, remoteName)
-        } else if (arguments.length == 4) {
-            itemName = arguments[1]
-            remoteName = arguments[2]
-            url = arguments[3]
-            println "Adding Remote for $itemType $itemName"
-            addRemote(itemName, remoteName, url)
-        } else {
-            println "Incorrect Syntax"
-            println "Usage: 'add-remote (${itemType}) (name)' - adds a remote (name) to the ${itemType} with default URL."
-            println "       'add-remote (${itemType}) (name) (url)' - adds a remote (name) to the ${itemType} with the given URL."
-        }
-        break
-     case "list-remotes":
-        if (arguments.length == 2) {
-            itemName = args[2]
-            println "Listing Remotes for $itemType $itemName"
-            listRemotes(itemName)
-        } else {
-            println "Incorrect Syntax"
-            println "Usage: 'list-remotes (${itemType})' - lists all remotes for (${itemType})"
-        }
-        break
-     default:
-        println "UNRECOGNIZED COMMAND - please try again or use 'groovyw util usage' for help"
-      }
     }
-  }
+}
 
   /**
    * Simply prints usage information.
