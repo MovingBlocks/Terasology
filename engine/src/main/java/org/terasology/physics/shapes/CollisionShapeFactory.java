@@ -19,16 +19,42 @@ import org.terasology.math.geom.Vector3f;
 
 import java.util.List;
 
+/**
+ * Factory interface to create new collision shapes.
+ */
 public interface CollisionShapeFactory {
+    /**
+     * Creates a new box shape with the given extents.
+     * @param extents The full extents of the box shape.
+     * @return The box shape.
+     */
     BoxShape getNewBox(Vector3f extents);
 
+    /**
+     * Creates a new convex hull shape with the given vertices.
+     * @param vertices The vertices of the convex hull shape.
+     * @return The convex hull shape.
+     */
     ConvexHullShape getNewConvexHull(List<Vector3f> vertices);
 
+    /**
+     * Creates a new box shape with unit extents, that is a cube with sides of length 1.
+     * @return The unit cube box shape.
+     */
     default BoxShape getNewUnitCube() {
         return getNewBox(Vector3f.one());
     }
 
+    /**
+     * Creates a new empty compound shape.
+     * @return The empty compound shape.
+     */
     CompoundShape getNewCompoundShape();
 
+    /**
+     * Creates a new sphere shape with the given radius.
+     * @param radius The radius of the shape.
+     * @return The sphere shape.
+     */
     SphereShape getNewSphere(float radius);
 }
