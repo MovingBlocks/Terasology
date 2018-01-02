@@ -19,8 +19,23 @@ import org.terasology.math.AABB;
 import org.terasology.math.Transform;
 import org.terasology.math.geom.Quat4f;
 
+/**
+ * The base type representing a collision entity in the physics engine.
+ */
 public interface CollisionShape {
+    /**
+     * Returns the axis-aligned bounding box ({@link AABB}) for the shape in the space represented
+     * by {@code transform}.
+     * @param transform The {@link Transform} pertaining to the space in which the AABB is to be calculated.
+     * @return The {@link AABB} bounding the shape.
+     */
     AABB getAABB(Transform transform);
 
+    /**
+     * Returns an identical shape rotated through the rotation angles represented by {@code rot}.
+     *
+     * @param rot The quaternion representation of the rotation.
+     * @return The rotated shape.
+     */
     CollisionShape rotate(Quat4f rot);
 }
