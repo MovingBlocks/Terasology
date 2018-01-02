@@ -1,0 +1,9 @@
+// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+new File(rootDir, 'meta').eachDir { possibleSubprojectDir ->
+    def subprojectName = 'meta:' + possibleSubprojectDir.name
+    println "Processing meta module $subprojectName, including it as a sub-project"
+    include subprojectName
+    def subprojectPath = ':' + subprojectName
+    def subproject = project(subprojectPath)
+    subproject.projectDir = possibleSubprojectDir
+}
