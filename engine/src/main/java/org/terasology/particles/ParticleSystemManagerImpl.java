@@ -52,7 +52,9 @@ import org.terasology.registry.Share;
 import java.util.stream.Stream;
 
 /**
- * See ParticleSystemManager for more information.
+ * A particle system manager implementation using events.
+ *
+ * See {@link ParticleSystemManager} for more information.
  */
 @API
 @Share(ParticleSystemManager.class)
@@ -91,7 +93,10 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         particleUpdater.dispose(entity);
     }
 
-
+    // TODO: Make generator / affector functions be maintained by a particle updater and register automatically when used by a new emitter.
+    /**
+     * Creates a new {@link ParticleUpdater} and registers generator and affector functions.
+     */
     public void initialise() {
         particleUpdater = ParticleUpdater.create(physics);
 
@@ -106,6 +111,9 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         registerAffectorFunction(new AccelerationAffectorFunction());
     }
 
+    /**
+     * De-registers all affector and generator functions and disposes the {@link ParticleUpdater}
+     */
     @Override
     public void shutdown() {
         registeredAffectorFunctions.clear();
@@ -114,6 +122,11 @@ public class ParticleSystemManagerImpl extends BaseComponentSystem implements Up
         particleUpdater = null;
     }
 
+    /**
+     * Updates all particle emitters, first spawning new particles and then applying affectors.
+     *
+     * @param delta The time (in seconds) since the last engine update.
+     */
     public void update(float delta) {
         particleUpdater.update(delta);
     }
