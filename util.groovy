@@ -79,7 +79,7 @@ boolean isUrlValid(String url) {
 /**
  * Primary entry point for retrieving items, kicks off recursively if needed.
  * @param items the items we want to retrieve
- * @param recurse whether to also retrieve dependencies of the desired modules
+ * @param recurse whether to also retrieve dependencies of the desired modules (only for modules)
  */
 def retrieve(String[] items, boolean recurse) {
     println "Now inside retrieve, user (recursively? $recurse) wants: $items"
@@ -93,7 +93,7 @@ def retrieve(String[] items, boolean recurse) {
 /**
  * Retrieves a single item via Git Clone. Considers whether it exists locally first or if it has already been retrieved this execution.
  * @param itemName the target item to retrieve
- * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve)
+ * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve) (only for modules)
  */
 def retrieveItem(String itemName, boolean recurse) {
     File targetDir = new File("$targetDirectory"+"/$itemName")
@@ -341,12 +341,14 @@ def performAction(String[] arguments , String type){
     } else {
     //Configuring the script for the type of command.
     initialize(type)
-
+    //Recursion is only for modules.
     def recurse = false
     switch(arguments[0]) {
       case "recurse":
           recurse = true
           println "We're retrieving recursively (all the things depended on too)"
+      // We just fall through here to the get logic after setting a boolean
+      //noinspection GroovyFallthrough
       case "get":
           println "Preparing to get $itemType"
           if (arguments.length == 1) {
@@ -378,7 +380,7 @@ def performAction(String[] arguments , String type){
           println "We're updating $itemType"
           String[] itemList
           if (arguments.length == 1) {
-              def itemString = getUserString('Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ')
+              def itemString = getUserString("Enter $itemType Name(s - separate multiple with spaces, CapiTaliZation MatterS): ")
               itemList = itemString.split("\\s+")
           } else {
               itemList = arguments.drop(1)
@@ -443,7 +445,7 @@ def printUsage() {
     println ""
     println "Available sub-commands:"
     println "- 'get' - retrieves one or more items in source form (separate with spaces)"
-    println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form"
+    println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (only for modules)"
     println "- 'create' - creates a new item of the given type."
     println "- 'update' - updates an item (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local items of the given type."
