@@ -40,7 +40,7 @@ public interface ParticleSystemManager {
     void registerAffectorFunction(AffectorFunction affectorFunction);
 
     /**
-     * Registers an Affector function to be used when updating particle systems that have the registered affector as a component.
+     * Registers a Generator function to be used to configure newly-created particles for particle systems that have the registered generator as a component.
      *
      * @param generatorFunction The generator function to be used.
      */

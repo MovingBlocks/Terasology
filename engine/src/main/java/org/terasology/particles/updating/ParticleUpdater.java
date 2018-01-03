@@ -31,7 +31,9 @@ import java.util.Collection;
 public interface ParticleUpdater {
 
     /**
-     * @param entity The entity with the particle system being registered.
+     * Registers a newly-added particle emitter entity to be updated each particle update.
+     *
+     * @param entity The entity with the {@link ParticleEmitterComponent} being registered.
      */
     void register(EntityRef entity);
 
@@ -41,6 +43,9 @@ public interface ParticleUpdater {
     void dispose(EntityRef entity);
 
     /**
+     * Prepares an emitter to be efficiently handled by the particle updater.
+     * Should be called on newly-added emitters and after each configuration change to an existing emitter.
+     *
      * @param emitter The particle emitter that is being updated.
      * @param registeredAffectorFunctions The list of affector functions to use when processing the given system's affectors.
      * @param registeredGeneratorFunctions The list of generator functions to use when processing the given system's generators.
