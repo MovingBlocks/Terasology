@@ -31,7 +31,9 @@ import java.util.Collection;
 public interface ParticleUpdater {
 
     /**
-     * @param entity The entity with the particle system being registered.
+     * Registers a newly-added particle emitter entity to be updated each particle update.
+     *
+     * @param entity The entity with the {@link ParticleEmitterComponent} being registered.
      */
     void register(EntityRef entity);
 
@@ -41,18 +43,37 @@ public interface ParticleUpdater {
     void dispose(EntityRef entity);
 
     /**
-     * @param emitter                    The particle emitter that is being updated.
-     * @param registeredAffectorFunctions  The list of affector functions to use when processing the given system's affectors.
+     * Prepares an emitter to be efficiently handled by the particle updater.
+     * Should be called on newly-added emitters and after each configuration change to an existing emitter.
+     *
+     * @param emitter The particle emitter that is being updated.
+     * @param registeredAffectorFunctions The list of affector functions to use when processing the given system's affectors.
      * @param registeredGeneratorFunctions The list of generator functions to use when processing the given system's generators.
      */
     void configureEmitter(ParticleEmitterComponent emitter,
                           BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
                           BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
 
+    /**
+     * Updates all particle emitters, first spawning new particles and then applying affectors.
+     *
+     * @param delta The time (in seconds) since the last engine update.
+     */
     void update(float delta);
 
+    /**
+     *
+     * @return All current particle emitters.
+     */
     Collection<ParticleEmitterComponent> getParticleEmitters();
 
+    /**
+     * Initializes a new particle updater.
+     *
+     * @param physics The physics system to be used when simulating particle physics (collisions).
+     *
+     * @return A newly configured particle updater.
+     */
     static ParticleUpdater create(Physics physics) {
         return new ParticleUpdaterImpl(physics);
     }

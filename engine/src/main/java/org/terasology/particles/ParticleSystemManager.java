@@ -24,7 +24,7 @@ import org.terasology.particles.rendering.ParticleRenderingData;
 import java.util.stream.Stream;
 
 /**
- * Component system responsible for keeping track of all ParticleSystem components and updating them.
+ * Component system responsible for keeping track of all {@link org.terasology.particles.components.ParticleEmitterComponent} components and updating them.
  * Also maintains a registry of generator and affector functions to be used when processing generators
  * and affectors during a particle system update.
  */
@@ -32,9 +32,27 @@ import java.util.stream.Stream;
 @API
 public interface ParticleSystemManager {
 
+    /**
+     * Registers an Affector function to be used when updating particle systems that have the registered affector as a component.
+     *
+     * @param affectorFunction The affector function to be used.
+     */
     void registerAffectorFunction(AffectorFunction affectorFunction);
 
+    /**
+     * Registers a Generator function to be used to configure newly-created particles for particle systems that have the registered generator as a component.
+     *
+     * @param generatorFunction The generator function to be used.
+     */
     void registerGeneratorFunction(GeneratorFunction generatorFunction);
 
+    /**
+     * Gets all current emitters that have a given particle data component and returns a stream of all particle pools and their associated data for rendering.
+     * A particle data component stores information used to define how the particles of the emitter it is attached to are rendered.
+     *
+     * @param particleDataComponent The particle data component to select emitters by.
+     *
+     * @return A stream of {@link ParticleRenderingData} to be used by particle renderers.
+     */
     Stream<ParticleRenderingData> getParticleEmittersByDataComponent(Class<? extends Component> particleDataComponent);
 }
