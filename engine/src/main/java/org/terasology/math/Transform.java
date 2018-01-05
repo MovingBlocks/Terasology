@@ -39,6 +39,7 @@ public class Transform {
 
     /**
      * Creates a new {@link Transform} with the given origin, rotation, and scale.
+     *
      * @param origin The origin of the transform.
      * @param rotation The rotation of the transform.
      * @param scale The scale of the transform.
@@ -50,9 +51,7 @@ public class Transform {
     }
 
     /**
-     * Creates and returns the basis matrix for this transform.
-     *
-     * A basis matrix is a 3x3 matrix which contains the rotation and scaling information of the transform.
+     * Returns the rotation and scaling information contained in the transform as a 3x3 basis matrix.
      *
      * @return The basis matrix.
      */
