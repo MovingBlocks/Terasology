@@ -20,7 +20,7 @@ import org.terasology.math.geom.Vector3f;
 import java.util.List;
 
 /**
- * Factory interface to create new collision shapes.
+ * Interface for factories creating new collision shapes.
  */
 public interface CollisionShapeFactory {
     /**
@@ -31,8 +31,8 @@ public interface CollisionShapeFactory {
     BoxShape getNewBox(Vector3f extents);
 
     /**
-     * Creates a new convex hull shape with the given vertices.
-     * @param vertices The vertices of the convex hull shape.
+     * Creates a new convex hull shape enveloping the given vertices.
+     * @param vertices The vertices to be enveloped by the convex hull shape.
      * @return The convex hull shape.
      */
     ConvexHullShape getNewConvexHull(List<Vector3f> vertices);
