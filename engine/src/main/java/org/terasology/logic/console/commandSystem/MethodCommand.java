@@ -101,7 +101,6 @@ public final class MethodCommand extends AbstractCommand {
                             }
                         }
                     }
-
                 }
             }
             logger.debug("Registering command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
