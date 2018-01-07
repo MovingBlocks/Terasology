@@ -81,18 +81,32 @@ public class RenderGraph {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public boolean connect(Node fromNode, Node toNode) {
-        Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
-        Preconditions.checkNotNull(toNode, "toNode cannot be null!");
+    public boolean connect(Node ... nodeList) {
+        boolean returnValue = true;
 
-        boolean success = edgeMap.put(fromNode, toNode);
-        if (success) {
-            reverseEdgeMap.put(toNode, fromNode);
-        } else {
-            logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
+        assert(nodeList.length > 1);
+
+        Node fromNode = null;
+
+        for (Node toNode : nodeList) {
+            Preconditions.checkNotNull(toNode, "toNode cannot be null!");
+
+            if (fromNode == null) {
+                fromNode = toNode;
+                continue;
+            }
+
+            boolean success = edgeMap.put(fromNode, toNode);
+            if (success) {
+                reverseEdgeMap.put(toNode, fromNode);
+            } else {
+                logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
+            }
+
+            returnValue = returnValue && success;
         }
 
-        return success;
+        return returnValue;
     }
 
     public boolean disconnect(Node fromNode, Node toNode) {
