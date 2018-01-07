@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.logic.actions.SpawnPrefabAction;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
@@ -51,6 +52,7 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
@@ -76,18 +78,16 @@ import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -143,12 +143,13 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Search commands/prefabs/assets with matching name, description, help text, usage or required permission
+     *
      * @param searched String which is used to search for match
      * @return String containing result of search
      */
     @Command(shortDescription = "Search commands/prefabs/assets",
-             helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                 + "help text, usage or required permission")
+            helpText = "Displays commands, prefabs, and assets with matching name, description, "
+                    + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
@@ -158,7 +159,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         // String containing numbers of commands, prefabs and block that match searched string
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
-            " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         // iterate through commands adding them to result
         if (commands.size() > 0) {
@@ -183,66 +184,72 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * List commands that match searched string
+     *
      * @param searchLowercase searched string lowercase
      * @return List of commands that match searched string
      */
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
-            .map(ConsoleCommand::getUsage).collect(Collectors.toList());
+                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
     }
 
     /**
      * Determine if command is matching one of criteria
+     *
      * @param searchLowercase searched string
-     * @param command ConsoleCommand to check if matches searched string
+     * @param command         ConsoleCommand to check if matches searched string
      * @return boolean containing true if command matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
-            || command.getDescription().toLowerCase().contains(searchLowercase)
-            || command.getHelpText().toLowerCase().contains(searchLowercase)
-            || command.getUsage().toLowerCase().contains(searchLowercase)
-            || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+                || command.getDescription().toLowerCase().contains(searchLowercase)
+                || command.getHelpText().toLowerCase().contains(searchLowercase)
+                || command.getUsage().toLowerCase().contains(searchLowercase)
+                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     /**
      * List prefabs that match searched string
+     *
      * @param searchLowercase searched string
      * @return List of prefabs that match searched string
      */
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
-            .filter(prefab -> matchesSearch(searchLowercase, prefab))
-            .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
+                .filter(prefab -> matchesSearch(searchLowercase, prefab))
+                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
     }
 
     /**
      * Determine if prefab is matching one of criteria
+     *
      * @param searchLowercase searched String
-     * @param prefab Prefab to check if matches searched string
+     * @param prefab          Prefab to check if matches searched string
      * @return boolean containing true if prefab matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
         return prefab.getName().toLowerCase().contains(searchLowercase)
-            || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     /**
      * List blocks that match searched string
+     *
      * @param searchLowercase searched string
      * @return List of blocks that match searched string
      */
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-            .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-            .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-            .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
     }
 
     /**
      * Determine if block family matches one of criteria
+     *
      * @param searchLowercase searched string
-     * @param def BlockFamilyDefinition to be checked
+     * @param def             BlockFamilyDefinition to be checked
      * @return boolean containing true if blockFamilyDefinition matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
@@ -252,6 +259,7 @@ public class CoreCommands extends BaseComponentSystem {
     /**
      * Time dilation slows down the passage of time by affecting how the main game loop runs,
      * with the goal being to handle high-latency situations by spreading out processing over a longer amount of time
+     *
      * @param rate float time dilation
      */
     @Command(shortDescription = "Alter the rate of time")
@@ -261,6 +269,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Change the UI language
+     *
      * @param langTag String containing language code to change
      * @return String containing language or if not recognized error message
      */
@@ -283,6 +292,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Shows a ui screen
+     *
      * @param uri String containing ui screen name
      * @return String containing Success if UI was change or Not found if screen is missing
      */
@@ -293,6 +303,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Reloads ui screen
+     *
      * @param ui String containing ui screen name
      * @return String containing Success if UI was reloaded or No unique resource found if more screens were found
      */
@@ -317,6 +328,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui screen
+     *
      * @param uri String containing ui screen name
      * @return String containing final message
      */
@@ -340,6 +352,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui skin
+     *
      * @param uri String containing name of ui skin
      * @return String containing final message
      */
@@ -363,6 +376,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Switches to fullscreen or to windowed mode
+     *
      * @return String containing final message
      */
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -378,6 +392,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Removes all entities of the given prefab
+     *
      * @param prefabName String containing prefab name
      */
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
@@ -402,7 +417,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Join a game
-     * @param address String containing address of game server
+     *
+     * @param address   String containing address of game server
      * @param portParam Integer containing game server port
      */
     @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -426,10 +442,11 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Leaves the current game and returns to main menu
+     *
      * @return String containing final message
      */
     @Command(shortDescription = "Leaves the current game and returns to main menu",
-             requiredPermission = PermissionManager.NO_PERMISSION)
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
         if (networkSystem.getMode() != NetworkMode.NONE) {
             gameEngine.changeState(new StateMainMenu());
@@ -441,10 +458,11 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Writes out information on all entities to a text file for debugging
+     *
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
+            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
@@ -454,7 +472,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns an instance of a prefab in the world
-     * @param sender Sender of command
+     *
+     * @param sender     Sender of command
      * @param prefabName String containing prefab name
      * @return String containing final message
      */
@@ -490,12 +509,13 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns a block in front of the player
-     * @param sender Sender of command
+     *
+     * @param sender    Sender of command
      * @param blockName String containing name of block to spawn
      * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-        "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -516,14 +536,139 @@ public class CoreCommands extends BaseComponentSystem {
         blockItem.send(new DropItemEvent(spawnPos));
         return "Spawned block.";
     }
+    @Command(shortDescription = "spawns many block together (value up to you prefer)", helpText = "you can select the particular block you want to spawn" +
+            "include the amount", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bulkDropper(@Sender EntityRef sender, @CommandParam("blockName") String blockName, @CommandParam("value") int value) {
 
+        //This is a loop which gives the particular amount of block the player wants to spawn
+        for (int i = 0; i <= value; i++) {
+            ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+            LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+            Vector3f spawnPos = characterLocation.getWorldPosition();
+            Vector3f offset = characterLocation.getWorldDirection();
+            offset.scale(3);
+            spawnPos.add(5,10,0);
+
+            BlockFamily block = blockManager.getBlockFamily(blockName);
+            if (block == null) {
+                return "";
+            }
+            BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+            EntityRef blockItem = blockItemFactory.newInstance(block);
+
+            blockItem.send(new DropItemEvent(spawnPos));
+        }
+
+        // this returns the block you have spawned and the amount
+        return "Dropped " + value + " Blocks :)";
+    }
+
+    @Command(shortDescription = "Spawns 10 bowling pin in a regular patter (1,2,3,4)", helpText = "just enter the command prepare and your block name",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String prepare  (@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
+
+        //loop for getting 10 blocks
+        for (int m = 0 ;m< 10; m++) {
+
+
+            //SpawnPrefabActionComponent spawnInfo = sender.getComponent(SpawnPrefabActionComponent.class);
+
+
+            ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+            LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+            Vector3f spawnPos = characterLocation.getWorldPosition();
+            Vector3f offset = characterLocation.getWorldDirection();
+
+
+            offset.scale(0);
+            // a is the distance betweeen the pins and coordinate difference in z vector
+            //xyz are the normal coordinates
+
+            float y = 2.0f; float x = 2.0f; float z =  2.0f; float a = 0.3f; float b = 0.5f;
+            // there is no guarantee that the pins will stand straight, but the range for ir to stand up right is from the vector y between (5.8 - 6.1)
+            float x1 = 0; float x2 = 0; float x3 = 0; float x4 = 0; float x5 = 0; float x6 = 0; float x7 = 0; float x8 = 0; float x9 = 0; float x10 = 0; float z1 = 0; float z2 = 0; float z3 = 0; float z4 = 0; float z5 = 0; float z6 = 0; float z7 = 0; float z8 = 0; float z9 = 0; float z10 = 0;
+
+
+            x1 = x; z1 = z;
+            x2 = x + a; z2 = z+b;
+            x3 = x-a; z3 = z2;
+            x4 = x1+a; z4 = z3+b;
+            x5 = x1; z5 = z4;
+            x6 = x3-a; z6 = z5;
+            x7 = x4+a; z7 = z6+b;
+            x8 = x2; z8 = z7;
+            x9 = x3; z9 = z8;
+            x10 = x6-a; z10 = z8;
+
+            //I know I could have used if else but eh..
+            if (m == 0) {
+                spawnPos.add(x1, y, z1);
+            }
+            if (m == 1) {
+                spawnPos.add(x2, y, z2);
+            }
+
+            if (m == 2) {
+                spawnPos.add(x3, y, z3);
+            }
+            if (m == 3) {
+                spawnPos.add(x4, y, z4);
+            }
+            if (m == 4) {
+                spawnPos.add(x5, y, z5);
+            }
+            if (m == 5) {
+                spawnPos.add(x6, y, z6);
+            }
+            if (m == 6) {
+                spawnPos.add(x7, y, z7);
+            }
+            if (m == 7) {
+                spawnPos.add(x8, y, z8);
+            }
+            if (m == 8) {
+                spawnPos.add(x9, y, z9);
+            }
+            if (m == 9) {
+                spawnPos.add(x10, y, z10);
+            }
+            //spawnPos.add(3, 2, n);
+
+            BlockFamily block = blockManager.getBlockFamily(blockName);
+            if (block == null) {
+                return "";
+            }
+            BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+            EntityRef blockItem = blockItemFactory.newInstance(block);
+
+            //blockItem.send(new SpawnPrefabAction(spawnPos));
+            //entityManager.create(spawnInfo.prefab, spawnPos);
+            blockItem.send(new DropItemEvent(spawnPos));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //spawnPos.add(-x, -2, -z);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return "Dropped 10 Bowlingpin :)";
+    }
     /**
      * Your ping to the server
      * @param sender Sender of command
      * @return String containing ping or error message
      */
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-        "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
+            "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
     public String ping(@Sender EntityRef sender) {
         Server server = networkSystem.getServer();
         if (server == null) {
@@ -555,7 +700,7 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing short description of all commands or longer help text if command is provided
      */
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
-             requiredPermission = PermissionManager.NO_PERMISSION)
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();
