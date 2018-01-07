@@ -42,6 +42,7 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.naming.Name;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
@@ -58,6 +59,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,6 @@ import java.util.concurrent.BlockingQueue;
 
 /**
  * An implementation of the EventSystem.
- *
  */
 public class EventSystemImpl implements EventSystem {
 
@@ -85,11 +86,13 @@ public class EventSystemImpl implements EventSystem {
 
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
+    private Set<Name> loadedModules = new HashSet<>();
 
-    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
+    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem, List<Name> loadedModules) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
+        this.loadedModules.addAll(loadedModules);
     }
 
     @Override
@@ -144,6 +147,10 @@ public class EventSystemImpl implements EventSystem {
                 if (!receiveEventAnnotation.netFilter().isValidFor(networkSystem.getMode(), false)) {
                     continue;
                 }
+                if (!allModulesLoaded(loadedModules, receiveEventAnnotation.requiredModules())) {
+                    continue;
+                }
+
                 Set<Class<? extends Component>> requiredComponents = Sets.newLinkedHashSet();
                 method.setAccessible(true);
                 Class<?>[] types = method.getParameterTypes();
@@ -171,6 +178,16 @@ public class EventSystemImpl implements EventSystem {
             }
         }
     }
+
+    private boolean allModulesLoaded(Set<Name> modules, String[] required) {
+        for (String module : required) {
+            if (!modules.contains(new Name(module))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public void unregisterEventHandler(ComponentSystem handler) {
@@ -417,10 +434,10 @@ public class EventSystemImpl implements EventSystem {
         private int priority;
 
         ReflectedEventHandlerInfo(ComponentSystem handler,
-                                         Method method,
-                                         int priority,
-                                         Collection<Class<? extends Component>> filterComponents,
-                                         Collection<Class<? extends Component>> componentParams) {
+                                  Method method,
+                                  int priority,
+                                  Collection<Class<? extends Component>> filterComponents,
+                                  Collection<Class<? extends Component>> componentParams) {
             this.handler = handler;
             this.method = method;
             this.filterComponents = ImmutableList.copyOf(filterComponents);
@@ -474,11 +491,11 @@ public class EventSystemImpl implements EventSystem {
         private int priority;
 
         ByteCodeEventHandlerInfo(ComponentSystem handler,
-                                        Method method,
-                                        int priority,
-                                        String activity,
-                                        Collection<Class<? extends Component>> filterComponents,
-                                        Collection<Class<? extends Component>> componentParams) {
+                                 Method method,
+                                 int priority,
+                                 String activity,
+                                 Collection<Class<? extends Component>> filterComponents,
+                                 Collection<Class<? extends Component>> componentParams) {
 
 
             this.handler = handler;

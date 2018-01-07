@@ -111,7 +111,7 @@ public final class EntitySystemSetupUtil {
         entityManager.setComponentLibrary(library.getComponentLibrary());
 
         // Event System
-        EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
+        EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem, environment.getModuleIdsOrderedByDependencies());
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 

@@ -28,7 +28,6 @@ import java.lang.annotation.Target;
  * <br><br>
  * These methods should have the form
  * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -37,6 +36,8 @@ public @interface ReceiveEvent {
      * What components that the entity must have for this method to be invoked
      */
     Class<? extends Component>[] components() default {};
+
+    String[] requiredModules() default {};
 
     RegisterMode netFilter() default RegisterMode.ALWAYS;
 
