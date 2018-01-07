@@ -586,7 +586,7 @@ public class CoreCommands extends BaseComponentSystem {
             // a is the distance betweeen the pins and coordinate difference in z vector
             //xyz are the normal coordinates
 
-            float y = 2.0f; float x = 2.0f; float z =  2.0f; float a = 0.3f; float b = 0.5f;
+            float y = 6.0f; float x = 2.0f; float z =  2.0f; float a = 0.3f; float b = 0.5f;
             // there is no guarantee that the pins will stand straight, but the range for ir to stand up right is from the vector y between (5.8 - 6.1)
             float x1 = 0; float x2 = 0; float x3 = 0; float x4 = 0; float x5 = 0; float x6 = 0; float x7 = 0; float x8 = 0; float x9 = 0; float x10 = 0; float z1 = 0; float z2 = 0; float z3 = 0; float z4 = 0; float z5 = 0; float z6 = 0; float z7 = 0; float z8 = 0; float z9 = 0; float z10 = 0;
 
