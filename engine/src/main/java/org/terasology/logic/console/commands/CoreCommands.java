@@ -596,54 +596,44 @@ public class CoreCommands extends BaseComponentSystem {
                 case 1:
                     pinposX[pinnumber] = 3.0f;
                     pinposZ[pinnumber] = 3.0f;
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] + deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
                     break;
                 case 2:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
                 case 3:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] + 3* deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
                     break;
                 case 4:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
                 case 5:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
                 case 6:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] + 5 * deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
                     break;
                 case 7:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
                 case 8:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
                 case 9:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
                     pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
                     pinposZ[pinnumber+1] = pinposZ[pinnumber];
                     break;
-                case 10:
-                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
-                    break;
             }
+
+            spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
 
             BlockFamily block = blockManager.getBlockFamily(blockName);
             if (block == null) {
