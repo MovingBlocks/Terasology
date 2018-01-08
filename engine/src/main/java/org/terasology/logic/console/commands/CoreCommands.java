@@ -16,6 +16,7 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
+import com.sun.jna.platform.unix.X11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -85,7 +86,11 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -536,20 +541,19 @@ public class CoreCommands extends BaseComponentSystem {
         blockItem.send(new DropItemEvent(spawnPos));
         return "Spawned block.";
     }
-    @Command(shortDescription = "spawns many block together (value up to you prefer)", helpText = "you can select the particular block you want to spawn" +
-            "include the amount", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Drops many blocks as per value choosen by the player", helpText = "the particular block can be seleted which the player wants to drop"
+                , runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bulkDropper(@Sender EntityRef sender, @CommandParam("blockName") String blockName, @CommandParam("value") int value) {
 
         //This is a loop which gives the particular amount of block the player wants to spawn
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = characterLocation.getWorldDirection();
+        offset.scale(3);
+        spawnPos.add(5,10,0);
         for (int i = 0; i <= value; i++) {
-            ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
-            LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
-
-            Vector3f spawnPos = characterLocation.getWorldPosition();
-            Vector3f offset = characterLocation.getWorldDirection();
-            offset.scale(3);
-            spawnPos.add(5,10,0);
-
             BlockFamily block = blockManager.getBlockFamily(blockName);
             if (block == null) {
                 return "";
@@ -564,16 +568,21 @@ public class CoreCommands extends BaseComponentSystem {
         return "Dropped " + value + " Blocks :)";
     }
 
-    @Command(shortDescription = "Spawns 10 bowling pin in a regular patter (1,2,3,4)", helpText = "just enter the command prepare and your block name",
+    @Command(shortDescription = "Drops bowling pin", helpText = " `prepare` command to be entered along with the `block name` ",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String prepare  (@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
 
-        //loop for getting 10 blocks
-        for (int m = 0 ;m< 10; m++) {
+        float [] pinposX= new float [11];
+        float [] pinposZ = new float [11];
+        float pinposY = 6.0f; float deltaX = 0.3f; float deltaZ = 0.5f;
 
+        // pinposY - is to be tweaked to make the pin stand upright.
+        // pinposX - the x vector of the pin number
+        // pinposZ - is the z vector of the pin number
+        // deltaX is the distance betweeen the pins in x vector
+        // deltaZ is the distance between the pins in z vector
 
-            //SpawnPrefabActionComponent spawnInfo = sender.getComponent(SpawnPrefabActionComponent.class);
-
+        for (int pinnumber = 1 ;pinnumber < 11; pinnumber++) {
 
             ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
             LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -581,60 +590,60 @@ public class CoreCommands extends BaseComponentSystem {
             Vector3f spawnPos = characterLocation.getWorldPosition();
             Vector3f offset = characterLocation.getWorldDirection();
 
-
             offset.scale(0);
-            // a is the distance betweeen the pins and coordinate difference in z vector
-            //xyz are the normal coordinates
 
-            float y = 6.0f; float x = 2.0f; float z =  2.0f; float a = 0.3f; float b = 0.5f;
-            // there is no guarantee that the pins will stand straight, but the range for ir to stand up right is from the vector y between (5.8 - 6.1)
-            float x1 = 0; float x2 = 0; float x3 = 0; float x4 = 0; float x5 = 0; float x6 = 0; float x7 = 0; float x8 = 0; float x9 = 0; float x10 = 0; float z1 = 0; float z2 = 0; float z3 = 0; float z4 = 0; float z5 = 0; float z6 = 0; float z7 = 0; float z8 = 0; float z9 = 0; float z10 = 0;
-
-
-            x1 = x; z1 = z;
-            x2 = x + a; z2 = z+b;
-            x3 = x-a; z3 = z2;
-            x4 = x1+a; z4 = z3+b;
-            x5 = x1; z5 = z4;
-            x6 = x3-a; z6 = z5;
-            x7 = x4+a; z7 = z6+b;
-            x8 = x2; z8 = z7;
-            x9 = x3; z9 = z8;
-            x10 = x6-a; z10 = z8;
-
-            //I know I could have used if else but eh..
-            if (m == 0) {
-                spawnPos.add(x1, y, z1);
+            switch (pinnumber) {
+                case 1:
+                    pinposX[pinnumber] = 3.0f;
+                    pinposZ[pinnumber] = 3.0f;
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] + deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
+                    break;
+                case 2:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 3:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] + 3* deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
+                    break;
+                case 4:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 5:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 6:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] + 5 * deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
+                    break;
+                case 7:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 8:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 9:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
+                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
+                    break;
+                case 10:
+                    spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
+                    break;
             }
-            if (m == 1) {
-                spawnPos.add(x2, y, z2);
-            }
-
-            if (m == 2) {
-                spawnPos.add(x3, y, z3);
-            }
-            if (m == 3) {
-                spawnPos.add(x4, y, z4);
-            }
-            if (m == 4) {
-                spawnPos.add(x5, y, z5);
-            }
-            if (m == 5) {
-                spawnPos.add(x6, y, z6);
-            }
-            if (m == 6) {
-                spawnPos.add(x7, y, z7);
-            }
-            if (m == 7) {
-                spawnPos.add(x8, y, z8);
-            }
-            if (m == 8) {
-                spawnPos.add(x9, y, z9);
-            }
-            if (m == 9) {
-                spawnPos.add(x10, y, z10);
-            }
-            //spawnPos.add(3, 2, n);
 
             BlockFamily block = blockManager.getBlockFamily(blockName);
             if (block == null) {
@@ -643,20 +652,13 @@ public class CoreCommands extends BaseComponentSystem {
             BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
             EntityRef blockItem = blockItemFactory.newInstance(block);
 
-            //blockItem.send(new SpawnPrefabAction(spawnPos));
-            //entityManager.create(spawnInfo.prefab, spawnPos);
             blockItem.send(new DropItemEvent(spawnPos));
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //spawnPos.add(-x, -2, -z);
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
         }
 
 
