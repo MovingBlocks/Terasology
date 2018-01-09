@@ -109,7 +109,7 @@
     "file-picker-cant-change-dir": "Zmiana folderu nie powiodła się",
     "file-picker-file-name": "Nazwa pliku: ",
     "file-picker-full-path": "Ścieżka do pliku: ",
-    "file-picker-home": "",
+    "file-picker-home": "Dom",
     "file-picker-invalid-file-name": "Niepoprawna nazwa pliku",
     "file-picker-invalid-location": "Niepoprawna lokalizacja pliku",
     "file-picker-parent": "Do góry",
