@@ -38,17 +38,34 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * A grid of {@link InventoryCell} used to display an inventory of an entity.
  */
 public class InventoryGrid extends CoreWidget {
-
+    /*
+    Defines maximum amount of cells in a single row of InventoryGrid.
+    E.g if an inventory of an entity has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells.
+     */
     @LayoutConfig
     private int maxHorizontalCells = 10;
+
+    /*
+    Defines first cell number from which the InventoryGrid should be displayed.
+    E.g if an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
+     */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
+
+    /*
+    Defines the maximum amount of cells drawn in an InventoryGrid.
+    Used together with cellOffset allows to access only parts of an entity's inventory.
+    E.g if an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
+     */
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
     private List<InventoryCell> cells = Lists.newArrayList();
+
+    //EntityRef to an entity whose inventory will be displayed by this InventoryGrid.
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -123,6 +140,10 @@ public class InventoryGrid extends CoreWidget {
         return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }
 
+    /**
+     * Returns an iterator over the {@link InventoryCell} this grid displays.
+     * @return Iterator over this grid's InventoryCells
+     */
     @Override
     public Iterator<UIWidget> iterator() {
         return Iterators.transform(cells.iterator(), new Function<UIWidget, UIWidget>() {
@@ -141,10 +162,18 @@ public class InventoryGrid extends CoreWidget {
         this.maxHorizontalCells = maxHorizontalCells;
     }
 
+    /**
+     * Binds the entity whose inventory will be displayed with this grid.
+     * @param binding Binding of the EntityRef type referring to the entity whose inventory will be displayed.
+     */
     public void bindTargetEntity(Binding<EntityRef> binding) {
         targetEntity = binding;
     }
 
+    /**
+     * Returns an EntityRef to the entity whose inventory is displayed using this grid.
+     * @return EntityRef to the entity whose inventory is displayed using this grid.
+     */
     public EntityRef getTargetEntity() {
         return targetEntity.get();
     }
@@ -186,6 +215,9 @@ public class InventoryGrid extends CoreWidget {
         return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
 
+    /**
+     * Returns an actual slot this grid displays.
+     */
     private final class SlotBinding extends ReadOnlyBinding<Integer> {
 
         private int slot;
