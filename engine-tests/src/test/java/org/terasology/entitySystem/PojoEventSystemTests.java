@@ -34,6 +34,7 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -42,6 +43,7 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -73,7 +75,7 @@ public class PojoEventSystemTests {
         entityManager.setPrefabManager(new PojoPrefabManager(context));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem);
+        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), networkSystem, new ArrayList<>());
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }
