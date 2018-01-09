@@ -42,22 +42,23 @@ import java.util.List;
  */
 public class InventoryGrid extends CoreWidget {
     /*
-    Defines maximum amount of cells in a single row of InventoryGrid.
-    E.g if an inventory of an entity has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells.
+    Defines maximum amount of cells displayed in a single row of InventoryGrid.
+    E.g if an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
      */
     @LayoutConfig
     private int maxHorizontalCells = 10;
 
     /*
-    Defines first cell number from which the InventoryGrid should be displayed.
+    Defines first inventory slot index to which an InventoryGrid should refer to.
     E.g if an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
+    Other slots will be not accessible by this InventoryGrid.
      */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
 
     /*
-    Defines the maximum amount of cells drawn in an InventoryGrid.
-    Used together with cellOffset allows to access only parts of an entity's inventory.
+    Defines the maximum amount of cells in an InventoryGrid
+    Used together with cellOffset allows developers to provide access to parts of an entity's inventory.
     E.g if an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
      */
     @LayoutConfig
@@ -65,7 +66,7 @@ public class InventoryGrid extends CoreWidget {
 
     private List<InventoryCell> cells = Lists.newArrayList();
 
-    //EntityRef to an entity whose inventory will be displayed by this InventoryGrid.
+    //EntityRef to an entity whose inventory will be accessed using this InventoryGrid.
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -141,8 +142,8 @@ public class InventoryGrid extends CoreWidget {
     }
 
     /**
-     * Returns an iterator over the {@link InventoryCell} this grid displays.
-     * @return Iterator over this grid's InventoryCells
+     * Returns an iterator over the {@link InventoryCell}s this grid displays.
+     * @return Iterator over this grid's InventoryCells.
      */
     @Override
     public Iterator<UIWidget> iterator() {
@@ -163,7 +164,7 @@ public class InventoryGrid extends CoreWidget {
     }
 
     /**
-     * Binds the entity whose inventory will be displayed with this grid.
+     * Binds the entity to this grid whose inventory will be accessed using this widget.
      * @param binding Binding of the EntityRef type referring to the entity whose inventory will be displayed.
      */
     public void bindTargetEntity(Binding<EntityRef> binding) {
@@ -216,7 +217,7 @@ public class InventoryGrid extends CoreWidget {
     }
 
     /**
-     * Returns an actual slot this grid displays.
+     * Provides a getter for slots of an inventory bound to this widget corresponding to this widget.
      */
     private final class SlotBinding extends ReadOnlyBinding<Integer> {
 
