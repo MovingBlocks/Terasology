@@ -41,32 +41,34 @@ import java.util.List;
  * A grid of {@link InventoryCell} used to display an inventory of an entity.
  */
 public class InventoryGrid extends CoreWidget {
-    /*
-    Defines maximum amount of cells displayed in a single row of InventoryGrid.
-    E.g if an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
+    /**
+     * Defines maximum amount of cells displayed in a single row of InventoryGrid.
+     * E.g if an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
      */
     @LayoutConfig
     private int maxHorizontalCells = 10;
 
-    /*
-    Defines first inventory slot index to which an InventoryGrid should refer to.
-    E.g if an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
-    Other slots will be not accessible by this InventoryGrid.
+    /**
+     * Defines first inventory slot index to which an InventoryGrid should refer to.
+     * E.g if an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
+     * Other slots will be not accessible by this InventoryGrid.
      */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
 
-    /*
-    Defines the maximum amount of cells in an InventoryGrid
-    Used together with cellOffset allows developers to provide access to parts of an entity's inventory.
-    E.g if an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
+    /**
+     * Defines the maximum amount of cells in an InventoryGrid
+     * Used together with cellOffset allows developers to provide access to parts of an entity's inventory.
+     * E.g if an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
      */
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
     private List<InventoryCell> cells = Lists.newArrayList();
 
-    //EntityRef to an entity whose inventory will be accessed using this InventoryGrid.
+    /**
+     * EntityRef to an entity whose inventory will be accessed using this InventoryGrid.
+     */
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -126,12 +128,6 @@ public class InventoryGrid extends CoreWidget {
         }
     }
 
-    /**
-     * Returns preferred content size of the InventoryGrid.
-     * @param canvas Canvas on which an InventoryGrid is drawn.
-     * @param sizeHint A {@link Vector2i} representing how much available space is for this widget.
-     * @return A {@link Vector2i} which represents the preferred size of this widget.
-     */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
