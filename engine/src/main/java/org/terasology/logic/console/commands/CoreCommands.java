@@ -526,9 +526,6 @@ public class CoreCommands extends BaseComponentSystem {
         spawnPos.add(offset);
 
         BlockFamily block = blockManager.getBlockFamily(blockName);
-        if (block == null) {
-            return "";
-        }
 
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
         EntityRef blockItem = blockItemFactory.newInstance(block);
@@ -548,12 +545,14 @@ public class CoreCommands extends BaseComponentSystem {
         Vector3f offset = characterLocation.getWorldDirection();
         offset.scale(3);
         spawnPos.add(5,10,0);
+        BlockFamily block = blockManager.getBlockFamily(blockName);
+        if (block == null) {
+            return "";
+        }
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+
         for (int i = 0; i <= value; i++) {
-            BlockFamily block = blockManager.getBlockFamily(blockName);
-            if (block == null) {
-                return "";
-            }
-            BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+
             EntityRef blockItem = blockItemFactory.newInstance(block);
 
             blockItem.send(new DropItemEvent(spawnPos));
@@ -576,32 +575,32 @@ public class CoreCommands extends BaseComponentSystem {
         offset.scale(5);
         spawnPos.add(offset);
 
+        BlockFamily block = blockManager.getBlockFamily(blockName);
+        if (block == null) {
+            return "";
+        }
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+
+        Vector3f startPos = new Vector3f(spawnPos);
+
         float deltax = .2f;
         float deltaz = .3f;
         float y = 1.0f;
 
+
         //rownumber loop is for selecting row
         for (int rownumber = 0; rownumber < 4; rownumber++) {
-
-            spawnPos.add(deltax * (4 - rownumber), 0, deltaz); //Spawn starting position for Rownumber
+            startPos.add(deltax * (4 - rownumber), 0, deltaz); //Spawn starting position for Rownumber
 
             // pinPosx loop is for vectorx position of bowling pin  in  a particular row
             for (int pinPosx = 0; pinPosx <= rownumber; pinPosx++) {
-
-
-                BlockFamily block = blockManager.getBlockFamily(blockName);
-                if (block == null) {
-                    return "";
-                }
-                BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
                 EntityRef blockItem = blockItemFactory.newInstance(block);
-
-                blockItem.send(new DropItemEvent(spawnPos));
+                blockItem.send(new DropItemEvent(startPos));
                 if (pinPosx < rownumber) {
-                    spawnPos.add(2 * deltax, 0, 0);
+                    startPos.add(2 * deltax, 0, 0);
                 }
             }
-            spawnPos.add(-deltax * (rownumber + 4), 0, 0);
+            startPos.add(-deltax * (rownumber + 4), 0, 0);
         }
         return "prepared 10 " + blockName + " in a bowling pin pattern :)";
     }
