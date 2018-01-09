@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Ordering;
-import com.sun.jna.platform.unix.X11;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
 import org.terasology.config.Config;
@@ -37,7 +36,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.i18n.TranslationProject;
 import org.terasology.i18n.TranslationSystem;
-import org.terasology.logic.actions.SpawnPrefabAction;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
@@ -53,7 +51,6 @@ import org.terasology.logic.permission.PermissionManager;
 import org.terasology.math.Direction;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
@@ -79,7 +76,6 @@ import org.terasology.rendering.world.WorldRendererImpl;
 import org.terasology.utilities.Assets;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -92,7 +88,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -565,94 +560,50 @@ public class CoreCommands extends BaseComponentSystem {
         }
 
         // this returns the block you have spawned and the amount
-        return "Dropped " + value + " Blocks :)";
+        return "Dropped " + value + " " + blockName + " Blocks :)";
     }
 
-    @Command(shortDescription = "Drops bowling pin", helpText = " `prepare` command to be entered along with the `block name` ",
+    @Command(shortDescription = "Arranges the blocks in a bowling pin format.", helpText = "Spawns a specific blocks in a regular bowling pin pattern, The item " +
+            " front of the player can simply picked up",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String prepare  (@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
 
-        float [] pinposX= new float [11];
-        float [] pinposZ = new float [11];
-        float pinposY = 6.0f; float deltaX = 0.3f; float deltaZ = 0.5f;
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
 
-        // pinposY - is to be tweaked to make the pin stand upright.
-        // pinposX - the x vector of the pin number
-        // pinposZ - is the z vector of the pin number
-        // deltaX is the distance betweeen the pins in x vector
-        // deltaZ is the distance between the pins in z vector
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = characterLocation.getWorldDirection();
+        offset.scale(5);
+        spawnPos.add(offset);
 
-        for (int pinnumber = 1 ;pinnumber < 11; pinnumber++) {
+        float deltax = .2f;
+        float deltaz = .3f;
+        float y = 1.0f;
 
-            ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
-            LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+        //rownumber loop is for selecting row
+        for (int rownumber = 0; rownumber < 4; rownumber++) {
 
-            Vector3f spawnPos = characterLocation.getWorldPosition();
-            Vector3f offset = characterLocation.getWorldDirection();
+            spawnPos.add(deltax * (4 - rownumber), 0, deltaz); //Spawn starting position for Rownumber
 
-            offset.scale(0);
+            // pinPosx loop is for vectorx position of bowling pin  in  a particular row
+            for (int pinPosx = 0; pinPosx <= rownumber; pinPosx++) {
 
-            switch (pinnumber) {
-                case 1:
-                    pinposX[pinnumber] = 3.0f;
-                    pinposZ[pinnumber] = 3.0f;
-                    pinposX[pinnumber+1] = pinposX[pinnumber] + deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
-                    break;
-                case 2:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
-                case 3:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] + 3* deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
-                    break;
-                case 4:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2*deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
-                case 5:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
-                case 6:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] + 5 * deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber] + deltaZ;
-                    break;
-                case 7:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
-                case 8:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
-                case 9:
-                    pinposX[pinnumber+1] = pinposX[pinnumber] - 2 * deltaX;
-                    pinposZ[pinnumber+1] = pinposZ[pinnumber];
-                    break;
+
+                BlockFamily block = blockManager.getBlockFamily(blockName);
+                if (block == null) {
+                    return "";
+                }
+                BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+                EntityRef blockItem = blockItemFactory.newInstance(block);
+
+                blockItem.send(new DropItemEvent(spawnPos));
+                if (pinPosx < rownumber) {
+                    spawnPos.add(2 * deltax, 0, 0);
+                }
             }
-
-            spawnPos.add(pinposX[pinnumber], pinposY, pinposZ[pinnumber]);
-
-            BlockFamily block = blockManager.getBlockFamily(blockName);
-            if (block == null) {
-                return "";
-            }
-            BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
-            EntityRef blockItem = blockItemFactory.newInstance(block);
-
-            blockItem.send(new DropItemEvent(spawnPos));
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
+            spawnPos.add(-deltax * (rownumber + 4), 0, 0);
         }
-
-
-        return "Dropped 10 Bowlingpin :)";
+        return "prepared 10 " + blockName + " in a bowling pin pattern :)";
     }
     /**
      * Your ping to the server
