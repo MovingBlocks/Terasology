@@ -126,6 +126,12 @@ public class InventoryGrid extends CoreWidget {
         }
     }
 
+    /**
+     * Returns preferred content size of the InventoryGrid.
+     * @param canvas Canvas on which an InventoryGrid is drawn.
+     * @param sizeHint A {@link Vector2i} representing how much available space is for this widget.
+     * @return A {@link Vector2i} which represents the preferred size of this widget.
+     */
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int numSlots = getNumSlots();
@@ -155,10 +161,18 @@ public class InventoryGrid extends CoreWidget {
         });
     }
 
+    /**
+     * Gets maximum horizontal cells amount.
+     * @return maximum horizontal cells amount.
+     */
     public int getMaxHorizontalCells() {
         return maxHorizontalCells;
     }
 
+    /**
+     * Sets maximum horizontal cells amount.
+     * @param maxHorizontalCells maximum horizontal cells amount.
+     */
     public void setMaxHorizontalCells(int maxHorizontalCells) {
         this.maxHorizontalCells = maxHorizontalCells;
     }
@@ -188,30 +202,58 @@ public class InventoryGrid extends CoreWidget {
         targetEntity.set(val);
     }
 
+    /**
+     * Binds the offset between cells (in px) of this widget.
+     * @param binding Binding of type Integer.
+     */
     public void bindCellOffset(Binding<Integer> binding) {
         cellOffset = binding;
     }
 
+    /**
+     * Gets the offset (in px) between the cells.
+     * @return the offset (in px) between the cells.
+     */
     public int getCellOffset() {
         return cellOffset.get();
     }
 
+    /**
+     * Sets the offset (in px) between the cells.
+     * @param val the desired offset (in px) between the cells.
+     */
     public void setCellOffset(int val) {
         cellOffset.set(val);
     }
 
+    /**
+     * Binds the maximum cell count.
+     * @param binding Binding of type Integer.
+     */
     public void bindMaxCellCount(Binding<Integer> binding) {
         maxCellCount = binding;
     }
 
+    /**
+     * Gets the maximum amount of cells that can be displayed.
+     * @return maximum amount of cells that can be displayed.
+     */
     public int getMaxCellCount() {
         return maxCellCount.get();
     }
 
+    /**
+     * Sets the maximum amount of cells that can be displayed.
+     * @param val maximum amount of cells that can be displayed.
+     */
     public void setMaxCellCount(int val) {
         maxCellCount.set(val);
     }
 
+    /**
+     * Gets the amount of cells this widget displays.
+     * @return the amount of cells this widget displays.
+     */
     public int getNumSlots() {
         return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
