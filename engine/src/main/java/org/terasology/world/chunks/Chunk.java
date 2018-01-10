@@ -19,6 +19,7 @@ package org.terasology.world.chunks;
 import org.terasology.module.sandbox.API;
 
 /**
+ * This interface bundles together all the methods chunk contains.
  */
 @API
 public interface Chunk extends ManagedChunk, RenderableChunk {
