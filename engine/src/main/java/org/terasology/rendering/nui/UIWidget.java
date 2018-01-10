@@ -93,8 +93,9 @@ public interface UIWidget extends Iterable<UIWidget> {
     void onBindEvent(BindButtonEvent event);
 
     /**
-     * Returns preferred content size of this widget.
-     * @param canvas Canvas on which this widget is drawn.
+     * Returns the preferred content size of this widget.
+     *
+     * @param canvas A {@link Canvas} on which this widget is drawn.
      * @param sizeHint A {@link Vector2i} representing how much available space is for this widget.
      * @return A {@link Vector2i} which represents the preferred size of this widget.
      */

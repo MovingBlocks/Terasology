@@ -42,24 +42,27 @@ import java.util.List;
  */
 public class InventoryGrid extends CoreWidget {
     /**
-     * Defines maximum amount of cells displayed in a single row of InventoryGrid.
-     * E.g if an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
+     * Defines the maximum amount of cells displayed in a single row of InventoryGrid.
+     *
+     * Example: If an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
      */
     @LayoutConfig
     private int maxHorizontalCells = 10;
 
     /**
-     * Defines first inventory slot index to which an InventoryGrid should refer to.
-     * E.g if an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
+     * Defines the first inventory slot index to which an InventoryGrid should refer to.
+     *
+     * Example: If an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
      * Other slots will be not accessible by this InventoryGrid.
      */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
 
     /**
-     * Defines the maximum amount of cells in an InventoryGrid
-     * Used together with cellOffset allows developers to provide access to parts of an entity's inventory.
-     * E.g if an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
+     * Defines the maximum amount of cells in an InventoryGrid.
+     * Used together with cellOffset, it allows developers to provide access to parts of an entity's inventory.
+     *
+     * Example: If an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
      */
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
@@ -145,6 +148,7 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Returns an iterator over the {@link InventoryCell}s this grid displays.
+     *
      * @return Iterator over this grid's InventoryCells.
      */
     @Override
@@ -158,16 +162,18 @@ public class InventoryGrid extends CoreWidget {
     }
 
     /**
-     * Gets maximum horizontal cells amount.
-     * @return maximum horizontal cells amount.
+     * Gets the maximum horizontal cells amount.
+     *
+     * @return The maximum horizontal cells amount.
      */
     public int getMaxHorizontalCells() {
         return maxHorizontalCells;
     }
 
     /**
-     * Sets maximum horizontal cells amount.
-     * @param maxHorizontalCells maximum horizontal cells amount.
+     * Sets the maximum horizontal cells amount.
+     *
+     * @param maxHorizontalCells The maximum horizontal cells amount.
      */
     public void setMaxHorizontalCells(int maxHorizontalCells) {
         this.maxHorizontalCells = maxHorizontalCells;
@@ -175,7 +181,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Binds the entity to this grid whose inventory will be accessed using this widget.
-     * @param binding Binding of the EntityRef type referring to the entity whose inventory will be displayed.
+     *
+     * @param binding A Binding of the EntityRef type referring to the entity whose inventory will be displayed.
      */
     public void bindTargetEntity(Binding<EntityRef> binding) {
         targetEntity = binding;
@@ -183,7 +190,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Returns an EntityRef to the entity whose inventory is displayed using this grid.
-     * @return EntityRef to the entity whose inventory is displayed using this grid.
+     *
+     * @return An EntityRef to the entity whose inventory is displayed using this grid.
      */
     public EntityRef getTargetEntity() {
         return targetEntity.get();
@@ -200,7 +208,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Binds the offset between cells (in px) of this widget.
-     * @param binding Binding of type Integer.
+     *
+     * @param binding A Binding of the Integer type.
      */
     public void bindCellOffset(Binding<Integer> binding) {
         cellOffset = binding;
@@ -208,7 +217,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Gets the offset (in px) between the cells.
-     * @return the offset (in px) between the cells.
+     *
+     * @return The offset (in px) between the cells.
      */
     public int getCellOffset() {
         return cellOffset.get();
@@ -216,7 +226,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Sets the offset (in px) between the cells.
-     * @param val the desired offset (in px) between the cells.
+     *
+     * @param val The desired offset (in px) between the cells.
      */
     public void setCellOffset(int val) {
         cellOffset.set(val);
@@ -224,7 +235,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Binds the maximum cell count.
-     * @param binding Binding of type Integer.
+     *
+     * @param binding A Binding of the Integer type.
      */
     public void bindMaxCellCount(Binding<Integer> binding) {
         maxCellCount = binding;
@@ -232,7 +244,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Gets the maximum amount of cells that can be displayed.
-     * @return maximum amount of cells that can be displayed.
+     *
+     * @return The maximum amount of cells that can be displayed.
      */
     public int getMaxCellCount() {
         return maxCellCount.get();
@@ -240,7 +253,8 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Sets the maximum amount of cells that can be displayed.
-     * @param val maximum amount of cells that can be displayed.
+     *
+     * @param val The maximum amount of cells that can be displayed.
      */
     public void setMaxCellCount(int val) {
         maxCellCount.set(val);
@@ -248,14 +262,15 @@ public class InventoryGrid extends CoreWidget {
 
     /**
      * Gets the amount of cells this widget displays.
-     * @return the amount of cells this widget displays.
+     *
+     * @return The amount of cells this widget displays.
      */
     public int getNumSlots() {
         return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
 
     /**
-     * Provides a getter for slots of an inventory bound to this widget corresponding to this widget.
+     * Provides a getter for slots of an inventory bound to this widget accordingly to displayed slots' indexes.
      */
     private final class SlotBinding extends ReadOnlyBinding<Integer> {
 
