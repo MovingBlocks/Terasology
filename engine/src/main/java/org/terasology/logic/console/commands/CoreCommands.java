@@ -148,7 +148,7 @@ public class CoreCommands extends BaseComponentSystem {
      */
     @Command(shortDescription = "Search commands/prefabs/assets",
             helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                    + "help text, usage or required permission")
+                + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
@@ -158,7 +158,7 @@ public class CoreCommands extends BaseComponentSystem {
 
         // String containing numbers of commands, prefabs and block that match searched string
         String result = "Found " + commands.size() + " command matches, " + prefabs.size() +
-                " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
+            " prefab matches and " + blocks.size() + " block matches when searching for '" + searched + "'.";
 
         // iterate through commands adding them to result
         if (commands.size() > 0) {
@@ -188,7 +188,7 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private List<String> findCommandMatches(String searchLowercase) {
         return console.getCommands().stream().filter(command -> matchesSearch(searchLowercase, command))
-                .map(ConsoleCommand::getUsage).collect(Collectors.toList());
+            .map(ConsoleCommand::getUsage).collect(Collectors.toList());
     }
 
     /**
@@ -199,10 +199,10 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
         return command.getName().toLowerCase().contains(searchLowercase)
-                || command.getDescription().toLowerCase().contains(searchLowercase)
-                || command.getHelpText().toLowerCase().contains(searchLowercase)
-                || command.getUsage().toLowerCase().contains(searchLowercase)
-                || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
+            || command.getDescription().toLowerCase().contains(searchLowercase)
+            || command.getHelpText().toLowerCase().contains(searchLowercase)
+            || command.getUsage().toLowerCase().contains(searchLowercase)
+            || command.getRequiredPermission().toLowerCase().contains(searchLowercase);
     }
 
     /**
@@ -212,8 +212,8 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private List<String> findPrefabMatches(String searchLowercase) {
         return StreamSupport.stream(prefabManager.listPrefabs().spliterator(), false)
-                .filter(prefab -> matchesSearch(searchLowercase, prefab))
-                .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
+            .filter(prefab -> matchesSearch(searchLowercase, prefab))
+            .map(prefab -> prefab.getUrn().toString()).collect(Collectors.toList());
     }
 
     /**
@@ -224,7 +224,7 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
         return prefab.getName().toLowerCase().contains(searchLowercase)
-                || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
+            || prefab.getUrn().toString().toLowerCase().contains(searchLowercase);
     }
 
     /**
@@ -234,9 +234,9 @@ public class CoreCommands extends BaseComponentSystem {
      */
     private List<String> findBlockMatches(String searchLowercase) {
         return assetManager.getAvailableAssets(BlockFamilyDefinition.class)
-                .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
-                .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
-                .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
+            .stream().<Optional<BlockFamilyDefinition>>map(urn -> assetManager.getAsset(urn, BlockFamilyDefinition.class))
+            .filter(def -> def.isPresent() && def.get().isLoadable() && matchesSearch(searchLowercase, def.get()))
+            .map(r -> new BlockUri(r.get().getUrn()).toString()).collect(Collectors.toList());
     }
 
     /**
@@ -494,7 +494,7 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containg final message
      */
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
-            "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+        "item in front of the player. You can simply pick it up.", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String spawnBlock(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -594,7 +594,7 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing ping or error message
      */
     @Command(shortDescription = "Your ping to the server", helpText = "The time it takes the packet " +
-            "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
+        "to reach the server and back", requiredPermission = PermissionManager.NO_PERMISSION)
     public String ping(@Sender EntityRef sender) {
         Server server = networkSystem.getServer();
         if (server == null) {
