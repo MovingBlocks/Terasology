@@ -41,7 +41,6 @@ import java.util.concurrent.LinkedBlockingDeque;
  * This class can be in two states, with the default being "logged out".
  */
 public final class StorageServiceWorker {
-    private static final String IDENDITY_STORAGE_I18N_ID = "storage-service";
 
     private static final Logger logger = LoggerFactory.getLogger(StorageServiceWorker.class);
 
