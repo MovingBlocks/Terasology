@@ -23,7 +23,7 @@ import org.terasology.input.RegisterBindButton;
 
 /**
  */
-@RegisterBindButton(id = "toolbarSlot8", description = "Toolbar Slot 9", category = "inventory")
+@RegisterBindButton(id = "toolbarSlot8", description = "${engine:menu#binding-toolbar-9}", category = "inventory")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.KEY_9)
 public class ToolbarSlot8Button extends ToolbarSlotButton {
     public ToolbarSlot8Button() {
