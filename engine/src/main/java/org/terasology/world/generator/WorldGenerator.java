@@ -41,8 +41,8 @@ public interface WorldGenerator {
     /**
      * Sets the seed to use for creating of the world made by this world generator.
      * <p>
-     * NOTE: this is a String value. The long value used in the most common implementation of this interface
-     * is calculated as hash of the String value.
+     * NOTE: this is a String value. The long value used in {@link org.terasology.world.generation.BaseFacetedWorldGenerator},
+     * which is the most commonly used implementation of this interface, is calculated as hash of this String value.
      *
      * @param seed Value of the seed
      */

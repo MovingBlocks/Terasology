@@ -18,17 +18,14 @@ package org.terasology.utilities.subscribables;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-
 public class AbstractGeneralSubscribable implements GeneralSubscribable {
 
     protected transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
 
     @Override
     public void subscribe(PropertyChangeListener changeListener) {
         this.propertyChangeSupport.addPropertyChangeListener(changeListener);
     }
-
 
     @Override
     public void unsubscribe(PropertyChangeListener changeListener) {

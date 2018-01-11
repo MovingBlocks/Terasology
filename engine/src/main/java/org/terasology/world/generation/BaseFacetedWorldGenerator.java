@@ -21,7 +21,7 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
 /**
- * The most common implementation of {@link WorldGenerator} based on the idea of Facets
+ * The most commonly used implementation of {@link WorldGenerator} based on the idea of Facets
  */
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
@@ -90,8 +90,8 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
     }
 
     /**
-     * Returns current {@link WorldBuilder} or creates new if none exists
-     * @return
+     * Returns current {@link WorldBuilder} or a new one if none has been created so far
+     * @return WorldBuilder used by this WorldGenerator
      */
     private WorldBuilder getWorldBuilder() {
         if (worldBuilder == null) {

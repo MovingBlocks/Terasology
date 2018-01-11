@@ -38,7 +38,7 @@ import org.terasology.world.liquid.LiquidData;
 @API
 public interface CoreChunk {
     /**
-     * @return Position of the chunk in blocks
+     * @return Position of the chunk in world, where units of distance from origin are blocks
      */
     Vector3i getPosition();
 

@@ -18,7 +18,6 @@ package org.terasology.utilities.subscribables;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-
 public abstract class AbstractSubscribable implements Subscribable {
 
     protected transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
