@@ -92,7 +92,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- *
  */
 @RegisterSystem
 public class CoreCommands extends BaseComponentSystem {
@@ -144,7 +143,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Search commands/prefabs/assets with matching name, description, help text, usage or required permission
-     *
      * @param searched String which is used to search for match
      * @return String containing result of search
      */
@@ -185,7 +183,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * List commands that match searched string
-     *
      * @param searchLowercase searched string lowercase
      * @return List of commands that match searched string
      */
@@ -196,9 +193,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if command is matching one of criteria
-     *
      * @param searchLowercase searched string
-     * @param command         ConsoleCommand to check if matches searched string
+     * @param command ConsoleCommand to check if matches searched string
      * @return boolean containing true if command matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, ConsoleCommand command) {
@@ -211,7 +207,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * List prefabs that match searched string
-     *
      * @param searchLowercase searched string
      * @return List of prefabs that match searched string
      */
@@ -223,9 +218,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if prefab is matching one of criteria
-     *
      * @param searchLowercase searched String
-     * @param prefab          Prefab to check if matches searched string
+     * @param prefab Prefab to check if matches searched string
      * @return boolean containing true if prefab matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, Prefab prefab) {
@@ -235,7 +229,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * List blocks that match searched string
-     *
      * @param searchLowercase searched string
      * @return List of blocks that match searched string
      */
@@ -248,9 +241,8 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Determine if block family matches one of criteria
-     *
      * @param searchLowercase searched string
-     * @param def             BlockFamilyDefinition to be checked
+     * @param def BlockFamilyDefinition to be checked
      * @return boolean containing true if blockFamilyDefinition matches searched string else false
      */
     private static boolean matchesSearch(String searchLowercase, BlockFamilyDefinition def) {
@@ -260,7 +252,6 @@ public class CoreCommands extends BaseComponentSystem {
     /**
      * Time dilation slows down the passage of time by affecting how the main game loop runs,
      * with the goal being to handle high-latency situations by spreading out processing over a longer amount of time
-     *
      * @param rate float time dilation
      */
     @Command(shortDescription = "Alter the rate of time")
@@ -270,7 +261,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Change the UI language
-     *
      * @param langTag String containing language code to change
      * @return String containing language or if not recognized error message
      */
@@ -293,7 +283,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Shows a ui screen
-     *
      * @param uri String containing ui screen name
      * @return String containing Success if UI was change or Not found if screen is missing
      */
@@ -304,7 +293,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Reloads ui screen
-     *
      * @param ui String containing ui screen name
      * @return String containing Success if UI was reloaded or No unique resource found if more screens were found
      */
@@ -329,7 +317,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui screen
-     *
      * @param uri String containing ui screen name
      * @return String containing final message
      */
@@ -353,7 +340,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Opens the NUI editor for a ui skin
-     *
      * @param uri String containing name of ui skin
      * @return String containing final message
      */
@@ -377,7 +363,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Switches to fullscreen or to windowed mode
-     *
      * @return String containing final message
      */
     @Command(shortDescription = "Toggles Fullscreen Mode", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -393,7 +378,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Removes all entities of the given prefab
-     *
      * @param prefabName String containing prefab name
      */
     @Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
@@ -418,8 +402,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Join a game
-     *
-     * @param address   String containing address of game server
+     * @param address String containing address of game server
      * @param portParam Integer containing game server port
      */
     @Command(shortDescription = "Join a game", requiredPermission = PermissionManager.NO_PERMISSION)
@@ -443,7 +426,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Leaves the current game and returns to main menu
-     *
      * @return String containing final message
      */
     @Command(shortDescription = "Leaves the current game and returns to main menu",
@@ -459,7 +441,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Writes out information on all entities to a text file for debugging
-     *
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
@@ -473,8 +454,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns an instance of a prefab in the world
-     *
-     * @param sender     Sender of command
+     * @param sender Sender of command
      * @param prefabName String containing prefab name
      * @return String containing final message
      */
@@ -510,8 +490,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     /**
      * Spawns a block in front of the player
-     *
-     * @param sender    Sender of command
+     * @param sender Sender of command
      * @param blockName String containing name of block to spawn
      * @return String containg final message
      */
@@ -563,8 +542,8 @@ public class CoreCommands extends BaseComponentSystem {
 
         for (int i = 0; i < value; i++) {
 
-                EntityRef blockItem = blockItemFactory.newInstance(block);
-                blockItem.send(new DropItemEvent(spawnPos));
+            EntityRef blockItem = blockItemFactory.newInstance(block);
+            blockItem.send(new DropItemEvent(spawnPos));
         }
 
         // this returns the block you have spawned and the amount
@@ -609,6 +588,7 @@ public class CoreCommands extends BaseComponentSystem {
         }
         return "prepared 10 " + blockName + " in a bowling pin pattern :)";
     }
+
     /**
      * Your ping to the server
      * @param sender Sender of command
