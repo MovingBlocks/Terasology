@@ -19,6 +19,7 @@ import org.terasology.input.BindableButton;
 import org.terasology.input.ControllerInput;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.Input;
+import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
@@ -344,6 +345,36 @@ public class BindsSubsystem implements EngineSubsystem, BindsManager {
 
     private BindableButton getBindButton(SimpleUri bindId) {
         return buttonLookup.get(bindId);
+    }
+
+    /**
+     * Enumerates all active input bindings for a given binding.
+     * @param bindId the ID
+     * @return a list of keyboard/mouse inputs that trigger the binding.
+     */
+    public List<Input> getInputsForBindButton(SimpleUri bindId) {
+        List<Input> inputs = Lists.newArrayList();
+        for (Map.Entry<Integer, BindableButton> entry : keyBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(InputType.KEY.getInput(entry.getKey()));
+            }
+        }
+
+        for (Map.Entry<MouseInput, BindableButton> entry : mouseButtonBinds.entrySet()) {
+            if (entry.getValue().getId().equals(bindId)) {
+                inputs.add(entry.getKey());
+            }
+        }
+
+        if (mouseWheelUpBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_UP);
+        }
+
+        if (mouseWheelDownBind.getId().equals(bindId)) {
+            inputs.add(MouseInput.WHEEL_DOWN);
+        }
+
+        return inputs;
     }
 
     private BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
