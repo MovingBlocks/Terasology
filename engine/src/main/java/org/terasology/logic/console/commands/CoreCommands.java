@@ -92,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ *
  */
 @RegisterSystem
 public class CoreCommands extends BaseComponentSystem {
@@ -537,9 +538,8 @@ public class CoreCommands extends BaseComponentSystem {
         return "Spawned block.";
     }
 
-    @Command(shortDescription = "You can indicate which block to drop with the first parameter and how many with the second", helpText = "the particular block can be seleted which " +
-            "the player wants to drop"
-                , runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "You can indicate which block to drop with the first parameter and how many with the second", helpText = "the particular block" +
+            " can be seleted which the player wants to drop", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bulkDrop(@Sender EntityRef sender, @CommandParam("blockName") String blockName, @CommandParam("value") int value) {
 
         //This is a loop which gives the particular amount of block the player wants to spawn
@@ -550,17 +550,15 @@ public class CoreCommands extends BaseComponentSystem {
         Vector3f offset = characterLocation.getWorldDirection();
 
         offset.scale(3);
-        spawnPos.add(5,10,0);
+        spawnPos.add(5, 10, 0);
         BlockFamily block = blockManager.getBlockFamily(blockName);
-        if (block == null)
-        {
+        if (block == null) {
             return "Sorry, your block is not found";
         }
 
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
-        if(value > 5000)
-        {
-            return "sorry the value you have entered exceeds the limit of 5000";
+        if (value > 5000) {
+            return "Value exceeds the maximum limit of 5000 blocks. your value: " + value + " blocks";
         }
 
         for (int i = 0; i <= value; i++) {
@@ -573,10 +571,10 @@ public class CoreCommands extends BaseComponentSystem {
         return "Dropped " + value + " " + blockName + " Blocks :)";
     }
 
-    @Command(shortDescription = "Sets up a typical bowling pin arrangement in front of the player. ", helpText = "Spawns a specific blocks in a regular bowling pin pattern, The item " +
-            " front of the player can simply picked up",
+    @Command(shortDescription = "Sets up a typical bowling pin arrangement in front of the player. ", helpText = "Spawns a specific blocks in a regular bowling " +
+            "pin pattern, The item front of the player can simply picked up",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public String bowlingPrep  (@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
+    public String bowlingPrep(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
 
         ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
         LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
@@ -593,8 +591,8 @@ public class CoreCommands extends BaseComponentSystem {
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
         Vector3f startPos = new Vector3f(spawnPos);
 
-        float deltax = .2f; // delta x is the distance between the pins in vectorX coordinate
-        float deltaz = .3f; //delta z is the distance between the pins in vectorZ coordinate
+        float deltax = .2f; // delta x is the distance between the pins in the rows.
+        float deltaz = .3f; //delta z is the distance between the rows.
         float vectorY = 1.0f; //the height of the drop (to be modified to keep the bowlingPin upright)
         //rownumber loop is for selecting row
         for (int rownumber = 0; rownumber < 4; rownumber++) {
