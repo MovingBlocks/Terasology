@@ -21,7 +21,8 @@ import org.terasology.module.sandbox.API;
 /**
  * Chunks are the smallest logical units of the worlds.
  *
- * Each chunk is 32x32x64 in dimensions, and is the default unit passed to world generator during world generation.
+ * Chunks are the default unit passed to world generator during world generation.
+ * For details on dimensions and other parameters of chunk, check {@link ChunkConstants}.
  */
 @API
 public interface Chunk extends ManagedChunk, RenderableChunk {
