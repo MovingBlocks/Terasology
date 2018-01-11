@@ -373,7 +373,6 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Switched to windowed mode";
         }
-
     }
 
     /**
@@ -619,7 +618,6 @@ public class CoreCommands extends BaseComponentSystem {
             return String.format("Error: Failed to ping server \"%s\" at %s:%s -- %s", remoteAddress[0], remoteAddress[1], remoteAddress[2], e);
         }
     }
-
 
     /**
      * Prints out short descriptions for all available commands, or a longer help text if a command is provided.
