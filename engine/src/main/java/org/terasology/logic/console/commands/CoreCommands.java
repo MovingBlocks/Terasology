@@ -561,7 +561,7 @@ public class CoreCommands extends BaseComponentSystem {
             return "Value exceeds the maximum limit of 5000 blocks. your value: " + value + " blocks";
         }
 
-        for (int i = 0; i <= value; i++) {
+        for (int i = 0; i < value; i++) {
 
                 EntityRef blockItem = blockItemFactory.newInstance(block);
                 blockItem.send(new DropItemEvent(spawnPos));
@@ -591,9 +591,9 @@ public class CoreCommands extends BaseComponentSystem {
         BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
         Vector3f startPos = new Vector3f(spawnPos);
 
-        float deltax = .2f; // delta x is the distance between the pins in the rows.
-        float deltaz = .3f; //delta z is the distance between the rows.
-        float vectorY = 1.0f; //the height of the drop (to be modified to keep the bowlingPin upright)
+        float deltax = 0.5f; // delta x is the distance between the pins in the rows.
+        float deltaz = 1.0f; //delta z is the distance between the rows.
+        float vectorY = 0.0f; //the height of the drop (to be modified to keep the bowlingPin upright)
         //rownumber loop is for selecting row
         for (int rownumber = 0; rownumber < 4; rownumber++) {
             startPos.add(deltax * (4 - rownumber), vectorY, deltaz); //Spawn starting position for Rownumber
