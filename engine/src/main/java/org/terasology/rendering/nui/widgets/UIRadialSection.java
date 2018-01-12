@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.utilities.Assets;
 
 import java.util.ArrayList;
@@ -42,6 +40,7 @@ public class UIRadialSection extends CoreWidget {
     private Boolean isSelected = false;
     private List<ActivateEventListener> listeners;
 
+    //TODO: Consider bringing back binding to icon,text and widget in UIRadialSection.java
     //TODO: Use bindings in future. Previously used bindings were throwing some exceptions not even allowing to open the screen with UIRadialRing, so this is a quick fix - conversion from binded properties to standard ones.
     @LayoutConfig
     private TextureRegion icon;
@@ -126,13 +125,6 @@ public class UIRadialSection extends CoreWidget {
     public void setInfoWidget(UIWidget infoWidget) {
         widget = infoWidget;
     }
-    //public void setInfoWidget(UIWidget infoWidget) {
-    //    widget.set(infoWidget);
-    //}
-
-    //public void setInfoWidget(Binding<UIWidget> infoWidget) {
-    //    widget = infoWidget;
-    //}
 
     /**
      * Set icon texture
@@ -140,13 +132,6 @@ public class UIRadialSection extends CoreWidget {
     public void setIcon(TextureRegion newIcon) {
         icon = newIcon;
     }
-    //public void setIcon(TextureRegion newIcon) {
-    //    icon.set(newIcon);
-    //}
-
-    //public void setIcon(Binding<TextureRegion> newIcon) {
-    //    icon = newIcon;
-    //}
 
     /**
      * Set section text
@@ -154,14 +139,6 @@ public class UIRadialSection extends CoreWidget {
     public void setText(String newText) {
         text = newText;
     }
-    //public void setText(String newText) {
-    //    text.set(newText);
-    //}
-
-    //public void setText(Binding<String> newText) {
-    //    text = newText;
-    //}
-
 
     /**
      * Sets the region in which to draw the info widget

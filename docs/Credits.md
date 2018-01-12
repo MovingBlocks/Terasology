@@ -212,7 +212,8 @@ Contributors
  [NicholasBatesNZ](https://github.com/NicholasBatesNZ),
  [digitalripperynr](https://github.com/digitalripperynr),
  [FieryPhoenix909](https://github.com/FieryPhoenix909),
- [Adrijaned](https://github.com/Adrijaned)
+ [Adrijaned](https://github.com/Adrijaned),
+ [anuar2k](https://github.com/anuar2k)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
