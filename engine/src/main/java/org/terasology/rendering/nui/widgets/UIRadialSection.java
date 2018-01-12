@@ -42,12 +42,13 @@ public class UIRadialSection extends CoreWidget {
     private Boolean isSelected = false;
     private List<ActivateEventListener> listeners;
 
+    //TODO: Use bindings in future. Previously used bindings were throwing some exceptions not even allowing to open the screen with UIRadialRing, so this is a quick fix - conversion from binded properties to standard ones.
     @LayoutConfig
-    private Binding<TextureRegion> icon = new DefaultBinding<>();
+    private TextureRegion icon;
     @LayoutConfig
-    private Binding<String> text = new DefaultBinding<>();
+    private String text;
     @LayoutConfig
-    private Binding<UIWidget> widget = new DefaultBinding<>();
+    private UIWidget widget;
 
     /**
      * Draws the widget
@@ -58,17 +59,17 @@ public class UIRadialSection extends CoreWidget {
         canvas.getRegion();
         canvas.drawTexture(sectionTexture, sectionRegion);
 
-        if (icon.get() != null) {
-            canvas.drawTexture(icon.get(), innerRegion);
+        if (icon != null) {
+            canvas.drawTexture(icon, innerRegion);
         }
 
-        if (text.get() != null) {
-            canvas.drawText(text.get(), innerRegion);
+        if (text != null) {
+            canvas.drawText(text, innerRegion);
         }
         if (isSelected) {
             canvas.drawTexture(selectedTexture, sectionRegion);
-            if (widget.get() != null) {
-                canvas.drawWidget(widget.get(), infoRegion);
+            if (widget != null) {
+                canvas.drawWidget(widget, infoRegion);
             }
         }
     }
@@ -123,34 +124,44 @@ public class UIRadialSection extends CoreWidget {
      * Sets info widget
      */
     public void setInfoWidget(UIWidget infoWidget) {
-        widget.set(infoWidget);
-    }
-
-    public void setInfoWidget(Binding<UIWidget> infoWidget) {
         widget = infoWidget;
     }
+    //public void setInfoWidget(UIWidget infoWidget) {
+    //    widget.set(infoWidget);
+    //}
+
+    //public void setInfoWidget(Binding<UIWidget> infoWidget) {
+    //    widget = infoWidget;
+    //}
 
     /**
      * Set icon texture
      */
     public void setIcon(TextureRegion newIcon) {
-        icon.set(newIcon);
-    }
-
-    public void setIcon(Binding<TextureRegion> newIcon) {
         icon = newIcon;
     }
+    //public void setIcon(TextureRegion newIcon) {
+    //    icon.set(newIcon);
+    //}
+
+    //public void setIcon(Binding<TextureRegion> newIcon) {
+    //    icon = newIcon;
+    //}
 
     /**
      * Set section text
      */
     public void setText(String newText) {
-        text.set(newText);
-    }
-
-    public void setText(Binding<String> newText) {
         text = newText;
     }
+    //public void setText(String newText) {
+    //    text.set(newText);
+    //}
+
+    //public void setText(Binding<String> newText) {
+    //    text = newText;
+    //}
+
 
     /**
      * Sets the region in which to draw the info widget
