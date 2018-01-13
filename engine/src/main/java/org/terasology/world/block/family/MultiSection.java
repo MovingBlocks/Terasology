@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface  MultiSection {
+public @interface MultiSection {
     String name();
     String coversSection();
     String[] appliesToSections();
