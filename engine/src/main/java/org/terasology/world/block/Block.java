@@ -20,6 +20,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.physics.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 
+import org.terasology.math.Rotation;
 import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -72,8 +73,7 @@ public final class Block {
     private BlockUri uri;
     private String displayName = "Untitled block";
     private BlockFamily family;
-    // TODO: Remove this and replace with the rotation applied to the block
-    private Side direction = Side.FRONT;
+    private Rotation rotation = Rotation.none();
 
     /* PROPERTIES */
 
@@ -175,12 +175,16 @@ public final class Block {
         this.family = value;
     }
 
-    public void setDirection(Side direction) {
-        this.direction = direction;
+    public void setRotation(Rotation rotation) {
+        this.rotation = rotation;
+    }
+
+    public Rotation getRotation() {
+        return rotation;
     }
 
     public Side getDirection() {
-        return direction;
+        return rotation.rotate(Side.FRONT);
     }
 
     /**
