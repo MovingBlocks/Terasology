@@ -71,7 +71,7 @@ public final class AABB {
         max.add(extent);
         return new AABB(min, max);
     }
-    
+
     /**
      * Creates an empty AABB that does not encompass any points.
      *
