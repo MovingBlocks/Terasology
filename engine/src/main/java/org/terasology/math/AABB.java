@@ -108,7 +108,7 @@ public final class AABB {
     }
 
     /**
-     * Creates a new AABB that contain the vertices as represented by a {@link TFloatList}.
+     * Creates a new AABB that contains the vertices as represented by a {@link TFloatList}.
      *
      * @param vertices The vertices to encompass.
      * @return The created AABB.
