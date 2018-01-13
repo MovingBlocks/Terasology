@@ -46,10 +46,24 @@ public final class AABB {
         this.max = max;
     }
 
+    /**
+     * Creates a new AABB from the given minimum and maximum points.
+     *
+     * @param min The minimum of the AABB.
+     * @param max The maximum of the AABB.
+     * @return The created AABB.
+     */
     public static AABB createMinMax(Vector3f min, Vector3f max) {
         return new AABB(new Vector3f(min), new Vector3f(max));
     }
 
+    /**
+     * Creates a new AABB with the given center and extents.
+     *
+     * @param center The center of the AABB.
+     * @param extents The extents of the AABB.
+     * @return The created AABB.
+     */
     public static AABB createCenterExtent(Vector3f center, Vector3f extent) {
         Vector3f min = new Vector3f(center);
         min.sub(extent);
@@ -57,7 +71,14 @@ public final class AABB {
         max.add(extent);
         return new AABB(min, max);
     }
-
+    
+    /**
+     * Creates an empty AABB that does not encompass any points.
+     *
+     * @param min The minimum of the AABB.
+     * @param max The maximum of the AABB.
+     * @return The created AABB.
+     */
     public static AABB createEmpty() {
         return new AABB(new Vector3f(), new Vector3f());
     }
@@ -88,6 +109,12 @@ public final class AABB {
         return new AABB(min, max);
     }
 
+    /**
+     * Creates a new AABB that encapsulates the vertices as represented by a {@link TFloatList}.
+     *
+     * @param vertices The vertices to encompass.
+     * @return The created AABB.
+     */
     public static AABB createEncompasing(TFloatList vertices) {
         int vertexCount = vertices.size() / 3;
         if (vertexCount == 0) {
@@ -117,6 +144,9 @@ public final class AABB {
         return dimensions;
     }
 
+    /**
+     * @return The center of the AABB.
+     */
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
@@ -124,10 +154,16 @@ public final class AABB {
         return dimensions;
     }
 
+    /**
+     * @return The minimum of the AABB.
+     */
     public Vector3f getMin() {
         return new Vector3f(min);
     }
 
+    /**
+     * @return The maximum of the AABB.
+     */
     public Vector3f getMax() {
         return new Vector3f(max);
     }
@@ -145,11 +181,27 @@ public final class AABB {
         return new AABB(newMin, newMax);
     }
 
+    /**
+     * Transform this AABB into a new AABB with the given rotation, offset and scale.
+     *
+     * @param rotation The rotation from the current AABB to the new AABB.
+     * @param offset The offset between the current AABB and the new AABB.
+     * @param scale The scale of the new AABB with respect to the old AABB.
+     * @return the new transformed AABB.
+     */
     public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
         Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
         return transform(transform);
     }
 
+    /**
+     * Transform this AABB into a new AABB with the given rotation, offset and scale as represented by the {@link Transform}.
+     *
+     * @param rotation The rotation from the current AABB to the new AABB.
+     * @param offset The offset between the current AABB and the new AABB.
+     * @param scale The scale of the new AABB with respect to the old AABB.
+     * @return the new transformed AABB.
+     */
     public AABB transform(Transform transform) {
         javax.vecmath.Vector3f newMin = new javax.vecmath.Vector3f();
         javax.vecmath.Vector3f newMax = new javax.vecmath.Vector3f();
@@ -224,6 +276,17 @@ public final class AABB {
         return r;
     }
 
+    /**
+     * Sweeps an AABB on to the AABB in the given direction and returns the normal of the first plane of intersection.
+     *
+     * @param direction The direction in which to perform the sweep test.
+     * @param pos The position of the given AABB.
+     * @param dimensions The extents of the given AABB.
+     * @param testX A boolean stating whether the x-axis should be tested.
+     * @param testY A boolean stating whether the y-axis should be tested.
+     * @param testZ A boolean stating whether the z-axis should be tested.
+     * @return The normal of the hit plane of the sweep test.
+     */
     public Vector3f getFirstHitPlane(Vector3f direction, Vector3f pos, Vector3f dimensions, boolean testX, boolean testY, boolean testZ) {
         Vector3f hitNormal = new Vector3f();
 
@@ -345,26 +408,44 @@ public final class AABB {
         return new Vector3f();
     }
 
+    /**
+     * @return The x-coordinate of the minimum of the AABB.
+     */
     public float minX() {
         return min.x;
     }
 
+    /**
+     * @return The y-coordinate of the minimum of the AABB.
+     */
     public float minY() {
         return min.y;
     }
 
+    /**
+     * @return The z-coordinate of the minimum of the AABB.
+     */
     public float minZ() {
         return min.z;
     }
 
+    /**
+     * @return The x-coordinate of the maximum of the AABB.
+     */
     public float maxX() {
         return max.x;
     }
 
+    /**
+     * @return The y-coordinate of the maximum of the AABB.
+     */
     public float maxY() {
         return max.y;
     }
 
+    /**
+     * @return The z-coordinate of the maximum of the AABB.
+     */
     public float maxZ() {
         return max.z;
     }
@@ -410,6 +491,13 @@ public final class AABB {
         return Objects.hashCode(min, max);
     }
 
+    /**
+     * Checks whether a given ray intersects the AABB.
+     *
+     * @param from The origin of the ray.
+     * @param direction The direction of the ray.
+     * @return True if the ray intersects the AABB, else false.
+     */
     public boolean intersectRectangle(Vector3f from, Vector3f direction) {
         Vector3f dirfrac = new Vector3f();
 
