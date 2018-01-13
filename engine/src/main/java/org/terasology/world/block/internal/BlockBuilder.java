@@ -117,7 +117,7 @@ public class BlockBuilder implements BlockBuilderHelper {
     @Override
     public Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section) {
         Block block = createRawBlock(defaultName, section);
-        block.setDirection(rotation.rotate(Side.FRONT));
+        block.setRotation(rotation);
         block.setPrimaryAppearance(createAppearance(shape, section.getBlockTiles(), rotation));
         setBlockFullSides(block, shape, rotation);
         block.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation));

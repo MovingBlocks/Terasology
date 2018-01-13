@@ -16,6 +16,7 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.terasology.math.Pitch;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
@@ -54,7 +55,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (definition.getData().hasSection("top")) {
             Block block = blockBuilder.constructSimpleBlock(definition, "top");
-            block.setDirection(Side.TOP);
+            block.setRotation(Rotation.rotate(Pitch.CLOCKWISE_270));
             blockMap.put(Side.TOP, block);
         }
         if (definition.getData().hasSection("front")) {
@@ -65,7 +66,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         }
         if (definition.getData().hasSection("bottom")) {
             Block block = blockBuilder.constructSimpleBlock(definition, "bottom");
-            block.setDirection(Side.BOTTOM);
+            block.setRotation(Rotation.rotate(Pitch.CLOCKWISE_90));
             blockMap.put(Side.BOTTOM, block);
         }
 
