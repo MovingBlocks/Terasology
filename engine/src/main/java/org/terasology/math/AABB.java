@@ -73,7 +73,7 @@ public final class AABB {
     }
 
     /**
-     * Creates an empty AABB that does not encompass any points.
+     * Creates an empty AABB that does not contain any points.
      *
      * @return The created AABB.
      */
@@ -108,7 +108,7 @@ public final class AABB {
     }
 
     /**
-     * Creates a new AABB that encapsulates the vertices as represented by a {@link TFloatList}.
+     * Creates a new AABB that contain the vertices as represented by a {@link TFloatList}.
      *
      * @param vertices The vertices to encompass.
      * @return The created AABB.
@@ -143,6 +143,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the center of the AABB.
+     * 
      * @return The center of the AABB.
      */
     public Vector3f getCenter() {
@@ -153,6 +155,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the minimum of the AABB.
+     * 
      * @return The minimum of the AABB.
      */
     public Vector3f getMin() {
@@ -160,6 +164,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the maximum of the AABB.
+     * 
      * @return The maximum of the AABB.
      */
     public Vector3f getMax() {
@@ -185,7 +191,7 @@ public final class AABB {
      * @param rotation The rotation from the current AABB to the new AABB.
      * @param offset The offset between the current AABB and the new AABB.
      * @param scale The scale of the new AABB with respect to the old AABB.
-     * @return the new transformed AABB.
+     * @return The new transformed AABB.
      */
     public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
         Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
@@ -405,6 +411,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the x-coordinate of the minimum of the AABB.
+     * 
      * @return The x-coordinate of the minimum of the AABB.
      */
     public float minX() {
@@ -412,6 +420,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the y-coordinate of the minimum of the AABB.
+     * 
      * @return The y-coordinate of the minimum of the AABB.
      */
     public float minY() {
@@ -419,6 +429,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the z-coordinate of the minimum of the AABB.
+     * 
      * @return The z-coordinate of the minimum of the AABB.
      */
     public float minZ() {
@@ -426,6 +438,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the x-coordinate of the maximum of the AABB.
+     * 
      * @return The x-coordinate of the maximum of the AABB.
      */
     public float maxX() {
@@ -433,6 +447,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the y-coordinate of the maximum of the AABB.
+     * 
      * @return The y-coordinate of the maximum of the AABB.
      */
     public float maxY() {
@@ -440,6 +456,8 @@ public final class AABB {
     }
 
     /**
+     * Returns the z-coordinate of the maximum of the AABB.
+     * 
      * @return The z-coordinate of the maximum of the AABB.
      */
     public float maxZ() {
