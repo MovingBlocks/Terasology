@@ -75,8 +75,6 @@ public final class AABB {
     /**
      * Creates an empty AABB that does not encompass any points.
      *
-     * @param min The minimum of the AABB.
-     * @param max The maximum of the AABB.
      * @return The created AABB.
      */
     public static AABB createEmpty() {
@@ -197,9 +195,7 @@ public final class AABB {
     /**
      * Transform this AABB into a new AABB with the given rotation, offset and scale as represented by the {@link Transform}.
      *
-     * @param rotation The rotation from the current AABB to the new AABB.
-     * @param offset The offset between the current AABB and the new AABB.
-     * @param scale The scale of the new AABB with respect to the old AABB.
+     * @param transform The {@link Transform} representing the offset, rotation, and scale transformation from this AABB to the new AABB. 
      * @return the new transformed AABB.
      */
     public AABB transform(Transform transform) {
