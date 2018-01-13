@@ -22,8 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to mark a {@link BlockFamily} to be registered into the game.
- * This annotations takes one argument, which is the name of the BlockFamily to be registered.
+ * This annotation is used to mark a {@link BlockFamily} to be registered in the environment.
+ * This annotation takes one argument, which is the name of the BlockFamily to be registered.<br><br>
+ * Examples:<br><br>
+ * <code>@RegisterBlockFamily("example")</code><br>
+ * In this case, a block family named "example" will be registered.<br><br>
+ * <code>@RegisterBlockFamily("painting")</code><br>
+ * <code>@BlockSections({"first", "second", "third"})</code><br>
+ * In this case, a block family named "painting" which has three different sections named "first, "second" and "third" will be registered.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

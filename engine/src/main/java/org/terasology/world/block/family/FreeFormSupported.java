@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation used to mark if a {@link BlockFamily} supports blocks in freeform shapes.
+ * Annotation used to mark if a {@link BlockFamily} supports blocks that have freeform shapes.
  * It takes an argument of the boolean type to mark if the annotated BlockFamily supports freeform shapes.
  */
 @Retention(RetentionPolicy.RUNTIME)
