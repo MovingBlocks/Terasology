@@ -136,6 +136,35 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return result;
     }
 
+
+    /**
+     *
+     * @param root The root block URI of the family
+     * @param definition The definition of the block family as passed down from the engine
+     * @param blockBuilder The block builder to make the blocks in the family
+     * @param name The name of the section of the block to be registered, ex: "no_connections"
+     * @param sides A byte representing the sides which should be connected for this block
+     * @param rotations All of the ways the block should be rotated
+     * @return All of the rotations possible for the block with the given sides
+     */
+    public Set<Block> registerBlock(BlockUri root,BlockFamilyDefinition definition,final BlockBuilderHelper blockBuilder,byte sides,Iterable<Rotation> rotations){
+        Set<Block> result = Sets.newLinkedHashSet();
+        for(Rotation rotation: rotations)
+        {
+            byte sideBits = 0;
+            for(Side side : SideBitFlag.getSides(sides)){
+                sideBits += SideBitFlag.getSide(rotation.rotate(side));
+            }
+            Block block = blockBuilder.constructTransformedBlock(definition,rotation);
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(root,new Name(String.valueOf(sideBits))));
+
+            blocks.put(sideBits,block);
+            result.add(block);
+        }
+        return result;
+    }
+
     /**
      * Using the location of the block, the side the block is being attached to and the direction the block is being placed in,
      * determine what block should be placed.
@@ -191,6 +220,18 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
             }
         }
         return null;
+    }
+
+    public byte getConnections(BlockUri blockUri){
+        if (getURI().equals(blockUri.getFamilyUri())) {
+            try {
+                return Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
+            } catch (IllegalArgumentException e) {
+                logger.error("can't find block with URI: {}", blockUri, e);
+                return 0;
+            }
+        }
+        return 0;
     }
 
     /**
