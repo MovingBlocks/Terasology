@@ -87,24 +87,8 @@ public final class MethodCommand extends AbstractCommand {
         Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         for (Method method : commandMethods) {
-            final Class[] paramTypes = method.getParameterTypes();
-            final Annotation[][] paramAnnotations = method.getParameterAnnotations();
-            boolean hasSenderAnnotation = false;
-            for (int i = 0; i < paramAnnotations.length; i++) {
-                if(paramTypes[i].getTypeName().equals(ENTITY_REF_NAME)) {
-                    if(paramAnnotations[i].length == 0) {
-                        logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
-                    } else {
-                        for (Annotation annotation: paramAnnotations[i]) {
-                            if (annotation instanceof Sender) {
-                                hasSenderAnnotation = true;
-                            }
-                        }
-                        if(!hasSenderAnnotation){
-                            logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
-                        }
-                    }
-                }
+            if(!hasSenderAnnotation(method)){
+                logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
             }
             logger.debug("Registering command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             try {
@@ -116,6 +100,26 @@ public final class MethodCommand extends AbstractCommand {
                 logger.error("Failed to load command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
             }
         }
+    }
+
+    private static boolean hasSenderAnnotation(Method method) {
+        final Class[] paramTypes = method.getParameterTypes();
+        final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < paramAnnotations.length; i++) {
+            if(paramTypes[i].getTypeName().equals(ENTITY_REF_NAME)) {
+                if(paramAnnotations[i].length == 0) {
+                    return false;
+                } else {
+                    for (Annotation annotation: paramAnnotations[i]) {
+                        if (annotation instanceof Sender) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        }
+        return false;
     }
 
     @Override
