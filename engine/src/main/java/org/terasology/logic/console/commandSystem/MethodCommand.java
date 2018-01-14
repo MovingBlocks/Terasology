@@ -89,16 +89,19 @@ public final class MethodCommand extends AbstractCommand {
         for (Method method : commandMethods) {
             final Class[] paramTypes = method.getParameterTypes();
             final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+            boolean hasSenderAnnotation = false;
             for (int i = 0; i < paramAnnotations.length; i++) {
                 if(paramTypes[i].getTypeName().equals(ENTITY_REF_NAME)) {
                     if(paramAnnotations[i].length == 0) {
-                        logger.info("Command {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName());
+                        logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
                     } else {
                         for (Annotation annotation: paramAnnotations[i]) {
                             if (annotation instanceof Sender) {
-                            } else {
-                                logger.info("Command {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName());
+                                hasSenderAnnotation = true;
                             }
+                        }
+                        if(!hasSenderAnnotation){
+                            logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
                         }
                     }
                 }
