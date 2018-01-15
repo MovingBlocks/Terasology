@@ -16,6 +16,8 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
@@ -33,6 +35,7 @@ import java.util.Set;
  */
 public final class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final SimpleUri id;
     private final String warningFormatString;
@@ -214,21 +217,11 @@ public final class SettingImpl<T> implements Setting<T> {
 
     @Override
     public void setValueFromJson(String json) {
-        if (value instanceof Integer) {
-            value = (T) (Integer) Integer.parseInt(json);
-        } else if (value instanceof Float) {
-            value = (T) (Float) Float.parseFloat(json);
-        } else if (value instanceof Double) {
-            value = (T) (Double) Double.parseDouble(json);
-        } else if (value instanceof String) {
-            value = (T) json;
-        } else {
-            throw new RuntimeException("Cannot convert string to type " + value.getClass().getSimpleName());
-        }
+        value = GSON.fromJson(json, valueClass);
     }
 
     @Override
     public String getValueAsJson() {
-        return value.toString();
+        return GSON.toJson(value);
     }
 }
