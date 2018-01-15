@@ -18,8 +18,9 @@ package org.terasology.config.flexible;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -124,16 +125,15 @@ public class FlexibleConfigImpl implements FlexibleConfig {
 
     @Override
     public void load(Reader reader) {
-        try (JsonReader jsonReader = new JsonReader(reader)) {
-            jsonReader.beginObject();
+        try {
+            JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
-            while (jsonReader.hasNext()) {
-                SimpleUri id = new SimpleUri(jsonReader.nextName());
-                String value = jsonReader.nextString();
-                temporarilyParkedSettings.put(id, value);
+            for (Map.Entry<String, JsonElement> jsonEntry : jsonObject.entrySet()) {
+                SimpleUri id = new SimpleUri(jsonEntry.getKey());
+                String valueJson = jsonEntry.getValue().toString();
+                temporarilyParkedSettings.put(id, valueJson);
             }
 
-            jsonReader.endObject();
         } catch (Exception e) {
             throw new RuntimeException("Error parsing config file!");
         }
