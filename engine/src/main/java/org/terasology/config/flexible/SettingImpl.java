@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.settings;
+package org.terasology.config.flexible;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;

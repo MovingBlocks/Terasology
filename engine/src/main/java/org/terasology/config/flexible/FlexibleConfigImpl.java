@@ -22,7 +22,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;

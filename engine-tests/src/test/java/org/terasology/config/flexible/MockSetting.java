@@ -15,7 +15,6 @@
  */
 package org.terasology.config.flexible;
 
-import org.terasology.config.flexible.settings.Setting;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
