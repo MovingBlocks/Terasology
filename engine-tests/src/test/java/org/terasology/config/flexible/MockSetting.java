@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.gson.JsonElement;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -84,7 +85,7 @@ class MockSetting<T> implements Setting<T> {
     public void setValueFromJson(String json) { }
 
     @Override
-    public String getValueAsJson() {
+    public JsonElement getValueAsJson() {
         return null;
     }
 }

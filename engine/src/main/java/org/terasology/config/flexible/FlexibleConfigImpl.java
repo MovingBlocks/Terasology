@@ -110,7 +110,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
             Setting setting = entry.getValue();
             if (!setting.getValue().equals(setting.getDefaultValue())) {
-                jsonObject.addProperty(entry.getKey().toString(), setting.getValueAsJson());
+                jsonObject.add(entry.getKey().toString(), setting.getValueAsJson());
             }
         }
 

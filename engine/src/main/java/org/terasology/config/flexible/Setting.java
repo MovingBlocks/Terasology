@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.gson.JsonElement;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -105,5 +106,5 @@ public interface Setting<T> {
     /**
      * Returns a JSON representation of the value stored in this {@link Setting}.
      */
-    String getValueAsJson();
+    JsonElement getValueAsJson();
 }

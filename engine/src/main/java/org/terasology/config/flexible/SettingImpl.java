@@ -18,6 +18,7 @@ package org.terasology.config.flexible;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
@@ -221,7 +222,7 @@ public final class SettingImpl<T> implements Setting<T> {
     }
 
     @Override
-    public String getValueAsJson() {
-        return GSON.toJson(value);
+    public JsonElement getValueAsJson() {
+        return GSON.toJsonTree(value);
     }
 }
