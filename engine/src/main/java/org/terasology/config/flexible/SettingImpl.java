@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
-public class SettingImpl<T> implements Setting<T> {
+public final class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
 
     private final SimpleUri id;
@@ -39,7 +39,7 @@ public class SettingImpl<T> implements Setting<T> {
 
     private final T defaultValue;
 
-    protected T value;
+    private T value;
 
     private String humanReadableName;
 
