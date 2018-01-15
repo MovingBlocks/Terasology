@@ -212,17 +212,23 @@ public final class SettingImpl<T> implements Setting<T> {
         return description;
     }
 
-    public void setValueFromString(String valueString) {
+    @Override
+    public void setValueFromJson(String json) {
         if (value instanceof Integer) {
-            value = (T) (Integer) Integer.parseInt(valueString);
+            value = (T) (Integer) Integer.parseInt(json);
         } else if (value instanceof Float) {
-            value = (T) (Float) Float.parseFloat(valueString);
+            value = (T) (Float) Float.parseFloat(json);
         } else if (value instanceof Double) {
-            value = (T) (Double) Double.parseDouble(valueString);
+            value = (T) (Double) Double.parseDouble(json);
         } else if (value instanceof String) {
-            value = (T) valueString;
+            value = (T) json;
         } else {
             throw new RuntimeException("Cannot convert string to type " + value.getClass().getSimpleName());
         }
+    }
+
+    @Override
+    public String getValueAsJson() {
+        return value.toString();
     }
 }

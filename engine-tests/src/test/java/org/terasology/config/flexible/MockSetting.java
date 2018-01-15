@@ -81,5 +81,10 @@ class MockSetting<T> implements Setting<T> {
     }
 
     @Override
-    public void setValueFromString(String valueString) { }
+    public void setValueFromJson(String json) { }
+
+    @Override
+    public String getValueAsJson() {
+        return null;
+    }
 }

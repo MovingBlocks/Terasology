@@ -54,7 +54,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         }
 
         if (temporarilyParkedSettings.containsKey(id)) {
-            setting.setValueFromString(temporarilyParkedSettings.remove(id));
+            setting.setValueFromJson(temporarilyParkedSettings.remove(id));
         }
 
         settings.put(id, setting);
@@ -110,7 +110,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
         for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
             Setting setting = entry.getValue();
             if (!setting.getValue().equals(setting.getDefaultValue())) {
-                jsonObject.addProperty(entry.getKey().toString(), setting.getValue().toString());
+                jsonObject.addProperty(entry.getKey().toString(), setting.getValueAsJson());
             }
         }
 

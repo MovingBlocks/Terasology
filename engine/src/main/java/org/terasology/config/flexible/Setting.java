@@ -98,7 +98,12 @@ public interface Setting<T> {
     boolean hasSubscribers();
 
     /**
-     * Parses the String based on the type of this {@link Setting}, and sets it.
+     * Sets the value of this {@link Setting} from the value's JSON representation.
      */
-    void setValueFromString(String valueString);
+    void setValueFromJson(String json);
+
+    /**
+     * Returns a JSON representation of the value stored in this {@link Setting}.
+     */
+    String getValueAsJson();
 }
