@@ -38,6 +38,7 @@ public final class SettingImpl<T> implements Setting<T> {
     private final String warningFormatString;
 
     private final T defaultValue;
+    private final Class<T> valueClass;
 
     private T value;
 
@@ -53,8 +54,8 @@ public final class SettingImpl<T> implements Setting<T> {
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
      */
-    public SettingImpl(SimpleUri id, T defaultValue) {
-        this(id, defaultValue, null);
+    public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue) {
+        this(valueClass, id, defaultValue, null);
     }
 
     /**
@@ -64,7 +65,7 @@ public final class SettingImpl<T> implements Setting<T> {
      * @param defaultValue the default value of the setting.
      * @param validator    the validator to be used to validate values.
      */
-    public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
+    public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
@@ -77,6 +78,7 @@ public final class SettingImpl<T> implements Setting<T> {
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
+        this.valueClass = valueClass;
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
@@ -212,13 +214,13 @@ public final class SettingImpl<T> implements Setting<T> {
 
     public void setValueFromString(String valueString) {
         if (value instanceof Integer) {
-            value = (T)(Integer)Integer.parseInt(valueString);
+            value = (T) (Integer) Integer.parseInt(valueString);
         } else if (value instanceof Float) {
-            value = (T)(Float)Float.parseFloat(valueString);
+            value = (T) (Float) Float.parseFloat(valueString);
         } else if (value instanceof Double) {
-            value = (T)(Double)Double.parseDouble(valueString);
+            value = (T) (Double) Double.parseDouble(valueString);
         } else if (value instanceof String) {
-            value = (T)valueString;
+            value = (T) valueString;
         } else {
             throw new RuntimeException("Cannot convert string to type " + value.getClass().getSimpleName());
         }

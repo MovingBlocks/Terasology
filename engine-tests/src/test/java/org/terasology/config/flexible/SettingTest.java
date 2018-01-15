@@ -39,7 +39,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(Integer.class, SETTING_ID,
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventResult = -1;
@@ -71,7 +71,7 @@ public class SettingTest {
 
         @Before
         public void setUp() {
-            setting = new SettingImpl<>(SETTING_ID,
+            setting = new SettingImpl<>(Integer.class, SETTING_ID,
                     50, new RangedNumberValidator<>(0, 100, false, false));
 
             eventCallCount = 0;
