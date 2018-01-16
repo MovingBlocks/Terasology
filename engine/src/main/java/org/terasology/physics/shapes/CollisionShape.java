@@ -26,6 +26,7 @@ public interface CollisionShape {
     /**
      * Returns the axis-aligned bounding box ({@link AABB}) for the shape in the space represented
      * by {@code transform}.
+     *
      * @param transform The {@link Transform} pertaining to the space in which the AABB is to be calculated.
      * @return The {@link AABB} bounding the shape.
      */

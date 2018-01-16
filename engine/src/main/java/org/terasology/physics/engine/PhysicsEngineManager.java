@@ -35,8 +35,9 @@ public final class PhysicsEngineManager {
 
     /**
      * Create a new {@link PhysicsEngine} instance.
-     * @param context
-     * @return
+     *
+     * @param context The {@link Context} with which to create the engine
+     * @return The created {@link PhysicsEngine} instance.
      */
     public static PhysicsEngine getNewPhysicsEngine(Context context) {
         return new BulletPhysics(context.get(WorldProvider.class));

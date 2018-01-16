@@ -23,6 +23,7 @@ import org.terasology.math.geom.Vector3f;
 public interface BoxShape extends CollisionShape {
     /**
      * Returns the half extents of the box shape without adding a margin.
+     *
      * @return The {@link Vector3f} containing the half extents of the box shape in each dimension.
      */
     Vector3f getHalfExtentsWithoutMargin();

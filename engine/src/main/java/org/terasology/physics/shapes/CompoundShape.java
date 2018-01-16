@@ -23,6 +23,7 @@ import org.terasology.math.Transform;
 public interface CompoundShape extends CollisionShape {
     /**
      * Adds a child shape to the compound shape.
+     *
      * @param transform The space transformation of the child shape relative to the compound shape.
      * @param collisionShape The child shape.
      */
