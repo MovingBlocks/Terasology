@@ -54,7 +54,6 @@ import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
-import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
@@ -347,10 +346,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node overlaysNode = new OverlaysNode(context);
         renderGraph.addNode(overlaysNode, "overlaysNode");
-
-        // TODO: remove this, including associated method in the RenderSystem interface
-        Node firstPersonViewNode = new FirstPersonViewNode(context);
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
     }
 
     private void addLightingNodes() {
