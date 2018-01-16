@@ -345,10 +345,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 

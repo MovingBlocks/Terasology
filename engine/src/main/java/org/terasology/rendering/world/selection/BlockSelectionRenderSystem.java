@@ -99,10 +99,6 @@ public class BlockSelectionRenderSystem extends BaseComponentSystem implements R
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 

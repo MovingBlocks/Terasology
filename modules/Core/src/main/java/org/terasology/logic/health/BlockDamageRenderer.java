@@ -96,10 +96,6 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
 
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 
