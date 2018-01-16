@@ -15,7 +15,8 @@
  */
 package org.terasology.world.block.entity.neighbourUpdate;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,115 +27,127 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.OnChangedBlock;
+import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
-import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
+public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem
+		implements UpdateSubscriberSystem, WorldChangeListener {
+	private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
-    @In
-    private WorldProvider worldProvider;
-    @In
-    private BlockEntityRegistry blockEntityRegistry;
+	WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-    private int largeBlockUpdateCount;
-    private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
+	@In
+	private BlockEntityRegistry blockEntityRegistry;
 
-    @ReceiveEvent
-    public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
-        largeBlockUpdateCount++;
-    }
+	private int largeBlockUpdateCount;
+	private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
-    @ReceiveEvent
-    public void largeBlockUpdateFinished(LargeBlockUpdateFinished event, EntityRef entity) {
-        largeBlockUpdateCount--;
-        if (largeBlockUpdateCount < 0) {
-            largeBlockUpdateCount = 0;
-            throw new IllegalStateException("LargeBlockUpdateFinished invoked too many times");
-        }
+	public NeighbourBlockFamilyUpdateSystem() {
+		worldProvider.registerListener(this);
+	}
 
-        if (largeBlockUpdateCount == 0) {
-            notifyNeighboursOfChangedBlocks();
-        }
-    }
+	@ReceiveEvent
+	public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
+		largeBlockUpdateCount++;
+	}
 
-    /**
-     * notifies the adjacent block families when a block is placed next to them
-     * @param event
-     * @param entity
-     */
-    @ReceiveEvent
-    public void OnBlockPlaced(OnBlockItemPlaced event, EntityRef entity) {
-        BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
-        if (blockComponent == null) {
-            return;
-        }
+	@ReceiveEvent
+	public void largeBlockUpdateFinished(LargeBlockUpdateFinished event, EntityRef entity) {
+		largeBlockUpdateCount--;
+		if (largeBlockUpdateCount < 0) {
+			largeBlockUpdateCount = 0;
+			throw new IllegalStateException("LargeBlockUpdateFinished invoked too many times");
+		}
 
-        Vector3i targetBlock = blockComponent.getPosition();
-        processUpdateForBlockLocation(targetBlock);
-    }
+		if (largeBlockUpdateCount == 0) {
+			notifyNeighboursOfChangedBlocks();
+		}
+	}
 
+	/**
+	 * notifies the adjacent block families when a block is placed next to them
+	 * 
+	 * @param event
+	 * @param entity
+	 */
+	@ReceiveEvent
+	public void OnBlockPlaced(OnBlockItemPlaced event, EntityRef entity) {
+		BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
+		if (blockComponent == null) {
+			return;
+		}
 
-    private void notifyNeighboursOfChangedBlocks() {
-        // Invoke the updates in another large block change for this class only
-        largeBlockUpdateCount++;
-        while (!blocksUpdatedInLargeBlockUpdate.isEmpty()) {
-            Set<Vector3i> blocksToUpdate = blocksUpdatedInLargeBlockUpdate;
+		Vector3i targetBlock = blockComponent.getPosition();
+		processUpdateForBlockLocation(targetBlock);
+	}
 
-            // Setup new collection for blocks changed in this pass
-            blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
+	@Override
+	public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
+		if (largeBlockUpdateCount > 0) {
+			blocksUpdatedInLargeBlockUpdate.add(pos);
+		} else {
+			Vector3i blockLocation = pos;
+			processUpdateForBlockLocation(blockLocation);
+		}
 
-            blocksToUpdate.forEach(this::processUpdateForBlockLocation);
-        }
-        largeBlockUpdateCount--;
-    }
+	}
 
-    @ReceiveEvent(components = {BlockComponent.class})
-    public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
-        if (largeBlockUpdateCount > 0) {
-            blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
-        } else {
-            Vector3i blockLocation = event.getBlockPosition();
-            processUpdateForBlockLocation(blockLocation);
-        }
-    }
+	private void notifyNeighboursOfChangedBlocks() {
+		// Invoke the updates in another large block change for this class only
+		largeBlockUpdateCount++;
+		while (!blocksUpdatedInLargeBlockUpdate.isEmpty()) {
+			Set<Vector3i> blocksToUpdate = blocksUpdatedInLargeBlockUpdate;
 
-    private void processUpdateForBlockLocation(Vector3i blockLocation) {
-        for (Side side : Side.values()) {
-            Vector3i neighborLocation = new Vector3i(blockLocation);
-            neighborLocation.add(side.getVector3i());
-            if (worldProvider.isBlockRelevant(neighborLocation)) {
-                Block neighborBlock = worldProvider.getBlock(neighborLocation);
-                final BlockFamily blockFamily = neighborBlock.getBlockFamily();
-                if (blockFamily instanceof UpdatesWithNeighboursFamily) {
-                    UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
-                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
-                    if (neighborBlock != neighborBlockAfterUpdate) {
-                        worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
-                    }
-                }
-            }
-        }
-    }
+			// Setup new collection for blocks changed in this pass
+			blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
-    @Override
-    public void update(float delta) {
-        if (largeBlockUpdateCount > 0) {
-            logger.error("Unmatched LargeBlockUpdateStarted - LargeBlockUpdateFinished not invoked enough times");
-        }
-        largeBlockUpdateCount = 0;
-    }
+			blocksToUpdate.forEach(this::processUpdateForBlockLocation);
+		}
+		largeBlockUpdateCount--;
+	}
+
+	private void processUpdateForBlockLocation(Vector3i blockLocation) {
+		for (Side side : Side.values()) {
+			Vector3i neighborLocation = new Vector3i(blockLocation);
+			neighborLocation.add(side.getVector3i());
+			if (worldProvider.isBlockRelevant(neighborLocation)) {
+				Block neighborBlock = worldProvider.getBlock(neighborLocation);
+				final BlockFamily blockFamily = neighborBlock.getBlockFamily();
+				if (blockFamily instanceof UpdatesWithNeighboursFamily) {
+					UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
+					Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation,
+							neighborBlock);
+					if (neighborBlock != neighborBlockAfterUpdate) {
+						worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void update(float delta) {
+		if (largeBlockUpdateCount > 0) {
+			logger.error("Unmatched LargeBlockUpdateStarted - LargeBlockUpdateFinished not invoked enough times");
+		}
+		largeBlockUpdateCount = 0;
+	}
+
+	@Override
+	public void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
+	}
 }
