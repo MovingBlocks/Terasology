@@ -27,9 +27,9 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
@@ -48,17 +48,19 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem
 		implements UpdateSubscriberSystem, WorldChangeListener {
 	private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
-	WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-
+	@In
+	private WorldProvider worldProvider;
+	
 	@In
 	private BlockEntityRegistry blockEntityRegistry;
 
 	private int largeBlockUpdateCount;
 	private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
-	public NeighbourBlockFamilyUpdateSystem() {
+	@Override
+    public void postBegin() {
 		worldProvider.registerListener(this);
-	}
+    }
 
 	@ReceiveEvent
 	public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
@@ -104,6 +106,16 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem
 			processUpdateForBlockLocation(blockLocation);
 		}
 
+	}
+
+	@ReceiveEvent(components = { BlockComponent.class })
+	public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
+		if (largeBlockUpdateCount > 0) {
+			blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
+		} else {
+			Vector3i blockLocation = event.getBlockPosition();
+			processUpdateForBlockLocation(blockLocation);
+		}
 	}
 
 	private void notifyNeighboursOfChangedBlocks() {
