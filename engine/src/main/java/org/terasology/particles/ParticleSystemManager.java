@@ -17,8 +17,6 @@ package org.terasology.particles;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.module.sandbox.API;
-import org.terasology.particles.functions.affectors.AffectorFunction;
-import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.particles.rendering.ParticleRenderingData;
 
 import java.util.stream.Stream;
@@ -31,20 +29,6 @@ import java.util.stream.Stream;
 
 @API
 public interface ParticleSystemManager {
-
-    /**
-     * Registers an Affector function to be used when updating particle systems that have the registered affector as a component.
-     *
-     * @param affectorFunction The affector function to be used.
-     */
-    void registerAffectorFunction(AffectorFunction affectorFunction);
-
-    /**
-     * Registers a Generator function to be used to configure newly-created particles for particle systems that have the registered generator as a component.
-     *
-     * @param generatorFunction The generator function to be used.
-     */
-    void registerGeneratorFunction(GeneratorFunction generatorFunction);
 
     /**
      * Gets all current emitters that have a given particle data component and returns a stream of all particle pools and their associated data for rendering.

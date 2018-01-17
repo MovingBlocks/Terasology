@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,20 @@
  */
 package org.terasology.particles.functions;
 
-import org.terasology.particles.ParticleDataMask;
+import org.terasology.entitySystem.Component;
+import org.terasology.module.sandbox.API;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Base class for GeneratorFunction and AffectorFunction. A particle system function is called on a particle to update its fields.
+ * This annotation is used to mark a {@link ParticleSystemFunction} to be registered in by the {@link org.terasology.particles.updating.ParticleUpdater}.
  */
-public abstract class ParticleSystemFunction<T> {
-    private final int rawDataMask;
-
-    public ParticleSystemFunction(ParticleDataMask dataMask, ParticleDataMask... dataMasks) {
-        this.rawDataMask = ParticleDataMask.toInt(dataMask, dataMasks);
-    }
-
-    public final int getDataMask() {
-        return rawDataMask;
-    }
+@API
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterParticleSystemFunction {
+    Class<? extends Component> componentClass();
 }

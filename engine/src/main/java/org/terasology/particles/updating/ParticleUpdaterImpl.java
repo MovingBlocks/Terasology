@@ -17,14 +17,21 @@ package org.terasology.particles.updating;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.ParticlePool;
 import org.terasology.particles.components.ParticleEmitterComponent;
+import org.terasology.particles.functions.ParticleSystemFunction;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.particles.functions.affectors.AffectorFunction;
 import org.terasology.particles.functions.generators.GeneratorFunction;
 import org.terasology.physics.HitResult;
@@ -38,9 +45,23 @@ import java.util.Set;
 /**
  * See ParticleUpdater for more information.
  */
-class ParticleUpdaterImpl implements ParticleUpdater {
+public class ParticleUpdaterImpl implements ParticleUpdater {
+
+    private static final Logger logger = LoggerFactory.getLogger(ParticleUpdaterImpl.class);
 
     private static final int PHYSICS_SKIP_NR = 100;
+
+    private ModuleManager moduleManager;
+
+    /**
+     * Map of Generators to the functions that process them.
+     */
+    private BiMap<Class<? extends Component>, GeneratorFunction> registeredGeneratorFunctions = HashBiMap.create();
+
+    /**
+     * Map of Affectors to the functions that process them.
+     */
+    private BiMap<Class<? extends Component>, AffectorFunction> registeredAffectorFunctions = HashBiMap.create();
 
     /**
      * Set of all particle emitters
@@ -58,12 +79,13 @@ class ParticleUpdaterImpl implements ParticleUpdater {
 
     //== public ========================================================================================================
 
-    ParticleUpdaterImpl(final Physics physics) {
+    public ParticleUpdaterImpl(final Physics physics, final ModuleManager moduleManager) {
         this.physics = physics;
+        this.moduleManager = moduleManager;
     }
 
     @Override
-    public void register(final EntityRef emitter) {
+    public void addEmitter(final EntityRef emitter) {
         Preconditions.checkArgument(emitter != null,
                 "Argument can not be null"
         );
@@ -78,7 +100,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     @Override
-    public void dispose(final EntityRef emitter) {
+    public void removeEmitter(final EntityRef emitter) {
         Preconditions.checkArgument(emitter != null,
                 "Argument can not be null"
         );
@@ -107,9 +129,37 @@ class ParticleUpdaterImpl implements ParticleUpdater {
     }
 
     @Override
-    public void configureEmitter(final ParticleEmitterComponent emitter,
-                                 final BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                                 final BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions) {
+    public void initialize() {
+        ModuleEnvironment environment = moduleManager.getEnvironment();
+
+        for (Class<?> type : environment.getTypesAnnotatedWith(RegisterParticleSystemFunction.class)) {
+            RegisterParticleSystemFunction annotation = type.getAnnotation(RegisterParticleSystemFunction.class);
+
+            if (!ParticleSystemFunction.class.isAssignableFrom(type)) {
+                logger.error("Cannot register particle system function {}, must be a subclass of ParticleSystemFunction", type.getSimpleName());
+            } else {
+                try {
+                    ParticleSystemFunction function = (ParticleSystemFunction) type.newInstance();
+
+                    if (function instanceof GeneratorFunction) {
+                        mapGeneratorFunction((GeneratorFunction) function, annotation.componentClass());
+
+                    } else if (function instanceof AffectorFunction) {
+                        mapAffectorFunction((AffectorFunction) function, annotation.componentClass());
+                    }
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
+    public void configureEmitter(final ParticleEmitterComponent emitter) {
 
         emitter.generatorFunctionMap.clear();
         emitter.affectorFunctionMap.clear();
@@ -121,6 +171,36 @@ class ParticleUpdaterImpl implements ParticleUpdater {
                 emitter.affectorFunctionMap.put(c, registeredAffectorFunctions.get(c.getClass()));
             }
         }
+    }
+
+    /**
+     * Maps a Generator function to the component it will be called on when new particles are emitted.
+     *
+     * @param generatorFunction The generator function to be used.
+     * @param componentClass    The component class this function is being mapped to.
+     */
+    private void mapGeneratorFunction(GeneratorFunction generatorFunction, Class<? extends Component> componentClass) {
+        Preconditions.checkArgument(!registeredGeneratorFunctions.containsKey(componentClass),
+                "Tried to register an GeneratorFunction for %s twice", generatorFunction
+        );
+
+        logger.info("Registering GeneratorFunction for Component class {}", componentClass);
+        registeredGeneratorFunctions.put(componentClass, generatorFunction);
+    }
+
+    /**
+     * Maps an Affector function to the component it will be called on when updating particles.
+     *
+     * @param affectorFunction The affector function to be used.
+     * @param componentClass   The component class this function is being mapped to.
+     */
+    private void mapAffectorFunction(AffectorFunction affectorFunction, Class<? extends Component> componentClass) {
+        Preconditions.checkArgument(!registeredAffectorFunctions.containsKey(componentClass),
+                "Tried to register an AffectorFunction for %s twice", affectorFunction
+        );
+
+        logger.info("Registering AffectorFunction for Component class {}", componentClass);
+        registeredAffectorFunctions.put(componentClass, affectorFunction);
     }
 
     //== particles =====================================================================================================
@@ -238,7 +318,7 @@ class ParticleUpdaterImpl implements ParticleUpdater {
             partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         }
 
-        // System ran out of lifetime -> stop emission -> dispose
+        // System ran out of lifetime -> stop emission -> deregister
         if (partSys.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
             partSys.lifeTime = Math.max(0, partSys.lifeTime - delta);
 

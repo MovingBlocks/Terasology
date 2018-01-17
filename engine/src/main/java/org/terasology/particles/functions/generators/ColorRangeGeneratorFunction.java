@@ -18,15 +18,17 @@ package org.terasology.particles.functions.generators;
 import org.terasology.particles.ParticleData;
 import org.terasology.particles.ParticleDataMask;
 import org.terasology.particles.components.generators.ColorRangeGeneratorComponent;
+import org.terasology.particles.functions.RegisterParticleSystemFunction;
 import org.terasology.utilities.random.Random;
 
 /**
  * Created by Linus on 11-3-2015.
  */
+@RegisterParticleSystemFunction(componentClass = ColorRangeGeneratorComponent.class)
 public final class ColorRangeGeneratorFunction extends GeneratorFunction<ColorRangeGeneratorComponent> {
 
     public ColorRangeGeneratorFunction() {
-        super(ColorRangeGeneratorComponent.class, ParticleDataMask.COLOR);
+        super(ParticleDataMask.COLOR);
     }
 
     @Override

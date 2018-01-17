@@ -15,13 +15,9 @@
  */
 package org.terasology.particles.updating;
 
-import com.google.common.collect.BiMap;
-import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.particles.ParticleSystemManager;
 import org.terasology.particles.components.ParticleEmitterComponent;
-import org.terasology.particles.functions.affectors.AffectorFunction;
-import org.terasology.particles.functions.generators.GeneratorFunction;
-import org.terasology.physics.Physics;
 
 import java.util.Collection;
 
@@ -31,28 +27,26 @@ import java.util.Collection;
 public interface ParticleUpdater {
 
     /**
-     * Registers a newly-added particle emitter entity to be updated each particle update.
+     * Registers a particle emitter entity to be updated each particle update.
      *
      * @param entity The entity with the {@link ParticleEmitterComponent} being registered.
      */
-    void register(EntityRef entity);
+    void addEmitter(EntityRef entity);
 
     /**
+     * De-registers a particle emitter, stopping it from being updated.
+     *
      * @param entity The entity with the particle system being disposed of.
      */
-    void dispose(EntityRef entity);
+    void removeEmitter(EntityRef entity);
 
     /**
      * Prepares an emitter to be efficiently handled by the particle updater.
      * Should be called on newly-added emitters and after each configuration change to an existing emitter.
      *
      * @param emitter The particle emitter that is being updated.
-     * @param registeredAffectorFunctions The list of affector functions to use when processing the given system's affectors.
-     * @param registeredGeneratorFunctions The list of generator functions to use when processing the given system's generators.
      */
-    void configureEmitter(ParticleEmitterComponent emitter,
-                          BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions,
-                          BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions);
+    void configureEmitter(ParticleEmitterComponent emitter);
 
     /**
      * Updates all particle emitters, first spawning new particles and then applying affectors.
@@ -68,13 +62,13 @@ public interface ParticleUpdater {
     Collection<ParticleEmitterComponent> getParticleEmitters();
 
     /**
-     * Initializes a new particle updater.
-     *
-     * @param physics The physics system to be used when simulating particle physics (collisions).
-     *
-     * @return A newly configured particle updater.
+     * Invoked when the updater is first created by the {@link ParticleSystemManager}
      */
-    static ParticleUpdater create(Physics physics) {
-        return new ParticleUpdaterImpl(physics);
-    }
+    void initialize();
+
+    /**
+     * Invoked when the particle engine is shutting down (when the game is unloading).
+     * De-registers all particle emitters.
+     */
+    void dispose();
 }
