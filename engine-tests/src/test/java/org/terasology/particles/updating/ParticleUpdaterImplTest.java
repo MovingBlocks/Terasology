@@ -1,24 +1,23 @@
 /*
-* Copyright 2017 MovingBlocks
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2017 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.particles.updating;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.particles.components.ParticleEmitterComponent;
@@ -34,6 +33,7 @@ import org.terasology.physics.engine.PhysicsEngine;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -45,20 +45,17 @@ import static org.mockito.Mockito.when;
 public class ParticleUpdaterImplTest {
 
     private ParticleUpdater particleUpdater;
-    private BiMap<Class<Component>, GeneratorFunction> registeredGeneratorFunctions;
-    private BiMap<Class<Component>, AffectorFunction> registeredAffectorFunctions;
 
     @Before
     public void setUp() throws Exception {
         Physics physics = mock(PhysicsEngine.class);
-        particleUpdater = new ParticleUpdaterImpl(physics);
-        registeredGeneratorFunctions = HashBiMap.create();
-        registeredAffectorFunctions = HashBiMap.create();
+        ModuleManager moduleManager = mock(ModuleManager.class);
+        particleUpdater = new ParticleUpdaterImpl(physics, moduleManager);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullEmitterRegistration() {
-        particleUpdater.register(null);
+        particleUpdater.addEmitter(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -66,7 +63,7 @@ public class ParticleUpdaterImplTest {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(null);
 
-        particleUpdater.register(emitterEntity);
+        particleUpdater.addEmitter(emitterEntity);
     }
 
     @Test
@@ -74,19 +71,13 @@ public class ParticleUpdaterImplTest {
         EntityRef emitterEntity = mock(EntityRef.class);
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(new ParticleEmitterComponent());
 
-        particleUpdater.register(emitterEntity);
+        particleUpdater.addEmitter(emitterEntity);
     }
 
     private Iterator<Component> getTestGeneratorsAndAffectors() {
         Collection<Component> components = new LinkedList<>();
         components.add(new EnergyRangeGeneratorComponent(0.5f, 1f));
         components.add(new VelocityAffectorComponent());
-
-        EnergyRangeGeneratorFunction energyRangeGeneratorFunction = new EnergyRangeGeneratorFunction();
-        registeredGeneratorFunctions.put(((GeneratorFunction) energyRangeGeneratorFunction).getComponentClass(), energyRangeGeneratorFunction);
-
-        VelocityAffectorFunction velocityAffectorFunction = new VelocityAffectorFunction();
-        registeredAffectorFunctions.put(((AffectorFunction) velocityAffectorFunction).getComponentClass(), velocityAffectorFunction);
 
         return components.iterator();
     }
@@ -101,14 +92,14 @@ public class ParticleUpdaterImplTest {
         particleEmitterComponent.ownerEntity = emitterEntity;
         when(emitterEntity.getComponent(ParticleEmitterComponent.class)).thenReturn(particleEmitterComponent);
 
-        particleUpdater.register(emitterEntity);
-        particleUpdater.configureEmitter(particleEmitterComponent, registeredAffectorFunctions, registeredGeneratorFunctions);
+        particleUpdater.addEmitter(emitterEntity);
+        particleUpdater.configureEmitter(particleEmitterComponent);
 
         for (Component component : (Iterable<Component>) () -> componentIterator) {
-            if (registeredGeneratorFunctions.containsKey(component.getClass())) {
+            if (component.getClass() == EnergyRangeGeneratorComponent.class) {
                 assertTrue(particleEmitterComponent.generatorFunctionMap.containsKey(component));
-            } else if (registeredGeneratorFunctions.containsKey(component.getClass())) {
-                assertTrue(particleEmitterComponent.generatorFunctionMap.containsKey(component));
+            } else if (component.getClass() == VelocityAffectorComponent.class) {
+                assertTrue(particleEmitterComponent.affectorFunctionMap.containsKey(component));
             }
         }
     }

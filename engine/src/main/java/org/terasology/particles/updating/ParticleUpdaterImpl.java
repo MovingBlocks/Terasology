@@ -49,6 +49,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
 
     private static final Logger logger = LoggerFactory.getLogger(ParticleUpdaterImpl.class);
 
+    /**
+     * Number used in determining how many particles to skip in each collision update step, as updating all particles is costly.
+     */
     private static final int PHYSICS_SKIP_NR = 100;
 
     private ModuleManager moduleManager;
@@ -68,16 +71,9 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
      */
     private final Set<ParticleEmitterComponent> registeredParticleSystems = new HashSet<>();
 
-    /**
-     * Map of ParticleDataComponent type to emitters of that type.
-     */
-    //private final Map<Class<? extends ParticleDataComponent>, ParticleEmitterComponent> particleSystemsLookup = new HashMap<>();
-
     private final FastRandom random = new FastRandom();
     private final Physics physics;
-    private float movingAvgDelta = 1.0f / 60.0f; //Starting guess average physics updateParticleSystem delta
-
-    //== public ========================================================================================================
+    private float movingAvgDelta = 1.0f / 60.0f; // Starting guess average physics updateParticleSystem delta
 
     public ParticleUpdaterImpl(final Physics physics, final ModuleManager moduleManager) {
         this.physics = physics;
@@ -203,8 +199,6 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         registeredAffectorFunctions.put(componentClass, affectorFunction);
     }
 
-    //== particles =====================================================================================================
-
     private void checkCollision(final ParticlePool pool, final int offset) {
         final Vector3f vel = new Vector3f();
         final Vector3f halfVelDir = new Vector3f();
@@ -260,8 +254,6 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    //== emission ======================================================================================================
-
     private void emitParticle(final ParticleEmitterComponent particleEmitter) {
         int index = particleEmitter.particlePool.reviveParticle();
 
@@ -304,8 +296,6 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
         }
     }
 
-    //== general =======================================================================================================
-
     private void updateParticleSystem(final ParticleEmitterComponent partSys, final float delta) {
         if (partSys.enabled && (partSys.particleSpawnsLeft == ParticleEmitterComponent.INFINITE_PARTICLE_SPAWNS || partSys.particleSpawnsLeft > 0)) {
             updateEmitter(partSys, 0, delta); // Emit particles
@@ -318,7 +308,6 @@ public class ParticleUpdaterImpl implements ParticleUpdater {
             partSys.collisionUpdateIteration = (partSys.collisionUpdateIteration + 1) % PHYSICS_SKIP_NR;
         }
 
-        // System ran out of lifetime -> stop emission -> deregister
         if (partSys.lifeTime != ParticleEmitterComponent.INDEFINITE_EMITTER_LIFETIME) {
             partSys.lifeTime = Math.max(0, partSys.lifeTime - delta);
 
