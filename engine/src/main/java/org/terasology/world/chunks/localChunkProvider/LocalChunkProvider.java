@@ -43,16 +43,8 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.biomes.BiomeManager;
-import org.terasology.world.block.BeforeDeactivateBlocks;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.OnActivatedBlocks;
-import org.terasology.world.block.OnAddedBlocks;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.ManagedChunk;
+import org.terasology.world.block.*;
+import org.terasology.world.chunks.*;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -69,18 +61,12 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
-import org.terasology.world.propagation.light.LightMerger;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 /**
  */
@@ -112,12 +98,26 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private BlockManager blockManager;
     private BiomeManager biomeManager;
+    private final Supplier<ChunkFinalizer> chunkFinalizerSupplier;
     private BlockEntityRegistry registry;
 
-    private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
+    private ChunkFinalizer chunkFinalizer;
 
+    //TODO Remove this old constructor at the end of the chunk overhaul
     public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                               BlockManager blockManager, BiomeManager biomeManager) {
+        this(storageManager,
+                entityManager,
+                generator,
+                blockManager,
+                biomeManager,
+                new LightMergingChunkFinalizer(),
+                LightMergingChunkFinalizer::new);
+    }
+
+    LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
+                              BlockManager blockManager, BiomeManager biomeManager, ChunkFinalizer chunkFinalizer,
+                              Supplier<ChunkFinalizer> chunkFinalizerSupplier) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
@@ -125,8 +125,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         this.biomeManager = biomeManager;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
+        this.chunkFinalizer = chunkFinalizer;
+        this.chunkFinalizerSupplier = chunkFinalizerSupplier;
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
+
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
         this.registry = value;
@@ -195,7 +198,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         } finally {
             regionLock.readLock().unlock();
         }
-
         ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, distance);
         if (listener != null) {
             region.setListener(listener);
@@ -241,7 +243,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public void completeUpdate() {
-        ReadyChunkInfo readyChunkInfo = lightMerger.completeMerge();
+        ReadyChunkInfo readyChunkInfo = chunkFinalizer.completeFinalization();
         if (readyChunkInfo != null) {
             Chunk chunk = readyChunkInfo.getChunk();
             chunk.markReady();
@@ -445,7 +447,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
     }
 
-
     private void updateRelevance() {
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
             chunkRelevanceRegion.update();
@@ -473,7 +474,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 return false;
             }
         }
-        lightMerger.beginMerge(chunk, readyChunkInfo);
+        chunkFinalizer.beginFinalization(chunk, readyChunkInfo);
         return true;
     }
 
@@ -526,14 +527,14 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public void restart() {
         pipeline.restart();
         unloadRequestTaskMaster.restart();
-        lightMerger.restart();
+        chunkFinalizer.restart();
     }
 
     @Override
     public void shutdown() {
         pipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        lightMerger.shutdown();
+        chunkFinalizer.shutdown();
     }
 
     @Override
@@ -572,7 +573,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         ChunkMonitor.fireChunkProviderDisposed(this);
         pipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-        lightMerger.shutdown();
+        chunkFinalizer.shutdown();
 
         nearCache.values().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
@@ -588,8 +589,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
-        lightMerger = new LightMerger<>(this);
-        lightMerger.restart();
+        chunkFinalizer = chunkFinalizerSupplier.get();
+        chunkFinalizer.initialize(this);
+        chunkFinalizer.restart();
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
