@@ -19,14 +19,13 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.EntityStore;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.persistence.ChunkStore;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -89,6 +88,7 @@ public class LocalChunkProviderTest {
         verify(entityManager).create();
         verify(mockEntity).addComponent(eq(testComponent));
     }
+
     @Test
     public void testCompleteUpdateGeneratesStoredEntitiesFromPrefab() throws Exception {
         final EntityRef worldEntity = mock(EntityRef.class);
@@ -111,7 +111,23 @@ public class LocalChunkProviderTest {
         verify(mockEntity).addComponent(eq(testComponent));
     }
 
-    private static class ChunkProviderTestComponent implements Component{
+
+    @Test
+    public void testCompleteUpdateRestoresEntitiesFromChunkStore() throws Exception {
+        final EntityRef worldEntity = mock(EntityRef.class);
+        chunkProvider.setWorldEntity(worldEntity);
+        final Chunk chunk = mock(Chunk.class);
+        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final ChunkStore chunkStore = mock(ChunkStore.class);
+        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
+        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
+
+        chunkProvider.completeUpdate();
+
+        verify(chunkStore).restoreEntities();
+    }
+
+    private static class ChunkProviderTestComponent implements Component {
 
     }
 }
