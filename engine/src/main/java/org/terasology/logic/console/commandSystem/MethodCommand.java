@@ -119,7 +119,7 @@ public final class MethodCommand extends AbstractCommand {
             }
 
         }
-        return false;
+        return true;
     }
 
     @Override
