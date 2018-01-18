@@ -126,6 +126,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkFinalizer = chunkFinalizer;
+        chunkFinalizer.initialize(this);
         this.chunkFinalizerSupplier = chunkFinalizerSupplier;
         ChunkMonitor.fireChunkProviderInitialized(this);
     }
