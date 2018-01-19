@@ -92,9 +92,8 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateGeneratesStoredEntities() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final EntityStore entityStore = new EntityStore();
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
-        entityStore.addComponent(testComponent);
+        final EntityStore entityStore = createEntityStoreWithComponents(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
@@ -103,7 +102,6 @@ public class LocalChunkProviderTest {
 
         chunkProvider.completeUpdate();
 
-        verify(entityManager).create();
         verify(mockEntity).addComponent(eq(testComponent));
     }
 
@@ -111,8 +109,8 @@ public class LocalChunkProviderTest {
     public void testCompleteUpdateGeneratesStoredEntitiesFromPrefab() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final Prefab prefab = mock(Prefab.class);
-        final EntityStore entityStore = new EntityStore(prefab);
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
+        final EntityStore entityStore = new EntityStore(prefab);
         entityStore.addComponent(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
         final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
@@ -142,7 +140,7 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateSendsBlockAddedEvents() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final TShortObjectHashMap<TIntList> blockPositionMapppings = new TShortObjectHashMap<>();
+        final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
         final short blockId = 42;
         final EntityRef blockEntity = mock(EntityRef.class);
         final Block block = new Block();
@@ -153,8 +151,8 @@ public class LocalChunkProviderTest {
         positions.add(position.x);
         positions.add(position.y);
         positions.add(position.z);
-        blockPositionMapppings.put(blockId, positions);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
+        blockPositionMappings.put(blockId, positions);
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
@@ -169,7 +167,7 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateSendsBlockActivatedEvents() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final TShortObjectHashMap<TIntList> blockPositionMapppings = new TShortObjectHashMap<>();
+        final TShortObjectHashMap<TIntList> blockPositionMappings = new TShortObjectHashMap<>();
         final short blockId = 42;
         final EntityRef blockEntity = mock(EntityRef.class);
         final Block block = new Block();
@@ -180,8 +178,8 @@ public class LocalChunkProviderTest {
         positions.add(position.x);
         positions.add(position.y);
         positions.add(position.z);
-        blockPositionMapppings.put(blockId, positions);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
+        blockPositionMappings.put(blockId, positions);
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMappings, mock(ChunkStore.class), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
@@ -191,6 +189,18 @@ public class LocalChunkProviderTest {
         final Event event = eventArgumentCaptor.getAllValues().get(1);
         assertThat(event, instanceOf(OnActivatedBlocks.class));
         assertThat(((OnActivatedBlocks) event).getBlockPositions(), hasItem(position));
+    }
+
+    private static EntityStore createEntityStoreWithComponents(Component... components) {
+        return createEntityStoreWithPrefabAndComponents(null, components);
+    }
+
+    private static EntityStore createEntityStoreWithPrefabAndComponents(Prefab prefab, Component... components) {
+        final EntityStore entityStore = new EntityStore(prefab);
+        for (Component component : components) {
+            entityStore.addComponent(component);
+        }
+        return entityStore;
     }
 
     private static Chunk mockChunkAt(final int x, final int y, final int z) {
