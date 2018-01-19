@@ -49,7 +49,6 @@ import java.util.Optional;
 
 /**
  * Stores all information for a specific block type.
- *
  */
 public final class Block {
 
@@ -112,6 +111,8 @@ public final class Block {
     // Physics
     private float mass = 10;
     private boolean debrisOnDestroy = true;
+    private float friction = 0.5f;
+    private float restitution = 0.0f;
 
     // Entity integration
     private Prefab prefab;
@@ -386,6 +387,7 @@ public final class Block {
 
     /**
      * Check can a block attach in the side of this block
+     *
      * @param side The side of attaching
      * @return False if this block is not allowed attachment or the side of this block is not full side
      */
@@ -470,6 +472,7 @@ public final class Block {
 
     /**
      * Indestructible if hardness is 0
+     *
      * @param hardness how much damage it takes to destroy the block, indestructible if hardness is 0
      */
     public void setHardness(int hardness) {
@@ -519,6 +522,22 @@ public final class Block {
 
     public void setMass(float mass) {
         this.mass = mass;
+    }
+
+    public float getFriction() {
+        return friction;
+    }
+
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
+    public float getRestitution() {
+        return restitution;
+    }
+
+    public void setRestitution(float restitution) {
+        this.restitution = restitution;
     }
 
     public BlockColorSource getColorSource(BlockPart part) {
@@ -617,8 +636,9 @@ public final class Block {
 
     /**
      * Set the collision box for the block
+     *
      * @param offset The offset to the block's center
-     * @param shape The shape of collision box
+     * @param shape  The shape of collision box
      */
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;

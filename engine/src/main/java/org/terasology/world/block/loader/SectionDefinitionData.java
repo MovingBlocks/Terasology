@@ -63,6 +63,8 @@ public class SectionDefinitionData {
 
     private float mass = 10f;
     private boolean debrisOnDestroy = true;
+    private float friction = 0.5f;
+    private float restitution = 0.0f;
 
     private EntityData entity = new EntityData();
     private InventoryData inventory = new InventoryData();
@@ -303,6 +305,22 @@ public class SectionDefinitionData {
 
     public void setDebrisOnDestroy(boolean debrisOnDestroy) {
         this.debrisOnDestroy = debrisOnDestroy;
+    }
+
+    public float getFriction() {
+        return friction;
+    }
+
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
+    public float getRestitution() {
+        return restitution;
+    }
+
+    public void setRestitution(float restitution) {
+        this.restitution = restitution;
     }
 
     public EntityData getEntity() {
