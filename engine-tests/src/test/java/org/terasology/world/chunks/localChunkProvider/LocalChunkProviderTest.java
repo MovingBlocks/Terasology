@@ -79,7 +79,7 @@ public class LocalChunkProviderTest {
     @Test
     public void testCompleteUpdateHandlesFinalizedChunkIfReady() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
@@ -96,7 +96,7 @@ public class LocalChunkProviderTest {
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
         entityStore.addComponent(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), entityStores);
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create()).thenReturn(mockEntity);
@@ -115,7 +115,7 @@ public class LocalChunkProviderTest {
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
         entityStore.addComponent(testComponent);
         final List<EntityStore> entityStores = Collections.singletonList(entityStore);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), entityStores);
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), entityStores);
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
         final EntityRef mockEntity = mock(EntityRef.class);
         when(entityManager.create(any(Prefab.class))).thenReturn(mockEntity);
@@ -128,10 +128,10 @@ public class LocalChunkProviderTest {
 
 
     @Test
-    public void testCompleteUpdateRestoresEntitiesFromChunkStore() throws Exception {
+    public void testCompleteUpdateRestoresEntitiesForRestoredChunks() throws Exception {
         final Chunk chunk = mockChunkAt(0, 0, 0);
         final ChunkStore chunkStore = mock(ChunkStore.class);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
@@ -154,7 +154,7 @@ public class LocalChunkProviderTest {
         positions.add(position.y);
         positions.add(position.z);
         blockPositionMapppings.put(blockId, positions);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
@@ -181,7 +181,7 @@ public class LocalChunkProviderTest {
         positions.add(position.y);
         positions.add(position.z);
         blockPositionMapppings.put(blockId, positions);
-        final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
+        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForRestoredChunk(chunk, blockPositionMapppings, mock(ChunkStore.class), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
         chunkProvider.completeUpdate();
