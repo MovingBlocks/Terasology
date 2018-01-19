@@ -43,8 +43,16 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.biomes.BiomeManager;
-import org.terasology.world.block.*;
-import org.terasology.world.chunks.*;
+import org.terasology.world.block.BeforeDeactivateBlocks;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.OnActivatedBlocks;
+import org.terasology.world.block.OnAddedBlocks;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkBlockIterator;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.ManagedChunk;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -62,7 +70,13 @@ import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -116,8 +130,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
-                              BlockManager blockManager, BiomeManager biomeManager, ChunkFinalizer chunkFinalizer,
-                              Supplier<ChunkFinalizer> chunkFinalizerSupplier) {
+                       BlockManager blockManager, BiomeManager biomeManager, ChunkFinalizer chunkFinalizer,
+                       Supplier<ChunkFinalizer> chunkFinalizerSupplier) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
@@ -246,46 +260,65 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public void completeUpdate() {
         ReadyChunkInfo readyChunkInfo = chunkFinalizer.completeFinalization();
         if (readyChunkInfo != null) {
-            Chunk chunk = readyChunkInfo.getChunk();
-            chunk.markReady();
-            updateAdjacentChunksReadyFieldOf(chunk);
-            updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
-
-            if (readyChunkInfo.isNewChunk()) {
-                PerformanceMonitor.startActivity("Generating queued Entities");
-                readyChunkInfo.getEntities().forEach(this::generateQueuedEntities);
-                PerformanceMonitor.endActivity();
-            }
-
-            if (readyChunkInfo.getChunkStore() != null) {
-                readyChunkInfo.getChunkStore().restoreEntities();
-            }
-
-            if (!readyChunkInfo.isNewChunk()) {
-                PerformanceMonitor.startActivity("Sending OnAddedBlocks");
-                readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
-                    if (positions.size() > 0) {
-                        blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
-                    }
-                    return true;
-                });
-                PerformanceMonitor.endActivity();
-            }
-
-            PerformanceMonitor.startActivity("Sending OnActivateBlocks");
-            readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
-                if (positions.size() > 0) {
-                    blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
-                }
-                return true;
-            });
-            PerformanceMonitor.endActivity();
-
-            if (readyChunkInfo.isNewChunk()) {
-                worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));
-            }
-            worldEntity.send(new OnChunkLoaded(readyChunkInfo.getPos()));
+            processReadyChunk(readyChunkInfo);
         }
+    }
+
+    private void processReadyChunk(final ReadyChunkInfo readyChunkInfo) {
+        updateChunkReadinessState(readyChunkInfo);
+        if (readyChunkInfo.isNewChunk()) {
+            generateQueuedEntities(readyChunkInfo);
+            sendOnActivatedBlocks(readyChunkInfo);
+            sendOnChunkGenerated(readyChunkInfo);
+        } else {
+            readyChunkInfo.getChunkStore().restoreEntities();
+            sendOnAddedBlocks(readyChunkInfo);
+            sendOnActivatedBlocks(readyChunkInfo);
+        }
+        sendOnChunkLoaded(readyChunkInfo);
+    }
+
+    private OnChunkLoaded sendOnChunkLoaded(final ReadyChunkInfo readyChunkInfo) {
+        return worldEntity.send(new OnChunkLoaded(readyChunkInfo.getPos()));
+    }
+
+    private void sendOnChunkGenerated(final ReadyChunkInfo readyChunkInfo) {
+        worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));
+    }
+
+    private void sendOnActivatedBlocks(final ReadyChunkInfo readyChunkInfo) {
+        PerformanceMonitor.startActivity("Sending OnActivateBlocks");
+        readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
+            if (positions.size() > 0) {
+                blockManager.getBlock(id).getEntity().send(new OnActivatedBlocks(positions, registry));
+            }
+            return true;
+        });
+        PerformanceMonitor.endActivity();
+    }
+
+    private void sendOnAddedBlocks(final ReadyChunkInfo readyChunkInfo) {
+        PerformanceMonitor.startActivity("Sending OnAddedBlocks");
+        readyChunkInfo.getBlockPositionMapppings().forEachEntry((id, positions) -> {
+            if (positions.size() > 0) {
+                blockManager.getBlock(id).getEntity().send(new OnAddedBlocks(positions, registry));
+            }
+            return true;
+        });
+        PerformanceMonitor.endActivity();
+    }
+
+    private void generateQueuedEntities(final ReadyChunkInfo readyChunkInfo) {
+        PerformanceMonitor.startActivity("Generating queued Entities");
+        readyChunkInfo.getEntities().forEach(this::generateQueuedEntities);
+        PerformanceMonitor.endActivity();
+    }
+
+    private void updateChunkReadinessState(final ReadyChunkInfo readyChunkInfo) {
+        Chunk chunk = readyChunkInfo.getChunk();
+        chunk.markReady();
+        updateAdjacentChunksReadyFieldOf(chunk);
+        updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
     }
 
     private void generateQueuedEntities(EntityStore store) {
