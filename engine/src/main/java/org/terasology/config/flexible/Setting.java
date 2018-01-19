@@ -99,7 +99,7 @@ public interface Setting<T> {
     boolean hasSubscribers();
 
     /**
-     * Sets the value of this {@link Setting} from the value's JSON representation.
+     * Sets the value of this {@link Setting} from a JSON representation as a string.
      */
     void setValueFromJson(String json);
 
