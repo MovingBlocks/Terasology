@@ -61,6 +61,7 @@ public class LocalChunkProviderTest {
     private EntityManager entityManager;
     private BlockManager blockManager;
     private BlockEntityRegistry blockEntityRegistry;
+    private EntityRef worldEntity;
 
     @Before
     public void setUp() throws Exception {
@@ -68,17 +69,16 @@ public class LocalChunkProviderTest {
         chunkFinalizer = mock(ChunkFinalizer.class);
         blockManager = mock(BlockManager.class);
         blockEntityRegistry = mock(BlockEntityRegistry.class);
+        worldEntity = mock(EntityRef.class);
         chunkProvider = new LocalChunkProvider(null,
                 entityManager, null, blockManager, null, chunkFinalizer, null);
         chunkProvider.setBlockEntityRegistry(blockEntityRegistry);
+        chunkProvider.setWorldEntity(worldEntity);
     }
 
     @Test
     public void testCompleteUpdateHandlesFinalizedChunkIfReady() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
 
@@ -91,10 +91,7 @@ public class LocalChunkProviderTest {
 
     @Test
     public void testCompleteUpdateGeneratesStoredEntities() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final EntityStore entityStore = new EntityStore();
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
         entityStore.addComponent(testComponent);
@@ -112,10 +109,7 @@ public class LocalChunkProviderTest {
 
     @Test
     public void testCompleteUpdateGeneratesStoredEntitiesFromPrefab() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final Prefab prefab = mock(Prefab.class);
         final EntityStore entityStore = new EntityStore(prefab);
         final ChunkProviderTestComponent testComponent = new ChunkProviderTestComponent();
@@ -135,10 +129,7 @@ public class LocalChunkProviderTest {
 
     @Test
     public void testCompleteUpdateRestoresEntitiesFromChunkStore() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final ChunkStore chunkStore = mock(ChunkStore.class);
         final ReadyChunkInfo readyChunkInfo = new ReadyChunkInfo(chunk, new TShortObjectHashMap<>(), chunkStore, Collections.emptyList());
         when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
@@ -150,10 +141,7 @@ public class LocalChunkProviderTest {
 
     @Test
     public void testCompleteUpdateSendsBlockAddedEvents() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final TShortObjectHashMap<TIntList> blockPositionMapppings = new TShortObjectHashMap<>();
         final short blockId = 42;
         final EntityRef blockEntity = mock(EntityRef.class);
@@ -180,10 +168,7 @@ public class LocalChunkProviderTest {
 
     @Test
     public void testCompleteUpdateSendsBlockActivatedEvents() throws Exception {
-        final EntityRef worldEntity = mock(EntityRef.class);
-        chunkProvider.setWorldEntity(worldEntity);
-        final Chunk chunk = mock(Chunk.class);
-        when(chunk.getPosition()).thenReturn(new Vector3i(0, 0, 0));
+        final Chunk chunk = mockChunkAt(0, 0, 0);
         final TShortObjectHashMap<TIntList> blockPositionMapppings = new TShortObjectHashMap<>();
         final short blockId = 42;
         final EntityRef blockEntity = mock(EntityRef.class);
@@ -206,6 +191,12 @@ public class LocalChunkProviderTest {
         final Event event = eventArgumentCaptor.getAllValues().get(1);
         assertThat(event, instanceOf(OnActivatedBlocks.class));
         assertThat(((OnActivatedBlocks) event).getBlockPositions(), hasItem(position));
+    }
+
+    private static Chunk mockChunkAt(final int x, final int y, final int z) {
+        final Chunk chunk = mock(Chunk.class);
+        when(chunk.getPosition()).thenReturn(new Vector3i(x, y, z));
+        return chunk;
     }
 
     private static class ChunkProviderTestComponent implements Component {
