@@ -70,6 +70,7 @@ import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -456,31 +457,33 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private boolean areAdjacentChunksReady(Chunk chunk) {
-        Vector3i centerChunkPos = chunk.getPosition();
-        for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = chunkCache.get(adjChunkPos);
-            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
-            if (!adjChunkReady) {
+        for (Chunk adjacentChunk : listAdjacentChunks(chunk)) {
+            if (!adjacentChunk.isReady()) {
                 return false;
             }
         }
         return true;
     }
 
+    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
+        listAdjacentChunks(chunkInCenter).forEach(this::updateAdjacentChunksReadyFieldOf);
+    }
+
     private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
         chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
     }
 
-    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
-        Vector3i centerChunkPos = chunkInCenter.getPosition();
+    private List<Chunk> listAdjacentChunks(Chunk chunk) {
+        final Vector3i centerChunkPosition = chunk.getPosition();
+        List<Chunk> adjacentChunks = new ArrayList<>(6);
         for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjacentChunk = chunkCache.get(adjChunkPos);
+            final Vector3i adjacentChunkPosition = side.getAdjacentPos(centerChunkPosition);
+            final Chunk adjacentChunk = chunkCache.get(adjacentChunkPosition);
             if (adjacentChunk != null) {
-                updateAdjacentChunksReadyFieldOf(adjacentChunk);
+                adjacentChunks.add(adjacentChunk);
             }
         }
+        return adjacentChunks;
     }
 
     private void updateRelevance() {
