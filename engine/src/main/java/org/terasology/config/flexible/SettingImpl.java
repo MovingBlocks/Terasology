@@ -86,6 +86,8 @@ public final class SettingImpl<T> implements Setting<T> {
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
         this.valueClass = valueClass;
+
+        this.subscribers = Sets.newHashSet();
     }
 
     private String formatWarning(String s) {
@@ -97,10 +99,8 @@ public final class SettingImpl<T> implements Setting<T> {
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
-        if (subscribers != null) {
-            for (PropertyChangeListener subscriber : subscribers) {
-                subscriber.propertyChange(event);
-            }
+        for (PropertyChangeListener subscriber : subscribers) {
+            subscriber.propertyChange(event);
         }
     }
 
@@ -113,10 +113,6 @@ public final class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean subscribe(PropertyChangeListener listener) {
-        if (subscribers == null) {
-            subscribers = Sets.newHashSet();
-        }
-
         if (listener == null) {
             logWarning("A null subscriber cannot be added.");
 
@@ -145,10 +141,6 @@ public final class SettingImpl<T> implements Setting<T> {
 
         subscribers.remove(listener);
 
-        if (subscribers.size() <= 0) {
-            subscribers = null;
-        }
-
         return true;
     }
 
@@ -157,7 +149,7 @@ public final class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean hasSubscribers() {
-        return subscribers != null;
+        return subscribers.size() > 0;
     }
 
     /**
