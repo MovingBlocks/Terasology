@@ -33,7 +33,6 @@ public interface ComponentSystem {
 
     /**
      * Called before the game is auto-saved.
-     * TODO: Implemented as default method to avoid violating API. May want to review / revise when retrofitting gestalt-entity v6+
      */
     default void preAutoSave() {
 
@@ -41,7 +40,6 @@ public interface ComponentSystem {
 
     /**
      * Called after the game is auto-saved.
-     * TODO: Implemented as default method to avoid violating API. May want to review / revise when retrofitting gestalt-entity v6+
      */
     default void postAutoSave() {
 

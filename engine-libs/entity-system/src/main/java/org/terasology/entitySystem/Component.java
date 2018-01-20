@@ -15,11 +15,13 @@
  */
 package org.terasology.entitySystem;
 
+import org.terasology.entitySystem.systems.ComponentSystem;
+
 /**
  * A Component is (a collection of) <b>data</b> that
  * <ul>
  *     <li> can be attached to/carried by an entity, and</li>
- *     <li> can be inspected and/or edited by one or more {@link org.terasology.entitySystem.systems.ComponentSystem}s.</li>
+ *     <li> can be inspected and/or edited by one or more {@link ComponentSystem}s.</li>
  * </ul>
  *
  */
