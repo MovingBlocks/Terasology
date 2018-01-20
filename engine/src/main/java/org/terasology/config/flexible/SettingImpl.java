@@ -81,6 +81,8 @@ public final class SettingImpl<T> implements Setting<T> {
                     "Check the logs for more information.");
         }
 
+        Preconditions.checkNotNull(defaultValue, formatWarning("The default value cannot be null."));
+
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
         this.valueClass = valueClass;
@@ -195,6 +197,8 @@ public final class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean setValue(T newValue) {
+        Preconditions.checkNotNull(newValue, formatWarning("The value of a setting cannot be null."));
+
         if (!validate(newValue)) {
             return false;
         }

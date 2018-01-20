@@ -179,7 +179,7 @@ public class FlexibleConfigTest {
             doubleSetting = new SettingImpl<>(Double.class, new SimpleUri("engine-tests:TestSetting2"), 30.0);
             config.add(doubleSetting);
 
-            testClassSetting = new SettingImpl<>(TestClass.class, new SimpleUri("engine-tests:TestSetting3"), null);
+            testClassSetting = new SettingImpl<>(TestClass.class, new SimpleUri("engine-tests:TestSetting3"), new TestClass(101));
             config.add(testClassSetting);
         }
 
@@ -235,7 +235,11 @@ public class FlexibleConfigTest {
             TestEnum c;
 
             public TestClass() {
-                a = 31;
+                this(31);
+            }
+
+            public TestClass(int a) {
+                this.a = a;
                 b = "string";
                 c = TestEnum.A2;
             }
