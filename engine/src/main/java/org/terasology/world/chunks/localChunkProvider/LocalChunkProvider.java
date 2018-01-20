@@ -99,7 +99,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
 
-    private Map<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
 
     private final Set<Vector3i> preparingChunks = Sets.newHashSet();
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
@@ -112,6 +111,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private BlockManager blockManager;
     private BiomeManager biomeManager;
+    private final ChunkCache chunkCache;
     private final Supplier<ChunkFinalizer> chunkFinalizerSupplier;
     private BlockEntityRegistry registry;
 
@@ -126,12 +126,13 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
                 blockManager,
                 biomeManager,
                 new LightMergingChunkFinalizer(),
-                LightMergingChunkFinalizer::new);
+                LightMergingChunkFinalizer::new,
+                new ConcurrentMapChunkCache());
     }
 
     LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator,
                        BlockManager blockManager, BiomeManager biomeManager, ChunkFinalizer chunkFinalizer,
-                       Supplier<ChunkFinalizer> chunkFinalizerSupplier) {
+                       Supplier<ChunkFinalizer> chunkFinalizerSupplier, ChunkCache chunkCache) {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
         this.generator = generator;
@@ -140,6 +141,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         this.chunkFinalizer = chunkFinalizer;
+        this.chunkCache = chunkCache;
         chunkFinalizer.initialize(this);
         this.chunkFinalizerSupplier = chunkFinalizerSupplier;
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -177,7 +179,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
-            Chunk chunk = nearCache.get(chunkPos);
+            Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null || !chunk.isReady()) {
                 return null;
             }
@@ -351,7 +353,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         List<ReadyChunkInfo> newReadyChunks = Lists.newArrayListWithExpectedSize(readyChunks.size());
         readyChunks.drainTo(newReadyChunks);
         for (ReadyChunkInfo readyChunkInfo : newReadyChunks) {
-            nearCache.put(readyChunkInfo.getPos(), readyChunkInfo.getChunk());
+            chunkCache.put(readyChunkInfo.getPos(), readyChunkInfo.getChunk());
             preparingChunks.remove(readyChunkInfo.getPos());
         }
         updateRelevanceRegionsWithNewChunks(newReadyChunks);
@@ -398,7 +400,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         logger.debug("Compacting cache");
-        Iterator<Vector3i> iterator = nearCache.keySet().iterator();
+        Iterator<Vector3i> iterator = chunkCache.iterateChunkPositions();
         while (iterator.hasNext()) {
             Vector3i pos = iterator.next();
             boolean keep = false;
@@ -423,7 +425,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private boolean unloadChunkInternal(Vector3i pos) {
-        Chunk chunk = nearCache.get(pos);
+        Chunk chunk = chunkCache.get(pos);
         if (!chunk.isReady()) {
             // Chunk hasn't been finished or changed, so just drop it.
             Iterator<ReadyChunkInfo> infoIterator = sortedReadyChunks.iterator();
@@ -457,7 +459,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         Vector3i centerChunkPos = chunk.getPosition();
         for (Side side : Side.values()) {
             Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = nearCache.get(adjChunkPos);
+            Chunk adjChunk = chunkCache.get(adjChunkPos);
             boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
             if (!adjChunkReady) {
                 return false;
@@ -474,9 +476,9 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         Vector3i centerChunkPos = chunkInCenter.getPosition();
         for (Side side : Side.values()) {
             Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = nearCache.get(adjChunkPos);
-            if (adjChunk != null) {
-                updateAdjacentChunksReadyFieldOf(adjChunk);
+            Chunk adjacentChunk = chunkCache.get(adjChunkPos);
+            if (adjacentChunk != null) {
+                updateAdjacentChunksReadyFieldOf(adjacentChunk);
             }
         }
     }
@@ -486,7 +488,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             chunkRelevanceRegion.update();
             if (chunkRelevanceRegion.isDirty()) {
                 for (Vector3i pos : chunkRelevanceRegion.getNeededChunks()) {
-                    Chunk chunk = nearCache.get(pos);
+                    Chunk chunk = chunkCache.get(pos);
                     if (chunk != null) {
                         chunkRelevanceRegion.checkIfChunkIsRelevant(chunk);
                     } else {
@@ -499,12 +501,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private boolean makeChunkAvailable(final ReadyChunkInfo readyChunkInfo) {
-        final Chunk chunk = nearCache.get(readyChunkInfo.getPos());
+        final Chunk chunk = chunkCache.get(readyChunkInfo.getPos());
         if (chunk == null) {
             return false;
         }
         for (Vector3i pos : Region3i.createFromCenterExtents(readyChunkInfo.getPos(), 1)) {
-            if (nearCache.get(pos) == null) {
+            if (chunkCache.get(pos) == null) {
                 return false;
             }
         }
@@ -544,7 +546,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public Chunk getChunk(Vector3i pos) {
-        Chunk chunk = nearCache.get(pos);
+        Chunk chunk = chunkCache.get(pos);
         if (isChunkReady(chunk)) {
             return chunk;
         }
@@ -553,7 +555,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public Collection<Chunk> getAllChunks() {
-        return nearCache.values();
+        return chunkCache.getAllChunks();
     }
 
 
@@ -575,11 +577,11 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     public void dispose() {
         shutdown();
 
-        for (Chunk chunk : nearCache.values()) {
+        for (Chunk chunk : chunkCache.getAllChunks()) {
             unloadChunkInternal(chunk.getPosition());
             chunk.dispose();
         }
-        nearCache.clear();
+        chunkCache.clear();
         /*
          * The chunk monitor needs to clear chunk references, so it's important
          * that no new chunk get created
@@ -589,12 +591,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public boolean reloadChunk(Vector3i coords) {
-        if (!nearCache.containsKey(coords)) {
+        if (!chunkCache.containsChunkAt(coords)) {
             return false;
         }
 
         if (unloadChunkInternal(coords)) {
-            nearCache.remove(coords);
+            chunkCache.removeChunkAt(coords);
             createOrLoadChunk(coords);
             return true;
         }
@@ -609,12 +611,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         chunkFinalizer.shutdown();
 
-        nearCache.values().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
+        chunkCache.getAllChunks().stream().filter(ManagedChunk::isReady).forEach(chunk -> {
             worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
             storageManager.deactivateChunk(chunk);
             chunk.dispose();
         });
-        nearCache.clear();
+        chunkCache.clear();
         readyChunks.clear();
         sortedReadyChunks.clear();
         storageManager.deleteWorld();
@@ -637,7 +639,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     }
 
     private void createOrLoadChunk(Vector3i chunkPos) {
-        Chunk chunk = nearCache.get(chunkPos);
+        Chunk chunk = chunkCache.get(chunkPos);
         if (chunk == null && !preparingChunks.contains(chunkPos)) {
             preparingChunks.add(chunkPos);
             pipeline.doTask(new AbstractChunkTask(chunkPos) {
@@ -675,12 +677,12 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     @Override
     public Chunk getChunkUnready(Vector3i pos) {
-        return nearCache.get(pos);
+        return chunkCache.get(pos);
     }
 
     @Override
     public boolean isChunkReady(Vector3i pos) {
-        return isChunkReady(nearCache.get(pos));
+        return isChunkReady(chunkCache.get(pos));
     }
 
     private boolean isChunkReady(Chunk chunk) {
