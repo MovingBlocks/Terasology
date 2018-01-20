@@ -19,6 +19,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleRegistry;
+import org.terasology.module.PathModule;
 import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
@@ -55,6 +56,16 @@ class ModuleDownloadListGenerator {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Whether the given module is present as source in the workspace.
+     *
+     * This is relevant when running the game from a local workspace to prevent downloading modules already present as
+     * source.
+     */
+    private boolean isSourceModule(Module module) {
+        return module instanceof PathModule;
+    }
+
     private boolean isOnlineVersionNewer(Module localVersion, Module onlineVersion) {
         if (onlineVersion == null) {
             return false;
@@ -66,6 +77,10 @@ class ModuleDownloadListGenerator {
         if (versionCompare > 0) {
             return true;
         } else if (versionCompare == 0) {
+            if (isSourceModule(localVersion)) {
+                // In case the version of the local source module is the same as remote, don't download it again.
+                return false;
+            } else {
                 /*
                  * Multiple binaries get released as the same snapshot version, A version name match thus does not
                  * guarantee that we have the newest version already if it is a snapshot version.
@@ -73,7 +88,8 @@ class ModuleDownloadListGenerator {
                  * Having the user redownload the same binary again is not ideal, but it is better then having the user
                  * being stuck on an outdated snapshot binary.
                  */
-            return onlineVersion.getVersion().isSnapshot();
+                return onlineVersion.getVersion().isSnapshot();
+            }
         } else {
             return false;
         }
