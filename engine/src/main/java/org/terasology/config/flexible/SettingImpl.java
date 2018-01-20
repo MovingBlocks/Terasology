@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -85,6 +86,14 @@ public final class SettingImpl<T> implements Setting<T> {
         this.valueClass = valueClass;
     }
 
+    private String formatWarning(String s) {
+        return MessageFormat.format(warningFormatString, s);
+    }
+
+    private void logWarning(String warningMessage) {
+        LOGGER.warn(formatWarning(warningMessage));
+    }
+
     private void dispatchChangedEvent(PropertyChangeEvent event) {
         if (subscribers != null) {
             for (PropertyChangeListener subscriber : subscribers) {
@@ -107,14 +116,12 @@ public final class SettingImpl<T> implements Setting<T> {
         }
 
         if (listener == null) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "A null subscriber cannot be added"));
+            logWarning("A null subscriber cannot be added.");
 
             return false;
         }
         if (subscribers.contains(listener)) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "The listener has already been subscribed"));
+            logWarning("The listener has already been subscribed.");
 
             return false;
         }
@@ -130,8 +137,7 @@ public final class SettingImpl<T> implements Setting<T> {
     @Override
     public boolean unsubscribe(PropertyChangeListener listener) {
         if (!subscribers.contains(listener)) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "The listener does not exist in the subscriber list"), id);
+            LOGGER.warn("The listener does not exist in the subscriber list.");
             return false;
         }
 
