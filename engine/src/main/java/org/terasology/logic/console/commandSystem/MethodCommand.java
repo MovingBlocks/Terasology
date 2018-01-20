@@ -117,7 +117,6 @@ public final class MethodCommand extends AbstractCommand {
                     }
                 }
             }
-
         }
         return true;
     }
