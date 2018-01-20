@@ -22,6 +22,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.flexible.validators.DefaultValueValidator;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -60,7 +61,7 @@ public final class SettingImpl<T> implements Setting<T> {
      * @param defaultValue the default value of the setting.
      */
     public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue) {
-        this(valueClass, id, defaultValue, null);
+        this(valueClass, id, defaultValue, new DefaultValueValidator<>());
     }
 
     /**
@@ -105,7 +106,7 @@ public final class SettingImpl<T> implements Setting<T> {
     }
 
     private boolean validate(T valueToValidate) {
-        return validator == null || validator.validate(valueToValidate);
+        return validator.validate(valueToValidate);
     }
 
     /**
