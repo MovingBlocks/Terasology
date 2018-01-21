@@ -92,6 +92,6 @@ nuiEditorAutosave.json
 # Ignore stuff we extract for use with Terasology
 /natives/
 config/metrics/
-
+configs/engine/rendering.cfg
 
 # Ignore weird stuff that might be obsolete
