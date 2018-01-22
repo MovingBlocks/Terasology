@@ -39,7 +39,7 @@ import org.terasology.physics.components.shapes.CapsuleShapeComponent;
 import org.terasology.physics.components.shapes.CylinderShapeComponent;
 import org.terasology.physics.components.shapes.HullShapeComponent;
 import org.terasology.physics.components.shapes.SphereShapeComponent;
-import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.world.WorldProvider;
 
 import java.util.Optional;
@@ -83,7 +83,7 @@ public class PlayerFactory {
         if (clientComp != null) {
             ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
 
-            MeshComponent meshComp = builder.getComponent(MeshComponent.class);
+            SkeletalMeshComponent meshComp = builder.getComponent(SkeletalMeshComponent.class);
             meshComp.color = colorComp.color;
         }
 

@@ -18,10 +18,12 @@
     "radius": 0.3,
     "jumpSpeed": 12
   },
-  "Mesh": {
-    "mesh": "engine:testmonkey",
-    "material": "engine:monkeyHead9",
-    "hideFromOwner": true
+  "SkeletalMesh": {
+    "mesh": "floatingCube",
+    "heightOffset": 0.0,
+    "material": "floatingCubeSkin",
+    "animationPool": ["floatingCubeIdle"],
+    "loop": true
   },
   "BoxShape": {
     "extents": [
