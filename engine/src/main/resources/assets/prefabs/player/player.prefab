@@ -18,12 +18,7 @@
     "radius": 0.3,
     "jumpSpeed": 12
   },
-  "SkeletalMesh": {
-    "mesh": "floatingCube",
-    "heightOffset": 0.0,
-    "material": "floatingCubeSkin",
-    "animationPool": ["floatingCubeIdle"],
-    "loop": true
+  "VisualCharacter": {
   },
   "BoxShape": {
     "extents": [
