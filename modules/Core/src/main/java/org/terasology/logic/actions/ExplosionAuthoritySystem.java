@@ -48,7 +48,7 @@ import java.util.Optional;
 
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ExplosionAuthoritySystem extends BaseComponentSystem {
-    static final String DELAYED_EXPLOSION_ACTION_ID = "Delayed Explosion";
+    public static final String DELAYED_EXPLOSION_ACTION_ID = "Delayed Explosion";
 
     @In
     private WorldProvider worldProvider;
@@ -157,13 +157,23 @@ public class ExplosionAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onDelayedExplosion(DelayedActionTriggeredEvent event, EntityRef entityRef,
-                                   ExplosionActionComponent explosionActionComponent,
-                                   BlockComponent blockComponent) {
+                                    ExplosionActionComponent explosionActionComponent) {
         if (event.getActionId().equals(DELAYED_EXPLOSION_ACTION_ID)) {
-            // always destroy the block that caused the explosion
-            worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
-            // create the explosion from the block's location
-            doExplosion(explosionActionComponent, blockComponent.getPosition().toVector3f(), entityRef);
+            //check if the exploding entity is a block or not
+            if (entityRef.hasComponent(BlockComponent.class)) {
+                BlockComponent blockComponent = entityRef.getComponent(BlockComponent.class);
+                // always destroy the block that caused the explosion
+                worldProvider.setBlock(blockComponent.getPosition(), blockManager.getBlock(BlockManager.AIR_ID));
+                // create the explosion from the block's location
+                doExplosion(explosionActionComponent, blockComponent.getPosition().toVector3f(), entityRef);
+            } else if (entityRef.hasComponent(LocationComponent.class)) {
+                // get the position of the non-block entity to make it explode from there
+                Vector3f position = entityRef.getComponent(LocationComponent.class).getWorldPosition();
+                // destroy the non-block entity
+                entityRef.destroy();
+                // create the explosion from the non-block entity location
+                doExplosion(explosionActionComponent, position, EntityRef.NULL);
+            }
         }
     }
 }
