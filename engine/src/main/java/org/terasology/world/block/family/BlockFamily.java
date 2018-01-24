@@ -25,7 +25,6 @@ import org.terasology.world.block.BlockUri;
  * A collection of blocks that are all different blocks
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
- *
  */
 public interface BlockFamily {
     ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
@@ -43,9 +42,10 @@ public interface BlockFamily {
     /**
      * Get the block that is appropriate for placement in the given situation
      *
-     * @param location
+     * @param location            The location where the block is going to be placed.
      * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
-     * @param direction           A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
+     * @param direction           A secondary direction after the attachment side that determines the facing of the block.
+     * @return The appropriate block
      */
     Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction);
 

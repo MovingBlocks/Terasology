@@ -25,8 +25,6 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- */
 public abstract class AbstractBlockFamily implements BlockFamily {
 
     private BlockUri uri;

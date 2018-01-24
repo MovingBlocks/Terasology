@@ -22,9 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Inherited
 /**
  * Describes the sections that a block can use such as top, left, right, bottom
  * but other sections can be used.
@@ -34,6 +31,9 @@ import java.lang.annotation.Target;
  *     the BlockSection
  * </p>
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Inherited
 public @interface BlockSections {
     String[] value();
 }
