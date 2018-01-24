@@ -45,6 +45,8 @@ public class SelectGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
+    public static final String LOAD_BUTTON_LABEL = "load";
+    public static final String DELETE_BUTTON_LABEL = "delete";
 
     @In
     private Config config;
@@ -84,10 +86,10 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         refreshList(gameList);
         gameList.subscribe((widget, item) -> loadGame(item));
-        gameList.subscribeSelection((widget, item) -> {
-            for (String targetId : new String[]{"load", "delete"}) {
-                find(targetId, UIButton.class).setEnabled(true);
-            }
+        gameList.subscribeSelection((widget, selectedGame) -> {
+            boolean isGameSelected = selectedGame != null;
+            find(LOAD_BUTTON_LABEL, UIButton.class).setEnabled(isGameSelected);
+            find(DELETE_BUTTON_LABEL, UIButton.class).setEnabled(isGameSelected);
         });
 
         CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
@@ -96,14 +98,14 @@ public class SelectGameScreen extends CoreScreenLayer {
             triggerForwardAnimation(screen);
         });
 
-        WidgetUtil.trySubscribe(this, "load", button -> {
+        WidgetUtil.trySubscribe(this, LOAD_BUTTON_LABEL, button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
                 loadGame(gameInfo);
             }
         });
 
-        WidgetUtil.trySubscribe(this, "delete", button -> {
+        WidgetUtil.trySubscribe(this, DELETE_BUTTON_LABEL, button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
                 Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
