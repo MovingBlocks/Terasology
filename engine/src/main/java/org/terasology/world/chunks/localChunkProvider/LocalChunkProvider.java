@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,6 +269,8 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
 
     private void processReadyChunk(final ReadyChunkInfo readyChunkInfo) {
         updateChunkReadinessState(readyChunkInfo);
+        //TODO, it is not clear if the activate/addedBlocks event logic is correct.
+        //See https://github.com/MovingBlocks/Terasology/issues/3244
         if (readyChunkInfo.isNewChunk()) {
             generateQueuedEntities(readyChunkInfo);
             sendOnActivatedBlocks(readyChunkInfo);

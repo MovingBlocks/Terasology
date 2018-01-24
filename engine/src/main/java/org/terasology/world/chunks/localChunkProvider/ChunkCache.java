@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import org.terasology.world.chunks.Chunk;
 import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * Chunk storage which allows to look up for chunks based on their world position.
+ */
 interface ChunkCache {
     Chunk get(Vector3i chunkPosition);
 

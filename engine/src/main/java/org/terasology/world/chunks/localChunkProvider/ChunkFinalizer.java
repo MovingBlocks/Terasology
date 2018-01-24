@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.internal.ReadyChunkInfo;
 
+/**
+ * Post-processor for loaded or generated chunks.
+ * Can be used to add extra runtime-metadata like light merging to a chunk before the chunk is stored in memory.
+ */
 public interface ChunkFinalizer {
 
     void initialize(GeneratingChunkProvider generatingChunkProvider);

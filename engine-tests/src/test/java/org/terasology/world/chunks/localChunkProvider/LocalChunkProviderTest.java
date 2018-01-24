@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ public class LocalChunkProviderTest {
     private ChunkCache chunkCache;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         entityManager = mock(EntityManager.class);
         chunkFinalizer = mock(ChunkFinalizer.class);
         blockManager = mock(BlockManager.class);
@@ -148,9 +148,9 @@ public class LocalChunkProviderTest {
 
         chunkProvider.completeUpdate();
 
-        final InOrder inOrder = inOrder(worldEntity);
-        inOrder.verify(worldEntity).send(any(OnChunkGenerated.class));
-        inOrder.verify(worldEntity).send(any(OnChunkLoaded.class));
+        final InOrder inOrderVerification = inOrder(worldEntity);
+        inOrderVerification.verify(worldEntity).send(any(OnChunkGenerated.class));
+        inOrderVerification.verify(worldEntity).send(any(OnChunkLoaded.class));
     }
 
     @Test
@@ -186,7 +186,6 @@ public class LocalChunkProviderTest {
         verify(entityManager).create(eq(prefab));
         verify(mockEntity).addComponent(eq(testComponent));
     }
-
 
     @Test
     public void testCompleteUpdateRestoresEntitiesForRestoredChunks() throws Exception {
