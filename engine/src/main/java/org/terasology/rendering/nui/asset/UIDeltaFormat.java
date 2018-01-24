@@ -19,16 +19,29 @@ import com.google.common.base.Charsets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.assets.format.AbstractAssetAlterationFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetDeltaFileFormat;
+import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.utilities.Assets;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 
+/**
+ * Enables UI screens (.ui) to have delta files.
+ * The delta files share the same extension as UI screens.
+ *
+ * Note that in the current form, only skinning is supported via delta files.
+ * Further, the skin you are overriding the existing skin with should reside in the same module as the delta file.
+*/
 @RegisterAssetDeltaFileFormat
 public class UIDeltaFormat extends AbstractAssetAlterationFileFormat<UIData> {
+    private static final Logger logger = LoggerFactory.getLogger(UIDeltaFormat.class);
+
     public UIDeltaFormat() {
         super("ui");
     }
@@ -42,7 +55,12 @@ public class UIDeltaFormat extends AbstractAssetAlterationFileFormat<UIData> {
             String filePath = input.toString();
             String moduleName = filePath.substring(1, filePath.indexOf('/', 1));
 
-            assetData.getRootWidget().setSkin(Assets.getSkin(moduleName + ":" + skinUri).get());
+            Optional<UISkin> skin = Assets.getSkin(moduleName + ":" + skinUri);
+            if (skin.isPresent()) {
+                assetData.getRootWidget().setSkin(skin.get());
+            } else {
+                logger.warn("Failed to load skin " + skinUri + " for the delta file " + input.getFilename());
+            }
         }
     }
 }
