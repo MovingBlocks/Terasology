@@ -15,7 +15,8 @@
  */
 package org.terasology.world.block.entity.neighbourUpdate;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,29 +30,37 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
+import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
-import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 /**
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem
+        implements UpdateSubscriberSystem, WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
     @In
     private WorldProvider worldProvider;
+
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
     private int largeBlockUpdateCount;
     private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
+
+    @Override
+    public void postBegin() {
+        worldProvider.registerListener(this);
+    }
 
     @ReceiveEvent
     public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
@@ -73,6 +82,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
 
     /**
      * notifies the adjacent block families when a block is placed next to them
+     * 
      * @param event
      * @param entity
      */
@@ -87,6 +97,26 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         processUpdateForBlockLocation(targetBlock);
     }
 
+    @Override
+    public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
+        if (largeBlockUpdateCount > 0) {
+            blocksUpdatedInLargeBlockUpdate.add(pos);
+        } else {
+            Vector3i blockLocation = pos;
+            processUpdateForBlockLocation(blockLocation);
+        }
+
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class})
+    public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
+        if (largeBlockUpdateCount > 0) {
+            blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
+        } else {
+            Vector3i blockLocation = event.getBlockPosition();
+            processUpdateForBlockLocation(blockLocation);
+        }
+    }
 
     private void notifyNeighboursOfChangedBlocks() {
         // Invoke the updates in another large block change for this class only
@@ -102,16 +132,6 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         largeBlockUpdateCount--;
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
-    public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
-        if (largeBlockUpdateCount > 0) {
-            blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
-        } else {
-            Vector3i blockLocation = event.getBlockPosition();
-            processUpdateForBlockLocation(blockLocation);
-        }
-    }
-
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
         for (Side side : Side.values()) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
@@ -121,7 +141,8 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
                 if (blockFamily instanceof UpdatesWithNeighboursFamily) {
                     UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
-                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
+                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation,
+                            neighborBlock);
                     if (neighborBlock != neighborBlockAfterUpdate) {
                         worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
                     }
@@ -136,5 +157,9 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
             logger.error("Unmatched LargeBlockUpdateStarted - LargeBlockUpdateFinished not invoked enough times");
         }
         largeBlockUpdateCount = 0;
+    }
+
+    @Override
+    public void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
     }
 }
