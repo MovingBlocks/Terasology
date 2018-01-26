@@ -258,7 +258,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         addWorldRenderingNodes(renderGraph);
 
-        addSkyNodes();
+        addSkyNodes(renderGraph);
 
         addLightingNodes(renderGraph);
 
