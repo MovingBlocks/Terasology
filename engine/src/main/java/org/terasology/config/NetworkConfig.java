@@ -20,9 +20,7 @@ import com.google.common.collect.Lists;
 
 import org.terasology.engine.TerasologyConstants;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,13 +73,15 @@ public class NetworkConfig {
         try {
             StringBuffer mOTD = new StringBuffer();
 
-            FileReader reader = new FileReader("motd.md");
+            InputStreamReader reader = new InputStreamReader(new FileInputStream("motd.md"), "UTF8");
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 mOTD.append(line);
             }
+
+            reader.close();
 
             serverMOTD =  mOTD.toString();
 
