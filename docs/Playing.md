@@ -85,6 +85,7 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [W,A,S,D] - Movement
 * [E] - Activate / Use (while pointing at a chest, TNT blocks, etc)
 * [Q] - Throw held (block) item (hold down to charge for a longer throw!)
+* [R] - Keep moving forward (like W) until [R] is pressed again
 * [Space] - Jump / Ascend
 * [Ctrl] - Crouch / Descend
 * [Shift] - Hold to run (or walk when run is toggled to default)

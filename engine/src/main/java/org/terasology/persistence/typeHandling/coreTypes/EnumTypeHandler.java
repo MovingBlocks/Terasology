@@ -81,6 +81,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
             for (PersistedData item : array) {
                 result.add(deserialize(item, context));
             }
+            return result;
         }
         return Lists.newArrayList();
     }
