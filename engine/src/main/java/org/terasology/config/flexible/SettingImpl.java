@@ -95,10 +95,6 @@ public class SettingImpl<T> implements Setting<T> {
         return MessageFormat.format(warningFormatString, s);
     }
 
-    private void logWarning(String warningMessage) {
-        LOGGER.warn(formatWarning(warningMessage));
-    }
-
     private void dispatchChangedEvent(PropertyChangeEvent event) {
         for (PropertyChangeListener subscriber : subscribers) {
             subscriber.propertyChange(event);
@@ -115,12 +111,12 @@ public class SettingImpl<T> implements Setting<T> {
     @Override
     public boolean subscribe(PropertyChangeListener listener) {
         if (listener == null) {
-            logWarning("A null subscriber cannot be added.");
+            LOGGER.warn(formatWarning("A null subscriber cannot be added."));
 
             return false;
         }
         if (subscribers.contains(listener)) {
-            logWarning("The listener has already been subscribed.");
+            LOGGER.warn(formatWarning("The listener has already been subscribed."));
 
             return false;
         }
@@ -136,7 +132,7 @@ public class SettingImpl<T> implements Setting<T> {
     @Override
     public boolean unsubscribe(PropertyChangeListener listener) {
         if (!subscribers.contains(listener)) {
-            LOGGER.warn("The listener does not exist in the subscriber list.");
+            LOGGER.warn(formatWarning("The listener does not exist in the subscriber list."));
             return false;
         }
 
