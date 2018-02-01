@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @param <T> The type of the value this {@link SettingImpl} contains.
  */
-public final class SettingImpl<T> implements Setting<T> {
+public class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -46,7 +46,7 @@ public final class SettingImpl<T> implements Setting<T> {
     private final T defaultValue;
     private final Class<T> valueClass;
 
-    private T value;
+    protected T value;
 
     private String humanReadableName;
 
