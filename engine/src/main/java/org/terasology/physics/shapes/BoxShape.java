@@ -18,7 +18,7 @@ package org.terasology.physics.shapes;
 import org.terasology.math.geom.Vector3f;
 
 /**
- * Represents a box shaped collision entity in the physics engine.
+ * Represents a box collision shape in the physics engine.
  */
 public interface BoxShape extends CollisionShape {
     /**

@@ -18,7 +18,7 @@ package org.terasology.physics.shapes;
 import org.terasology.math.Transform;
 
 /**
- * Represents a compound collision entity composed of other {@link CollisionShape}s in the physics engine.
+ * Represents a compound collision shape composed of other {@link CollisionShape}s in the physics engine.
  */
 public interface CompoundShape extends CollisionShape {
     /**
