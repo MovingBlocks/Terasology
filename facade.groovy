@@ -4,7 +4,7 @@ Class centralClass = new GroovyClassLoader(getClass().getClassLoader()).parseCla
 GroovyObject fxScript = (GroovyObject) centralClass.newInstance()
 
 //Initialize the object.
-fxScript.initialize("module")
+fxScript.initialize("facade")
 itemType = fxScript.itemType
 excludedDependencies = fxScript.excludedDependencies
 targetDirectory = fxScript.targetDirectory
