@@ -103,11 +103,11 @@ class RenderableWorldImpl implements RenderableWorld {
     public void onChunkLoaded(Vector3i chunkCoordinates) {
         if (renderableRegion.encompasses(chunkCoordinates)) {
             Chunk chunk = chunkProvider.getChunk(chunkCoordinates);
-            if (chunk == null) {
-                logger.warn("Warning: onChunkLoaded called for a null chunk!");
-            } else {
+            if (chunk != null) {
                 chunksInProximityOfCamera.add(chunk);
                 Collections.sort(chunksInProximityOfCamera, new ChunkFrontToBackComparator());
+            } else {
+                logger.warn("Warning: onChunkLoaded called for a null chunk!");
             }
         }
     }
