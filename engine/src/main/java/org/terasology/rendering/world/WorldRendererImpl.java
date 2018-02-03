@@ -396,8 +396,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     private void addReflectionAndRefractionNodes(RenderGraph renderGraph) {
-        Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
-
         FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
         BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
@@ -407,7 +405,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node worldReflectionNode = new WorldReflectionNode(context);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-        renderGraph.connect(reflectedBackdropNode, worldReflectionNode);
+
+        renderGraph.connect(reflectedBufferClearingNode, reflectedBackdropNode, worldReflectionNode);
 
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
         BufferClearingNode reflectedRefractedBufferClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -415,6 +414,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node chunksRefractiveReflectiveNode = new RefractiveReflectiveBlocksNode(context);
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+
+        Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
         renderGraph.connect(reflectedRefractedBufferClearingNode, chunksRefractiveReflectiveNode);
         renderGraph.connect(worldReflectionNode, chunksRefractiveReflectiveNode);
         // TODO: At this stage, it is unclear -why- this connection is required, we just know that it's required. Investigate.
