@@ -19,10 +19,12 @@ package org.terasology.world.chunks;
 import org.terasology.module.sandbox.API;
 
 /**
- * Chunks are the smallest logical units of the worlds.
+ * Chunks are a box-shaped logical grouping of Terasology's blocks, for performance reasons. 
  *
- * Chunks are the default unit passed to world generator during world generation.
- * For details on dimensions and other parameters of chunk, check {@link ChunkConstants}.
+ * For example the renderer renders a single mesh for all opaque blocks in a chunk rather
+ * than rendering each block as a separate mesh.
+ *
+ * For details on dimensions and other chunks characteristics see {@link ChunkConstants}.
  */
 @API
 public interface Chunk extends ManagedChunk, RenderableChunk {
