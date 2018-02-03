@@ -181,7 +181,7 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         Chunk[] chunks = new Chunk[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null || !chunk.isReady()) {
+            if (chunk == null) {
                 return null;
             }
             chunkPos.sub(region.minX(), region.minY(), region.minZ());
@@ -322,8 +322,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
     private void updateChunkReadinessState(final ReadyChunkInfo readyChunkInfo) {
         Chunk chunk = readyChunkInfo.getChunk();
         chunk.markReady();
-        updateAdjacentChunksReadyFieldOf(chunk);
-        updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
     }
 
     private void generateQueuedEntities(EntityStore store) {
@@ -447,7 +445,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
         }
         storageManager.deactivateChunk(chunk);
         chunk.dispose();
-        updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
 
         try {
             unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
@@ -465,14 +462,6 @@ public class LocalChunkProvider implements GeneratingChunkProvider {
             }
         }
         return true;
-    }
-
-    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
-        listAdjacentChunks(chunkInCenter).forEach(this::updateAdjacentChunksReadyFieldOf);
-    }
-
-    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
-        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
     }
 
     private List<Chunk> listAdjacentChunks(Chunk chunk) {

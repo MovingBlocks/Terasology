@@ -53,7 +53,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -90,54 +89,6 @@ public class LocalChunkProviderTest {
         chunkProvider.completeUpdate();
 
         verify(chunk).markReady();
-    }
-
-    @Test
-    public void testCompleteUpdateSetsChunkAdjacentChunksReady() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        generateMockChunkCubeWithSideWidthAround(chunk.getPosition(), 1, chunkCache);
-        markAllChunksAsReady(chunkCache);
-
-        chunkProvider.completeUpdate();
-
-        verify(chunk).setAdjacentChunksReady(true);
-    }
-
-    @Test
-    public void testCompleteUpdateSetsChunkAdjacentChunksNotReadyIfChunksMissing() throws Exception {
-        final Chunk chunk = mockChunkAt(0, 0, 0);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-        generateMockChunkCubeWithSideWidthAround(chunk.getPosition(), 1, chunkCache);
-        markAllChunksAsReadyExcludingPosition(chunkCache, new Vector3i(1, 0, 0));
-
-        chunkProvider.completeUpdate();
-
-        verify(chunk, never()).setAdjacentChunksReady(true);
-    }
-
-    @Test
-    public void testCompleteUpdateSetsAdjacentChunksAdjacentChunksReady() throws Exception {
-        generateMockChunkCubeWithSideWidthAround(new Vector3i(0, 1, 0), 1, chunkCache);
-        chunkCache.removeChunkAt(new Vector3i(0, 0, 0));
-        markAllChunksAsReady(chunkCache);
-        final Chunk adjacentChunk = mockChunkAt(0, 1, 0);
-        chunkCache.put(adjacentChunk.getPosition(), adjacentChunk);
-        final Chunk chunk = mockChunkWithReadinessStateAt(0, 0, 0);
-        chunkCache.put(chunk.getPosition(), chunk);
-        final ReadyChunkInfo readyChunkInfo = ReadyChunkInfo.createForNewChunk(chunk, new TShortObjectHashMap<>(), Collections.emptyList());
-        when(chunkFinalizer.completeFinalization()).thenReturn(readyChunkInfo);
-
-        // chunk at 0,1,0 is not ready and all adjacent chunks around it except 0,0,0 are marked ready.
-        // we expect chunk 0,0,0 to become ready and all adjacent chunks to be updated
-        chunkProvider.completeUpdate();
-
-        // therefore chunk 0,1,0 should have its adjacent chunk readiness state set to true
-        // because now all of its adjacent chunks are ready
-        verify(adjacentChunk).setAdjacentChunksReady(true);
     }
 
     @Test
