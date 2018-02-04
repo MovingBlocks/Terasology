@@ -22,7 +22,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.flexible.validators.DefaultValueValidator;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -61,7 +60,7 @@ public class SettingImpl<T> implements Setting<T> {
      * @param defaultValue the default value of the setting.
      */
     public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue) {
-        this(valueClass, id, defaultValue, new DefaultValueValidator<>());
+        this(valueClass, id, defaultValue, null);
     }
 
     /**
@@ -87,8 +86,6 @@ public class SettingImpl<T> implements Setting<T> {
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
         this.valueClass = valueClass;
-
-        this.subscribers = Sets.newHashSet();
     }
 
     private String formatWarning(String s) {
@@ -96,13 +93,15 @@ public class SettingImpl<T> implements Setting<T> {
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
-        for (PropertyChangeListener subscriber : subscribers) {
-            subscriber.propertyChange(event);
+        if (subscribers != null) {
+            for (PropertyChangeListener subscriber : subscribers) {
+                subscriber.propertyChange(event);
+            }
         }
     }
 
     private boolean validate(T valueToValidate) {
-        return validator.validate(valueToValidate);
+        return validator == null || validator.validate(valueToValidate);
     }
 
     /**
@@ -110,6 +109,10 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean subscribe(PropertyChangeListener listener) {
+        if (subscribers == null) {
+            subscribers = Sets.newHashSet();
+        }
+
         if (listener == null) {
             LOGGER.warn(formatWarning("A null subscriber cannot be added."));
 
@@ -138,6 +141,10 @@ public class SettingImpl<T> implements Setting<T> {
 
         subscribers.remove(listener);
 
+        if (subscribers.size() <= 0) {
+            subscribers = null;
+        }
+
         return true;
     }
 
@@ -146,7 +153,7 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean hasSubscribers() {
-        return subscribers.size() > 0;
+        return subscribers != null;
     }
 
     /**
