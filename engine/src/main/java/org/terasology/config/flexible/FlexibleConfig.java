@@ -67,7 +67,7 @@ public interface FlexibleConfig {
     Map<SimpleUri, Setting> getSettings();
 
     /**
-     * Returns a potentially verbose human-readable description of the purpose of this {@link FlexibleConfig}.
+     * Returns a potentially verbose, human-readable description regarding the purpose of this {@link FlexibleConfig}.
      * This description is also written to file when the {@link FlexibleConfig} is saved.
      */
     String getDescription();
