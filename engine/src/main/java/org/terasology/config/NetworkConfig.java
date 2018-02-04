@@ -20,11 +20,11 @@ import com.google.common.collect.Lists;
 
 import org.terasology.engine.TerasologyConstants;
 
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
+
 public class NetworkConfig {
 
     private List<ServerInfo> servers = Lists.newArrayList(new ServerInfo("localhost", "localhost", TerasologyConstants.DEFAULT_PORT));
@@ -70,7 +70,26 @@ public class NetworkConfig {
     }
 
     public String getServerMOTD() {
-        return serverMOTD;
+        try {
+            StringBuffer mOTD = new StringBuffer();
+
+            InputStreamReader reader = new InputStreamReader(new FileInputStream("motd.md"), "UTF8");
+            BufferedReader bufferedReader = new BufferedReader(reader);
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                mOTD.append(line);
+            }
+
+            reader.close();
+
+            serverMOTD =  mOTD.toString();
+
+            return serverMOTD;
+
+        } catch (IOException e) {
+            return serverMOTD;
+        }
     }
 
     public void setServerMOTD(String serverMOTD) {

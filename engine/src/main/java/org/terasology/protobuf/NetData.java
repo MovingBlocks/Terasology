@@ -3,6 +3,11 @@
 
 package org.terasology.protobuf;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 public final class NetData {
   private NetData() {}
   public static void registerAllExtensions(
@@ -15633,12 +15638,13 @@ public final class NetData {
      * <code>optional string MOTD = 19;</code>
      */
     public java.lang.String getMOTD() {
+
       java.lang.Object ref = mOTD_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
+        com.google.protobuf.ByteString bs =
+                (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
           mOTD_ = s;
