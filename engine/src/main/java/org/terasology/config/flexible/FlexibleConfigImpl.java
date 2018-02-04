@@ -39,6 +39,12 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
     private final Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
 
+    private final String description;
+
+    public FlexibleConfigImpl(String description) {
+        this.description = description;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -102,6 +108,11 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     @Override
     public Map<SimpleUri, Setting> getSettings() {
         return settings;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override
