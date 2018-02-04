@@ -59,18 +59,18 @@ public class SettingImpl<T> implements Setting<T> {
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
      */
-    public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue) {
-        this(valueClass, id, defaultValue, null);
+    public SettingImpl(SimpleUri id, T defaultValue) {
+        this(id, defaultValue, null);
     }
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and validator.
-     *
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
      * @param validator    the validator to be used to validate values.
      */
-    public SettingImpl(Class<T> valueClass, SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
+    @SuppressWarnings("unchecked")
+    public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
 
@@ -85,7 +85,7 @@ public class SettingImpl<T> implements Setting<T> {
 
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
-        this.valueClass = valueClass;
+        this.valueClass = (Class<T>) defaultValue.getClass();
     }
 
     private String formatWarning(String s) {

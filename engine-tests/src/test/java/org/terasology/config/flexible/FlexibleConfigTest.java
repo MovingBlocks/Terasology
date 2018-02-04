@@ -173,13 +173,13 @@ public class FlexibleConfigTest {
         private SettingImpl<TestClass> testClassSetting;
 
         private void setupSettings() {
-            testEnumSetting = new SettingImpl<>(TestEnum.class, new SimpleUri("engine-tests:TestSetting1"), TestEnum.A1);
+            testEnumSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting1"), TestEnum.A1);
             config.add(testEnumSetting);
 
-            doubleSetting = new SettingImpl<>(Double.class, new SimpleUri("engine-tests:TestSetting2"), 30.0);
+            doubleSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting2"), 30.0);
             config.add(doubleSetting);
 
-            testClassSetting = new SettingImpl<>(TestClass.class, new SimpleUri("engine-tests:TestSetting3"), new TestClass(101));
+            testClassSetting = new SettingImpl<>(new SimpleUri("engine-tests:TestSetting3"), new TestClass(101));
             config.add(testClassSetting);
         }
 
