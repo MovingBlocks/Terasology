@@ -202,13 +202,13 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
 
-                    Transform toWorldSpaceTransform = new Transform(worldPos, worldRot, worldScale);
+                    Transform toWorldSpace = new Transform(worldPos, worldRot, worldScale);
 
                     Vector3f offsetFromCamera = new Vector3f();
                     offsetFromCamera.sub(worldPos, cameraPosition);
                     Matrix4f matrixCameraSpace = new Matrix4f(worldRot, offsetFromCamera, worldScale);
 
-                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpaceTransform);
+                    AABB aabb = meshComp.mesh.getAABB().transform(toWorldSpace);
                     if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
