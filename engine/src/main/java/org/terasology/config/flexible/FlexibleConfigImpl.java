@@ -35,6 +35,7 @@ import java.util.Map;
 public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final String DESCRIPTION_PROPERTY_NAME = "description";
 
     private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
     private final Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
@@ -119,6 +120,8 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     public void save(Writer writer) {
         JsonObject jsonObject = new JsonObject();
 
+        jsonObject.addProperty(DESCRIPTION_PROPERTY_NAME, description);
+
         for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
             Setting setting = entry.getValue();
             if (!setting.getValue().equals(setting.getDefaultValue())) {
@@ -140,6 +143,10 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
 
             for (Map.Entry<String, JsonElement> jsonEntry : jsonObject.entrySet()) {
+                if (jsonEntry.getKey().equals(DESCRIPTION_PROPERTY_NAME)) {
+                    continue;
+                }
+
                 SimpleUri id = new SimpleUri(jsonEntry.getKey());
                 String valueJson = jsonEntry.getValue().toString();
                 temporarilyParkedSettings.put(id, valueJson);

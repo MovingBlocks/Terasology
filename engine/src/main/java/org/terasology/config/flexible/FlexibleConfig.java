@@ -74,6 +74,8 @@ public interface FlexibleConfig {
 
     /**
      * Saves the values of all settings having non-default values, to enable persistence across sessions.
+     * Also saved for documentation purposes is the description of the {@link FlexibleConfig}, as
+     * determined by {@link #getDescription()}.
      *
      * All the non-default values that were not used in this session and are still "parked" are also
      * saved as-is, to be used later.
