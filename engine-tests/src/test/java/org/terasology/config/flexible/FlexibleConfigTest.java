@@ -153,6 +153,7 @@ public class FlexibleConfigTest {
 
     public static class JsonStorage {
         private static final String CONFIG_AS_JSON = "{\n" +
+                "  \"description\": \"\",\n" +
                 "  \"engine-tests:TestSetting3\": {\n" +
                 "    \"a\": 31,\n" +
                 "    \"b\": \"string\",\n" +
@@ -161,6 +162,7 @@ public class FlexibleConfigTest {
                 "  \"engine-tests:TestSetting1\": \"A3\",\n" +
                 "  \"engine-tests:TestSetting2\": 21.0\n" +
                 "}";
+
 
         private static final TestEnum TESTENUM_SETTING_VALUE = TestEnum.A3;
         private static final double DOUBLE_SETTING_VALUE = 21.0;
