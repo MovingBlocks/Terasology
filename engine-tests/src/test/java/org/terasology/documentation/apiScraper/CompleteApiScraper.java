@@ -13,39 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.documentation;
+package org.terasology.documentation.apiScraper;
 
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import org.terasology.engine.module.ExternalApiWhitelist;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Enumerates all classes and packages that are annotated with {@link API}.
  */
-public final class ApiScraper {
-    private ApiScraper() {
+public final class CompleteApiScraper {
+    private CompleteApiScraper() {
         // Private constructor, utility class
     }
 
     /**
-     * @param args (ignored)
+     *
+     * @return Project's Packages, Interfaces, Classes and Methods
      * @throws Exception if the module environment cannot be loaded
      */
-    public static void main(String[] args) throws Exception {
+    public static StringBuffer getApi() throws Exception {
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleEnvironment environment = moduleManager.getEnvironment();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        SortedSetMultimap<String, String> sortedApi = Multimaps.newSortedSetMultimap(new HashMap<>(), TreeSet::new);
+        Multimap<String, String> api = Multimaps.newMultimap(new HashMap<String, Collection<String>>(), ArrayList::new);
 
         for (Class<?> apiClass : environment.getTypesAnnotatedWith(API.class)) {
             //System.out.println("Processing: " + apiClass);
@@ -77,49 +80,56 @@ public final class ApiScraper {
                     int slash = categoryFragment.lastIndexOf("/", hyphen);
                     category = categoryFragment.substring(slash + 1, hyphen);
                     //System.out.println("category fragment pared down: " + category);
-
-                    if (isPackage) {
-                        //System.out.println("Jar-based Package: " + apiPackage + ", came from " + location);
-                        sortedApi.put(category, apiPackage + " (PACKAGE)");
-                    } else {
-                        //System.out.println("Jar-based Class: " + apiClass + ", came from " + location);
-                        sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
-
-                    }
-
+                    addToApi(isPackage, category, apiPackage, apiClass, api);
                     break;
 
                 case "file" :
-
                     // If file based we know it is local so organize it like that
                     category = "terasology engine";
-
-                    if (isPackage) {
-                        //System.out.println("Local Package: " + apiPackage + ", came from " + location);
-                        sortedApi.put(category, apiPackage + " (PACKAGE)");
-                    } else {
-                        //System.out.println("Local Class: " + apiClass + ", came from " + location);
-                        sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
-                    }
-
+                    addToApi(isPackage, category, apiPackage, apiClass, api);
                     break;
 
                 default :
                     System.out.println("Unknown protocol for: " + apiClass + ", came from " + location);
             }
         }
-        sortedApi.putAll("external", ExternalApiWhitelist.CLASSES.stream()
+        api.putAll("external", ExternalApiWhitelist.CLASSES.stream()
                 .map(clazz->clazz.getName() + " (CLASS)").collect(Collectors.toSet()));
-        sortedApi.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
+        api.putAll("external", ExternalApiWhitelist.PACKAGES.stream()
                 .map(packagee->packagee + " (PACKAGE)").collect(Collectors.toSet()));
 
-        System.out.println("# Modding API:\n");
-        for (String key : sortedApi.keySet()) {
-            System.out.println("## " + key + "\n");
-            for (String value : sortedApi.get(key)) {
-                System.out.println("* " + value);
+
+        StringBuffer stringApi = new StringBuffer();
+
+        stringApi.append("# Modding API:\n");
+        for (String key : api.keySet()) {
+            stringApi.append("## " + key + "\n");
+            for (String value : api.get(key)) {
+                stringApi.append("* " + value + "\n");
             }
-            System.out.println("");
+            stringApi.append("\n");
         }
+
+        return stringApi;
+    }
+
+    private static void addToApi(boolean isPackage, String category, String apiPackage, Class<?> apiClass, Multimap<String, String> api){
+        if (isPackage) {
+            //System.out.println("Local Package: " + apiPackage + ", came from " + location);
+            api.put(category, apiPackage + " (PACKAGE)");
+        } else {
+            //System.out.println("Local Class: " + apiClass + ", came from " + location);
+            api.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
+            Method[] methods = apiClass.getDeclaredMethods();
+            for(int i = 0; i < methods.length; i++){
+                if(!methods[i].isDefault() && !methods[i].isBridge() && !methods[i].isSynthetic()){
+                    api.put(category, " - " + methods[i].getName() +  " (METHOD)");
+                    api.put(category, " -- " + methods[i].getReturnType() +  " (RETURN)");
+                    api.put(category, " -- " + Arrays.toString(methods[i].getParameterTypes()) +  " (PARAMETERS)");
+                    api.put(category, " -- " + Arrays.toString(methods[i].getExceptionTypes()) +  " (EXCEPTIONS)");
+                }
+            }
+        }
+
     }
 }
