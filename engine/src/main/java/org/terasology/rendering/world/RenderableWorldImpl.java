@@ -377,7 +377,11 @@ class RenderableWorldImpl implements RenderableWorld {
     }
 
     private boolean isChunkValidForRender(RenderableChunk chunk) {
-        return chunk.isReady() && chunk.areAdjacentChunksReady();
+        return chunk.isReady() && areSurroundingChunksLoaded(chunk);
+    }
+
+    private boolean areSurroundingChunksLoaded(RenderableChunk chunk) {
+        return worldProvider.getWorldViewAround(chunk.getPosition()) != null;
     }
 
     private boolean isChunkVisibleFromMainLight(RenderableChunk chunk) {

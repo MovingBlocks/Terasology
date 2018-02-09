@@ -19,14 +19,12 @@ package org.terasology.world.chunks.remoteChunkProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -122,7 +120,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
                     if (oldChunk != null) {
                         oldChunk.dispose();
-                        updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
                     }
                 }
             }
@@ -268,8 +265,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         Chunk chunk = lightMerger.completeMerge();
         if (chunk != null) {
             chunk.markReady();
-            updateAdjacentChunksReadyFieldOf(chunk);
-            updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
             listener.onChunkReady(chunk.getPosition());
             worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         }
@@ -289,33 +284,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         return chunkCache.get(pos);
     }
 
-    private boolean areAdjacentChunksReady(Chunk chunk) {
-        Vector3i centerChunkPos = chunk.getPosition();
-        for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = chunkCache.get(adjChunkPos);
-            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
-            if (!adjChunkReady) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
-        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
-    }
-
-    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
-        Vector3i centerChunkPos = chunkInCenter.getPosition();
-        for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
-            Chunk adjChunk = chunkCache.get(adjChunkPos);
-            if (adjChunk != null) {
-                updateAdjacentChunksReadyFieldOf(adjChunk);
-            }
-        }
-    }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
 
