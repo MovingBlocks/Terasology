@@ -87,21 +87,10 @@ public class FlexibleConfigManagerImpl implements FlexibleConfigManager {
         }
     }
 
-    private void ensureDirectoryExists(Path filePath) {
-        try {
-            Files.createDirectories(filePath.getParent());
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot create directory for FC!");
-        }
-    }
-
     private Path getPathForFlexibleConfig(SimpleUri flexibleConfigId) {
-        Path filePath = PathManager.getInstance()
-                                        .getHomePath()
-                                        .resolve("configs")
-                                        .resolve(flexibleConfigId.getModuleName().toString())
-                                        .resolve(flexibleConfigId.getObjectName().toString() + ".cfg");
-        ensureDirectoryExists(filePath);
-        return filePath;
+        return PathManager.getInstance()
+                            .getConfigsPath()
+                            .resolve(flexibleConfigId.getModuleName().toString())
+                            .resolve(flexibleConfigId.getObjectName().toString() + ".cfg");
     }
 }
