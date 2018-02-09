@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.settings;
+package org.terasology.config.flexible;
 
+import com.google.gson.JsonElement;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -98,7 +99,12 @@ public interface Setting<T> {
     boolean hasSubscribers();
 
     /**
-     * Parses the String based on the type of this {@link Setting}, and sets it.
+     * Sets the value of this {@link Setting} from a JSON representation encoded in a string.
      */
-    void setValueFromString(String valueString);
+    void setValueFromJson(String json);
+
+    /**
+     * Returns a JSON representation of the value stored in this {@link Setting}.
+     */
+    JsonElement getValueAsJson();
 }

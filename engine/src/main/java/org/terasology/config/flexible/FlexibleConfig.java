@@ -15,7 +15,6 @@
  */
 package org.terasology.config.flexible;
 
-import org.terasology.config.flexible.settings.Setting;
 import org.terasology.engine.SimpleUri;
 
 import java.io.Reader;
@@ -68,7 +67,15 @@ public interface FlexibleConfig {
     Map<SimpleUri, Setting> getSettings();
 
     /**
+     * Returns a potentially verbose, human-readable description regarding the purpose of this {@link FlexibleConfig}.
+     * This description is also written to file when the {@link FlexibleConfig} is saved.
+     */
+    String getDescription();
+
+    /**
      * Saves the values of all settings having non-default values, to enable persistence across sessions.
+     * Also saved for documentation purposes is the description of the {@link FlexibleConfig}, as
+     * determined by {@link #getDescription()}.
      *
      * All the non-default values that were not used in this session and are still "parked" are also
      * saved as-is, to be used later.
