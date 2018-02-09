@@ -136,7 +136,7 @@ public class DeferredMainLightNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/mainLightGeometry");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 

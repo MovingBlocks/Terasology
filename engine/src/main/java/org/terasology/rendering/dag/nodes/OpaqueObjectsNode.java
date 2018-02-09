@@ -77,7 +77,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/opaqueObjects");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();

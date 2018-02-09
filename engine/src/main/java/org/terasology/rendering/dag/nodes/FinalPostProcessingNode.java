@@ -135,7 +135,7 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/finalPostProcessing");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         postMaterial.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true); //for use in DOF effect
 

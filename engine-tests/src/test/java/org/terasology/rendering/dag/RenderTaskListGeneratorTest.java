@@ -17,6 +17,7 @@ package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.terasology.engine.SimpleUri;
 
 import java.util.List;
 
@@ -29,19 +30,25 @@ public class RenderTaskListGeneratorTest {
 
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(new AlphaNode());
-        orderedNodes.add(new BravoNode());
-        orderedNodes.add(new CharlieNode());
+        Node alphaNode = new AlphaNode();
+        alphaNode.setUri(new SimpleUri("engine:alphaNode"));
+        orderedNodes.add(alphaNode);
+        Node bravoNode = new BravoNode();
+        bravoNode.setUri(new SimpleUri("engine:bravoNode"));
+        orderedNodes.add(bravoNode);
+        Node charlieNode = new CharlieNode();
+        charlieNode.setUri(new SimpleUri("engine:charlieNode"));
+        orderedNodes.add(charlieNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- AlphaNode",        taskList.get(0).toString().trim()); // Strictly speaking we don't need
+        assertEquals("----- engine:alphaNode (AlphaNode)",        taskList.get(0).toString().trim()); // Strictly speaking we don't need
         assertEquals("SetName: foo",       taskList.get(1).toString().trim()); // trimming MarkerTask.toString(),
-        assertEquals("AlphaNode",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
-        assertEquals("----- BravoNode",        taskList.get(3).toString().trim()); // We just do it to avoid attracting
-        assertEquals("BravoNode",   taskList.get(4).toString().trim()); // too much attention to it.
-        assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode", taskList.get(6).toString().trim());
+        assertEquals("engine:alphaNode (AlphaNode)",   taskList.get(2).toString().trim()); // resulting in "----- <NodeName>"
+        assertEquals("----- engine:bravoNode (BravoNode)",        taskList.get(3).toString().trim()); // We just do it to avoid attracting
+        assertEquals("engine:bravoNode (BravoNode)",   taskList.get(4).toString().trim()); // too much attention to it.
+        assertEquals("----- engine:charlieNode (CharlieNode)",      taskList.get(5).toString().trim());
+        assertEquals("engine:charlieNode (CharlieNode)", taskList.get(6).toString().trim());
         assertEquals("SetName: bar",       taskList.get(7).toString().trim());
     }
 
@@ -49,23 +56,31 @@ public class RenderTaskListGeneratorTest {
     public void testReducePersistingStateChanges() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(new AlphaNode());
-        orderedNodes.add(new BravoNode());
-        orderedNodes.add(new CharlieNode());
-        orderedNodes.add(new DeltaNode());
+        Node alphaNode = new AlphaNode();
+        alphaNode.setUri(new SimpleUri("engine:alphaNode"));
+        orderedNodes.add(alphaNode);
+        Node bravoNode = new BravoNode();
+        bravoNode.setUri(new SimpleUri("engine:bravoNode"));
+        orderedNodes.add(bravoNode);
+        Node charlieNode = new CharlieNode();
+        charlieNode.setUri(new SimpleUri("engine:charlieNode"));
+        orderedNodes.add(charlieNode);
+        Node deltaNode = new DeltaNode();
+        deltaNode.setUri(new SimpleUri("engine:deltaNode"));
+        orderedNodes.add(deltaNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
+        assertEquals("----- engine:alphaNode (AlphaNode)",        taskList.get(0).toString().trim());
         assertEquals("SetName: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
-        assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode",   taskList.get(4).toString().trim());
-        assertEquals("----- CharlieNode",      taskList.get(5).toString().trim());
-        assertEquals("CharlieNode", taskList.get(6).toString().trim());
-        assertEquals("----- DeltaNode",        taskList.get(7).toString().trim());
+        assertEquals("engine:alphaNode (AlphaNode)",   taskList.get(2).toString().trim());
+        assertEquals("----- engine:bravoNode (BravoNode)",        taskList.get(3).toString().trim());
+        assertEquals("engine:bravoNode (BravoNode)",   taskList.get(4).toString().trim());
+        assertEquals("----- engine:charlieNode (CharlieNode)",      taskList.get(5).toString().trim());
+        assertEquals("engine:charlieNode (CharlieNode)", taskList.get(6).toString().trim());
+        assertEquals("----- engine:deltaNode (DeltaNode)",        taskList.get(7).toString().trim());
         assertEquals("SetName: delta",     taskList.get(8).toString().trim());
-        assertEquals("DeltaNode",   taskList.get(9).toString().trim());
+        assertEquals("engine:deltaNode (DeltaNode)",   taskList.get(9).toString().trim());
         assertEquals("SetName: bar",       taskList.get(10).toString().trim());
     }
 
@@ -73,28 +88,38 @@ public class RenderTaskListGeneratorTest {
     public void testReducePersistingStateChangesEcho() {
         RenderTaskListGenerator renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = Lists.newArrayList();
-        orderedNodes.add(new AlphaNode());
-        orderedNodes.add(new BravoNode());
-        orderedNodes.add(new EchoNode());
-        orderedNodes.add(new CharlieNode());
-        orderedNodes.add(new DeltaNode());
+        Node alphaNode = new AlphaNode();
+        alphaNode.setUri(new SimpleUri("engine:alphaNode"));
+        orderedNodes.add(alphaNode);
+        Node bravoNode = new BravoNode();
+        bravoNode.setUri(new SimpleUri("engine:bravoNode"));
+        orderedNodes.add(bravoNode);
+        Node echoNode = new EchoNode();
+        echoNode.setUri(new SimpleUri("engine:echoNode"));
+        orderedNodes.add(echoNode);
+        Node charlieNode = new CharlieNode();
+        charlieNode.setUri(new SimpleUri("engine:charlieNode"));
+        orderedNodes.add(charlieNode);
+        Node deltaNode = new DeltaNode();
+        deltaNode.setUri(new SimpleUri("engine:deltaNode"));
+        orderedNodes.add(deltaNode);
 
         List<RenderPipelineTask> taskList = renderTaskListGenerator.generateFrom(orderedNodes);
 
-        assertEquals("----- AlphaNode",        taskList.get(0).toString().trim());
+        assertEquals("----- engine:alphaNode (AlphaNode)",        taskList.get(0).toString().trim());
         assertEquals("SetName: foo",       taskList.get(1).toString().trim());
-        assertEquals("AlphaNode",   taskList.get(2).toString().trim());
-        assertEquals("----- BravoNode",        taskList.get(3).toString().trim());
-        assertEquals("BravoNode",   taskList.get(4).toString().trim());
-        assertEquals("----- EchoNode",         taskList.get(5).toString().trim());
+        assertEquals("engine:alphaNode (AlphaNode)",   taskList.get(2).toString().trim());
+        assertEquals("----- engine:bravoNode (BravoNode)",        taskList.get(3).toString().trim());
+        assertEquals("engine:bravoNode (BravoNode)",   taskList.get(4).toString().trim());
+        assertEquals("----- engine:echoNode (EchoNode)",         taskList.get(5).toString().trim());
         assertEquals("SetName: bar",       taskList.get(6).toString().trim());
-        assertEquals("EchoNode",    taskList.get(7).toString().trim());
-        assertEquals("----- CharlieNode",      taskList.get(8).toString().trim());
+        assertEquals("engine:echoNode (EchoNode)",    taskList.get(7).toString().trim());
+        assertEquals("----- engine:charlieNode (CharlieNode)",      taskList.get(8).toString().trim());
         assertEquals("SetName: foo",       taskList.get(9).toString().trim());
-        assertEquals("CharlieNode", taskList.get(10).toString().trim());
-        assertEquals("----- DeltaNode",        taskList.get(11).toString().trim());
+        assertEquals("engine:charlieNode (CharlieNode)", taskList.get(10).toString().trim());
+        assertEquals("----- engine:deltaNode (DeltaNode)",        taskList.get(11).toString().trim());
         assertEquals("SetName: delta",     taskList.get(12).toString().trim());
-        assertEquals("DeltaNode",   taskList.get(13).toString().trim());
+        assertEquals("engine:deltaNode (DeltaNode)",   taskList.get(13).toString().trim());
         assertEquals("SetName: bar",   taskList.get(14).toString().trim());
     }
 

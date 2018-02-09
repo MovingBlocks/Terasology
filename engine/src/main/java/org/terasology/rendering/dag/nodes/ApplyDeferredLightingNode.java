@@ -74,7 +74,7 @@ public class ApplyDeferredLightingNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/applyDeferredLighting");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Actual Node Processing
 

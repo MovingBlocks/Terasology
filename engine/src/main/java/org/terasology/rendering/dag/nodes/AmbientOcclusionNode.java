@@ -140,7 +140,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/ambientOcclusion");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         ssaoMaterial.setFloat4("ssaoSettings", ssaoStrength, ssaoRad, 0.0f, 0.0f, true);
 

@@ -54,7 +54,6 @@ import org.terasology.rendering.dag.nodes.DeferredMainLightNode;
 import org.terasology.rendering.dag.nodes.DeferredPointLightsNode;
 import org.terasology.rendering.dag.nodes.DownSamplerForExposureNode;
 import org.terasology.rendering.dag.nodes.FinalPostProcessingNode;
-import org.terasology.rendering.dag.nodes.FirstPersonViewNode;
 import org.terasology.rendering.dag.nodes.HazeNode;
 import org.terasology.rendering.dag.nodes.HighPassNode;
 import org.terasology.rendering.dag.nodes.InitialPostProcessingNode;
@@ -77,6 +76,7 @@ import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.ScreenGrabber;
+import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.opengl.fbms.ImmutableFBOs;
 import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
@@ -93,6 +93,7 @@ import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_STENCIL_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_16X16_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_1X1_CONFIG;
 import static org.terasology.rendering.dag.nodes.DownSamplerForExposureNode.FBO_2X2_CONFIG;
@@ -253,44 +254,150 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     private void initRenderGraph() {
-        addShadowMapNodes();
+        addGBufferClearingNodes(renderGraph);
 
-        addReflectionNodes();
+        addWorldRenderingNodes(renderGraph);
 
-        addSkyNodes();
+        addSkyNodes(renderGraph);
 
-        addWorldRenderingNodes();
+        addLightingNodes(renderGraph);
 
-        addLightingNodes();
+        add3dDecorationNodes(renderGraph);
 
-        addRefractiveReflectiveNode();
+        addReflectionAndRefractionNodes(renderGraph);
 
-        add3dDecorationNodes();
+        addPrePostProcessingNodes(renderGraph);
 
-        addPrePostProcessingNodes();
+        addBloomNodes(renderGraph);
 
-        addPostProcessingNodes();
+        addExposureNodes(renderGraph);
 
-        addOutputNodes();
+        addInitialPostProcessingNodes(renderGraph);
+
+        addFinalPostProcessingNodes(renderGraph);
+
+        addOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
         List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
         renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
     }
 
-    private void addShadowMapNodes() {
+    private void addGBufferClearingNodes(RenderGraph renderGraph) {
+        SwappableFBO gBufferPair = displayResolutionDependentFBOs.getGBufferPair();
+
+        BufferClearingNode lastUpdatedGBufferClearingNode = new BufferClearingNode(gBufferPair.getLastUpdatedFbo(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(lastUpdatedGBufferClearingNode, "lastUpdatedGBufferClearingNode");
+
+        BufferClearingNode staleGBufferClearingNode = new BufferClearingNode(gBufferPair.getStaleFbo(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        renderGraph.addNode(staleGBufferClearingNode, "staleGBufferClearingNode");
+    }
+
+    private void addWorldRenderingNodes(RenderGraph renderGraph) {
+        Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
+
+        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
+        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueObjectsNode);
+
+        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
+        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueBlocksNode);
+
+        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
+        renderGraph.connect(lastUpdatedGBufferClearingNode, alphaRejectBlocksNode);
+
+        Node overlaysNode = new OverlaysNode(context);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+        renderGraph.connect(lastUpdatedGBufferClearingNode, overlaysNode);
+    }
+
+    private void addSkyNodes(RenderGraph renderGraph) {
+        Node backdropNode = new BackdropNode(context);
+        renderGraph.addNode(backdropNode, "backdropNode");
+
+        FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
+        FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
+
+        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo);
+        renderGraph.addNode(hazeIntermediateNode, "hazeIntermediateNode");
+
+        FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
+        FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
+
+        HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo);
+        renderGraph.addNode(hazeFinalNode, "hazeFinalNode");
+
+        Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
+        renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, hazeIntermediateNode, hazeFinalNode);
+    }
+
+    private void addLightingNodes(RenderGraph renderGraph) {
+        Node opaqueObjectsNode = renderGraph.findNode("engine:opaqueObjectsNode");
+        Node opaqueBlocksNode = renderGraph.findNode("engine:opaqueBlocksNode");
+        Node alphaRejectBlocksNode = renderGraph.findNode("engine:alphaRejectBlocksNode");
+        Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
+        Node staleGBufferClearingNode = renderGraph.findNode("engine:staleGBufferClearingNode");
+
         FBOConfig shadowMapConfig = new FBOConfig(ShadowMapNode.SHADOW_MAP_FBO_URI, FBO.Type.NO_COLOR).useDepthBuffer();
         BufferClearingNode shadowMapClearingNode = new BufferClearingNode(shadowMapConfig, shadowMapResolutionDependentFBOs, GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(shadowMapClearingNode, "shadowMapClearingNode");
 
         shadowMapNode = new ShadowMapNode(context);
         renderGraph.addNode(shadowMapNode, "shadowMapNode");
+        renderGraph.connect(shadowMapClearingNode, shadowMapNode);
+
+        Node deferredPointLightsNode = new DeferredPointLightsNode(context);
+        renderGraph.addNode(deferredPointLightsNode, "deferredPointLightsNode");
+        renderGraph.connect(opaqueObjectsNode, deferredPointLightsNode);
+        renderGraph.connect(opaqueBlocksNode, deferredPointLightsNode);
+        renderGraph.connect(alphaRejectBlocksNode, deferredPointLightsNode);
+
+        Node deferredMainLightNode = new DeferredMainLightNode(context);
+        renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
+        renderGraph.connect(shadowMapNode, deferredMainLightNode);
+        renderGraph.connect(opaqueObjectsNode, deferredMainLightNode);
+        renderGraph.connect(opaqueBlocksNode, deferredMainLightNode);
+        renderGraph.connect(alphaRejectBlocksNode, deferredMainLightNode);
+        renderGraph.connect(deferredPointLightsNode, deferredMainLightNode);
+
+        Node applyDeferredLightingNode = new ApplyDeferredLightingNode(context);
+        renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
+        renderGraph.connect(deferredMainLightNode, applyDeferredLightingNode);
+        renderGraph.connect(deferredPointLightsNode, applyDeferredLightingNode);
+        renderGraph.connect(lastUpdatedGBufferClearingNode, applyDeferredLightingNode);
+        renderGraph.connect(staleGBufferClearingNode, applyDeferredLightingNode);
     }
 
-    private void addReflectionNodes() {
+    private void add3dDecorationNodes(RenderGraph renderGraph) {
+        Node opaqueObjectsNode = renderGraph.findNode("engine:opaqueObjectsNode");
+        Node opaqueBlocksNode = renderGraph.findNode("engine:opaqueBlocksNode");
+        Node alphaRejectBlocksNode = renderGraph.findNode("engine:alphaRejectBlocksNode");
+        Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
+
+        Node outlineNode = new OutlineNode(context);
+        renderGraph.addNode(outlineNode, "outlineNode");
+        renderGraph.connect(opaqueObjectsNode, outlineNode);
+        renderGraph.connect(opaqueBlocksNode, outlineNode);
+        renderGraph.connect(alphaRejectBlocksNode, outlineNode);
+
+        Node ambientOcclusionNode = new AmbientOcclusionNode(context);
+        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
+        renderGraph.connect(opaqueObjectsNode, ambientOcclusionNode);
+        renderGraph.connect(opaqueBlocksNode, ambientOcclusionNode);
+        renderGraph.connect(alphaRejectBlocksNode, ambientOcclusionNode);
+        // TODO: At this stage, it is unclear -why- this connection is required, we just know that it's required. Investigate.
+        renderGraph.connect(applyDeferredLightingNode, ambientOcclusionNode);
+
+        Node blurredAmbientOcclusionNode = new BlurredAmbientOcclusionNode(context);
+        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
+        renderGraph.connect(ambientOcclusionNode, blurredAmbientOcclusionNode);
+    }
+
+    private void addReflectionAndRefractionNodes(RenderGraph renderGraph) {
         FBOConfig reflectedBufferConfig = new FBOConfig(BackdropReflectionNode.REFLECTED_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT).useDepthBuffer();
-        BufferClearingNode reflectedBufferClearingNode =
-                new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        BufferClearingNode reflectedBufferClearingNode = new BufferClearingNode(reflectedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         renderGraph.addNode(reflectedBufferClearingNode, "reflectedBufferClearingNode");
 
         Node reflectedBackdropNode = new BackdropReflectionNode(context);
@@ -298,186 +405,158 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node worldReflectionNode = new WorldReflectionNode(context);
         renderGraph.addNode(worldReflectionNode, "worldReflectionNode");
-    }
 
-    private void addSkyNodes() {
+        renderGraph.connect(reflectedBufferClearingNode, reflectedBackdropNode, worldReflectionNode);
+
         FBOConfig reflectedRefractedBufferConfig = new FBOConfig(RefractiveReflectiveBlocksNode.REFRACTIVE_REFLECTIVE_FBO_URI, FULL_SCALE, FBO.Type.HDR).useNormalBuffer();
-        BufferClearingNode reflectedRefractedClearingNode =
-                new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        renderGraph.addNode(reflectedRefractedClearingNode, "reflectedRefractedClearingNode");
+        BufferClearingNode reflectedRefractedBufferClearingNode = new BufferClearingNode(reflectedRefractedBufferConfig, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderGraph.addNode(reflectedRefractedBufferClearingNode, "reflectedRefractedBufferClearingNode");
 
-        FBOConfig gBuffer1Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer1")); // TODO: Remove the hard coded value here
-        FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
-
-        BufferClearingNode lastUpdatedGBufferClearingNode =
-                new BufferClearingNode(gBuffer1Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(lastUpdatedGBufferClearingNode, "gBuffer1ClearingNode");
-
-        BufferClearingNode staleGBufferClearingNode =
-                new BufferClearingNode(gBuffer2Config, displayResolutionDependentFBOs, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        renderGraph.addNode(staleGBufferClearingNode, "gBuffer2ClearingNode");
-
-        Node backdropNode = new BackdropNode(context);
-        renderGraph.addNode(backdropNode, "backdropNode");
-
-        FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
-
-        String label = "hazeIntermediate";
-        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo, label);
-        renderGraph.addNode(hazeIntermediateNode, label + "Node");
-
-        FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
-
-        label = "hazeFinal";
-        HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo, label);
-        renderGraph.addNode(hazeFinalNode, label + "Node");
-    }
-
-    private void addWorldRenderingNodes() {
-        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
-        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
-
-        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
-        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
-
-        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
-        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
-
-        Node overlaysNode = new OverlaysNode(context);
-        renderGraph.addNode(overlaysNode, "overlaysNode");
-
-        // TODO: remove this, including associated method in the RenderSystem interface
-        Node firstPersonViewNode = new FirstPersonViewNode(context);
-        renderGraph.addNode(firstPersonViewNode, "firstPersonViewNode");
-    }
-
-    private void addLightingNodes() {
-        Node deferredPointLightsNode = new DeferredPointLightsNode(context);
-        renderGraph.addNode(deferredPointLightsNode, "DeferredPointLightsNode");
-
-        Node deferredMainLightNode = new DeferredMainLightNode(context);
-        renderGraph.addNode(deferredMainLightNode, "deferredMainLightNode");
-
-        Node applyDeferredLightingNode = new ApplyDeferredLightingNode(context);
-        renderGraph.addNode(applyDeferredLightingNode, "applyDeferredLightingNode");
-    }
-
-    private void addRefractiveReflectiveNode() {
         Node chunksRefractiveReflectiveNode = new RefractiveReflectiveBlocksNode(context);
         renderGraph.addNode(chunksRefractiveReflectiveNode, "chunksRefractiveReflectiveNode");
+
+        Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
+        renderGraph.connect(reflectedRefractedBufferClearingNode, chunksRefractiveReflectiveNode);
+        renderGraph.connect(worldReflectionNode, chunksRefractiveReflectiveNode);
+        // TODO: At this stage, it is unclear -why- this connection is required, we just know that it's required. Investigate.
+        renderGraph.connect(applyDeferredLightingNode, chunksRefractiveReflectiveNode);
         // TODO: consider having a non-rendering node for FBO.attachDepthBufferTo() methods
     }
 
-    private void add3dDecorationNodes() {
-        Node outlineNode = new OutlineNode(context);
-        renderGraph.addNode(outlineNode, "outlineNode");
-
-        Node ambientOcclusionNode = new AmbientOcclusionNode(context);
-        renderGraph.addNode(ambientOcclusionNode, "ambientOcclusionNode");
-
-        Node blurredAmbientOcclusionNode = new BlurredAmbientOcclusionNode(context);
-        renderGraph.addNode(blurredAmbientOcclusionNode, "blurredAmbientOcclusionNode");
-    }
-
-    private void addPrePostProcessingNodes() {
+    private void addPrePostProcessingNodes(RenderGraph renderGraph) {
         // Pre-post-processing, just one more interaction with 3D data (semi-transparent objects, in SimpleBlendMaterialsNode)
         // and then it's 2D post-processing all the way to the image shown on the display.
+
+        Node overlaysNode = renderGraph.findNode("engine:overlaysNode");
+        Node hazeFinalNode = renderGraph.findNode("engine:hazeFinalNode");
+        Node chunksRefractiveReflectiveNode = renderGraph.findNode("engine:chunksRefractiveReflectiveNode");
+        Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
+        Node outlineNode = renderGraph.findNode("engine:outlineNode");
+        Node blurredAmbientOcclusionNode = renderGraph.findNode("engine:blurredAmbientOcclusionNode");
+
         Node prePostCompositeNode = new PrePostCompositeNode(context);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
+        renderGraph.connect(overlaysNode, prePostCompositeNode);
+        renderGraph.connect(hazeFinalNode, prePostCompositeNode);
+        renderGraph.connect(chunksRefractiveReflectiveNode, prePostCompositeNode);
+        renderGraph.connect(applyDeferredLightingNode, prePostCompositeNode);
+        renderGraph.connect(outlineNode, prePostCompositeNode);
+        renderGraph.connect(blurredAmbientOcclusionNode, prePostCompositeNode);
 
         Node simpleBlendMaterialsNode = new SimpleBlendMaterialsNode(context);
         renderGraph.addNode(simpleBlendMaterialsNode, "simpleBlendMaterialsNode");
+        renderGraph.connect(prePostCompositeNode, simpleBlendMaterialsNode);
     }
 
-    private void addPostProcessingNodes() {
-        // Post-Processing proper: tone mapping, light shafts, bloom and blur passes
-        Node lightShaftsNode = new LightShaftsNode(context);
-        renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
-
-        Node initialPostProcessingNode = new InitialPostProcessingNode(context);
-        renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
-
-        FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
-        String label = "downSampling_gBuffer_to_16x16px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo16pixels =
-                new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo16pixels, label + "Node");
-
-        label = "downSampling_16x16px_to_8x8px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo8pixels =
-                new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo8pixels, label + "Node");
-
-        label = "downSampling_8x8px_to_4x4px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo4pixels = new DownSamplerForExposureNode(context, FBO_8X8_CONFIG, immutableFBOs, FBO_4X4_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo4pixels, label + "Node");
-
-        label = "downSampling_4x4px_to_2x2px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo2pixels = new DownSamplerForExposureNode(context, FBO_4X4_CONFIG, immutableFBOs, FBO_2X2_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo2pixels, label + "Node");
-
-        label = "downSampling_2x2px_to_1x1px_forExposure";
-        DownSamplerForExposureNode exposureDownSamplerTo1pixel = new DownSamplerForExposureNode(context, FBO_2X2_CONFIG, immutableFBOs, FBO_1X1_CONFIG, immutableFBOs, label);
-        renderGraph.addNode(exposureDownSamplerTo1pixel, label + "Node");
-
-        Node updateExposureNode = new UpdateExposureNode(context);
-        renderGraph.addNode(updateExposureNode, "updateExposureNode");
-
-        Node toneMappingNode = new ToneMappingNode(context);
-        renderGraph.addNode(toneMappingNode, "toneMappingNode");
-
+    private void addBloomNodes(RenderGraph renderGraph) {
         // Bloom Effect: one high-pass filter and three blur passes
+
         Node highPassNode = new HighPassNode(context);
         renderGraph.addNode(highPassNode, "highPassNode");
 
         FBOConfig halfScaleBloomConfig = new FBOConfig(BloomBlurNode.HALF_SCALE_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO halfScaleBloomFbo = displayResolutionDependentFBOs.request(halfScaleBloomConfig);
 
-        label = "halfScaleBlurredBloom";
-        BloomBlurNode halfScaleBlurredBloom = new BloomBlurNode(context, displayResolutionDependentFBOs.get(HighPassNode.HIGH_PASS_FBO_URI), halfScaleBloomFbo, label);
-        renderGraph.addNode(halfScaleBlurredBloom, label + "Node");
+        BloomBlurNode halfScaleBlurredBloomNode = new BloomBlurNode(context, displayResolutionDependentFBOs.get(HighPassNode.HIGH_PASS_FBO_URI), halfScaleBloomFbo);
+        renderGraph.addNode(halfScaleBlurredBloomNode, "halfScaleBlurredBloomNode");
 
         FBOConfig quarterScaleBloomConfig = new FBOConfig(BloomBlurNode.QUARTER_SCALE_FBO_URI, QUARTER_SCALE, FBO.Type.DEFAULT);
         FBO quarterScaleBloomFbo = displayResolutionDependentFBOs.request(quarterScaleBloomConfig);
 
-        label = "quarterScaleBlurredBloom";
-        BloomBlurNode quarterScaleBlurredBloom = new BloomBlurNode(context, halfScaleBloomFbo, quarterScaleBloomFbo, label);
-        renderGraph.addNode(quarterScaleBlurredBloom, label + "Node");
+        BloomBlurNode quarterScaleBlurredBloomNode = new BloomBlurNode(context, halfScaleBloomFbo, quarterScaleBloomFbo);
+        renderGraph.addNode(quarterScaleBlurredBloomNode, "quarterScaleBlurredBloomNode");
 
         FBOConfig one8thScaleBloomConfig = new FBOConfig(BloomBlurNode.ONE_8TH_SCALE_FBO_URI, ONE_8TH_SCALE, FBO.Type.DEFAULT);
         FBO one8thScaleBloomFbo = displayResolutionDependentFBOs.request(one8thScaleBloomConfig);
 
-        label = "one8thScaleBlurredBloom";
-        BloomBlurNode one8thScaleBlurredBloom = new BloomBlurNode(context, quarterScaleBloomFbo, one8thScaleBloomFbo, label);
-        renderGraph.addNode(one8thScaleBlurredBloom, label + "Node");
+        BloomBlurNode one8thScaleBlurredBloomNode = new BloomBlurNode(context, quarterScaleBloomFbo, one8thScaleBloomFbo);
+        renderGraph.addNode(one8thScaleBlurredBloomNode, "one8thScaleBlurredBloomNode");
+
+        Node simpleBlendMaterialsNode = renderGraph.findNode("engine:simpleBlendMaterialsNode");
+        renderGraph.connect(simpleBlendMaterialsNode, highPassNode, halfScaleBlurredBloomNode,
+                                        quarterScaleBlurredBloomNode, one8thScaleBlurredBloomNode);
+    }
+
+    private void addExposureNodes(RenderGraph renderGraph) {
+        FBOConfig gBuffer2Config = displayResolutionDependentFBOs.getFboConfig(new SimpleUri("engine:fbo.gBuffer2")); // TODO: Remove the hard coded value here
+        DownSamplerForExposureNode exposureDownSamplerTo16pixels = new DownSamplerForExposureNode(context, gBuffer2Config, displayResolutionDependentFBOs, FBO_16X16_CONFIG, immutableFBOs);
+        renderGraph.addNode(exposureDownSamplerTo16pixels, "exposureDownSamplerTo16pixels");
+
+        DownSamplerForExposureNode exposureDownSamplerTo8pixels = new DownSamplerForExposureNode(context, FBO_16X16_CONFIG, immutableFBOs, FBO_8X8_CONFIG, immutableFBOs);
+        renderGraph.addNode(exposureDownSamplerTo8pixels, "exposureDownSamplerTo8pixels");
+
+        DownSamplerForExposureNode exposureDownSamplerTo4pixels = new DownSamplerForExposureNode(context, FBO_8X8_CONFIG, immutableFBOs, FBO_4X4_CONFIG, immutableFBOs);
+        renderGraph.addNode(exposureDownSamplerTo4pixels, "exposureDownSamplerTo4pixels");
+
+        DownSamplerForExposureNode exposureDownSamplerTo2pixels = new DownSamplerForExposureNode(context, FBO_4X4_CONFIG, immutableFBOs, FBO_2X2_CONFIG, immutableFBOs);
+        renderGraph.addNode(exposureDownSamplerTo2pixels, "exposureDownSamplerTo2pixels");
+
+        DownSamplerForExposureNode exposureDownSamplerTo1pixel = new DownSamplerForExposureNode(context, FBO_2X2_CONFIG, immutableFBOs, FBO_1X1_CONFIG, immutableFBOs);
+        renderGraph.addNode(exposureDownSamplerTo1pixel, "exposureDownSamplerTo1pixel");
+
+        Node updateExposureNode = new UpdateExposureNode(context);
+        renderGraph.addNode(updateExposureNode, "updateExposureNode");
+
+        Node simpleBlendMaterialsNode = renderGraph.findNode("engine:simpleBlendMaterialsNode");
+        renderGraph.connect(simpleBlendMaterialsNode, exposureDownSamplerTo16pixels, exposureDownSamplerTo8pixels,
+                            exposureDownSamplerTo4pixels, exposureDownSamplerTo2pixels, exposureDownSamplerTo1pixel,
+                            updateExposureNode);
+    }
+
+    private void addInitialPostProcessingNodes(RenderGraph renderGraph) {
+        Node simpleBlendMaterialsNode = renderGraph.findNode("engine:simpleBlendMaterialsNode");
+        Node one8thScaleBlurredBloomNode = renderGraph.findNode("engine:one8thScaleBlurredBloomNode");
+
+        // Light shafts
+        Node lightShaftsNode = new LightShaftsNode(context);
+        renderGraph.addNode(lightShaftsNode, "lightShaftsNode");
+        renderGraph.connect(simpleBlendMaterialsNode, lightShaftsNode);
+
+        // Adding the bloom and light shafts to the gBuffer
+        Node initialPostProcessingNode = new InitialPostProcessingNode(context);
+        renderGraph.addNode(initialPostProcessingNode, "initialPostProcessingNode");
+        renderGraph.connect(lightShaftsNode, initialPostProcessingNode);
+        renderGraph.connect(one8thScaleBlurredBloomNode, initialPostProcessingNode);
+    }
+
+    private void addFinalPostProcessingNodes(RenderGraph renderGraph) {
+        Node initialPostProcessingNode = renderGraph.findNode("engine:initialPostProcessingNode");
+        Node updateExposureNode = renderGraph.findNode("engine:updateExposureNode");
+
+        Node toneMappingNode = new ToneMappingNode(context);
+        renderGraph.addNode(toneMappingNode, "toneMappingNode");
+        renderGraph.connect(updateExposureNode, toneMappingNode);
+        renderGraph.connect(initialPostProcessingNode, toneMappingNode);
 
         // Late Blur nodes: assisting Motion Blur and Depth-of-Field effects
         FBOConfig firstLateBlurConfig = new FBOConfig(FIRST_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO firstLateBlurFbo = displayResolutionDependentFBOs.request(firstLateBlurConfig);
 
-        label = "firstLateBlur";
-        LateBlurNode firstLateBlurNode = new LateBlurNode(context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo, label);
-        renderGraph.addNode(firstLateBlurNode, label + "Node");
+        LateBlurNode firstLateBlurNode = new LateBlurNode(context, displayResolutionDependentFBOs.get(ToneMappingNode.TONE_MAPPING_FBO_URI), firstLateBlurFbo);
+        renderGraph.addNode(firstLateBlurNode, "firstLateBlurNode");
 
         FBOConfig secondLateBlurConfig = new FBOConfig(SECOND_LATE_BLUR_FBO_URI, HALF_SCALE, FBO.Type.DEFAULT);
         FBO secondLateBlurFbo = displayResolutionDependentFBOs.request(secondLateBlurConfig);
 
-        label = "secondLateBlur";
-        LateBlurNode secondLateBlurNode = new LateBlurNode(context, firstLateBlurFbo, secondLateBlurFbo, label);
-        renderGraph.addNode(secondLateBlurNode, label + "Node");
+        LateBlurNode secondLateBlurNode = new LateBlurNode(context, firstLateBlurFbo, secondLateBlurFbo);
+        renderGraph.addNode(secondLateBlurNode, "secondLateBlurNode");
 
         Node finalPostProcessingNode = new FinalPostProcessingNode(context);
         renderGraph.addNode(finalPostProcessingNode, "finalPostProcessingNode");
+
+        renderGraph.connect(toneMappingNode, firstLateBlurNode, secondLateBlurNode, finalPostProcessingNode);
     }
 
-    private void addOutputNodes() {
-        Node copyToVRFrameBufferNode = new OutputToHMDNode(context);
-        renderGraph.addNode(copyToVRFrameBufferNode, "outputToVRFrameBufferNode");
+    private void addOutputNodes(RenderGraph renderGraph) {
+        Node finalPostProcessingNode = renderGraph.findNode("engine:finalPostProcessingNode");
 
-        Node copyImageToScreenNode = new OutputToScreenNode(context);
-        renderGraph.addNode(copyImageToScreenNode, "outputToScreenNode");
+        Node outputToVRFrameBufferNode = new OutputToHMDNode(context);
+        renderGraph.addNode(outputToVRFrameBufferNode, "outputToVRFrameBufferNode");
+        renderGraph.connect(finalPostProcessingNode, outputToVRFrameBufferNode);
+
+        Node outputToScreenNode = new OutputToScreenNode(context);
+        renderGraph.addNode(outputToScreenNode, "outputToScreenNode");
+        renderGraph.connect(finalPostProcessingNode, outputToScreenNode);
     }
 
     @Override
@@ -592,6 +671,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         // there could be potentially other places, i.e. in the UI code. In the rendering engine we'd like
         // to eventually rely on a default OpenGL state.
         glDisable(GL_CULL_FACE);
+        FBO lastUpdatedGBuffer = displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo();
+        glViewport(0, 0, lastUpdatedGBuffer.width(), lastUpdatedGBuffer.height());
         //glDisable(GL_DEPTH_TEST);
         //glDisable(GL_NORMALIZE); // currently keeping these as they are, until we find where they are used.
         //glDepthFunc(GL_LESS);
@@ -621,6 +702,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     public void dispose() {
         renderableWorld.dispose();
         worldProvider.dispose();
+        renderGraph.dispose();
         // TODO: Shift this to a better place, after a RenderGraph class has been implemented.
         SetViewportToSizeOf.disposeDefaultInstance();
     }
@@ -727,9 +809,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command,
-                               @CommandParam(value = "arguments") final String... arguments) {
-        Node node = renderGraph.findNode(new SimpleUri(nodeUri));
+    public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
+        Node node = renderGraph.findNode(nodeUri);
         if (node == null) {
             throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
         }

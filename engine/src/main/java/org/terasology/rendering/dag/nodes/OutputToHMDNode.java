@@ -89,7 +89,7 @@ public class OutputToHMDNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outputToHMD");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
         finalFbo.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();

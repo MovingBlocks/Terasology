@@ -152,7 +152,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/opaqueChunks");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Common Shader Parameters
 

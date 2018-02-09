@@ -99,7 +99,7 @@ public class OutlineNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outline");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Shader Parameters
 

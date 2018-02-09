@@ -145,6 +145,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     @Range(min = 0.0f, max = 0.50f)
     private float parallaxScale = 0.05f;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private Vector3f sunDirection;
+
     public RefractiveReflectiveBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
@@ -206,15 +209,18 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/RefractiveReflectiveBlocks");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         chunkMaterial.activateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
 
         // Common Shader Parameters
 
+        sunDirection = backdropProvider.getSunDirection(false);
+
         chunkMaterial.setFloat("daylight", backdropProvider.getDaylight(), true);
         chunkMaterial.setFloat("swimming", activeCamera.isUnderWater() ? 1.0f : 0.0f, true);
         chunkMaterial.setFloat("time", worldProvider.getTime().getDays(), true);
+        chunkMaterial.setFloat3("sunVec", sunDirection, true);
 
         // Specific Shader Parameters
 

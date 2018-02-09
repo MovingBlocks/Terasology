@@ -93,7 +93,7 @@ public class UpdateExposureNode extends AbstractNode {
     @Override
     public void process() {
         if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("rendering/updateExposure");
+            PerformanceMonitor.startActivity("rendering/" + getUri());
 
             writeOnlyPbo.copyFromFBO(downSampledScene.getId(), 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
             ByteBuffer pixels = writeOnlyPbo.readBackPixels();
