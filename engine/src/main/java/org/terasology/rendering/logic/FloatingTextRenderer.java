@@ -170,10 +170,6 @@ public class FloatingTextRenderer extends BaseComponentSystem implements RenderS
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderOverlay() {
     }
 

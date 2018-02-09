@@ -151,11 +151,6 @@ public class SpriteParticleRenderer implements RenderSystem {
     }
 
     @Override
-    public void renderFirstPerson() {
-
-    }
-
-    @Override
     public void renderShadows() {
 
     }
