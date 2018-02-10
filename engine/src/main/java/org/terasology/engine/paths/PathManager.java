@@ -271,7 +271,6 @@ public final class PathManager {
         Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
         configsPath = installPath.resolve(CONFIGS_DIR);
-        Files.createDirectories(configsPath);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }
