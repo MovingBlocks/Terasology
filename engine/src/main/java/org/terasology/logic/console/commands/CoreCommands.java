@@ -147,8 +147,8 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing result of search
      */
     @Command(shortDescription = "Search commands/prefabs/assets",
-             helpText = "Displays commands, prefabs, and assets with matching name, description, "
-                 + "help text, usage or required permission")
+            helpText = "Displays commands, prefabs, and assets with matching name, description, "
+                + "help text, usage or required permission")
     public String search(@CommandParam("searched") String searched) {
         String searchLowercase = searched.toLowerCase();
 
@@ -373,7 +373,6 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Switched to windowed mode";
         }
-
     }
 
     /**
@@ -429,7 +428,7 @@ public class CoreCommands extends BaseComponentSystem {
      * @return String containing final message
      */
     @Command(shortDescription = "Leaves the current game and returns to main menu",
-             requiredPermission = PermissionManager.NO_PERMISSION)
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String leave() {
         if (networkSystem.getMode() != NetworkMode.NONE) {
             gameEngine.changeState(new StateMainMenu());
@@ -444,7 +443,7 @@ public class CoreCommands extends BaseComponentSystem {
      * @throws IOException thrown when error with saving file occures
      */
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
-             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
+            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
         PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
@@ -517,6 +516,78 @@ public class CoreCommands extends BaseComponentSystem {
         return "Spawned block.";
     }
 
+    @Command(shortDescription = "You can indicate which block to drop with the first parameter and how many with the second", helpText = "the particular block" +
+            " can be seleted which the player wants to drop", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bulkDrop(@Sender EntityRef sender, @CommandParam("blockName") String blockName, @CommandParam("value") int value) {
+
+        //This is a loop which gives the particular amount of block the player wants to spawn
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = characterLocation.getWorldDirection();
+
+        offset.scale(3);
+        spawnPos.add(5, 10, 0);
+        BlockFamily block = blockManager.getBlockFamily(blockName);
+        if (block == null) {
+            return "Sorry, your block is not found";
+        }
+
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+        if (value > 5000) {
+            return "Value exceeds the maximum limit of 5000 blocks. your value: " + value + " blocks";
+        }
+
+        for (int i = 0; i < value; i++) {
+
+            EntityRef blockItem = blockItemFactory.newInstance(block);
+            blockItem.send(new DropItemEvent(spawnPos));
+        }
+
+        // this returns the block you have spawned and the amount
+        return "Dropped " + value + " " + blockName + " Blocks :)";
+    }
+
+    @Command(shortDescription = "Sets up a typical bowling pin arrangement in front of the player. ", helpText = "Spawns a specific blocks in a regular bowling " +
+            "pin pattern, The item front of the player can simply picked up",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public String bowlingPrep(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
+
+        ClientComponent clientComponent = sender.getComponent(ClientComponent.class);
+        LocationComponent characterLocation = clientComponent.character.getComponent(LocationComponent.class);
+
+        Vector3f spawnPos = characterLocation.getWorldPosition();
+        Vector3f offset = characterLocation.getWorldDirection();
+        offset.scale(5);
+        spawnPos.add(offset);
+        BlockFamily block = blockManager.getBlockFamily(blockName);
+        if (block == null) {
+            return "Sorry, your block is not found";
+        }
+
+        BlockItemFactory blockItemFactory = new BlockItemFactory(entityManager);
+        Vector3f startPos = new Vector3f(spawnPos);
+
+        float deltax = 0.5f; // delta x is the distance between the pins in the rows.
+        float deltaz = 1.0f; //delta z is the distance between the rows.
+        float vectorY = 0.0f; //the height of the drop (to be modified to keep the bowlingPin upright)
+        //rownumber loop is for selecting row
+        for (int rownumber = 0; rownumber < 4; rownumber++) {
+            startPos.add(deltax * (4 - rownumber), vectorY, deltaz); //Spawn starting position for Rownumber
+            // pinPosx loop is for vectorx position of bowling pin  in  a particular row
+            for (int pinPosx = 0; pinPosx <= rownumber; pinPosx++) {
+                EntityRef blockItem = blockItemFactory.newInstance(block);
+                blockItem.send(new DropItemEvent(startPos));
+                if (pinPosx < rownumber) {
+                    startPos.add(2 * deltax, 0, 0); // drift of position in vector x coordinate, for the last pin stop drifting
+                }
+            }
+            startPos.add(-deltax * (rownumber + 4), 0, 0); // returns to start position
+        }
+        return "prepared 10 " + blockName + " in a bowling pin pattern :)";
+    }
+
     /**
      * Your ping to the server
      * @param sender Sender of command
@@ -548,14 +619,13 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-
     /**
      * Prints out short descriptions for all available commands, or a longer help text if a command is provided.
      * @param commandName String containing command for which will be displayed help
      * @return String containing short description of all commands or longer help text if command is provided
      */
     @Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.",
-             requiredPermission = PermissionManager.NO_PERMISSION)
+            requiredPermission = PermissionManager.NO_PERMISSION)
     public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
         if (commandName == null) {
             StringBuilder msg = new StringBuilder();
