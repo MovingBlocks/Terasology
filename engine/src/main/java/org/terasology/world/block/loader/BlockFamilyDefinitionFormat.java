@@ -203,6 +203,8 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
             setFloat(data::setMass, jsonObject, "mass");
             setBoolean(data::setDebrisOnDestroy, jsonObject, "debrisOnDestroy");
+            setFloat(data::setFriction, jsonObject, "friction");
+            setFloat(data::setRestitution, jsonObject, "restitution");
 
             if (jsonObject.has("entity") && jsonObject.get("entity").isJsonObject()) {
                 JsonObject entityObject = jsonObject.getAsJsonObject("entity");

@@ -524,6 +524,7 @@ public class BulletPhysics implements PhysicsEngine {
             collider.rb.setAngularFactor(VecMath.to(rigidBody.angularFactor));
             collider.rb.setLinearFactor(VecMath.to(rigidBody.linearFactor));
             collider.rb.setFriction(rigidBody.friction);
+            collider.rb.setRestitution(rigidBody.restitution);
             collider.collidesWith = combineGroups(rigidBody.collidesWith);
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);

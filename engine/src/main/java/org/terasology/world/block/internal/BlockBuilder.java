@@ -159,6 +159,8 @@ public class BlockBuilder implements BlockBuilderHelper {
 
         block.setMass(def.getMass());
         block.setDebrisOnDestroy(def.isDebrisOnDestroy());
+        block.setFriction(def.getFriction());
+        block.setRestitution(def.getRestitution());
 
         if (def.getEntity() != null) {
             block.setPrefab(def.getEntity().getPrefab());
