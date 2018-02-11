@@ -500,10 +500,6 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 

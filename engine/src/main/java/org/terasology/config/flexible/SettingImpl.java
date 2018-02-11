@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.config.flexible.settings;
+package org.terasology.config.flexible;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.flexible.validators.SettingValueValidator;
@@ -33,11 +37,13 @@ import java.util.Set;
  */
 public class SettingImpl<T> implements Setting<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingImpl.class);
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final SimpleUri id;
     private final String warningFormatString;
 
     private final T defaultValue;
+    private final Class<T> valueClass;
 
     protected T value;
 
@@ -59,11 +65,11 @@ public class SettingImpl<T> implements Setting<T> {
 
     /**
      * Creates a new {@link SettingImpl} with the given id, default value and validator.
-     *
      * @param id           the id of the setting.
      * @param defaultValue the default value of the setting.
      * @param validator    the validator to be used to validate values.
      */
+    @SuppressWarnings("unchecked")
     public SettingImpl(SimpleUri id, T defaultValue, SettingValueValidator<T> validator) {
         this.id = id;
         this.warningFormatString = MessageFormat.format("Setting {0}: '{'0}'", this.id);
@@ -75,8 +81,15 @@ public class SettingImpl<T> implements Setting<T> {
                     "Check the logs for more information.");
         }
 
+        Preconditions.checkNotNull(defaultValue, formatWarning("The default value cannot be null."));
+
         this.defaultValue = defaultValue;
         this.value = this.defaultValue;
+        this.valueClass = (Class<T>) defaultValue.getClass();
+    }
+
+    private String formatWarning(String s) {
+        return MessageFormat.format(warningFormatString, s);
     }
 
     private void dispatchChangedEvent(PropertyChangeEvent event) {
@@ -101,14 +114,12 @@ public class SettingImpl<T> implements Setting<T> {
         }
 
         if (listener == null) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "A null subscriber cannot be added"));
+            LOGGER.warn(formatWarning("A null subscriber cannot be added."));
 
             return false;
         }
         if (subscribers.contains(listener)) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "The listener has already been subscribed"));
+            LOGGER.warn(formatWarning("The listener has already been subscribed."));
 
             return false;
         }
@@ -124,8 +135,7 @@ public class SettingImpl<T> implements Setting<T> {
     @Override
     public boolean unsubscribe(PropertyChangeListener listener) {
         if (!subscribers.contains(listener)) {
-            LOGGER.warn(MessageFormat.format(this.warningFormatString,
-                    "The listener does not exist in the subscriber list"), id);
+            LOGGER.warn(formatWarning("The listener does not exist in the subscriber list."));
             return false;
         }
 
@@ -183,6 +193,8 @@ public class SettingImpl<T> implements Setting<T> {
      */
     @Override
     public boolean setValue(T newValue) {
+        Preconditions.checkNotNull(newValue, formatWarning("The value of a setting cannot be null."));
+
         if (!validate(newValue)) {
             return false;
         }
@@ -210,17 +222,13 @@ public class SettingImpl<T> implements Setting<T> {
         return description;
     }
 
-    public void setValueFromString(String valueString) {
-        if (value instanceof Integer) {
-            value = (T)(Integer)Integer.parseInt(valueString);
-        } else if (value instanceof Float) {
-            value = (T)(Float)Float.parseFloat(valueString);
-        } else if (value instanceof Double) {
-            value = (T)(Double)Double.parseDouble(valueString);
-        } else if (value instanceof String) {
-            value = (T)valueString;
-        } else {
-            throw new RuntimeException("Cannot convert string to type " + value.getClass().getSimpleName());
-        }
+    @Override
+    public void setValueFromJson(String json) {
+        value = GSON.fromJson(json, valueClass);
+    }
+
+    @Override
+    public JsonElement getValueAsJson() {
+        return GSON.toJsonTree(value);
     }
 }

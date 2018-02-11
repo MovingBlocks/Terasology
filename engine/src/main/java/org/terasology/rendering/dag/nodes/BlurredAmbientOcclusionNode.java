@@ -96,7 +96,7 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode implemen
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/blurredAmbientOcclusion");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         ssaoBlurredMaterial.setFloat2("texelSize", 1.0f / outputFboWidth, 1.0f / outputFboHeight, true);
 

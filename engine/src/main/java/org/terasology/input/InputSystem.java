@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package org.terasology.input;
 import com.google.common.collect.Queues;
 import org.terasology.config.ControllerConfig.ControllerInfo;
 import org.terasology.config.facade.InputDeviceConfiguration;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.config.BindsManager;
+import org.terasology.engine.subsystem.config.BindsSubsystem;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
@@ -53,6 +55,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -80,6 +83,9 @@ public class InputSystem extends BaseComponentSystem {
 
     @In
     private CameraTargetSystem targetSystem;
+
+    @In
+    private BindsSubsystem bindsSubsystem;
 
     private MouseDevice mouse = new NullMouseDevice();
     private KeyboardDevice keyboard = new NullKeyboardDevice();
@@ -379,5 +385,15 @@ public class InputSystem extends BaseComponentSystem {
         mouse.getInputQueue();
         keyboard.getInputQueue();
         controllers.getInputQueue();
+    }
+
+    /**
+     * API-exposed caller to {@link BindsSubsystem#getInputsForBindButton(SimpleUri)}
+     * TODO: Restored for API reasons, may be duplicating code elsewhere. Should be reviewed
+     * @param bindId the ID
+     * @return a list of keyboard/mouse inputs that trigger the binding.
+     */
+    public List<Input> getInputsForBindButton(SimpleUri bindId) {
+        return bindsSubsystem.getInputsForBindButton((bindId));
     }
 }

@@ -150,7 +150,7 @@ public class DeferredPointLightsNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
 

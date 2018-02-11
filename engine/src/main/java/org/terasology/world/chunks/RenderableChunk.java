@@ -48,9 +48,6 @@ public interface RenderableChunk extends LitChunk {
 
     void disposeMesh();
 
-    void setAdjacentChunksReady(boolean b);
-
-    boolean areAdjacentChunksReady();
-
     boolean isReady();
+
 }

@@ -74,6 +74,7 @@ Thumbs.db
 # Ignore Terasology output
 *.log
 /saves/
+/configs/
 /screenshots/
 /logs/
 /terasology-server/

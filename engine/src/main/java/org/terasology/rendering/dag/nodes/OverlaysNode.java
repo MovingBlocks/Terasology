@@ -96,7 +96,7 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/overlays");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();

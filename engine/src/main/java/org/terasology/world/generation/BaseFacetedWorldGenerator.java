@@ -20,6 +20,9 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
+/**
+ * The most commonly used implementation of {@link WorldGenerator} based on the idea of Facets
+ */
 public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
 
     protected WorldBuilder worldBuilder;
@@ -54,6 +57,9 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
         world = null;
     }
 
+    /**
+     * @return New {@link WorldBuilder} for building the current world
+     */
     protected abstract WorldBuilder createWorld();
 
     @Override
@@ -83,6 +89,10 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
         return world;
     }
 
+    /**
+     * Returns current {@link WorldBuilder} or a new one if none has been created so far
+     * @return WorldBuilder used by this WorldGenerator
+     */
     private WorldBuilder getWorldBuilder() {
         if (worldBuilder == null) {
             worldBuilder = createWorld();

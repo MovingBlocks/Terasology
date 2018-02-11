@@ -67,7 +67,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outputToScreen");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.

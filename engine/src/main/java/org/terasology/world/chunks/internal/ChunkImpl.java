@@ -538,16 +538,6 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public void setAdjacentChunksReady(boolean value) {
-        this.adjacentChunksReady = value;
-    }
-
-    @Override
-    public boolean areAdjacentChunksReady() {
-        return this.adjacentChunksReady;
-    }
-
-    @Override
     public boolean isDisposed() {
         return disposed;
     }

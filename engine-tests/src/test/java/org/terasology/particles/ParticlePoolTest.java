@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.particles.internal;
+package org.terasology.particles;
 
 import org.junit.Test;
 import org.terasology.math.TeraMath;
-import org.terasology.particles.ParticlePool;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -26,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Unit test for ParticlePool.
+ * Unit test for {@link ParticlePool}.
  */
 public class ParticlePoolTest {
     private static Random random = new FastRandom(9083);
@@ -186,7 +185,6 @@ public class ParticlePoolTest {
         poolSize = 1;
         testPool = new ParticlePool(poolSize);
         fillWithRandom(testPool, 1);
-        comparisonPool = createCopy(testPool);
         livingParticles = 1;
         deadParticles = 0;
 

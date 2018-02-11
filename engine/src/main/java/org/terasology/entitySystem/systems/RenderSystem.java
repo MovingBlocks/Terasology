@@ -39,11 +39,6 @@ public interface RenderSystem extends ComponentSystem {
     void renderOverlay();
 
     /**
-     * Called when first person objects should be rendered.
-     */
-    void renderFirstPerson();
-
-    /**
      * Currently not used.
      */
     @Deprecated

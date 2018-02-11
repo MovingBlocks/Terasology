@@ -262,10 +262,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 
