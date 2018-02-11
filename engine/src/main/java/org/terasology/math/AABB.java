@@ -148,11 +148,6 @@ public final class AABB {
         return dimensions;
     }
 
-    /**
-     * Returns the center of the AABB.
-     * 
-     * @return The center of the AABB.
-     */
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
@@ -160,20 +155,10 @@ public final class AABB {
         return dimensions;
     }
 
-    /**
-     * Returns the minimum of the AABB.
-     * 
-     * @return The minimum of the AABB.
-     */
     public Vector3f getMin() {
         return new Vector3f(min);
     }
 
-    /**
-     * Returns the maximum of the AABB.
-     * 
-     * @return The maximum of the AABB.
-     */
     public Vector3f getMax() {
         return new Vector3f(max);
     }
@@ -207,7 +192,7 @@ public final class AABB {
     /**
      * Transform this AABB into a new AABB with the given rotation, offset and scale as represented by the {@link Transform}.
      *
-     * @param transform The {@link Transform} representing the offset, rotation, and scale transformation from this AABB to the new AABB. 
+     * @param transform The {@link Transform} representing the offset, rotation, and scale transformation from this AABB to the new AABB.
      * @return the new transformed AABB.
      */
     public AABB transform(Transform transform) {
@@ -363,56 +348,26 @@ public final class AABB {
         return new Vector3f();
     }
 
-    /**
-     * Returns the x-coordinate of the minimum of the AABB.
-     * 
-     * @return The x-coordinate of the minimum of the AABB.
-     */
     public float minX() {
         return min.x;
     }
 
-    /**
-     * Returns the y-coordinate of the minimum of the AABB.
-     * 
-     * @return The y-coordinate of the minimum of the AABB.
-     */
     public float minY() {
         return min.y;
     }
 
-    /**
-     * Returns the z-coordinate of the minimum of the AABB.
-     * 
-     * @return The z-coordinate of the minimum of the AABB.
-     */
     public float minZ() {
         return min.z;
     }
 
-    /**
-     * Returns the x-coordinate of the maximum of the AABB.
-     * 
-     * @return The x-coordinate of the maximum of the AABB.
-     */
     public float maxX() {
         return max.x;
     }
 
-    /**
-     * Returns the y-coordinate of the maximum of the AABB.
-     * 
-     * @return The y-coordinate of the maximum of the AABB.
-     */
     public float maxY() {
         return max.y;
     }
 
-    /**
-     * Returns the z-coordinate of the maximum of the AABB.
-     * 
-     * @return The z-coordinate of the maximum of the AABB.
-     */
     public float maxZ() {
         return max.z;
     }
