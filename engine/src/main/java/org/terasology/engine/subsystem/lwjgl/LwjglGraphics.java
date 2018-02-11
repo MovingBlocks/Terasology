@@ -92,6 +92,8 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexParameterf;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.config.RenderingConfig.WINDOW_POS_X_;
+import static org.terasology.config.RenderingConfig.WINDOW_POS_Y_;
 
 public class LwjglGraphics extends BaseLwjglSubsystem {
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
@@ -198,8 +200,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void preShutdown() {
         if (Display.isCreated() && !Display.isFullscreen() && Display.isVisible()) {
-            config.setWindowPosX(Display.getX());
-            config.setWindowPosY(Display.getY());
+            config.getFlexibleConfig().get(WINDOW_POS_X_).setValue(Display.getX());
+            config.getFlexibleConfig().get(WINDOW_POS_Y_).setValue(Display.getY());
         }
     }
 

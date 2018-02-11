@@ -18,6 +18,9 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.terasology.config.flexible.FlexibleConfig;
+import org.terasology.config.flexible.SettingImpl;
+import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.cameras.PerspectiveCameraSettings;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
 import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
@@ -28,13 +31,9 @@ import java.beans.PropertyChangeListener;
 
 /**
  */
+@SuppressWarnings("WeakerAccess")
 public class RenderingConfig extends AbstractSubscribable {
-
     public static final String PIXEL_FORMAT = "PixelFormat";
-    public static final String WINDOW_POS_X = "WindowPosX";
-    public static final String WINDOW_POS_Y = "WindowPosY";
-    public static final String WINDOW_WIDTH = "WindowWidth";
-    public static final String WINDOW_HEIGHT = "WindowHeight";
     public static final String DISPLAY_MODE_SETTING = "DisplayModeSetting";
     public static final String ANIMATED_MENU = "AnimatedMenu";
     public static final String VIEW_DISTANCE = "viewDistance";
@@ -76,6 +75,11 @@ public class RenderingConfig extends AbstractSubscribable {
     public static final String SCREENSHOT_FORMAT = "ScreenshotFormat";
     public static final String DUMP_SHADERS = "DumpShaders";
     public static final String VOLUMETRIC_FOG = "VolumetricFog";
+
+    public static final SimpleUri WINDOW_POS_X_ = new SimpleUri("engine:windowPosX");
+    public static final SimpleUri WINDOW_POS_Y_ = new SimpleUri("engine:windowPosY");
+    public static final SimpleUri WINDOW_WIDTH_ = new SimpleUri("engine:windowWidth");
+    public static final SimpleUri WINDOW_HEIGHT_ = new SimpleUri("engine:windowHeight");
 
     private PixelFormat pixelFormat;
     private int windowPosX;
@@ -125,6 +129,8 @@ public class RenderingConfig extends AbstractSubscribable {
     private String screenshotFormat;
     private PerspectiveCameraSettings cameraSettings;
 
+    private FlexibleConfig flexibleConfig;
+
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
     public PerspectiveCameraSettings getCameraSettings() {
@@ -143,46 +149,6 @@ public class RenderingConfig extends AbstractSubscribable {
         // This method could theoretically use a better equality check then. In practice
         // it's unlikely a new PixelFormat instance will ever be value-per-value identical
         // to the previous one.
-    }
-
-    public int getWindowPosX() {
-        return windowPosX;
-    }
-
-    public void setWindowPosX(int windowPosX) {
-        int oldValue = this.windowPosX;
-        this.windowPosX = windowPosX;
-        propertyChangeSupport.firePropertyChange(WINDOW_POS_X, oldValue, this.windowPosX);
-    }
-
-    public int getWindowPosY() {
-        return windowPosY;
-    }
-
-    public void setWindowPosY(int windowPosY) {
-        int oldValue = this.windowPosY;
-        this.windowPosY = windowPosY;
-        propertyChangeSupport.firePropertyChange(WINDOW_POS_Y, oldValue, this.windowPosY);
-    }
-
-    public int getWindowWidth() {
-        return windowWidth;
-    }
-
-    public void setWindowWidth(int windowWidth) {
-        int oldValue = this.windowWidth;
-        this.windowWidth = windowWidth;
-        propertyChangeSupport.firePropertyChange(WINDOW_WIDTH, oldValue, this.windowWidth);
-    }
-
-    public int getWindowHeight() {
-        return windowHeight;
-    }
-
-    public void setWindowHeight(int windowHeight) {
-            int oldValue = this.windowHeight;
-            this.windowHeight = windowHeight;
-            propertyChangeSupport.firePropertyChange(WINDOW_HEIGHT, oldValue, this.windowHeight);
     }
 
     public DisplayMode getDisplayMode() {
@@ -657,4 +623,74 @@ public class RenderingConfig extends AbstractSubscribable {
         propertyChangeSupport.firePropertyChange(VOLUMETRIC_FOG, oldValue, this.volumetricFog);
     }
 
+    public void loadDefaultRenderingConfig(FlexibleConfig flexibleConfig) {
+        this.flexibleConfig = flexibleConfig;
+
+        // flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:pixelFormat"), 24));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:windowPosX"), 0));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:windowPosY"), 0));
+        flexibleConfig.add(new SettingImpl<>(WINDOW_WIDTH_, 1280));
+        flexibleConfig.add(new SettingImpl<>(WINDOW_HEIGHT_, 720));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:displayModeSetting"), DisplayModeSetting.WINDOWED));
+        // "viewDistance": "${engine:menu#view-distance-moderate}",
+        // flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:animatedMenu"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:flickeringLight"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:animateGrass"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:animateWater"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:fieldOfView"), 90.0));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:cameraBobbing"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:renderPlacingBox"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:blurIntensity"), 2));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:reflectiveWater"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:vignette"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:motionBlur"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:ssao"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:filmGrain"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:outline"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:lightShafts"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:eyeAdaptation"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:bloom"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:dynamicShadows"), true));
+        // flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:vrSupport"), false));
+        // oculusVrSupport
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:maxTextureAtlasResolution"), 4096));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:maxChunksUsedForShadowMapping"), 1024));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:shadowMapResolution"), 1024));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:normalMapping"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:parallaxMapping"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:dynamicShadowsPcfFiltering"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:cloudShadows"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:renderNearest"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:particleEffectLimit"), 10));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:frameLimit"), 60));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:meshLimit"), 400));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:inscattering"), true));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:localReflections"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:vSync"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:clampLighting"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:fboScale"), 100));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:dumpShaders"), false));
+        // flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:volumetricFog"), false));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:screenshotSize"), ScreenshotSize.NORMAL_SIZE));
+        flexibleConfig.add(new SettingImpl<>(new SimpleUri("engine:screenshotFormat"), "jpg"));
+        /*
+        "cameraSettings": {
+            "cameraSetting": "${engine:menu#camera-setting-normal}"
+        },
+        */
+        /*
+        "debug": {
+            "enabled": false,
+            "firstPersonElementsHidden": false,
+            "hudHidden": false,
+            "wireframe": false,
+            "renderChunkBoundingBoxes": false,
+            "renderSkeletons": false
+        }
+        */
+    }
+
+    public FlexibleConfig getFlexibleConfig() {
+        return flexibleConfig;
+    }
 }

@@ -29,6 +29,9 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.terasology.config.RenderingConfig.WINDOW_POS_X_;
+import static org.terasology.config.RenderingConfig.WINDOW_POS_Y_;
+import static org.terasology.config.RenderingConfig.WINDOW_WIDTH_;
 
 public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayDevice {
     public static final String DISPLAY_RESOLUTION_CHANGE = "displayResolutionChange";
@@ -78,7 +81,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
             switch (displayModeSetting) {
                 case FULLSCREEN:
                     Display.setDisplayMode(Display.getDesktopDisplayMode());
-                    Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
+                    Display.setLocation((Integer)config.getFlexibleConfig().get(WINDOW_POS_X_).getValue(), (Integer)config.getFlexibleConfig().get(WINDOW_POS_Y_).getValue());
                     Display.setFullscreen(true);
                     config.setDisplayModeSetting(displayModeSetting);
                     config.setFullscreen(true);
@@ -94,7 +97,7 @@ public class LwjglDisplayDevice extends AbstractSubscribable implements DisplayD
                 case WINDOWED:
                     System.setProperty("org.lwjgl.opengl.Window.undecorated", "false");
                     Display.setDisplayMode(config.getDisplayMode());
-                    Display.setLocation(config.getWindowPosX(), config.getWindowPosY());
+                    Display.setLocation((Integer)config.getFlexibleConfig().get(WINDOW_POS_X_).getValue(), (Integer)config.getFlexibleConfig().get(WINDOW_POS_Y_).getValue());
                     Display.setFullscreen(false);
                     Display.setResizable(true);
                     config.setDisplayModeSetting(displayModeSetting);

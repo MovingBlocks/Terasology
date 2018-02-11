@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.config.facade.BindsConfiguration;
 import org.terasology.config.facade.BindsConfigurationImpl;
 import org.terasology.config.facade.InputDeviceConfiguration;
@@ -27,6 +28,7 @@ import org.terasology.config.flexible.FlexibleConfig;
 import org.terasology.config.flexible.FlexibleConfigImpl;
 import org.terasology.config.flexible.FlexibleConfigManager;
 import org.terasology.config.flexible.FlexibleConfigManagerImpl;
+import org.terasology.config.flexible.SettingImpl;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -36,6 +38,8 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.identity.PrivateIdentityCertificate;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.identity.storageServiceClient.StorageServiceWorker;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.DisplayModeSetting;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.ScreenshotSize;
 
 /**
  * The configuration subsystem manages Terasology's configuration
@@ -63,7 +67,8 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         flexibleConfigManager.addConfig(new SimpleUri("engine:rendering"), renderingFlexibleConfig);
 
         flexibleConfigManager.loadAllConfigs();
-        // Add settings to RenderingFC
+
+        config.getRendering().loadDefaultRenderingConfig(renderingFlexibleConfig);
 
         String serverPortProperty = System.getProperty(SERVER_PORT_PROPERTY);
         if (serverPortProperty != null) {
@@ -81,7 +86,7 @@ public class ConfigurationSubsystem implements EngineSubsystem {
         checkServerIdentity();
 
         // TODO: Move to display subsystem
-        logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
+        // logger.info("Video Settings: {}", config.renderConfigAsJson(config.getRendering()));
 
         rootContext.put(Config.class, config);
         //add facades
