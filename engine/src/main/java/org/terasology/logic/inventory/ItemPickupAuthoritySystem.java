@@ -115,6 +115,8 @@ public class ItemPickupAuthoritySystem extends BaseComponentSystem {
                                                BlockItemComponent blockItemComponent,
                                                RigidBodyComponent rigidBodyComponent) {
         rigidBodyComponent.mass = blockItemComponent.blockFamily.getArchetypeBlock().getMass();
+        rigidBodyComponent.friction = blockItemComponent.blockFamily.getArchetypeBlock().getFriction();
+        rigidBodyComponent.restitution = blockItemComponent.blockFamily.getArchetypeBlock().getRestitution();
         itemEntity.saveComponent(rigidBodyComponent);
     }
 }

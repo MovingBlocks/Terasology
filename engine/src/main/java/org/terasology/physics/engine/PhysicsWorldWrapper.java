@@ -54,6 +54,8 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         private CollisionShape shape;
         private Vector3i position;
         private Vector3f offset;
+        private float friction;
+        private float restitution;
 
          TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
             this.shape = block.getCollisionShape();
@@ -61,6 +63,8 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
             this.colliding = shape != null && colliding;
             this.blocking = shape != null && blocking;
             this.position = position;
+            this.friction = block.getFriction();
+            this.restitution = block.getRestitution();
         }
 
         @Override
@@ -90,14 +94,12 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
         @Override
         public float getFriction() {
-            // TODO Auto-generated method stub
-            return 0;
+             return friction;
         }
 
         @Override
         public float getRestitution() {
-            // TODO Auto-generated method stub
-            return 0;
+            return restitution;
         }
     }
 }
