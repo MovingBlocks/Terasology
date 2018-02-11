@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.opengl;
 
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
@@ -33,6 +32,8 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
+import org.terasology.math.Transform;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
@@ -179,43 +180,6 @@ public class OpenGLMesh extends Mesh {
         } else {
             logger.error("Attempted to render disposed mesh: {}", getUrn());
         }
-    }
-
-    public int addToBatch(Transform transform, Transform normalTransform, TFloatList vertexData, TIntList indexData, int indexOffset) {
-        int uv1 = 0;
-        int uv2 = 0;
-        int n = 0;
-        int c = 0;
-        for (int v = 0; v < data.getVertices().size(); v += VERTEX_SIZE) {
-            javax.vecmath.Vector3f vert = new javax.vecmath.Vector3f(data.getVertices().get(v), data.getVertices().get(v + 1), data.getVertices().get(v + 2));
-            transform.transform(vert);
-            vertexData.add(vert.x);
-            vertexData.add(vert.y);
-            vertexData.add(vert.z);
-            for (int i = 0; i < TEX_COORD_0_SIZE; ++i) {
-                vertexData.add(data.getTexCoord0().get(uv1 + i));
-            }
-            for (int i = 0; i < TEX_COORD_1_SIZE; ++i) {
-                vertexData.add(data.getTexCoord1().get(uv2 + i));
-            }
-            javax.vecmath.Vector3f norm = new javax.vecmath.Vector3f(data.getNormals().get(n), data.getNormals().get(n + 1), data.getNormals().get(n + 2));
-            normalTransform.transform(norm);
-            vertexData.add(norm.x);
-            vertexData.add(norm.y);
-            vertexData.add(norm.z);
-            for (int i = 0; i < COLOR_SIZE; ++i) {
-                vertexData.add(data.getColors().get(c + i));
-            }
-            uv1 += TEX_COORD_0_SIZE;
-            uv2 += TEX_COORD_1_SIZE;
-            n += NORMAL_SIZE;
-            c += COLOR_SIZE;
-        }
-        TIntIterator indexIterator = data.getIndices().iterator();
-        while (indexIterator.hasNext()) {
-            indexData.add(indexIterator.next() + indexOffset);
-        }
-        return indexOffset + data.getVertices().size() / VERTEX_SIZE;
     }
 
     private void buildMesh(MeshData newData) {

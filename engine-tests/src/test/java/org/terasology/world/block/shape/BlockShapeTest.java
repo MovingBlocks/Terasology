@@ -15,8 +15,9 @@
  */
 package org.terasology.world.block.shape;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
+import org.terasology.physics.bullet.shapes.BulletConvexHullShape;
+import org.terasology.physics.shapes.CollisionShape;
+import org.terasology.physics.shapes.ConvexHullShape;
 import com.bulletphysics.util.ObjectArrayList;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,7 +75,9 @@ public class BlockShapeTest extends TerasologyTestingEnvironment {
                     new Vector3f(-0.49999997f, -0.49999997f, 0.49999997f),
                     new Vector3f(0.49999997f, 0.0f, 0.49999997f)};
 
-            ObjectArrayList<javax.vecmath.Vector3f> points = ((ConvexHullShape) shape).getPoints();
+            BulletConvexHullShape bulletConvexHullShape = (BulletConvexHullShape) shape;
+
+            ObjectArrayList<javax.vecmath.Vector3f> points = ((com.bulletphysics.collision.shapes.ConvexHullShape) bulletConvexHullShape.underlyingShape).getPoints();
             for (int x = 0; x < points.size(); x++){
                 fuzzVectorTest(test[x], VecMath.from(points.get(x)));
 

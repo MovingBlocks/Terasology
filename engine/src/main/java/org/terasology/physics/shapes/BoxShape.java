@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.physics.shapes;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.math.geom.Vector3f;
 
 /**
+ * Represents a box collision shape in the physics engine.
  */
-public class SphereShapeComponent implements Component {
-    public float radius = 0.5f;
+public interface BoxShape extends CollisionShape {
+    /**
+     * Returns the half extents of the box shape without adding a margin.
+     *
+     * @return The {@link Vector3f} containing the half extents of the box shape in each dimension.
+     */
+    Vector3f getHalfExtentsWithoutMargin();
 }

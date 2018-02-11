@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.physics.shapes;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.network.Replicate;
-
 /**
+ * Represents a sphere collision shape in the physics engine.
  */
-public class BoxShapeComponent implements Component {
-    @Replicate
-    public Vector3f extents = new Vector3f(1, 1, 1);
+public interface SphereShape extends CollisionShape {
 }

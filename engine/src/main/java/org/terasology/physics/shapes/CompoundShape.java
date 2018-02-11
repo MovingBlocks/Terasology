@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.physics.shapes;
 
-import org.terasology.entitySystem.Component;
+import org.terasology.math.Transform;
 
 /**
+ * Represents a compound collision shape composed of other {@link CollisionShape}s in the physics engine.
  */
-public class CylinderShapeComponent implements Component {
-    public float radius = 0.5f;
-    public float height = 1.0f;
+public interface CompoundShape extends CollisionShape {
+    /**
+     * Adds a child shape to the compound shape.
+     *
+     * @param transform The space transformation of the child shape relative to the compound shape.
+     * @param collisionShape The child shape.
+     */
+    void addChildShape(Transform transform, CollisionShape collisionShape);
 }
