@@ -1,6 +1,6 @@
 {
     "shape": "door",
-    "rotation": "horizontal",
+    "family": "horizontal",
     "attachmentAllowed": false,
     "mass": 40
 }

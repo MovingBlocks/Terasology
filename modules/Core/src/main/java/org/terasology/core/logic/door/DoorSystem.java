@@ -123,8 +123,8 @@ public class DoorSystem extends BaseComponentSystem {
             closedSide = attachSide.yawClockwise(1);
         }
 
-        Block newBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
-        Block newTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
+        Block newBottomBlock = door.bottomBlockFamily.getBlockForPlacement(bottomBlockPos, closedSide, Side.TOP);
+        Block newTopBlock = door.topBlockFamily.getBlockForPlacement(bottomBlockPos, closedSide, Side.TOP);
 
         Map<Vector3i, Block> blockMap = new HashMap<>();
         blockMap.put(bottomBlockPos, newBottomBlock);
@@ -196,9 +196,9 @@ public class DoorSystem extends BaseComponentSystem {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         Side newSide = door.closedSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
-        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
+        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(regionComp.region.min(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
-        Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
+        Block topBlock = door.topBlockFamily.getBlockForPlacement( regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
         if (door.closeSound != null) {
             entity.send(new PlaySoundEvent(door.closeSound, 1f));
@@ -213,9 +213,9 @@ public class DoorSystem extends BaseComponentSystem {
         DoorComponent door = entity.getComponent(DoorComponent.class);
         Side newSide = door.openSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
-        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
+        Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(regionComp.region.min(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
-        Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
+        Block topBlock = door.topBlockFamily.getBlockForPlacement(regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
         if (door.openSound != null) {
             entity.send(new PlaySoundEvent(door.openSound, 1f));
