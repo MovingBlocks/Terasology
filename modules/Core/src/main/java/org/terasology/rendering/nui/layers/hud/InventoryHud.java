@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.hud;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.inventory.SelectedInventorySlotComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
@@ -32,6 +33,9 @@ public class InventoryHud extends CoreHudWidget {
 
     @In
     private Time time;
+
+    @In
+    private DelayManager delayManager;
 
     private UICrosshair crosshair;
     private UIText toolTipText;
@@ -51,6 +55,7 @@ public class InventoryHud extends CoreHudWidget {
         crosshair = find("crosshair", UICrosshair.class);
         toolTipText = find("toolTipText", UIText.class);
         toolTipText.bindText(new CurrentSlotItem(localPlayer));
+        toolTipText.bindVisible(new CurrentSlotEmpty((localPlayer)));
     }
 
     public void setChargeAmount(float amount) {
@@ -90,6 +95,24 @@ public class InventoryHud extends CoreHudWidget {
                 }
             }
             return "";
+        }
+    }
+
+    private final class CurrentSlotEmpty extends ReadOnlyBinding<Boolean> {
+        private LocalPlayer localPlayer;
+
+        private CurrentSlotEmpty (LocalPlayer localPlayer) {
+            this.localPlayer = localPlayer;
+        }
+        @Override
+        public Boolean get() {
+            SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
+            for (InventoryCell cell : findAll(InventoryCell.class)) {
+                if (cell.getTargetItem().getComponent(DisplayNameComponent.class) != null && cell.getTargetSlot() == component.slot) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
