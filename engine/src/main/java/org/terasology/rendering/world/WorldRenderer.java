@@ -17,9 +17,11 @@ package org.terasology.rendering.world;
 
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
+import org.terasology.rendering.dag.RenderGraph;
 import org.terasology.rendering.world.viewDistance.ViewDistance;
 
 /**
@@ -218,4 +220,11 @@ public interface WorldRenderer {
      */
     // TODO: transform this to return an object or a map. Consumers would then take care of formatting.
     String getMetrics();
+
+    /**
+     * Returns the RenderGraph used to organize the nodes. This can be used to Modules to add/remove Nodes to the game.
+     *
+     * @return a RenderGraph used to organize the nodes.
+     */
+    RenderGraph getRenderGraph();
 }

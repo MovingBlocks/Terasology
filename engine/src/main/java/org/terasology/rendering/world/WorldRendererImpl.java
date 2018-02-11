@@ -31,6 +31,7 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -126,7 +127,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
-    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
+    private RenderGraph renderGraph = new RenderGraph();
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
@@ -641,7 +642,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
 
         if (requestedTaskListRefresh) {
-            renderTaskListGenerator.refresh();
+            List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+            renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
         }
     }
@@ -808,9 +810,15 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     public void shutdown() {
     }
 
+    @Override
+    public RenderGraph getRenderGraph() {
+        return renderGraph;
+    }
+
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
-        Node node = renderGraph.findNode(nodeUri);
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        Node node = worldRenderer.getRenderGraph().findNode(nodeUri);
         if (node == null) {
             throw new RuntimeException(("No node is associated with URI '" + nodeUri + "'"));
         }
