@@ -113,6 +113,8 @@ public class SectionDefinitionData {
 
         this.mass = other.mass;
         this.debrisOnDestroy = other.debrisOnDestroy;
+        this.friction = other.friction;
+        this.restitution = other.restitution;
 
         this.entity = new EntityData(other.entity);
         this.inventory = new InventoryData(other.inventory);

@@ -4,5 +4,5 @@
 {
     "basedOn": "core:rock",
     "displayName": "Rubber",
-    "restitution": 100
+    "restitution": 0.9
 }

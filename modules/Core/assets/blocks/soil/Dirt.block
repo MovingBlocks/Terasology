@@ -2,6 +2,5 @@
  * Dirt is pretty basic
  */
 {
-    "basedOn": "core:soil",
-    "friction": 100
+    "basedOn": "core:soil"
 }
