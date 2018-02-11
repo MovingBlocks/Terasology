@@ -110,7 +110,13 @@ public final class AABB {
     /**
      * Creates a new AABB that contains the vertices as represented by a {@link TFloatList}.
      *
-     * @param vertices The vertices to encompass.
+     * @param vertices The vertices to encompass. It is assumed that the X, Y, Z components of each
+     *                 vertex are stored consecutively in the {@link TFloatList}.
+     *
+     *                 For the {@code i}th vertex in the list, the X, Y, and Z components
+     *                 are stored at indices {@code 3 * i}, {@code 3 * i + 1}, and
+     *                 {@code 3 * i + 2} respectively.
+     *
      * @return The created AABB.
      */
     public static AABB createEncompasing(TFloatList vertices) {
