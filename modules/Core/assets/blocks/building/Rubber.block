@@ -4,5 +4,6 @@
 {
     "basedOn": "core:rock",
     "displayName": "Rubber",
-    "restitution": 0.9
+    "restitution": 0.9,
+    "mass": 20
 }
