@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
+ * Adds a series of useful commands to the game. Likely these could be moved to more fitting places over time.
  */
 @RegisterSystem
 public class CoreCommands extends BaseComponentSystem {
@@ -516,8 +517,9 @@ public class CoreCommands extends BaseComponentSystem {
         return "Spawned block.";
     }
 
-    @Command(shortDescription = "You can indicate which block to drop with the first parameter and how many with the second", helpText = "the particular block" +
-            " can be seleted which the player wants to drop", runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    @Command(shortDescription = "Mass-drops the desired block however many times the player indicates",
+            helpText = "First parameter indicates which block to drop, second parameter how many",
+            runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bulkDrop(@Sender EntityRef sender, @CommandParam("blockName") String blockName, @CommandParam("value") int value) {
 
         //This is a loop which gives the particular amount of block the player wants to spawn
@@ -549,8 +551,8 @@ public class CoreCommands extends BaseComponentSystem {
         return "Dropped " + value + " " + blockName + " Blocks :)";
     }
 
-    @Command(shortDescription = "Sets up a typical bowling pin arrangement in front of the player. ", helpText = "Spawns a specific blocks in a regular bowling " +
-            "pin pattern, The item front of the player can simply picked up",
+    @Command(shortDescription = "Sets up a typical bowling pin arrangement in front of the player. ",
+            helpText = "Spawns the specific block in a regular bowling pin pattern, Throw something at it!",
             runOnServer = true, requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public String bowlingPrep(@Sender EntityRef sender, @CommandParam("blockName") String blockName) {
 
