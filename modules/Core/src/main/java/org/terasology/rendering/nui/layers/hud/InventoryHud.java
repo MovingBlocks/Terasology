@@ -75,7 +75,7 @@ public class InventoryHud extends CoreHudWidget {
         }
     }
 
-    public class CurrentSlotItem extends ReadOnlyBinding<String> {
+    private final class CurrentSlotItem extends ReadOnlyBinding<String> {
         private LocalPlayer localPlayer;
 
         private CurrentSlotItem (LocalPlayer localPlayer) {
@@ -85,8 +85,9 @@ public class InventoryHud extends CoreHudWidget {
         public String get() {
             SelectedInventorySlotComponent component = localPlayer.getCharacterEntity().getComponent(SelectedInventorySlotComponent.class);
             for (InventoryCell cell : findAll(InventoryCell.class)) {
-                if (cell.getTargetItem().getComponent(DisplayNameComponent.class) != null && cell.getTargetSlot() == component.slot)
+                if (cell.getTargetItem().getComponent(DisplayNameComponent.class) != null && cell.getTargetSlot() == component.slot) {
                     return cell.getTargetItem().getComponent(DisplayNameComponent.class).name;
+                }
             }
             return "";
         }
