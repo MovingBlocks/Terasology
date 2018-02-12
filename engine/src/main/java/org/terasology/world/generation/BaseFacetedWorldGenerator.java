@@ -19,6 +19,9 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.zones.Zone;
+
+import java.util.List;
 
 /**
  * The most commonly used implementation of {@link WorldGenerator} based on the idea of Facets
@@ -98,5 +101,15 @@ public abstract class BaseFacetedWorldGenerator implements WorldGenerator {
             worldBuilder = createWorld();
         }
         return worldBuilder;
+    }
+
+    @Override
+    public List<Zone> getZones() {
+        return getWorldBuilder().getChildZones();
+    }
+
+    @Override
+    public Zone getNamedZone(String name) {
+        return getWorldBuilder().getChildZone(name);
     }
 }

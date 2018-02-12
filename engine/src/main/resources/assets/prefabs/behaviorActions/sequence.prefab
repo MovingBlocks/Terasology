@@ -1,0 +1,12 @@
+{
+    "BehaviorNode" : {
+        "action"    : "sequence",
+        "name"    : "sequence",
+        "displayName"      : "Sequence",
+        "category"  : "basic",
+        "shape"     : "diamond",
+        "description": "Evaluates the children one by one.\nStarts next child, if previous child finishes with SUCCESS.\nSUCCESS: when all children finishes SUCCESS.\nFAILURE: as soon as a child finished with FAILURE.",
+        "color"     : [0.7, 0.7, 0.7, 255],
+        "textColor" : [  0,   0,   0, 255]
+    }
+}

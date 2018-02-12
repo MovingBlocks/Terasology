@@ -1,0 +1,12 @@
+{
+    "BehaviorNode" : {
+        "action"      : "loop",
+        "name"        : "loop",
+        "displayName"      : "Loop",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Runs child forever",
+        "color"     : [0.7, 0.7, 0.7,  255],
+        "textColor" : [  0,   0,   0, 255]
+    }
+}

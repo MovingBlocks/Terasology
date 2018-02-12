@@ -23,6 +23,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.EntityBuffer;
 import org.terasology.world.generation.World;
+import org.terasology.world.zones.Zone;
+
+import java.util.List;
 
 /**
  * World generator is an interface responsible for generating worlds from their seed
@@ -69,6 +72,10 @@ public interface WorldGenerator {
      * @return Generated world
      */
     World getWorld();
+
+    List<Zone> getZones();
+
+    Zone getNamedZone(String name);
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.

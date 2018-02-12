@@ -1,0 +1,22 @@
+{
+  "BehaviorNode": {
+    "action": "guard",
+    "name": "guard",
+    "displayName": "Guard",
+    "category": "logic",
+    "shape": "diamond",
+    "description": "Runs the child if the condition specified holds.",
+    "color": [
+      0.7,
+      0.7,
+      0.7,
+      255
+    ],
+    "textColor": [
+      0,
+      0,
+      0,
+      255
+    ]
+  }
+}

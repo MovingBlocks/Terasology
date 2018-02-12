@@ -1,0 +1,10 @@
+{
+    sequence : [
+        {
+            lookup : { tree : "unittest:BehaviorA" }
+        },
+        {
+            lookup : { tree : "unittest:BehaviorB" }
+        }
+    ]
+}

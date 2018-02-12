@@ -121,14 +121,16 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
-        if (input.getDelta() + lastState.getTime() < time.getGameTimeInMs() + MAX_INPUT_OVERFLOW) {
+
+        float delta = input.getDelta() + lastState.getTime() - (time.getGameTimeInMs() + MAX_INPUT_OVERFLOW);
+        if (delta < 0) {
             CharacterStateEvent newState = stepState(input, lastState, entity);
             stateBuffer.add(newState);
 
             characterMovementSystemUtility.setToState(entity, newState);
             lastInputEvent.put(entity, input);
         } else {
-            logger.warn("Received too much input from {}, dropping input.", entity);
+            logger.warn("Received too much input from {}, dropping input. Delta difference: {}", entity, delta);
         }
     }
 

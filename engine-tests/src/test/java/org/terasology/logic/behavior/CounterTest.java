@@ -1,11 +1,11 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,97 +16,60 @@
 package org.terasology.logic.behavior;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.terasology.logic.behavior.tree.CounterNode;
-import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.logic.behavior.actions.CounterAction;
+import org.terasology.logic.behavior.actions.Print;
+import org.terasology.logic.behavior.actions.TimeoutAction;
+import org.terasology.logic.behavior.core.Actor;
+import org.terasology.logic.behavior.core.BehaviorNode;
+import org.terasology.logic.behavior.core.BehaviorTreeBuilder;
+import org.terasology.logic.behavior.core.BehaviorTreeRunner;
 
 public class CounterTest {
+    private BehaviorTreeBuilder treeBuilder;
 
     @Test
-    public void test00() {
-        Interpreter interpreter = new Interpreter(null);
-        DebugNode debugNode = new DebugNode(0);
-        CounterNode counterNode = new CounterNode(0, debugNode);
-        interpreter.start(counterNode);
+    public void test() {
+        assertRun("{ sequence:[ { print:{msg:A} } ] }", 1, "[A]");
+        assertRun("{ sequence:[ { print:{msg:A} }, { print:{msg:B} }  ] }", 1, "[A][B]");
+        assertRun("{ sequence:[ { print:{msg:A} }, failure, { print:{msg:B} }  ] }", 1, "[A]");
 
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        Assert.assertNull(debugNode.lastTask);
-        Assert.assertTrue(interpreter.tick(0) == 0);
+        assertRun("{ sequence:[ { counter:{ count=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 1, "[A][B]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 1, "[A]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][A][B]");
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][A][B][A][A][B]");
+
+        assertRun("{ sequence:[ { counter:{ count=2, child:{ counter:{ count=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 4, "[A][A][A][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=2, child:{ print:{msg:A} } } },{ print:{msg:B} } ] }", 4, "[A][B][A][B][A][B][A][B]");
+        assertRun("{ sequence:[ { timeout:{ time=1, child:{ timeout:{ time=2, child:{ print:{msg:A} } } } } },{ print:{msg:B} } ] }", 2, "[A][B][A][B]");
     }
 
-    @Test
-    public void test01() {
-        Interpreter interpreter = new Interpreter(null);
-        DebugNode debugNode = new DebugNode(0);
-        CounterNode counterNode = new CounterNode(1, debugNode);
+    @Before
+    public void setup() {
 
-        interpreter.start(counterNode);
+        treeBuilder = new BehaviorTreeBuilder();
+        treeBuilder.registerAction("print", Print.class);
+        treeBuilder.registerDecorator("counter", CounterAction.class);
+        treeBuilder.registerDecorator("timeout", TimeoutAction.class);
 
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        Assert.assertTrue(debugNode.lastTask.updateCalled);
-        Assert.assertTrue(debugNode.lastTask.initializeCalled);
-        Assert.assertTrue(debugNode.lastTask.terminateCalled);
-        debugNode.lastTask = null;
-
-        Assert.assertTrue(interpreter.tick(0) == 0);
     }
 
-    @Test
-    public void test11() {
-        Interpreter interpreter = new Interpreter(null);
-        DebugNode debugNode = new DebugNode(1);
-        CounterNode counterNode = new CounterNode(1, debugNode);
-
-        interpreter.start(counterNode);
-
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask first = debugNode.lastTask;
-        Assert.assertTrue(first.updateCalled);
-        Assert.assertTrue(first.initializeCalled);
-        Assert.assertTrue(!first.terminateCalled);
-        first.reset();
-
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask last = debugNode.lastTask;
-        Assert.assertTrue(last.updateCalled);
-        Assert.assertTrue(!last.initializeCalled);
-        Assert.assertTrue(last.terminateCalled);
-        Assert.assertSame(first, last);
-
-        Assert.assertTrue(interpreter.tick(0) == 0);
-    }
-
-    @Test
-    public void testX() {
-        Interpreter interpreter = new Interpreter(null);
-        DebugNode debugNode = new DebugNode(10);
-
-        interpreter.start(debugNode);
-
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask first = debugNode.lastTask;
-        Assert.assertTrue(first.updateCalled);
-        Assert.assertTrue(first.initializeCalled);
-        Assert.assertTrue(!first.terminateCalled);
-        first.reset();
-
-        for (int i = 0; i < 9; i++) {
-            Assert.assertTrue(interpreter.tick(0) > 0);
-            DebugNode.DebugTask current = debugNode.lastTask;
-            Assert.assertSame(first, current);
-            Assert.assertTrue(current.updateCalled);
-            Assert.assertTrue(!current.initializeCalled);
-            Assert.assertTrue(!current.terminateCalled);
-            current.reset();
+    private void assertRun(String tree, int executions, String expectedOutput) {
+        Print.output = new StringBuilder();
+        BehaviorNode node = treeBuilder.fromJson(tree);
+        String json = treeBuilder.toJson(node);
+        BehaviorNode n2 = treeBuilder.fromJson(json);
+        String json2 = treeBuilder.toJson(n2);
+        Assert.assertEquals(json, json2);
+        Actor actor = new Actor(null);
+        actor.setDelta(0.5f);
+        BehaviorTreeRunner runner = new DefaultBehaviorTreeRunner(node, actor);
+        for (int i = 0; i < executions; i++) {
+            runner.step();
         }
 
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask last = debugNode.lastTask;
-        Assert.assertTrue(last.updateCalled);
-        Assert.assertTrue(!last.initializeCalled);
-        Assert.assertTrue(last.terminateCalled);
-        Assert.assertSame(first, last);
-
-        Assert.assertTrue(interpreter.tick(0) == 0);
+        Assert.assertEquals(expectedOutput, Print.output.toString());
     }
 }

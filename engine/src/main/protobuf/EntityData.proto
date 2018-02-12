@@ -46,6 +46,13 @@ message Entity {
     optional int64 owner = 6;
     repeated string removed_component = 15;
 
+    enum Scope {
+        GLOBAL = 0;
+        SECTOR = 1;
+        CHUNK = 2;
+    }
+    optional Scope scope = 7;
+
     extensions 5000 to max;
 }
 
