@@ -73,9 +73,13 @@ public interface WorldGenerator {
      */
     World getWorld();
 
-    List<Zone> getZones();
+    default List<Zone> getZones() {
+        return null;
+    }
 
-    Zone getNamedZone(String name);
+    default Zone getNamedZone(String name) {
+        return null;
+    }
 
     /**
      * Determines a spawn position suitable for this world, such as that used to spawn the initial player.
