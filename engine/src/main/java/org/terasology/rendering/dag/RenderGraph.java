@@ -91,19 +91,18 @@ public class RenderGraph {
         for (Node toNode : nodeList) {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
-            if (fromNode == null) {
-                fromNode = toNode;
-                continue;
+            if (fromNode != null) {
+                boolean success = edgeMap.put(fromNode, toNode);
+                if (success) {
+                    reverseEdgeMap.put(toNode, fromNode);
+                } else {
+                    logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
+                }
+
+                returnValue = returnValue && success;
             }
 
-            boolean success = edgeMap.put(fromNode, toNode);
-            if (success) {
-                reverseEdgeMap.put(toNode, fromNode);
-            } else {
-                logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
-            }
-
-            returnValue = returnValue && success;
+            fromNode = toNode;
         }
 
         return returnValue;

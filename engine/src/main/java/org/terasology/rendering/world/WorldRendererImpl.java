@@ -256,9 +256,9 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private void initRenderGraph() {
         addGBufferClearingNodes(renderGraph);
 
-        addWorldRenderingNodes(renderGraph);
-
         addSkyNodes(renderGraph);
+
+        addWorldRenderingNodes(renderGraph);
 
         addLightingNodes(renderGraph);
 
@@ -293,26 +293,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(staleGBufferClearingNode, "staleGBufferClearingNode");
     }
 
-    private void addWorldRenderingNodes(RenderGraph renderGraph) {
-        Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
-
-        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
-        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueObjectsNode);
-
-        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
-        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueBlocksNode);
-
-        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
-        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, alphaRejectBlocksNode);
-
-        Node overlaysNode = new OverlaysNode(context);
-        renderGraph.addNode(overlaysNode, "overlaysNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, overlaysNode);
-    }
-
     private void addSkyNodes(RenderGraph renderGraph) {
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
@@ -331,6 +311,29 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
         renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, hazeIntermediateNode, hazeFinalNode);
+    }
+
+    private void addWorldRenderingNodes(RenderGraph renderGraph) {
+        // Ideally, world rendering nodes only depend on gBufferClearingNode. However, since haze is produced
+        // by blurring the gBuffer and we don't want world objects/lighting to be a part of the haze,
+        // the world rendering nodes need to run after hazeIntermediateNode.
+        Node hazeIntermediateNode = renderGraph.findNode("engine:hazeIntermediateNode");
+
+        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
+        renderGraph.connect(hazeIntermediateNode, opaqueObjectsNode);
+
+        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
+        renderGraph.connect(hazeIntermediateNode, opaqueBlocksNode);
+
+        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
+        renderGraph.connect(hazeIntermediateNode, alphaRejectBlocksNode);
+
+        Node overlaysNode = new OverlaysNode(context);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+        renderGraph.connect(hazeIntermediateNode, overlaysNode);
     }
 
     private void addLightingNodes(RenderGraph renderGraph) {
