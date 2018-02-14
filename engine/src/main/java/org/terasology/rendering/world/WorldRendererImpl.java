@@ -314,11 +314,15 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     }
 
     private void addWorldRenderingNodes(RenderGraph renderGraph) {
-        // Ideally, world rendering nodes only depend on gBufferClearingNode. However, since haze is produced
-        // by blurring the gBuffer and we don't want world objects/lighting to be a part of the haze,
-        // the world rendering nodes need to run after hazeFinalNode. Strictly speaking the dependency is on
-        // HazeIntermediateNode rather than HazeFinalNode, but we wish to keep the haze nodes grouped together.
-        // See diagram: https://sketchboard.me/nAE1f4q2pDpd#/
+        /* Ideally, world rendering nodes only depend on the gBufferClearingNode. However,
+        since the haze is produced by blurring the content of the gBuffer and we only want
+        the sky color to contribute  to the haze, the world rendering nodes need to run
+        after hazeFinalNode, so that the landscape and other meshes are not part of the haze.
+
+        Strictly speaking however, it is only the hazeIntermediateNode that should be processed
+        before the world rendering nodes. Here we have chosen to also ensure that hazeFinalNode is
+        processed before the world rendering nodes - not because it's necessary, but to keep all
+        the haze-related nodes together. */
         Node hazeFinalNode = renderGraph.findNode("engine:hazeFinalNode");
 
         Node opaqueObjectsNode = new OpaqueObjectsNode(context);
