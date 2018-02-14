@@ -180,7 +180,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             character.setOwner(entity);
             if (!character.hasComponent(AliveCharacterComponent.class)) {
                 nuiManager.pushScreen("engine:deathScreen");
-                character.addComponent(new AliveCharacterComponent());
             }
             Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
         } else {
