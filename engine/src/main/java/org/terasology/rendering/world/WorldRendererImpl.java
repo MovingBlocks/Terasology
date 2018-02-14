@@ -316,24 +316,26 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private void addWorldRenderingNodes(RenderGraph renderGraph) {
         // Ideally, world rendering nodes only depend on gBufferClearingNode. However, since haze is produced
         // by blurring the gBuffer and we don't want world objects/lighting to be a part of the haze,
-        // the world rendering nodes need to run after hazeIntermediateNode.
-        Node hazeIntermediateNode = renderGraph.findNode("engine:hazeIntermediateNode");
+        // the world rendering nodes need to run after hazeFinalNode. Strictly speaking the dependency is on
+        // HazeIntermediateNode rather than HazeFinalNode, but we wish to keep the haze nodes grouped together.
+        // See diagram: https://sketchboard.me/nAE1f4q2pDpd#/
+        Node hazeFinalNode = renderGraph.findNode("engine:hazeFinalNode");
 
         Node opaqueObjectsNode = new OpaqueObjectsNode(context);
         renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
-        renderGraph.connect(hazeIntermediateNode, opaqueObjectsNode);
+        renderGraph.connect(hazeFinalNode, opaqueObjectsNode);
 
         Node opaqueBlocksNode = new OpaqueBlocksNode(context);
         renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
-        renderGraph.connect(hazeIntermediateNode, opaqueBlocksNode);
+        renderGraph.connect(hazeFinalNode, opaqueBlocksNode);
 
         Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
         renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
-        renderGraph.connect(hazeIntermediateNode, alphaRejectBlocksNode);
+        renderGraph.connect(hazeFinalNode, alphaRejectBlocksNode);
 
         Node overlaysNode = new OverlaysNode(context);
         renderGraph.addNode(overlaysNode, "overlaysNode");
-        renderGraph.connect(hazeIntermediateNode, overlaysNode);
+        renderGraph.connect(hazeFinalNode, overlaysNode);
     }
 
     private void addLightingNodes(RenderGraph renderGraph) {
