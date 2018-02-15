@@ -22,8 +22,9 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
@@ -119,10 +120,9 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
 @RegisterSystem
-public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
-
+public final class WorldRendererImpl implements WorldRenderer {
     /*
-     * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
+     * Presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
@@ -159,22 +159,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-
-    // Required for ComponentSystem to register the system (via @RegisterSystem).
-    // @RegisterSystem requires a default constructor, and since we have final variables in the class,
-    // it was essential to set them to some value (in this case, null) in this constructor.
-    // Note that this constructor shouldn't be actually used normally anywhere in code.
-    public WorldRendererImpl() {
-        renderingConfig = null;
-        vrProvider = null;
-        renderQueues = null;
-        context = null;
-        backdropProvider = null;
-        worldProvider = null;
-        renderableWorld = null;
-        shaderManager = null;
-        playerCamera = null;
-    }
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -231,6 +215,8 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
+
+        MethodCommand.registerAvailable(this, context.get(Console.class), context);
     }
 
     private void initRenderingSupport() {
@@ -782,30 +768,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
 
     public void recompileShaders() {
         shaderManager.recompileAllShaders();
-    }
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void preBegin() {
-    }
-
-    @Override
-    public void postBegin() {
-    }
-
-    @Override
-    public void preSave() {
-    }
-
-    @Override
-    public void postSave() {
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
