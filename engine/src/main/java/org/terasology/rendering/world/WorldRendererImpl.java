@@ -774,6 +774,15 @@ public final class WorldRendererImpl implements WorldRenderer {
     }
 
     /**
+     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature,
+     * allows developers to hot-swap shaders for easy development.
+     */
+    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
+    public void recompileShaders() {
+        shaderManager.recompileAllShaders();
+    }
+
+    /**
      * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
      * concerned Nodes, which in turn take care of executing them.
      */

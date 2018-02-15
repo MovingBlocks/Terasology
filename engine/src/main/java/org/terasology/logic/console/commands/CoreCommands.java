@@ -100,9 +100,6 @@ public class CoreCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @In
-    private WorldRenderer worldRenderer;
-
-    @In
     private PrefabManager prefabManager;
 
     @In
@@ -615,14 +612,5 @@ public class CoreCommands extends BaseComponentSystem {
     @Command(shortDescription = "Clears the console window of previous messages.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void clear() {
         console.clear();
-    }
-
-    /**
-     * Forces all the shaders to recompile
-     */
-    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
-    public void recompileShaders() {
-        WorldRendererImpl worldRendererImpl = (WorldRendererImpl) worldRenderer;
-        worldRendererImpl.recompileShaders();
     }
 }
