@@ -137,7 +137,6 @@ public final class WorldRendererImpl implements WorldRenderer {
     private final ShaderManager shaderManager;
     private final SubmersibleCamera playerCamera;
 
-    // TODO: @In
     private final OpenVRProvider vrProvider;
 
     private float timeSmoothedMainLightIntensity;
@@ -182,6 +181,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
+        // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
         vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
             context.put(OpenVRProvider.class, vrProvider);
@@ -766,10 +766,19 @@ public final class WorldRendererImpl implements WorldRenderer {
         return currentRenderingStage;
     }
 
+    /**
+     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature,
+     * allows developers to hot-swap shaders for easy development.
+     */
+    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
         shaderManager.recompileAllShaders();
     }
 
+    /**
+     * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
+     * concerned Nodes, which in turn take care of executing them.
+     */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
         Node node = renderGraph.findNode(nodeUri);
