@@ -20,6 +20,10 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.world.WorldRenderer;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * If bloom is enabled via the rendering settings, this method generates the blurred images needed
@@ -30,11 +34,13 @@ import org.terasology.rendering.opengl.FBO;
  * <p>
  * For more information see: http://en.wikipedia.org/wiki/Bloom_(shader_effect)
  */
-public class BloomBlurNode extends BlurNode {
+public class BloomBlurNode extends BlurNode implements PropertyChangeListener {
     public static final SimpleUri HALF_SCALE_FBO_URI = new SimpleUri("engine:fbo.halfScaleBlurredBloom");
     public static final SimpleUri QUARTER_SCALE_FBO_URI = new SimpleUri("engine:fbo.quarterScaleBlurredBloom");
     public static final SimpleUri ONE_8TH_SCALE_FBO_URI = new SimpleUri("engine:fbo.one8thScaleBlurredBloom");
     private static final float BLUR_RADIUS = 12.0f;
+
+    private WorldRenderer worldRenderer;
 
     /**
      * Constructs a BloomBlurNode instance. This method must be called once shortly after instantiation
@@ -57,5 +63,11 @@ public class BloomBlurNode extends BlurNode {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
+        worldRenderer = context.get(WorldRenderer.class);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

@@ -29,6 +29,9 @@ import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -36,7 +39,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.LEFT_EYE;
 import static org.terasology.rendering.world.WorldRenderer.RenderingStage.MONO;
 
-public class OutputToScreenNode extends ConditionDependentNode {
+public class OutputToScreenNode extends ConditionDependentNode implements PropertyChangeListener {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
@@ -48,8 +51,6 @@ public class OutputToScreenNode extends ConditionDependentNode {
     private StateChange bindFbo;
 
     public OutputToScreenNode(Context context) {
-        super(context);
-
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
         worldRenderer = context.get(WorldRenderer.class);
 
@@ -114,6 +115,11 @@ public class OutputToScreenNode extends ConditionDependentNode {
         removeDesiredStateChange(bindFbo);
         bindFbo = new SetInputTextureFromFbo(0, fbo, ColorTexture, displayResolutionDependentFBOs, DEFAULT_TEXTURED_MATERIAL_URN, "texture");
         addDesiredStateChange(bindFbo);
+        worldRenderer.requestTaskListRefresh();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
         worldRenderer.requestTaskListRefresh();
     }
 }

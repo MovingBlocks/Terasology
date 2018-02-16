@@ -20,6 +20,10 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.world.WorldRenderer;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 
 /**
@@ -32,12 +36,14 @@ import org.terasology.rendering.opengl.FBO;
  * I.e. if the sky is pink at sunset, faraway hills will fade into pink as they get
  * further away from the camera.
  */
-public class HazeNode extends BlurNode {
+public class HazeNode extends BlurNode implements PropertyChangeListener {
     public static final SimpleUri INTERMEDIATE_HAZE_FBO_URI = new SimpleUri("engine:fbo.intermediateHaze");
     public static final SimpleUri FINAL_HAZE_FBO_URI = new SimpleUri("engine:fbo.finalHaze");
     private static final float BLUR_RADIUS = 8.0f;
 
     private RenderingConfig renderingConfig;
+
+    private WorldRenderer worldRenderer;
 
     /**
      * Initializes the HazeNode instance.
@@ -59,5 +65,11 @@ public class HazeNode extends BlurNode {
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.INSCATTERING, this);
         requiresCondition(() -> renderingConfig.isInscattering());
+        worldRenderer = context.get(WorldRenderer.class);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

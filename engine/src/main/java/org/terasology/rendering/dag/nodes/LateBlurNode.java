@@ -21,6 +21,7 @@ import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
+import org.terasology.rendering.world.WorldRenderer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -45,6 +46,7 @@ public class LateBlurNode extends BlurNode implements PropertyChangeListener {
     private static final float OVERALL_BLUR_RADIUS_FACTOR = 0.8f;
 
     private RenderingConfig renderingConfig;
+    private WorldRenderer worldRenderer;
 
     /**
      * Constructs a LateBlurNode instance.
@@ -67,11 +69,14 @@ public class LateBlurNode extends BlurNode implements PropertyChangeListener {
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLUR_INTENSITY, this);
         requiresCondition(() -> renderingConfig.getBlurIntensity() != 0);
+        worldRenderer = context.get(WorldRenderer.class);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         updateBlurRadius();
+        // Changing the blurRadius can potentially enable/disable the Node, meaning we have to refresh the taskList.
+        worldRenderer.requestTaskListRefresh();
     }
 
     private void updateBlurRadius() {

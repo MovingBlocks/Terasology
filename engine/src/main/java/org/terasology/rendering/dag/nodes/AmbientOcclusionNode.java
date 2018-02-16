@@ -99,8 +99,6 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
     private FloatBuffer ssaoSamples;
 
     public AmbientOcclusionNode(Context context) {
-        super(context);
-
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();

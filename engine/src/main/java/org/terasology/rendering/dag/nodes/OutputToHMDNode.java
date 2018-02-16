@@ -31,6 +31,9 @@ import org.terasology.rendering.openvrprovider.OpenVRProvider;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -40,7 +43,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
-public class OutputToHMDNode extends ConditionDependentNode {
+public class OutputToHMDNode extends ConditionDependentNode implements PropertyChangeListener {
     private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
     private static final SimpleUri RIGHT_EYE_FBO_URI = new SimpleUri("engine:fbo.rightEye");
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
@@ -58,8 +61,6 @@ public class OutputToHMDNode extends ConditionDependentNode {
      * information for the vrProvider to use.
      */
     public OutputToHMDNode(Context context) {
-        super(context);
-
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
 
@@ -123,5 +124,10 @@ public class OutputToHMDNode extends ConditionDependentNode {
         // because it assumes that FBO 0 is bound before this node is run.
         // TODO: break this node into two different nodes that use addDesiredStateChange(BindFbo...))
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

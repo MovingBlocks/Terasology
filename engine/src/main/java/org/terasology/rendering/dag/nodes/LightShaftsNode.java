@@ -37,6 +37,9 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
@@ -52,12 +55,13 @@ import static org.terasology.rendering.opengl.ScalingFactors.HALF_SCALE;
  *
  * [1] https://en.wikipedia.org/wiki/Crepuscular_rays
  */
-public class LightShaftsNode extends ConditionDependentNode {
+public class LightShaftsNode extends ConditionDependentNode implements PropertyChangeListener {
     public static final SimpleUri LIGHT_SHAFTS_FBO_URI = new SimpleUri("engine:fbo.lightShafts");
     private static final ResourceUrn LIGHT_SHAFTS_MATERIAL_URN = new ResourceUrn("engine:prog.lightShafts");
 
     private BackdropProvider backdropProvider;
     private SubmersibleCamera activeCamera;
+    private WorldRenderer worldRenderer;
 
     private Material lightShaftsMaterial;
 
@@ -82,10 +86,9 @@ public class LightShaftsNode extends ConditionDependentNode {
     private Vector4f sunPositionScreenSpace = new Vector4f();
 
     public LightShaftsNode(Context context) {
-        super(context);
-
         backdropProvider = context.get(BackdropProvider.class);
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        worldRenderer = context.get(WorldRenderer.class);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.LIGHT_SHAFTS, this);
@@ -140,5 +143,10 @@ public class LightShaftsNode extends ConditionDependentNode {
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

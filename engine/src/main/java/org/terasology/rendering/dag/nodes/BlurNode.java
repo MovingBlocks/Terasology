@@ -49,8 +49,6 @@ public class BlurNode extends ConditionDependentNode {
      * @param blurRadius the blur radius: higher values cause higher blur. The shader's default is 16.0f.
      */
     public BlurNode(Context context, FBO inputFbo, FBO outputFbo, float blurRadius) {
-        super(context);
-
         this.blurRadius = blurRadius;
 
         setupConditions(context);

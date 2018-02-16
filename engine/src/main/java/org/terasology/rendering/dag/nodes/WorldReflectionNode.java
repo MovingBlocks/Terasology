@@ -103,8 +103,6 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
      * This method also requests the material using the "chunk" shaders (vertex, fragment) to be enabled.
      */
     public WorldReflectionNode(Context context) {
-        super(context);
-
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);

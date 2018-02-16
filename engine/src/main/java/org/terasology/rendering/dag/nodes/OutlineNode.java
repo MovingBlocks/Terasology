@@ -33,6 +33,9 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.world.WorldRenderer;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
@@ -46,12 +49,13 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  *
  * [1] https://en.wikipedia.org/wiki/Sobel_operator
  */
-public class OutlineNode extends ConditionDependentNode {
+public class OutlineNode extends ConditionDependentNode implements PropertyChangeListener {
     public static final SimpleUri OUTLINE_FBO_URI = new SimpleUri("engine:fbo.outline");
     private static final ResourceUrn OUTLINE_MATERIAL_URN = new ResourceUrn("engine:prog.sobel");
 
     private RenderingConfig renderingConfig;
     private SubmersibleCamera activeCamera;
+    private WorldRenderer worldRenderer;
 
     private Material outlineMaterial;
 
@@ -65,9 +69,8 @@ public class OutlineNode extends ConditionDependentNode {
     private float pixelOffsetY = 1.0f;
 
     public OutlineNode(Context context) {
-        super(context);
-
         activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        worldRenderer = context.get(WorldRenderer.class);
 
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
@@ -116,5 +119,10 @@ public class OutlineNode extends ConditionDependentNode {
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }
