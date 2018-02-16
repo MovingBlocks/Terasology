@@ -38,7 +38,7 @@ public abstract class AbstractNode implements Node {
 
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
-    private boolean enabled = true;
+    protected boolean enabled = true;
     private SimpleUri nodeUri = null;
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
