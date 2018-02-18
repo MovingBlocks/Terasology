@@ -30,6 +30,7 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [AnotherWorldPlants](https://github.com/Terasology/AnotherWorldPlants) - farming and tree growth for AnotherWorld
 * [BasicCrafting](https://github.com/Terasology/BasicCrafting) - a basic crafting system
+* [Behaviors](https://github.com/Terasology/Behaviors) - library module containing various behavior trees for use in our AI system
 * [BlockDetector](https://github.com/Terasology/BlockDetector) - adds a simple little tool that can detect specific blocks (beeping in proximity)
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [BlockPicker](https://github.com/Terasology/BlockPicker) - allows the player access to an infinite block inventory with the `B` key
@@ -135,9 +136,11 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [Tasks](https://github.com/Terasology/Tasks) - allows for the definition of tasks/quests
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
 * [TutorialAssetSystem](https://github.com/Terasology/TutorialAssetSystem) - a tutorial module covering our asset system, see also its [wiki](https://github.com/Terasology/TutorialAssetSystem/wiki)
+* [TutorialBehaviors](https://github.com/Terasology/TutorialBehaviors) - a tutorial module covering our behavior tree system
 * [TutorialDynamicCities](https://github.com/Terasology/TutorialDynamicCities) - GSOC 2016 project tutorial / docs. Covers how dynamic cities function. [Shared wiki with DynamicCities](https://github.com/Terasology/DynamicCities/wiki)
 * ~~[TutorialGraphicTweaks](https://github.com/Terasology/TutorialGraphicTweaks) - GSOC 2016 project tutorial / docs. Contains examples of how to modify rendering from a module~~ (pending some refactoring before final merge of needed changes to the engine)
 * [TutorialNui](https://github.com/Terasology/TutorialNui) - GSOC 2016 project tutorial / docs. Includes details both on NUI itself as well as its editor in the [wiki](https://github.com/Terasology/TutorialNui/wiki)
+* [TutorialSectors](https://github.com/Terasology/TutorialSectors) - a tutorial module covering our sector system (separated entity pools based on geographic location and differing entity scope)
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - a world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 * [Valentines](https://github.com/Terasology/Valentines) - What is love? Gooey don't hurt me, don't hurt me, no more ... ♫
 * [WeatherManager](https://github.com/Terasology/WeatherManager) - simple weather foundation, tracks whether, maintains a single cloud layer, and so on 
