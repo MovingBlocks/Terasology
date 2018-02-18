@@ -22,7 +22,7 @@ import org.terasology.network.Replicate;
 /**
  * Add this component to characters to give them a visual appearance.
  *
- * This component does not specifcy however how the character look like. Instead
+ * This component does not specify however how the character look like. Instead
  * it uses a {@link CreateVisualCharacterEvent} to create a vsiual appearance for the character.
  *
  *
