@@ -307,7 +307,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         FBO finalHazeFbo = displayResolutionDependentFBOs.request(finalHazeConfig);
 
         HazeNode finalHazeNode = new HazeNode(context, intermediateHazeFbo, finalHazeFbo);
-        renderGraph.addNode(finalHazeNode, "hazeFinalNode");
+        renderGraph.addNode(finalHazeNode, "finalHazeNode");
 
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
         renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, intermediateHazeNode, finalHazeNode);
@@ -317,10 +317,10 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         /* Ideally, world rendering nodes only depend on the gBufferClearingNode. However,
         since the haze is produced by blurring the content of the gBuffer and we only want
         the sky color to contribute  to the haze, the world rendering nodes need to run
-        after hazeFinalNode, so that the landscape and other meshes are not part of the haze.
+        after finalHazeNode, so that the landscape and other meshes are not part of the haze.
 
         Strictly speaking however, it is only the hazeIntermediateNode that should be processed
-        before the world rendering nodes. Here we have chosen to also ensure that hazeFinalNode is
+        before the world rendering nodes. Here we have chosen to also ensure that finalHazeNode is
         processed before the world rendering nodes - not because it's necessary, but to keep all
         the haze-related nodes together. */
         Node finalHazeNode = renderGraph.findNode("engine:finalHazeNode");
