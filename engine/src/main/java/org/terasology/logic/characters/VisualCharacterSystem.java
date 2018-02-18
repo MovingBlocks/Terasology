@@ -20,6 +20,7 @@ import org.terasology.engine.modes.loadProcesses.AwaitedLocalCharacterSpawnEvent
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -27,10 +28,10 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.characters.events.CreateVisualCharacterEvent;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
@@ -39,6 +40,8 @@ import org.terasology.registry.In;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.rendering.nui.Color;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -59,7 +62,9 @@ public class VisualCharacterSystem extends BaseComponentSystem {
 
     private boolean awaitedLocalCharacterSpawn = false;
 
-    @ReceiveEvent(components = {VisualCharacterComponent.class})
+    private Map<EntityRef, EntityRef> characterToVisualMap = new HashMap<>();
+
+    @ReceiveEvent(components = VisualCharacterComponent.class)
     public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity) {
         if (!awaitedLocalCharacterSpawn) {
             /*
@@ -68,26 +73,47 @@ public class VisualCharacterSystem extends BaseComponentSystem {
              */
             return;
         }
-        sendCreateVisualCharacterEventIfNotOwnCharacter(entity);
+        createVisualCharacterIfNotOwnCharacter(entity);
     }
 
-    void sendCreateVisualCharacterEventIfNotOwnCharacter(EntityRef entity) {
-        boolean isCharacterOfLocalPlayer = entity.getOwner().equals(localPlayer.getClientEntity());
+
+    @ReceiveEvent(components = {VisualCharacterComponent.class})
+    public void onBeforeDeactivatedVisualCharacter(BeforeDeactivateComponent event, EntityRef entity) {
+        EntityRef visualCharacter = characterToVisualMap.remove(entity);
+        if (visualCharacter != null) {
+            visualCharacter.destroy();
+        }
+    }
+
+    void createVisualCharacterIfNotOwnCharacter(EntityRef characterEntity) {
+        boolean isCharacterOfLocalPlayer = characterEntity.getOwner().equals(localPlayer.getClientEntity());
         if (isCharacterOfLocalPlayer) {
             return;
         }
-        entity.send(new CreateVisualCharacterEvent());
+        CreateVisualCharacterEvent event = new CreateVisualCharacterEvent(entityManager.newBuilder());
+        characterEntity.send(event);
+        EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
+        entityBuilder.setPersistent(false);
+        entityBuilder.setOwner(characterEntity);
+        entityBuilder.addOrSaveComponent(new LocationComponent());
+        EntityRef visualCharacterEntity = entityBuilder.build();
+
+
+        Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
+        characterToVisualMap.put(characterEntity, visualCharacterEntity);
     }
 
     /**
      * Handles the local character spawn  event by doing the work that had to be delayed till then:
      * The CreateVisualCharacterEvent events that could not be sent previously will be sent.
+     * (They could not be sent earlier as we need to know if the cahracter belongs to the local player or not
+     * which can't be determined if the created/loaded character has not been linked to the player yet)
      */
     @ReceiveEvent
     public void onAwaitedLocalCharacterSpawnEvent(AwaitedLocalCharacterSpawnEvent event, EntityRef entity) {
         awaitedLocalCharacterSpawn = true;
-        for (EntityRef visualCharacter: entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
-            sendCreateVisualCharacterEventIfNotOwnCharacter(visualCharacter);
+        for (EntityRef character: entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
+            createVisualCharacterIfNotOwnCharacter(character);
         }
     }
 
@@ -95,18 +121,14 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
     public void onCreateDefaultVisualCharacter(CreateVisualCharacterEvent event, EntityRef characterEntity) {
         Prefab prefab = assetManager.getAsset("engine:defaultVisualCharacter", Prefab.class).get();
-        EntityBuilder entityBuilder = entityManager.newBuilder(prefab);
-        entityBuilder.setPersistent(false);
-        entityBuilder.setOwner(characterEntity);
+        EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
+        entityBuilder.addPrefab(prefab);
         SkeletalMeshComponent skeletalMeshComponent = entityBuilder.getComponent(SkeletalMeshComponent.class);
         if (skeletalMeshComponent != null) {
             skeletalMeshComponent.color = colorOfOwningPlayer(characterEntity).orElse(Color.WHITE);
             entityBuilder.saveComponent(skeletalMeshComponent);
         }
-        entityBuilder.addOrSaveComponent(new LocationComponent());
-        EntityRef entityRef = entityBuilder.build();
 
-        Location.attachChild(characterEntity, entityRef, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
         event.consume();
     }

@@ -15,11 +15,12 @@
  */
 package org.terasology.logic.characters.events;
 
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.EventPriority;
-import org.terasology.logic.location.Location;
 import org.terasology.logic.characters.VisualCharacterComponent;
+import org.terasology.logic.location.Location;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 
@@ -38,4 +39,13 @@ import org.terasology.math.geom.Vector3f;
  * Typically gets only sent to other players
  */
 public class CreateVisualCharacterEvent extends AbstractConsumableEvent {
+    private EntityBuilder visualCharacterBuilder;
+
+    public CreateVisualCharacterEvent(EntityBuilder visualCharacterBuilder) {
+        this.visualCharacterBuilder = visualCharacterBuilder;
+    }
+
+    public EntityBuilder getVisualCharacterBuilder() {
+        return visualCharacterBuilder;
+    }
 }
