@@ -20,11 +20,15 @@ class functions {
      * @param type the type to be initialized
      */
     def initialize(String type) {
-        //Load gradlew properties to check for github settings.
+        // Look for a gradle.properties to check for a variety of override configuration
         Properties properties = new Properties()
-        new File("gradle.properties").withInputStream {
-            properties.load(it)
+        File gradlePropsFile = new File("gradle.properties")
+        if (gradlePropsFile.exists()) {
+            gradlePropsFile.withInputStream {
+                properties.load(it)
+            }
         }
+
         if (type == "meta") {
             githubRepo = "MetaTerasology"
             targetDirectory = "metas"
