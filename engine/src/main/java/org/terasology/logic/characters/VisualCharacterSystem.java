@@ -34,15 +34,10 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ColorComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.logic.SkeletalMeshComponent;
-import org.terasology.rendering.nui.Color;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * This system is responsible for sending a {@link CreateVisualCharacterEvent} according to how it is specified in
@@ -134,30 +129,9 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         Prefab prefab = assetManager.getAsset("engine:defaultVisualCharacter", Prefab.class).get();
         EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
         entityBuilder.addPrefab(prefab);
-        SkeletalMeshComponent skeletalMeshComponent = entityBuilder.getComponent(SkeletalMeshComponent.class);
-        if (skeletalMeshComponent != null) {
-            skeletalMeshComponent.color = colorOfOwningPlayer(characterEntity).orElse(Color.WHITE);
-            entityBuilder.saveComponent(skeletalMeshComponent);
-        }
-
-
         event.consume();
     }
 
-    private Optional<Color> colorOfOwningPlayer(EntityRef entityRef) {
-        EntityRef owner = entityRef.getOwner();
-        if (owner == null) {
-            owner = entityRef;
-        }
-        ClientComponent clientComp = owner.getComponent(ClientComponent.class);
-        if (clientComp != null) {
-            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
-            if (colorComp != null) {
-                return Optional.of(colorComp.color);
-            }
-        }
-        return Optional.empty();
-    }
 
     /**
      * For tests only
