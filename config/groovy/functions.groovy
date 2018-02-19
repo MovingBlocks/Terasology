@@ -5,6 +5,10 @@ import org.ajoberstar.grgit.Remote
 import groovy.json.JsonSlurper
 
 class functions {
+
+    // For preparing an instance of the target item type utility class we want to work with
+    GroovyObject itemTypeScript
+
     /**
      * Default settings for modules.
      * githubRepo stores the Repository name.
@@ -48,6 +52,11 @@ class functions {
             //Looking for alternative Github Home in gradle properties.
             githubHome = properties.alternativeGithubHome ?: githubRepo
         }
+
+        File itemTypeScriptFile = new File("config/groovy/${type}.groovy")
+        Class targetClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(itemTypeScriptFile)
+        itemTypeScript = (GroovyObject) targetClass.newInstance()
+        itemTypeScript.test()
     }
 
     // For keeping a list of items retrieved so far
