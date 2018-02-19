@@ -23,6 +23,7 @@ import org.mockito.stubbing.Answer;
 import org.terasology.context.Context;
 import org.terasology.context.internal.ContextImpl;
 import org.terasology.engine.modes.loadProcesses.AwaitedLocalCharacterSpawnEvent;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -67,8 +68,12 @@ public class VisualCharacterSystemTest {
         }).when(localPlayer).getClientEntity();
 
         this.entityManager = Mockito.mock(EntityManager.class);
+
+        Mockito.doReturn(Mockito.mock(EntityBuilder.class)).when(entityManager).newBuilder();
+
         context.put(EntityManager.class, this.entityManager);
         InjectionHelper.inject(system, context);
+        system.setCreateAndAttachVisualEntityStrategy((entityBuilder, characterEntity) -> Mockito.mock(EntityRef.class));
 
     }
 

@@ -64,6 +64,8 @@ public class VisualCharacterSystem extends BaseComponentSystem {
 
     private Map<EntityRef, EntityRef> characterToVisualMap = new HashMap<>();
 
+    private VisualEntityBuildAndAttachStrategy createAndAttachVisualEntityStrategy = this::createAndAttachVisualEntity;
+
     @ReceiveEvent(components = VisualCharacterComponent.class)
     public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity) {
         if (!awaitedLocalCharacterSpawn) {
@@ -93,14 +95,23 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         CreateVisualCharacterEvent event = new CreateVisualCharacterEvent(entityManager.newBuilder());
         characterEntity.send(event);
         EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
+        EntityRef visualCharacterEntity = createAndAttachVisualEntityStrategy.createAndAttachVisualEntity(entityBuilder,
+                characterEntity);
+        characterToVisualMap.put(characterEntity, visualCharacterEntity);
+    }
+
+    private EntityRef createAndAttachVisualEntity(EntityBuilder entityBuilder, EntityRef characterEntity) {
         entityBuilder.setPersistent(false);
         entityBuilder.setOwner(characterEntity);
         entityBuilder.addOrSaveComponent(new LocationComponent());
         EntityRef visualCharacterEntity = entityBuilder.build();
 
-
         Location.attachChild(characterEntity, visualCharacterEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
-        characterToVisualMap.put(characterEntity, visualCharacterEntity);
+        return visualCharacterEntity;
+    }
+
+    interface VisualEntityBuildAndAttachStrategy {
+        EntityRef createAndAttachVisualEntity(EntityBuilder entityBuilder, EntityRef characterEntity);
     }
 
     /**
@@ -146,5 +157,12 @@ public class VisualCharacterSystem extends BaseComponentSystem {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * For tests only
+     */
+    void setCreateAndAttachVisualEntityStrategy(VisualEntityBuildAndAttachStrategy createAndAttachVisualEntityStrategy) {
+        this.createAndAttachVisualEntityStrategy = createAndAttachVisualEntityStrategy;
     }
 }
