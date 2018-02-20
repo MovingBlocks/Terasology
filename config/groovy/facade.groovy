@@ -5,4 +5,6 @@ class facade {
         println "I'm the facade script!"
     }
 
+    def excludedItems = ["PC", "TeraEd"]
+
 }

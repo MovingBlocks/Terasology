@@ -5,4 +5,5 @@ class meta {
         println "I'm the meta script!"
     }
 
+    def excludedItems = []
 }

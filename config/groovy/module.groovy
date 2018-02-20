@@ -5,6 +5,8 @@ class module {
         println "I'm the module script!"
     }
 
+    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
+
 }
 
 // TODO: Move the module.txt parsing for dependencies in here since it is unique to this type

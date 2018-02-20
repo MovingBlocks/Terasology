@@ -4,7 +4,7 @@ import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Remote
 import groovy.json.JsonSlurper
 
-class functions {
+class common {
 
     // For preparing an instance of the target item type utility class we want to work with
     GroovyObject itemTypeScript
@@ -17,8 +17,12 @@ class functions {
      */
     def githubRepo = "Terasology"
     def targetDirectory = "modules"
-    def itemType = "Module"
+    def itemType = "module"
     def githubHome = "Terasology"
+
+    // Things we don't want to retrieve/update as they live in the main Terasology repo
+    def excludedItems
+
     /**
      * Main logic for changing the item type.
      * @param type the type to be initialized
@@ -36,18 +40,18 @@ class functions {
         if (type == "meta") {
             githubRepo = "MetaTerasology"
             targetDirectory = "metas"
-            itemType = "Meta"
-            //Looking for alternative Github Home (Meta) in gradle properties.
+            itemType = "meta"
+            //Looking for alternative Github Home (meta) in gradle properties.
             githubHome = properties.alternativeGithubMetaHome ?: githubRepo
         } else {
             if (type == "lib") {
                 githubRepo = "MovingBlocks"
                 targetDirectory = "libs"
-                itemType = "Library"
+                itemType = "library"
             } else if (type == "facade") {
                 githubRepo = "MovingBlocks"
                 targetDirectory = "facades"
-                itemType = "Facade"
+                itemType = "facade"
             }
             //Looking for alternative Github Home in gradle properties.
             githubHome = properties.alternativeGithubHome ?: githubRepo
@@ -57,13 +61,12 @@ class functions {
         Class targetClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(itemTypeScriptFile)
         itemTypeScript = (GroovyObject) targetClass.newInstance()
         itemTypeScript.test()
+
+        excludedItems = itemTypeScript.excludedItems
     }
 
     // For keeping a list of items retrieved so far
     def itemsRetrieved = []
-
-    // Dependencies we don't want to retrieve as they live in the main Terasology repo
-    def excludedDependencies = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
 
     /**
      * Accepts input from the user, showing a descriptive prompt.
@@ -118,11 +121,9 @@ class functions {
             println "We already retrieved $itemName - skipping"
         } else {
             itemsRetrieved << itemName
-            //Special Logic for target URLs. If type is facade, 'Facade' is used as prefix. Same for  Libraries and 'Tera'.
             def targetUrl = "https://github.com/${githubHome}/${itemName}"
-            if (itemType == "Library") {
-                targetUrl = "https://github.com/${githubHome}/Tera${itemName}"
-            } else if (itemType == "Facade") {
+            //Special logic for target URLs. If type is facade, 'Facade' is used as prefix
+            if (itemType == "facade") {
                 targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
             }
             if (!isUrlValid(targetUrl)) {
@@ -147,15 +148,15 @@ class functions {
                 if (!moduleManifest.exists()) {
                     def moduleText = new File("templates/module.txt").text
                     moduleManifest << moduleText.replaceAll('MODULENAME', module)
-                    println "WARNING: Module $itemName did not have a module.txt! One was created, please review and submit to GitHub"
+                    println "WARNING: the module $itemName did not have a module.txt! One was created, please review and submit to GitHub"
                 }
                 //This is only for modules.
                 if (recurse) {
                     def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
                     if (foundDependencies.length == 0) {
-                        println "Module $itemName did not appear to have any dependencies we need to worry about"
+                        println "The module $itemName did not appear to have any dependencies we need to worry about"
                     } else {
-                        println "Module $itemName has the following module dependencies we care about: $foundDependencies"
+                        println "The module $itemName has the following module dependencies we care about: $foundDependencies"
                         String[] uniqueDependencies = foundDependencies - itemsRetrieved
                         println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
                         if (uniqueDependencies.length > 0) {
@@ -182,7 +183,7 @@ class functions {
         def slurper = new JsonSlurper()
         def moduleConfig = slurper.parseText(targetModuleInfo.text)
         for (dependency in moduleConfig.dependencies) {
-            if (excludedDependencies.contains(dependency.id)) {
+            if (excludedItems.contains(dependency.id)) {
                 println "Skipping listed dependency $dependency as it is in the exclude list (shipped with primary project)"
             } else {
                 println "Accepting listed dependency $dependency"

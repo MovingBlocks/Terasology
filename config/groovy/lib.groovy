@@ -5,4 +5,5 @@ class lib {
         println "I'm the lib script!"
     }
 
+    def excludedItems = []
 }
