@@ -62,18 +62,9 @@ public class DownSamplerNode extends ConditionDependentNode {
         addDesiredStateChange(new SetInputTextureFromFbo(0, inputFbo, ColorTexture, inputFboManager,
                 DOWN_SAMPLER_MATERIAL_URN, TEXTURE_NAME));
 
-        setupConditions(context);
-
         addDesiredStateChange(new EnableMaterial(DOWN_SAMPLER_MATERIAL_URN));
         downSampler = getMaterial(DOWN_SAMPLER_MATERIAL_URN);
     }
-
-    /**
-     * This method does nothing. It is meant to be overridden by inheriting classes if needed.
-     * On the other hand, there might be situations in which downsampling should always occur,
-     * in which case this DownSamplerNode class is good as it is.
-     */
-    protected void setupConditions(Context context) { }
 
     /**
      * Processes the input FBO downsampling its color attachment into the color attachment of the output FBO.
