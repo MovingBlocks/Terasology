@@ -53,8 +53,6 @@ public class BlurNode extends ConditionDependentNode {
 
         this.blurRadius = blurRadius;
 
-        setupConditions(context);
-
         this.inputFbo = inputFbo;
         this.outputFbo = outputFbo;
         addDesiredStateChange(new BindFbo(outputFbo));
@@ -63,13 +61,6 @@ public class BlurNode extends ConditionDependentNode {
         addDesiredStateChange(new EnableMaterial(BLUR_MATERIAL_URN));
         this.blurMaterial = getMaterial(BLUR_MATERIAL_URN);
     }
-
-    /**
-     * This method does nothing. It is meant to be overridden by inheriting classes if needed.
-     * On the other hand, there might be situations in which the blur should always occur,
-     * in which case this BlurNode class is good as it is.
-     */
-    protected void setupConditions(Context context) { }
 
     /**
      * Performs the blur.

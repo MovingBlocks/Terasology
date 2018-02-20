@@ -47,17 +47,9 @@ public class HazeNode extends BlurNode {
      */
     public HazeNode(Context context, FBO inputFbo, FBO outputFbo) {
         super(context, inputFbo, outputFbo, BLUR_RADIUS);
-    }
 
-    /**
-     * This method establishes the conditions in which the blur will take place, by enabling or disabling the node.
-     *
-     * In this particular case the node is enabled if RenderingConfig.isInscattering() returns true.
-     */
-    @Override
-    protected void setupConditions(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
+        requiresCondition(renderingConfig::isInscattering);
         renderingConfig.subscribe(RenderingConfig.INSCATTERING, this);
-        requiresCondition(() -> renderingConfig.isInscattering());
     }
 }
