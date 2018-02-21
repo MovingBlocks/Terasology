@@ -770,8 +770,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature,
      * allows developers to hot-swap shaders for easy development.
      *
-     * Usage:
-     *      recompileShaders
+     * To run the command simply type "recompileShaders" and then press Enter in the console.
      */
     @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
@@ -785,7 +784,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      * Usage:
      *      dagCommandNode <nodeUri> <command> <parameters>
      *
-     * Sample Usage:
+     * Example:
      *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
      */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
