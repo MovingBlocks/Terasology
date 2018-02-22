@@ -37,6 +37,8 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
@@ -46,6 +48,7 @@ import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+//import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.ModuleSelectionInfo;
 import org.terasology.rendering.nui.layers.mainMenu.selectModulesScreen.SelectModulesScreen;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
@@ -109,7 +112,6 @@ public class CreateGameScreen extends CoreScreenLayer {
             });
         }
 
-
         final UIText worldName = find("worldName", UIText.class);
         setGameName(worldName);
 
@@ -138,10 +140,20 @@ public class CreateGameScreen extends CoreScreenLayer {
         gameplay.setOptionRenderer(new StringTextRenderer<Module>() {
             @Override
             public String getString(Module value) {
-                return value.getMetadata().getDisplayName().value();
+            	return value.getMetadata().getDisplayName().value();
+            }
+            
+            @Override
+            public void draw(Module value, Canvas canvas)
+            {
+        		canvas.getCurrentStyle().setTextColor(
+        			validateModuleDependencies(value.getId()) 
+        				? Color.WHITE : Color.RED);
+            	super.draw(value, canvas);
+            	canvas.getCurrentStyle().setTextColor(Color.WHITE);
             }
         });
-
+        
         UILabel gameplayDescription = find("gameplayDescription", UILabel.class);
         gameplayDescription.bindText(new ReadOnlyBinding<String>() {
             @Override
@@ -152,7 +164,6 @@ public class CreateGameScreen extends CoreScreenLayer {
                 } else {
                     return "";
                 }
-
             }
         });
 
@@ -211,9 +222,21 @@ public class CreateGameScreen extends CoreScreenLayer {
                     return "";
                 }
             });
+            
+            final UIButton playButton = find("play", UIButton.class);
+            playButton.bindEnabled(new Binding<Boolean>() {
+				@Override
+				public Boolean get() {
+					return validateModuleDependencies(gameplay.getSelection().getId());
+				}
+
+				@Override
+				public void set(Boolean value) {
+					playButton.setEnabled(value);
+				}
+            });
         }
-
-
+        
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         WidgetUtil.trySubscribe(this, "play", button -> {
@@ -271,10 +294,10 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
         });
-
+        
         WidgetUtil.trySubscribe(this, "mods", w -> triggerForwardAnimation(SelectModulesScreen.ASSET_URI));
     }
-
+    
     @Override
     public void onOpened() {
         super.onOpened();
@@ -353,6 +376,11 @@ public class CreateGameScreen extends CoreScreenLayer {
         }
     }
 
+    private boolean validateModuleDependencies(Name moduleName) {
+    	DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+    	return resolver.resolve(moduleName).isSuccess();
+    }
+    
     private void setSelectedGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         if (moduleConfig.getDefaultGameplayModuleName().equals(module.getId().toString())) {
@@ -366,7 +394,7 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         // Set the default generator of the selected gameplay module
         setDefaultGeneratorOfGameplayModule(module);
-
+        
         config.save();
     }
 
