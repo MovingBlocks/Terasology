@@ -256,9 +256,9 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private void initRenderGraph() {
         addGBufferClearingNodes(renderGraph);
 
-        addWorldRenderingNodes(renderGraph);
-
         addSkyNodes(renderGraph);
+
+        addWorldRenderingNodes(renderGraph);
 
         addLightingNodes(renderGraph);
 
@@ -293,44 +293,53 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderGraph.addNode(staleGBufferClearingNode, "staleGBufferClearingNode");
     }
 
-    private void addWorldRenderingNodes(RenderGraph renderGraph) {
-        Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
-
-        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
-        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueObjectsNode);
-
-        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
-        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, opaqueBlocksNode);
-
-        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
-        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, alphaRejectBlocksNode);
-
-        Node overlaysNode = new OverlaysNode(context);
-        renderGraph.addNode(overlaysNode, "overlaysNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, overlaysNode);
-    }
-
     private void addSkyNodes(RenderGraph renderGraph) {
         Node backdropNode = new BackdropNode(context);
         renderGraph.addNode(backdropNode, "backdropNode");
 
-        FBOConfig hazeIntermediateConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeIntermediateFbo = displayResolutionDependentFBOs.request(hazeIntermediateConfig);
+        FBOConfig intermediateHazeConfig = new FBOConfig(HazeNode.INTERMEDIATE_HAZE_FBO_URI, ONE_16TH_SCALE, FBO.Type.DEFAULT);
+        FBO intermediateHazeFbo = displayResolutionDependentFBOs.request(intermediateHazeConfig);
 
-        HazeNode hazeIntermediateNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), hazeIntermediateFbo);
-        renderGraph.addNode(hazeIntermediateNode, "hazeIntermediateNode");
+        HazeNode intermediateHazeNode = new HazeNode(context, displayResolutionDependentFBOs.getGBufferPair().getLastUpdatedFbo(), intermediateHazeFbo);
+        renderGraph.addNode(intermediateHazeNode, "intermediateHazeNode");
 
-        FBOConfig hazeFinalConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
-        FBO hazeFinalFbo = displayResolutionDependentFBOs.request(hazeFinalConfig);
+        FBOConfig finalHazeConfig = new FBOConfig(HazeNode.FINAL_HAZE_FBO_URI, ONE_32TH_SCALE, FBO.Type.DEFAULT);
+        FBO finalHazeFbo = displayResolutionDependentFBOs.request(finalHazeConfig);
 
-        HazeNode hazeFinalNode = new HazeNode(context, hazeIntermediateFbo, hazeFinalFbo);
-        renderGraph.addNode(hazeFinalNode, "hazeFinalNode");
+        HazeNode finalHazeNode = new HazeNode(context, intermediateHazeFbo, finalHazeFbo);
+        renderGraph.addNode(finalHazeNode, "finalHazeNode");
 
         Node lastUpdatedGBufferClearingNode = renderGraph.findNode("engine:lastUpdatedGBufferClearingNode");
-        renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, hazeIntermediateNode, hazeFinalNode);
+        renderGraph.connect(lastUpdatedGBufferClearingNode, backdropNode, intermediateHazeNode, finalHazeNode);
+    }
+
+    private void addWorldRenderingNodes(RenderGraph renderGraph) {
+        /* Ideally, world rendering nodes only depend on the gBufferClearingNode. However,
+        since the haze is produced by blurring the content of the gBuffer and we only want
+        the sky color to contribute  to the haze, the world rendering nodes need to run
+        after finalHazeNode, so that the landscape and other meshes are not part of the haze.
+
+        Strictly speaking however, it is only the hazeIntermediateNode that should be processed
+        before the world rendering nodes. Here we have chosen to also ensure that finalHazeNode is
+        processed before the world rendering nodes - not because it's necessary, but to keep all
+        the haze-related nodes together. */
+        Node finalHazeNode = renderGraph.findNode("engine:finalHazeNode");
+
+        Node opaqueObjectsNode = new OpaqueObjectsNode(context);
+        renderGraph.addNode(opaqueObjectsNode, "opaqueObjectsNode");
+        renderGraph.connect(finalHazeNode, opaqueObjectsNode);
+
+        Node opaqueBlocksNode = new OpaqueBlocksNode(context);
+        renderGraph.addNode(opaqueBlocksNode, "opaqueBlocksNode");
+        renderGraph.connect(finalHazeNode, opaqueBlocksNode);
+
+        Node alphaRejectBlocksNode = new AlphaRejectBlocksNode(context);
+        renderGraph.addNode(alphaRejectBlocksNode, "alphaRejectBlocksNode");
+        renderGraph.connect(finalHazeNode, alphaRejectBlocksNode);
+
+        Node overlaysNode = new OverlaysNode(context);
+        renderGraph.addNode(overlaysNode, "overlaysNode");
+        renderGraph.connect(finalHazeNode, overlaysNode);
     }
 
     private void addLightingNodes(RenderGraph renderGraph) {
@@ -428,7 +437,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         // and then it's 2D post-processing all the way to the image shown on the display.
 
         Node overlaysNode = renderGraph.findNode("engine:overlaysNode");
-        Node hazeFinalNode = renderGraph.findNode("engine:hazeFinalNode");
+        Node finalHazeNode = renderGraph.findNode("engine:finalHazeNode");
         Node chunksRefractiveReflectiveNode = renderGraph.findNode("engine:chunksRefractiveReflectiveNode");
         Node applyDeferredLightingNode = renderGraph.findNode("engine:applyDeferredLightingNode");
         Node outlineNode = renderGraph.findNode("engine:outlineNode");
@@ -437,7 +446,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         Node prePostCompositeNode = new PrePostCompositeNode(context);
         renderGraph.addNode(prePostCompositeNode, "prePostCompositeNode");
         renderGraph.connect(overlaysNode, prePostCompositeNode);
-        renderGraph.connect(hazeFinalNode, prePostCompositeNode);
+        renderGraph.connect(finalHazeNode, prePostCompositeNode);
         renderGraph.connect(chunksRefractiveReflectiveNode, prePostCompositeNode);
         renderGraph.connect(applyDeferredLightingNode, prePostCompositeNode);
         renderGraph.connect(outlineNode, prePostCompositeNode);
