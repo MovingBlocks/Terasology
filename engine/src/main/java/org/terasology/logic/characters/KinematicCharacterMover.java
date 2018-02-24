@@ -689,8 +689,8 @@ public class KinematicCharacterMover implements CharacterMover {
                 endVelocity.y = -0.0f * endVelocity.y;
             }
 
-            // Jump again in mid-air only if a jump was requested and there are jumps remaining.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
+            // Jump again in mid-air only if a jump was requested and there are jumps remaining and current movement mode can be grounded.
+            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0 && movementComp.mode.canBeGrounded) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.
