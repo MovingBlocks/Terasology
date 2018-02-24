@@ -52,6 +52,8 @@ public class DownSamplerNode extends ConditionDependentNode {
      */
     public DownSamplerNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                             FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
+        super(context);
+
         FBO inputFbo = requiresFBO(inputFboConfig, inputFboManager);
         outputFbo = requiresFBO(outputFboConfig, outputFboManager);
 

@@ -16,7 +16,10 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.collect.Lists;
+import org.terasology.context.Context;
+import org.terasology.rendering.world.WorldRenderer;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.function.Supplier;
@@ -24,8 +27,14 @@ import java.util.function.Supplier;
 /**
  * TODO: Add javadocs
  */
-public abstract class ConditionDependentNode extends AbstractNode {
+public abstract class ConditionDependentNode extends AbstractNode implements PropertyChangeListener {
     private List<Supplier<Boolean>> conditions = Lists.newArrayList();
+
+    protected WorldRenderer worldRenderer;
+
+    protected ConditionDependentNode(Context context) {
+        worldRenderer = context.get(WorldRenderer.class);
+    }
 
     protected void requiresCondition(Supplier<Boolean> condition) {
         conditions.add(condition);
@@ -42,5 +51,10 @@ public abstract class ConditionDependentNode extends AbstractNode {
     @Override
     public boolean isEnabled() {
         return enabled && checkConditions();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

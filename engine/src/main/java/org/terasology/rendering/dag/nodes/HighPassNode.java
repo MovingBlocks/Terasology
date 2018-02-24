@@ -31,10 +31,6 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -44,7 +40,7 @@ import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
  * An instance of this class generates a high pass image out of the color content of the GBUFFER and stores
  * the result into HIGH_PASS_FBO_URI, for other nodes to take advantage of it.
  */
-public class HighPassNode extends ConditionDependentNode implements PropertyChangeListener {
+public class HighPassNode extends ConditionDependentNode {
     public static final SimpleUri HIGH_PASS_FBO_URI = new SimpleUri("engine:fbo.highPass");
     public static final FBOConfig HIGH_PASS_FBO_CONFIG = new FBOConfig(HIGH_PASS_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT);
     private static final ResourceUrn HIGH_PASS_MATERIAL_URN = new ResourceUrn("engine:prog.highPass");
@@ -53,12 +49,10 @@ public class HighPassNode extends ConditionDependentNode implements PropertyChan
     @Range(min = 0.0f, max = 5.0f)
     private float highPassThreshold = 0.05f;
 
-    private WorldRenderer worldRenderer;
-
     private Material highPass;
 
     public HighPassNode(Context context) {
-        worldRenderer = context.get(WorldRenderer.class);
+        super(context);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
@@ -92,10 +86,5 @@ public class HighPassNode extends ConditionDependentNode implements PropertyChan
         renderFullscreenQuad();
 
         PerformanceMonitor.endActivity();
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-        worldRenderer.requestTaskListRefresh();
     }
 }

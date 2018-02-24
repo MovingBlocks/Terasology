@@ -28,11 +28,7 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
@@ -43,14 +39,13 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs.FINAL_BUFFER;
 
-public class OutputToHMDNode extends ConditionDependentNode implements PropertyChangeListener {
+public class OutputToHMDNode extends ConditionDependentNode {
     private static final SimpleUri LEFT_EYE_FBO_URI = new SimpleUri("engine:fbo.leftEye");
     private static final SimpleUri RIGHT_EYE_FBO_URI = new SimpleUri("engine:fbo.rightEye");
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
     // TODO: make these configurable options
 
     private OpenVRProvider vrProvider;
-    private WorldRenderer worldRenderer;
 
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
@@ -61,13 +56,15 @@ public class OutputToHMDNode extends ConditionDependentNode implements PropertyC
      * information for the vrProvider to use.
      */
     public OutputToHMDNode(Context context) {
+        super(context);
+
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
 
+        // TODO: Consider reworking this, since it might cause problems later, when we support switching vr in-game.
         if (this.isEnabled()) {
-            worldRenderer = context.get(WorldRenderer.class);
-
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
             leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
@@ -124,10 +121,5 @@ public class OutputToHMDNode extends ConditionDependentNode implements PropertyC
         // because it assumes that FBO 0 is bound before this node is run.
         // TODO: break this node into two different nodes that use addDesiredStateChange(BindFbo...))
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-        worldRenderer.requestTaskListRefresh();
     }
 }

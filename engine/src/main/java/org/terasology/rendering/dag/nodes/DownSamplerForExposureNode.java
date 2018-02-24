@@ -22,10 +22,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
-import org.terasology.rendering.world.WorldRenderer;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * Extends the DownSamplerNode class adding setup conditions and fbo configs needed to calculate the exposure value.
@@ -37,14 +33,12 @@ import java.beans.PropertyChangeListener;
  * Once the rendering achieved so far has been downsampled to a 1x1 pixel image the RGB values of the pixel effectively
  * encode the average brightness of the rendering, which in turn is used to tweak the exposure parameter later nodes use.
  */
-public class DownSamplerForExposureNode extends DownSamplerNode implements PropertyChangeListener {
+public class DownSamplerForExposureNode extends DownSamplerNode {
     public static final FBOConfig FBO_16X16_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.16x16px"), 16, 16, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_8X8_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.8x8px"), 8, 8, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_4X4_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.4x4px"), 4, 4, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_2X2_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.2x2px"), 2, 2, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
-
-    private WorldRenderer worldRenderer;
 
     public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                                         FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
@@ -61,11 +55,5 @@ public class DownSamplerForExposureNode extends DownSamplerNode implements Prope
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.EYE_ADAPTATION, this);
         requiresCondition(renderingConfig::isEyeAdaptation);
-        worldRenderer = context.get(WorldRenderer.class);
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-        worldRenderer.requestTaskListRefresh();
     }
 }

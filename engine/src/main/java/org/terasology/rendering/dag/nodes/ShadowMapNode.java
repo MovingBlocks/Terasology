@@ -37,7 +37,6 @@ import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
@@ -67,7 +66,6 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
     private RenderQueuesHelper renderQueues;
 
@@ -75,10 +73,11 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
     private float texelSize;
 
     public ShadowMapNode(Context context) {
+        super(context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         renderingConfig = context.get(Config.class).getRendering();
-        worldRenderer = context.get(WorldRenderer.class);
 
         activeCamera = worldRenderer.getActiveCamera();
 
@@ -118,7 +117,7 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
 
         switch (propertyName) {
             case RenderingConfig.DYNAMIC_SHADOWS:
-                worldRenderer.requestTaskListRefresh();
+                super.propertyChange(event);
                 break;
 
             case RenderingConfig.SHADOW_MAP_RESOLUTION:
