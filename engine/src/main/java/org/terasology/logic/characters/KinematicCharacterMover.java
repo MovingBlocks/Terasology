@@ -612,6 +612,11 @@ public class KinematicCharacterMover implements CharacterMover {
             climb(state, input, desiredVelocity);
         }
 
+        // If swimming or diving, cancel double jump to avoid jumping underwater and on the surface
+        if (movementComp.mode == MovementMode.SWIMMING || movementComp.mode == MovementMode.DIVING) {
+            movementComp.numberOfJumpsLeft = 0;
+        }
+
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
@@ -689,8 +694,8 @@ public class KinematicCharacterMover implements CharacterMover {
                 endVelocity.y = -0.0f * endVelocity.y;
             }
 
-            // Jump again in mid-air only if a jump was requested and there are jumps remaining and current movement mode can be grounded.
-            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0 && movementComp.mode.canBeGrounded) {
+            // Jump again in mid-air only if a jump was requested and there are jumps remaining.
+            if (input.isJumpRequested() && movementComp.numberOfJumpsLeft > 0) {
                 state.setGrounded(false);
 
                 // Send event to allow for other systems to modify the jump force.
