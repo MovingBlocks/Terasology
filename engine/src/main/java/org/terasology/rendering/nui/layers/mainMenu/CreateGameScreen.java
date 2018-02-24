@@ -139,20 +139,18 @@ public class CreateGameScreen extends CoreScreenLayer {
         gameplay.setOptionRenderer(new StringTextRenderer<Module>() {
             @Override
             public String getString(Module value) {
-            	return value.getMetadata().getDisplayName().value();
+                return value.getMetadata().getDisplayName().value();
             }
-            
+
             @Override
-            public void draw(Module value, Canvas canvas)
-            {
-        		canvas.getCurrentStyle().setTextColor(
-        			validateModuleDependencies(value.getId()) 
-        				? Color.WHITE : Color.RED);
-            	super.draw(value, canvas);
-            	canvas.getCurrentStyle().setTextColor(Color.WHITE);
+            public void draw(Module value, Canvas canvas) {
+                canvas.getCurrentStyle()
+                        .setTextColor(validateModuleDependencies(value.getId()) ? Color.WHITE : Color.RED);
+                super.draw(value, canvas);
+                canvas.getCurrentStyle().setTextColor(Color.WHITE);
             }
         });
-        
+
         UILabel gameplayDescription = find("gameplayDescription", UILabel.class);
         gameplayDescription.bindText(new ReadOnlyBinding<String>() {
             @Override
@@ -166,13 +164,15 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         });
 
-        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerator", UIDropdownScrollable.class);
+        final UIDropdownScrollable<WorldGeneratorInfo> worldGenerator = find("worldGenerator",
+                UIDropdownScrollable.class);
         if (worldGenerator != null) {
             worldGenerator.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
                 @Override
                 public List<WorldGeneratorInfo> get() {
                     // grab all the module names and their dependencies
-                    // This grabs modules from `config.getDefaultModSelection()` which is updated in SelectModulesScreen
+                    // This grabs modules from `config.getDefaultModSelection()` which is updated in
+                    // SelectModulesScreen
                     Set<Name> enabledModuleNames = getAllEnabledModuleNames().stream().collect(Collectors.toSet());
                     List<WorldGeneratorInfo> result = Lists.newArrayList();
                     for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
@@ -188,8 +188,10 @@ public class CreateGameScreen extends CoreScreenLayer {
             worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
-                    // get the default generator from the config.  This is likely to have  a user triggered selection.
-                    WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
+                    // get the default generator from the config. This is likely to have a user
+                    // triggered selection.
+                    WorldGeneratorInfo info = worldGeneratorManager
+                            .getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
                     if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
                         return info;
                     }
@@ -221,28 +223,29 @@ public class CreateGameScreen extends CoreScreenLayer {
                     return "";
                 }
             });
-            
+
             final UIButton playButton = find("play", UIButton.class);
             playButton.bindEnabled(new Binding<Boolean>() {
-				@Override
-				public Boolean get() {
-					return validateModuleDependencies(gameplay.getSelection().getId());
-				}
+                @Override
+                public Boolean get() {
+                    return validateModuleDependencies(gameplay.getSelection().getId());
+                }
 
-				@Override
-				public void set(Boolean value) {
-					playButton.setEnabled(value);
-				}
+                @Override
+                public void set(Boolean value) {
+                    playButton.setEnabled(value);
+                }
             });
         }
-        
+
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (worldGenerator.getSelection() == null) {
                 MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                 if (errorMessagePopup != null) {
-                    errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
+                    errorMessagePopup.setMessage("No World Generator Selected",
+                            "Select a world generator (you may need to activate a mod with a generator first).");
                 }
             } else {
                 GameManifest gameManifest = new GameManifest();
@@ -252,9 +255,11 @@ public class CreateGameScreen extends CoreScreenLayer {
                 DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
                 ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
                 if (!result.isSuccess()) {
-                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI,
+                            MessagePopup.class);
                     if (errorMessagePopup != null) {
-                        errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+                        errorMessagePopup.setMessage("Invalid Module Selection",
+                                "Please review your module seleciton and try again");
                     }
                     return;
                 }
@@ -262,12 +267,13 @@ public class CreateGameScreen extends CoreScreenLayer {
                     gameManifest.addModule(module.getId(), module.getVersion());
                 }
 
-                float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+                float timeOffset = 0.25f + 0.025f; // Time at dawn + little offset to spawn in a brighter env.
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                         (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                 gameManifest.addWorld(worldInfo);
 
-                gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+                gameEngine.changeState(new StateLoading(gameManifest,
+                        (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
             }
         });
 
@@ -293,10 +299,10 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
         });
-        
+
         WidgetUtil.trySubscribe(this, "mods", w -> triggerForwardAnimation(SelectModulesScreen.ASSET_URI));
     }
-    
+
     @Override
     public void onOpened() {
         super.onOpened();
@@ -308,9 +314,11 @@ public class CreateGameScreen extends CoreScreenLayer {
         String configDefaultModuleName = config.getDefaultModSelection().getDefaultGameplayModuleName();
         String useThisModuleName = "";
 
-        // Get the default gameplay module from the config if it exists. This is likely to have a user triggered selection.
+        // Get the default gameplay module from the config if it exists. This is likely
+        // to have a user triggered selection.
         // Otherwise, default to DEFAULT_GAME_TEMPLATE_NAME.
-        if ("".equalsIgnoreCase(configDefaultModuleName) || DEFAULT_GAME_TEMPLATE_NAME.equalsIgnoreCase(configDefaultModuleName)) {
+        if ("".equalsIgnoreCase(configDefaultModuleName)
+                || DEFAULT_GAME_TEMPLATE_NAME.equalsIgnoreCase(configDefaultModuleName)) {
             useThisModuleName = DEFAULT_GAME_TEMPLATE_NAME;
         } else {
             useThisModuleName = configDefaultModuleName;
@@ -376,10 +384,10 @@ public class CreateGameScreen extends CoreScreenLayer {
     }
 
     private boolean validateModuleDependencies(Name moduleName) {
-    	DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
-    	return resolver.resolve(moduleName).isSuccess();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        return resolver.resolve(moduleName).isSuccess();
     }
-    
+
     private void setSelectedGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         if (moduleConfig.getDefaultGameplayModuleName().equals(module.getId().toString())) {
@@ -393,11 +401,12 @@ public class CreateGameScreen extends CoreScreenLayer {
 
         // Set the default generator of the selected gameplay module
         setDefaultGeneratorOfGameplayModule(module);
-        
+
         config.save();
     }
 
-    // Sets the default generator of the passed in gameplay module. Make sure it's already selected.
+    // Sets the default generator of the passed in gameplay module. Make sure it's
+    // already selected.
     private void setDefaultGeneratorOfGameplayModule(Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
 
@@ -424,8 +433,8 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
         }
-        Collections.sort(gameplayModules, (o1, o2) ->
-                o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value()));
+        Collections.sort(gameplayModules, (o1, o2) -> o1.getMetadata().getDisplayName().value()
+                .compareTo(o2.getMetadata().getDisplayName().value()));
 
         return gameplayModules;
     }
