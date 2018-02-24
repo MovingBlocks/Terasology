@@ -45,17 +45,9 @@ public class BloomBlurNode extends BlurNode {
      */
     public BloomBlurNode(Context context, FBO inputFbo, FBO outputFbo) {
         super(context, inputFbo, outputFbo, BLUR_RADIUS);
-    }
 
-    /**
-     * This method establishes the conditions in which the blur will take place, by enabling or disabling the node.
-     *
-     * In this particular case the node is enabled if RenderingConfig.isBloom is true.
-     */
-    @Override
-    protected void setupConditions(Context context) {
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
-        renderingConfig.subscribe(RenderingConfig.BLOOM, this);
         requiresCondition(renderingConfig::isBloom);
+        renderingConfig.subscribe(RenderingConfig.BLOOM, this);
     }
 }

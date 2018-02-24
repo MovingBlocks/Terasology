@@ -54,19 +54,12 @@ public class LateBlurNode extends BlurNode implements PropertyChangeListener {
      */
     public LateBlurNode(Context context, FBO inputFbo, FBO outputFbo) {
         super(context, inputFbo, outputFbo, 0); // note: blurRadius is 0.0 at this stage.
-        updateBlurRadius(); // only here blurRadius is properly set.
-    }
 
-    /**
-     * This method establishes the conditions in which the blur will take place, by enabling or disabling the node.
-     *
-     * In this particular case the node is enabled if RenderingConfig.getBlurIntensity is not 0 - or blur is enabled.
-     */
-    @Override
-    protected void setupConditions(Context context) {
         renderingConfig = context.get(Config.class).getRendering();
+        requiresCondition(() -> renderingConfig.getBlurIntensity() != 0); // getBlurIntensity > 0 implies blur is enabled.
         renderingConfig.subscribe(RenderingConfig.BLUR_INTENSITY, this);
-        requiresCondition(() -> renderingConfig.getBlurIntensity() != 0);
+
+        updateBlurRadius(); // only here blurRadius is properly set.
     }
 
     @Override
