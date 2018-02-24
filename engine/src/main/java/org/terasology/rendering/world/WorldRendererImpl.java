@@ -22,8 +22,9 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.permission.PermissionManager;
@@ -119,10 +120,9 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
 @RegisterSystem
-public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
-
+public final class WorldRendererImpl implements WorldRenderer {
     /*
-     * presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
+     * Presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
@@ -137,7 +137,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private final ShaderManager shaderManager;
     private final SubmersibleCamera playerCamera;
 
-    // TODO: @In
     private final OpenVRProvider vrProvider;
 
     private float timeSmoothedMainLightIntensity;
@@ -150,6 +149,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
+    private final Console console;
 
     private RenderTaskListGenerator renderTaskListGenerator;
     private boolean requestedTaskListRefresh;
@@ -159,22 +159,6 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
     private ImmutableFBOs immutableFBOs;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
     private ShadowMapResolutionDependentFBOs shadowMapResolutionDependentFBOs;
-
-    // Required for ComponentSystem to register the system (via @RegisterSystem).
-    // @RegisterSystem requires a default constructor, and since we have final variables in the class,
-    // it was essential to set them to some value (in this case, null) in this constructor.
-    // Note that this constructor shouldn't be actually used normally anywhere in code.
-    public WorldRendererImpl() {
-        renderingConfig = null;
-        vrProvider = null;
-        renderQueues = null;
-        context = null;
-        backdropProvider = null;
-        worldProvider = null;
-        renderableWorld = null;
-        shaderManager = null;
-        playerCamera = null;
-    }
 
     /**
      * Instantiates a WorldRenderer implementation.
@@ -198,6 +182,7 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         this.backdropProvider = context.get(BackdropProvider.class);
         this.renderingConfig = context.get(Config.class).getRendering();
         this.shaderManager = context.get(ShaderManager.class);
+        // TODO: Instantiate the VR provider at a more reasonable location, and just obtain it via context here.
         vrProvider = OpenVRProvider.getInstance();
         if (renderingConfig.isVrSupport()) {
             context.put(OpenVRProvider.class, vrProvider);
@@ -231,6 +216,9 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         renderQueues = renderableWorld.getRenderQueues();
 
         initRenderingSupport();
+
+        console = context.get(Console.class);
+        MethodCommand.registerAvailable(this, console, context);
     }
 
     private void initRenderingSupport() {
@@ -789,34 +777,29 @@ public final class WorldRendererImpl implements WorldRenderer, ComponentSystem {
         return currentRenderingStage;
     }
 
+    /**
+     * Forces a recompilation of all shaders. This command, backed by Gestalt's monitoring feature,
+     * allows developers to hot-swap shaders for easy development.
+     *
+     * To run the command simply type "recompileShaders" and then press Enter in the console.
+     */
+    @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
+        console.addMessage("Recompiling shaders... ");
         shaderManager.recompileAllShaders();
+        console.addMessage("done!");
     }
 
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void preBegin() {
-    }
-
-    @Override
-    public void postBegin() {
-    }
-
-    @Override
-    public void preSave() {
-    }
-
-    @Override
-    public void postSave() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
+    /**
+     * Acts as an interface between the console and the Nodes. All parameters passed to command are redirected to the
+     * concerned Nodes, which in turn take care of executing them.
+     *
+     * Usage:
+     *      dagCommandNode <nodeUri> <command> <parameters>
+     *
+     * Example:
+     *      dagNodeCommand engine:outputToScreenNode setFbo engine:fbo.ssao
+     */
     @Command(shortDescription = "Debugging command for DAG.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void dagNodeCommand(@CommandParam("nodeUri") final String nodeUri, @CommandParam("command") final String command, @CommandParam(value= "arguments") final String... arguments) {
         Node node = renderGraph.findNode(nodeUri);
