@@ -114,7 +114,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
         addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
         displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
 
-        retrieveFboDimentions();
+        retrieveFboDimensions();
 
         // TODO: check for input textures brought in by the material
 
@@ -166,14 +166,14 @@ public class AmbientOcclusionNode extends ConditionDependentNode {
                 break;
 
             case POST_FBO_REGENERATION:
-                retrieveFboDimentions();
+                retrieveFboDimensions();
                 break;
 
             // default: no other cases are possible - see subscribe operations in initialize().
         }
     }
 
-    private void retrieveFboDimentions() {
+    private void retrieveFboDimensions() {
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }
