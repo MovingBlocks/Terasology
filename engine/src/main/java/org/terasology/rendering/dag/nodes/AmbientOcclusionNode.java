@@ -38,13 +38,11 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.Assets;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Optional;
@@ -72,7 +70,7 @@ import static org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBO
  *
  * See http://en.wikipedia.org/wiki/Ambient_occlusion for more information on this technique.
  */
-public class AmbientOcclusionNode extends ConditionDependentNode implements PropertyChangeListener {
+public class AmbientOcclusionNode extends ConditionDependentNode {
     public static final SimpleUri SSAO_FBO_URI = new SimpleUri("engine:fbo.ssao");
     public static final int SSAO_KERNEL_ELEMENTS = 32;
     public static final int SSAO_NOISE_SIZE = 4;
@@ -101,7 +99,7 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
     public AmbientOcclusionNode(Context context) {
         super(context);
 
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        activeCamera = worldRenderer.getActiveCamera();
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);
@@ -114,8 +112,9 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
         ssaoFbo = requiresFBO(new FBOConfig(SSAO_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT), displayResolutionDependentFBOs);
         addDesiredStateChange(new BindFbo(ssaoFbo));
         addDesiredStateChange(new SetViewportToSizeOf(ssaoFbo));
-        propertyChange(null); // Cheeky way to initialise outputFboWidth, outputFboHeight
         displayResolutionDependentFBOs.subscribe(POST_FBO_REGENERATION, this);
+
+        retrieveFboDimensions();
 
         // TODO: check for input textures brought in by the material
 
@@ -159,8 +158,22 @@ public class AmbientOcclusionNode extends ConditionDependentNode implements Prop
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        // The only property we are subscribing to is DisplayResolutionDependentFBOs.POST_FBO_REGENERATION,
-        // which means there is no need to check or process the event object.
+        String propertyName = event.getPropertyName();
+
+        switch (propertyName) {
+            case RenderingConfig.SSAO:
+                super.propertyChange(event);
+                break;
+
+            case POST_FBO_REGENERATION:
+                retrieveFboDimensions();
+                break;
+
+            // default: no other cases are possible - see subscribe operations in initialize().
+        }
+    }
+
+    private void retrieveFboDimensions() {
         outputFboWidth = ssaoFbo.width();
         outputFboHeight = ssaoFbo.height();
     }

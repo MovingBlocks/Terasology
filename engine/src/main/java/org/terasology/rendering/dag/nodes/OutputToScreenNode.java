@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -40,7 +39,6 @@ public class OutputToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-    private WorldRenderer worldRenderer;
 
     private FBO lastUpdatedGBuffer;
     private FBO staleGBuffer;
@@ -51,7 +49,6 @@ public class OutputToScreenNode extends ConditionDependentNode {
         super(context);
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 

@@ -72,6 +72,8 @@ public class LateBlurNode extends BlurNode implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         updateBlurRadius();
+        // Changing the blurRadius can potentially enable/disable the Node, meaning we have to refresh the taskList.
+        super.propertyChange(event);
     }
 
     private void updateBlurRadius() {

@@ -41,12 +41,10 @@ import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.terasology.rendering.dag.nodes.BackdropReflectionNode.REFLECTED_FBO_URI;
@@ -67,11 +65,10 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/1Iz7MA8Y5q7yjxxcgZW-0antv5kgx6NYkvoInielbwGU/edit?usp=sharing
  */
-public class WorldReflectionNode extends ConditionDependentNode implements PropertyChangeListener {
+public class WorldReflectionNode extends ConditionDependentNode {
     private static final ResourceUrn CHUNK_MATERIAL_URN = new ResourceUrn("engine:prog.chunk");
 
     private RenderQueuesHelper renderQueues;
-    private WorldRenderer worldRenderer;
     private BackdropProvider backdropProvider;
     private WorldProvider worldProvider;
 
@@ -109,7 +106,6 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);
 
-        worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new ReflectedCamera(activeCamera)); // this has to go before the LookThrough state change
         addDesiredStateChange(new LookThrough(activeCamera));
@@ -222,7 +218,6 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
 
         switch (propertyName) {
             case RenderingConfig.REFLECTIVE_WATER:
-                requiresCondition(() -> renderingConfig.isReflectiveWater());
                 break;
 
             case RenderingConfig.NORMAL_MAPPING:
@@ -254,6 +249,6 @@ public class WorldReflectionNode extends ConditionDependentNode implements Prope
             // default: no other cases are possible - see subscribe operations in initialize().
         }
 
-        worldRenderer.requestTaskListRefresh();
+        super.propertyChange(event);
     }
 }

@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 public abstract class ConditionDependentNode extends AbstractNode implements PropertyChangeListener {
     private List<Supplier<Boolean>> conditions = Lists.newArrayList();
 
-    private WorldRenderer worldRenderer;
+    protected WorldRenderer worldRenderer;
 
     protected ConditionDependentNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -38,7 +38,6 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
 
     protected void requiresCondition(Supplier<Boolean> condition) {
         conditions.add(condition);
-        checkConditions(); // TODO: better to remove this in near feature
     }
 
     private boolean checkConditions() {
@@ -46,23 +45,16 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
         for (Supplier<Boolean> condition : conditions) {
             conditionsAreSatisfied = conditionsAreSatisfied && condition.get();
         }
-
-        if (conditionsAreSatisfied != isEnabled()) {
-            setEnabled(conditionsAreSatisfied);
-            // enabling/disabling here means we cannot enable/disable nodes directly:
-            // we must always go through the settings.
-            return true;
-        } else {
-            return false;
-        }
-
+        return conditionsAreSatisfied;
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        boolean conditionsChanged = checkConditions();
-        if (conditionsChanged) {
-            worldRenderer.requestTaskListRefresh();
-        }
+    public boolean isEnabled() {
+        return enabled && checkConditions();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        worldRenderer.requestTaskListRefresh();
     }
 }

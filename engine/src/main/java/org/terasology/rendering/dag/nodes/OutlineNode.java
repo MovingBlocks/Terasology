@@ -31,7 +31,6 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.DepthStencilTexture;
 import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
@@ -67,7 +66,7 @@ public class OutlineNode extends ConditionDependentNode {
     public OutlineNode(Context context) {
         super(context);
 
-        activeCamera = context.get(WorldRenderer.class).getActiveCamera();
+        activeCamera = worldRenderer.getActiveCamera();
 
         renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.OUTLINE, this);
