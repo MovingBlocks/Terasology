@@ -149,6 +149,7 @@ public final class WorldRendererImpl implements WorldRenderer {
     private int statRenderedTriangles;
 
     private final RenderingConfig renderingConfig;
+    private final Console console;
 
     private RenderTaskListGenerator renderTaskListGenerator;
     private boolean requestedTaskListRefresh;
@@ -216,7 +217,8 @@ public final class WorldRendererImpl implements WorldRenderer {
 
         initRenderingSupport();
 
-        MethodCommand.registerAvailable(this, context.get(Console.class), context);
+        console = context.get(Console.class);
+        MethodCommand.registerAvailable(this, console, context);
     }
 
     private void initRenderingSupport() {
@@ -774,7 +776,9 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
+        console.addMessage("Recompiling shaders..");
         shaderManager.recompileAllShaders();
+        console.addMessage("Done!");
     }
 
     /**
