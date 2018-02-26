@@ -36,9 +36,6 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * This system is responsible for sending a {@link CreateVisualCharacterEvent} according to how it is specified in
  * {@link VisualCharacterComponent}. It also provides a default handling for {@link CreateVisualCharacterEvent} that
@@ -57,12 +54,11 @@ public class VisualCharacterSystem extends BaseComponentSystem {
 
     private boolean awaitedLocalCharacterSpawn = false;
 
-    private Map<EntityRef, EntityRef> characterToVisualMap = new HashMap<>();
-
     private VisualEntityBuildAndAttachStrategy createAndAttachVisualEntityStrategy = this::createAndAttachVisualEntity;
 
-    @ReceiveEvent(components = VisualCharacterComponent.class)
-    public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity) {
+    @ReceiveEvent
+    public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity,
+                                           VisualCharacterComponent visualCharacterComponent) {
         if (!awaitedLocalCharacterSpawn) {
             /*
              * Before character has spawned localPlayer is not properly initialized
@@ -70,19 +66,17 @@ public class VisualCharacterSystem extends BaseComponentSystem {
              */
             return;
         }
-        createVisualCharacterIfNotOwnCharacter(entity);
+        createVisualCharacterIfNotOwnCharacter(entity, visualCharacterComponent);
     }
 
 
     @ReceiveEvent(components = {VisualCharacterComponent.class})
-    public void onBeforeDeactivatedVisualCharacter(BeforeDeactivateComponent event, EntityRef entity) {
-        EntityRef visualCharacter = characterToVisualMap.remove(entity);
-        if (visualCharacter != null) {
-            visualCharacter.destroy();
-        }
+    public void onBeforeDeactivatedVisualCharacter(BeforeDeactivateComponent event, EntityRef entity,
+                                                   VisualCharacterComponent visualCharacterComponent) {
+        visualCharacterComponent.visualCharacter.destroy();
     }
 
-    void createVisualCharacterIfNotOwnCharacter(EntityRef characterEntity) {
+    void createVisualCharacterIfNotOwnCharacter(EntityRef characterEntity, VisualCharacterComponent visualCharacterComponent) {
         boolean isCharacterOfLocalPlayer = characterEntity.getOwner().equals(localPlayer.getClientEntity());
         if (isCharacterOfLocalPlayer) {
             return;
@@ -92,7 +86,9 @@ public class VisualCharacterSystem extends BaseComponentSystem {
         EntityBuilder entityBuilder = event.getVisualCharacterBuilder();
         EntityRef visualCharacterEntity = createAndAttachVisualEntityStrategy.createAndAttachVisualEntity(entityBuilder,
                 characterEntity);
-        characterToVisualMap.put(characterEntity, visualCharacterEntity);
+
+        visualCharacterComponent.visualCharacter = visualCharacterEntity;
+        characterEntity.saveComponent(visualCharacterComponent);
     }
 
     private EntityRef createAndAttachVisualEntity(EntityBuilder entityBuilder, EntityRef characterEntity) {
@@ -112,14 +108,14 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     /**
      * Handles the local character spawn  event by doing the work that had to be delayed till then:
      * The CreateVisualCharacterEvent events that could not be sent previously will be sent.
-     * (They could not be sent earlier as we need to know if the cahracter belongs to the local player or not
+     * (They could not be sent earlier as we need to know if the character belongs to the local player or not
      * which can't be determined if the created/loaded character has not been linked to the player yet)
      */
     @ReceiveEvent
     public void onAwaitedLocalCharacterSpawnEvent(AwaitedLocalCharacterSpawnEvent event, EntityRef entity) {
         awaitedLocalCharacterSpawn = true;
         for (EntityRef character: entityManager.getEntitiesWith(VisualCharacterComponent.class)) {
-            createVisualCharacterIfNotOwnCharacter(character);
+            createVisualCharacterIfNotOwnCharacter(character, entity.getComponent(VisualCharacterComponent.class));
         }
     }
 

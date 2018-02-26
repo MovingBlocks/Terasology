@@ -16,27 +16,23 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityBuilder;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.logic.characters.VisualCharacterComponent;
-import org.terasology.logic.location.Location;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
- * Send to the character entities when a visual represenation of it should be created for them: The event will be send
+ * Sent to the character entities when a visual represenation of it should be created for them: The event will be send
  * to characters that have the {@link VisualCharacterComponent}.
  *
  * When you want to create a new type of visual character just create a handler for this event and consume it.
- * The handler should create the visual represenation of the character.
+ * The handler should create the visual represenation of the character via the builder provided by the even.t
  *
- * Typically it is a client system (as headless server needs no visuals) and attaches the visual character to
- * the client one via {@link Location#attachChild(EntityRef, EntityRef, Vector3f, Quat4f)}.
- * The event handler should be coupled on a component to that also n
+ * There is a default handling on {@link EventPriority#PRIORITY_TRIVIAL}. The defualt handler creates
+ * a placeholder character. To prevent this placeholder character to be created the event must be consumed
+ * by a handler that creates its own visual character.
  *
- * There is a default handling on {@link EventPriority#PRIORITY_TRIVIAL} that creates a placeholder.
- * Typically gets only sent to other players
+ * Typically gets only sent to characters of other players
+ * and not to the owned character as in first person you don't see yourself.
  */
 public class CreateVisualCharacterEvent extends AbstractConsumableEvent {
     private EntityBuilder visualCharacterBuilder;
