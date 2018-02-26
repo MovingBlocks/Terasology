@@ -112,7 +112,7 @@ ext {
         }
 
         // Set meta-modules to use Git
-        rootProject.project(':meta').childProjects.each { child ->
+        rootProject.project(':metas').childProjects.each { child ->
 
             println "Preparing IntelliJ Git setup for meta-module $child.value.name"
             vcsMappings.appendNode('mapping', [
