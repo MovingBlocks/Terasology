@@ -6,4 +6,9 @@ class lib {
     }
 
     def excludedItems = []
+
+    // Libs currently do not care about dependencies
+    String[] findDependencies(File targetDir) {
+        return []
+    }
 }

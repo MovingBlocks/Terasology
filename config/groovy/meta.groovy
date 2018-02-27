@@ -6,4 +6,9 @@ class meta {
     }
 
     def excludedItems = []
+
+    // Meta modules currently do not care about dependencies
+    String[] findDependencies(File targetDir) {
+        return []
+    }
 }

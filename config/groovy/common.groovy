@@ -2,7 +2,6 @@
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Remote
-import groovy.json.JsonSlurper
 
 class common {
 
@@ -152,7 +151,7 @@ class common {
                 }
                 //This is only for modules.
                 if (recurse) {
-                    def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
+                    def foundDependencies = itemTypeScript.findDependencies(targetDir)
                     if (foundDependencies.length == 0) {
                         println "The module $itemName did not appear to have any dependencies we need to worry about"
                     } else {
@@ -166,31 +165,6 @@ class common {
                 }
             }
         }
-    }
-
-    /**
-     * Reads a given module info file to figure out which if any dependencies it has. Filters out any already retrieved.
-     * This method is only for modules.
-     * @param targetModuleInfo the target file to check (a module.txt file or similar)
-     * @return a String[] containing the next level of dependencies, if any
-     */
-    String[] readModuleDependencies(File targetModuleInfo) {
-        def qualifiedDependencies = []
-        if (!targetModuleInfo.exists()) {
-            println "The module info file did not appear to exist - can't calculate dependencies"
-            return qualifiedDependencies
-        }
-        def slurper = new JsonSlurper()
-        def moduleConfig = slurper.parseText(targetModuleInfo.text)
-        for (dependency in moduleConfig.dependencies) {
-            if (excludedItems.contains(dependency.id)) {
-                println "Skipping listed dependency $dependency as it is in the exclude list (shipped with primary project)"
-            } else {
-                println "Accepting listed dependency $dependency"
-                qualifiedDependencies << dependency.id
-            }
-        }
-        return qualifiedDependencies
     }
 
     /**
