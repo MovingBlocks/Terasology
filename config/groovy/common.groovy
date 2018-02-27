@@ -59,7 +59,6 @@ class common {
         File itemTypeScriptFile = new File("config/groovy/${type}.groovy")
         Class targetClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(itemTypeScriptFile)
         itemTypeScript = (GroovyObject) targetClass.newInstance()
-        itemTypeScript.test()
 
         excludedItems = itemTypeScript.excludedItems
     }
@@ -212,17 +211,16 @@ class common {
      * @param itemName the module to list remotes for
      */
     def listRemotes(String itemName) {
-        File moduleExistence = new File("${targetDirectory}/$itemName")
-        if (!moduleExistence.exists()) {
-            println "$itemType '$itemName' not found. Typo? Or run 'groovyw util $itemType get $itemName' first"
+        if (!new File(targetDirectory, itemName).exists()) {
+            println "$itemType '$itemName' not found. Typo? Or run 'groovyw $itemType get $itemName' first"
             return
         }
         def remoteGit = Grgit.open(dir: "${targetDirectory}/${itemName}")
         def remote = remoteGit.remote.list()
-        def x = 1
+        def index = 1
         for (Remote item: remote) {
-            println(x + " " + item.name + " " + "(" + item.url + ")")
-            x += 1
+            println(index + " " + item.name + " (" + item.url + ")")
+            index++
         }
     }
 
@@ -232,7 +230,7 @@ class common {
      * @param name the name to use for all the Git remotes
      */
     def addRemotes(String[] items, String name) {
-        for (String item: items) {
+        for (String item : items) {
             addRemote(item, name)
         }
     }
@@ -255,7 +253,7 @@ class common {
     def addRemote(String itemName, String remoteName, String url) {
         File targetModule = new File("${targetDirectory}/${itemName}")
         if (!targetModule.exists()) {
-            println "$itemType '$itemName' not found. Typo? Or run 'groovyw util $itemType get $itemName' first"
+            println "$itemType '$itemName' not found. Typo? Or run 'groovyw $itemType get $itemName' first"
             return
         }
         def remoteGit = Grgit.open(dir: "${targetDirectory}/${itemName}")

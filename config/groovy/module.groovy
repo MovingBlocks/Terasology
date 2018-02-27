@@ -2,10 +2,6 @@ import groovy.json.JsonSlurper
 
 class module {
 
-    def test() {
-        println "I'm the module script!"
-    }
-
     def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
 
     String[] findDependencies(File targetDir) {

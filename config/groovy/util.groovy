@@ -1,5 +1,3 @@
-println "Hi from util.groovy. Args are $args"
-
 // Create an instance of the common script to operate on
 File sourceFile = new File("config/groovy/common.groovy")
 Class sourceClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile)
@@ -35,7 +33,6 @@ itemType = common.itemType
 
 // At this point we have the type script loaded, so don't need that arg anymore
 String[] cleanerArgs = args.drop(1)
-println "cleanerArgs is now " + cleanerArgs
 
 excludedItems = common.excludedItems
 targetDirectory = common.targetDirectory
@@ -141,19 +138,18 @@ switch(cleanerArgs[0]) {
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
 
-
 /**
  * Simply prints usage information.
  */
 def printUsage() {
     println ""
-    println "Utility script for interacting with Terasology. General Syntax:"
+    println "Utility script for interacting with Terasology. General syntax:"
     println "  groovyw (type) (sub-command)"
     println "- 'type' may be module,meta,lib or facade."
     println ""
     println "Available sub-commands:"
     println "- 'get' - retrieves one or more items in source form (separate with spaces)"
-    println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (only for modules)"
+    println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)"
     println "- 'create' - creates a new item of the given type."
     println "- 'update' - updates an item (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local items of the given type."
@@ -162,17 +158,16 @@ def printUsage() {
     println "- 'list-remotes (item)' - lists all remotes for (item) "
     println ""
     println "Available flags:"
-    println "-remote [someRemote]' to clone from an alternative remote, also adding the Terasology/MovingBlocks/MetaTerasology (depends on the type) repo as 'origin'"
+    println "-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"
     println "       Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties."
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
     println ""
-    println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies"
+    println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
     println ""
-    println "*NOTE*: Item names are case sensitive"
+    println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""
     println "If you omit further arguments beyond the sub command you'll be prompted for details"
-    println "After changing modules available in your workspace rerun 'gradlew idea' and/or refresh your IDE"
     println ""
     println "For advanced usage see project documentation. For instance you can provide an alternative GitHub home"
     println "A gradle.properties file (one exists under '/templates' in an engine workspace) can provide such overrides"
