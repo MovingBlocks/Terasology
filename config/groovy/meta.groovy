@@ -3,6 +3,14 @@ class meta {
 
     def excludedItems = []
 
+    def getGithubDefaultHome(Properties properties) {
+        // Note how metas use a different override property - since same name as the paired module they cannot live in same org
+        return properties.alternativeGithubMetaHome ?: "MetaTerasology"
+    }
+
+    def targetDirectory = "metas"
+    def itemType = "meta"
+
     // Meta modules currently do not care about dependencies
     String[] findDependencies(File targetDir) {
         return []

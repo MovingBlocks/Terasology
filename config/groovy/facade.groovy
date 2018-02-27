@@ -3,6 +3,13 @@ class facade {
 
     def excludedItems = ["PC", "TeraEd"]
 
+    def getGithubDefaultHome(Properties properties) {
+        return properties.alternativeGithubHome ?: "MovingBlocks"
+    }
+
+    def targetDirectory = "facades"
+    def itemType = "facade"
+
     // Facades currently do not care about dependencies
     String[] findDependencies(File targetDir) {
         return []

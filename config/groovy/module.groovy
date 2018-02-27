@@ -4,6 +4,13 @@ class module {
 
     def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
 
+    def getGithubDefaultHome(Properties properties) {
+        return properties.alternativeGithubHome ?: "Terasology"
+    }
+
+    def targetDirectory = "modules"
+    def itemType = "module"
+
     String[] findDependencies(File targetDir) {
         def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
         println "Looked for dependencies, found: " + foundDependencies

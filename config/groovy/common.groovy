@@ -5,25 +5,29 @@ import org.ajoberstar.grgit.Remote
 
 class common {
 
-    // For preparing an instance of the target item type utility class we want to work with
+    /** For preparing an instance of the target item type utility class we want to work with */
     GroovyObject itemTypeScript
 
-    /**
-     * Default settings for modules.
-     * githubRepo stores the Repository name.
-     * targetDirectory stores the working directory.
-     * itemType is used to generalize the script.
-     */
-    def githubRepo = "Terasology"
-    def targetDirectory = "modules"
-    def itemType = "module"
-    def githubHome = "Terasology"
+    /** The official default GitHub home (org/user) for the type */
+    def githubDefaultHome
 
-    // Things we don't want to retrieve/update as they live in the main Terasology repo
+    /** The actual target GitHub home (org/user) for the type, as potentially requested by the user */
+    def githubTargetHome
+
+    /** The target directory for the type */
+    def targetDirectory
+
+    /** The clean human readable name for the type */
+    def itemType
+
+    /** Things we don't want to retrieve/update as they live in the main MovingBlocks/Terasology repo */
     def excludedItems
 
+    /** For keeping a list of items retrieved so far */
+    def itemsRetrieved = []
+
     /**
-     * Main logic for changing the item type.
+     * Initialize defaults to match the target item type
      * @param type the type to be initialized
      */
     def initialize(String type) {
@@ -36,35 +40,16 @@ class common {
             }
         }
 
-        if (type == "meta") {
-            githubRepo = "MetaTerasology"
-            targetDirectory = "metas"
-            itemType = "meta"
-            //Looking for alternative Github Home (meta) in gradle properties.
-            githubHome = properties.alternativeGithubMetaHome ?: githubRepo
-        } else {
-            if (type == "lib") {
-                githubRepo = "MovingBlocks"
-                targetDirectory = "libs"
-                itemType = "library"
-            } else if (type == "facade") {
-                githubRepo = "MovingBlocks"
-                targetDirectory = "facades"
-                itemType = "facade"
-            }
-            //Looking for alternative Github Home in gradle properties.
-            githubHome = properties.alternativeGithubHome ?: githubRepo
-        }
-
         File itemTypeScriptFile = new File("config/groovy/${type}.groovy")
         Class targetClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(itemTypeScriptFile)
         itemTypeScript = (GroovyObject) targetClass.newInstance()
 
         excludedItems = itemTypeScript.excludedItems
+        githubDefaultHome = itemTypeScript.getGithubDefaultHome(properties)
+        githubTargetHome = githubDefaultHome
+        targetDirectory = itemTypeScript.targetDirectory
+        itemType = itemTypeScript.itemType
     }
-
-    // For keeping a list of items retrieved so far
-    def itemsRetrieved = []
 
     /**
      * Accepts input from the user, showing a descriptive prompt.
@@ -119,21 +104,17 @@ class common {
             println "We already retrieved $itemName - skipping"
         } else {
             itemsRetrieved << itemName
-            def targetUrl = "https://github.com/${githubHome}/${itemName}"
-            //Special logic for target URLs. If type is facade, 'Facade' is used as prefix .. TODO: probably scrap this for consistency's sake
-            if (itemType == "facade") {
-                targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
-            }
+            def targetUrl = "https://github.com/${githubTargetHome}/${itemName}"
             if (!isUrlValid(targetUrl)) {
                 println "Can't retrieve $itemType from $targetUrl - URL appears invalid. Typo? Not created yet?"
                 return
             }
             println "Retrieving $itemType $itemName from $targetUrl"
-            if (githubHome != githubRepo) {
-                println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the $githubRepo remote as 'origin'"
-                Grgit.clone dir: targetDir, uri: targetUrl, remote: githubHome
-                println "Primary clone operation complete, about to add the 'origin' remote for the $githubRepo org address"
-                addRemote(itemName, "origin", "https://github.com/${githubRepo}/${itemName}")
+            if (githubTargetHome != githubDefaultHome) {
+                println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as 'origin'"
+                Grgit.clone dir: targetDir, uri: targetUrl, remote: githubTargetHome
+                println "Primary clone operation complete, about to add the 'origin' remote for the $githubDefaultHome org address"
+                addRemote(itemName, "origin", "https://github.com/${githubDefaultHome}/${itemName}")
             } else {
                 Grgit.clone dir: targetDir, uri: targetUrl
             }
@@ -180,7 +161,7 @@ class common {
         itemTypeScript.copyInTemplateFiles(targetDir)
 
         Grgit.init dir: targetDir, bare: false
-        addRemote(itemName, "origin", "https://github.com/${githubRepo}/${itemName}.git")
+        addRemote(itemName, "origin", "https://github.com/${githubDefaultHome}/${itemName}.git")
     }
 
     /**
@@ -285,10 +266,10 @@ class common {
         }
         if (remoteArg != -1) {
             if (arguments.length == (remoteArg + 1)) {
-                githubHome = getUserString('Enter Name for the Remote (no spaces)')
+                githubTargetHome = getUserString('Enter name for the git remote (no spaces)')
                 arguments = arguments.dropRight(1)
             } else {
-                githubHome = arguments[remoteArg + 1]
+                githubTargetHome = arguments[remoteArg + 1]
                 arguments = arguments.dropRight(2)
             }
         }

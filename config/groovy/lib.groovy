@@ -3,6 +3,13 @@ class lib {
 
     def excludedItems = []
 
+    def getGithubDefaultHome(Properties properties) {
+        return properties.alternativeGithubHome ?: "MovingBlocks"
+    }
+
+    def targetDirectory = "libs"
+    def itemType = "library"
+
     // Libs currently do not care about dependencies
     String[] findDependencies(File targetDir) {
         return []
