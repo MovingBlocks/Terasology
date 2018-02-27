@@ -8,7 +8,6 @@ class module {
 
     def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
 
-
     String[] findDependencies(File targetDir) {
         def foundDependencies = readModuleDependencies(new File(targetDir, "module.txt"))
         println "Looked for dependencies, found: " + foundDependencies
@@ -40,10 +39,22 @@ class module {
         return qualifiedDependencies
     }
 
-}
+    def copyInTemplateFiles(File targetDir) {
+        // Copy in the template build.gradle for modules
+        println "In copyInTemplateFiles for module $targetDir.name - copying in a build.gradle then next checking for module.txt"
+        File targetBuildGradle = new File(targetDir, 'build.gradle')
+        targetBuildGradle.delete()
+        targetBuildGradle << new File('templates/build.gradle').text
 
-// TODO: Move the module.txt parsing for dependencies in here since it is unique to this type
-// Make the function methods call into the types for extra steps like what files to copy into a new dir
-// shift MODULENAME to ITEMNAMEREPLACEMENT
-// make a list of template files to copy
-// replace ITEMNAMEREPLACEMENT in each
+        // Copy in the template module.txt for modules (if one doesn't exist yet)
+        File moduleManifest = new File(targetDir, 'module.txt')
+        if (!moduleManifest.exists()) {
+            def moduleText = new File("templates/module.txt").text
+
+            moduleManifest << moduleText.replaceAll('MODULENAME', targetDir.name)
+            println "WARNING: the module ${targetDir.name} did not have a module.txt! One was created, please review and submit to GitHub"
+        }
+
+        // TODO: Copy in a module readme template soon
+    }
+}

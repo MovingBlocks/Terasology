@@ -108,7 +108,7 @@ class common {
     /**
      * Retrieves a single item via Git Clone. Considers whether it exists locally first or if it has already been retrieved this execution.
      * @param itemName the target item to retrieve
-     * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve) (only for modules)
+     * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve)
      */
     def retrieveItem(String itemName, boolean recurse) {
         File targetDir = new File("$targetDirectory" + "/$itemName")
@@ -121,7 +121,7 @@ class common {
         } else {
             itemsRetrieved << itemName
             def targetUrl = "https://github.com/${githubHome}/${itemName}"
-            //Special logic for target URLs. If type is facade, 'Facade' is used as prefix
+            //Special logic for target URLs. If type is facade, 'Facade' is used as prefix .. TODO: probably scrap this for consistency's sake
             if (itemType == "facade") {
                 targetUrl = "https://github.com/${githubHome}/Facade${itemName}"
             }
@@ -134,33 +134,25 @@ class common {
                 println "Doing a retrieve from a custom remote: $githubHome - will name it as such plus add the $githubRepo remote as 'origin'"
                 Grgit.clone dir: targetDir, uri: targetUrl, remote: githubHome
                 println "Primary clone operation complete, about to add the 'origin' remote for the $githubRepo org address"
-                addRemote(module, "origin", "https://github.com/${githubRepo}/${module}")
+                addRemote(itemName, "origin", "https://github.com/${githubRepo}/${itemName}")
             } else {
                 Grgit.clone dir: targetDir, uri: targetUrl
             }
-            File targetBuildGradle = new File(targetDir, 'build.gradle')
-            targetBuildGradle.delete()
-            targetBuildGradle << new File('templates/build.gradle').text
-            //If the type is module, module.text is retrieved.
-            if (targetDirectory == "modules") {
-                File moduleManifest = new File(targetDir, 'module.txt')
-                if (!moduleManifest.exists()) {
-                    def moduleText = new File("templates/module.txt").text
-                    moduleManifest << moduleText.replaceAll('MODULENAME', module)
-                    println "WARNING: the module $itemName did not have a module.txt! One was created, please review and submit to GitHub"
-                }
-                //This is only for modules.
-                if (recurse) {
-                    def foundDependencies = itemTypeScript.findDependencies(targetDir)
-                    if (foundDependencies.length == 0) {
-                        println "The module $itemName did not appear to have any dependencies we need to worry about"
-                    } else {
-                        println "The module $itemName has the following module dependencies we care about: $foundDependencies"
-                        String[] uniqueDependencies = foundDependencies - itemsRetrieved
-                        println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
-                        if (uniqueDependencies.length > 0) {
-                            retrieve(uniqueDependencies, true)
-                        }
+
+            // This step allows the item type to check the newly cloned item and add in extra template stuff
+            itemTypeScript.copyInTemplateFiles(targetDir)
+
+            // Handle also retrieving dependencies if the item type cares about that
+            if (recurse) {
+                def foundDependencies = itemTypeScript.findDependencies(targetDir)
+                if (foundDependencies.length == 0) {
+                    println "The $itemType $itemName did not appear to have any dependencies we need to worry about"
+                } else {
+                    println "The $itemType $itemName has the following $itemType dependencies we care about: $foundDependencies"
+                    String[] uniqueDependencies = foundDependencies - itemsRetrieved
+                    println "After removing dupes already retrieved we have the remaining dependencies left: $uniqueDependencies"
+                    if (uniqueDependencies.length > 0) {
+                        retrieve(uniqueDependencies, true)
                     }
                 }
             }
@@ -168,9 +160,7 @@ class common {
     }
 
     /**
-     * Creates a new item with the given name and adds the necessary .gitignore,
-     * build.gradle and module.txt files.
-     * module.txt is only for modules.
+     * Creates a new item with the given name and adds the necessary .gitignore file plus more if the itemType desires
      * @param itemName the name of the item to be created
      */
     def createItem(String itemName) {
@@ -181,29 +171,15 @@ class common {
         }
         println "Creating target directory"
         targetDir.mkdir()
+
+        // For now everything gets the same .gitignore, but beyond that defer to the itemType for specifics
         println "Creating .gitignore"
         File gitignore = new File(targetDir, ".gitignore")
         def gitignoreText = new File("templates/.gitignore").text
         gitignore << gitignoreText
-        //If the type is facade, facades.gradle is created else build.gradle is created.
-        if (targetDirectory == "facades") {
-            println "Creating facades.gradle"
-            File facadesGradle = new File(targetDir, "facades.gradle")
-            def facadesGradleText = new File("templates/facades.gradle").text
-            facadesGradle << facadesGradleText
-        } else {
-            println "Creating build.gradle"
-            File buildGradle = new File(targetDir, "build.gradle")
-            def buildGradleText = new File("templates/build.gradle").text
-            buildGradle << buildGradleText
-        }
-        //If the type is module, module.text is created.
-        if (targetDirectory == "modules") {
-            println "Creating module.txt"
-            File moduleManifest = new File(targetDir, "module.txt")
-            def moduleText = new File("templates/module.txt").text
-            moduleManifest << moduleText.replaceAll('MODULENAME', itemName)
-        }
+
+        itemTypeScript.copyInTemplateFiles(targetDir)
+
         Grgit.init dir: targetDir, bare: false
         addRemote(itemName, "origin", "https://github.com/${githubRepo}/${itemName}.git")
     }
