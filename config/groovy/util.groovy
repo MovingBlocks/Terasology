@@ -129,28 +129,27 @@ switch(cleanerArgs[0]) {
         }
         break
 
-    case "list-modules":
-        String[] availableModules = common.retrieveAvailableModules()
-        String[] localModules = common.retrieveLocalModules()
-        println "The following modules are available for download:"
-        if (availableModules.size() == 0){
-            println "No modules available for download."
-        } else if (localModules == availableModules){
-            println "All modules are downloaded."
+    case "list":
+        String[] availableItems = common.retrieveAvailableItems()
+        String[] localItems = common.retrieveLocalItems()
+        println "The following items are available for download:"
+        if (availableItems.size() == 0){
+            println "No items available for download."
+        } else if (localItems == availableItems){
+            println "All items are already downloaded."
         } else {
-            for (module in availableModules){
-                if(!(localModules.contains(module))){
-                    println "--$module"
+            for (item in availableItems){
+                if(!(localItems.contains(item))){
+                    println "--$item"
                 }
             }
         }
-        println ""
-        println "The following modules are already downloaded:"
-        if(localModules.size() == 0){
-            println "No modules downloaded."
+        println "\nThe following items are already downloaded:"
+        if(localItems.size() == 0){
+            println "No items downloaded."
         } else {
-            for(module in localModules){
-                println "--$module"
+            for(item in localItems){
+                println "--$item"
             }
         }
         break
@@ -171,13 +170,13 @@ def printUsage() {
     println "Available sub-commands:"
     println "- 'get' - retrieves one or more items in source form (separate with spaces)"
     println "- 'recurse' - retrieves the given item(s) *and* their dependencies in source form (really only for modules)"
+    println "- 'list' - lists items that are available for download or downloaded already."
     println "- 'create' - creates a new item of the given type."
     println "- 'update' - updates an item (git pulls latest from current origin, if workspace is clean"
     println "- 'update-all' - updates all local items of the given type."
     println "- 'add-remote (item) (name)' - adds a remote (name) to (item) with the default URL."
     println "- 'add-remote (item) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (item)' - lists all remotes for (item) "
-    println "- 'list-modules' - lists modules that are available for download or downloaded already."
     println ""
     println "Available flags:"
     println "-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"

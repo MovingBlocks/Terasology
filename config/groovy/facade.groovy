@@ -7,7 +7,7 @@ class facade {
         return properties.alternativeGithubHome ?: "MovingBlocks"
     }
 
-    def targetDirectory = "facades"
+    File targetDirectory = new File("facades")
     def itemType = "facade"
 
     // Facades currently do not care about dependencies
@@ -21,5 +21,21 @@ class facade {
         if (!targetBuildGradle.exists()) {
             targetBuildGradle << new File('templates/facades.gradle').text
         }
+    }
+
+    /**
+     * Filters the given items based on this item type's preferences
+     * @param possibleItems A map of repos (possible items) and their descriptions (potential filter data)
+     * @return A list containing only the items this type cares about
+     */
+    List filterItemsFromApi(Map possibleItems) {
+        List itemList = []
+
+        // Facades only includes repos found to have a particular string snippet in their description
+        itemList = possibleItems.findAll {
+            it.value?.contains("Automation category: Terasology Facade")
+        }.collect {it.key}
+
+        return itemList
     }
 }

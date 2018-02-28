@@ -17,7 +17,7 @@ class common {
     def githubTargetHome
 
     /** The target directory for the type */
-    def targetDirectory
+    File targetDirectory
 
     /** The clean human readable name for the type */
     def itemType
@@ -80,7 +80,7 @@ class common {
     /**
      * Primary entry point for retrieving items, kicks off recursively if needed.
      * @param items the items we want to retrieve
-     * @param recurse whether to also retrieve dependencies of the desired modules (only for modules)
+     * @param recurse whether to also retrieve dependencies of the desired items (only really for modules ...)
      */
     def retrieve(String[] items, boolean recurse) {
         println "Now inside retrieve, user (recursively? $recurse) wants: $items"
@@ -97,7 +97,7 @@ class common {
      * @param recurse whether to also retrieve its dependencies (if so then recurse back into retrieve)
      */
     def retrieveItem(String itemName, boolean recurse) {
-        File targetDir = new File("$targetDirectory" + "/$itemName")
+        File targetDir = new File(targetDirectory, itemName)
         println "Request to retrieve $itemType $itemName would store it at $targetDir - exists? " + targetDir.exists()
         if (targetDir.exists()) {
             println "That $itemType already had an existing directory locally. If something is wrong with it please delete and try again"
@@ -146,7 +146,7 @@ class common {
      * @param itemName the name of the item to be created
      */
     def createItem(String itemName) {
-        File targetDir = new File("${targetDirectory}/$itemName")
+        File targetDir = new File(targetDirectory, itemName)
         if (targetDir.exists()) {
             println "Target directory already exists. Aborting."
             return
@@ -172,7 +172,7 @@ class common {
      */
     def updateItem(String itemName) {
         println "Attempting to update $itemType $itemName"
-        File targetDir = new File("${targetDirectory}/${itemName}")
+        File targetDir = new File(targetDirectory, itemName)
         if (!targetDir.exists()) {
             println "$itemType \"$itemName\" not found"
             return
@@ -191,7 +191,7 @@ class common {
 
     /**
      * List all existing Git remotes for a given item.
-     * @param itemName the module to list remotes for
+     * @param itemName the item to list remotes for
      */
     def listRemotes(String itemName) {
         if (!new File(targetDirectory, itemName).exists()) {
@@ -234,7 +234,7 @@ class common {
      * @param URL address to the remote Git repo
      */
     def addRemote(String itemName, String remoteName, String url) {
-        File targetModule = new File("${targetDirectory}/${itemName}")
+        File targetModule = new File(targetDirectory, itemName)
         if (!targetModule.exists()) {
             println "$itemType '$itemName' not found. Typo? Or run 'groovyw $itemType get $itemName' first"
             return
@@ -279,41 +279,47 @@ class common {
     }
 
     /**
-     * Retrieves all the available modules on DestinationSol account in the form of a list.
-     * @return a String[] containing the names of modules available for downlaod.
+     * Retrieves all the available items for the target type in the form of a list.
+     * @return a String[] containing the names of items available for download.
      */
-    String[] retrieveAvailableModules() {
-        def moduleList = []
-        def githubAPIURL = "https://api.github.com/users/DestinationSol/repos"
-        if(!isUrlValid(githubAPIURL)){
-            println "Some problem in retrieving available modules. GitHub API not accessible."
+    String[] retrieveAvailableItems() {
+
+        // TODO: The GitHub API allows 100 only items max before paginating (30 by default). Need more pages in some cases
+        // By the time a call to list items reaches that point we need better ways to display the result as well
+        // However, in some cases heavy filtering could still mean that very few items will actually display ...
+        // Another consideration is if we should be more specific in the API request, like only retrieving name + description
+        def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=100"
+
+        if(!isUrlValid(githubHomeApiUrl)){
+            println "Deduced GitHub API URL $githubHomeApiUrl seems inaccessible."
             return []
         }
-        def repoData = new URL(githubAPIURL).getText()
+
+        // Make a temporary map of found repos (possible items) and the associated repo description (for filter options)
+        def mappedPossibleItems = [:]
+        def githubHomeApiData = new URL(githubHomeApiUrl).getText()
         def slurper = new JsonSlurper()
-        def parsedData = slurper.parseText(repoData)
-        for (repo in parsedData.name) {
-            //DestinationSol account contains the splash site. Its not a module so exclude it.
-            if (!(repo=="DestinationSol.github.io")) {
-                moduleList << repo
-            }
+        def parsedData = slurper.parseText(githubHomeApiData)
+        parsedData.each {
+            mappedPossibleItems.put(it.name, it.description)
         }
-        return moduleList
+
+        return itemTypeScript.filterItemsFromApi(mappedPossibleItems)
     }
 
     /**
-     * Retrieves all the downloaded modules in the form of a list.
-     * @return a String[] containing the names of downloaded modules.
+     * Retrieves all the downloaded items in the form of a list.
+     * @return a String[] containing the names of downloaded items.
      */
-    String[] retrieveLocalModules(){
-        def localModules =[]
-        new File("modules").eachDir() { dir ->
-            String moduleName = dir.getPath().substring(8)
-            //The excludedItems are not considered as downloaded modules.
-            if(!(excludedItems.contains(moduleName))){
-                localModules << moduleName
+    String[] retrieveLocalItems(){
+        def localItems =[]
+        targetDirectory.eachDir() { dir ->
+            String itemName = dir.getName()
+            // Don't consider excluded items
+            if(!(excludedItems.contains(itemName))){
+                localItems << itemName
             }
         }
-        return localModules
+        return localItems
     }
 }

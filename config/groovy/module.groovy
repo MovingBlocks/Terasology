@@ -2,13 +2,14 @@ import groovy.json.JsonSlurper
 
 class module {
 
-    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay"]
+    // TODO: Eventually add the Terasology org's site repo to the exclude list
+    def excludedItems = ["engine", "Core", "CoreSampleGameplay", "BuilderSampleGameplay", "Index"]
 
     def getGithubDefaultHome(Properties properties) {
         return properties.alternativeGithubHome ?: "Terasology"
     }
 
-    def targetDirectory = "modules"
+    File targetDirectory = new File("modules")
     def itemType = "module"
 
     String[] findDependencies(File targetDir) {
@@ -59,5 +60,21 @@ class module {
         }
 
         // TODO: Copy in a module readme template soon
+    }
+
+    /**
+     * Filters the given items based on this item type's preferences
+     * @param possibleItems A map of repos (possible items) and their descriptions (potential filter data)
+     * @return A list containing only the items this type cares about
+     */
+    List filterItemsFromApi(Map possibleItems) {
+        List itemList = []
+
+        // Modules just consider the item name and excludes those in a specific list
+        itemList = possibleItems.findAll {
+            !excludedItems.contains (it.key)
+        }.collect {it.key}
+
+        return itemList
     }
 }
