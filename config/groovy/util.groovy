@@ -93,9 +93,9 @@ switch(cleanerArgs[0]) {
 
     case "update-all":
         println "We're updating every $itemType"
-        println "List of modules: ${common.retrieveLocalModules()}"
-        for(module in common.retrieveLocalModules()){
-            common.updateItem(module)
+        println "List of local entries: ${common.retrieveLocalItems()}"
+        for(item in common.retrieveLocalItems()){
+            common.updateItem(item)
         }
         break
 
@@ -183,8 +183,8 @@ def printUsage() {
     println "       Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties."
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
-    println ""
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
+    println "Example: 'groovyw list libs' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""
     println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""

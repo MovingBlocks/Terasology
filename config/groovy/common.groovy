@@ -28,6 +28,9 @@ class common {
     /** For keeping a list of items retrieved so far */
     def itemsRetrieved = []
 
+    /** The default name of a git remote we might want to work on or keep handy */
+    String defaultRemote = "origin"
+
     /**
      * Initialize defaults to match the target item type
      * @param type the type to be initialized
@@ -113,10 +116,10 @@ class common {
             }
             println "Retrieving $itemType $itemName from $targetUrl"
             if (githubTargetHome != githubDefaultHome) {
-                println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as 'origin'"
+                println "Doing a retrieve from a custom remote: $githubTargetHome - will name it as such plus add the $githubDefaultHome remote as '$defaultRemote'"
                 Grgit.clone dir: targetDir, uri: targetUrl, remote: githubTargetHome
-                println "Primary clone operation complete, about to add the 'origin' remote for the $githubDefaultHome org address"
-                addRemote(itemName, "origin", "https://github.com/${githubDefaultHome}/${itemName}")
+                println "Primary clone operation complete, about to add the '$defaultRemote' remote for the $githubDefaultHome org address"
+                addRemote(itemName, defaultRemote, "https://github.com/${githubDefaultHome}/${itemName}")
             } else {
                 Grgit.clone dir: targetDir, uri: targetUrl
             }
@@ -163,7 +166,7 @@ class common {
         itemTypeScript.copyInTemplateFiles(targetDir)
 
         Grgit.init dir: targetDir, bare: false
-        addRemote(itemName, "origin", "https://github.com/${githubDefaultHome}/${itemName}.git")
+        addRemote(itemName, defaultRemote, "https://github.com/${githubDefaultHome}/${itemName}.git")
     }
 
     /**
@@ -178,15 +181,26 @@ class common {
             return
         }
         def itemGit = Grgit.open(dir: targetDir)
+
+        // Do a check for the default remote before we attempt to update
+        def remotes = itemGit.remote.list()
+        def targetUrl = remotes.find{
+            it.name == defaultRemote
+        }?.url
+        if (targetUrl == null || !isUrlValid(targetUrl)) {
+            println "While updating $itemName found its '$defaultRemote' remote invalid or its URL unresponsive: $targetUrl"
+            return
+        }
+
+        // At this point we should have a valid remote to pull from. If local repo is clean then pull!
         def clean = itemGit.status().clean
         println "Is \"$itemName\" clean? $clean"
         if (!clean) {
             println "$itemType has uncommitted changes. Aborting."
             return
         }
-
         println "Updating $itemType $itemName"
-        itemGit.pull remote: "origin"
+        itemGit.pull remote: defaultRemote
     }
 
     /**
