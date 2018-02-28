@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 @GrabResolver(name = 'jcenter', root = 'http://jcenter.bintray.com/')
 @Grab(group = 'org.ajoberstar', module = 'grgit', version = '1.9.3')
 import org.ajoberstar.grgit.Grgit
@@ -274,5 +276,44 @@ class common {
             }
         }
         return arguments.drop(1)
+    }
+
+    /**
+     * Retrieves all the available modules on DestinationSol account in the form of a list.
+     * @return a String[] containing the names of modules available for downlaod.
+     */
+    String[] retrieveAvailableModules() {
+        def moduleList = []
+        def githubAPIURL = "https://api.github.com/users/DestinationSol/repos"
+        if(!isUrlValid(githubAPIURL)){
+            println "Some problem in retrieving available modules. GitHub API not accessible."
+            return []
+        }
+        def repoData = new URL(githubAPIURL).getText()
+        def slurper = new JsonSlurper()
+        def parsedData = slurper.parseText(repoData)
+        for (repo in parsedData.name) {
+            //DestinationSol account contains the splash site. Its not a module so exclude it.
+            if (!(repo=="DestinationSol.github.io")) {
+                moduleList << repo
+            }
+        }
+        return moduleList
+    }
+
+    /**
+     * Retrieves all the downloaded modules in the form of a list.
+     * @return a String[] containing the names of downloaded modules.
+     */
+    String[] retrieveLocalModules(){
+        def localModules =[]
+        new File("modules").eachDir() { dir ->
+            String moduleName = dir.getPath().substring(8)
+            //The excludedItems are not considered as downloaded modules.
+            if(!(excludedItems.contains(moduleName))){
+                localModules << moduleName
+            }
+        }
+        return localModules
     }
 }

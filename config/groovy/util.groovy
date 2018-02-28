@@ -93,14 +93,9 @@ switch(cleanerArgs[0]) {
 
     case "update-all":
         println "We're updating every $itemType"
-        println "List:"
-        new File(targetDirectory).eachDir() { dir ->
-            String itemName = dir.getPath().substring(8)
-            if (!common.excludedItems.contains(itemName)) {
-                common.updateItem(itemName)
-            } else {
-                println "Skipping excluded item $itemName"
-            }
+        println "List of modules: ${common.retrieveLocalModules()}"
+        for(module in common.retrieveLocalModules()){
+            common.updateItem(module)
         }
         break
 
@@ -134,6 +129,32 @@ switch(cleanerArgs[0]) {
         }
         break
 
+    case "list-modules":
+        String[] availableModules = common.retrieveAvailableModules()
+        String[] localModules = common.retrieveLocalModules()
+        println "The following modules are available for download:"
+        if (availableModules.size() == 0){
+            println "No modules available for download."
+        } else if (localModules == availableModules){
+            println "All modules are downloaded."
+        } else {
+            for (module in availableModules){
+                if(!(localModules.contains(module))){
+                    println "--$module"
+                }
+            }
+        }
+        println ""
+        println "The following modules are already downloaded:"
+        if(localModules.size() == 0){
+            println "No modules downloaded."
+        } else {
+            for(module in localModules){
+                println "--$module"
+            }
+        }
+        break
+
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
@@ -156,6 +177,7 @@ def printUsage() {
     println "- 'add-remote (item) (name)' - adds a remote (name) to (item) with the default URL."
     println "- 'add-remote (item) (name) (URL)' - adds a remote with the given URL"
     println "- 'list-remotes (item)' - lists all remotes for (item) "
+    println "- 'list-modules' - lists modules that are available for download or downloaded already."
     println ""
     println "Available flags:"
     println "-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"

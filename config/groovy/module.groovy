@@ -33,9 +33,9 @@ class module {
         def moduleConfig = slurper.parseText(targetModuleInfo.text)
         for (dependency in moduleConfig.dependencies) {
             if (excludedItems.contains(dependency.id)) {
-                println "Skipping listed dependency $dependency as it is in the exclude list (shipped with primary project)"
+                println "Skipping listed dependency $dependency.id as it is in the exclude list (shipped with primary project)"
             } else {
-                println "Accepting listed dependency $dependency"
+                println "Accepting listed dependency $dependency.id"
                 qualifiedDependencies << dependency.id
             }
         }
