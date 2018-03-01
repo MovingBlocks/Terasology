@@ -82,6 +82,7 @@ public class SelectGameScreen extends CoreScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
+        gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
 
         CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
