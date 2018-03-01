@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.world;
 
+import java.util.List;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
@@ -22,7 +23,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commandSystem.MethodCommand;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -86,9 +86,6 @@ import org.terasology.rendering.world.viewDistance.ViewDistance;
 import org.terasology.utilities.Assets;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
-
-import java.util.List;
-
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -119,14 +116,13 @@ import static org.terasology.rendering.opengl.ScalingFactors.QUARTER_SCALE;
  * TODO: update this section to include new, relevant objects
  * - a RenderableWorld instance, providing acceleration structures caching blocks requiring different rendering treatments<br/>
  */
-@RegisterSystem
 public final class WorldRendererImpl implements WorldRenderer {
     /*
      * Presumably, the eye height should be context.get(Config.class).getPlayer().getEyeHeight() above the ground plane.
      * It's not, so for now, we use this factor to adjust for the disparity.
      */
     private static final float GROUND_PLANE_HEIGHT_DISPARITY = -0.7f;
-    private static RenderGraph renderGraph = new RenderGraph(); // TODO: Try making this non-static
+    private RenderGraph renderGraph = new RenderGraph();
 
     private boolean isFirstRenderingStageForCurrentFrame;
     private final RenderQueuesHelper renderQueues;
