@@ -184,7 +184,7 @@ def printUsage() {
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
-    println "Example: 'groovyw list libs' - would list library projects compatible with being embedded in a Terasology workspace"
+    println "Example: 'groovyw libs list' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""
     println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""
