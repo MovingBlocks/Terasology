@@ -11,7 +11,7 @@ File an Issue
 -------------
 You can report bugs and feature requests to [GitHub Issues](https://github.com/MovingBlocks/Terasology/issues). As mentioned please look for a similar existing issue before submitting a new one.
 
-For finding easy to do issues to start with look at the [Contributor-friendly](https://github.com/MovingBlocks/Terasology/labels/Good%20First%20Issue) issues.
+For finding easy to do issues to start with look at the [Good First Issue](https://github.com/MovingBlocks/Terasology/labels/Good%20First%20Issue) issues.
 
 We prefer questions and support requests be posted in the [forum](http://forum.terasology.org/forum).
 

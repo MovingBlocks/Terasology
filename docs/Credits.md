@@ -213,7 +213,9 @@ Contributors
  [digitalripperynr](https://github.com/digitalripperynr),
  [FieryPhoenix909](https://github.com/FieryPhoenix909),
  [Adrijaned](https://github.com/Adrijaned),
- [anuar2k](https://github.com/anuar2k)
+ [anuar2k](https://github.com/anuar2k),
+ [4Denthusiast](https://github.com/4Denthusiast),
+ [dacharya64](https://github.com/dacharya64)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
