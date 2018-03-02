@@ -78,7 +78,7 @@ public class NotificationOverlay extends CoreScreenLayer {
                 for (Message msg : msgs) {
                     if (count > size - MAX_MESSAGES) {
                         messageHistory.append(StringUtils.abbreviate(msg.getMessage(), MAX_CHAR_PER_MSG));
-                        if (count < size) {
+                        if (count < size && msg.hasNewLine()) {
                             messageHistory.append(Console.NEW_LINE);
                         }
                     }
