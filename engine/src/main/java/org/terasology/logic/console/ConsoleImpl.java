@@ -118,37 +118,27 @@ public class ConsoleImpl implements Console {
     }
 
     /**
-     * Adds a message to the console (as a CoreMessageType.CONSOLE message) without new line at the end
+     * Adds a message to the console
      *
-     * @param message The message content
+     * @param message    The message to be added
+     * @param newLine    Flag indicates about new line at the of message
      */
     @Override
-    public void addInlineMessage(String message)
+    public void addMessage(String message, boolean newLine)
     {
-        addMessage(new Message(message, false));
+        addMessage(new Message(message, newLine));
     }
 
     /**
-     * Adds a message to the console without new line at the end
+     * Adds a message to the console
      *
-     * @param message The content of the message
-     * @param type    The type of the message
+     * @param message    The message to be added
+     * @param type       The type of the message
+     * @param newLine    Flag indicates about new line at the of message
      */
     @Override
-    public void addInlineMessage(String message, MessageType type)
-    {
-        addMessage(new Message(message, type, false));
-    }
-
-    /**
-     * Adds a message to the console without new line at the end
-     *
-     * @param message The message to be added
-     */
-    @Override
-    public void addInlineMessage(Message message)
-    {
-        addMessage(new Message(message.getMessage(), message.getType(), false));
+    public void addMessage(String message, MessageType type, boolean newLine) {
+        addMessage(new Message(message, type, newLine));
     }
 
     /**

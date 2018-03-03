@@ -60,27 +60,21 @@ public interface Console {
     void addMessage(Message message);
 
     /**
-     * Adds a message to the console (as a CoreMessageType.CONSOLE message) without new line at the end
+     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *
      * @param message
+     * @param newLine Flag indicates about new line at the end of message
      */
-    void addInlineMessage(String message);
+    void addMessage(String message, boolean newLine);
 
     /**
-     * Adds a message to the console without new line at the end
+     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *
      * @param message
      * @param type
+     * @param newLine Flag indicates about new line at the end of message
      */
-    void addInlineMessage(String message, MessageType type);
-
-    /**
-     * Adds a message to the console without new line at the end
-     *
-     * @param message
-     */
-    void addInlineMessage(Message message);
-
+    void addMessage(String message, MessageType type, boolean newLine);
     /**
      * @return An iterator over all messages in the console
      */

@@ -785,7 +785,7 @@ public final class WorldRendererImpl implements WorldRenderer {
      */
     @Command(shortDescription = "Forces a recompilation of shaders.", requiredPermission = PermissionManager.NO_PERMISSION)
     public void recompileShaders() {
-        console.addInlineMessage("Recompiling shaders... ");
+        console.addMessage("Recompiling shaders... ", false);
         shaderManager.recompileAllShaders();
         console.addMessage("done!");
     }

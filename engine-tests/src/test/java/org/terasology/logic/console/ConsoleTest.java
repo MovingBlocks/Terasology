@@ -54,14 +54,14 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
 
     @Test
     public void testAddInlineMessage() {
-        getConsole().addInlineMessage(MSG_TXT);
+        getConsole().addMessage(MSG_TXT, false);
 
         checkMessage(getConsole().getMessages().iterator(), false);
     }
 
     @Test
     public void testAddInlineMessage2() {
-        getConsole().addInlineMessage(new Message(MSG_TXT));
+        getConsole().addMessage(new Message(MSG_TXT, false));
 
         checkMessage(getConsole().getMessages().iterator(), false);
     }
