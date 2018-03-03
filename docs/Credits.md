@@ -220,7 +220,8 @@ Contributors
  [TheFlash98](https://github.com/TheFlash98),
  [iaronaraujo](https://github.com/iaronaraujo),
  [l0ftyWhizZ](https://github.com/l0ftyWhizZ),
- [manas96](https://github.com/manas96)
+ [manas96](https://github.com/manas96),
+ [morrilet](https://github.com/morrilet)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
