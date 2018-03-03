@@ -105,7 +105,7 @@ public class ParticlePoolTest {
         }
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void constructorTest() {
         final int[] poolSizes = {1, 27, 133};
 
@@ -124,13 +124,9 @@ public class ParticlePoolTest {
 
             assertEquals(size * 4, pool.color.length);
         }
-
-        try {
-            ParticlePool pool = new ParticlePool(0);
-            fail();
-        } catch (IllegalArgumentException e) {
-            assertTrue(true); //succeed
-        }
+        // Should throw exception after creating the pool
+        ParticlePool pool = new ParticlePool(0);
+        
     }
 
     @Test
