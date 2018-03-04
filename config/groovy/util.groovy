@@ -132,30 +132,44 @@ switch(cleanerArgs[0]) {
     case "list":
         String[] availableItems = common.retrieveAvailableItems()
         String[] localItems = common.retrieveLocalItems()
+        String[] downloadableItems = availableItems.minus(localItems)
         println "The following items are available for download:"
-        if (availableItems.size() == 0){
+        if (availableItems.size() == 0) {
             println "No items available for download."
-        } else if (localItems == availableItems){
+        } else if (downloadableItems.size() == 0) {
             println "All items are already downloaded."
         } else {
-            for (item in availableItems){
-                if(!(localItems.contains(item))){
-                    println "--$item"
-                }
-            }
+            printListItems(downloadableItems)
         }
         println "\nThe following items are already downloaded:"
-        if(localItems.size() == 0){
+        if(localItems.size() == 0) {
             println "No items downloaded."
         } else {
-            for(item in localItems){
-                println "--$item"
-            }
+            printListItems(localItems)
         }
         break
 
     default:
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
+}
+
+private void printListItems(String[] items) {
+    def final CONDENSED_FORMAT_THRESHOLD = 50
+    items.size() < CONDENSED_FORMAT_THRESHOLD ?
+        printListItemsSimple(items) :
+        printListItemsCondensed(items)
+}
+
+private void printListItemsSimple(String[] items) {
+    for (item in items.sort()) {
+        println "--$item"
+    }
+}
+
+private void printListItemsCondensed(String[] items) {
+    for (group in items.groupBy {it[0].toUpperCase()}) {
+        println "--" + group.key + ": " + group.value.sort().join(", ")
+    }
 }
 
 /**
