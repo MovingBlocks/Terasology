@@ -24,6 +24,8 @@ import java.util.Iterator;
 
 public class ConsoleTest extends TerasologyTestingEnvironment {
 
+    private final String MSG_TXT = "Test message";
+
     @Test
     public void testClearCommand() {
         for (int i = 0; i < 10; i++) {
@@ -33,6 +35,43 @@ public class ConsoleTest extends TerasologyTestingEnvironment {
         getConsole().clear();
 
         Iterator<Message> it = getConsole().getMessages().iterator();
+        Assert.assertFalse(it.hasNext());
+    }
+
+    @Test
+    public void testAddMessage() {
+        getConsole().addMessage(MSG_TXT);
+
+        checkMessage(getConsole().getMessages().iterator(), true);
+    }
+
+    @Test
+    public void testAddConsoleMessage() {
+        getConsole().addMessage(new Message(MSG_TXT));
+
+        checkMessage(getConsole().getMessages().iterator(), true);
+    }
+
+    @Test
+    public void testAddInlineMessage() {
+        getConsole().addMessage(MSG_TXT, false);
+
+        checkMessage(getConsole().getMessages().iterator(), false);
+    }
+
+    @Test
+    public void testAddInlineMessage2() {
+        getConsole().addMessage(new Message(MSG_TXT, false));
+
+        checkMessage(getConsole().getMessages().iterator(), false);
+    }
+
+    private void checkMessage(Iterator<Message> it, boolean hasNewLine) {
+        Assert.assertNotNull(it);
+        Assert.assertTrue(it.hasNext());
+        final Message message = it.next();
+        Assert.assertEquals(MSG_TXT, message.getMessage());
+        Assert.assertEquals(hasNewLine, message.hasNewLine());
         Assert.assertFalse(it.hasNext());
     }
 
