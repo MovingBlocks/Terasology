@@ -28,7 +28,7 @@ public interface ComponentContainer {
     /**
      * @param componentClass
      * @param <T>
-     * @return The requested component, or null if the this doesn't have a component of this type
+     * @return The requested component, or null if this doesn't have a component of this type
      */
     <T extends Component> T getComponent(Class<T> componentClass);
 
