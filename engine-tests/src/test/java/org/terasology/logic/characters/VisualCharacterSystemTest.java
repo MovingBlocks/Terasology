@@ -104,7 +104,7 @@ public class VisualCharacterSystemTest {
         EntityRef clientEntity = mockEntityWithUniqueId();
         EntityRef otherClientEntity = mockEntityWithUniqueId();
 
-        EntityRef ownCharacterEntity = mockEntityWithUniqueId();
+        EntityRef ownCharacterEntity = mockEntityWithUniqueId(true);
         List<Event> ownCharacterEntityEvents = new ArrayList<>();
         recordEntityEventsToList(ownCharacterEntity, ownCharacterEntityEvents);
 
@@ -151,10 +151,21 @@ public class VisualCharacterSystemTest {
     }
 
     private EntityRef mockEntityWithUniqueId() {
+        return mockEntityWithUniqueId(false);
+    }
+
+    private EntityRef mockEntityWithUniqueId(boolean addComponent) {
         EntityRef entityRef = Mockito.mock(EntityRef.class);
         // Proper getId and exists method are needed to make equals work properly.
         Mockito.when(entityRef.getId()).thenReturn(nextEntityId++);
         Mockito.when(entityRef.exists()).thenReturn(true);
+        /*
+         * Needed to add component when onAwaitedLocalCharacterSpawnEvent() is called
+         * on the returned entity and attempts to get a component (returns null)
+         */
+        if (addComponent)
+        	Mockito.when(entityRef.getComponent(VisualCharacterComponent.class)).thenReturn(Mockito.mock(VisualCharacterComponent.class));
+        
         return entityRef;
     }
 
