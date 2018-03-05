@@ -94,7 +94,7 @@ public class VisualCharacterSystemTest {
      *     <li>No visual character gets created (via event) for the own character (as it is first person)</li>
      *     <li>That the system can deal with LocalPlayer and characters not being properly linked when
      *     the character entities get loaded/created</li>
-     *     <li>A visual character gets created (via event) for charcters that were already present when the player
+     *     <li>A visual character gets created (via event) for characters that were already present when the player
      *     joined</li>
      *     <li>A visual character gets created (via event) for characters that joins afterwards </li>
      * </ul>
