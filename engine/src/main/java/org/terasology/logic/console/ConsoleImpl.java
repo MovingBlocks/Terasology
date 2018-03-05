@@ -120,6 +120,30 @@ public class ConsoleImpl implements Console {
     /**
      * Adds a message to the console
      *
+     * @param message    The message to be added
+     * @param newLine    Flag indicates about new line at the of message
+     */
+    @Override
+    public void addMessage(String message, boolean newLine)
+    {
+        addMessage(new Message(message, newLine));
+    }
+
+    /**
+     * Adds a message to the console
+     *
+     * @param message    The message to be added
+     * @param type       The type of the message
+     * @param newLine    Flag indicates about new line at the of message
+     */
+    @Override
+    public void addMessage(String message, MessageType type, boolean newLine) {
+        addMessage(new Message(message, type, newLine));
+    }
+
+    /**
+     * Adds a message to the console
+     *
      * @param message The message to be added
      */
     @Override

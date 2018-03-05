@@ -37,6 +37,8 @@ import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
@@ -109,7 +111,6 @@ public class CreateGameScreen extends CoreScreenLayer {
             });
         }
 
-
         final UIText worldName = find("worldName", UIText.class);
         setGameName(worldName);
 
@@ -140,6 +141,13 @@ public class CreateGameScreen extends CoreScreenLayer {
             public String getString(Module value) {
                 return value.getMetadata().getDisplayName().value();
             }
+
+            @Override
+            public void draw(Module value, Canvas canvas) {
+                canvas.getCurrentStyle().setTextColor(validateModuleDependencies(value.getId()) ? Color.WHITE : Color.RED);
+                super.draw(value, canvas);
+                canvas.getCurrentStyle().setTextColor(Color.WHITE);
+            }
         });
 
         UILabel gameplayDescription = find("gameplayDescription", UILabel.class);
@@ -152,7 +160,6 @@ public class CreateGameScreen extends CoreScreenLayer {
                 } else {
                     return "";
                 }
-
             }
         });
 
@@ -178,7 +185,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
-                    // get the default generator from the config.  This is likely to have  a user triggered selection.
+                    // get the default generator from the config. This is likely to have a user triggered selection.
                     WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
                     if (info != null && getAllEnabledModuleNames().contains(info.getUri().getModuleName())) {
                         return info;
@@ -211,8 +218,20 @@ public class CreateGameScreen extends CoreScreenLayer {
                     return "";
                 }
             });
-        }
 
+            final UIButton playButton = find("play", UIButton.class);
+            playButton.bindEnabled(new Binding<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return validateModuleDependencies(gameplay.getSelection().getId());
+                }
+
+                @Override
+                public void set(Boolean value) {
+                    playButton.setEnabled(value);
+                }
+            });
+        }
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
 
@@ -240,7 +259,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                     gameManifest.addModule(module.getId(), module.getVersion());
                 }
 
-                float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
+                float timeOffset = 0.25f + 0.025f; // Time at dawn + little offset to spawn in a brighter env.
                 WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                         (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                 gameManifest.addWorld(worldInfo);
@@ -351,6 +370,11 @@ public class CreateGameScreen extends CoreScreenLayer {
                 recursivelyAddModuleDependencies(modules, dependencyInfo.getId());
             }
         }
+    }
+
+    private boolean validateModuleDependencies(Name moduleName) {
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        return resolver.resolve(moduleName).isSuccess();
     }
 
     private void setSelectedGameplayModule(Module module) {

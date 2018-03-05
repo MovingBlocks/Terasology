@@ -213,7 +213,16 @@ Contributors
  [digitalripperynr](https://github.com/digitalripperynr),
  [FieryPhoenix909](https://github.com/FieryPhoenix909),
  [Adrijaned](https://github.com/Adrijaned),
- [anuar2k](https://github.com/anuar2k)
+ [anuar2k](https://github.com/anuar2k),
+ [4Denthusiast](https://github.com/4Denthusiast),
+ [dacharya64](https://github.com/dacharya64),
+ [Naman-sopho](https://github.com/Naman-sopho),
+ [TheFlash98](https://github.com/TheFlash98),
+ [iaronaraujo](https://github.com/iaronaraujo),
+ [l0ftyWhizZ](https://github.com/l0ftyWhizZ),
+ [manas96](https://github.com/manas96),
+ [morrilet](https://github.com/morrilet),
+ [J-Dill](https://github.com/J-Dill)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

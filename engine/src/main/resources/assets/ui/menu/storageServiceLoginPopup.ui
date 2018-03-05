@@ -39,7 +39,8 @@
                 },
                 {
                   "type": "UIText",
-                  "id": "url"
+                  "id": "url",
+                  "text": "https://utility.terasology.org"
                 }
               ]
             },
