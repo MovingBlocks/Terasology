@@ -31,7 +31,7 @@ public interface Console {
     /**
      * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
      *
-     * @param command
+     * @param command   The command to be registered
      */
     void registerCommand(ConsoleCommand command);
 
@@ -40,39 +40,39 @@ public interface Console {
     /**
      * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *
-     * @param message
+     * @param message   The message to be added, as a string.
      */
     void addMessage(String message);
 
     /**
      * Adds a message to the console
      *
-     * @param message
-     * @param type
+     * @param message   The message to be added, as a string.
+     * @param type      The type of the message
      */
     void addMessage(String message, MessageType type);
 
     /**
      * Adds a message to the console
      *
-     * @param message
+     * @param message   The message to be added
      */
     void addMessage(Message message);
 
     /**
      * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *
-     * @param message
-     * @param newLine Flag indicates about new line at the end of message
+     * @param message    The message to be added, as a string.
+     * @param newLine    A boolean: True causes a newline character to be appended at the end of the message. False doesn't.
      */
     void addMessage(String message, boolean newLine);
 
     /**
      * Adds a message to the console (as a CoreMessageType.CONSOLE message)
      *
-     * @param message
-     * @param type
-     * @param newLine Flag indicates about new line at the end of message
+     * @param message    The message to be added, as a string.
+     * @param type       The type of the message
+     * @param newLine    A boolean: True causes a newline character to be appended at the end of the message. False doesn't.
      */
     void addMessage(String message, MessageType type, boolean newLine);
     /**
