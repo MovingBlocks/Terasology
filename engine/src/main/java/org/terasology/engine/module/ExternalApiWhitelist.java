@@ -79,6 +79,8 @@ public final class ExternalApiWhitelist {
             .add("sun.reflect")
             .add("com.snowplowanalytics.snowplow.tracker.events")
             .add("com.snowplowanalytics.snowplow.tracker.payload")
+            .add("org.lwjgl.opengl.GL11")
+            .add("org.lwjgl.opengl")
             .build();
 
     public static final Set<Class<?>> CLASSES = new ImmutableSet.Builder<Class<?>>()
