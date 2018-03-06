@@ -634,7 +634,8 @@ public final class WorldRendererImpl implements WorldRenderer {
         renderableWorld.queueVisibleChunks(isFirstRenderingStageForCurrentFrame);
 
         if (requestedTaskListRefresh) {
-            renderTaskListGenerator.refresh();
+            List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
+            renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
         }
     }
@@ -771,6 +772,11 @@ public final class WorldRendererImpl implements WorldRenderer {
     @Override
     public RenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
+    }
+
+    @Override
+    public RenderGraph getRenderGraph() {
+        return renderGraph;
     }
 
     /**
