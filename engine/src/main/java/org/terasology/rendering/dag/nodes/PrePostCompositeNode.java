@@ -98,7 +98,9 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     @Range(min = 0.0f, max = 1.0f)
     private float hazeThreshold = 0.8f;
 
-    public PrePostCompositeNode(Context context) {
+    public PrePostCompositeNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
 

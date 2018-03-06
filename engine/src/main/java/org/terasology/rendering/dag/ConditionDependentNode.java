@@ -32,7 +32,9 @@ public abstract class ConditionDependentNode extends AbstractNode implements Pro
 
     protected WorldRenderer worldRenderer;
 
-    protected ConditionDependentNode(Context context) {
+    protected ConditionDependentNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         worldRenderer = context.get(WorldRenderer.class);
     }
 

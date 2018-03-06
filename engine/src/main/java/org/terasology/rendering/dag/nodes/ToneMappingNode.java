@@ -60,7 +60,9 @@ public class ToneMappingNode extends AbstractNode {
     @Range(min = 0.0f, max = 100.0f)
     private float whitePoint = 9f;
 
-    public ToneMappingNode(Context context) {
+    public ToneMappingNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         screenGrabber = context.get(ScreenGrabber.class);
 
         DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);

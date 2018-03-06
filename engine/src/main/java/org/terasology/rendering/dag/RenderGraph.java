@@ -41,11 +41,10 @@ public class RenderGraph {
         graph = GraphBuilder.directed().build();
     }
 
-    public void addNode(Node node, String suggestedUri) {
+    public void addNode(Node node) {
         Preconditions.checkNotNull(node, "node cannot be null!");
-        Preconditions.checkNotNull(suggestedUri, "suggestedUri cannot be null!");
 
-        SimpleUri nodeUri = new SimpleUri("engine:" + suggestedUri);
+        SimpleUri nodeUri = node.getUri();
         if (nodeMap.containsKey(nodeUri)) {
             throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
         }
@@ -54,7 +53,6 @@ public class RenderGraph {
             throw new RuntimeException("The node " + nodeUri + " has already been added, with a different uri!");
         }
 
-        node.setUri(nodeUri);
         nodeMap.put(nodeUri, node);
         graph.addNode(node);
     }

@@ -44,7 +44,9 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
 
     private SetWireframe wireframeStateChange;
 
-    public OpaqueObjectsNode(Context context) {
+    public OpaqueObjectsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
 
         wireframeStateChange = new SetWireframe(true);

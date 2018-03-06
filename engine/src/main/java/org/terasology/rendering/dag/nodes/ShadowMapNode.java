@@ -72,8 +72,8 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
     private SubmersibleCamera activeCamera;
     private float texelSize;
 
-    public ShadowMapNode(Context context) {
-        super(context);
+    public ShadowMapNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);

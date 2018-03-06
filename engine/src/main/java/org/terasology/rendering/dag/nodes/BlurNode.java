@@ -48,8 +48,8 @@ public class BlurNode extends ConditionDependentNode {
      * @param outputFbo The output fbo, to store the blurred image.
      * @param blurRadius the blur radius: higher values cause higher blur. The shader's default is 16.0f.
      */
-    public BlurNode(Context context, FBO inputFbo, FBO outputFbo, float blurRadius) {
-        super(context);
+    public BlurNode(String nodeUri, Context context, FBO inputFbo, FBO outputFbo, float blurRadius) {
+        super(nodeUri, context);
 
         this.blurRadius = blurRadius;
 

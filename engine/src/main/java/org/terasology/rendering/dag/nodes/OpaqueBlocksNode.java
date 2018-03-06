@@ -81,7 +81,9 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
     @Range(min = 0.0f, max = 0.50f)
     private float parallaxScale = 0.05f;
 
-    public OpaqueBlocksNode(Context context) {
+    public OpaqueBlocksNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         worldProvider = context.get(WorldProvider.class);
 

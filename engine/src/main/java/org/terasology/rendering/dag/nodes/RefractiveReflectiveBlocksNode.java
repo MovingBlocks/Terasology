@@ -148,7 +148,9 @@ public class RefractiveReflectiveBlocksNode extends AbstractNode implements Prop
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f sunDirection;
 
-    public RefractiveReflectiveBlocksNode(Context context) {
+    public RefractiveReflectiveBlocksNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         worldProvider = context.get(WorldProvider.class);

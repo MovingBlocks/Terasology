@@ -43,8 +43,8 @@ public class BloomBlurNode extends BlurNode {
      * @param inputFbo The input fbo, containing the image to be blurred.
      * @param outputFbo The output fbo, to store the blurred image.
      */
-    public BloomBlurNode(Context context, FBO inputFbo, FBO outputFbo) {
-        super(context, inputFbo, outputFbo, BLUR_RADIUS);
+    public BloomBlurNode(String nodeUri, Context context, FBO inputFbo, FBO outputFbo) {
+        super(nodeUri, context, inputFbo, outputFbo, BLUR_RADIUS);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(renderingConfig::isBloom);
