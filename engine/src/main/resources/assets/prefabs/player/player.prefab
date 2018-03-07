@@ -18,10 +18,7 @@
     "radius": 0.3,
     "jumpSpeed": 12
   },
-  "Mesh": {
-    "mesh": "engine:testmonkey",
-    "material": "engine:monkeyHead9",
-    "hideFromOwner": true
+  "VisualCharacter": {
   },
   "BoxShape": {
     "extents": [
