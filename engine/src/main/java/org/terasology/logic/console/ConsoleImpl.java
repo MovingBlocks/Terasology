@@ -120,8 +120,8 @@ public class ConsoleImpl implements Console {
     /**
      * Adds a message to the console
      *
-     * @param message    The message to be added
-     * @param newLine    Flag indicates about new line at the of message
+     * @param message    The message to be added, as a string.
+     * @param newLine    A boolean: True causes a newline character to be appended at the end of the message. False doesn't.
      */
     @Override
     public void addMessage(String message, boolean newLine)
@@ -132,9 +132,9 @@ public class ConsoleImpl implements Console {
     /**
      * Adds a message to the console
      *
-     * @param message    The message to be added
+     * @param message    The message to be added, as a string.
      * @param type       The type of the message
-     * @param newLine    Flag indicates about new line at the of message
+     * @param newLine    A boolean: True causes a newline character to be appended at the end of the message. False doesn't.
      */
     @Override
     public void addMessage(String message, MessageType type, boolean newLine) {
