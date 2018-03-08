@@ -46,10 +46,8 @@ import java.util.stream.Collectors;
 @RegisterAssetFileFormat
 public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationData> {
 
-    private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
-//    private static final String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
-    private static final String FLOAT_PATTERN = "([-+]?[0-9]*\\.?[0-9]+)";
-    private static final String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
+    private static final String INTEGER_PATTERN = MD5Patterns.INTEGER_PATTERN;
+    private static final String VECTOR3_PATTERN = MD5Patterns.VECTOR3_PATTERN;
 
     private static final int POSITION_X_FLAG = 0x1;
     private static final int POSITION_Y_FLAG = 0x2;
@@ -58,7 +56,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
     private static final int ORIENTATION_Y_FLAG = 0x10;
     private static final int ORIENTATION_Z_FLAG = 0x20;
 
-    private Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
+    private Pattern commandLinePattern = MD5Patterns.commandLinePattern;
     private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN);
     private Pattern doubleVectorPattern = Pattern.compile(VECTOR3_PATTERN + "\\s*" + VECTOR3_PATTERN);
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
