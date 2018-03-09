@@ -94,7 +94,7 @@ public class VisualCharacterSystemTest {
      *     <li>No visual character gets created (via event) for the own character (as it is first person)</li>
      *     <li>That the system can deal with LocalPlayer and characters not being properly linked when
      *     the character entities get loaded/created</li>
-     *     <li>A visual character gets created (via event) for charcters that were already present when the player
+     *     <li>A visual character gets created (via event) for characters that were already present when the player
      *     joined</li>
      *     <li>A visual character gets created (via event) for characters that joins afterwards </li>
      * </ul>
@@ -107,6 +107,8 @@ public class VisualCharacterSystemTest {
         EntityRef ownCharacterEntity = mockEntityWithUniqueId(true);
         List<Event> ownCharacterEntityEvents = new ArrayList<>();
         recordEntityEventsToList(ownCharacterEntity, ownCharacterEntityEvents);
+        VisualCharacterComponent visualComponentOfOwnCharacter = new VisualCharacterComponent();
+        Mockito.when(ownCharacterEntity.getComponent(VisualCharacterComponent.class)).thenReturn(visualComponentOfOwnCharacter);
 
         EntityRef otherCharacterEntity = mockEntityWithUniqueId();
         List<Event> otherCharacterEntityEvents = new ArrayList<>();
@@ -114,12 +116,15 @@ public class VisualCharacterSystemTest {
 
         clientEntityReturnedByLocalPlayer = EntityRef.NULL;
 
+
         /*
          * Simulate activation before entity is done
          * since the character is not properly linked yet nothing should happen
          */
-        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), otherCharacterEntity);
-        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), ownCharacterEntity);
+        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), otherCharacterEntity,
+                new VisualCharacterComponent());
+        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), ownCharacterEntity,
+                visualComponentOfOwnCharacter);
 
         simulateProperLinkingOfLocalPlayerAndCharacterEntities(clientEntity, otherClientEntity,
                 ownCharacterEntity, otherCharacterEntity);
@@ -139,7 +144,8 @@ public class VisualCharacterSystemTest {
         // Joined player is not properly linked but it should not matter:
         Mockito.when(laterJoiningCharacterEntity.getOwner()).thenReturn(EntityRef.NULL);
 
-        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), laterJoiningCharacterEntity);
+        system.onActivatedVisualCharacter(OnActivatedComponent.newInstance(), laterJoiningCharacterEntity,
+                new VisualCharacterComponent());
 
 
         /*
