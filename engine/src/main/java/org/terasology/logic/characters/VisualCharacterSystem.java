@@ -57,7 +57,8 @@ public class VisualCharacterSystem extends BaseComponentSystem {
     private VisualEntityBuildAndAttachStrategy createAndAttachVisualEntityStrategy = this::createAndAttachVisualEntity;
 
     @ReceiveEvent
-    public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity) {
+    public void onActivatedVisualCharacter(OnActivatedComponent event, EntityRef entity, 
+    									   VisualCharacterComponent visualCharacterComponent) {
         if (!awaitedLocalCharacterSpawn) {
             /*
              * Before character has spawned localPlayer is not properly initialized
@@ -65,7 +66,7 @@ public class VisualCharacterSystem extends BaseComponentSystem {
              */
             return;
         }
-        createVisualCharacterIfNotOwnCharacter(entity, new VisualCharacterComponent());
+        createVisualCharacterIfNotOwnCharacter(entity, visualCharacterComponent);
     }
 
 
