@@ -155,7 +155,6 @@ public class VisualCharacterSystemTest {
         assertTypesInListEqual(laterJoiningCharacterEntityEvents, Arrays.asList(CreateVisualCharacterEvent.class));
 
     }
-    
 
     private EntityRef mockEntityWithUniqueId() {
         EntityRef entityRef = Mockito.mock(EntityRef.class);
@@ -165,7 +164,6 @@ public class VisualCharacterSystemTest {
 
         return entityRef;
     }
-
     private void simulateProperLinkingOfLocalPlayerAndCharacterEntities(EntityRef clientEntity, EntityRef otherClientEntity, EntityRef ownCharacterEntity, EntityRef otherCharacterEntity) {
         // Simulate linking of character with client
         clientEntityReturnedByLocalPlayer = clientEntity;

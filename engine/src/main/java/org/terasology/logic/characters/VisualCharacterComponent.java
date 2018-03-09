@@ -26,7 +26,7 @@ import org.terasology.network.Replicate;
  *
  * This component does not specify however how the character look like.
  * Instead event handlers can be implemented for a {@link CreateVisualCharacterEvent}
- * that create a visual character entity. The event gets automatically
+ * that create a visual character entity. The event gets automatically send,
  * when a visual character needs to be created.
  *
  *
