@@ -18,8 +18,8 @@ package org.terasology.rendering.md5;
 import java.util.regex.Pattern;
 
 /**
- * Class to hold the REGEX patterns for MD5SkeletonLoader.java
- * and MD5AnimationLoader.java.
+ * Class to hold the REGEX patterns for MD5SkeletonLoader
+ * and MD5AnimationLoader.
  *
  */
 public class MD5Patterns {

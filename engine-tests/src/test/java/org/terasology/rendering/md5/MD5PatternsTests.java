@@ -15,29 +15,53 @@
  */
 package org.terasology.rendering.md5;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
 public class MD5PatternsTests {
+	// https://stackoverflow.com/questions/34571/how-do-i-test-a-private-function-or-a-class-that-has-private-methods-fields-or
+	public static class IntegerPatternTest {
+		@Test
+		public void testIntegerPattern() {
+			String[] testNumbers = {"10", "6", "9E1", "76E1", "5E15", "3e4"};
+			for (String number : testNumbers) {
+				Matcher testMatcher = Pattern.compile(MD5Patterns.INTEGER_PATTERN).matcher(number);
+				if (testMatcher.find())
+					assertEquals(number, testMatcher.group());
+			}
+		}
+	}
 	
-	public static class IntegerPatternTests {
+	public static class FloatPatternTest {
+		@Test
+		public void testFloatPattern() {
+			String[] testNumbers = {"10.1", "10.0", "99E1", "99.0E1.0", "99.0011E1.22", "78e1.0"};
+			for (String number : testNumbers) {
+				Matcher testMatcher = Pattern.compile(MD5Patterns.FLOAT_PATTERN).matcher(number);
+				if (testMatcher.find())
+					assertEquals(number, testMatcher.group());
+			}
+		}
+	}
+	
+	public static class Vector3PatternTest {
 		
 	}
 	
-	public static class FloatPatternTests {
+	public static class Vector2PattersTest {
 		
 	}
 	
-	public static class Vector3PatternTests {
-		
-	}
-	
-	public static class Vector2PattersTests {
-		
-	}
-	
-	public static class CommandLinePatternTests {
+	public static class CommandLinePatternTest {
 		
 	}
 }
