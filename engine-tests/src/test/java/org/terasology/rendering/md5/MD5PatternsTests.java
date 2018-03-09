@@ -28,15 +28,16 @@ import org.junit.runner.RunWith;
 
 @RunWith(Enclosed.class)
 public class MD5PatternsTests {
-	// https://stackoverflow.com/questions/34571/how-do-i-test-a-private-function-or-a-class-that-has-private-methods-fields-or
+
 	public static class IntegerPatternTest {
 		@Test
 		public void testIntegerPattern() {
 			String[] testNumbers = {"10", "6", "9E1", "76E1", "5E15", "3e4"};
 			for (String number : testNumbers) {
 				Matcher testMatcher = Pattern.compile(MD5Patterns.INTEGER_PATTERN).matcher(number);
-				if (testMatcher.find())
+				if (testMatcher.find()) {
 					assertEquals(number, testMatcher.group());
+				}
 			}
 		}
 	}
@@ -47,8 +48,9 @@ public class MD5PatternsTests {
 			String[] testNumbers = {"10.1", "10.0", "99E1", "99.0E1.0", "99.0011E1.22", "78e1.0"};
 			for (String number : testNumbers) {
 				Matcher testMatcher = Pattern.compile(MD5Patterns.FLOAT_PATTERN).matcher(number);
-				if (testMatcher.find())
+				if (testMatcher.find()) {
 					assertEquals(number, testMatcher.group());
+				}
 			}
 		}
 	}
@@ -56,28 +58,39 @@ public class MD5PatternsTests {
 	public static class Vector3PatternTest {
 		@Test
 		public void testVector3Pattern() {
-			String[] testVectors = {"(10.5 25.0 99E1 )", "(9.5 54.0e9.3 99E1 )", "(4 6.2 11E6.6 )"}; //TODO do we want the space after the last one?
+			String[] testVectors = {"(10.5 25.0 99E1 )", "(9.5 54.0e9.3 99E1 )", "(4 6.2 11E6.6 )"};
 			for (String vector : testVectors) {
 				Matcher testMatcher = Pattern.compile(MD5Patterns.VECTOR3_PATTERN).matcher(vector);
-				if (testMatcher.find())
+				if (testMatcher.find()) {
 					assertEquals(vector, testMatcher.group());
+				}
 			}
 		}
 	}
 	
-	public static class Vector2PattersTest {
+	public static class Vector2PatternTest {
 		@Test
 		public void testVector2Pattern() {
 			String[] testVectors = {"(10.1 25.0 )", "(9.5 9E1 )", "(1 4e9.0 )"};
 			for (String vector : testVectors) {
 				Matcher testMatcher = Pattern.compile(MD5Patterns.VECTOR3_PATTERN).matcher(vector);
-				if (testMatcher.find())
+				if (testMatcher.find()) {
 					assertEquals(vector, testMatcher.group());
+				}
 			}
 		}
 	}
 	
 	public static class CommandLinePatternTest {
-		
+		@Test
+		public void testCommandLinePattern() {
+			String[] testCommands = {"\"help\" ", "\"this\"that", "\"faster\""};
+			for (String command : testCommands) {
+				Matcher testMatcher = Pattern.compile(MD5Patterns.VECTOR3_PATTERN).matcher("commandLine " + command);
+				if (testMatcher.find()) {
+					assertEquals(command, testMatcher.group());
+				}
+			}
+		}
 	}
 }
