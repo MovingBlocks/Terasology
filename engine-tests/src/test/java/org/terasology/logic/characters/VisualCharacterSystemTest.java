@@ -161,9 +161,9 @@ public class VisualCharacterSystemTest {
         // Proper getId and exists method are needed to make equals work properly.
         Mockito.when(entityRef.getId()).thenReturn(nextEntityId++);
         Mockito.when(entityRef.exists()).thenReturn(true);
-
         return entityRef;
     }
+    
     private void simulateProperLinkingOfLocalPlayerAndCharacterEntities(EntityRef clientEntity, EntityRef otherClientEntity, EntityRef ownCharacterEntity, EntityRef otherCharacterEntity) {
         // Simulate linking of character with client
         clientEntityReturnedByLocalPlayer = clientEntity;
