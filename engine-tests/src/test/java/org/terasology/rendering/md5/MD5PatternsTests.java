@@ -56,7 +56,7 @@ public class MD5PatternsTests {
 	public static class Vector3PatternTest {
 		@Test
 		public void testVector3Pattern() {
-			String[] testVectors = {"(10.1 25.0 99E1 )", "(9.5 54.0e9.3 99E1 )"}; //TODO do we want the space after the last one?
+			String[] testVectors = {"(10.5 25.0 99E1 )", "(9.5 54.0e9.3 99E1 )", "(4 6.2 11E6.6 )"}; //TODO do we want the space after the last one?
 			for (String vector : testVectors) {
 				Matcher testMatcher = Pattern.compile(MD5Patterns.VECTOR3_PATTERN).matcher(vector);
 				if (testMatcher.find())
@@ -66,7 +66,15 @@ public class MD5PatternsTests {
 	}
 	
 	public static class Vector2PattersTest {
-		
+		@Test
+		public void testVector2Pattern() {
+			String[] testVectors = {"(10.1 25.0 )", "(9.5 9E1 )", "(1 4e9.0 )"};
+			for (String vector : testVectors) {
+				Matcher testMatcher = Pattern.compile(MD5Patterns.VECTOR3_PATTERN).matcher(vector);
+				if (testMatcher.find())
+					assertEquals(vector, testMatcher.group());
+			}
+		}
 	}
 	
 	public static class CommandLinePatternTest {
