@@ -149,14 +149,14 @@ float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtVi
 
     float fogInt = length(cameraToFogWorldPosition) * volumetricHeightDensityAtViewer;
     const float slopeThreshold = 0.01;
+    float t = heightFalloff * cameraToFogWorldPosition.y;
 
-    if (abs(cameraToFogWorldPosition.y) > slopeThreshold)
+    if (abs(t) > slopeThreshold)
     {
-        float t = heightFalloff * cameraToFogWorldPosition.y;
         fogInt *= (1.0 - exp(-t)) / t;
     }
 
-    return exp(-globalDensity * fogInt);
+    return 1 - exp(-globalDensity * fogInt);
 }
 
 float calcLuminance(vec3 color) {

@@ -52,11 +52,10 @@ uniform float outlineThickness;
 #define VOLUMETRIC_FOG_COLOR 1.0, 1.0, 1.0
 
 uniform mat4 invViewProjMatrix;
-uniform vec4 volumetricFogSettings;
+uniform vec3 volumetricFogSettings;
 #define volFogDensityAtViewer volumetricFogSettings.x
 #define volFogGlobalDensity volumetricFogSettings.y
 #define volFogHeightFalloff volumetricFogSettings.z
-#define volFogDensity volumetricFogSettings.w
 
 uniform vec3 fogWorldPosition;
 #endif
@@ -164,8 +163,7 @@ void main() {
 
 #ifdef VOLUMETRIC_FOG
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
-    float volumetricFogValue = volFogDensity *
-        calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
+    float volumetricFogValue = calcVolumetricFog(worldPosition - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
 
     vec3 volFogColor = vec3(VOLUMETRIC_FOG_COLOR);
 

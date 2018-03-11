@@ -49,7 +49,7 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
 
 /**
  * An instance of this class takes advantage of the content of a number of previously filled buffers
- * to add screen-space ambient occlusion (SSAO), outlines, reflections [1], atmospheric haze and volumetric fog [2]
+ * to add screen-space ambient occlusion (SSAO), outlines, reflections [1], atmospheric haze and volumetric fog
  *
  * As this node does not quite use 3D geometry and only relies on 2D sources and a 2D output buffer, it
  * could be argued that, despite its name, it represents the first step of the PostProcessing portion
@@ -58,7 +58,6 @@ import static org.terasology.rendering.opengl.OpenGLUtils.renderFullscreenQuad;
  * has been shot on stage or on location.
  *
  * [1] And refractions? To be verified.
- * [2] Currently not working: the code is there but it is never enabled.
  */
 public class PrePostCompositeNode extends AbstractNode implements PropertyChangeListener {
     private static final ResourceUrn PRE_POST_MATERIAL_URN = new ResourceUrn("engine:prog.prePostComposite");
@@ -97,6 +96,14 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 1.0f)
     private float hazeThreshold = 0.8f;
+    
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = 0.0f, max = 0.1f)
+    private float volFogGlobalDensity = 0.005f;
+    @SuppressWarnings("FieldCanBeLocal")
+    @Range(min = -0.1f, max = 0.1f)
+    private float volFogHeightFalloff = -0.01f;
+    
 
     public PrePostCompositeNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -177,7 +184,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
         if (volumetricFogIsEnabled) {
             prePostMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-            //TODO: Other parameters and volumetric fog test case is needed
+            prePostMaterial.setFloat3("volumetricFogSettings", 1f, volFogGlobalDensity, volFogHeightFalloff, true);
         }
 
         if (hazeIsEnabled) {
