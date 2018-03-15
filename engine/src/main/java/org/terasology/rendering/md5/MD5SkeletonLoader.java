@@ -47,14 +47,14 @@ import java.util.regex.Pattern;
 @RegisterAssetFileFormat
 public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData> {
 
-    private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
-    private static final String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
-    private static final String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
-    private static final String VECTOR2_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
+    private static final String INTEGER_PATTERN = MD5Patterns.INTEGER_PATTERN;
+    private static final String FLOAT_PATTERN = MD5Patterns.FLOAT_PATTERN;
+    private static final String VECTOR3_PATTERN = MD5Patterns.VECTOR3_PATTERN;
+    private static final String VECTOR2_PATTERN = MD5Patterns.VECTOR2_PATTERN;
 
     private static final Logger logger = LoggerFactory.getLogger(MD5SkeletonLoader.class);
 
-    private Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
+    private Pattern commandLinePattern = MD5Patterns.commandLinePattern;
     private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + VECTOR3_PATTERN + "\\s*" + VECTOR3_PATTERN);
     private Pattern vertPatten = Pattern.compile("vert\\s+" + INTEGER_PATTERN + "\\s+" + VECTOR2_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN);
     private Pattern triPattern = Pattern.compile("tri\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN);
