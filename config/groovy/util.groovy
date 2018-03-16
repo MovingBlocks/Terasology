@@ -130,6 +130,7 @@ switch(cleanerArgs[0]) {
         break
 
     case "list":
+        ListFormat listFormat  = determineListFormat(cleanerArgs)
         String[] availableItems = common.retrieveAvailableItems()
         String[] localItems = common.retrieveLocalItems()
         String[] downloadableItems = availableItems.minus(localItems)
@@ -139,13 +140,13 @@ switch(cleanerArgs[0]) {
         } else if (downloadableItems.size() == 0) {
             println "All items are already downloaded."
         } else {
-            printListItems(downloadableItems)
+            printListItems(downloadableItems, listFormat)
         }
         println "\nThe following items are already downloaded:"
         if(localItems.size() == 0) {
             println "No items downloaded."
         } else {
-            printListItems(localItems)
+            printListItems(localItems, listFormat)
         }
         break
 
@@ -153,11 +154,25 @@ switch(cleanerArgs[0]) {
         println "UNRECOGNIZED COMMAND '" + cleanerArgs[0] + "' - please try again or use 'groovyw usage' for help"
 }
 
-private void printListItems(String[] items) {
-    def final CONDENSED_FORMAT_THRESHOLD = 50
-    items.size() < CONDENSED_FORMAT_THRESHOLD ?
-        printListItemsSimple(items) :
-        printListItemsCondensed(items)
+enum ListFormat { DEFAULT, SIMPLE, CONDENSED };
+
+private ListFormat determineListFormat(String[] args) {
+    for (listFormat in ListFormat.values()) {
+        if (args.contains("-${listFormat.name().toLowerCase()}-list-format"))
+            return listFormat;
+    }
+    return ListFormat.DEFAULT;
+}
+
+private void printListItems(String[] items, ListFormat listFormat) {
+    def final DEFAULT_FORMAT_CONDENSATION_THRESHOLD = 50
+    switch (listFormat) {
+        case ListFormat.SIMPLE: printListItemsSimple(items); break;
+        case ListFormat.CONDENSED: printListItemsCondensed(items); break;
+        default: items.size() < DEFAULT_FORMAT_CONDENSATION_THRESHOLD ?
+            printListItemsSimple(items) :
+            printListItemsCondensed(items)
+    }
 }
 
 private void printListItemsSimple(String[] items) {
@@ -193,12 +208,17 @@ def printUsage() {
     println "- 'list-remotes (item)' - lists all remotes for (item) "
     println ""
     println "Available flags:"
-    println "-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"
+    println "'-remote [someRemote]' to clone from an alternative remote, also adding the upstream org (like MovingBlocks) repo as 'origin'"
     println "       Note: 'get' + 'recurse' only. This will override an alternativeGithubHome set via gradle.properties."
+    println "'-simple-list-format' to print one item per row. This flag applies only to 'list' sub-command"
+    println "'-condensed-list-format' to group items by starting letter. This flag applies only to 'list' sub-command"
+    println "'-default-list-format' to print short lists in simple format and long ones in condensed format. "
+    println "       Note: This flag is implicitly switched on for 'list' sub-command and can be overridden"
+    println "             with explicit use of '-simple-list-format' or '-condensed-list-format' flag"
     println ""
     println "Example: 'groovyw module get Sample -remote jellysnake' - would retrieve Sample from jellysnake's Sample repo on GitHub."
     println "Example: 'groovyw module recurse GooeysQuests Sample' - would retrieve those modules plus their dependencies as source"
-    println "Example: 'groovyw libs list' - would list library projects compatible with being embedded in a Terasology workspace"
+    println "Example: 'groovyw lib list' - would list library projects compatible with being embedded in a Terasology workspace"
     println ""
     println "*NOTE*: Item names are case sensitive. If you add items then `gradlew idea` or similar may be needed to refresh your IDE"
     println ""
