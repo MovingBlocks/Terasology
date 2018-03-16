@@ -26,6 +26,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -56,18 +57,44 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
+
+        addDesiredStateChange(new EnableFaceCulling());
     }
 
     public void enableWireframe() {
+        boolean refreshTaskList = false;
+
+        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
+        if (getDesiredStateChanges().contains(faceCullingStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
+            refreshTaskList = true;
+        }
+
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
+            refreshTaskList = true;
+        }
+
+        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
+        boolean refreshTaskList = false;
+
+        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
+        if (!getDesiredStateChanges().contains(faceCullingStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
+            refreshTaskList = true;
+        }
+
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList = true;
+        }
+
+        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }

@@ -31,6 +31,7 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
@@ -95,6 +96,8 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
+        addDesiredStateChange(new EnableFaceCulling());
+
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
         chunkMaterial = getMaterial(CHUNK_MATERIAL_URN);
@@ -122,15 +125,39 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
     }
 
     public void enableWireframe() {
+        boolean refreshTaskList = false;
+
+        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
+        if (getDesiredStateChanges().contains(faceCullingStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
+            refreshTaskList = true;
+        }
+
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
             addDesiredStateChange(wireframeStateChange);
+            refreshTaskList = true;
+        }
+
+        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
+        boolean refreshTaskList = false;
+
+        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
+        if (!getDesiredStateChanges().contains(faceCullingStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
+            refreshTaskList = true;
+        }
+
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
             removeDesiredStateChange(wireframeStateChange);
+            refreshTaskList = true;
+        }
+
+        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }

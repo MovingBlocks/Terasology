@@ -29,6 +29,7 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -94,6 +95,8 @@ public class ShadowMapNode extends ConditionDependentNode implements PropertyCha
         addDesiredStateChange(new BindFbo(shadowMapFbo));
         addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL_URN));
+
+        addDesiredStateChange(new EnableFaceCulling());
     }
 
     private float calculateTexelSize(int shadowMapResolution) {
