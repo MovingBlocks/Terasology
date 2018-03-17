@@ -27,8 +27,5 @@ public class MD5Patterns {
     public static final String FLOAT_PATTERN = "((?:[\\+-]?\\d*(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d*(?:\\.\\d*)?|\\.\\d+))?)";
     public static final String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
     public static final String VECTOR2_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
-    public static Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
+    public static final String commandLinePattern = "commandline \"(.*)\".*";
 }
-
-
-

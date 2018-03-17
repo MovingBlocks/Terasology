@@ -47,18 +47,19 @@ import java.util.regex.Pattern;
 @RegisterAssetFileFormat
 public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData> {
 
-    private static final String INTEGER_PATTERN = MD5Patterns.INTEGER_PATTERN;
-    private static final String FLOAT_PATTERN = MD5Patterns.FLOAT_PATTERN;
-    private static final String VECTOR3_PATTERN = MD5Patterns.VECTOR3_PATTERN;
-    private static final String VECTOR2_PATTERN = MD5Patterns.VECTOR2_PATTERN;
-
     private static final Logger logger = LoggerFactory.getLogger(MD5SkeletonLoader.class);
 
-    private Pattern commandLinePattern = MD5Patterns.commandLinePattern;
-    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + VECTOR3_PATTERN + "\\s*" + VECTOR3_PATTERN);
-    private Pattern vertPatten = Pattern.compile("vert\\s+" + INTEGER_PATTERN + "\\s+" + VECTOR2_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN);
-    private Pattern triPattern = Pattern.compile("tri\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN);
-    private Pattern weightPattern = Pattern.compile("weight\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + VECTOR3_PATTERN);
+    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s*" + MD5Patterns.VECTOR3_PATTERN + "\\s*" + MD5Patterns.VECTOR3_PATTERN);
+    private Pattern vertPatten = Pattern.compile("vert\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s+" + MD5Patterns.VECTOR2_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s+" + MD5Patterns.INTEGER_PATTERN);
+    private Pattern triPattern = Pattern.compile("tri\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s+" + MD5Patterns.INTEGER_PATTERN);
+    private Pattern weightPattern = Pattern.compile("weight\\s+" + MD5Patterns.INTEGER_PATTERN + 
+            "\\s+" + MD5Patterns.INTEGER_PATTERN + "\\s+" + MD5Patterns.FLOAT_PATTERN + 
+            "\\s+" + MD5Patterns.VECTOR3_PATTERN);
 
     public MD5SkeletonLoader() {
         super("md5mesh");
@@ -118,7 +119,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);
 
         line = MD5ParserCommon.readToLine(reader, "commandline ");
-        Matcher commandlineMatch = commandLinePattern.matcher(line);
+        Matcher commandlineMatch = Pattern.compile(MD5Patterns.commandLinePattern).matcher(line);
         if (commandlineMatch.matches()) {
             md5.commandline = commandlineMatch.group(1);
         }
