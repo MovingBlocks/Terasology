@@ -44,9 +44,14 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private WorldRenderer worldRenderer;
 
     private SetWireframe wireframeStateChange;
+    private EnableFaceCulling faceCullingStateChange;
 
     public OpaqueObjectsNode(Context context) {
         componentSystemManager = context.get(ComponentSystemManager.class);
+
+        // Added before instantiating WireframeTrigger so it can remove this state change if needed - see enableWireframe()
+        faceCullingStateChange = new EnableFaceCulling();
+        addDesiredStateChange(faceCullingStateChange);
 
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
@@ -57,44 +62,20 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
-
-        addDesiredStateChange(new EnableFaceCulling());
     }
 
     public void enableWireframe() {
-        boolean refreshTaskList = false;
-
-        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
-        if (getDesiredStateChanges().contains(faceCullingStateChange)) {
-            removeDesiredStateChange(faceCullingStateChange);
-            refreshTaskList = true;
-        }
-
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList = true;
-        }
-
-        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
-        boolean refreshTaskList = false;
-
-        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
-        if (!getDesiredStateChanges().contains(faceCullingStateChange)) {
-            addDesiredStateChange(faceCullingStateChange);
-            refreshTaskList = true;
-        }
-
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList = true;
-        }
-
-        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }

@@ -65,6 +65,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
     private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
+    private EnableFaceCulling faceCullingStateChange;
     private RenderingDebugConfig renderingDebugConfig;
 
     private SubmersibleCamera activeCamera;
@@ -86,6 +87,10 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         renderQueues = context.get(RenderQueuesHelper.class);
         worldProvider = context.get(WorldProvider.class);
 
+        // Added before instantiating WireframeTrigger so it can remove this state change if needed - see enableWireframe()
+        faceCullingStateChange = new EnableFaceCulling();
+        addDesiredStateChange(faceCullingStateChange);
+
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
@@ -95,8 +100,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         addDesiredStateChange(new LookThrough(activeCamera));
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
-
-        addDesiredStateChange(new EnableFaceCulling());
 
         addDesiredStateChange(new EnableMaterial(CHUNK_MATERIAL_URN));
 
@@ -125,39 +128,17 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
     }
 
     public void enableWireframe() {
-        boolean refreshTaskList = false;
-
-        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
-        if (getDesiredStateChanges().contains(faceCullingStateChange)) {
-            removeDesiredStateChange(faceCullingStateChange);
-            refreshTaskList = true;
-        }
-
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
             addDesiredStateChange(wireframeStateChange);
-            refreshTaskList = true;
-        }
-
-        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }
 
     public void disableWireframe() {
-        boolean refreshTaskList = false;
-
-        EnableFaceCulling faceCullingStateChange = new EnableFaceCulling();
-        if (!getDesiredStateChanges().contains(faceCullingStateChange)) {
-            addDesiredStateChange(faceCullingStateChange);
-            refreshTaskList = true;
-        }
-
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
             removeDesiredStateChange(wireframeStateChange);
-            refreshTaskList = true;
-        }
-
-        if (refreshTaskList) {
             worldRenderer.requestTaskListRefresh();
         }
     }
