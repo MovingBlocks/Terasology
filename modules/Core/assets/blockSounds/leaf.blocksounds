@@ -1,0 +1,5 @@
+{
+    "stepSounds": [],
+    "destroySounds": ["core:Leaves"],
+    "digSounds": ["core:Leaves"]
+}
