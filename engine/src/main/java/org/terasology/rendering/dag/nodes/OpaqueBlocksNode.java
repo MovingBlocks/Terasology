@@ -87,6 +87,10 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         renderQueues = context.get(RenderQueuesHelper.class);
         worldProvider = context.get(WorldProvider.class);
 
+        worldRenderer = context.get(WorldRenderer.class);
+        activeCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThrough(activeCamera));
+
         // Added before instantiating WireframeTrigger so it can remove this state change if needed - see enableWireframe()
         faceCullingStateChange = new EnableFaceCulling();
         addDesiredStateChange(faceCullingStateChange);
@@ -94,10 +98,6 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         wireframeStateChange = new SetWireframe(true);
         renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
-
-        worldRenderer = context.get(WorldRenderer.class);
-        activeCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new LookThrough(activeCamera));
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 

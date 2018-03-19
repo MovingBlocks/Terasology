@@ -49,6 +49,10 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     public OpaqueObjectsNode(Context context) {
         componentSystemManager = context.get(ComponentSystemManager.class);
 
+        worldRenderer = context.get(WorldRenderer.class);
+        Camera playerCamera = worldRenderer.getActiveCamera();
+        addDesiredStateChange(new LookThrough(playerCamera));
+
         // Added before instantiating WireframeTrigger so it can remove this state change if needed - see enableWireframe()
         faceCullingStateChange = new EnableFaceCulling();
         addDesiredStateChange(faceCullingStateChange);
@@ -56,10 +60,6 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
         wireframeStateChange = new SetWireframe(true);
         RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
         new WireframeTrigger(renderingDebugConfig, this);
-
-        worldRenderer = context.get(WorldRenderer.class);
-        Camera playerCamera = worldRenderer.getActiveCamera();
-        addDesiredStateChange(new LookThrough(playerCamera));
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
     }
