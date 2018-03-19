@@ -99,11 +99,10 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.1f)
-    private float volFogGlobalDensity = 0.005f;
+    private float volumetricFogGlobalDensity = 0.005f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = -0.1f, max = 0.1f)
-    private float volFogHeightFalloff = -0.01f;
-    
+    private float volumetricFogHeightFalloff = -0.01f;
 
     public PrePostCompositeNode(Context context) {
         worldRenderer = context.get(WorldRenderer.class);
@@ -184,7 +183,7 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
 
         if (volumetricFogIsEnabled) {
             prePostMaterial.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-            prePostMaterial.setFloat3("volumetricFogSettings", 1f, volFogGlobalDensity, volFogHeightFalloff, true);
+            prePostMaterial.setFloat3("volumetricFogSettings", 1f, volumetricFogGlobalDensity, volumetricFogHeightFalloff, true);
         }
 
         if (hazeIsEnabled) {

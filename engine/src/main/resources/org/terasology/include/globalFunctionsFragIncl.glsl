@@ -147,16 +147,15 @@ float calcPcfShadowTerm(sampler2D shadowMap, float lightDepth, vec2 texCoord, fl
 float calcVolumetricFog(vec3 fogWorldPosition, float volumetricHeightDensityAtViewer, float globalDensity, float heightFalloff) {
     vec3 cameraToFogWorldPosition = -fogWorldPosition;
 
-    float fogInt = length(cameraToFogWorldPosition) * volumetricHeightDensityAtViewer;
+    float fogTotal = length(cameraToFogWorldPosition) * volumetricHeightDensityAtViewer;
     const float slopeThreshold = 0.01;
-    float t = heightFalloff * cameraToFogWorldPosition.y;
+    float heightDensityFactor = heightFalloff * cameraToFogWorldPosition.y;
 
-    if (abs(t) > slopeThreshold)
-    {
-        fogInt *= (1.0 - exp(-t)) / t;
+    if (abs(heightDensityFactor) > slopeThreshold) {
+        fogTotal *= (1.0 - exp(-heightDensityFactor)) / heightDensityFactor;
     }
 
-    return 1 - exp(-globalDensity * fogInt);
+    return 1 - exp(-globalDensity * fogTotal);
 }
 
 float calcLuminance(vec3 color) {
