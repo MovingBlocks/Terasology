@@ -227,6 +227,11 @@ public interface WorldRenderer {
      *
      * This object is used by Engine and Modules to add/remove Nodes to/from the rendering process.
      *
+     * Nodes encapsulate the rendering functionality of the renderer. A node might provide a basic rendering
+     * of the landscape, another might add deferred lighting to it while another might add tone mapping
+     * to the resulting 2d image. Arbitrary features and effects can be added or removed by adding or removing
+     * nodes to the graph and connecting them appropriately with other nodes.
+     *
      * @return the RenderGraph containing the nodes used by the rendering process.
      */
     RenderGraph getRenderGraph();

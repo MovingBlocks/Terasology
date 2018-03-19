@@ -50,7 +50,14 @@ public class RenderGraph {
         }
 
         if (graph.nodes().contains(node)) {
-            throw new RuntimeException("The node " + nodeUri + " has already been added, with a different uri!");
+            SimpleUri existingNodeUri = null;
+            for (Map.Entry<SimpleUri, Node> nodeEntry : nodeMap.entrySet()) {
+                if (nodeEntry.getValue().equals(node)) {
+                    existingNodeUri = nodeEntry.getKey();
+                }
+            }
+
+            throw new RuntimeException("Node addition failure: '" + nodeUri + "' has already been added, to the render graph, with uri '" + existingNodeUri +"'");
         }
 
         nodeMap.put(nodeUri, node);
@@ -62,11 +69,11 @@ public class RenderGraph {
 
         Node node = findNode(nodeUri);
         if (!graph.nodes().contains(node)) {
-            throw new RuntimeException("The node you specified is not present in the graph!");
+            throw new RuntimeException("Node removal failure: there is no '" + nodeUri + "' in the render graph!");
         }
 
         if (graph.adjacentNodes(node).size() != 0) {
-            throw new RuntimeException("The node you are trying to remove is still connected to other nodes in the graph!");
+            throw new RuntimeException("Node removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
         }
 
         nodeMap.remove(nodeUri);
@@ -86,7 +93,7 @@ public class RenderGraph {
     public boolean connect(Node ... nodeList) {
         boolean returnValue = true;
 
-        Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect()");
+        Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
         Node fromNode = null;
 
@@ -94,13 +101,12 @@ public class RenderGraph {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
             if (fromNode != null) {
-                boolean success = graph.putEdge(fromNode, toNode);
-
-                if (!success) {
+                if (!graph.hasEdgeConnecting(fromNode, toNode)) {
+                    graph.putEdge(fromNode, toNode);
+                } else {
                     logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
+                    returnValue = false;
                 }
-
-                returnValue = returnValue && success;
             }
 
             fromNode = toNode;
@@ -112,6 +118,10 @@ public class RenderGraph {
     public boolean disconnect(Node fromNode, Node toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
+
+        if (!graph.hasEdgeConnecting(fromNode, toNode)) {
+            logger.warn("Trying to disconnect two already disconnected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
+        }
 
         return graph.removeEdge(fromNode, toNode);
     }
@@ -168,6 +178,7 @@ public class RenderGraph {
     public void dispose() {
         for (Node node : nodeMap.values()) {
             graph.removeNode(node);
+            node.dispose();
         }
         nodeMap.clear();
     }

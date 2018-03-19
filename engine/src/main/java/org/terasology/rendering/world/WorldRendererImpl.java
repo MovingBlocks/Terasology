@@ -263,8 +263,7 @@ public final class WorldRendererImpl implements WorldRenderer {
         addOutputNodes(renderGraph);
 
         renderTaskListGenerator = new RenderTaskListGenerator();
-        List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
-        renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
+        requestTaskListRefresh();
     }
 
     private void addGBufferClearingNodes(RenderGraph renderGraph) {
