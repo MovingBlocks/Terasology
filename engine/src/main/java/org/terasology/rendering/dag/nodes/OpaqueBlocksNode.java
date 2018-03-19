@@ -91,7 +91,12 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
 
-        // Added before instantiating WireframeTrigger so it can remove this state change if needed - see enableWireframe()
+        // IF wireframe is enabled the WireframeTrigger will remove the face culling state change
+        // from the set of desired state changes.
+        // The alternative would have been to check here first if wireframe mode is enabled and *if not*
+        // add the face culling state change. However, if wireframe *is* enabled, the WireframeTrigger
+        // would attempt to remove the face culling state even though it isn't there, relying on the
+        // quiet behaviour of Set.remove(nonExistentItem). We therefore favored the first solution.
         faceCullingStateChange = new EnableFaceCulling();
         addDesiredStateChange(faceCullingStateChange);
 
