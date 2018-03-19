@@ -275,9 +275,7 @@ public class ChunkMesh {
                 break;
             case ALPHA_REJECT:
                 renderVbo(1);
-                glDisable(GL_CULL_FACE);
                 renderVbo(2);
-                glEnable(GL_CULL_FACE);
                 break;
             case REFRACTIVE:
                 renderVbo(3);
