@@ -67,11 +67,14 @@ void main() {
     vec4 colorTransparent = texture2D(texSceneReflectiveRefractive, gl_TexCoord[0].xy);
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
 
-#if defined VOLUMETRIC_FOG || defined LOCAL_REFLECTIONS
-    vec3 worldPositionViewSpace = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invProjMatrix);
+#if defined VOLUMETRIC_FOG
+    // TODO: As costly as in the deferred light geometry pass - frustum ray method would be great here
+    vec3 fragmentPositionInCameraSpace = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invViewProjMatrix);
 #endif
 
 #if defined (LOCAL_REFLECTIONS)
+    vec3 worldPositionViewSpace = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invProjMatrix);
+
     vec4 transparentNormalColorValue = texture2D(texSceneReflectiveRefractiveNormals, gl_TexCoord[0].xy).xyzw;
     vec3 reflectionNormal = transparentNormalColorValue.xyz * 2.0 - 1.0;
     vec3 viewingDirection = normalize(worldPositionViewSpace.xyz);
@@ -160,7 +163,7 @@ void main() {
 
 #ifdef VOLUMETRIC_FOG
     // Use lightValueAtPlayerPos to avoid volumetric fog in caves
-    float volumetricFogValue = calcVolumetricFog(worldPositionViewSpace - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
+    float volumetricFogValue = calcVolumetricFog(fragmentPositionInCameraSpace - fogWorldPosition, volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff);
 
     vec3 volFogColor = vec3(VOLUMETRIC_FOG_COLOR);
 
