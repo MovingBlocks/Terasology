@@ -90,9 +90,7 @@ public class RenderGraph {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public boolean connect(Node ... nodeList) {
-        boolean returnValue = true;
-
+    public void connect(Node ... nodeList) {
         Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
         Node fromNode = null;
@@ -105,17 +103,14 @@ public class RenderGraph {
                     graph.putEdge(fromNode, toNode);
                 } else {
                     logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
-                    returnValue = false;
                 }
             }
 
             fromNode = toNode;
         }
-
-        return returnValue;
     }
 
-    public boolean disconnect(Node fromNode, Node toNode) {
+    public void disconnect(Node fromNode, Node toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
@@ -123,7 +118,7 @@ public class RenderGraph {
             logger.warn("Trying to disconnect two already disconnected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
         }
 
-        return graph.removeEdge(fromNode, toNode);
+        graph.removeEdge(fromNode, toNode);
     }
 
     // TODO: Add `boolean isFullyFunctional(Node node)`
