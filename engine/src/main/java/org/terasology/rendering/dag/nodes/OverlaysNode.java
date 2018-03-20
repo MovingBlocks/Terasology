@@ -50,13 +50,13 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
     public OverlaysNode(Context context) {
         componentSystemManager = context.get(ComponentSystemManager.class);
 
-        wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
-        new WireframeTrigger(renderingDebugConfig, this);
-
         worldRenderer = context.get(WorldRenderer.class);
         SubmersibleCamera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
+
+        wireframeStateChange = new SetWireframe(true);
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
