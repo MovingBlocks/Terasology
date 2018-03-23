@@ -80,7 +80,7 @@ void main() {
 
 // Only necessary for opaque objects
 #if !defined (FEATURE_REFRACTIVE_PASS)
-	if (clip > 0.001 && vertexWorldPos.y < clip) {
+	if (vertexWorldPos.y < clip) {
         discard;
 	}
 #endif
