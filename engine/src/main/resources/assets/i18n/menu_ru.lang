@@ -174,6 +174,8 @@
     "preview-world-title": "Предварительный просмотр мира",
     "preview-zoom-factor": "Масштаб",
     "previous-toolbar-item": "Предыдущий инструмент",
+    "remove-confirmation-popup-title": "Подтвердите удаление",
+    "remove-confirmation-popup-message": "Вы уверены, что хотите это удалить?",
     "remove-binding": "удалить",
     "remove-server": "Удалить",
     "reset-default": "Сброс настроек",
