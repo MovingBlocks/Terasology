@@ -298,8 +298,7 @@ class common {
      */
     String[] retrieveAvailableItems() {
 
-        // TODO: The GitHub API allows 100 only items max before paginating (30 by default). Need more pages in some cases
-        // By the time a call to list items reaches that point we need better ways to display the result as well
+        // TODO: We need better ways to display the result especially when it contains a lot of items
         // However, in some cases heavy filtering could still mean that very few items will actually display ...
         // Another consideration is if we should be more specific in the API request, like only retrieving name + description
         def githubHomeApiUrl = "https://api.github.com/users/$githubTargetHome/repos?per_page=100"
@@ -311,14 +310,32 @@ class common {
 
         // Make a temporary map of found repos (possible items) and the associated repo description (for filter options)
         def mappedPossibleItems = [:]
-        def githubHomeApiData = new URL(githubHomeApiUrl).getText()
+        def currentPageUrl = githubHomeApiUrl
         def slurper = new JsonSlurper()
-        def parsedData = slurper.parseText(githubHomeApiData)
-        parsedData.each {
-            mappedPossibleItems.put(it.name, it.description)
+        while (currentPageUrl) {
+            new URL(currentPageUrl).openConnection().with { connection ->
+                connection.content.withReader { reader ->
+                    slurper.parseText(reader.text).each { item ->
+                        mappedPossibleItems.put(item.name, item.description)
+                    }
+                }
+                currentPageUrl = getLink(connection, "next")
+            }
         }
 
         return itemTypeScript.filterItemsFromApi(mappedPossibleItems)
+    }
+
+    /**
+     * Retrieves link from HTTP headers (RFC 5988).
+     * @param connection connection to retrieve link from
+     * @param relation relation type of requested link
+     * @return link with the requested relation type
+     */
+    private static String getLink(URLConnection connection, String relation) {
+        def links = connection.getHeaderField("Link")
+        def linkMatcher = links =~ /<(.*)>;\s*rel="${relation}"/
+        linkMatcher.find() ? linkMatcher.group(1) : null
     }
 
     /**
