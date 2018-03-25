@@ -71,7 +71,7 @@ public class MenuControlSystem extends BaseComponentSystem {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
-        if(getPlayerCount()==2) {
+        if(getPlayerCount()==1) {
             if (!time.isPaused()) {
                 time.setPaused(true);
             } else {
