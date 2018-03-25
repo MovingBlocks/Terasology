@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import org.terasology.audio.AudioManager;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -29,6 +30,7 @@ import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -49,14 +51,18 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private Time time;
-
-    //private boolean isPaused=false;
-    //private float currTimeDilation=time.getGameTimeDilation();
+    @In
+    private EntityManager entityManager;
 
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("dropItemRegion");  //Ensure the drop region is behind the toolbar
         nuiManager.getHUD().addHUDElement("toolbar");
+    }
+
+    private int getPlayerCount() {
+        int playerCount=entityManager.getCountOfEntitiesWith(ClientInfoComponent.class);
+        return playerCount;
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -65,12 +71,12 @@ public class MenuControlSystem extends BaseComponentSystem {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
-
-        if(!time.isPaused()){
-            time.setPaused(true);
-        }
-        else{
-            time.setPaused(false);
+        if(getPlayerCount()==2) {
+            if (!time.isPaused()) {
+                time.setPaused(true);
+            } else {
+                time.setPaused(false);
+            }
         }
     }
 
