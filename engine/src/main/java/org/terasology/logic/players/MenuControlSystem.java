@@ -40,6 +40,7 @@ import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.Assets;
 import org.terasology.engine.Time;
 
+
 /**
  * This system controls the client's in-game menus (Pause screen, Death screen, HUDs and overlays).
  */
@@ -71,11 +72,14 @@ public class MenuControlSystem extends BaseComponentSystem {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
-        if(getPlayerCount()==1) {
-            if (!time.isPaused()) {
-                time.setPaused(true);
-            } else {
-                time.setPaused(false);
+        if ((event.getState() == ButtonState.DOWN) || (event.getState() == ButtonState.UP))
+        {
+            if(getPlayerCount()==1) {
+                if (!time.isPaused()) {
+                    time.setPaused(true);
+                } else {
+                    time.setPaused(false);
+                }
             }
         }
     }
