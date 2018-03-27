@@ -49,17 +49,6 @@ public class RenderGraph {
             throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
         }
 
-        if (graph.nodes().contains(node)) {
-            SimpleUri existingNodeUri = null;
-            for (Map.Entry<SimpleUri, Node> nodeEntry : nodeMap.entrySet()) {
-                if (nodeEntry.getValue().equals(node)) {
-                    existingNodeUri = nodeEntry.getKey();
-                }
-            }
-
-            throw new RuntimeException("Node addition failure: '" + nodeUri + "' has already been added, to the render graph, with uri '" + existingNodeUri +"'");
-        }
-
         nodeMap.put(nodeUri, node);
         graph.addNode(node);
     }
