@@ -61,7 +61,7 @@ public class MenuControlSystem extends BaseComponentSystem {
         nuiManager.getHUD().addHUDElement("toolbar");
     }
 
-    private int getPlayerCount() {
+   private int getPlayerCount() {
         int playerCount=entityManager.getCountOfEntitiesWith(ClientInfoComponent.class);
         return playerCount;
     }
@@ -72,14 +72,13 @@ public class MenuControlSystem extends BaseComponentSystem {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
-        if ((event.getState() == ButtonState.DOWN) || (event.getState() == ButtonState.UP))
+        if(getPlayerCount()==1)
         {
-            if(getPlayerCount()==1) {
-                if (!time.isPaused()) {
-                    time.setPaused(true);
-                } else {
-                    time.setPaused(false);
-                }
+            if(nuiManager.isOpen("engine:pauseMenu")) {
+                time.setPaused(true);
+            }
+            else{
+                time.setPaused(false);
             }
         }
     }
