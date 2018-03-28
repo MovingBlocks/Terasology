@@ -180,7 +180,7 @@ public class WorldReflectionNode extends ConditionDependentNode {
             }
         }
 
-        chunkMaterial.setFloat("clip", activeCamera.getClipHeight(), true);
+        chunkMaterial.setFloat("clip", activeCamera.getReflectionHeight(), true);
 
         // Actual Node Processing
 
