@@ -61,7 +61,9 @@ public class MenuControlSystem extends BaseComponentSystem {
         nuiManager.getHUD().addHUDElement("toolbar");
     }
 
-   private int getPlayerCount() {
+    //TODO
+    //Implement this function in a separate file for reusabitility
+    private int getPlayerCount() {
         int playerCount=entityManager.getCountOfEntitiesWith(ClientInfoComponent.class);
         return playerCount;
     }
