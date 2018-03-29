@@ -418,7 +418,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             List<String> codedWorldInfo = new ArrayList<>();
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null) {
+            if (serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
             }
 
@@ -437,7 +437,7 @@ public class JoinGameScreen extends CoreScreenLayer {
             List<String> codedWorldInfo = new ArrayList<>();
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null) {
+            if (serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
             }
 
@@ -452,7 +452,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         try {
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null) {
+            if (serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
             }
 
