@@ -418,8 +418,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             List<String> codedWorldInfo = new ArrayList<>();
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null)
+            if(serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+            }
 
             for (WorldInfo wi : serverInfoMessage.getWorldInfoList()) {
                 float timeInDays = wi.getTime() / (float) WorldTime.DAY_LENGTH;
@@ -436,8 +437,9 @@ public class JoinGameScreen extends CoreScreenLayer {
             List<String> codedWorldInfo = new ArrayList<>();
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null)
+            if(serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+            }
 
             codedWorldInfo.add(String.format("%d", serverInfoMessage.getOnlinePlayersAmount()));
             return Joiner.on('\n').join(codedWorldInfo);
@@ -450,8 +452,9 @@ public class JoinGameScreen extends CoreScreenLayer {
         try {
             ServerInfoMessage serverInfoMessage = info.get();
 
-            if(serverInfoMessage == null)
+            if(serverInfoMessage == null) {
                 return FontColor.getColored(translationSystem.translate("${engine:menu#connection-failed}"), Color.RED);
+            }
 
             List<String> codedModInfo = new ArrayList<>();
             ModuleRegistry reg = moduleManager.getRegistry();
