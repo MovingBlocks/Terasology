@@ -78,8 +78,8 @@ uniform float clip;
 
 void main() {
 
-// Only necessary for opaque objects
-#if !defined (FEATURE_REFRACTIVE_PASS)
+// Active for worldReflectionNode only.
+#if defined FEATURE_USE_FORWARD_LIGHTING
 	if (vertexWorldPos.y < clip) {
         discard;
 	}
