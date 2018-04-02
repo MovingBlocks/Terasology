@@ -709,7 +709,10 @@ public class KinematicCharacterMover implements CharacterMover {
                 movementComp.numberOfJumpsLeft--;
             }
 
-            state.setGrounded(false);
+            if (state.isGrounded()) {
+                movementComp.numberOfJumpsLeft--;
+                state.setGrounded(false);
+            }
         }
         if (input.isFirstRun() && moveResult.isHorizontalHit()) {
             Vector3f hitVelocity = new Vector3f(state.getVelocity());
