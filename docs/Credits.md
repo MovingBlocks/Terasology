@@ -223,7 +223,9 @@ Contributors
  [manas96](https://github.com/manas96),
  [morrilet](https://github.com/morrilet),
  [J-Dill](https://github.com/J-Dill),
- [mwesolowski](https://github.com/mwesolowski)
+ [mwesolowski](https://github.com/mwesolowski),
+ [4Denthusiast](https://github.com/4Denthusiast),
+ [Shade254](https://github.com/Shade254)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
