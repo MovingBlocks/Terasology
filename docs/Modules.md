@@ -21,7 +21,6 @@ Here's a list of modules bundled with the game by default (this line-up will cha
 * [AdditionalRails](https://github.com/Terasology/AdditionalRails) - container module for more rails
 * [AdditionalVegetables](https://github.com/Terasology/AdditionalVegetables) - container module for more vegetables
 * [AdditionalWorlds](https://github.com/Terasology/AdditionalWorlds) - container module for more worlds
-* [AdvancedBehaviors](https://github.com/Terasology/AdvancedBehaviors) - adds behavior trees and logic for NPCs!
 * [AdventureAssets](https://github.com/Terasology/AdventureAssets) - a set of assets for adventure time!
 * [Alchemy](https://github.com/Terasology/Alchemy) - create alchemical potions!
 * [AlchemyPlantGenerator](https://github.com/Terasology/AlchemyPlantGenerator) - a world plugin that'll seed the plants used by Alchemy into a given plugin-capable world
