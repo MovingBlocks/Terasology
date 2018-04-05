@@ -79,10 +79,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    private float parallaxBias = 0.05f;
+    private float parallaxBias = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    private float parallaxScale = 0.05f;
+    private float parallaxScale = 0.5f;
 
     public AlphaRejectBlocksNode(Context context) {
         renderQueues = context.get(RenderQueuesHelper.class);
