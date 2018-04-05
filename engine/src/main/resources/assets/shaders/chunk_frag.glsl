@@ -45,6 +45,7 @@ varying vec3 worldSpaceNormal;
 varying mat3 normalMatrix;
 
 uniform sampler2D textureAtlasNormal;
+#endif
 
 #if defined (PARALLAX_MAPPING)
 uniform vec4 parallaxProperties;
@@ -52,7 +53,6 @@ uniform vec4 parallaxProperties;
 #define parallaxScale parallaxProperties.y
 
 uniform sampler2D textureAtlasHeight;
-#endif
 #endif
 
 
@@ -92,7 +92,7 @@ void main() {
     vec3 normalOpaque = normal;
     float shininess = 0.0;
 
-#if defined (NORMAL_MAPPING)
+#if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
     vec3 dp1 = dFdx(vertexProjPos.xyz);
@@ -114,11 +114,12 @@ void main() {
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
 	texCoord += height * normalize(eyeTangentSpace).xy * TEXTURE_OFFSET;
 #endif
-
+#if defined (NORMAL_MAPPING)
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
     normalOpaque = normalize(tbn * normalOpaque);
 
     shininess = texture2D(textureAtlasNormal, texCoord).w;
+#endif
 #endif
 
 #ifdef FEATURE_REFRACTIVE_PASS

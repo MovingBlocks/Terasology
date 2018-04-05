@@ -117,10 +117,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);
+        }
 
-            if (parallaxMappingIsEnabled) {
-                addDesiredStateChange(setTerrainHeightInputTexture);
-            }
+        if (parallaxMappingIsEnabled) {
+            addDesiredStateChange(setTerrainHeightInputTexture);
         }
     }
 
@@ -168,10 +168,10 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
         chunkMaterial.setInt("textureLava", 2, true);
         if (normalMappingIsEnabled) {
             chunkMaterial.setInt("textureAtlasNormal", 3, true);
-            if (parallaxMappingIsEnabled) {
-                chunkMaterial.setInt("textureAtlasHeight", 4, true);
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        }
+        if (parallaxMappingIsEnabled) {
+            chunkMaterial.setInt("textureAtlasHeight", 4, true);
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
         chunkMaterial.setFloat("clip", 0.0f, true);
@@ -215,24 +215,16 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 } else {
                     removeDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 }
                 break;
             case RenderingConfig.PARALLAX_MAPPING:
                 parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
-                if (normalMappingIsEnabled) {
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    } else {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
                 }
                 break;
 

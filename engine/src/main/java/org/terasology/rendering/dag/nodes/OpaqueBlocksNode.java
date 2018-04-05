@@ -125,10 +125,10 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);
+        }
 
-            if (parallaxMappingIsEnabled) {
-                addDesiredStateChange(setTerrainHeightInputTexture);
-            }
+        if (parallaxMappingIsEnabled) {
+            addDesiredStateChange(setTerrainHeightInputTexture);
         }
     }
 
@@ -175,10 +175,8 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         chunkMaterial.setFloat("clip", 0.0f, true);
 
-        if (normalMappingIsEnabled) {
-            if (parallaxMappingIsEnabled) {
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        if (parallaxMappingIsEnabled) {
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
         // Actual Node Processing
@@ -237,25 +235,17 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 } else {
                     removeDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 }
                 break;
 
             case RenderingConfig.PARALLAX_MAPPING:
                 parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
-                if (normalMappingIsEnabled) {
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    } else {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
                 }
                 break;
 
