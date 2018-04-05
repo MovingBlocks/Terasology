@@ -97,7 +97,7 @@ void main() {
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
     // Screen-space coordinates happen to be a coordinate system to which it's possible to relate both view-space and texture coordinates, but are themselves irrelevant.
     mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
-    mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy));
+    mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy)) / TEXTURE_OFFSET;
     //mat2 uvToScreem = inverse(screenToUv);
     //inverse is not available in GLSL 1.20, so calculate it manually:
         float det = screenToUv[0][0] * screenToUv[1][1] - screenToUv[1][0] * screenToUv[0][1];
