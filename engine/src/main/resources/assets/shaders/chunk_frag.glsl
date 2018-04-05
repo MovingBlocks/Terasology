@@ -76,6 +76,12 @@ uniform sampler2D textureLava;
 
 uniform float clip;
 
+//inverse is not available in GLSL 1.20, so calculate it manually
+mat2 inverse2(mat2 m) {
+    float det = m[0][0] * m[1][1] - m[1][0] * m[0][1];
+    return mat2(m[1][1], -m[0][1], -m[1][0], m[0][0]) / det;
+}
+
 void main() {
 
 // Active for worldReflectionNode only.
@@ -95,34 +101,29 @@ void main() {
 #if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
-    // Screen-space coordinates happen to be a coordinate system to which it's possible to relate both view-space and texture coordinates, but are themselves irrelevant.
+    // The specific relationship between screen coordinates and view coordinates is irrelevant here. Screen coordinates just happen to be a basis that it's possible to relate both view and UV space coordinates to.
     mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
     mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy)) / TEXTURE_OFFSET;
-    //mat2 uvToScreem = inverse(screenToUv);
-    //inverse is not available in GLSL 1.20, so calculate it manually:
-        float det = screenToUv[0][0] * screenToUv[1][1] - screenToUv[1][0] * screenToUv[0][1];
-        mat2 uvToScreen = mat2(vec2(screenToUv[1][1],-screenToUv[0][1]),vec2(-screenToUv[1][0],screenToUv[0][0])) / det;
+    mat2 uvToScreen = inverse2(screenToUv);
     mat2x3 uvToView = screenToView * uvToScreen;
-    mat3 tbn = mat3(uvToView[0], uvToView[1], normal);
 
 #if defined (PARALLAX_MAPPING)
-    vec3 eyeTangentSpace = normalizedVPos * tbn;
+    vec2 viewDirectionTextureOffset = normalizedVPos * uvToView;
 
-    float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-    //Ideally this should be divided by eyeTangentSpace.z, but in practice this looks better at
-    //low angles, as it can't extend beyond its original space.
-	texCoord += height * eyeTangentSpace.xy * TEXTURE_OFFSET;
+    float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
+    //Ideally this should be divided by dot(normal, normalizedVPos), as the texture offset is the amount the light-ray travels in across the texture in the time it takes to traverse the distance "height" perpendicular to the surface, but in practice this way looks better at low angles, as the height-map can't make the triangle extend beyond its normal size.
+	texCoord += height * viewDirectionTextureOffset * TEXTURE_OFFSET;
 	
 	//Crudely prevent the parallax from extending to other textures in the same atlas.
 	vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
-	vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge.
+	vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
 	texCoord = clamp(texCoord, texCorner, texCorner + texSize);
 #endif
 #if defined (NORMAL_MAPPING)
-    //Normalised but not orthonormalised. It should usually be orthogonal anyway, but it's not obvious what's the best thing to do when it isn't.
-    mat3 tbnNormalised = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
+    //Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
+    mat3 extendedTangentSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
-    normalOpaque = normalize(tbnNormalised * normalOpaque);
+    normalOpaque = normalize(extendedTangentSpaceToViewSpace * normalOpaque);
 
     shininess = texture2D(textureAtlasNormal, texCoord).w;
 #endif
