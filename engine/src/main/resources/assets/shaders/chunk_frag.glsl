@@ -95,28 +95,27 @@ void main() {
 #if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
-    vec3 dp1 = dFdx(vertexProjPos.xyz);
-    vec3 dp2 = dFdy(vertexProjPos.xyz);
-    vec2 duv1 = dFdx(gl_TexCoord[0].xy);
-    vec2 duv2 = dFdy(gl_TexCoord[0].xy);
-
-    vec3 dp2perp = cross(dp2, normal);
-    vec3 dp1perp = cross(normal, dp1);
-    vec3 tangent = dp2perp * duv1.x + dp1perp * duv2.x;
-    vec3 binormal = dp2perp * duv1.y + dp1perp * duv2.y;
-
-    float invMax = inversesqrt(max(dot(tangent,tangent), dot(binormal,binormal)));
-    mat3 tbn = mat3(tangent * invMax, binormal * invMax, normal);
+    // Screen-space coordinates happen to be a coordinate system to which it's possible to relate both view-space and texture coordinates, but are themselves irrelevant.
+    mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
+    mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy));
+    //mat2 uvToScreem = inverse(screenToUv);
+    //inverse is not available in GLSL 1.20, so calculate it manually:
+        float det = screenToUv[0][0] * screenToUv[1][1] - screenToUv[1][0] * screenToUv[0][1];
+        mat2 uvToScreen = mat2(vec2(screenToUv[1][1],-screenToUv[0][1]),vec2(-screenToUv[1][0],screenToUv[0][0])) / det;
+    mat2x3 uvToView = screenToView * uvToScreen;
+    mat3 tbn = mat3(uvToView[0], uvToView[1], normal);
 
 #if defined (PARALLAX_MAPPING)
-    vec3 eyeTangentSpace = tbn * vertexViewPos.xyz;
+    vec3 eyeTangentSpace = transpose(tbn) * normalizedVPos;
 
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-	texCoord += height * normalize(eyeTangentSpace).xy * TEXTURE_OFFSET;
+	texCoord += height * eyeTangentSpace.xy / eyeTangentSpace.z * TEXTURE_OFFSET;
 #endif
 #if defined (NORMAL_MAPPING)
+    //Normalised but not orthonormalised. It should usually be orthogonal anyway, but it's not obvious what's the best thing to do when it isn't.
+    mat3 tbnNormalised = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
-    normalOpaque = normalize(tbn * normalOpaque);
+    normalOpaque = normalize(tbnNormalised * normalOpaque);
 
     shininess = texture2D(textureAtlasNormal, texCoord).w;
 #endif
