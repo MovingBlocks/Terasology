@@ -106,10 +106,15 @@ void main() {
     mat3 tbn = mat3(uvToView[0], uvToView[1], normal);
 
 #if defined (PARALLAX_MAPPING)
-    vec3 eyeTangentSpace = transpose(tbn) * normalizedVPos;
+    vec3 eyeTangentSpace = normalizedVPos * tbn;
 
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
 	texCoord += height * eyeTangentSpace.xy / eyeTangentSpace.z * TEXTURE_OFFSET;
+	
+	//Crudely prevent the parallax from extending to other textures in the same atlas.
+	vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
+	vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge.
+	texCoord = clamp(texCoord, texCorner, texCorner + texSize);
 #endif
 #if defined (NORMAL_MAPPING)
     //Normalised but not orthonormalised. It should usually be orthogonal anyway, but it's not obvious what's the best thing to do when it isn't.
