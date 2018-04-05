@@ -109,7 +109,9 @@ void main() {
     vec3 eyeTangentSpace = normalizedVPos * tbn;
 
     float height =  parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-	texCoord += height * eyeTangentSpace.xy / eyeTangentSpace.z * TEXTURE_OFFSET;
+    //Ideally this should be divided by eyeTangentSpace.z, but in practice this looks better at
+    //low angles, as it can't extend beyond its original space.
+	texCoord += height * eyeTangentSpace.xy * TEXTURE_OFFSET;
 	
 	//Crudely prevent the parallax from extending to other textures in the same atlas.
 	vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
