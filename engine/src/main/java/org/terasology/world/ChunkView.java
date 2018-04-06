@@ -187,6 +187,38 @@ public interface ChunkView {
     void setLiquid(int x, int y, int z, LiquidData newState);
 
     /**
+     * @param pos
+     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     */
+    byte getRawLiquid(Vector3i pos);
+
+    /**
+     * @param x
+     * @param y
+     * @param z
+     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     */
+    byte getRawLiquid(int x, int y, int z);
+
+    /**
+     * Sets the liquid state at the given position, if it is within the view
+     *
+     * @param pos
+     * @param newState
+     */
+    void setRawLiquid(Vector3i pos, byte newState);
+
+    /**
+     * Sets the liquid state at the given position, if it is within the view
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param newState
+     */
+    void setRawLiquid(int x, int y, int z, byte newState);
+
+    /**
      * Converts a coordinate from view-space to world space.
      *
      * @param localPos

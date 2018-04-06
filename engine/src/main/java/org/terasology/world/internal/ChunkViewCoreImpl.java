@@ -210,6 +210,36 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
+    public byte getRawLiquid(Vector3i pos) {
+        return getRawLiquid(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        if (!blockRegion.encompasses(x, y, z)) {
+            return 0;
+        }
+
+        int chunkIndex = relChunkIndex(x, y, z);
+        return chunks[chunkIndex].getRawLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize));
+    }
+
+    @Override
+    public void setRawLiquid(Vector3i pos, byte newState) {
+        setRawLiquid(pos.x, pos.y, pos.z, newState);
+    }
+
+    @Override
+    public void setRawLiquid(int x, int y, int z, byte newState) {
+        if (blockRegion.encompasses(x, y, z)) {
+            int chunkIndex = relChunkIndex(x, y, z);
+            chunks[chunkIndex].setRawLiquid(ChunkMath.calcBlockPos(x, y, z, chunkFilterSize), newState);
+        } else {
+            throw new IllegalStateException("Attempted to modify liquid data though an unlocked view");
+        }
+    }
+
+    @Override
     public void setLight(Vector3i pos, byte light) {
         setLight(pos.x, pos.y, pos.z, light);
     }

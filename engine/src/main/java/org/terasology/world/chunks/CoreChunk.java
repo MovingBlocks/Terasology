@@ -155,6 +155,42 @@ public interface CoreChunk {
     LiquidData getLiquid(int x, int y, int z);
 
     /**
+     * Sets raw liquid data at given position relative to the chunk.
+     *
+     * @param pos   Position of the block relative to corner of the chunk
+     * @param state Liquid state to set the block to
+     */
+    void setRawLiquid(BaseVector3i pos, byte state);
+
+    /**
+     * Sets raw liquid data at given position relative to the chunk.
+     *
+     * @param x        X offset from the corner of the chunk
+     * @param y        Y offset from the corner of the chunk
+     * @param z        Z offset from the corner of the chunk
+     * @param newState Liquid state to set the block to
+     */
+    void setRawLiquid(int x, int y, int z, byte newState);
+
+    /**
+     * Returns raw liquid data at given position relative to the chunk.
+     *
+     * @param pos Position of the block relative to corner of the chunk
+     * @return Liquid state currently assigned to the block
+     */
+    byte getRawLiquid(BaseVector3i pos);
+
+    /**
+     * Returns raw liquid data at given position relative to the chunk.
+     *
+     * @param x X offset from the corner of the chunk
+     * @param y Y offset from the corner of the chunk
+     * @param z Z offset from the corner of the chunk
+     * @return Liquid state currently assigned to the block
+     */
+    byte getRawLiquid(int x, int y, int z);
+
+    /**
      * Returns offset of this chunk to the world center (0:0:0), with one unit being one chunk.
      *
      * @return Offset of this chunk from world center in chunks

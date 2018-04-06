@@ -313,6 +313,32 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
+    public boolean setRawLiquid(int x, int y, int z, byte newState, byte oldState) {
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
+        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            LiquidData liquidState = chunk.getLiquid(blockPos);
+            if (liquidState.equals(oldState)) {
+                chunk.setRawLiquid(blockPos, newState);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        Vector3i chunkPos = ChunkMath.calcChunkPos(x, y, z);
+        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
+            return chunk.getRawLiquid(blockPos);
+        }
+        return 0;
+    }
+
+    @Override
     public Block getBlock(int x, int y, int z) {
         CoreChunk chunk = chunkProvider.getChunk(ChunkMath.calcChunkPosX(x), ChunkMath.calcChunkPosY(y), ChunkMath.calcChunkPosZ(z));
         if (chunk != null) {

@@ -132,6 +132,16 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
+    public boolean setRawLiquid(int x, int y, int z, byte newData, byte oldData) {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public byte getRawLiquid(int x, int y, int z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public Block getBlock(int x, int y, int z) {
         Block result = blocks.get(new Vector3i(x, y, z));
         if (result == null) {

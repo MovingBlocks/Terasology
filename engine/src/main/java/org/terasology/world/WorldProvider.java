@@ -54,6 +54,22 @@ public interface WorldProvider extends WorldProviderCore {
     LiquidData getLiquid(Vector3i blockPos);
 
     /**
+     * @param pos
+     * @param state    The new value of the liquid state
+     * @param oldState The expected previous value of the liquid state
+     * @return Whether the liquid change was made successfully. Will fail of oldState != the current state, or if the underlying chunk is not available
+     */
+    boolean setRawLiquid(Vector3i pos, byte state, byte oldState);
+
+    /**
+     * Returns the liquid state at the given position.
+     *
+     * @param blockPos
+     * @return The state of the block
+     */
+    byte getRawLiquid(Vector3i blockPos);
+
+    /**
      * Returns the block value at the given position.
      *
      * @param pos The position
