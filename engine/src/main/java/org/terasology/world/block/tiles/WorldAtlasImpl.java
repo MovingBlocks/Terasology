@@ -158,6 +158,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private int indexTile(ResourceUrn uri) {
+        logger.info("Adding tile: "+uri.toString());
         if (tiles.size() == MAX_TILES) {
             logger.error("Maximum tiles exceeded");
             return 0;

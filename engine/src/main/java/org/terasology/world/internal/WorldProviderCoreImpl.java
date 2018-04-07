@@ -318,8 +318,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = ChunkMath.calcBlockPos(x, y, z);
-            LiquidData liquidState = chunk.getLiquid(blockPos);
-            if (liquidState.equals(oldState)) {
+            byte liquidState = chunk.getRawLiquid(blockPos);
+            if (liquidState == oldState) {
                 chunk.setRawLiquid(blockPos, newState);
                 return true;
             }
