@@ -68,6 +68,12 @@ public class ClientCommands extends BaseComponentSystem {
         return "World time changed";
     }
 
+    @Command(shortDescription = "Permanently sets the current world time in days", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public  String setPermanentWorldTime(@CommandParam("day") float day) {
+        worldProvider.getTime().togglePermanentTime();
+        worldProvider.getTime().setDays(day);
+        return "World time changed";
+    }
     /**
      * Sets the spawn location for the client to the current location
      * @return String containing debug information on the entity

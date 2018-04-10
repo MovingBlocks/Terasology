@@ -30,7 +30,7 @@ import org.terasology.world.WorldComponent;
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 
     private static final float WORLD_TIME_MULTIPLIER = 48f;
-
+    private boolean PERMANENTLY_SET_TIME = false;
     private AtomicLong worldTime = new AtomicLong(0);
 
     @In
@@ -71,22 +71,27 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
     }
 
     @Override
+    public void togglePermanentTime () {PERMANENTLY_SET_TIME = !PERMANENTLY_SET_TIME;}
+
+    @Override
     public void update(float delta) {
-        long deltaMs = time.getGameDeltaInMs();
-        if (deltaMs > 0) {
-            deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
-            long startTime = worldTime.getAndAdd(deltaMs);
-            long endTime = startTime + deltaMs;
+        if (!PERMANENTLY_SET_TIME) {
+            long deltaMs = time.getGameDeltaInMs();
+            if (deltaMs > 0) {
+                deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
+                long startTime = worldTime.getAndAdd(deltaMs);
+                long endTime = startTime + deltaMs;
 
-            long startTick = startTime / TICK_EVENT_RATE;
-            long endTick = endTime / TICK_EVENT_RATE;
+                long startTick = startTime / TICK_EVENT_RATE;
+                long endTick = endTime / TICK_EVENT_RATE;
 
-            if (startTick != endTick) {
-                long tick = endTime - endTime % TICK_EVENT_RATE;
-                getWorldEntity().send(new WorldTimeEvent(tick));
+                if (startTick != endTick) {
+                    long tick = endTime - endTime % TICK_EVENT_RATE;
+                    getWorldEntity().send(new WorldTimeEvent(tick));
+                }
+
+                // TODO: consider sending a DailyTick (independent from solar events such as midnight)
             }
-
-            // TODO: consider sending a DailyTick (independent from solar events such as midnight)
         }
     }
 
@@ -96,4 +101,6 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
         }
         return EntityRef.NULL;
     }
+
+
 }
