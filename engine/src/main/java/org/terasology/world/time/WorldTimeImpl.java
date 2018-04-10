@@ -101,6 +101,4 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
         }
         return EntityRef.NULL;
     }
-
-
 }

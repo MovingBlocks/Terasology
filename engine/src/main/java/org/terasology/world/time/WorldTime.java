@@ -72,5 +72,10 @@ public interface WorldTime extends ComponentSystem {
      * @param timeInDays
      */
     void setDays(float timeInDays);
+
+    /**
+     * Permanently sets the world time in terms of days
+     *
+     */
     void togglePermanentTime ();
 }

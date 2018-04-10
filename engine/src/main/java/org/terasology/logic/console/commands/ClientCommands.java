@@ -72,7 +72,7 @@ public class ClientCommands extends BaseComponentSystem {
     public  String setPermanentWorldTime(@CommandParam("day") float day) {
         worldProvider.getTime().togglePermanentTime();
         worldProvider.getTime().setDays(day);
-        return "World time changed";
+        return "Permanently set the world time to " + day;
     }
     /**
      * Sets the spawn location for the client to the current location
