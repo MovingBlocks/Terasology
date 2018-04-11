@@ -38,6 +38,7 @@ import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
+import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.VisualComponent;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -132,6 +133,9 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
             EntityRef newItem = heldItemComponent.selectedItem;
+            if (newItem.hasComponent(LightComponent.class)){
+                localPlayer.getCharacterEntity().addComponent(new LightComponent());
+            }
             linkHeldItemLocationForLocalPlayer(newItem);
         }
     }
