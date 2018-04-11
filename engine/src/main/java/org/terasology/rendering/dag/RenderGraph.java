@@ -57,7 +57,7 @@ public class RenderGraph {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
         Node node = findNode(nodeUri);
-        if (!graph.nodes().contains(node)) {
+        if (node == null) {
             throw new RuntimeException("Node removal failure: there is no '" + nodeUri + "' in the render graph!");
         }
 
@@ -104,7 +104,7 @@ public class RenderGraph {
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
         if (!graph.hasEdgeConnecting(fromNode, toNode)) {
-            logger.warn("Trying to disconnect two already disconnected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
+            logger.warn("Trying to disconnect two nodes that aren't connected, " + fromNode.getUri() + " and " + toNode.getUri());
         }
 
         graph.removeEdge(fromNode, toNode);
