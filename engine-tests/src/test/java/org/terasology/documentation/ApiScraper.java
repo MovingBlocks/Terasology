@@ -84,7 +84,6 @@ public final class ApiScraper {
                     } else {
                         //System.out.println("Jar-based Class: " + apiClass + ", came from " + location);
                         sortedApi.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
-
                     }
 
                     break;

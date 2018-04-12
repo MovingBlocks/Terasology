@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.sandbox.API;
 import org.terasology.testUtil.ModuleManagerFactory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -119,11 +120,40 @@ public final class CompleteApiScraper {
             api.put(category, apiPackage + " (PACKAGE)");
         } else {
             //System.out.println("Local Class: " + apiClass + ", came from " + location);
-            api.put(category, apiClass.getName() + (apiClass.isInterface() ? " (INTERFACE)" : " (CLASS)"));
+            String className = apiClass.getName();
+            String type;
+            if(apiClass.isInterface()){
+                type = " (INTERFACE)";
+            } else {
+                int modifier = apiClass.getModifiers();
+                if( Modifier.isAbstract(modifier)){
+                    type = " (ABSTRACT CLASS)";
+                }else{
+                    type = " (CLASS)";
+                }
+            }
+            api.put(category, className + type);
+
+            Constructor[] constructors = apiClass.getDeclaredConstructors();
+            for(int i = 0; i < constructors.length; i++){
+                api.put(category, " - " + constructors[i].getName() +  " (CONSTRUCTOR)");
+                api.put(category, " -- " + Arrays.toString(constructors[i].getParameterTypes()) +  " (PARAMETERS)");
+            }
+
+
             Method[] methods = apiClass.getDeclaredMethods();
             for(int i = 0; i < methods.length; i++){
                 if(!methods[i].isDefault() && !methods[i].isBridge() && !methods[i].isSynthetic()){
-                    api.put(category, " - " + methods[i].getName() +  " (METHOD)");
+
+                    //
+                    int modifier = methods[i].getModifiers();
+                    if( Modifier.isAbstract(modifier)){
+                        type = " (ABSTRACT METHOD)";
+                    }else{
+                        type = " (METHOD)";
+                    }
+                    //
+                    api.put(category, " - " + methods[i].getName() +  type);
                     api.put(category, " -- " + methods[i].getReturnType() +  " (RETURN)");
                     api.put(category, " -- " + Arrays.toString(methods[i].getParameterTypes()) +  " (PARAMETERS)");
                     api.put(category, " -- " + Arrays.toString(methods[i].getExceptionTypes()) +  " (EXCEPTIONS)");

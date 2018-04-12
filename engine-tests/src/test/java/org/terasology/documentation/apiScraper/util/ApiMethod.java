@@ -18,7 +18,7 @@ package org.terasology.documentation.apiScraper.util;
 
 public class ApiMethod {
 
-    public static final String DEFAULT_VALUE = "DEFAULT";
+    //public static final String DEFAULT_VALUE = "DEFAULT";
 
     private String className;
     private String name;
@@ -34,9 +34,9 @@ public class ApiMethod {
         this.parametersType = parametersType;
     }
 
-    public ApiMethod(){
+    /*public ApiMethod(){
         this(DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE);
-    }
+    }*/
 
     public String getClassName(){
         return className;
