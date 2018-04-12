@@ -93,7 +93,7 @@ void main() {
 
     vec2 texCoord = gl_TexCoord[0].xy;
 
-    vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
+    vec3 normalizedViewPos = -normalize(vertexViewPos.xyz);
     vec2 projectedPos = projectVertexToTexCoord(vertexProjPos);
     vec3 normalOpaque = normal;
     float shininess = 0.0;
@@ -101,18 +101,18 @@ void main() {
 #if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
-    // The specific relationship between screen coordinates and view coordinates is irrelevant here. Screen coordinates just happen to be a basis that it's possible to relate both view and UV space coordinates to.
+    // The only reason dFdx and dFdy are used here is that it happens to be possible to relate both view and UV coordinates to screen-space coordinated. The specific relationship between screen coordinates and view coordinates is irrelevant.
     mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
     mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy)) / TEXTURE_OFFSET;
     mat2 uvToScreen = inverse2(screenToUv);
     mat2x3 uvToView = screenToView * uvToScreen;
 
 #if defined (PARALLAX_MAPPING)
-    vec2 viewDirectionTextureOffset = normalizedVPos * uvToView;
+    vec2 viewDirectionUvProjection = -normalizedViewPos * uvToView;
 
     float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-    //Ideally this should be divided by dot(normal, normalizedVPos), as the texture offset is the amount the light-ray travels in across the texture in the time it takes to traverse the distance "height" perpendicular to the surface, but in practice this way looks better at low angles, as the height-map can't make the triangle extend beyond its normal size.
-	texCoord += height * viewDirectionTextureOffset * TEXTURE_OFFSET;
+    //Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord is the component parallel to the surface of a vector along the view's forward axis, the other component being a vector perpendicular to the surface and having magnitude "height". In practice the current way looks better at low angles, as the height-map can't make the triangle protrude beyond its boundaries like displacement mapping would.
+	texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
 	
 	//Crudely prevent the parallax from extending to other textures in the same atlas.
 	vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
@@ -121,9 +121,9 @@ void main() {
 #endif
 #if defined (NORMAL_MAPPING)
     //Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
-    mat3 extendedTangentSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
+    mat3 uvnSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
-    normalOpaque = normalize(extendedTangentSpaceToViewSpace * normalOpaque);
+    normalOpaque = normalize(uvnSpaceToViewSpace * normalOpaque);
 
     shininess = texture2D(textureAtlasNormal, texCoord).w;
 #endif
@@ -237,7 +237,7 @@ void main() {
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
      if (isWater && isOceanWater) {
-            float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp);
+            float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedViewPos, waterSpecExp);
             color.xyz += vec3(specularHighlight, specularHighlight, specularHighlight);
 
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
@@ -247,7 +247,7 @@ void main() {
 
             /* FRESNEL */
             if (!swimming) {
-                float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
+                float f = fresnel(dot(normalWater, normalizedViewPos), waterFresnelBias, waterFresnelPow);
                 color += mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
                     reflectionColor * (1.0 - waterTint) + waterTint * litWaterTint, f);
             } else {
