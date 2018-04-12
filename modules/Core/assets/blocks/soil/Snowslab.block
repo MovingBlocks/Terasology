@@ -1,0 +1,13 @@
+{
+    "displayName": "Snowslab",
+    "basedOn": "core:soil",
+    "tiles": {
+        "top": "Snow",
+        "bottom": "Dirt",
+        "front": "SnowSideQuarter",
+        "back": "SnowSideQuarter",
+        "left": "SnowSideQuarter",
+        "right": "SnowSideQuarter"
+    },
+    "sounds": "Core:snow"
+}
