@@ -9,5 +9,10 @@
         "left": "SnowSideQuarter",
         "right": "SnowSideQuarter"
     },
+
+    "entity":  {
+        "prefab" : ""
+    },
+
     "sounds": "Core:snow"
 }
