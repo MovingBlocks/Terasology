@@ -136,6 +136,11 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
             if (newItem.hasComponent(LightComponent.class)){
                 localPlayer.getCharacterEntity().addComponent(new LightComponent());
             }
+            else {
+                if (localPlayer.getCharacterEntity().hasComponent(LightComponent.class)){
+                    localPlayer.getCharacterEntity().removeComponent(LightComponent.class);
+                }
+            }
             linkHeldItemLocationForLocalPlayer(newItem);
         }
     }
