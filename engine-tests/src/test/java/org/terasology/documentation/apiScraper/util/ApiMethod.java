@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 package org.terasology.documentation.apiScraper.util;
 
 
+import java.util.Objects;
+
+/**
+ * Saves informations about methods and constructors to be used at the ApiComparator class
+ */
 public class ApiMethod {
 
-    //public static final String DEFAULT_VALUE = "DEFAULT";
 
     private String className;
     private String name;
@@ -26,7 +30,15 @@ public class ApiMethod {
     private String exceptionType;
     private String parametersType;
 
-    public ApiMethod(String className, String name, String returnType, String exceptionType, String parametersType){
+    /**
+     *
+     * @param className Name of the class in which the method can be found
+     * @param name Name of the method
+     * @param returnType Return type of the method
+     * @param exceptionType List of exception types of the method
+     * @param parametersType List of the method's parameters' type
+     */
+    public ApiMethod(String className, String name, String returnType, String exceptionType, String parametersType) {
         this.className = className;
         this.name = name;
         this.returnType = returnType;
@@ -34,11 +46,8 @@ public class ApiMethod {
         this.parametersType = parametersType;
     }
 
-    /*public ApiMethod(){
-        this(DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE,DEFAULT_VALUE);
-    }*/
 
-    public String getClassName(){
+    public String getClassName() {
         return className;
     }
 
@@ -60,25 +69,25 @@ public class ApiMethod {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ApiMethod apiMethod = (ApiMethod) o;
 
-        if (!getClassName().equals(apiMethod.getClassName())) return false;
-        if (!getName().equals(apiMethod.getName())) return false;
-        if (!getReturnType().equals(apiMethod.getReturnType())) return false;
-        if (!getExceptionType().equals(apiMethod.getExceptionType())) return false;
-        return getParametersType().equals(apiMethod.getParametersType());
+
+        return getClassName().equals(apiMethod.getClassName())
+                && getName().equals(apiMethod.getName())
+                && getReturnType().equals(apiMethod.getReturnType())
+                && getExceptionType().equals(apiMethod.getExceptionType())
+                && getParametersType().equals(apiMethod.getParametersType());
     }
 
     @Override
     public int hashCode() {
-        int result = getClassName().hashCode();
-        result = 31 * result + getName().hashCode();
-        result = 31 * result + getReturnType().hashCode();
-        result = 31 * result + getExceptionType().hashCode();
-        result = 31 * result + getParametersType().hashCode();
-        return result;
+        return Objects.hash();
     }
 }
