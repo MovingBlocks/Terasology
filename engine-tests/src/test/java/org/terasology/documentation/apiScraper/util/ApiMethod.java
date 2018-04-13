@@ -31,7 +31,6 @@ public class ApiMethod {
     private String parametersType;
 
     /**
-     *
      * @param className Name of the class in which the method can be found
      * @param name Name of the method
      * @param returnType Return type of the method

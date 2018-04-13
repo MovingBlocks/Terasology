@@ -132,7 +132,6 @@ final class CompleteApiScraper {
             }
             stringApi.append("\n");
         }
-
         return stringApi;
     }
 
@@ -186,7 +185,5 @@ final class CompleteApiScraper {
                 api.put(category, " -- " + Arrays.toString(method.getExceptionTypes()) +  " (EXCEPTIONS)");
             }
         }
-
-
     }
 }

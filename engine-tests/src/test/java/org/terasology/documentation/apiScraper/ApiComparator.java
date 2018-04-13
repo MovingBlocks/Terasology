@@ -29,34 +29,38 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-
 /**
- * Generates a "New_API_file.txt" and compares it with the "API_file.txt" to detect major and minor version increases.
- * Major increases: Deletion of class, new abstract method, method deletion, existing method's change of
- * parameters types, exception types or return type.
- * Minor increases: Creation of a new class and new method in an interface or abstract class,
+ * Detects API changes between two versions.
  */
 public final class ApiComparator {
+
+    private static final String ORIGINAL_API_FILE = "API_file.txt";
+    private static final String NEW_API_FILE = "New_API_file.txt";
 
     private ApiComparator() {
 
     }
 
-
+    /*
+     * Generates a NEW_API_FILE and compares it with the ORIGINAL_API_FILE to detect major and minor version increases.
+     * Major increases: Deletion of class, new public abstract method, new interface public method,
+     * public method deletion, existing public method's change of parameters types, exception types or return type.
+     * Minor increases: Creation of a new class and new public method in an abstract class.
+     */
     public static void main(String[] args) throws Exception {
 
-        try (BufferedReader br = new BufferedReader(new FileReader("API_file.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(ORIGINAL_API_FILE))) {
 
             //Creating a map with the original api's data
             Map<String, Collection<ApiMethod>> originalApi = getApi(br);
             br.close();
 
             //Generating "New_API_file.txt"
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("New_API_file.txt")));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(NEW_API_FILE)));
             writer.write(CompleteApiScraper.getApi().toString());
             writer.flush();
             writer.close();
-            BufferedReader br2 = new BufferedReader(new FileReader("New_API_file.txt"));
+            BufferedReader br2 = new BufferedReader(new FileReader(NEW_API_FILE));
 
             //Creating a map with the new api's data
             Map<String, Collection<ApiMethod>> newApi = getApi(br2);
@@ -68,14 +72,12 @@ public final class ApiComparator {
             checkMethodChanges(originalApi, newApi);
             System.out.println("REPORT FINISHED");
         }
-
     }
 
     /**
-     * Reads an api file and puts it's information in a map to be used in the api comparison
+     * Reads an api file and puts its information in a map to be used in the api comparison
      * @param br BufferedReader containing an api file content
-     * @return A map with the api classes and interfaces as keys;
-     * Their methods and as a list of ApiMethods in the values
+     * @return A map with the api classes and interfaces as keys.Their methods and as a list of ApiMethods in the values
      * @throws Exception if the readLine fails.
      */
     private static Map<String, Collection<ApiMethod>> getApi(BufferedReader br) throws Exception {
@@ -135,13 +137,12 @@ public final class ApiComparator {
                 System.out.println("MINOR INCREASE, ADDITION OF " + className);
             }
         }
-
     }
 
     /**
      * Checks creation and deletion of methods, as well as existing method changes
-     * @param originalApi the original api generated from "API_file.txt"
-     * @param newApi the new apí generated from "New_API_file.txt"
+     * @param originalApi the original api generated from ORIGINAL_API_FILE
+     * @param newApi the new apí generated from NEW_API_FILE
      */
     private static void checkMethodChanges(Map<String, Collection<ApiMethod>> originalApi,
                                            Map<String, Collection<ApiMethod>> newApi) {
@@ -185,14 +186,18 @@ public final class ApiComparator {
                     if (method2.getName().endsWith("(ABSTRACT METHOD)")) {
                         System.out.println("MAJOR INCREASE, NEW ABSTRACT METHOD " + method2.getName() + " ON " + method2.getClassName());
                     } else {
-                        System.out.println("MINOR INCREASE, NEW METHOD " + method2.getName() + " ON " + method2.getClassName());
+                        String minorOrMajor;
+                        if (method2.getClassName().endsWith("(INTERFACE)")) {
+                            minorOrMajor = "MAJOR";
+                        } else {
+                            minorOrMajor = "MINOR";
+                        }
+                        System.out.println(minorOrMajor + " INCREASE, NEW METHOD " + method2.getName() + " ON " + method2.getClassName());
                     }
                     System.out.println("=================================================================");
                 }
             }
-
         }
-
     }
 
     private static void checkMethodDeletion(Collection<ApiMethod> originalMethods, Collection<ApiMethod> newMethods) {
@@ -232,7 +237,6 @@ public final class ApiComparator {
                 System.out.println("MAJOR INCREASE, METHOD DELETION:  " + method1.getName() + " ON " + method1.getClassName());
             }
         }
-
     }
 
     private static boolean isInterfaceOrAbstract(String className) {
@@ -265,7 +269,6 @@ public final class ApiComparator {
             System.out.println("NEW: " + s2);
             System.out.println("=================================================================");
         }
-
     }
 
     /**
@@ -282,8 +285,5 @@ public final class ApiComparator {
             }
         }
         return new ApiMethod("", "", "", "", "");
-
     }
-
-
 }
