@@ -67,7 +67,7 @@ public class MD5PatternsTests {
             for (int i = 0; i < testCommands.length; i++) {
                 testCommands[i] = "commandline " + testCommands[i];
             }
-            compareStringsToPattern(testCommands, MD5Patterns.commandLinePattern);
+            compareStringsToPattern(testCommands, MD5Patterns.COMMAND_LINE_PATTERN);
         }
     }
     

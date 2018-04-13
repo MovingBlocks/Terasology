@@ -119,7 +119,7 @@ public class MD5SkeletonLoader extends AbstractAssetFileFormat<SkeletalMeshData>
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);
 
         line = MD5ParserCommon.readToLine(reader, "commandline ");
-        Matcher commandlineMatch = Pattern.compile(MD5Patterns.commandLinePattern).matcher(line);
+        Matcher commandlineMatch = Pattern.compile(MD5Patterns.COMMAND_LINE_PATTERN).matcher(line);
         if (commandlineMatch.matches()) {
             md5.commandline = commandlineMatch.group(1);
         }

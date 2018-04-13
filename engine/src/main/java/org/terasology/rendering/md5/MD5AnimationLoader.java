@@ -57,7 +57,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
             "\\s*" + MD5Patterns.INTEGER_PATTERN + "\\s*" + MD5Patterns.INTEGER_PATTERN);
     private Pattern doubleVectorPattern = Pattern.compile(MD5Patterns.VECTOR3_PATTERN + 
             "\\s*" + MD5Patterns.VECTOR3_PATTERN);
-    private Pattern frameStartPattern = Pattern.compile("frame " + MD5Patterns.VECTOR3_PATTERN + " \\{");
+    private Pattern frameStartPattern = Pattern.compile("frame " + MD5Patterns.INTEGER_PATTERN + " \\{");
 
     public MD5AnimationLoader() {
         super("md5anim");
@@ -142,7 +142,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);
 
         line = MD5ParserCommon.readToLine(reader, "commandline ");
-        Matcher commandlineMatch = Pattern.compile(MD5Patterns.commandLinePattern).matcher(line);
+        Matcher commandlineMatch = Pattern.compile(MD5Patterns.COMMAND_LINE_PATTERN).matcher(line);
         if (commandlineMatch.matches()) {
             md5.commandline = commandlineMatch.group(1);
         }
