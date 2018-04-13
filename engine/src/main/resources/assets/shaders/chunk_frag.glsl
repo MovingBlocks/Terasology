@@ -101,7 +101,9 @@ void main() {
 #if defined (NORMAL_MAPPING) || defined (PARALLAX_MAPPING)
     // TODO: Calculates the tangent frame on the fly - this is absurdly costly... But storing
     // the tangent for each vertex in the chunk VBO might be not the best idea either.
-    // The only reason dFdx and dFdy are used here is that it happens to be possible to relate both view and UV coordinates to screen-space coordinated. The specific relationship between screen coordinates and view coordinates is irrelevant.
+    // The only reason dFdx and dFdy are used here is that it happens to be possible to relate 
+    // both view and UV coordinates to screen-space coordinated. The specific relationship between 
+    // screen coordinates and view coordinates is irrelevant.
     mat2x3 screenToView = mat2x3(dFdx(vertexViewPos.xyz), dFdy(vertexViewPos.xyz));
     mat2   screenToUv   = mat2  (dFdx(gl_TexCoord[0].xy), dFdy(gl_TexCoord[0].xy)) / TEXTURE_OFFSET;
     mat2 uvToScreen = inverse2(screenToUv);
@@ -120,7 +122,8 @@ void main() {
 	texCoord = clamp(texCoord, texCorner, texCorner + texSize);
 #endif
 #if defined (NORMAL_MAPPING)
-    //Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
+    // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular 
+    // block shapes like torches), but it's not obvious what's the best thing to do when it isn't.
     mat3 uvnSpaceToViewSpace = mat3(normalize(uvToView[0]), normalize(uvToView[1]), normal);
     normalOpaque = normalize(texture2D(textureAtlasNormal, texCoord).xyz * 2.0 - 1.0);
     normalOpaque = normalize(uvnSpaceToViewSpace * normalOpaque);
