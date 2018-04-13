@@ -86,9 +86,9 @@ void main() {
 
 // Active for worldReflectionNode only.
 #if defined FEATURE_USE_FORWARD_LIGHTING
-	if (vertexWorldPos.y < clip) {
+    if (vertexWorldPos.y < clip) {
         discard;
-	}
+    }
 #endif
 
     vec2 texCoord = gl_TexCoord[0].xy;
@@ -113,13 +113,17 @@ void main() {
     vec2 viewDirectionUvProjection = -normalizedViewPos * uvToView;
 
     float height = parallaxScale * texture2D(textureAtlasHeight, texCoord).r - parallaxBias;
-    //Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord is the component parallel to the surface of a vector along the view's forward axis, the other component being a vector perpendicular to the surface and having magnitude "height". In practice the current way looks better at low angles, as the height-map can't make the triangle protrude beyond its boundaries like displacement mapping would.
-	texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
+    // Ideally this should be divided by dot(normal, normalizedViewPos), as the offset for texCoord 
+    // is the component parallel to the surface of a vector along the view's forward axis, 
+    // the other component being a vector perpendicular to the surface and having magnitude "height". 
+    // In practice the current way looks better at low angles, as the height-map can't make the triangle 
+    // protrude beyond its boundaries like displacement mapping would.
+    texCoord += height * viewDirectionUvProjection * TEXTURE_OFFSET;
 	
-	//Crudely prevent the parallax from extending to other textures in the same atlas.
-	vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
-	vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
-	texCoord = clamp(texCoord, texCorner, texCorner + texSize);
+    //Crudely prevent the parallax from extending to other textures in the same atlas.
+    vec2 texCorner = floor(gl_TexCoord[0].xy/TEXTURE_OFFSET)*TEXTURE_OFFSET;
+    vec2 texSize = vec2(1,1)*TEXTURE_OFFSET*0.9999; //Remain strictly this side of the edge of the texture.
+    texCoord = clamp(texCoord, texCorner, texCorner + texSize);
 #endif
 #if defined (NORMAL_MAPPING)
     // Normalised but not orthonormalised. It should be orthogonal anyway (except for some non-rectangular 
@@ -239,37 +243,37 @@ void main() {
 
     // Apply reflection and refraction AFTER the lighting has been applied (otherwise bright areas below water become dark)
     // The water tint has still to be adjusted adjusted though...
-     if (isWater && isOceanWater) {
-            float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedViewPos, waterSpecExp);
-            color.xyz += vec3(specularHighlight, specularHighlight, specularHighlight);
+    if (isWater && isOceanWater) {
+        float specularHighlight = WATER_SPEC * calcDayAndNightLightingFactor(daylightValue, daylight) * calcSpecLightNormalized(normalWater, sunVecViewAdjusted, normalizedViewPos, waterSpecExp);
+        color.xyz += vec3(specularHighlight, specularHighlight, specularHighlight);
 
-            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
-            vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
+        vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
+        vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalWaterOffset.xy * waterRefraction).xyz, 1.0);
 
-            vec4 litWaterTint = vec4(WATER_TINT) * vec4(combinedLightValue.x, combinedLightValue.y, combinedLightValue.z, 1.0);
+        vec4 litWaterTint = vec4(WATER_TINT) * vec4(combinedLightValue.x, combinedLightValue.y, combinedLightValue.z, 1.0);
 
-            /* FRESNEL */
-            if (!swimming) {
-                float f = fresnel(dot(normalWater, normalizedViewPos), waterFresnelBias, waterFresnelPow);
-                color += mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
+        /* FRESNEL */
+        if (!swimming) {
+            float f = fresnel(dot(normalWater, normalizedViewPos), waterFresnelBias, waterFresnelPow);
+            color += mix(refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint,
                     reflectionColor * (1.0 - waterTint) + waterTint * litWaterTint, f);
-            } else {
-                color += refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
-            }
+        } else {
+             color += refractionColor * (1.0 - waterTint) +  waterTint * litWaterTint;
+        }
 
-            color.a = 1.0;
-     } else if (isWater) {
-            texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
-            texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-            texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
+        color.a = 1.0;
+    } else if (isWater) {
+        texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+        texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+        texCoord.y += mod(timeToTick(time, -0.1), 127.0) * (1.0/128.0);
 
-            vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
-            albedoColor.rgb *= combinedLightValue;
+        vec4 albedoColor = texture2D(textureWater, texCoord.xy).rgba;
+        albedoColor.rgb *= combinedLightValue;
 
-            vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
+        vec3 refractionColor = texture2D(texSceneOpaque, projectedPos + albedoColor.rg * 0.05).rgb;
 
-            color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
-            color.a = 1.0;
+        color.rgb += mix(refractionColor, albedoColor.rgb, albedoColor.a);
+        color.a = 1.0;
     } else {
         vec3 refractionColor = texture2D(texSceneOpaque, projectedPos).rgb;
         vec4 albedoColor = texture2D(textureAtlas, texCoord.xy);
