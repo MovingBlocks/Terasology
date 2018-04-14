@@ -34,8 +34,15 @@ import static org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice.DISPLAY_R
 import static org.terasology.rendering.opengl.ScalingFactors.FULL_SCALE;
 
 /**
- * TODO: Add javadocs
- * TODO: Better naming
+ * An instance of this class manages FBOs that need to be regenerated on resolution changes.
+ *
+ * The FBOs are regenerated when the display resolution changes or when a screenshot is triggered
+ * and the screenshot resolution differs from the display resolution.
+ *
+ * Before and after regeneration an event is fired to any subscribers of the instance.
+ * See method propertyChange(PropertyChangeEvent) for details.
+ *
+ * An instance of this class also generates a number of default FBOs: see the constructor for details.
  */
 public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
     public static final SimpleUri FINAL_BUFFER = new SimpleUri("engine:fbo.finalBuffer");
@@ -50,6 +57,20 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
 
     private boolean wasTakingScreenshotLastFrame;
 
+    /**
+     * The constructor: returns an instance of this class, subscribes it and generates the default FBOs.
+     *
+     * The returned instance is subscribed to the RenderingConfig.FBO_SCALE and DisplayDevice.DISPLAY_RESOLUTION_CHANGE
+     * settings, so that changes to either properties trigger the regeneration of the FBOs handled by this manager,
+     * if necessary.
+     *
+     * This constructor also initializes the SwappableFBOs of the GBuffer and the buffer identified by the
+     * SimpleUri stored in DisplayResolutionDependentFBOs.FINAL_BUFFER.
+     *
+     * @param renderingConfig the RenderingConfig instance.
+     * @param screenGrabber the ScreenGrabber instance.
+     * @param displayDevice the DisplayDevice instance
+     */
     public DisplayResolutionDependentFBOs(RenderingConfig renderingConfig, ScreenGrabber screenGrabber, DisplayDevice displayDevice) {
         this.renderingConfig = renderingConfig;
         this.screenGrabber = screenGrabber;
@@ -95,7 +116,7 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
 
     /**
      * Invoked before real-rendering starts
-    */
+     */
     public void update() {
         if (!screenGrabber.isTakingScreenshot()) {
             if (wasTakingScreenshotLastFrame) {
@@ -138,10 +159,30 @@ public class DisplayResolutionDependentFBOs extends AbstractFBOsManager implemen
         fboLookup.clear();
     }
 
+    /**
+     * Returns the GBuffer FBOs as a SwappableFBO instance.
+     *
+     * The GBuffer is constituted by a special pair of FBOs working in tandem: rendering nodes can use one of the
+     * FBOs to read from while writing to the other FBO in the pair.
+     *
+     * @return a SwappableFBO object containing the two GBuffer FBOs.
+     */
     public SwappableFBO getGBufferPair() {
         return gBufferPair;
     }
 
+    /**
+     * This method triggers the regeneration of the managed FBOs.
+     *
+     * The regeneration takes place only if the PropertyChangeEvent passed to the method has
+     * a property name equal to LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE or RenderingConfig.FBO_SCALE.
+     *
+     * Before and after the FBO regeneration event are fired to all subscribers of the manager, with
+     * property names PRE_FBO_REGENERATION and POST_FBO_REGENERATION respectively.
+     *
+     * @param propertyChangeEvent a PropertyChangeEvent instance with name LwjglDisplayDevice.DISPLAY_RESOLUTION_CHANGE
+     *                            or RenderingConfig.FBO_SCALE.
+     */
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         if (propertyChangeEvent.getPropertyName().equals(DISPLAY_RESOLUTION_CHANGE) || propertyChangeEvent.getPropertyName().equals(FBO_SCALE)) {
             updateFullScale();
