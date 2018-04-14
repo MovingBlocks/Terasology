@@ -1,6 +1,6 @@
 {
-    "displayName": "Lightsnow",
-    "basedOn": "core:soil",
+    "displayName": "Snowslab",
+    "basedOn": "core:rock",
     "tiles": {
         "top": "Snow",
         "bottom": "Dirt",
@@ -9,10 +9,5 @@
         "left": "SnowSideQuarter",
         "right": "SnowSideQuarter"
     },
-
-    "entity":  {
-        "prefab" : "snow"
-    },
-
     "sounds": "Core:snow"
 }
