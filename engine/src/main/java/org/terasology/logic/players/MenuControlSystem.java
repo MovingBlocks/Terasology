@@ -30,7 +30,8 @@ import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -54,18 +55,13 @@ public class MenuControlSystem extends BaseComponentSystem {
     private Time time;
     @In
     private EntityManager entityManager;
+    @In
+    private NetworkSystem networkSystem;
 
     @Override
     public void initialise() {
         nuiManager.getHUD().addHUDElement("dropItemRegion");  //Ensure the drop region is behind the toolbar
         nuiManager.getHUD().addHUDElement("toolbar");
-    }
-
-    //TODO
-    //Implement this function in a separate file for reusabitility
-    private int getPlayerCount() {
-        int playerCount=entityManager.getCountOfEntitiesWith(ClientInfoComponent.class);
-        return playerCount;
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -74,12 +70,10 @@ public class MenuControlSystem extends BaseComponentSystem {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
-        if(getPlayerCount()==1)
-        {
-            if(nuiManager.isOpen("engine:pauseMenu")) {
+        if (networkSystem.getMode() == NetworkMode.NONE) {
+            if (nuiManager.isOpen("engine:pauseMenu")) {
                 time.setPaused(true);
-            }
-            else{
+            } else {
                 time.setPaused(false);
             }
         }
