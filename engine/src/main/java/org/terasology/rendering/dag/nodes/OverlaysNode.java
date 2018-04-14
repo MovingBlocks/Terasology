@@ -47,7 +47,9 @@ public class OverlaysNode extends AbstractNode implements WireframeCapable {
 
     private SetWireframe wireframeStateChange;
 
-    public OverlaysNode(Context context) {
+    public OverlaysNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
 
         worldRenderer = context.get(WorldRenderer.class);

@@ -40,9 +40,10 @@ public class DownSamplerForExposureNode extends DownSamplerNode {
     public static final FBOConfig FBO_2X2_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.2x2px"), 2, 2, FBO.Type.DEFAULT);
     public static final FBOConfig FBO_1X1_CONFIG = new FBOConfig(new SimpleUri("engine:fbo.1x1px"), 1, 1, FBO.Type.DEFAULT);
 
-    public DownSamplerForExposureNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
+    public DownSamplerForExposureNode(String nodeUri, Context context,
+                                                        FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                                         FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
-        super(context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager);
+        super(nodeUri, context, inputFboConfig, inputFboManager, outputFboConfig, outputFboManager);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(renderingConfig::isEyeAdaptation);

@@ -52,8 +52,8 @@ public class LateBlurNode extends BlurNode implements PropertyChangeListener {
      * @param inputFbo The input fbo, containing the image to be blurred.
      * @param outputFbo The output fbo, to store the blurred image.
      */
-    public LateBlurNode(Context context, FBO inputFbo, FBO outputFbo) {
-        super(context, inputFbo, outputFbo, 0); // note: blurRadius is 0.0 at this stage.
+    public LateBlurNode(String nodeUri, Context context, FBO inputFbo, FBO outputFbo) {
+        super(nodeUri, context, inputFbo, outputFbo, 0); // note: blurRadius is 0.0 at this stage.
 
         renderingConfig = context.get(Config.class).getRendering();
         requiresCondition(() -> renderingConfig.getBlurIntensity() != 0); // getBlurIntensity > 0 implies blur is enabled.

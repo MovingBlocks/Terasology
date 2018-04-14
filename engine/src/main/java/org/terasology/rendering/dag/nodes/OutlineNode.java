@@ -63,8 +63,8 @@ public class OutlineNode extends ConditionDependentNode {
     @Range(min = 0.0f, max = 16.0f)
     private float pixelOffsetY = 1.0f;
 
-    public OutlineNode(Context context) {
-        super(context);
+    public OutlineNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         activeCamera = worldRenderer.getActiveCamera();
 

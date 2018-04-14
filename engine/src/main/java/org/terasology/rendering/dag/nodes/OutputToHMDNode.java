@@ -55,8 +55,8 @@ public class OutputToHMDNode extends ConditionDependentNode {
      * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
-    public OutputToHMDNode(Context context) {
-        super(context);
+    public OutputToHMDNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));

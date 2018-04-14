@@ -64,8 +64,8 @@ public class BlurredAmbientOcclusionNode extends ConditionDependentNode {
 
     private FBO ssaoBlurredFbo;
 
-    public BlurredAmbientOcclusionNode(Context context) {
-        super(context);
+    public BlurredAmbientOcclusionNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.SSAO, this);

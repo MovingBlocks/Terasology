@@ -87,7 +87,9 @@ public class FinalPostProcessingNode extends AbstractNode implements PropertyCha
 
     private final int noiseTextureSize = 1024;
 
-    public FinalPostProcessingNode(Context context) {
+    public FinalPostProcessingNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         screenGrabber = context.get(ScreenGrabber.class);
