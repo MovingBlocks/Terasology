@@ -39,7 +39,7 @@ public class MD5PatternsTests {
     public static class FloatPatternTest {
         @Test
         public void testFloatPattern() {
-            String[] testNumbers = {"10.1", "10.0", "99E1", "99.0E1.0", "99.0011E1.22", "78e1.0"};
+            String[] testNumbers = {"6", "10.0", "-11.9", "+759.76"};
             compareStringsToPattern(testNumbers, MD5Patterns.FLOAT_PATTERN);
         }
     }
@@ -47,7 +47,7 @@ public class MD5PatternsTests {
     public static class Vector3PatternTest {
         @Test
         public void testVector3Pattern() {
-            String[] testVectors = {"(10.5 25.0 99E1 )", "(9.5 54.0e9.3 99E1 )", "(4 6.2 11E6.6 )"};
+            String[] testVectors = {"(10.5 25.0 -1 )", "(9.5 -75.98 97 )", "(4 6.2 +5 )"};
             compareStringsToPattern(testVectors, MD5Patterns.VECTOR3_PATTERN);
         }
     }
@@ -55,7 +55,7 @@ public class MD5PatternsTests {
     public static class Vector2PatternTest {
         @Test
         public void testVector2Pattern() {
-            String[] testVectors = {"(10.1 25.0 )", "(9.5 9E1 )", "(1 4e9.0 )"};
+            String[] testVectors = {"(10.1 25.0 )", "(9.5 -30 )", "(1 76.075 )"};
             compareStringsToPattern(testVectors, MD5Patterns.VECTOR2_PATTERN);
         }
     }
