@@ -202,12 +202,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(type);
                 }
-                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                    RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                    if (dirtiedChunk != null) {
-                        dirtiedChunk.setDirty(true);
-                    }
-                }
+                markBlockDirty(worldPos);
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
@@ -222,7 +217,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
          * Hint: This method has a benchmark available in the BenchmarkScreen, The screen can be opened ingame via the
          * command "showSCreen BenchmarkScreen".
          */
-        Set<RenderableChunk> dirtiedChunks = new HashSet<>();
         Set<BlockChange> changedBlocks = new HashSet<>();
         Map<Vector3i, Block> result = new HashMap<>(blocks.size());
 
@@ -242,12 +236,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                     } else {
                         oldChange.setTo(type);
                     }
-                    for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                        RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                        if (dirtiedChunk != null) {
-                            dirtiedChunks.add(dirtiedChunk);
-                        }
-                    }
+                    markBlockDirty(worldPos);
                     changedBlocks.add(new BlockChange(worldPos, oldBlockType, type));
                 }
                 result.put(worldPos, oldBlockType);
@@ -256,14 +245,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             }
         }
 
-        for (RenderableChunk chunk : dirtiedChunks) {
-            chunk.setDirty(true);
-        }
         for (BlockChange change : changedBlocks) {
             notifyBlockChanged(change.getPosition(), change.getTo(), change.getFrom());
         }
 
         return result;
+    }
+    
+    private void markBlockDirty(Vector3i worldPos) {
+        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+            RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+            if (dirtiedChunk != null) {
+                dirtiedChunk.setDirty(true);
+            }
+        }
     }
 
     private void notifyBlockChanged(Vector3i pos, Block type, Block oldType) {
@@ -295,6 +290,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             LiquidData liquidState = chunk.getLiquid(blockPos);
             if (liquidState.equals(oldState)) {
                 chunk.setLiquid(blockPos, newState);
+                markBlockDirty(new Vector3i(x,y,z));
                 return true;
             }
         }
@@ -321,6 +317,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
             byte liquidState = chunk.getRawLiquid(blockPos);
             if (liquidState == oldState) {
                 chunk.setRawLiquid(blockPos, newState);
+                markBlockDirty(new Vector3i(x,y,z));
                 return true;
             }
         }
@@ -372,12 +369,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     oldChange.setTo(biome);
                 }
-                for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
-                    RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
-                    if (dirtiedChunk != null) {
-                        dirtiedChunk.setDirty(true);
-                    }
-                }
+                markBlockDirty(worldPos);
                 notifyBiomeChanged(worldPos, biome, oldBiomeType);
             }
             return oldBiomeType;
