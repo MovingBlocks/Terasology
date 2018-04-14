@@ -183,7 +183,13 @@ final class CompleteApiScraper {
                 api.put(category, " -- " + method.getReturnType() +  " (RETURN)");
                 api.put(category, " -- " + Arrays.toString(method.getParameterTypes()) +  " (PARAMETERS)");
                 api.put(category, " -- " + Arrays.toString(method.getExceptionTypes()) +  " (EXCEPTIONS)");
+            } else if (method.isDefault() && apiClass.isInterface()) {
+                api.put(category, " - " + method.getName() +  " (DEFAULT METHOD)");
+                api.put(category, " -- " + method.getReturnType() +  " (RETURN)");
+                api.put(category, " -- " + Arrays.toString(method.getParameterTypes()) +  " (PARAMETERS)");
+                api.put(category, " -- " + Arrays.toString(method.getExceptionTypes()) +  " (EXCEPTIONS)");
             }
+
         }
     }
 }

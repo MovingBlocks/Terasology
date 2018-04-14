@@ -96,10 +96,11 @@ public final class ApiComparator {
                 aux = br.readLine();
                 while ((aux != null && (aux.endsWith("(METHOD)")
                         || aux.endsWith("(CONSTRUCTOR)")
-                        || aux.endsWith("(ABSTRACT METHOD)")))) {
+                        || aux.endsWith("(ABSTRACT METHOD)")
+                        || aux.endsWith("(DEFAULT METHOD)")))) {
 
                     //Checks if its a method or constructor
-                    if (aux.endsWith("(METHOD)") || aux.endsWith("(ABSTRACT METHOD)")) {
+                    if (aux.endsWith("(METHOD)") || aux.endsWith("(ABSTRACT METHOD)") || aux.endsWith("(DEFAULT METHOD)")) {
                         String returnType = br.readLine();
                         String parameters = br.readLine();
                         String exceptionType = br.readLine();
@@ -182,17 +183,25 @@ public final class ApiComparator {
                         found = true;
                     }
                 }
-                if (!found && isInterfaceOrAbstract(method2.getClassName())) {
-                    if (method2.getName().endsWith("(ABSTRACT METHOD)")) {
-                        System.out.println("MAJOR INCREASE, NEW ABSTRACT METHOD " + method2.getName() + " ON " + method2.getClassName());
-                    } else {
-                        String minorOrMajor;
-                        if (method2.getClassName().endsWith("(INTERFACE)")) {
-                            minorOrMajor = "MAJOR";
+                if (!found) {
+                    if (isInterfaceOrAbstract(method2.getClassName())) {
+                        if (method2.getName().endsWith("(ABSTRACT METHOD)")) {
+                            System.out.println("MAJOR INCREASE, NEW ABSTRACT METHOD " + method2.getName() + " ON " + method2.getClassName());
                         } else {
-                            minorOrMajor = "MINOR";
+                            String minorOrMajor;
+                            if (method2.getClassName().endsWith("(INTERFACE)")) {
+                                if (method2.getName().endsWith("(DEFAULT METHOD)")) {
+                                    minorOrMajor = "MINOR";
+                                } else {
+                                    minorOrMajor = "MAJOR";
+                                }
+                            } else {
+                                minorOrMajor = "MINOR";
+                            }
+                            System.out.println(minorOrMajor + " INCREASE, NEW METHOD " + method2.getName() + " ON " + method2.getClassName());
                         }
-                        System.out.println(minorOrMajor + " INCREASE, NEW METHOD " + method2.getName() + " ON " + method2.getClassName());
+                    } else {
+                        System.out.println("MINOR INCREASE, NEW METHOD " + method2.getName() + " ON " + method2.getClassName());
                     }
                     System.out.println("=================================================================");
                 }
