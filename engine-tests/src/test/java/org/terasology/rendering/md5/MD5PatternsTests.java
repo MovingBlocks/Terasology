@@ -81,8 +81,7 @@ public class MD5PatternsTests {
             Matcher matcher = Pattern.compile(pattern).matcher(number);
             if (matcher.find()) {
                 assertEquals(number, matcher.group());
-            }
-            else {
+            } else {
                 fail("The pattern did not match " + number);
             }
         }
