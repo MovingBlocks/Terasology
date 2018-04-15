@@ -46,10 +46,6 @@ import java.util.stream.Collectors;
 @RegisterAssetFileFormat
 public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationData> {
 
-    private static final String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
-    private static final String FLOAT_PATTERN = "([-+]?[0-9]*\\.?[0-9]+)";
-    private static final String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
-
     private static final int POSITION_X_FLAG = 0x1;
     private static final int POSITION_Y_FLAG = 0x2;
     private static final int POSITION_Z_FLAG = 0x4;
@@ -57,10 +53,11 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
     private static final int ORIENTATION_Y_FLAG = 0x10;
     private static final int ORIENTATION_Z_FLAG = 0x20;
 
-    private Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
-    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN);
-    private Pattern doubleVectorPattern = Pattern.compile(VECTOR3_PATTERN + "\\s*" + VECTOR3_PATTERN);
-    private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
+    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + MD5Patterns.INTEGER_PATTERN +
+            "\\s*" + MD5Patterns.INTEGER_PATTERN + "\\s*" + MD5Patterns.INTEGER_PATTERN);
+    private Pattern doubleVectorPattern = Pattern.compile(MD5Patterns.VECTOR3_PATTERN +
+            "\\s*" + MD5Patterns.VECTOR3_PATTERN);
+    private Pattern frameStartPattern = Pattern.compile("frame " + MD5Patterns.INTEGER_PATTERN + " \\{");
 
     public MD5AnimationLoader() {
         super("md5anim");
@@ -145,7 +142,7 @@ public class MD5AnimationLoader extends AbstractAssetFileFormat<MeshAnimationDat
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);
 
         line = MD5ParserCommon.readToLine(reader, "commandline ");
-        Matcher commandlineMatch = commandLinePattern.matcher(line);
+        Matcher commandlineMatch = Pattern.compile(MD5Patterns.COMMAND_LINE_PATTERN).matcher(line);
         if (commandlineMatch.matches()) {
             md5.commandline = commandlineMatch.group(1);
         }
