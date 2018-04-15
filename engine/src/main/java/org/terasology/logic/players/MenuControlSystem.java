@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.terasology.logic.players;
 
 import org.terasology.audio.AudioManager;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -53,8 +52,7 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private Time time;
-    @In
-    private EntityManager entityManager;
+
     @In
     private NetworkSystem networkSystem;
 
@@ -112,5 +110,4 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
         event.consume();
     }
-
 }
