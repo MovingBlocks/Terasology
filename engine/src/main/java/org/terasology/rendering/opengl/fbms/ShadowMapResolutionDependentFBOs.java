@@ -32,10 +32,10 @@ import org.terasology.rendering.opengl.FBOConfig;
  *
  * Shadow Maps and FBOs are plural because the base class is capable of handling multiple shadow maps,
  * i.e. to simulate the shadows of more than one light source, i.e. multiple suns. This doesn't imply
- * that the rest of the engine if capable of that.
+ * that the rest of the engine is capable of that.
  */
 public class ShadowMapResolutionDependentFBOs extends AbstractFBOsManager implements PropertyChangeListener {
-    // TODO: see if we can pass the Context to the constructor and initialize thes variables there.
+    // TODO: see if we can pass the Context to the constructor and initialize these variables there.
     private Config config = CoreRegistry.get(Config.class);
     private RenderingConfig renderingConfig = config.getRendering();
     private FBO.Dimensions shadowMapResolution;
