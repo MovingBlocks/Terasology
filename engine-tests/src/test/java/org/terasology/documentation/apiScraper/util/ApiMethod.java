@@ -19,7 +19,7 @@ package org.terasology.documentation.apiScraper.util;
 import java.util.Objects;
 
 /**
- * Saves informations about methods and constructors to be used at the ApiComparator class
+ * Saves information about methods and constructors to be used at the ApiComparator class.
  */
 public class ApiMethod {
 
@@ -31,7 +31,7 @@ public class ApiMethod {
     private String parametersType;
 
     /**
-     * @param className Name of the class in which the method can be found
+     * @param className Name of the class in which the method can be found.
      * @param name Name of the method
      * @param returnType Return type of the method
      * @param exceptionType List of exception types of the method

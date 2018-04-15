@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.List;
 
 /**
- * Detects API changes between two versions.
+ * Detects API changes between two instances of a scanned code base.
  */
 public final class ApiComparator {
 
@@ -41,11 +41,11 @@ public final class ApiComparator {
 
     }
 
-    /*
+    /**
      * Generates a NEW_API_FILE and compares it with the ORIGINAL_API_FILE to detect major and minor version increases.
-     * Major increases: Deletion of class, new public abstract method, new interface public method,
+     * Major increases: Deletion of class, new public abstract method, new non-default interface method,
      * public method deletion, existing public method's change of parameters types, exception types or return type.
-     * Minor increases: Creation of a new class and new public method in an abstract class.
+     * Minor increases: Creation of a new class, new non-abstract public methods.
      */
     public static void main(String[] args) throws Exception {
 
@@ -75,9 +75,9 @@ public final class ApiComparator {
     }
 
     /**
-     * Reads an api file and puts its information in a map to be used in the api comparison
+     * Reads an api file and puts its information in a map to be used in the api comparison.
      * @param br BufferedReader containing an api file content
-     * @return A map with the api classes and interfaces as keys.Their methods and as a list of ApiMethods in the values
+     * @return Map of api classes and interfaces as keys corresponding to lists of ApiMethods as values
      * @throws Exception if the readLine fails.
      */
     private static Map<String, Collection<ApiMethod>> getApi(BufferedReader br) throws Exception {
@@ -141,7 +141,7 @@ public final class ApiComparator {
     }
 
     /**
-     * Checks creation and deletion of methods, as well as existing method changes
+     * Checks creation and deletion of methods, as well as existing method changes.
      * @param originalApi the original api generated from ORIGINAL_API_FILE
      * @param newApi the new apí generated from NEW_API_FILE
      */
@@ -254,7 +254,7 @@ public final class ApiComparator {
 
     /**
      * Compares a not overloaded method in the newApi and originalApi to notify parameter type, return type or
-     * exception type changes
+     * exception type changes.
      * @param method1 a not overloaded method from the originalApi, with the same name as method2
      * @param method2 a not overloaded method from the newApi, with the same name as method1
      */
@@ -265,7 +265,7 @@ public final class ApiComparator {
     }
 
     /**
-     * Compares a method's field in the newApi and originalApi. This field can be, return, parameter or exception type
+     * Compares a method's field in the newApi and originalApi. This field can be, return, parameter or exception type.
      * @param s1 field to be compared from a method in the originalApi
      * @param s2 field to be compared from a method in the newApi
      * @param methodName name of the method to have it's field being compared
@@ -281,11 +281,10 @@ public final class ApiComparator {
     }
 
     /**
-     * Tries to find a method with the same name and parameter type as 'method' in a collection of methods
+     * Tries to find a method with the same name and parameter type as 'method' in a collection of methods.
      * @param method the method used in the search
      * @param methods the collection of methods
-     * @return the method with the same name and parameter type as 'method' if it exists. If not, returns a new
-     * ApiMethod with all the attributes being empty String.
+     * @return method with same name and parameter type if 'method' exists, otherwise a new ApiMethod with empty attributes
      */
     private static ApiMethod getMethodWithSameNameAndParameters(ApiMethod method, Collection<ApiMethod> methods) {
         for (ApiMethod m : methods) {
