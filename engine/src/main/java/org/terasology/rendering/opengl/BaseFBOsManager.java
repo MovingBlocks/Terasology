@@ -81,13 +81,4 @@ public interface BaseFBOsManager extends Subscribable {
      * @return the FBOConfig associated with the given fboName
      */
     FBOConfig getFboConfig(SimpleUri fboName);
-
-    // TODO: remove these four methods: they have been made redundant by SetInputTexture state changes.
-    boolean bindFboColorTexture(SimpleUri fboName);
-
-    boolean bindFboDepthTexture(SimpleUri fboName);
-
-    boolean bindFboNormalsTexture(SimpleUri fboName);
-
-    boolean bindFboLightBufferTexture(SimpleUri fboName);
 }
