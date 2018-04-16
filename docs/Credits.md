@@ -266,6 +266,7 @@ Soundtrack and Sound Effects
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
 * Camera Click Noise from Snapper4298, from FreeSound.org
+* Block dig and destroy sounds by Austin Kelly
 * Other sound effects created by Exile.
 
 Icons
