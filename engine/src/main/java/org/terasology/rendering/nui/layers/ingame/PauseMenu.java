@@ -38,4 +38,10 @@ public class PauseMenu extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "devTools", widget -> getManager().pushScreen("devToolsMenuScreen"));
         WidgetUtil.trySubscribe(this, "telemetry", button -> triggerForwardAnimation(TelemetryScreen.ASSET_URI));
     }
+
+    @Override
+    public void onScreenOpened() {
+        getManager().removeOverlay( "engine:onlinePlayersOverlay" );
+    }
+
 }

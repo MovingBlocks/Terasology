@@ -104,7 +104,9 @@ public class PrePostCompositeNode extends AbstractNode implements PropertyChange
     @Range(min = -0.1f, max = 0.1f)
     private float volumetricFogHeightFalloff = -0.01f;
 
-    public PrePostCompositeNode(Context context) {
+    public PrePostCompositeNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
 

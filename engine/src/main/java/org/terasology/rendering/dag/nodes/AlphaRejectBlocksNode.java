@@ -84,7 +84,9 @@ public class AlphaRejectBlocksNode extends AbstractNode implements WireframeCapa
     @Range(min = 0.0f, max = 0.50f)
     private float parallaxScale = 0.05f;
 
-    public AlphaRejectBlocksNode(Context context) {
+    public AlphaRejectBlocksNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         worldProvider = context.get(WorldProvider.class);
 

@@ -16,19 +16,16 @@
 package org.terasology.rendering.dag;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * TODO: Add javadocs
@@ -36,38 +33,39 @@ import java.util.Map.Entry;
 public class RenderGraph {
     private static final Logger logger = LoggerFactory.getLogger(RenderGraph.class);
 
-    private Map<SimpleUri, Node> nodeMap = Maps.newHashMap();
-    // TODO: Convert to biMap
-    private Multimap<Node, Node> edgeMap = HashMultimap.create();
-    private Multimap<Node, Node> reverseEdgeMap = HashMultimap.create();
+    private Map<SimpleUri, Node> nodeMap;
+    private MutableGraph<Node> graph;
 
-    public SimpleUri addNode(Node node, String suggestedUri) {
+    public RenderGraph() {
+        nodeMap = Maps.newHashMap();
+        graph = GraphBuilder.directed().build();
+    }
+
+    public void addNode(Node node) {
         Preconditions.checkNotNull(node, "node cannot be null!");
-        Preconditions.checkNotNull(suggestedUri, "suggestedUri cannot be null!");
 
-        SimpleUri nodeUri = new SimpleUri("engine:" + suggestedUri);
-
+        SimpleUri nodeUri = node.getUri();
         if (nodeMap.containsKey(nodeUri)) {
-            int i = 2;
-            while (nodeMap.containsKey(new SimpleUri(nodeUri.toString() + i))) {
-                i++;
-            }
-            nodeUri = new SimpleUri(nodeUri.toString() + i);
+            throw new RuntimeException("A node with uri " + nodeUri + " already exists!");
         }
 
-        node.setUri(nodeUri);
         nodeMap.put(nodeUri, node);
-
-        return nodeUri;
+        graph.addNode(node);
     }
 
     public Node removeNode(SimpleUri nodeUri) {
         Preconditions.checkNotNull(nodeUri, "nodeUri cannot be null!");
 
-        if (edgeMap.containsKey(nodeUri)) {
-            throw new RuntimeException("The node you are trying to remove is still connected to other nodes in the graph!");
+        Node node = findNode(nodeUri);
+        if (node == null) {
+            throw new RuntimeException("Node removal failure: there is no '" + nodeUri + "' in the render graph!");
         }
 
+        if (graph.adjacentNodes(node).size() != 0) {
+            throw new RuntimeException("Node removal failure: node '" + nodeUri + "' is still connected to other nodes in the render graph!");
+        }
+
+        nodeMap.remove(nodeUri);
         return nodeMap.remove(nodeUri);
     }
 
@@ -81,10 +79,8 @@ public class RenderGraph {
         return findNode(new SimpleUri(simpleUri));
     }
 
-    public boolean connect(Node ... nodeList) {
-        boolean returnValue = true;
-
-        assert(nodeList.length > 1);
+    public void connect(Node ... nodeList) {
+        Preconditions.checkArgument(nodeList.length > 1, "Expected at least 2 nodes as arguments to connect() - found " + nodeList.length);
 
         Node fromNode = null;
 
@@ -92,28 +88,26 @@ public class RenderGraph {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
             if (fromNode != null) {
-                boolean success = edgeMap.put(fromNode, toNode);
-                if (success) {
-                    reverseEdgeMap.put(toNode, fromNode);
+                if (!graph.hasEdgeConnecting(fromNode, toNode)) {
+                    graph.putEdge(fromNode, toNode);
                 } else {
-                    logger.warn("Trying to connect two already connected nodes, " + fromNode.getClass() + " and " + toNode.getClass());
+                    logger.warn("Trying to connect two already connected nodes, " + fromNode.getUri() + " and " + toNode.getUri());
                 }
-
-                returnValue = returnValue && success;
             }
 
             fromNode = toNode;
         }
-
-        return returnValue;
     }
 
-    public boolean disconnect(Node fromNode, Node toNode) {
+    public void disconnect(Node fromNode, Node toNode) {
         Preconditions.checkNotNull(fromNode, "fromNode cannot be null!");
         Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
-        reverseEdgeMap.remove(toNode, fromNode);
-        return edgeMap.remove(fromNode, toNode);
+        if (!graph.hasEdgeConnecting(fromNode, toNode)) {
+            logger.warn("Trying to disconnect two nodes that aren't connected, " + fromNode.getUri() + " and " + toNode.getUri());
+        }
+
+        graph.removeEdge(fromNode, toNode);
     }
 
     // TODO: Add `boolean isFullyFunctional(Node node)`
@@ -131,15 +125,12 @@ public class RenderGraph {
         List<Node> nodesToExamine = Lists.newArrayList();
         int visitedNodes = 0;
 
-        // Calculate the in-degree for each node.
-        for (Entry<Node, Collection<Node>> nodeEdgeList : reverseEdgeMap.asMap().entrySet()) {
-            inDegreeMap.put(nodeEdgeList.getKey(), nodeEdgeList.getValue().size());
-        }
+        // Calculate the in-degree for each node, and mark all nodes with no incoming edges for examination.
+        for (Node node : graph.nodes()) {
+            int inDegree = graph.inDegree(node);
+            inDegreeMap.put(node, inDegree);
 
-        // Add the missing nodes that did not have any edges, and mark them for examination
-        for (Node node : nodeMap.values()) {
-            if (!inDegreeMap.containsKey(node)) {
-                inDegreeMap.put(node, 0);
+            if (inDegree == 0) {
                 nodesToExamine.add(node);
             }
         }
@@ -147,7 +138,7 @@ public class RenderGraph {
         while (!nodesToExamine.isEmpty()) {
             Node currentNode = nodesToExamine.remove(0);
 
-            for (Node adjacentNode : edgeMap.get(currentNode)) {
+            for (Node adjacentNode : graph.successors(currentNode)) {
                 int updatedInDegree = inDegreeMap.get(adjacentNode) - 1;
                 inDegreeMap.put(adjacentNode, updatedInDegree);
 
@@ -169,8 +160,10 @@ public class RenderGraph {
     }
 
     public void dispose() {
+        for (Node node : nodeMap.values()) {
+            graph.removeNode(node);
+            node.dispose();
+        }
         nodeMap.clear();
-        edgeMap.clear();
-        reverseEdgeMap.clear();
     }
 }

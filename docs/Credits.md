@@ -227,7 +227,9 @@ Contributors
  [4Denthusiast](https://github.com/4Denthusiast),
  [Shade254](https://github.com/Shade254),
  [Maximetinu](https://github.com/Maximetinu),
- [readv](https://github.com/readv)
+ [readv](https://github.com/readv),
+ [Arihant-Joshi](https://github.com/Arihant-Joshi),
+ [J-Dill](https://github.com/J-Dill)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),

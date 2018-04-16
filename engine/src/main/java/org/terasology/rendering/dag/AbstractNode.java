@@ -20,7 +20,12 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
+import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.BaseFBOsManager;
 import org.terasology.rendering.opengl.FBO;
@@ -39,7 +44,14 @@ public abstract class AbstractNode implements Node {
     private Set<StateChange> desiredStateChanges = Sets.newLinkedHashSet();
     private Map<SimpleUri, BaseFBOsManager> fboUsages = Maps.newHashMap();
     protected boolean enabled = true;
-    private SimpleUri nodeUri = null;
+    private final SimpleUri nodeUri;
+
+    protected AbstractNode(String nodeUri, Context context) {
+        ModuleManager moduleManager = context.get(ModuleManager.class);
+        Name providingModule = moduleManager.getEnvironment().getModuleProviding(this.getClass());
+
+        this.nodeUri = new SimpleUri(providingModule.toString() + ":" + nodeUri);
+    }
 
     protected FBO requiresFBO(FBOConfig fboConfig, BaseFBOsManager fboManager) {
         SimpleUri fboName = fboConfig.getName();
@@ -98,15 +110,6 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public void handleCommand(String command, String... arguments) { }
-
-    @Override
-    public void setUri(SimpleUri nodeUri) {
-        if (this.nodeUri == null) {
-            this.nodeUri = nodeUri;
-        } else {
-            throw new RuntimeException("Cannot set a Node's URI more than once!");
-        }
-    }
 
     @Override
     public SimpleUri getUri() {

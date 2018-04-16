@@ -78,7 +78,9 @@ public class InitialPostProcessingNode extends AbstractNode implements PropertyC
     @Range(min = 0.0f, max = 1.0f)
     private float bloomFactor = 0.5f;
 
-    public InitialPostProcessingNode(Context context) {
+    public InitialPostProcessingNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         worldProvider = context.get(WorldProvider.class);
 
         worldRenderer = context.get(WorldRenderer.class);

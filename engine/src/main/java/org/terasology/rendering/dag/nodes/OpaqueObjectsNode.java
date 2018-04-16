@@ -46,7 +46,9 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private SetWireframe wireframeStateChange;
     private EnableFaceCulling faceCullingStateChange;
 
-    public OpaqueObjectsNode(Context context) {
+    public OpaqueObjectsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
 
         worldRenderer = context.get(WorldRenderer.class);

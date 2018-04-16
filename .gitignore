@@ -94,5 +94,8 @@ nuiEditorAutosave.json
 /natives/
 config/metrics/
 
+# Ignore API files
+API_file.txt
+New_API_file.txt
 
 # Ignore weird stuff that might be obsolete

@@ -50,9 +50,10 @@ public class DownSamplerNode extends ConditionDependentNode {
      * @param outputFboConfig an FBOConfig instance describing the output FBO, to be retrieved from the FBO manager
      * @param outputFboManager the FBO manager from which to retrieve the output FBO
      */
-    public DownSamplerNode(Context context, FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
+    public DownSamplerNode(String nodeUri, Context context,
+                                            FBOConfig inputFboConfig, BaseFBOsManager inputFboManager,
                                             FBOConfig outputFboConfig, BaseFBOsManager outputFboManager) {
-        super(context);
+        super(nodeUri, context);
 
         FBO inputFbo = requiresFBO(inputFboConfig, inputFboManager);
         outputFbo = requiresFBO(outputFboConfig, outputFboManager);

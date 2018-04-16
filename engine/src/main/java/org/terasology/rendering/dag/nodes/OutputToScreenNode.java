@@ -45,8 +45,8 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
     private StateChange bindFbo;
 
-    public OutputToScreenNode(Context context) {
-        super(context);
+    public OutputToScreenNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
 
