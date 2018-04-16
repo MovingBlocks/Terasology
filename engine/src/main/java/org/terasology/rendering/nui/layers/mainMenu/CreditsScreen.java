@@ -56,20 +56,23 @@ public class CreditsScreen extends CoreScreenLayer {
                 StringBuilder credits = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
-                    line = line.trim().replaceAll("\\[([^]]*)]\\(([^)]+)\\)", "$1");
-                    if (line.startsWith("* ") && line.endsWith(":")) {
-                        credits.append(System.lineSeparator());
-                        credits.append(line, 2, line.length() - 1);
-                        credits.append(System.lineSeparator());
-                        credits.append(System.lineSeparator());
-                    } else if (line.startsWith("* ")) {
-                        credits.append(line, 2, line.length());
-                        credits.append(System.lineSeparator());
+                    line = line.replaceAll("\\[([^]]*)]\\(([^)]+)\\)", "$1").trim();
+                    if (line.startsWith("* ")) {
+                        if (line.endsWith(":")) {
+                            credits.append(System.lineSeparator());
+                            credits.append(line, 2, line.length() - 1);
+                            credits.append(System.lineSeparator());
+                            credits.append(System.lineSeparator());
+                        } else {
+                            credits.append(line, 2, line.length());
+                            credits.append(System.lineSeparator());
+                        }
                     } else {
                         credits.append(line);
                         credits.append(System.lineSeparator());
                     }
                 }
+
                 creditsScroll.setText(credits.toString());
                 creditsScroll.setAutoReset(false);
                 creditsScroll.setScrollingSpeed(1);

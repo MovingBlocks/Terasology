@@ -60,11 +60,6 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
-    /**
-     * Margin between the horizontal border and the text, in pixels
-     */
-    @LayoutConfig
-    private int marginX = 8;
     
     /**
      * Maps text to their Y coordinates
@@ -250,32 +245,13 @@ public class UIScrollingText extends CoreWidget {
                 textY.put(entry.getKey(), entry.getValue() - step);
             }
         } else {
-            String[] parsed = getText().split("\\r?\\n", -1);
             Font font = canvas.getCurrentStyle().getFont();
             int y = canvas.size().y + lineSpacing;
-            for (String line : parsed) {
-                // line wrapping logic
-                List<String> wrappedLines = new ArrayList<>();
-                int maxWidth = canvas.size().x - (marginX * 2);
-                String[] words = line.split(" ");
-                String text = words[0];
-
-                for (int word = 1; word < words.length; word++) {
-                    String newText = text + " " + words[word];
-                    if (font.getWidth(newText) > maxWidth) {
-                        wrappedLines.add(text);
-                        text = words[word];
-                    } else {
-                        text = newText;
-                    }
-                }
-
-                wrappedLines.add(text);
-
-                for (String wrappedLine : wrappedLines) {
-                    textY.put(wrappedLine, y);
-                    y += font.getHeight(wrappedLine) + lineSpacing;
-                }
+            int maxWidth = canvas.size().x;
+            List<String> lines = TextLineBuilder.getLines(font, getText(), maxWidth);
+            for (String line : lines) {
+                textY.put(line, y);
+                y += font.getHeight(line) + lineSpacing;
             }
         }
     }
