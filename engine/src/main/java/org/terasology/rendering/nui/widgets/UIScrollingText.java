@@ -25,6 +25,7 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,11 @@ public class UIScrollingText extends CoreWidget {
      */
     @LayoutConfig
     private int lineSpacing = 3;
+    /**
+     * Margin between the horizontal border and the text, in pixels
+     */
+    @LayoutConfig
+    private int marginX = 8;
     
     /**
      * Maps text to their Y coordinates
@@ -248,8 +254,28 @@ public class UIScrollingText extends CoreWidget {
             Font font = canvas.getCurrentStyle().getFont();
             int y = canvas.size().y + lineSpacing;
             for (String line : parsed) {
-                textY.put(line, y);
-                y += font.getHeight(line) + lineSpacing;
+                // line wrapping logic
+                List<String> wrappedLines = new ArrayList<>();
+                int maxWidth = canvas.size().x - (marginX * 2);
+                String[] words = line.split(" ");
+                String text = words[0];
+
+                for (int word = 1; word < words.length; word++) {
+                    String newText = text + " " + words[word];
+                    if (font.getWidth(newText) > maxWidth) {
+                        wrappedLines.add(text);
+                        text = words[word];
+                    } else {
+                        text = newText;
+                    }
+                }
+
+                wrappedLines.add(text);
+
+                for (String wrappedLine : wrappedLines) {
+                    textY.put(wrappedLine, y);
+                    y += font.getHeight(wrappedLine) + lineSpacing;
+                }
             }
         }
     }
