@@ -228,7 +228,8 @@ Contributors
  [Maximetinu](https://github.com/Maximetinu),
  [readv](https://github.com/readv),
  [Arihant-Joshi](https://github.com/Arihant-Joshi),
- [Austin 'skate54345' Kelly](https://github.com/skate54345)
+ [Austin 'skate54345' Kelly](https://github.com/skate54345),
+ [Inei1](https://github.com/Inei1)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
