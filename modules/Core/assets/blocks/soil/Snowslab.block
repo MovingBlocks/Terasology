@@ -1,13 +1,20 @@
-{
+ {
     "displayName": "Snowslab",
-    "basedOn": "core:rock",
-    "tiles": {
-        "top": "Snow",
-        "bottom": "Dirt",
-        "front": "SnowSideQuarter",
-        "back": "SnowSideQuarter",
-        "left": "SnowSideQuarter",
-        "right": "SnowSideQuarter"
+    "basedOn": "core:soil",
+    "rotation": "attachedToSurface",
+    "sides": {
+        "shape": "slab2"
+    },
+    "top": {
+        "shape": "slab2"
+    },
+    "penetrable": true,
+    "attachmentAllowed": false,
+    "shadowCasting": false,
+    "luminance": 15,
+    "hardness": 1,
+    "inventory": {
+        "directPickup": true
     },
     "sounds": "Core:snow"
 }
