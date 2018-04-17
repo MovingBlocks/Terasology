@@ -81,15 +81,15 @@ public class OnlinePlayersOverlay extends CoreScreenLayer {
     }
 
     private String determinePlayerAndPing(PingStockComponent pingStockComponent) {
-        Iterable<EntityRef> allClients = entityManager.getEntitiesWith(ClientComponent.class);
         Map<EntityRef, Long> pingMap = pingStockComponent.getValues();
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (EntityRef clientEntity : allClients) {
+        for (Map.Entry<EntityRef, Long> entry : pingMap.entrySet()) {
             if (!first) {
                 sb.append("\n");
             }
-            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
+            EntityRef clientEntity = entry.getKey();
+            ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);;
             sb.append(PlayerUtil.getColoredPlayerName(clientComp.clientInfo));
             sb.append(" ");
             Long pingValue = pingMap.get(clientEntity);
