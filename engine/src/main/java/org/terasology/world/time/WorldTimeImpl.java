@@ -80,14 +80,10 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
     }
 
     @Override
-    public boolean isSunHalted () {
-        return haltSunPosition;
-    }
+    public boolean isSunHalted () { return haltSunPosition; }
 
     @Override
-    public float getFixedDays () {
-        return fixedDays;
-    }
+    public float getFixedDays () { return fixedDays; }
 
     @Override
     public void update(float delta) {
