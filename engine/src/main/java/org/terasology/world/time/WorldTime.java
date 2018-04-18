@@ -77,5 +77,6 @@ public interface WorldTime extends ComponentSystem {
      * Permanently sets the world time in terms of days
      *
      */
-    void togglePermanentTime ();
+    boolean togglePermanentTime ();
+    float getFixedDays ();
 }

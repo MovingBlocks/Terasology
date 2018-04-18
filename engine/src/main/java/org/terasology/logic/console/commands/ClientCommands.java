@@ -68,11 +68,20 @@ public class ClientCommands extends BaseComponentSystem {
         return "World time changed";
     }
 
+    /**
+     * Permanently sets the current world time for the local player in days
+     * @param day Float containing day to be set
+     * @return String message containing message to notify user
+     */
     @Command(shortDescription = "Permanently sets the current world time in days", requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public  String setPermanentWorldTime(@CommandParam("day") float day) {
-        worldProvider.getTime().togglePermanentTime();
+        boolean permanentTimeSet = worldProvider.getTime().togglePermanentTime();
         worldProvider.getTime().setDays(day);
-        return "Permanently set the world time to " + day;
+        if (permanentTimeSet) {
+            return "Permanently set the world time to " + day;
+        } else {
+            return "Disabled permanent world time";
+        }
     }
     /**
      * Sets the spawn location for the client to the current location

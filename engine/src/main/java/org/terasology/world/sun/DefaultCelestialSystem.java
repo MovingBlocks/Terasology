@@ -58,7 +58,12 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
 
     @Override
     public float getSunPosAngle() {
-        float days = getWorldTime().getDays();
+        float days;
+        if (!getWorldTime().togglePermanentTime()) {
+            days = getWorldTime().getDays();
+        } else {
+            days = getWorldTime().getFixedDays();
+        }
         return  model.getSunPosAngle(days);
     }
 
