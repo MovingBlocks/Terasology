@@ -133,14 +133,6 @@ public class FirstPersonClientSystem extends BaseComponentSystem implements Upda
     public void onHeldItemChanged(OnChangedComponent event, EntityRef character, CharacterHeldItemComponent heldItemComponent, CharacterComponent characterComponents) {
         if (localPlayer.getCharacterEntity().equals(character)) {
             EntityRef newItem = heldItemComponent.selectedItem;
-            if (newItem.hasComponent(LightComponent.class)){
-                localPlayer.getCharacterEntity().addComponent(new LightComponent());
-            }
-            else {
-                if (localPlayer.getCharacterEntity().hasComponent(LightComponent.class)){
-                    localPlayer.getCharacterEntity().removeComponent(LightComponent.class);
-                }
-            }
             linkHeldItemLocationForLocalPlayer(newItem);
         }
     }
