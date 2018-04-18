@@ -75,9 +75,10 @@ public class ClientCommands extends BaseComponentSystem {
      */
     @Command(shortDescription = "Permanently sets the current world time in days", requiredPermission = PermissionManager.CHEAT_PERMISSION)
     public  String setPermanentWorldTime(@CommandParam("day") float day) {
-        boolean permanentTimeSet = worldProvider.getTime().togglePermanentTime();
         worldProvider.getTime().setDays(day);
-        if (permanentTimeSet) {
+        worldProvider.getTime().togglePermanentTime(day);
+
+        if (worldProvider.getTime().isSunHalted()) {
             return "Permanently set the world time to " + day;
         } else {
             return "Disabled permanent world time";

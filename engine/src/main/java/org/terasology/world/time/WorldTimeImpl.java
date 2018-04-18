@@ -72,9 +72,15 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
     }
 
     @Override
-    public boolean togglePermanentTime () {
+    public void togglePermanentTime (float timeInDays) {
         haltSunPosition = !haltSunPosition;
-        fixedDays = getDays();
+        if (haltSunPosition) {
+            fixedDays = timeInDays;
+        }
+    }
+
+    @Override
+    public boolean isSunHalted () {
         return haltSunPosition;
     }
 
