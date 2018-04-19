@@ -72,21 +72,4 @@ public interface WorldTime extends ComponentSystem {
      * @param timeInDays
      */
     void setDays(float timeInDays);
-
-    /**
-     * Permanently sets the world time in terms of days
-     *
-     * @param timeInDays
-     */
-    void togglePermanentTime (float timeInDays);
-
-    /**
-     * @return Whether the sun's position and angle has been halted or not
-     */
-    boolean isSunHalted();
-
-    /**
-     * @return World time when the sun was halted
-     */
-    float getFixedDays ();
 }

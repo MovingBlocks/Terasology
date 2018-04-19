@@ -29,6 +29,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
  * This class contains basic client commands for debugging eg.
@@ -45,6 +47,9 @@ public class ClientCommands extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private CelestialSystem celestialSystem;
 
     /**
      * Displays debug information on the target entity for the target the camera is pointing at
@@ -69,19 +74,19 @@ public class ClientCommands extends BaseComponentSystem {
     }
 
     /**
-     * Permanently sets the current world time for the local player in days
+     * Permanently halts the sun's position and angle
      * @param day Float containing day to be set
      * @return String message containing message to notify user
      */
-    @Command(shortDescription = "Permanently sets the current world time in days", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public  String setPermanentWorldTime(@CommandParam("day") float day) {
+    @Command(shortDescription = "Permanently halts the sun's position and angle", requiredPermission = PermissionManager.CHEAT_PERMISSION)
+    public  String setSunPosition(@CommandParam("day") float day) {
         worldProvider.getTime().setDays(day);
-        worldProvider.getTime().togglePermanentTime(day);
+        celestialSystem.toggleSunHalting(day);
 
-        if (worldProvider.getTime().isSunHalted()) {
-            return "Permanently set the world time to " + day;
+        if (celestialSystem.isSunHalted()) {
+            return "Permanently set the sun's position.";
         } else {
-            return "Disabled permanent world time";
+            return "Disabled the sun's halt.";
         }
     }
     /**

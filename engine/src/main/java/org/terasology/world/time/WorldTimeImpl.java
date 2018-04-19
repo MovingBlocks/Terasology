@@ -71,19 +71,6 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
         setMilliseconds((long) ((double) timeInDays * DAY_LENGTH));
     }
 
-    @Override
-    public void togglePermanentTime (float timeInDays) {
-        haltSunPosition = !haltSunPosition;
-        if (haltSunPosition) {
-            fixedDays = timeInDays;
-        }
-    }
-
-    @Override
-    public boolean isSunHalted () { return haltSunPosition; }
-
-    @Override
-    public float getFixedDays () { return fixedDays; }
 
     @Override
     public void update(float delta) {
