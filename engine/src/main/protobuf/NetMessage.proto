@@ -146,6 +146,8 @@ message ServerInfoMessage {
     repeated WorldInfo worldInfo = 9;
     repeated sint32 biomeShortId = 10 [packed=true];
     repeated string biomeId = 11;
+    repeated string blackList = 12;
+    repeated string whiteList = 13;
 
     optional string version = 15;
     optional string gameName = 16;

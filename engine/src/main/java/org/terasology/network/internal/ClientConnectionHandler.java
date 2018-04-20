@@ -16,6 +16,7 @@
 package org.terasology.network.internal;
 
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -28,6 +29,8 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.identity.ClientIdentity;
+import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.module.ModuleLoader;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;
@@ -69,13 +72,23 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
-    private void scheduleTimeout(Channel inputChannel) {
+    private void scheduleTimeout(Channel inputChannel, NetData.NetMessage message) {
         channel = inputChannel;
         timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
         timeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
                 synchronized (joinStatus) {
+                    if (clientOnBlacklist(message)) {
+                        joinStatus.setErrorMessage("Client on blacklist");
+                        channel.close();
+                    }
+
+                    if (!clientOnWhitelist(message)) {
+                        joinStatus.setErrorMessage("Client not on whitelist");
+                        channel.close();
+                    }
+
                     if (System.currentTimeMillis() > timeoutPoint
                             && joinStatus.getStatus() != JoinStatus.Status.COMPLETE
                             && joinStatus.getStatus() != JoinStatus.Status.FAILED) {
@@ -94,10 +107,10 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             return;
         }
-        scheduleTimeout(ctx.getChannel());
 
         // Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        scheduleTimeout(ctx.getChannel(), message);
         synchronized (joinStatus) {
             timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
             if (message.hasServerInfo()) {
@@ -261,6 +274,26 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
 
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
+    }
+
+    private boolean clientOnBlacklist(NetData.NetMessage netMessage) {
+        Config config = CoreRegistry.get(Config.class);
+        if (config != null) {
+            for (ClientIdentity identity : config.getSecurity().getAllIdentities().values()) {
+                String blacklistString = netMessage.getServerInfo().getBlackListList().toString().substring(1,
+                        netMessage.getServerInfo().getBlackListList().toString().length() - 1);
+                Set blacklist = new Gson().fromJson(blacklistString, Set.class);
+                if (blacklist.contains(identity.getPlayerPublicCertificate().toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // TODO: add a way to enable whitelist and do these checks
+    private boolean clientOnWhitelist(NetData.NetMessage netMessage) {
+        return true;
     }
 
     public JoinStatus getJoinStatus() {

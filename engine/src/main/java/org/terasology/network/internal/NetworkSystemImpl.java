@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
@@ -46,6 +47,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -92,12 +94,15 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.generator.WorldGenerator;
 
+import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -798,7 +803,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void processNewClient(NetClient client) {
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         // log after connect so that the name has been set:
-        logger.info("New client connected: {}", client.getName());
+        ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
+        serverConnectListManager.loadLists();
+        Path blackListPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+        try {
+            Set blacklistedIDs = new Gson().fromJson(Files.newBufferedReader(blackListPath), Set.class);
+            System.out.println("BLIDS: " + blacklistedIDs);
+            if (blacklistedIDs.contains(client.getId())){
+                System.out.println("ID: " + client.getId());
+                forceDisconnect(client);
+                return;
+            }
+            System.out.println("ID: " + client.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
                 NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
@@ -847,7 +867,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         WorldGenerator worldGen = context.get(WorldGenerator.class);
         if (worldGen != null) {
-            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
+            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
@@ -867,6 +887,18 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         for (BlockFamily registeredBlockFamily : blockManager.listRegisteredBlockFamilies()) {
             serverInfoMessageBuilder.addRegisterBlockFamily(registeredBlockFamily.getURI().toString());
+        }
+        Path homePath = PathManager.getInstance().getHomePath();
+        try {
+            for (String line : Files.readAllLines(homePath.resolve("blacklist.json"))) {
+                serverInfoMessageBuilder.addBlackList(line);
+            }
+            for (String line : Files.readAllLines(homePath.resolve("whitelist.json"))) {
+                serverInfoMessageBuilder.addWhiteList(line);
+            }
+        } catch (IOException e) {
+            logger.error("blacklist and/or whitelist files not found");
+            e.printStackTrace();
         }
         serializeComponentInfo(serverInfoMessageBuilder);
         serializeEventInfo(serverInfoMessageBuilder);
