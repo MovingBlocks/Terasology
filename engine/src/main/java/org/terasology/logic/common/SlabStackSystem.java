@@ -54,10 +54,42 @@ public class SlabStackSystem extends BaseComponentSystem {
 
     @In
     private WorldProvider worldProvider;
+    @In
+    private BlockManager blockManager;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
+    @In
+    private LocalPlayer localPlayer;
 
+    //TODO: Need to add right click logic into this, currently it "activates (press E)" the target block. Look at NUIMouseClickEvent
     @ReceiveEvent(components = {SlabComponent.class, SlabStackComponent.class, BlockComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity){
-        BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
-        Block block = blockComponent.getBlock();
+        EntityRef instigator = event.getInstigator();
+        BlockComponent targetBlockComponent = event.getTarget().getComponent(BlockComponent.class);
+        if (targetBlockComponent == null) {
+            event.consume();
+        }
+
+        Side surfaceSide = Side.inDirection(event.getHitNormal());
+        Side secondaryDirection = ChunkMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
+        Vector3i blockPos = new Vector3i(targetBlockComponent.getPosition());
+        Vector3i targetPos = new Vector3i(blockPos).add(surfaceSide.getVector3i());
+        SlabStackComponent stackComponent = event.getTarget().getComponent(SlabStackComponent.class);
+
+        if (stackComponent != null && stackComponent.slabs < MAX_SLABS) {
+            EntityRef stackEntity = event.getTarget();
+        } else if (canPlaceBlock(blockPos, targetPos)) {
+        }
+        event.consume();
+
+    }
+
+    private void updateSlabStack(Vector3i stackPos, int slabs, EntityRef instigator) {
+
+    }
+
+
+    private boolean canPlaceBlock(Vector3i blockPos, Vector3i targetPos) {
+        return false;
     }
 }
