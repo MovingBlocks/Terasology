@@ -70,7 +70,6 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
         setMilliseconds((long) ((double) timeInDays * DAY_LENGTH));
     }
 
-
     @Override
     public void update(float delta) {
         long deltaMs = time.getGameDeltaInMs();
