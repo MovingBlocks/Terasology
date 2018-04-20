@@ -79,8 +79,7 @@ public class ClientCommands extends BaseComponentSystem {
      * @return String message containing message to notify user
      */
     @Command(shortDescription = "Permanently halts the sun's position and angle", requiredPermission = PermissionManager.CHEAT_PERMISSION)
-    public  String setSunPosition(@CommandParam("day") float day) {
-        worldProvider.getTime().setDays(day);
+    public  String toggleSunHalting(@CommandParam("day") float day) {
         celestialSystem.toggleSunHalting(day);
 
         if (celestialSystem.isSunHalted()) {

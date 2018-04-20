@@ -30,8 +30,7 @@ import org.terasology.world.WorldComponent;
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 
     private static final float WORLD_TIME_MULTIPLIER = 48f;
-    private boolean haltSunPosition = false;
-    private float fixedDays = 0f;
+
     private AtomicLong worldTime = new AtomicLong(0);
 
     @In
