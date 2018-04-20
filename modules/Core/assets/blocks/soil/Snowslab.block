@@ -12,5 +12,8 @@
     	"stackable" : true,
     	"directPickup" : true
     },
+    "entity" : {
+           "prefab" : "slab"
+     },
     "sounds": "Core:snow"
 }
