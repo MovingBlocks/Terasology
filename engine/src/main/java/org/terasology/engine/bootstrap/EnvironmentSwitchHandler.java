@@ -111,7 +111,7 @@ public final class EnvironmentSwitchHandler {
          * existing then yet.
          */
         unregisterPrefabFormats(assetTypeManager);
-        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        registeredPrefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary, moduleManager.getEnvironment());
         assetTypeManager.registerCoreFormat(Prefab.class, registeredPrefabFormat);
         registeredPrefabDeltaFormat = new PrefabDeltaFormat(componentLibrary, typeSerializationLibrary);
         assetTypeManager.registerCoreDeltaFormat(Prefab.class, registeredPrefabDeltaFormat);

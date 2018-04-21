@@ -75,7 +75,7 @@ public class PrefabTest {
                 (AssetFactory<Prefab, PrefabData>) PojoPrefab::new, "prefabs");
         ComponentLibrary componentLibrary = context.get(ComponentLibrary.class);
         TypeSerializationLibrary typeSerializationLibrary = context.get(TypeSerializationLibrary.class);
-        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary);
+        PrefabFormat prefabFormat = new PrefabFormat(componentLibrary, typeSerializationLibrary, null);
         assetTypeManager.registerCoreFormat(Prefab.class, prefabFormat);
         assetTypeManager.switchEnvironment(moduleManager.getEnvironment());
         context.put(AssetManager.class, assetTypeManager.getAssetManager());
