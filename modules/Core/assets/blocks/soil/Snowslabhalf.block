@@ -1,0 +1,19 @@
+ {
+    "displayName": "Half Snow Slab",
+    "basedOn": "core:soil",
+    "rotation": "attachedToSurface",
+    "sides": {
+        "shape": "halfslab"
+    },
+    "top": {
+        "shape": "halfslab"
+    },
+    "inventory" : {
+    	"stackable" : true,
+    	"directPickup" : true
+    },
+    "entity" : {
+           "prefab" : "slab"
+     },
+    "sounds": "Core:snow"
+}

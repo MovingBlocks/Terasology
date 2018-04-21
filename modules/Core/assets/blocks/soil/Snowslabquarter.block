@@ -1,12 +1,12 @@
  {
-    "displayName": "Snowslab",
+    "displayName": "Quarter Snow Slab",
     "basedOn": "core:soil",
     "rotation": "attachedToSurface",
     "sides": {
-        "shape": "slab2"
+        "shape": "quarterslab"
     },
     "top": {
-        "shape": "slab2"
+        "shape": "quarterslab"
     },
     "inventory" : {
     	"stackable" : true,
