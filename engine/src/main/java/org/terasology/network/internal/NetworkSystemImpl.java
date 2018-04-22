@@ -809,10 +809,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         try {
             Set blacklistedIDs = new Gson().fromJson(Files.newBufferedReader(blackListPath), Set.class);
             System.out.println("BLIDS: " + blacklistedIDs);
-            if (blacklistedIDs.contains(client.getId())){
-                System.out.println("ID: " + client.getId());
-                forceDisconnect(client);
-                return;
+            // TODO: change the unit test NetworkOwnerShipTest to make this check unnecessary
+            if (blacklistedIDs != null) {
+                if (blacklistedIDs.contains(client.getId())) {
+                    System.out.println("ID: " + client.getId());
+                    forceDisconnect(client);
+                    return;
+                }
             }
             System.out.println("ID: " + client.getId());
         } catch (IOException e) {
