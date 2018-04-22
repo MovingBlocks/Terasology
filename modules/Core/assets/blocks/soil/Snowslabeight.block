@@ -8,10 +8,7 @@
     "top": {
         "shape": "eightslab"
     },
-    "inventory" : {
-    	"stackable" : true,
-    	"directPickup" : true
-    },
+    "penetrable": true,
     "entity" : {
            "prefab" : "slab"
      },

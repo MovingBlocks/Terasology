@@ -8,10 +8,6 @@
     "top": {
         "shape": "halfslab"
     },
-    "inventory" : {
-    	"stackable" : true,
-    	"directPickup" : true
-    },
     "entity" : {
            "prefab" : "slab"
      },
