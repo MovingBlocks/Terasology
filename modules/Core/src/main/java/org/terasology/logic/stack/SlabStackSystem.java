@@ -23,6 +23,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.logic.characters.events.AttackEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -94,6 +95,7 @@ public class SlabStackSystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
     public void onRightClick(ActivateEvent event, EntityRef entity, SlabComponent slabComponent) {
+        logger.info("Works when pressed");
         EntityRef instigator = event.getInstigator();
         BlockComponent targetBlockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (targetBlockComponent == null) {
@@ -184,8 +186,8 @@ public class SlabStackSystem extends BaseComponentSystem {
         }
 
         SlabStackComponent stackComponent = stackEntity.getComponent(SlabStackComponent.class);
-        int currentLayers = (stackComponent.slabs - 1) / SLABS_PER_LAYER + 1;
-        int newLayers = (slabs - 1) / SLABS_PER_LAYER + 1;
+        int currentLayers = (stackComponent.slabs - 1) / SLAB_PER_LAYER  + 1;
+        int newLayers = (slabs - 1) / SLAB_PER_LAYER + 1;
 
         if (currentLayers != newLayers) {
             BlockFamily blockFamily;
