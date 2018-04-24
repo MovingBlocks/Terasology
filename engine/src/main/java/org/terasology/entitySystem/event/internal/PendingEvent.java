@@ -22,7 +22,7 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  */
-class PendingEvent {
+public class PendingEvent {
     private EntityRef entity;
     private Event event;
     private Component component;

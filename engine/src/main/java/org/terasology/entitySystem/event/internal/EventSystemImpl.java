@@ -50,6 +50,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
+import org.terasology.recording.EventCatcher;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
@@ -86,10 +87,19 @@ public class EventSystemImpl implements EventSystem {
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
 
+    //Event recording
+    private boolean isRecording = false;
+    private EventCatcher eventCatcher;
+    private long eventCounter;
+
+
     public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
+        this.eventCatcher = new EventCatcher();
+        this.eventCounter = 0;
+        this.isRecording = true; //test purposes
     }
 
     @Override
@@ -258,6 +268,11 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
+            //event recording
+            if (this.isRecording) {
+                eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
+                this.eventCounter++;
+            }
             networkReplicate(entity, event);
 
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
@@ -358,6 +373,11 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
+            //event recording
+            if (this.isRecording) {
+                eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
+                this.eventCounter++;
+            }
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
