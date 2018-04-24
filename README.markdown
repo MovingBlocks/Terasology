@@ -40,7 +40,7 @@ We have gone to great lengths to make developing and modding Terasology as easy 
 * Clone the code or download a zip
 * Run `gradlew game` (on Unixes, including macOS, run `./gradlew` everywhere you see `gradlew`) in the root of the project directory 
 
-That's really it! If you want the project set up in IntelliJ (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
+That's really it! If you want the project set up in [IntelliJ](https://www.jetbrains.com/idea/download/) (our favored IDE) you run `gradlew idea` then load the generated project config. Then you get a bunch of run configurations and other stuff for free!
 
 For more on developing/modding see the [wiki](https://github.com/MovingBlocks/Terasology/wiki)
 
@@ -57,3 +57,4 @@ For more on developing/modding see the [wiki](https://github.com/MovingBlocks/Te
 * [Twitter](https://twitter.com/Terasology)
 * [Facebook](http://www.facebook.com/pages/Terasology/248329655219905)
 * [G+](https://plus.google.com/b/103835217961917018533)
+* [Discord](https://discord.gg/4uKbB8J)
