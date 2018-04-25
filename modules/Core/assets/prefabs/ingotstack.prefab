@@ -1,0 +1,19 @@
+{
+    "Inventory": {
+        "privateToOwner": false,
+        "itemSlots": [
+            0
+        ]
+    },
+    "PlaySoundAction": {
+        "sounds": "engine:click"
+    },
+    "IngotStack": {
+    },
+    "InteractionTarget": {},
+    "InteractionScreen": {
+        "screen": "core:containerScreen"
+    },
+    "Network": {
+    }
+}
