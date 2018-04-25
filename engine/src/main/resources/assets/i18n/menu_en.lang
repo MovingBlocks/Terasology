@@ -223,6 +223,8 @@
     "preview-world-title": "Preview World...",
     "preview-zoom-factor": "Zoom",
     "previous-toolbar-item": "Previous Toolbar Item",
+    "remove-confirmation-popup-title": "Confirm delete",
+    "remove-confirmation-popup-message": "Are you sure you want to delete it?",
     "remove-binding": "Remove",
     "remove-server": "Remove",
     "reset-default": "Reset",
