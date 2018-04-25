@@ -85,10 +85,10 @@ public class WorldReflectionNode extends ConditionDependentNode {
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    private float parallaxBias = 0.05f;
+    private float parallaxBias = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    private float parallaxScale = 0.05f;
+    private float parallaxScale = 0.5f;
 
     /**
      * Constructs an instance of this class.
@@ -174,10 +174,10 @@ public class WorldReflectionNode extends ConditionDependentNode {
         chunkMaterial.setInt("textureLava", 2, true);
         if (isNormalMapping) {
             chunkMaterial.setInt("textureAtlasNormal", 3, true);
-            if (isParallaxMapping) {
-                chunkMaterial.setInt("textureAtlasHeight", 4, true);
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        }
+        if (isParallaxMapping) {
+            chunkMaterial.setInt("textureAtlasHeight", 4, true);
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
         chunkMaterial.setFloat("clip", activeCamera.getReflectionHeight(), true);
@@ -224,25 +224,17 @@ public class WorldReflectionNode extends ConditionDependentNode {
                 isNormalMapping = renderingConfig.isNormalMapping();
                 if (isNormalMapping) {
                     addDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    }
                 } else {
                     removeDesiredStateChange(setNormalTerrain);
-                    if (isParallaxMapping) {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
                 }
                 break;
 
             case RenderingConfig.PARALLAX_MAPPING:
                 isParallaxMapping = renderingConfig.isParallaxMapping();
-                if (isNormalMapping) {
-                    if (isParallaxMapping) {
-                        addDesiredStateChange(setHeightTerrain);
-                    } else {
-                        removeDesiredStateChange(setHeightTerrain);
-                    }
+                if (isParallaxMapping) {
+                    addDesiredStateChange(setHeightTerrain);
+                } else {
+                    removeDesiredStateChange(setHeightTerrain);
                 }
                 break;
 

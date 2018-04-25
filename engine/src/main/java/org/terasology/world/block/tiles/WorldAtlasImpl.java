@@ -63,7 +63,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     private static final int MAX_TILES = 65536;
     private static final Color UNIT_Z_COLOR = new Color(0.5f, 0.5f, 1.0f, 1.0f);
     private static final Color TRANSPARENT_COLOR = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-    private static final Color BLACK_COLOR = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+    private static final Color MID_RED_COLOR = new Color(0.5f, 0.0f, 0.0f, 1.0f);
 
     private int maxAtlasSize = 4096;
     private int atlasSize = 256;
@@ -225,7 +225,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         int numMipMaps = getNumMipmaps();
         ByteBuffer[] data = createAtlasMipmaps(numMipMaps, TRANSPARENT_COLOR, tiles, "tiles.png");
         ByteBuffer[] dataNormal = createAtlasMipmaps(numMipMaps, UNIT_Z_COLOR, tilesNormal, "tilesNormal.png", tilesGloss);
-        ByteBuffer[] dataHeight = createAtlasMipmaps(numMipMaps, BLACK_COLOR, tilesHeight, "tilesHeight.png");
+        ByteBuffer[] dataHeight = createAtlasMipmaps(numMipMaps, MID_RED_COLOR, tilesHeight, "tilesHeight.png");
 
         TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         Texture terrainTex = Assets.generateAsset(new ResourceUrn("engine:terrain"), terrainTexData, Texture.class);
@@ -233,7 +233,7 @@ public class WorldAtlasImpl implements WorldAtlas {
         TextureData terrainNormalData = new TextureData(atlasSize, atlasSize, dataNormal, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         Assets.generateAsset(new ResourceUrn("engine:terrainNormal"), terrainNormalData, Texture.class);
 
-        TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
+        TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
         Assets.generateAsset(new ResourceUrn("engine:terrainHeight"), terrainHeightData, Texture.class);
 
         MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block").get());
