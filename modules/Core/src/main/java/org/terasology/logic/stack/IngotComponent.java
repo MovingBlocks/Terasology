@@ -18,3 +18,5 @@ package org.terasology.logic.stack;
 import org.terasology.entitySystem.Component;
 
 public class IngotComponent implements Component {
+
+}
