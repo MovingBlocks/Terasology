@@ -9,7 +9,8 @@
         "shape": "quarterslab"
     },
     "entity" : {
-           "prefab" : "slab"
-     },
+        "prefab" : "slabstack"
+    },
+    "attachmentAllowed": false,
     "sounds": "Core:snow"
 }

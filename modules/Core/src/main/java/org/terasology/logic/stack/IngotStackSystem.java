@@ -70,6 +70,7 @@ public class IngotStackSystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_HIGH)
     public void onRightClick(ActivateEvent event, EntityRef entity, IngotComponent ingotComponent) {
+        logger.info("right click is working?");
         EntityRef instigator = event.getInstigator();
         BlockComponent targetBlockComponent = event.getTarget().getComponent(BlockComponent.class);
         if (targetBlockComponent == null) {

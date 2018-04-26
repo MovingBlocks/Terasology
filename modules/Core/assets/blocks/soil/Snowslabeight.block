@@ -10,7 +10,8 @@
     },
     "penetrable": true,
     "entity" : {
-           "prefab" : "slab"
-     },
+           "prefab" : "slabstack"
+    },
+    "attachmentAllowed": false,
     "sounds": "Core:snow"
 }
