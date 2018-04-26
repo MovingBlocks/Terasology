@@ -1,0 +1,11 @@
+{
+    "texture" : "foliagecolor",
+    "textureSize" : [32, 32],
+    "grid" : {
+        "tileSize" : [16, 16],
+        "gridDimensions" : [2, 2],
+        "tileNames" : [
+            "theGlasses", "", "", ""
+        ]
+    }
+}

@@ -18,5 +18,9 @@ package org.terasology.logic.stack;
 import org.terasology.entitySystem.Component;
 
 public class IngotComponent implements Component {
+<<<<<<< HEAD
 
 }
+=======
+}
+>>>>>>> c4c6bee58609285bc19b94ce1f64119af9fe1fb6
