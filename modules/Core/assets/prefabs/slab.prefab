@@ -1,4 +1,11 @@
 {
-    "Slab": {},
-    "SlabStack":{}
+    "parent" : "engine:iconItem",
+    "Item" : {
+        "icon" : "engine:items#axe",
+        "stackId": "Slab"
+    },
+    "DisplayName" : {
+        "name" : "Slab"
+    },
+    "Slab" : {}
 }

@@ -217,6 +217,8 @@
     "preview-world-title": "preview-world-title",
     "preview-zoom-factor": "preview-zoom-factor",
     "previous-toolbar-item": "previous-toolbar-item",
+    "remove-confirmation-popup-title": "remove-confirmation-popup-title",
+    "remove-confirmation-popup-message": "remove-confirmation-popup-message",
     "remove-binding": "remove-binding",
     "remove-server": "remove-server",
     "reset-default": "reset-default",

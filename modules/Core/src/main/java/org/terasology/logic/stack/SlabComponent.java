@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.common;
+package org.terasology.logic.stack;
 
 import org.terasology.entitySystem.Component;
 
-public class SlabStackComponent implements Component {
-    public int slabs;
+public class SlabComponent implements Component{
 }

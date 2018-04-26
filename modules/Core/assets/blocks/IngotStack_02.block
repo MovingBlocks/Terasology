@@ -1,0 +1,10 @@
+/**
+ * 2/3 of a full stack of ingots
+ */
+{
+    "shape" : "StructuralResources:stack_02",
+    "attachmentAllowed": false,
+    "entity" : {
+        "prefab" : "ingotstack"
+    }
+}

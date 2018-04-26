@@ -12,5 +12,6 @@
     "replacementAllowed": true,
     "translucent": true,
     "doubleSided": true,
-    "debrisOnDestroy": false
+    "debrisOnDestroy": false,
+    "sounds": "Core:leaf"
 }

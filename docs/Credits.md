@@ -224,12 +224,14 @@ Contributors
  [morrilet](https://github.com/morrilet),
  [J-Dill](https://github.com/J-Dill),
  [mwesolowski](https://github.com/mwesolowski),
- [4Denthusiast](https://github.com/4Denthusiast),
  [Shade254](https://github.com/Shade254),
  [Maximetinu](https://github.com/Maximetinu),
  [readv](https://github.com/readv),
  [Arihant-Joshi](https://github.com/Arihant-Joshi),
- [J-Dill](https://github.com/J-Dill)
+ [Austin 'skate54345' Kelly](https://github.com/skate54345),
+ [Inei1](https://github.com/Inei1),
+ [dorasun](https://github.com/dorasun),
+ [oekonomi](https://github.com/oekonomi)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
@@ -266,6 +268,7 @@ Soundtrack and Sound Effects
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
 * Camera Click Noise from Snapper4298, from FreeSound.org
+* Block dig and destroy sounds by Austin Kelly
 * Other sound effects created by Exile.
 
 Icons
