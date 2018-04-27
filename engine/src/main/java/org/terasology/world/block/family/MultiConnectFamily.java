@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,24 +134,22 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
      * @param root The root block URI of the family
      * @param definition The definition of the block family as passed down from the engine
      * @param blockBuilder The block builder to make the blocks in the family
-     * @param name The name of the section of the block to be registered, ex: "no_connections"
      * @param sides A byte representing the sides which should be connected for this block
      * @param rotations All of the ways the block should be rotated
      * @return All of the rotations possible for the block with the given sides
      */
-    public Set<Block> registerBlock(BlockUri root,BlockFamilyDefinition definition,final BlockBuilderHelper blockBuilder,byte sides,Iterable<Rotation> rotations){
+    public Set<Block> registerBlock(BlockUri root, BlockFamilyDefinition definition, final BlockBuilderHelper blockBuilder, byte sides, Iterable<Rotation> rotations) {
         Set<Block> result = Sets.newLinkedHashSet();
-        for(Rotation rotation: rotations)
-        {
+        for (Rotation rotation: rotations) {
             byte sideBits = 0;
-            for(Side side : SideBitFlag.getSides(sides)){
+            for (Side side : SideBitFlag.getSides(sides)) {
                 sideBits += SideBitFlag.getSide(rotation.rotate(side));
             }
-            BlockUri uri = new BlockUri(root,new Name(String.valueOf(sideBits)));
-            Block block = blockBuilder.constructTransformedBlock(definition,rotation, uri, this);
+            BlockUri uri = new BlockUri(root, new Name(String.valueOf(sideBits)));
+            Block block = blockBuilder.constructTransformedBlock(definition, rotation, uri, this);
             block.setUri(uri);
 
-            blocks.put(sideBits,block);
+            blocks.put(sideBits, block);
             result.add(block);
         }
         return result;
@@ -214,7 +212,7 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         return null;
     }
 
-    public byte getConnections(BlockUri blockUri){
+    public byte getConnections(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
                 return Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
@@ -233,5 +231,4 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public Iterable<Block> getBlocks() {
         return blocks.valueCollection();
     }
-
 }
