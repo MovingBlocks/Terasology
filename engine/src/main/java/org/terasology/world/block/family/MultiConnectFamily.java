@@ -147,9 +147,9 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
             for(Side side : SideBitFlag.getSides(sides)){
                 sideBits += SideBitFlag.getSide(rotation.rotate(side));
             }
-            Block block = blockBuilder.constructTransformedBlock(definition,rotation);
-            block.setBlockFamily(this);
-            block.setUri(new BlockUri(root,new Name(String.valueOf(sideBits))));
+            BlockUri uri = new BlockUri(root,new Name(String.valueOf(sideBits)));
+            Block block = blockBuilder.constructTransformedBlock(definition,rotation, uri, this);
+            block.setUri(uri);
 
             blocks.put(sideBits,block);
             result.add(block);
