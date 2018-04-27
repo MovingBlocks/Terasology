@@ -43,7 +43,7 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
 
     public HorizontalFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-        BlockUri uri = null;
+        BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
         } else {
@@ -51,16 +51,14 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
         }
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
-            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot,
+                    new BlockUri(uri, new Name(side.name())), this);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
-            block.setBlockFamily(this);
-            block.setUri(new BlockUri(uri, new Name(side.name())));
             blocks.put(side, block);
         }
-        this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
+        setBlockUri(uri);
     }
 
     public HorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
@@ -69,17 +67,12 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
 
-            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot, new BlockUri(uri, new Name(side.name())), this);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
-            block.setBlockFamily(this);
-            block.setUri(new BlockUri(uri, new Name(side.name())));
             blocks.put(side, block);
         }
-        this.setCategory(definition.getCategories());
-        this.setBlockUri(uri);
-
     }
 
     protected Side getArchetypeSide() {
