@@ -83,7 +83,9 @@ public class DeferredPointLightsNode extends AbstractNode {
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f activeCameraToLightSpace = new Vector3f();
 
-    public DeferredPointLightsNode(Context context) {
+    public DeferredPointLightsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
         entityManager = context.get(EntityManager.class);
@@ -150,7 +152,7 @@ public class DeferredPointLightsNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/pointLightsGeometry");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_POINT);
 

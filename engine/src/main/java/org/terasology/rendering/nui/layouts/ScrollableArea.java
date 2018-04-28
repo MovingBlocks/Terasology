@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 
-/**
- */
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;
 
@@ -178,6 +176,16 @@ public class ScrollableArea extends CoreLayout {
 
     public void setContent(UIWidget widget) {
         this.content = widget;
+    }
+
+    /**
+     * Allows setting the preferred size directly via code instead of solely in a .ui file.
+     * @param width the preferred width to set
+     * @param height the preferred height to set
+     */
+    public void setPreferredSize (int width, int height) {
+        preferredWidth = width;
+        preferredHeight = height;
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
 import org.terasology.rendering.dag.ConditionDependentNode;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.SetViewportToSizeOf;
 import org.terasology.rendering.opengl.FBO;
@@ -37,10 +38,10 @@ import org.terasology.rendering.opengl.fbms.ShadowMapResolutionDependentFBOs;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.RenderQueuesHelper;
 import org.terasology.rendering.world.RenderableWorld;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.RenderableChunk;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
 
@@ -57,7 +58,7 @@ import static org.terasology.rendering.primitives.ChunkMesh.RenderPhase.OPAQUE;
  * TODO: move diagram to the wiki when this part of the code is stable
  * - https://docs.google.com/drawings/d/13I0GM9jDFlZv1vNrUPlQuBbaF86RPRNpVfn5q8Wj2lc/edit?usp=sharing
  */
-public class ShadowMapNode extends ConditionDependentNode {
+public class ShadowMapNode extends ConditionDependentNode implements PropertyChangeListener {
     public static final SimpleUri SHADOW_MAP_FBO_URI = new SimpleUri("engine:fbo.sceneShadowMap");
     private static final ResourceUrn SHADOW_MAP_MATERIAL_URN = new ResourceUrn("engine:prog.shadowMap");
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
@@ -66,20 +67,18 @@ public class ShadowMapNode extends ConditionDependentNode {
     public Camera shadowMapCamera = new OrthographicCamera(-SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, SHADOW_FRUSTUM_BOUNDS, -SHADOW_FRUSTUM_BOUNDS);
 
     private BackdropProvider backdropProvider;
-    private WorldRenderer worldRenderer;
     private RenderingConfig renderingConfig;
     private RenderQueuesHelper renderQueues;
 
     private SubmersibleCamera activeCamera;
     private float texelSize;
 
-    public ShadowMapNode(Context context) {
-        super(context);
+    public ShadowMapNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         renderQueues = context.get(RenderQueuesHelper.class);
         backdropProvider = context.get(BackdropProvider.class);
         renderingConfig = context.get(Config.class).getRendering();
-        worldRenderer = context.get(WorldRenderer.class);
 
         activeCamera = worldRenderer.getActiveCamera();
 
@@ -96,6 +95,8 @@ public class ShadowMapNode extends ConditionDependentNode {
         addDesiredStateChange(new BindFbo(shadowMapFbo));
         addDesiredStateChange(new SetViewportToSizeOf(shadowMapFbo));
         addDesiredStateChange(new EnableMaterial(SHADOW_MAP_MATERIAL_URN));
+
+        addDesiredStateChange(new EnableFaceCulling());
     }
 
     private float calculateTexelSize(int shadowMapResolution) {
@@ -147,7 +148,7 @@ public class ShadowMapNode extends ConditionDependentNode {
     public void process() {
         // TODO: remove this IF statement when VR is handled via parallel nodes, one per eye.
         if (worldRenderer.isFirstRenderingStageForCurrentFrame()) {
-            PerformanceMonitor.startActivity("rendering/shadowMap");
+            PerformanceMonitor.startActivity("rendering/" + getUri());
 
             // Actual Node Processing
 

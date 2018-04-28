@@ -16,15 +16,13 @@
 
 package org.terasology.math;
 
-import com.bulletphysics.linearmath.AabbUtil2;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
+import org.terasology.math.geom.Matrix3f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3d;
 import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Matrix4f;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +34,8 @@ import java.util.List;
  */
 public final class AABB {
 
+    public static final float DEFAULT_MARGIN = 0.01f;
+    public static final float HALVING_FACTOR = 0.5f;
     private final Vector3f min;
     private final Vector3f max;
 
@@ -113,14 +113,14 @@ public final class AABB {
     public Vector3f getExtents() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.sub(min);
-        dimensions.scale(0.5f);
+        dimensions.scale(HALVING_FACTOR);
         return dimensions;
     }
 
     public Vector3f getCenter() {
         Vector3f dimensions = new Vector3f(max);
         dimensions.add(min);
-        dimensions.scale(0.5f);
+        dimensions.scale(HALVING_FACTOR);
         return dimensions;
     }
 
@@ -146,15 +146,56 @@ public final class AABB {
     }
 
     public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
-        Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
+        Transform transform = new Transform(offset, rotation, scale);
         return transform(transform);
     }
 
     public AABB transform(Transform transform) {
-        javax.vecmath.Vector3f newMin = new javax.vecmath.Vector3f();
-        javax.vecmath.Vector3f newMax = new javax.vecmath.Vector3f();
-        AabbUtil2.transformAabb(VecMath.to(min), VecMath.to(max), 0.01f, transform, newMin, newMax);
-        return new AABB(VecMath.from(newMin), VecMath.from(newMax));
+        return transform(transform, DEFAULT_MARGIN);
+    }
+
+    public AABB transform(Transform transform, float margin) {
+        // Adaptation of method AabbUtil2.transformAabb from the TeraBullet library.
+        Vector3f localHalfExtents = new Vector3f();
+        localHalfExtents.sub(max, min);
+        localHalfExtents.mul(HALVING_FACTOR);
+
+        localHalfExtents.x += margin;
+        localHalfExtents.y += margin;
+        localHalfExtents.z += margin;
+
+        Vector3f localCenter = new Vector3f(max);
+        localCenter.add(min);
+        localCenter.mul(HALVING_FACTOR);
+
+        Matrix3f absBasis = transform.getBasis();
+
+        absBasis.m00 = Math.abs(absBasis.m00);
+        absBasis.m01 = Math.abs(absBasis.m01);
+        absBasis.m02 = Math.abs(absBasis.m02);
+        absBasis.m10 = Math.abs(absBasis.m10);
+        absBasis.m11 = Math.abs(absBasis.m11);
+        absBasis.m12 = Math.abs(absBasis.m12);
+        absBasis.m20 = Math.abs(absBasis.m20);
+        absBasis.m21 = Math.abs(absBasis.m21);
+        absBasis.m22 = Math.abs(absBasis.m22);
+
+        Vector3f center = new Vector3f(localCenter);
+        absBasis.transform(center);
+        center.add(transform.origin);
+
+        Vector3f extent = new Vector3f();
+
+        extent.x = absBasis.getRow(0).dot(localHalfExtents);
+        extent.y = absBasis.getRow(1).dot(localHalfExtents);
+        extent.z = absBasis.getRow(2).dot(localHalfExtents);
+
+        Vector3f worldMin = new Vector3f();
+        worldMin.sub(center, extent);
+
+        Vector3f worldMax = new Vector3f(center).add(extent);
+
+        return AABB.createMinMax(worldMin, worldMax);
     }
 
     /**

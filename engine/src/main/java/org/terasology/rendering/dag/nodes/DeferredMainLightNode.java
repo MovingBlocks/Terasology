@@ -83,7 +83,9 @@ public class DeferredMainLightNode extends AbstractNode {
     @SuppressWarnings("FieldCanBeLocal")
     private Vector3f mainLightInViewSpace = new Vector3f();
 
-    public DeferredMainLightNode(Context context) {
+    public DeferredMainLightNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         backdropProvider = context.get(BackdropProvider.class);
         renderingConfig = context.get(Config.class).getRendering();
         worldProvider = context.get(WorldProvider.class);
@@ -136,7 +138,7 @@ public class DeferredMainLightNode extends AbstractNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/mainLightGeometry");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         lightGeometryMaterial.activateFeature(ShaderProgramFeature.FEATURE_LIGHT_DIRECTIONAL);
 

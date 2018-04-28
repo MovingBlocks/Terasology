@@ -24,8 +24,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/**
- */
 public class PostBeginSystems extends StepBasedLoadProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(PostBeginSystems.class);

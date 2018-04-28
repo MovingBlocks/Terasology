@@ -46,7 +46,7 @@ public class InitialiseWorldGenerator extends SingleStepLoadProcess {
         worldGenerator.initialize();
 
         WorldRenderer worldRenderer = context.get(WorldRenderer.class);
-        worldRenderer.getActiveCamera().setReflectionHeight(worldGenerator.getWorld().getSeaLevel());
+        worldRenderer.getActiveCamera().setReflectionHeight(worldGenerator.getWorld().getSeaLevel() + 0.5f);
 
         return true;
     }

@@ -31,6 +31,7 @@ import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.EnableMaterial;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetInputTexture2D;
@@ -64,6 +65,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
     private Material chunkMaterial;
     private SetWireframe wireframeStateChange;
+    private EnableFaceCulling faceCullingStateChange;
     private RenderingDebugConfig renderingDebugConfig;
 
     private SubmersibleCamera activeCamera;
@@ -76,22 +78,33 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.5f)
-    private float parallaxBias = 0.05f;
+    private float parallaxBias = 0.25f;
     @SuppressWarnings("FieldCanBeLocal")
     @Range(min = 0.0f, max = 0.50f)
-    private float parallaxScale = 0.05f;
+    private float parallaxScale = 0.5f;
 
-    public OpaqueBlocksNode(Context context) {
+    public OpaqueBlocksNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         renderQueues = context.get(RenderQueuesHelper.class);
         worldProvider = context.get(WorldProvider.class);
-
-        wireframeStateChange = new SetWireframe(true);
-        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
-        new WireframeTrigger(renderingDebugConfig, this);
 
         worldRenderer = context.get(WorldRenderer.class);
         activeCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(activeCamera));
+
+        // IF wireframe is enabled the WireframeTrigger will remove the face culling state change
+        // from the set of desired state changes.
+        // The alternative would have been to check here first if wireframe mode is enabled and *if not*
+        // add the face culling state change. However, if wireframe *is* enabled, the WireframeTrigger
+        // would attempt to remove the face culling state even though it isn't there, relying on the
+        // quiet behaviour of Set.remove(nonExistentItem). We therefore favored the first solution.
+        faceCullingStateChange = new EnableFaceCulling();
+        addDesiredStateChange(faceCullingStateChange);
+
+        wireframeStateChange = new SetWireframe(true);
+        renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
 
@@ -114,15 +127,16 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         if (normalMappingIsEnabled) {
             addDesiredStateChange(setTerrainNormalsInputTexture);
+        }
 
-            if (parallaxMappingIsEnabled) {
-                addDesiredStateChange(setTerrainHeightInputTexture);
-            }
+        if (parallaxMappingIsEnabled) {
+            addDesiredStateChange(setTerrainHeightInputTexture);
         }
     }
 
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
             addDesiredStateChange(wireframeStateChange);
             worldRenderer.requestTaskListRefresh();
         }
@@ -130,6 +144,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
             removeDesiredStateChange(wireframeStateChange);
             worldRenderer.requestTaskListRefresh();
         }
@@ -152,7 +167,7 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/opaqueChunks");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         // Common Shader Parameters
 
@@ -162,10 +177,8 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
 
         chunkMaterial.setFloat("clip", 0.0f, true);
 
-        if (normalMappingIsEnabled) {
-            if (parallaxMappingIsEnabled) {
-                chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
-            }
+        if (parallaxMappingIsEnabled) {
+            chunkMaterial.setFloat4("parallaxProperties", parallaxBias, parallaxScale, 0.0f, 0.0f, true);
         }
 
         // Actual Node Processing
@@ -224,25 +237,17 @@ public class OpaqueBlocksNode extends AbstractNode implements WireframeCapable, 
                 normalMappingIsEnabled = renderingConfig.isNormalMapping();
                 if (normalMappingIsEnabled) {
                     addDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 } else {
                     removeDesiredStateChange(setTerrainNormalsInputTexture);
-                    if (parallaxMappingIsEnabled) {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
                 }
                 break;
 
             case RenderingConfig.PARALLAX_MAPPING:
                 parallaxMappingIsEnabled = renderingConfig.isParallaxMapping();
-                if (normalMappingIsEnabled) {
-                    if (parallaxMappingIsEnabled) {
-                        addDesiredStateChange(setTerrainHeightInputTexture);
-                    } else {
-                        removeDesiredStateChange(setTerrainHeightInputTexture);
-                    }
+                if (parallaxMappingIsEnabled) {
+                    addDesiredStateChange(setTerrainHeightInputTexture);
+                } else {
+                    removeDesiredStateChange(setTerrainHeightInputTexture);
                 }
                 break;
 

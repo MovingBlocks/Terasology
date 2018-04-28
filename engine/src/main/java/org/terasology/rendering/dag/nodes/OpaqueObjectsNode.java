@@ -26,6 +26,7 @@ import org.terasology.rendering.dag.AbstractNode;
 import org.terasology.rendering.dag.WireframeCapable;
 import org.terasology.rendering.dag.WireframeTrigger;
 import org.terasology.rendering.dag.stateChanges.BindFbo;
+import org.terasology.rendering.dag.stateChanges.EnableFaceCulling;
 import org.terasology.rendering.dag.stateChanges.LookThrough;
 import org.terasology.rendering.dag.stateChanges.SetWireframe;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
@@ -43,23 +44,36 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
     private WorldRenderer worldRenderer;
 
     private SetWireframe wireframeStateChange;
+    private EnableFaceCulling faceCullingStateChange;
 
-    public OpaqueObjectsNode(Context context) {
+    public OpaqueObjectsNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         componentSystemManager = context.get(ComponentSystemManager.class);
-
-        wireframeStateChange = new SetWireframe(true);
-        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
-        new WireframeTrigger(renderingDebugConfig, this);
 
         worldRenderer = context.get(WorldRenderer.class);
         Camera playerCamera = worldRenderer.getActiveCamera();
         addDesiredStateChange(new LookThrough(playerCamera));
+
+        // IF wireframe is enabled the WireframeTrigger will remove the face culling state change
+        // from the set of desired state changes.
+        // The alternative would have been to check here first if wireframe mode is enabled and *if not*
+        // add the face culling state change. However, if wireframe *is* enabled, the WireframeTrigger
+        // would attempt to remove the face culling state even though it isn't there, relying on the
+        // quiet behaviour of Set.remove(nonExistentItem). We therefore favored the first solution.
+        faceCullingStateChange = new EnableFaceCulling();
+        addDesiredStateChange(faceCullingStateChange);
+
+        wireframeStateChange = new SetWireframe(true);
+        RenderingDebugConfig renderingDebugConfig = context.get(Config.class).getRendering().getDebug();
+        new WireframeTrigger(renderingDebugConfig, this);
 
         addDesiredStateChange(new BindFbo(context.get(DisplayResolutionDependentFBOs.class).getGBufferPair().getLastUpdatedFbo()));
     }
 
     public void enableWireframe() {
         if (!getDesiredStateChanges().contains(wireframeStateChange)) {
+            removeDesiredStateChange(faceCullingStateChange);
             addDesiredStateChange(wireframeStateChange);
             worldRenderer.requestTaskListRefresh();
         }
@@ -67,6 +81,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
 
     public void disableWireframe() {
         if (getDesiredStateChanges().contains(wireframeStateChange)) {
+            addDesiredStateChange(faceCullingStateChange);
             removeDesiredStateChange(wireframeStateChange);
             worldRenderer.requestTaskListRefresh();
         }
@@ -77,7 +92,7 @@ public class OpaqueObjectsNode extends AbstractNode implements WireframeCapable 
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/opaqueObjects");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         for (RenderSystem renderer : componentSystemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();

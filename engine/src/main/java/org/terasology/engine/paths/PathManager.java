@@ -46,6 +46,7 @@ public final class PathManager {
     private static final String MOD_DIR = "modules";
     private static final String SCREENSHOT_DIR = "screenshots";
     private static final String NATIVES_DIR = "natives";
+    private static final String CONFIGS_DIR = "configs";
 
     private static PathManager instance;
     private Path installPath;
@@ -58,6 +59,7 @@ public final class PathManager {
     private ImmutableList<Path> modPaths = ImmutableList.of();
     private Path screenshotPath;
     private Path nativesPath;
+    private Path configsPath;
 
     private PathManager() {
         // By default, the path should be the code location (where terasology.jar is)
@@ -237,6 +239,14 @@ public final class PathManager {
     }
 
     /**
+     *
+     * @return Path in which the game's config files are saved.
+     */
+    public Path getConfigsPath() {
+        return configsPath;
+    }
+
+    /**
      * Updates all of the path manager's file/directory references to match the path settings. Creates directories if they don't already exist.
      * @throws IOException Thrown when required directories cannot be accessed.
      */
@@ -260,6 +270,7 @@ public final class PathManager {
         screenshotPath = homePath.resolve(SCREENSHOT_DIR);
         Files.createDirectories(screenshotPath);
         nativesPath = installPath.resolve(NATIVES_DIR);
+        configsPath = installPath.resolve(CONFIGS_DIR);
         if (currentWorldPath == null) {
             currentWorldPath = homePath;
         }

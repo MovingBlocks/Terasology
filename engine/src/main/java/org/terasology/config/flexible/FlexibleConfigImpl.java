@@ -16,10 +16,17 @@
 package org.terasology.config.flexible;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -27,14 +34,16 @@ import java.util.Map;
  */
 public class FlexibleConfigImpl implements FlexibleConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlexibleConfigImpl.class);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final String DESCRIPTION_PROPERTY_NAME = "description";
 
-    private Map<SimpleUri, Setting> settingMap;
+    private final Map<SimpleUri, Setting> settings = Maps.newHashMap();
+    private final Map<SimpleUri, String> temporarilyParkedSettings = Maps.newHashMap();
 
-    /**
-     * Creates a new {@link FlexibleConfigImpl} instance.
-     */
-    public FlexibleConfigImpl() {
-        this.settingMap = Maps.newHashMap();
+    private final String description;
+
+    public FlexibleConfigImpl(String description) {
+        this.description = description;
     }
 
     /**
@@ -52,7 +61,12 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
-        settingMap.put(id, setting);
+        if (temporarilyParkedSettings.containsKey(id)) {
+            setting.setValueFromJson(temporarilyParkedSettings.remove(id));
+        }
+
+        settings.put(id, setting);
+
         return true;
     }
 
@@ -71,7 +85,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
             return false;
         }
 
-        settingMap.remove(id);
+        settings.remove(id);
         return true;
     }
 
@@ -81,7 +95,7 @@ public class FlexibleConfigImpl implements FlexibleConfig {
     @Override
     @SuppressWarnings("unchecked")
     public <V> Setting<V> get(SimpleUri id) {
-        return (Setting<V>) settingMap.get(id);
+        return (Setting<V>) settings.get(id);
     }
 
     /**
@@ -89,6 +103,57 @@ public class FlexibleConfigImpl implements FlexibleConfig {
      */
     @Override
     public boolean contains(SimpleUri id) {
-        return settingMap.containsKey(id);
+        return settings.containsKey(id);
+    }
+
+    @Override
+    public Map<SimpleUri, Setting> getSettings() {
+        return settings;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void save(Writer writer) {
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty(DESCRIPTION_PROPERTY_NAME, description);
+
+        for (Map.Entry<SimpleUri, Setting> entry : settings.entrySet()) {
+            Setting setting = entry.getValue();
+            if (!setting.getValue().equals(setting.getDefaultValue())) {
+                jsonObject.add(entry.getKey().toString(), setting.getValueAsJson());
+            }
+        }
+
+        // Add any temporarily parked setting that hasn't been used in this session of the application.
+        for (Map.Entry<SimpleUri, String> entry : temporarilyParkedSettings.entrySet()) {
+            jsonObject.addProperty(entry.getKey().toString(), entry.getValue());
+        }
+
+        gson.toJson(jsonObject, writer);
+    }
+
+    @Override
+    public void load(Reader reader) {
+        try {
+            JsonObject jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+
+            for (Map.Entry<String, JsonElement> jsonEntry : jsonObject.entrySet()) {
+                if (jsonEntry.getKey().equals(DESCRIPTION_PROPERTY_NAME)) {
+                    continue;
+                }
+
+                SimpleUri id = new SimpleUri(jsonEntry.getKey());
+                String valueJson = jsonEntry.getValue().toString();
+                temporarilyParkedSettings.put(id, valueJson);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing config file!");
+        }
     }
 }

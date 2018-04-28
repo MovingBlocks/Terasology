@@ -38,6 +38,7 @@ public class EntityInfoComponent implements Component {
     @Replicate
     public EntityRef owner = EntityRef.NULL;
     public boolean alwaysRelevant;
+    public EntityScope scope = EntityScope.getDefaultScope();
 
     public EntityInfoComponent() {
     }
@@ -46,5 +47,10 @@ public class EntityInfoComponent implements Component {
         this.parentPrefab = parentPrefab;
         this.persisted = persisted;
         this.alwaysRelevant = alwaysRelevant;
+    }
+
+    public EntityInfoComponent(@Nullable Prefab parentPrefab, boolean persisted, boolean alwaysRelevant, EntityScope scope) {
+        this(parentPrefab, persisted, alwaysRelevant);
+        this.scope = scope;
     }
 }

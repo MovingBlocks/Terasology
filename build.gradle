@@ -77,7 +77,7 @@ dependencies {
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
 
     // Config for our code analytics lives in a centralized repo: https://github.com/MovingBlocks/TeraConfig
-    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.1.0', ext: 'zip'
+    codeMetrics group: 'org.terasology.config', name: 'codemetrics', version: '1.2.0', ext: 'zip'
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -217,6 +217,7 @@ idea {
     module.excludeDirs += file('protobuf')
 
     // Exclude output dirs
+    module.excludeDirs += file('configs')
     module.excludeDirs += file('logs')
     module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')

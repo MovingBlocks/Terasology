@@ -212,10 +212,6 @@ public class RegionOutlineRenderer extends BaseComponentSystem implements Render
     }
 
     @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
     public void renderShadows() {
     }
 }

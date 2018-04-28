@@ -15,11 +15,14 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.sectors.SectorSimulationComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.EntitySerializer;
@@ -28,11 +31,16 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 
+import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
+import static org.terasology.entitySystem.entity.internal.EntityScope.GLOBAL;
+import static org.terasology.entitySystem.entity.internal.EntityScope.SECTOR;
+
 /**
  */
 public abstract class BaseEntityRef extends EntityRef {
 
     protected LowLevelEntityManager entityManager;
+    private static final Logger logger = LoggerFactory.getLogger(BaseEntityRef.class);
 
     public BaseEntityRef(LowLevelEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -45,16 +53,14 @@ public abstract class BaseEntityRef extends EntityRef {
 
     @Override
     public boolean isAlwaysRelevant() {
-        return isActive() && getEntityInfo().alwaysRelevant;
+        return isActive() && getScope().getAlwaysRelevant();
     }
 
     @Override
     public void setAlwaysRelevant(boolean alwaysRelevant) {
         if (exists()) {
-            EntityInfoComponent info = getEntityInfo();
-            if (info.alwaysRelevant != alwaysRelevant) {
-                info.alwaysRelevant = alwaysRelevant;
-                saveComponent(info);
+            if (alwaysRelevant != isAlwaysRelevant()) {
+                setScope(alwaysRelevant ? GLOBAL : CHUNK);
             }
         }
     }
@@ -76,6 +82,59 @@ public abstract class BaseEntityRef extends EntityRef {
                 saveComponent(info);
             }
         }
+    }
+
+    @Override
+    public EntityScope getScope() {
+        if (exists()) {
+            return getEntityInfo().scope;
+        }
+        return null;
+    }
+
+    @Override
+    public void setScope(EntityScope scope) {
+        if (exists()) {
+            EntityInfoComponent info = getEntityInfo();
+            if (!info.scope.equals(scope)) {
+
+                EngineEntityPool newPool;
+                switch (scope) {
+                    case GLOBAL:
+                    case CHUNK:
+                        newPool = entityManager.getGlobalPool();
+                        removeComponent(SectorSimulationComponent.class);
+                        break;
+                    case SECTOR:
+                        newPool = entityManager.getSectorManager();
+                        if (!hasComponent(SectorSimulationComponent.class)) {
+                            addComponent(new SectorSimulationComponent());
+                        }
+                        break;
+                    default:
+                        logger.error("Unrecognised scope {}.", scope);
+                        return;
+                }
+
+                entityManager.moveToPool(getId(), newPool);
+                info.scope = scope;
+                saveComponent(info);
+            }
+        }
+    }
+
+    @Override
+    public void setSectorScope(long maxDelta) {
+        setSectorScope(maxDelta, maxDelta);
+    }
+
+    @Override
+    public void setSectorScope(long unloadedMaxDelta, long loadedMaxDelta) {
+        setScope(SECTOR);
+        SectorSimulationComponent simulationComponent = getComponent(SectorSimulationComponent.class);
+        simulationComponent.unloadedMaxDelta = unloadedMaxDelta;
+        simulationComponent.loadedMaxDelta = loadedMaxDelta;
+        saveComponent(simulationComponent);
     }
 
     @Override
@@ -172,6 +231,7 @@ public abstract class BaseEntityRef extends EntityRef {
         return builder.toString();
     }
 
+    @Override
     public void invalidate() {
         entityManager = null;
     }

@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.utilities.Assets;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.module.ModuleAwareAssetTypeManager;
 import org.terasology.config.Config;
@@ -50,20 +50,24 @@ import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
+import org.terasology.utilities.Assets;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+import org.terasology.world.zones.Zone;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Shows a preview of the generated world and provides some
@@ -94,6 +98,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private UIImage previewImage;
     private UISlider zoomSlider;
+    private UIDropdown<Zone> zoneSelector;
     private UIButton applyButton;
 
     private UIText seed;
@@ -107,6 +112,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private Texture texture;
 
     private boolean triggerUpdate;
+    private String targetZone = "Surface";
 
     public PreviewWorldScreen() {
     }
@@ -129,7 +135,20 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
             worldGenerator = WorldGeneratorManager.createWorldGenerator(worldGenUri, subContext, environment);
             worldGenerator.setWorldSeed(seed.getText());
-            previewGen = new FacetLayerPreview(environment, worldGenerator);
+
+            List<Zone> previewZones = Lists.newArrayList(worldGenerator.getZones())
+                    .stream()
+                    .filter(z -> !z.getPreviewLayers().isEmpty())
+                    .collect(Collectors.toList());
+            if (previewZones.isEmpty()) {
+                zoneSelector.setVisible(false);
+                previewGen = new FacetLayerPreview(environment, worldGenerator);
+            } else {
+                zoneSelector.setVisible(true);
+                zoneSelector.setOptions(previewZones);
+                zoneSelector.setSelection(previewZones.get(0));
+            }
+
             configureProperties();
         } else {
             throw new UnresolvedDependencyException("Unable to resolve depencencies for " + worldGenUri);
@@ -231,6 +250,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
         seed = find("seed", UIText.class);
 
+        zoneSelector = find("zoneSelector", UIDropdown.class);
+
         applyButton = find("apply", UIButton.class);
         if (applyButton != null) {
             applyButton.subscribe(widget -> updatePreview());
@@ -270,6 +291,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
             int zoom = TeraMath.floorToInt(zoomSlider.getValue());
             TextureData data = texture.getData();
+
+            if (zoneSelector.isVisible()) {
+                previewGen = zoneSelector.getSelection().preview(worldGenerator);
+            }
             previewGen.render(data, zoom, progressListener);
 
             return data;

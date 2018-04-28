@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 
 /**
  * Utility class to perform requests to the service API.
@@ -42,6 +43,10 @@ final class ServiceApiRequest {
         return code >= 200 && code < 300;
     }
 
+    private static boolean isRedirect(int code) {
+        return code == HttpURLConnection.HTTP_MOVED_PERM || code == HttpURLConnection.HTTP_MOVED_TEMP;
+    }
+
     private static void parseError(HttpURLConnection conn) throws IOException, StorageServiceException {
         try (InputStream errResponse = conn.getErrorStream()) {
             try {
@@ -52,21 +57,45 @@ final class ServiceApiRequest {
         }
     }
 
-    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection conn, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
+    public static <REQUEST, RESPONSE> RESPONSE request(HttpURLConnection firstConn, HttpMethod method, String sessionToken, REQUEST data, Class<RESPONSE> responseClass)
             throws IOException, StorageServiceException {
-        conn.setRequestMethod(method.name());
-        conn.setUseCaches(false);
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Content-Type", "application/json");
-        if (sessionToken != null) {
-            conn.setRequestProperty("Session-Token", sessionToken);
-        }
-        if (data != null) {
-            try (OutputStream request = conn.getOutputStream()) {
-                request.write(GSON.toJson(data).getBytes());
+        HttpURLConnection conn = null;
+        int followedRedirects = 0;
+        do {
+            if (conn == null) {
+                conn = firstConn;
+            } else if (followedRedirects >= 8) {
+                throw new IOException("Reached max limit of HTTP redirects");
+            } else {
+                String redirectUrl = conn.getHeaderField("Location");
+                if (redirectUrl == null) {
+                    throw new IOException("An HTTP redirect status code was received, but no Location header was specified");
+                }
+                redirectUrl = URLDecoder.decode(redirectUrl, "UTF-8");
+
+                //needed if the Location header specifies a relative redirect, e.g. "Location: /some/path/on/the/same/server"
+                URL baseUrl = conn.getURL();
+                //if redirectUrl is already absolute (contains authority), baseUrl will be ignored (see javadoc for the URL(URL, String) constructor for more info)
+                URL target = new URL(baseUrl, redirectUrl);
+
+                conn = (HttpURLConnection) target.openConnection();
+                followedRedirects++;
             }
-        }
-        conn.connect();
+            conn.setRequestMethod(method.name());
+            conn.setUseCaches(false);
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            if (sessionToken != null) {
+                conn.setRequestProperty("Session-Token", sessionToken);
+            }
+            if (data != null) {
+                try (OutputStream request = conn.getOutputStream()) {
+                    request.write(GSON.toJson(data).getBytes());
+                }
+            }
+            conn.connect();
+        } while (isRedirect(conn.getResponseCode()));
+
         if (!isSuccessful(conn.getResponseCode())) {
             parseError(conn);
         }

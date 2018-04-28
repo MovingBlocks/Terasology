@@ -94,7 +94,7 @@ public final class StorageServiceWorker {
     public void flushNotificationsToConsole(Console target) {
         while (!notificationBuffer.isEmpty()) {
             ConsoleNotification notification = notificationBuffer.pop();
-            String message = "Identity storage service: " + String.format(translationSystem.translate(notification.messageId), notification.args);
+            String message = translationSystem.translate("${engine:menu#storage-service}")+": " + String.format(translationSystem.translate(notification.messageId), notification.args);
             target.addMessage(message, CoreMessageType.NOTIFICATION);
         }
     }

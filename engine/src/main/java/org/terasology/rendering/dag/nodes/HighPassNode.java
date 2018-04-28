@@ -51,8 +51,8 @@ public class HighPassNode extends ConditionDependentNode {
 
     private Material highPass;
 
-    public HighPassNode(Context context) {
-        super(context);
+    public HighPassNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         RenderingConfig renderingConfig = context.get(Config.class).getRendering();
         renderingConfig.subscribe(RenderingConfig.BLOOM, this);
@@ -79,7 +79,7 @@ public class HighPassNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/highpass");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
 
         highPass.setFloat("highPassThreshold", highPassThreshold, true);
 

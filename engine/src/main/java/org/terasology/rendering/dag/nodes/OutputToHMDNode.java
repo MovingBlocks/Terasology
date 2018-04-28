@@ -28,7 +28,6 @@ import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.FBOConfig;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 import org.terasology.rendering.openvrprovider.OpenVRProvider;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 
 import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
@@ -47,7 +46,6 @@ public class OutputToHMDNode extends ConditionDependentNode {
     // TODO: make these configurable options
 
     private OpenVRProvider vrProvider;
-    private WorldRenderer worldRenderer;
 
     private FBO leftEyeFbo;
     private FBO rightEyeFbo;
@@ -57,16 +55,16 @@ public class OutputToHMDNode extends ConditionDependentNode {
      * Constructs an instance of this node. Specifically, initialize the vrProvider and pass the frame buffer
      * information for the vrProvider to use.
      */
-    public OutputToHMDNode(Context context) {
-        super(context);
+    public OutputToHMDNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         vrProvider = context.get(OpenVRProvider.class);
         requiresCondition(() -> (context.get(Config.class).getRendering().isVrSupport() && vrProvider.isInitialized()));
 
+        // TODO: Consider reworking this, since it might cause problems later, when we support switching vr in-game.
         if (this.isEnabled()) {
-            worldRenderer = context.get(WorldRenderer.class);
-
             DisplayResolutionDependentFBOs displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
+
             leftEyeFbo = requiresFBO(new FBOConfig(LEFT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             rightEyeFbo = requiresFBO(new FBOConfig(RIGHT_EYE_FBO_URI, FULL_SCALE, FBO.Type.DEFAULT).useDepthBuffer(), displayResolutionDependentFBOs);
             finalFbo = displayResolutionDependentFBOs.get(FINAL_BUFFER);
@@ -89,7 +87,7 @@ public class OutputToHMDNode extends ConditionDependentNode {
      */
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outputToHMD");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
         finalFbo.bindTexture();
         renderFinalStereoImage(worldRenderer.getCurrentRenderStage());
         PerformanceMonitor.endActivity();

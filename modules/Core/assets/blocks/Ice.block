@@ -4,5 +4,6 @@
 {
     "ice": true,
     "translucent": true,
-    "hardness": 1
+    "hardness": 1,
+    "friction": 0.00001
 }

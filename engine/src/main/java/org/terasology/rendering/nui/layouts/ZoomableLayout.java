@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.input.Keyboard;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.TeraMath;
@@ -136,15 +135,19 @@ public class ZoomableLayout extends CoreLayout {
 
         canvas.addInteractionRegion(dragListener);
         for (PositionalWidget widget : widgets) {
-            if (!widget.isVisible()) {
-                continue;
-            }
-            Vector2i screenStart = worldToScreen(widget.getPosition());
-            Vector2f worldEnd = new Vector2f(widget.getPosition());
-            worldEnd.add(widget.getSize());
-            Vector2i screenEnd = worldToScreen(worldEnd);
-            canvas.drawWidget(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+            drawWidget(canvas, widget);
         }
+    }
+
+    protected void drawWidget(Canvas canvas, PositionalWidget widget) {
+        if (!widget.isVisible()) {
+            return;
+        }
+        Vector2i screenStart = worldToScreen(widget.getPosition());
+        Vector2f worldEnd = new Vector2f(widget.getPosition());
+        worldEnd.add(widget.getSize());
+        Vector2i screenEnd = worldToScreen(worldEnd);
+        canvas.drawWidget(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
     }
 
     @Override

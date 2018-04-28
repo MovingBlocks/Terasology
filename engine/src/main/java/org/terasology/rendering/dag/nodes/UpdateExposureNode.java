@@ -74,7 +74,9 @@ public class UpdateExposureNode extends AbstractNode {
     private PBO writeOnlyPbo;   // PBOs are 1x1 pixels buffers used to read GPU data back into the CPU.
                                 // This data is then used in the context of eye adaptation.
 
-    public UpdateExposureNode(Context context) {
+    public UpdateExposureNode(String nodeUri, Context context) {
+        super(nodeUri, context);
+
         backdropProvider = context.get(BackdropProvider.class);
         screenGrabber = context.get(ScreenGrabber.class);
 
@@ -93,7 +95,7 @@ public class UpdateExposureNode extends AbstractNode {
     @Override
     public void process() {
         if (renderingConfig.isEyeAdaptation()) {
-            PerformanceMonitor.startActivity("rendering/updateExposure");
+            PerformanceMonitor.startActivity("rendering/" + getUri());
 
             writeOnlyPbo.copyFromFBO(downSampledScene.getId(), 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
             ByteBuffer pixels = writeOnlyPbo.readBackPixels();

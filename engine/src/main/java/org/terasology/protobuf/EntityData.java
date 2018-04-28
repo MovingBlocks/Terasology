@@ -4241,6 +4241,15 @@ public final class EntityData {
      */
     com.google.protobuf.ByteString
         getRemovedComponentBytes(int index);
+
+    /**
+     * <code>optional .Entity.Scope scope = 7;</code>
+     */
+    boolean hasScope();
+    /**
+     * <code>optional .Entity.Scope scope = 7;</code>
+     */
+    org.terasology.protobuf.EntityData.Entity.Scope getScope();
   }
   /**
    * Protobuf type {@code Entity}
@@ -4345,6 +4354,17 @@ public final class EntityData {
               owner_ = input.readInt64();
               break;
             }
+            case 56: {
+              int rawValue = input.readEnum();
+              org.terasology.protobuf.EntityData.Entity.Scope value = org.terasology.protobuf.EntityData.Entity.Scope.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(7, rawValue);
+              } else {
+                bitField0_ |= 0x00000010;
+                scope_ = value;
+              }
+              break;
+            }
             case 122: {
               com.google.protobuf.ByteString bs = input.readBytes();
               if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
@@ -4400,6 +4420,97 @@ public final class EntityData {
     @java.lang.Override
     public com.google.protobuf.Parser<Entity> getParserForType() {
       return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code Entity.Scope}
+     */
+    public enum Scope
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>GLOBAL = 0;</code>
+       */
+      GLOBAL(0, 0),
+      /**
+       * <code>SECTOR = 1;</code>
+       */
+      SECTOR(1, 1),
+      /**
+       * <code>CHUNK = 2;</code>
+       */
+      CHUNK(2, 2),
+      ;
+
+      /**
+       * <code>GLOBAL = 0;</code>
+       */
+      public static final int GLOBAL_VALUE = 0;
+      /**
+       * <code>SECTOR = 1;</code>
+       */
+      public static final int SECTOR_VALUE = 1;
+      /**
+       * <code>CHUNK = 2;</code>
+       */
+      public static final int CHUNK_VALUE = 2;
+
+
+      public final int getNumber() { return value; }
+
+      public static Scope valueOf(int value) {
+        switch (value) {
+          case 0: return GLOBAL;
+          case 1: return SECTOR;
+          case 2: return CHUNK;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Scope>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<Scope>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Scope>() {
+              public Scope findValueByNumber(int number) {
+                return Scope.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return org.terasology.protobuf.EntityData.Entity.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Scope[] VALUES = values();
+
+      public static Scope valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Scope(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:Entity.Scope)
     }
 
     private int bitField0_;
@@ -4577,6 +4688,21 @@ public final class EntityData {
       return removedComponent_.getByteString(index);
     }
 
+    public static final int SCOPE_FIELD_NUMBER = 7;
+    private org.terasology.protobuf.EntityData.Entity.Scope scope_;
+    /**
+     * <code>optional .Entity.Scope scope = 7;</code>
+     */
+    public boolean hasScope() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional .Entity.Scope scope = 7;</code>
+     */
+    public org.terasology.protobuf.EntityData.Entity.Scope getScope() {
+      return scope_;
+    }
+
     private void initFields() {
       id_ = 0L;
       component_ = java.util.Collections.emptyList();
@@ -4585,6 +4711,7 @@ public final class EntityData {
       alwaysRelevant_ = false;
       owner_ = 0L;
       removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      scope_ = org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4634,6 +4761,9 @@ public final class EntityData {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt64(6, owner_);
       }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeEnum(7, scope_.getNumber());
+      }
       for (int i = 0; i < removedComponent_.size(); i++) {
         output.writeBytes(15, removedComponent_.getByteString(i));
       }
@@ -4680,6 +4810,10 @@ public final class EntityData {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(6, owner_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(7, scope_.getNumber());
       }
       {
         int dataSize = 0;
@@ -4828,6 +4962,8 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000020);
         removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000040);
+        scope_ = org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -4891,6 +5027,10 @@ public final class EntityData {
           bitField0_ = (bitField0_ & ~0x00000040);
         }
         result.removedComponent_ = removedComponent_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.scope_ = scope_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4966,6 +5106,9 @@ public final class EntityData {
             removedComponent_.addAll(other.removedComponent_);
           }
           onChanged();
+        }
+        if (other.hasScope()) {
+          setScope(other.getScope());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -5572,6 +5715,41 @@ public final class EntityData {
   }
   ensureRemovedComponentIsMutable();
         removedComponent_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private org.terasology.protobuf.EntityData.Entity.Scope scope_ = org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
+      /**
+       * <code>optional .Entity.Scope scope = 7;</code>
+       */
+      public boolean hasScope() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional .Entity.Scope scope = 7;</code>
+       */
+      public org.terasology.protobuf.EntityData.Entity.Scope getScope() {
+        return scope_;
+      }
+      /**
+       * <code>optional .Entity.Scope scope = 7;</code>
+       */
+      public Builder setScope(org.terasology.protobuf.EntityData.Entity.Scope value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000080;
+        scope_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .Entity.Scope scope = 7;</code>
+       */
+      public Builder clearScope() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        scope_ = org.terasology.protobuf.EntityData.Entity.Scope.GLOBAL;
         onChanged();
         return this;
       }
@@ -16585,50 +16763,52 @@ public final class EntityData {
       "\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nna" +
       "me_index\030\003 \001(\005\"S\n\tComponent\022\022\n\ntype_inde" +
       "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
-      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\274\001\n\006Entity\022\n\n\002id\030\001 \001",
+      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\206\002\n\006Entity\022\n\n\002id\030\001 \001",
       "(\003\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
       "oved_component_index\030\003 \003(\005B\002\020\001\022\025\n\rparent" +
       "_prefab\030\004 \001(\t\022\026\n\016alwaysRelevant\030\005 \001(\010\022\r\n" +
-      "\005owner\030\006 \001(\003\022\031\n\021removed_component\030\017 \003(\t*" +
-      "\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\003\022" +
-      "\027\n\013componentId\030\002 \003(\005B\002\020\001\022\034\n\024componentFie" +
-      "ldCounts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfiel" +
-      "dValue\030\005 \003(\0132\006.Value\022\034\n\020removedComponent" +
-      "\030\006 \003(\005B\002\020\001\022\r\n\005owner\030\007 \001(\003\022\027\n\017parentPrefa" +
-      "bUri\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname",
-      "_index\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Compon" +
-      "ent\022\026\n\ndeprecated\030\003 \003(\005B\002\020\001\022\027\n\tpersisted" +
-      "\030\004 \001(\010:\004true\022\030\n\020removedComponent\030\005 \003(\t\022\026" +
-      "\n\016alwaysRelevant\030\006 \001(\010\022\014\n\004name\030\017 \001(\t\022\023\n\013" +
-      "parent_name\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022\014\n" +
-      "\004type\030\001 \001(\005\022\020\n\010fieldIds\030\002 \001(\014\022\032\n\nfieldVa" +
-      "lue\030\003 \003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntitySt" +
-      "ore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\017componen" +
-      "t_class\030\003 \003(\t\022\022\n\nentityName\030\002 \003(\t\022\027\n\013ent" +
-      "ityNamed\030\004 \003(\003B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013Player",
-      "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rch" +
-      "aracterPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002" +
-      "\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030" +
-      "\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\332\002\n\nChunkStore\022\033\n\005store" +
-      "\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001" +
-      "(\021\022\t\n\001z\030\004 \001(\021\022\031\n\021deprecated_data_3\030\005 \001(\005" +
-      "\022\031\n\021deprecated_data_4\030\006 \001(\014\022\031\n\021deprecate" +
-      "d_data_1\030\007 \001(\014\022\031\n\021deprecated_data_2\030\010 \001(" +
-      "\014\022\031\n\021deprecated_data_5\030\t \001(\014\022(\n\nblock_da" +
-      "ta\030\n \001(\0132\024.RunLengthEncoding16\022(\n\013liquid",
-      "_data\030\013 \001(\0132\023.RunLengthEncoding8\022(\n\nbiom" +
-      "e_data\030\014 \001(\0132\024.RunLengthEncoding16*\t\010\210\'\020" +
-      "\200\200\200\200\002\"L\n\023RunLengthEncoding16\022\026\n\nrunLengt" +
-      "hs\030\001 \003(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200" +
-      "\200\200\002\"G\n\022RunLengthEncoding8\022\026\n\nrunLengths\030" +
-      "\001 \003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\260\001\n" +
-      "\013GlobalStore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n" +
-      "\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017component_clas" +
-      "s\030\003 \003(\t\022\026\n\016next_entity_id\030\020 \001(\003\022\036\n\022depre" +
-      "cated_data_17\030\021 \003(\003B\002\020\001\022\023\n\013prefab_name\030\022",
-      " \003(\t*\t\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerSt" +
-      "oreType\020\001\022\022\n\016ChunkStoreType\020\002B\'\n\027org.ter" +
-      "asology.protobufB\nEntityDataH\001"
+      "\005owner\030\006 \001(\003\022\031\n\021removed_component\030\017 \003(\t\022" +
+      "\034\n\005scope\030\007 \001(\0162\r.Entity.Scope\"*\n\005Scope\022\n" +
+      "\n\006GLOBAL\020\000\022\n\n\006SECTOR\020\001\022\t\n\005CHUNK\020\002*\t\010\210\'\020\200" +
+      "\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\003\022\027\n\013com" +
+      "ponentId\030\002 \003(\005B\002\020\001\022\034\n\024componentFieldCoun" +
+      "ts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfieldValue" +
+      "\030\005 \003(\0132\006.Value\022\034\n\020removedComponent\030\006 \003(\005",
+      "B\002\020\001\022\r\n\005owner\030\007 \001(\003\022\027\n\017parentPrefabUri\030\020" +
+      " \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname_index" +
+      "\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\026\n" +
+      "\ndeprecated\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010" +
+      ":\004true\022\030\n\020removedComponent\030\005 \003(\t\022\026\n\016alwa" +
+      "ysRelevant\030\006 \001(\010\022\014\n\004name\030\017 \001(\t\022\023\n\013parent" +
+      "_name\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022\014\n\004type\030" +
+      "\001 \001(\005\022\020\n\010fieldIds\030\002 \001(\014\022\032\n\nfieldValue\030\003 " +
+      "\003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntityStore\022\027\n" +
+      "\006entity\030\001 \003(\0132\007.Entity\022\027\n\017component_clas",
+      "s\030\003 \003(\t\022\022\n\nentityName\030\002 \003(\t\022\027\n\013entityNam" +
+      "ed\030\004 \003(\003B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013PlayerStore\022" +
+      "\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rcharacte" +
+      "rPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002\022\025\n\rch" +
+      "aracterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030\022 \001(\010*" +
+      "\t\010\210\'\020\200\200\200\200\002\"\332\002\n\nChunkStore\022\033\n\005store\030\001 \001(\013" +
+      "2\014.EntityStore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001" +
+      "z\030\004 \001(\021\022\031\n\021deprecated_data_3\030\005 \001(\005\022\031\n\021de" +
+      "precated_data_4\030\006 \001(\014\022\031\n\021deprecated_data" +
+      "_1\030\007 \001(\014\022\031\n\021deprecated_data_2\030\010 \001(\014\022\031\n\021d",
+      "eprecated_data_5\030\t \001(\014\022(\n\nblock_data\030\n \001" +
+      "(\0132\024.RunLengthEncoding16\022(\n\013liquid_data\030" +
+      "\013 \001(\0132\023.RunLengthEncoding8\022(\n\nbiome_data" +
+      "\030\014 \001(\0132\024.RunLengthEncoding16*\t\010\210\'\020\200\200\200\200\002\"" +
+      "L\n\023RunLengthEncoding16\022\026\n\nrunLengths\030\001 \003" +
+      "(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"G\n" +
+      "\022RunLengthEncoding8\022\026\n\nrunLengths\030\001 \003(\021B" +
+      "\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\260\001\n\013Globa" +
+      "lStore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefa" +
+      "b\030\002 \003(\0132\007.Prefab\022\027\n\017component_class\030\003 \003(",
+      "\t\022\026\n\016next_entity_id\030\020 \001(\003\022\036\n\022deprecated_" +
+      "data_17\030\021 \003(\003B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\t" +
+      "\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerStoreTyp" +
+      "e\020\001\022\022\n\016ChunkStoreType\020\002B\'\n\027org.terasolog" +
+      "y.protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16665,7 +16845,7 @@ public final class EntityData {
     internal_static_Entity_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Entity_descriptor,
-        new java.lang.String[] { "Id", "Component", "RemovedComponentIndex", "ParentPrefab", "AlwaysRelevant", "Owner", "RemovedComponent", });
+        new java.lang.String[] { "Id", "Component", "RemovedComponentIndex", "ParentPrefab", "AlwaysRelevant", "Owner", "RemovedComponent", "Scope", });
     internal_static_PackedEntity_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_PackedEntity_fieldAccessorTable = new

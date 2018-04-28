@@ -16,9 +16,9 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.internal.EngineEntityPool;
+import org.terasology.entitySystem.entity.internal.EngineSectorManager;
 
-/**
- */
 public interface LowLevelEntityManager extends EntityManager {
 
     boolean isExistingEntity(long id);
@@ -38,5 +38,25 @@ public interface LowLevelEntityManager extends EntityManager {
     Iterable<Component> iterateComponents(long id);
 
     void destroy(long id);
+
+    /**
+     * @return the global entity pool
+     */
+    EngineEntityPool getGlobalPool();
+
+    /**
+     * @return the sector manager
+     */
+    EngineSectorManager getSectorManager();
+
+    /**
+     * Moves the given entity into the given pool. This will move the entity and all of its components, as well as
+     * re-assigning it in the entity manager.
+     *
+     * @param id the id of the entity to move
+     * @param pool the pool to move the entity into
+     * @return whether the move was successful
+     */
+    boolean moveToPool(long id, EngineEntityPool pool);
 
 }

@@ -273,4 +273,21 @@ public final class ChunkMath {
             target[dimX - 1 + dimX * (dimY - 1)] = Math.min(source[dimX - 2 + dimX * (dimY - 1)], source[dimX - 1 + dimX * (dimY - 2)]);
         }
     }
+
+    /**
+     * Works out whether the given block resides inside the given chunk.
+     *
+     * Both positions must be given as world position, not local position. In addition, the chunk position must be
+     * given in chunk coordinates, not in block coordinates.
+     *
+     * For example, using chunks of width 32, a block with x coordinate of 33 will be counted as inside a chunk with x
+     * coordinate of 1.
+     *
+     * @param blockWorldPos the block to check for
+     * @param chunkWorldPos the chunk to check in
+     * @return whether the block is inside the chunk
+     */
+    public static boolean blockInChunk(Vector3i blockWorldPos, Vector3i chunkWorldPos) {
+        return calcChunkPos(blockWorldPos).equals(chunkWorldPos);
+    }
 }

@@ -134,8 +134,13 @@ class ServerListDownloader {
             }
 
             jsonReader.endArray();
-
-            status = String.format("${engine:menu#server-list-complete}");
+            
+            if(servers.size()==0) {
+                status = String.format("Server Error!");
+            }
+            else {
+                status = String.format("${engine:menu#server-list-complete}");
+            }
         }
     }
 }

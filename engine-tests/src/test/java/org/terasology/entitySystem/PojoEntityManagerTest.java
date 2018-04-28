@@ -30,6 +30,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
+import org.terasology.entitySystem.entity.internal.PojoEntityPool;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -59,6 +60,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.terasology.entitySystem.entity.internal.EntityScope.CHUNK;
 
 /**
  */
@@ -97,6 +99,9 @@ public class PojoEntityManagerTest {
     public void testCreateEntity() {
         EntityRef entity = entityManager.create();
         assertNotNull(entity);
+        assertEquals(CHUNK, entity.getScope());
+        assertTrue(entityManager.getGlobalPool().contains(entity.getId()));
+        assertFalse(entityManager.getSectorManager().contains(entity.getId()));
     }
 
     @Test
@@ -106,6 +111,9 @@ public class PojoEntityManagerTest {
         assertNotNull(entity);
         assertNotNull(entity.getComponent(StringComponent.class));
         assertEquals(comp, entity.getComponent(StringComponent.class));
+        assertEquals(CHUNK, entity.getScope());
+        assertTrue(entityManager.getGlobalPool().contains(entity.getId()));
+        assertFalse(entityManager.getSectorManager().contains(entity.getId()));
     }
 
     @Test
@@ -381,5 +389,25 @@ public class PojoEntityManagerTest {
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
+    }
+
+    @Test
+    public void testMoveToPool() {
+        EntityRef entity = entityManager.create();
+        long id = entity.getId();
+
+        PojoEntityPool pool1 = new PojoEntityPool(entityManager);
+        PojoEntityPool pool2 = new PojoEntityPool(entityManager);
+
+        assertFalse(pool1.contains(id));
+        assertFalse(pool2.contains(id));
+
+        assertTrue(entityManager.moveToPool(id, pool1));
+        assertTrue(pool1.contains(id));
+        assertFalse(pool2.contains(id));
+
+        assertTrue(entityManager.moveToPool(id, pool2));
+        assertTrue(pool2.contains(id));
+        assertFalse(pool1.contains(id));
     }
 }

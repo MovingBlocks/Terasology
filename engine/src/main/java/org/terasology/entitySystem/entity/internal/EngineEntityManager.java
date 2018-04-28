@@ -19,36 +19,15 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
-/**
- */
-public interface EngineEntityManager extends LowLevelEntityManager {
+import java.util.Optional;
+
+public interface EngineEntityManager extends LowLevelEntityManager, EngineEntityPool {
 
     void setEntityRefStrategy(RefStrategy strategy);
 
-    /**
-     * Creates an entity but doesn't send any lifecycle events.
-     * <br><br>
-     * This is used by the block entity system to give an illusion of permanence to temporary block entities.
-     *
-     * @param components
-     * @return The newly created entity ref.
-     */
-    EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components);
-
-    /**
-     * Creates an entity but doesn't send any lifecycle events.
-     * <br><br>
-     * This is used by the block entity system to give an illusion of permanence to temporary block entities.
-     *
-     * @param prefab
-     * @return The newly created entity ref.
-     */
-    EntityRef createEntityWithoutLifecycleEvents(String prefab);
-
-    EntityRef createEntityWithoutLifecycleEvents(Prefab prefab);
+    RefStrategy getEntityRefStrategy();
 
     /**
      * Destroys an entity without sending lifecycle events.
@@ -75,7 +54,7 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      * @param id
      * @return The entityRef for the given id
      */
-    EntityRef createEntityRefWithId(long id);
+    EntityRef getEntity(long id);
 
     /**
      * This is used to persist the entity manager's state
@@ -135,4 +114,57 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      * @return The default serialization library to use for serializing components
      */
     TypeSerializationLibrary getTypeSerializerLibrary();
+
+    /**
+     * Gets the entity pool associated with a given entity.
+     *
+     * If the pool isn't assigned or the entity doesn't exist, an error is logged and the optional is returned empty
+     *
+     * @param id the id of the entity
+     * @return an {@link Optional} containing the pool if it exists, or empty
+     */
+    Optional<EngineEntityPool> getPool(long id);
+
+    /**
+     * Creates a new entity.
+     *
+     * This method is designed for internal use by the EntityBuilder; the {@link #create} methods should be used in
+     * most circumstances.
+     *
+     * @return the id of the newly created entity
+     */
+    long createEntity();
+
+    /**
+     * Attempts to register a new id with the entity manager.
+     *
+     * This method is designed for internal use by the EntityBuilder.
+     *
+     * @param id the id to register
+     * @return whether the registration was successful
+     */
+    boolean registerId(long id);
+
+    /**
+     * Notifies the appropriate subscribers that an entity's component was changed.
+     *
+     * This method is designed for internal use by the EntityBuilder.
+     *
+     * @param changedEntity the entity which the changed component belongs to
+     * @param component the class of the changed component
+     */
+    void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component);
+
+    /**
+     *
+     * Tell the EntityManager which pool the given entity is in, so that its components can be found.
+     *
+     * This is designed for internal use; {@link #moveToPool(long, EngineEntityPool)} should be used to move entities
+     * between pools.
+     *
+     * @param entityId the id of the entity to assign
+     * @param pool the pool the entity is in
+     */
+    void assignToPool(long entityId, EngineEntityPool pool);
+
 }

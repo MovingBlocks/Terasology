@@ -41,6 +41,7 @@ import java.util.Set;
  */
 public final class MethodCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
+    private static final String ENTITY_REF_NAME = "org.terasology.entitySystem.entity.EntityRef";
 
     private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                           SpecificAccessibleObject<Method> executionMethod, Context context) {
@@ -85,8 +86,10 @@ public final class MethodCommand extends AbstractCommand {
     public static void registerAvailable(Object provider, Console console, Context context) {
         Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
-
         for (Method method : commandMethods) {
+            if(!hasSenderAnnotation(method)){
+                logger.error("Command {} provided by {} contains a EntityRef without @Sender annotation, may cause a NullPointerException", method.getName(), provider.getClass().getSimpleName());
+            }
             logger.debug("Registering command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             try {
                 SpecificAccessibleObject<Method> specificMethod = new SpecificAccessibleObject<>(method, provider);
@@ -97,6 +100,25 @@ public final class MethodCommand extends AbstractCommand {
                 logger.error("Failed to load command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
             }
         }
+    }
+
+    private static boolean hasSenderAnnotation(Method method) {
+        final Class[] paramTypes = method.getParameterTypes();
+        final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < paramAnnotations.length; i++) {
+            if(paramTypes[i].getTypeName().equals(ENTITY_REF_NAME)) {
+                if(paramAnnotations[i].length == 0) {
+                    return false;
+                } else {
+                    for (Annotation annotation: paramAnnotations[i]) {
+                        if (annotation instanceof Sender) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override

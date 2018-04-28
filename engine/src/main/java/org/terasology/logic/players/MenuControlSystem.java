@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.PlayerDeathEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
@@ -36,6 +38,8 @@ import org.terasology.rendering.nui.layers.ingame.DeathScreen;
 import org.terasology.rendering.nui.layers.ingame.OnlinePlayersOverlay;
 import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.utilities.Assets;
+import org.terasology.engine.Time;
+
 
 /**
  * This system controls the client's in-game menus (Pause screen, Death screen, HUDs and overlays).
@@ -45,6 +49,12 @@ public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private Time time;
+
+    @In
+    private NetworkSystem networkSystem;
 
     @Override
     public void initialise() {
@@ -57,6 +67,13 @@ public class MenuControlSystem extends BaseComponentSystem {
         if (event.getState() == ButtonState.DOWN) {
             nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
+        }
+        if (networkSystem.getMode() == NetworkMode.NONE) {
+            if (nuiManager.isOpen("engine:pauseMenu")) {
+                time.setPaused(true);
+            } else {
+                time.setPaused(false);
+            }
         }
     }
 
@@ -93,5 +110,4 @@ public class MenuControlSystem extends BaseComponentSystem {
         }
         event.consume();
     }
-
 }

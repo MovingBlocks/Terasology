@@ -207,7 +207,32 @@ Contributors
  [Dane99](https://github.com/Dane99),
  [Derpthemeus](https://github.com/Derpthemeus),
  [Aaron Harris](https://github.com/aaron-harris),
- [floppypanda](https://github.com/floppypanda)
+ [floppypanda](https://github.com/floppypanda),
+ [Naman-sopho](https://github.com/Naman-sopho),
+ [NicholasBatesNZ](https://github.com/NicholasBatesNZ),
+ [digitalripperynr](https://github.com/digitalripperynr),
+ [FieryPhoenix909](https://github.com/FieryPhoenix909),
+ [Adrijaned](https://github.com/Adrijaned),
+ [anuar2k](https://github.com/anuar2k),
+ [4Denthusiast](https://github.com/4Denthusiast),
+ [dacharya64](https://github.com/dacharya64),
+ [Naman-sopho](https://github.com/Naman-sopho),
+ [TheFlash98](https://github.com/TheFlash98),
+ [iaronaraujo](https://github.com/iaronaraujo),
+ [l0ftyWhizZ](https://github.com/l0ftyWhizZ),
+ [manas96](https://github.com/manas96),
+ [morrilet](https://github.com/morrilet),
+ [J-Dill](https://github.com/J-Dill),
+ [mwesolowski](https://github.com/mwesolowski),
+ [Shade254](https://github.com/Shade254),
+ [Maximetinu](https://github.com/Maximetinu),
+ [readv](https://github.com/readv),
+ [Arihant-Joshi](https://github.com/Arihant-Joshi),
+ [Austin 'skate54345' Kelly](https://github.com/skate54345),
+ [Inei1](https://github.com/Inei1),
+ [dorasun](https://github.com/dorasun),
+ [oekonomi](https://github.com/oekonomi),
+ [Chris 'cwgreene' Greene](https://github.com/cwgreene)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
@@ -244,6 +269,7 @@ Soundtrack and Sound Effects
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
 * Camera Click Noise from Snapper4298, from FreeSound.org
+* Block dig and destroy sounds by Austin Kelly
 * Other sound effects created by Exile.
 
 Icons

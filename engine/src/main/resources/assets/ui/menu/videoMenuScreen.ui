@@ -58,7 +58,7 @@
                                 {
                                     "type": "UIDropdown",
                                     "id": "graphicsPreset"
-                                },
+                                }
                             ]
                         },
                         {
@@ -386,13 +386,11 @@
                                 },
                                 {
                                     "type": "UILabel",
-                                    "text": "${engine:menu#volumetric-fog}: ",
-                                    "enabled": false
+                                    "text": "${engine:menu#volumetric-fog}: "
                                 },
                                 {
                                     "type": "UICheckbox",
-                                    "id": "volumetricFog",
-                                    "enabled": false
+                                    "id": "volumetricFog"
                                 }
                             ]
                         },

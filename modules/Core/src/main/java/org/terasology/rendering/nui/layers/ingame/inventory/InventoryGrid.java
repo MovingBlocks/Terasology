@@ -38,17 +38,40 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * A grid of {@link InventoryCell} used to display an inventory of an entity.
  */
 public class InventoryGrid extends CoreWidget {
-
+    /**
+     * Defines the maximum amount of cells displayed in a single row of InventoryGrid.
+     *
+     * Example: If an inventory has 20 slots and maxHorizontalCells is set to 5, the grid will have 4 rows of cells (grid size will be 5x4).
+     */
     @LayoutConfig
     private int maxHorizontalCells = 10;
+
+    /**
+     * Defines the first inventory slot index to which an InventoryGrid should refer to.
+     *
+     * Example: If an inventory has 20 slots and cellOffset is set to 5, 15 cells will be drawn starting from slot no. 5 (starting from zero).
+     * Other slots will be not accessible by this InventoryGrid.
+     */
     @LayoutConfig
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
+
+    /**
+     * Defines the maximum amount of cells in an InventoryGrid.
+     * Used together with cellOffset, it allows developers to provide access to parts of an entity's inventory.
+     *
+     * Example: If an inventory has 20 slots, maxCellCount is set to 10 and cellOffset to 5, there will be 10 cells drawn, starting from slot no. 5 and ending at cell no. 14 (starting from zero).
+     */
     @LayoutConfig
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
     private List<InventoryCell> cells = Lists.newArrayList();
+
+    /**
+     * EntityRef to an entity whose inventory will be accessed using this InventoryGrid.
+     */
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -123,6 +146,11 @@ public class InventoryGrid extends CoreWidget {
         return new Vector2i(horizontalCells * cellSize.x, verticalCells * cellSize.y);
     }
 
+    /**
+     * Returns an iterator over the {@link InventoryCell}s this grid displays.
+     *
+     * @return Iterator over this grid's InventoryCells.
+     */
     @Override
     public Iterator<UIWidget> iterator() {
         return Iterators.transform(cells.iterator(), new Function<UIWidget, UIWidget>() {
@@ -133,18 +161,38 @@ public class InventoryGrid extends CoreWidget {
         });
     }
 
+    /**
+     * Gets the maximum horizontal cells amount.
+     *
+     * @return The maximum horizontal cells amount.
+     */
     public int getMaxHorizontalCells() {
         return maxHorizontalCells;
     }
 
+    /**
+     * Sets the maximum horizontal cells amount.
+     *
+     * @param maxHorizontalCells The maximum horizontal cells amount.
+     */
     public void setMaxHorizontalCells(int maxHorizontalCells) {
         this.maxHorizontalCells = maxHorizontalCells;
     }
 
+    /**
+     * Binds the entity to this grid whose inventory will be accessed using this widget.
+     *
+     * @param binding A Binding of the EntityRef type referring to the entity whose inventory will be displayed.
+     */
     public void bindTargetEntity(Binding<EntityRef> binding) {
         targetEntity = binding;
     }
 
+    /**
+     * Returns an EntityRef to the entity whose inventory is displayed using this grid.
+     *
+     * @return An EntityRef to the entity whose inventory is displayed using this grid.
+     */
     public EntityRef getTargetEntity() {
         return targetEntity.get();
     }
@@ -158,34 +206,72 @@ public class InventoryGrid extends CoreWidget {
         targetEntity.set(val);
     }
 
+    /**
+     * Binds the offset between cells (in px) of this widget.
+     *
+     * @param binding A Binding of the Integer type.
+     */
     public void bindCellOffset(Binding<Integer> binding) {
         cellOffset = binding;
     }
 
+    /**
+     * Gets the offset (in px) between the cells.
+     *
+     * @return The offset (in px) between the cells.
+     */
     public int getCellOffset() {
         return cellOffset.get();
     }
 
+    /**
+     * Sets the offset (in px) between the cells.
+     *
+     * @param val The desired offset (in px) between the cells.
+     */
     public void setCellOffset(int val) {
         cellOffset.set(val);
     }
 
+    /**
+     * Binds the maximum cell count.
+     *
+     * @param binding A Binding of the Integer type.
+     */
     public void bindMaxCellCount(Binding<Integer> binding) {
         maxCellCount = binding;
     }
 
+    /**
+     * Gets the maximum amount of cells that can be displayed.
+     *
+     * @return The maximum amount of cells that can be displayed.
+     */
     public int getMaxCellCount() {
         return maxCellCount.get();
     }
 
+    /**
+     * Sets the maximum amount of cells that can be displayed.
+     *
+     * @param val The maximum amount of cells that can be displayed.
+     */
     public void setMaxCellCount(int val) {
         maxCellCount.set(val);
     }
 
+    /**
+     * Gets the amount of cells this widget displays.
+     *
+     * @return The amount of cells this widget displays.
+     */
     public int getNumSlots() {
         return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
 
+    /**
+     * Provides a getter for slots of an inventory bound to this widget accordingly to displayed slots' indexes.
+     */
     private final class SlotBinding extends ReadOnlyBinding<Integer> {
 
         private int slot;

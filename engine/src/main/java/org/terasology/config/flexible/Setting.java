@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.terasology.config.flexible;
 
+import com.google.gson.JsonElement;
 import org.terasology.config.flexible.validators.SettingValueValidator;
 import org.terasology.engine.SimpleUri;
 
@@ -96,4 +97,14 @@ public interface Setting<T> {
      * Returns a boolean stating whether this {@link Setting} has any subscribers.
      */
     boolean hasSubscribers();
+
+    /**
+     * Sets the value of this {@link Setting} from a JSON representation encoded in a string.
+     */
+    void setValueFromJson(String json);
+
+    /**
+     * Returns a JSON representation of the value stored in this {@link Setting}.
+     */
+    JsonElement getValueAsJson();
 }

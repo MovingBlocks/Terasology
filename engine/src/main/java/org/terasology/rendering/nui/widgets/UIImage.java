@@ -37,7 +37,7 @@ public class UIImage extends CoreWidget {
     private Binding<Color> tint = new DefaultBinding<>(Color.WHITE);
 
     @LayoutConfig
-    private boolean ignoreAspectRatio = false;
+    private boolean ignoreAspectRatio;
 
     public UIImage() {
     }

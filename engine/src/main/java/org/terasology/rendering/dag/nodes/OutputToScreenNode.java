@@ -27,7 +27,6 @@ import org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo;
 import org.terasology.rendering.opengl.FBO;
 import org.terasology.rendering.opengl.SwappableFBO;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
-import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.terasology.rendering.dag.stateChanges.SetInputTextureFromFbo.FboTexturesTypes.ColorTexture;
@@ -40,18 +39,16 @@ public class OutputToScreenNode extends ConditionDependentNode {
     private static final ResourceUrn DEFAULT_TEXTURED_MATERIAL_URN = new ResourceUrn("engine:prog.defaultTextured");
 
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-    private WorldRenderer worldRenderer;
 
     private FBO lastUpdatedGBuffer;
     private FBO staleGBuffer;
 
     private StateChange bindFbo;
 
-    public OutputToScreenNode(Context context) {
-        super(context);
+    public OutputToScreenNode(String nodeUri, Context context) {
+        super(nodeUri, context);
 
         displayResolutionDependentFBOs = context.get(DisplayResolutionDependentFBOs.class);
-        worldRenderer = context.get(WorldRenderer.class);
 
         requiresCondition(() -> worldRenderer.getCurrentRenderStage() == MONO || worldRenderer.getCurrentRenderStage() == LEFT_EYE);
 
@@ -67,7 +64,7 @@ public class OutputToScreenNode extends ConditionDependentNode {
 
     @Override
     public void process() {
-        PerformanceMonitor.startActivity("rendering/outputToScreen");
+        PerformanceMonitor.startActivity("rendering/" + getUri());
         // The way things are set-up right now, we can have FBOs that are not the same size as the display (if scale != 100%).
         // However, when drawing the final image to the screen, we always want the viewport to match the size of display,
         // and not that of some FBO. Hence, we are manually setting the viewport via glViewport over here.

@@ -109,6 +109,18 @@
                                 }
                             },
                             {
+                                "type": "UIDropdown",
+                                "id": "zoneSelector",
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-top": {
+                                        "target": "BOTTOM",
+                                        "widget": "zoomSlider",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
                                 "type": "UILabel",
                                 "id": "seedLabel",
                                 "text": "${engine:menu#world-seed}:",
@@ -116,7 +128,7 @@
                                     "use-content-height": true,
                                     "position-top": {
                                         "target": "BOTTOM",
-                                        "widget": "zoomSlider",
+                                        "widget": "zoneSelector",
                                         "offset": 8
                                     }
                                 }

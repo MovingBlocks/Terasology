@@ -15,6 +15,8 @@
  */
 package org.terasology.config;
 
+import org.terasology.context.internal.MockContext;
+
 public class InputConfig {
 
     private ControllerConfig controllers = new ControllerConfig();
@@ -34,7 +36,7 @@ public class InputConfig {
     }
 
     public void reset() {
-        Config defaultConfig = new Config();
+        Config defaultConfig = new Config(new MockContext());
         defaultConfig.loadDefaults();
         InputConfig defaultInputConfig = defaultConfig.getInput();
 
