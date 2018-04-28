@@ -97,6 +97,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
         } catch (InterruptedException | ExecutionException e) {
             logger.warn("An error occurred during execution", e);
             getManager().popScreen();
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", e.getMessage());
         }
     }
 
