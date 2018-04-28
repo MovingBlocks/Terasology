@@ -231,7 +231,8 @@ Contributors
  [Austin 'skate54345' Kelly](https://github.com/skate54345),
  [Inei1](https://github.com/Inei1),
  [dorasun](https://github.com/dorasun),
- [oekonomi](https://github.com/oekonomi)
+ [oekonomi](https://github.com/oekonomi),
+ [Chris 'cwgreene' Greene](https://github.com/cwgreene)
 * GUI Team:
  [Anton "small-jeeper" Kireev](https://github.com/small-jeeper),
  [miniME89](https://github.com/miniME89),
