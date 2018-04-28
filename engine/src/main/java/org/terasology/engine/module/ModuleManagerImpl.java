@@ -50,8 +50,10 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Policy;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,6 +68,10 @@ public class ModuleManagerImpl implements ModuleManager {
     private ModuleInstallManager installManager;
 
     public ModuleManagerImpl(String masterServerAddress) {
+        this(masterServerAddress, Collections.emptyList());
+    }
+
+    public ModuleManagerImpl(String masterServerAddress, List<Class<?>> classesOnClasspathsToAddToEngine) {
         metadataReader = new ModuleMetadataJsonAdapter();
         for (ModuleExtension ext : StandardModuleExtension.values()) {
             metadataReader.registerExtension(ext.getKey(), ext.getValueType());
@@ -73,7 +79,13 @@ public class ModuleManagerImpl implements ModuleManager {
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
-            engineModule = ClasspathModule.create(metadata, getClass(), Module.class, Asset.class);
+            List<Class<?>> additionalClassesList = new ArrayList<>(classesOnClasspathsToAddToEngine.size() + 2);
+            additionalClassesList.add(Module.class); // provide access to gestalt-module.jar
+            additionalClassesList.add(Asset.class); // provide access to gestalt-asset-core.jar
+            additionalClassesList.addAll(classesOnClasspathsToAddToEngine); // provide access to any facade-provided classes
+            Class<?>[] additionalClassesArray = new Class[additionalClassesList.size()];
+            additionalClassesArray = additionalClassesList.toArray(additionalClassesArray);
+            engineModule = ClasspathModule.create(metadata, getClass(), additionalClassesArray);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read engine metadata", e);
         } catch (URISyntaxException e) {
@@ -102,7 +114,11 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     public ModuleManagerImpl(Config config) {
-        this(config.getNetwork().getMasterServer());
+        this(config, Collections.emptyList());
+    }
+
+    public ModuleManagerImpl(Config config, List<Class<?>> classesOnClasspathsToAddToEngine) {
+        this(config.getNetwork().getMasterServer(), classesOnClasspathsToAddToEngine);
     }
 
     /**
