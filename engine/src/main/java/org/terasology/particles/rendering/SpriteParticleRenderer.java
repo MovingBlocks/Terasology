@@ -17,6 +17,8 @@ package org.terasology.particles.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.lwjgl.LwjglDisplayDevice;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -68,16 +70,23 @@ public class SpriteParticleRenderer implements RenderSystem {
     @In
     ParticleSystemManager particleSystemManager;
 
+    @In
+    DisplayDevice displayDevice;
+
     private DisplayList drawUnitQuad;
 
 
     public void finalize() throws Throwable {
         super.finalize();
-        drawUnitQuad.dispose();
+        if (null != drawUnitQuad) {
+            drawUnitQuad.dispose();
+        }
     }
 
     public void dispose() {
-        drawUnitQuad.dispose();
+        if (null != drawUnitQuad) {
+            drawUnitQuad.dispose();
+        }
     }
 
     //"BIG" TODO: Have all of the work done in this method be done on the GPU by a shader. Use GPU instancing to just send some particle data after particles are already instanced and have the whole cloud rendered at once.
@@ -157,6 +166,11 @@ public class SpriteParticleRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
+        // Nasty hack to only run LWJGL code with a LwjglDisplayDevice.  Should be unnecessary once "big todo" for drawParticles is resolved.
+        if (!(displayDevice instanceof LwjglDisplayDevice)) {
+            return;
+        }
+
         drawUnitQuad = new DisplayList(() -> {
             glBegin(GL_TRIANGLE_FAN);
             GL11.glTexCoord2f(UNIT_QUAD_VERTICES[0] + 0.5f, -UNIT_QUAD_VERTICES[1] + 0.5f);
