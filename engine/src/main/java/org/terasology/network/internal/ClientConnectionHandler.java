@@ -78,6 +78,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         timeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAA");
                 synchronized (joinStatus) {
                     if (clientOnBlacklist(message)) {
                         joinStatus.setErrorMessage("Client on blacklist");
@@ -283,7 +284,9 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                 String blacklistString = netMessage.getServerInfo().getBlackListList().toString().substring(1,
                         netMessage.getServerInfo().getBlackListList().toString().length() - 1);
                 Set blacklist = new Gson().fromJson(blacklistString, Set.class);
-                if (blacklist.contains(identity.getPlayerPublicCertificate().toString())) {
+                if (blacklist == null){
+                    return false;
+                } else if (blacklist.contains(identity.getPlayerPublicCertificate().toString())) {
                     return true;
                 }
             }
@@ -291,9 +294,22 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         return false;
     }
 
-    // TODO: add a way to enable whitelist and do these checks
     private boolean clientOnWhitelist(NetData.NetMessage netMessage) {
-        return true;
+        Config config = CoreRegistry.get(Config.class);
+        if (config != null) {
+            for (ClientIdentity identity : config.getSecurity().getAllIdentities().values()) {
+                String whitelistString = netMessage.getServerInfo().getWhiteListList().toString().substring(1,
+                        netMessage.getServerInfo().getWhiteListList().toString().length() - 1);
+                Set whitelist = new Gson().fromJson(whitelistString, Set.class);
+                if (whitelist == null) {
+                    return true;
+                }
+                if (whitelist.contains(identity.getPlayerPublicCertificate().toString()) || whitelist.isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public JoinStatus getJoinStatus() {

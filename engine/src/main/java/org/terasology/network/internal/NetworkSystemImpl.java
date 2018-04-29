@@ -802,17 +802,25 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void processNewClient(NetClient client) {
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
-        // log after connect so that the name has been set:
         ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
         serverConnectListManager.loadLists();
-        Path blackListPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+        Path blacklistPath = ServerConnectListManager.getInstance().getBlacklistPath();
+        Path whitelistPath = ServerConnectListManager.getInstance().getWhitelistPath();
         try {
-            Set blacklistedIDs = new Gson().fromJson(Files.newBufferedReader(blackListPath), Set.class);
+            Set blacklistedIDs = new Gson().fromJson(Files.newBufferedReader(blacklistPath), Set.class);
+            Set whitelistedIDs = new Gson().fromJson(Files.newBufferedReader(whitelistPath), Set.class);
             System.out.println("BLIDS: " + blacklistedIDs);
-            // TODO: change the unit test NetworkOwnerShipTest to make this check unnecessary
+            System.out.println("WLIDS: " + whitelistedIDs);
             if (blacklistedIDs != null) {
                 if (blacklistedIDs.contains(client.getId())) {
-                    System.out.println("ID: " + client.getId());
+                    System.out.println("BLID: " + client.getId());
+                    forceDisconnect(client);
+                    return;
+                }
+            }
+            if (whitelistedIDs != null) {
+                if (!whitelistedIDs.contains(client.getId())) {
+                    System.out.println("WLID: " + client.getId());
                     forceDisconnect(client);
                     return;
                 }
@@ -830,6 +838,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
         connectClient(client);
 
+        // log after connect so that the name has been set:
         logger.info("New client entity: {}", client.getEntity());
         for (EntityRef netEntity : entityManager.getEntitiesWith(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);

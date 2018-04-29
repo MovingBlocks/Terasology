@@ -42,6 +42,7 @@ import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
+import org.terasology.network.internal.ServerConnectListManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
@@ -104,6 +105,9 @@ public class StateHeadlessSetup implements GameState {
             gameManifest = createGameManifest();
         }
         gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
+
+        // generate blacklist and whitelist files
+        ServerConnectListManager.getInstance().loadLists();
     }
 
     public GameManifest createGameManifest() {

@@ -48,7 +48,6 @@ public class ServerConnectListManager {
     }
 
     public void loadLists() {
-        //System.out.println(PathManager.getInstance().getInstallPath().resolve("terasology-server"));
         try {
             if (!Files.exists(blacklistPath)) {
                 Files.createFile(blacklistPath);
@@ -68,7 +67,7 @@ public class ServerConnectListManager {
         return instance;
     }
 
-    public boolean getClientWhitelisted(String clientID) {
+    public boolean clientWhitelisted(String clientID) {
         return whitelistedIDs.contains(clientID);
     }
 
@@ -80,7 +79,11 @@ public class ServerConnectListManager {
         return whitelistedIDs;
     }
 
-    public boolean getClientBlacklisted(String clientID) {
+    public Path getWhitelistPath() {
+        return whitelistPath;
+    }
+
+    public boolean clientBlacklisted(String clientID) {
         return blacklistedIDs.contains(clientID);
     }
 
@@ -92,4 +95,7 @@ public class ServerConnectListManager {
         return blacklistedIDs;
     }
 
+    public Path getBlacklistPath() {
+        return blacklistPath;
+    }
 }
