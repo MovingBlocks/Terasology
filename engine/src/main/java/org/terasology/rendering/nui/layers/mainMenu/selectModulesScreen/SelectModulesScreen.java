@@ -22,13 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.config.SelectModulesConfig;
 import org.terasology.config.ModuleConfig;
+import org.terasology.config.SelectModulesConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.DependencyResolutionFailedException;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
@@ -89,6 +90,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private WorldGeneratorManager worldGenManager;
     @In
     private TranslationSystem translationSystem;
+
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
@@ -96,6 +98,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private Future<Void> remoteModuleRegistryUpdater;
     private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
+    private ResettableUIText moduleSearch;
 
     @Override
     public void onOpened() {
@@ -174,12 +177,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 }
             });
 
-            ResettableUIText moduleSearch = find("moduleSearch", ResettableUIText.class);
+            moduleSearch = find("moduleSearch", ResettableUIText.class);
             if (moduleSearch != null) {
                 moduleSearch.subscribe(new TextChangeEventListener() {
                     @Override
                     public void onTextChange(String oldText, String newText) {
-                        filterText(newText);
+                        filterModules();
                     }
                 });
             }
@@ -359,47 +362,138 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
 
-            localOnlyCheckbox = find("localOnly", UICheckbox.class);
-            localOnlyCheckbox.bindChecked(
-                    new Binding<Boolean>() {
+            UICheckbox libraryCheckBox = find("libraryCheckbox", UICheckbox.class);
+            libraryCheckBox.setChecked(selectModulesConfig.isLibraryChecked());
+            libraryCheckBox.subscribe(e -> {
+                libraryCheckBox.setChecked(!selectModulesConfig.isLibraryChecked());
+                selectModulesConfig.setIsLibraryChecked(!selectModulesConfig.isLibraryChecked());
+                filterModules();
+            });
 
-                        @Override
-                        public Boolean get() {
-                            filterText(moduleSearch.getText());
-                            prepareModuleList(selectModulesConfig.isChecked());
-                            return selectModulesConfig.isChecked();
-                        }
+            UICheckbox assetCheckBox = find("assetCheckbox", UICheckbox.class);
+            assetCheckBox.setChecked(selectModulesConfig.isAssetplayChecked());
+            assetCheckBox.subscribe(e -> {
+                assetCheckBox.setChecked(!selectModulesConfig.isAssetplayChecked());
+                selectModulesConfig.setIsAssetplayChecked(!selectModulesConfig.isAssetplayChecked());
+                filterModules();
+            });
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsChecked(value);
-                            filterText(moduleSearch.getText());
-                            prepareModuleList(value);
-                        }
-                    }
-            );
+            UICheckbox worldCheckBox = find("worldCheckbox", UICheckbox.class);
+            worldCheckBox.setChecked(selectModulesConfig.isWorldChecked());
+            worldCheckBox.subscribe(e -> {
+                worldCheckBox.setChecked(!selectModulesConfig.isWorldChecked());
+                selectModulesConfig.setIsWorldChecked(!selectModulesConfig.isWorldChecked());
+                filterModules();
+            });
+
+            UICheckbox gameplayCheckBox = find("gameplayCheckbox", UICheckbox.class);
+            gameplayCheckBox.setChecked(selectModulesConfig.isGameplayChecked());
+            gameplayCheckBox.subscribe(e -> {
+                gameplayCheckBox.setChecked(!selectModulesConfig.isGameplayChecked());
+                selectModulesConfig.setIsGameplayChecked(!selectModulesConfig.isGameplayChecked());
+                filterModules();
+            });
+
+            UICheckbox augmentationCheckBox = find("augmentationCheckbox", UICheckbox.class);
+            augmentationCheckBox.setChecked(selectModulesConfig.isAugmentationChecked());
+            augmentationCheckBox.subscribe(e -> {
+                augmentationCheckBox.setChecked(!selectModulesConfig.isAugmentationChecked());
+                selectModulesConfig.setIsAugmentationChecked(!selectModulesConfig.isAugmentationChecked());
+                filterModules();
+            });
+
+            UICheckbox specialCheckBox = find("specialCheckbox", UICheckbox.class);
+            specialCheckBox.setChecked(selectModulesConfig.isSpecialChecked());
+            specialCheckBox.subscribe(e ->{
+                specialCheckBox.setChecked(!selectModulesConfig.isSpecialChecked());
+                selectModulesConfig.setIsSpecialChecked(!selectModulesConfig.isSpecialChecked());
+                filterModules();
+            });
+
+            UIButton activateFilter = find("activateFilter", UIButton.class);
+            activateFilter.subscribe(e ->{
+                filterModules();
+            });
+
+            localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
+            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+            localOnlyCheckbox.subscribe(e -> {
+                localOnlyCheckbox.setChecked(!selectModulesConfig.isLocalOnlyChecked());
+                selectModulesConfig.setIsLocalOnlyChecked(!selectModulesConfig.isLocalOnlyChecked());
+                filterModules();
+            });
         }
-
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
-    private void prepareModuleList(boolean checked) {
-        if (selectModulesConfig.isChecked()) {
-            Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
-            while (iter.hasNext()) {
-                if (!iter.next().isPresent()) {
-                    iter.remove();
-                }
+     private void filterModules() {
+        sortedModules.clear();
+        sortedModules.addAll(allSortedModules);
+        if(selectModulesConfig.isAssetplayChecked() || selectModulesConfig.isAugmentationChecked() || selectModulesConfig.isGameplayChecked() || selectModulesConfig.isSpecialChecked() || selectModulesConfig.isWorldChecked() || selectModulesConfig.isLibraryChecked()) {
+            advancedModuleFilter();
+        }
+         if (selectModulesConfig.isLocalOnlyChecked()) {
+            localModuleFilter();
+        }
+        filterText();
+    }
+
+    private void localModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            if (!iter.next().isPresent()) {
+                iter.remove();
             }
         }
     }
 
-    private void filterText(String newText) {
-        sortedModules.clear();
-        for (ModuleSelectionInfo m : allSortedModules) {
-            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                sortedModules.add(m);
+    private void filterText() {
+        String newText = moduleSearch.getText();
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            if (!iter.next().getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                iter.remove();
             }
+        }
+    }
+
+
+    private void advancedModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            ModuleSelectionInfo m = iter.next();
+            Module module;
+            if(m.isPresent()) {
+                module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());//(m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+            else {
+                module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+
+            if(selectModulesConfig.isLibraryChecked() && StandardModuleExtension.isLibraryModule(module)) {
+                continue;
+            }
+
+            if(selectModulesConfig.isAssetplayChecked() && StandardModuleExtension.isAssetplayModule(module)) {
+                continue;
+            }
+
+            if(selectModulesConfig.isWorldChecked() && StandardModuleExtension.isWorldModule(module)) {
+                continue;
+            }
+
+            if(selectModulesConfig.isGameplayChecked() && StandardModuleExtension.isGameplayModule(module)) {
+                continue;
+            }
+
+            if(selectModulesConfig.isSpecialChecked() && StandardModuleExtension.isSpecialModule(module)) {
+                continue;
+            }
+
+            if(selectModulesConfig.isAugmentationChecked() && StandardModuleExtension.isAugmentationModule(module)) {
+                continue;
+            }
+            iter.remove();
         }
     }
 
@@ -475,7 +569,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        
+
         if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isChecked()) {
             needsUpdate = false;
             try {
