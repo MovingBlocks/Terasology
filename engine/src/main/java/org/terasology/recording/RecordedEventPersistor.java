@@ -15,21 +15,22 @@
  */
 package org.terasology.recording;
 
-import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.persistence.internal.EntityStorer;
 
-public class EventCatcher {
+import java.util.Collection;
 
-    private EventStorage storage;
-    private long startTime;
+public class RecordedEventPersistor {
 
-    public EventCatcher() {
-        storage = EventStorage.getInstance();
-        startTime = System.currentTimeMillis(); // I have to check for how long I can record using this
+    private EntityStorer storer;
+
+    public RecordedEventPersistor() {
+
     }
 
-    public boolean addEvent(PendingEvent pe, long position) {
-        long timestamp = System.currentTimeMillis() - this.startTime;
-        RecordedEvent re = new RecordedEvent(pe, timestamp, position);
-        return storage.add(re);
+
+    public  void persistEvents(Collection<RecordedEvent> events) {
+
     }
+
+
 }

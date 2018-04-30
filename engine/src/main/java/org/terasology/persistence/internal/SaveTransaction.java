@@ -30,6 +30,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
+import org.terasology.recording.EventStorage;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -137,6 +138,8 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
+            EventStorage.getInstance().saveEventsString();
+            EventStorage.isRecording = false;
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);
