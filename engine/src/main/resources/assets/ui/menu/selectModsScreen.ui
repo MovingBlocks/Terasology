@@ -109,6 +109,16 @@
                                     },
                                     {
                                         "type": "UICheckbox",
+                                        "id": "serverSideOnlyCheckbox",
+                                        "family": "option-grid"
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "Server-side Only",
+                                        "id": "serverSideOnly"
+                                    },
+                                    {
+                                        "type": "UICheckbox",
                                         "id": "gameplayCheckbox",
                                         "family": "option-grid"
                                     },
@@ -173,26 +183,6 @@
                                     "position-horizontal-center": {},
                                     "position-top": {
                                         "target": "TOP"
-                                    }
-                                }
-                            },
-                            {
-                                "type": "RowLayout",
-                                "id": "activateFilterButton",
-                                "horizontalSpacing": 8,
-                                "contents": [
-                                    {
-                                        "type": "UIButton",
-                                        "id": "activateFilter",
-                                        "text": "Activate Filter"
-                                    }
-                                ],
-                                "layoutInfo": {
-                                    "width": 250,
-                                    "height": 24,
-                                    "position-horizontal-center": {},
-                                    "position-bottom": {
-                                        "target": "BOTTOM"
                                     }
                                 }
                             }

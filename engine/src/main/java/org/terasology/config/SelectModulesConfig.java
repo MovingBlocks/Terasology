@@ -15,77 +15,46 @@
  */
 package org.terasology.config;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+import org.terasology.engine.module.StandardModuleExtension;
+
 public class SelectModulesConfig {
-    private boolean isChecked;
-    private boolean isLibraryChecked;
-    private boolean isAssetplayChecked;
-    private boolean isWorldChecked;
-    private boolean isGameplayChecked;
-    private boolean isAugmentationChecked;
-    private boolean isSpecialChecked;
-    private boolean isLocalOnlyChecked;
+	public boolean localOnly;
 
-    public boolean isChecked() {
-        return isChecked;
-    }
+	public boolean isLocalOnlyChecked() {
+		return localOnly;
+	}
 
-    public void setIsChecked(boolean value) {
-        this.isChecked = value;
-    }
+	public void setIsLocalOnlyChecked(Boolean flag) {
+		this.localOnly = flag;
+	}
 
-    public boolean isLibraryChecked() {
-        return isLibraryChecked;
-    }
+	private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
 
-    public void setIsLibraryChecked(boolean value) {
-        this.isLibraryChecked = value;
-    }
+	public boolean isAnyStandardModuleExtensionSelected() {
+		return !selectedStandardModuleExtensionEnumSet.isEmpty();
+	}
 
-    public boolean isAssetplayChecked() {
-        return isAssetplayChecked;
-    }
+	public Collection<StandardModuleExtension> getSelectedStandardModuleExtensions() {
+		return Collections.unmodifiableSet(selectedStandardModuleExtensionEnumSet);
+	}
 
-    public void setIsAssetplayChecked(boolean value) {
-        this.isAssetplayChecked = value;
-    }
+	public boolean isStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
+		return selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension);
+	}
 
-    public boolean isGameplayChecked() {
-        return isGameplayChecked;
-    }
+	public void toggleStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
+		if (selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension)) {
+			selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
+		} else {
+			selectedStandardModuleExtensionEnumSet.add(standardModuleExtension);
+		}
+	}
 
-    public void setIsGameplayChecked(boolean value) {
-        this.isGameplayChecked = value;
-    }
-
-    public boolean isAugmentationChecked() {
-        return isAugmentationChecked;
-    }
-
-    public void setIsAugmentationChecked(boolean value) {
-        this.isAugmentationChecked = value;
-    }
-
-    public boolean isSpecialChecked() {
-        return isSpecialChecked;
-    }
-
-    public void setIsSpecialChecked(boolean value) {
-        this.isSpecialChecked = value;
-    }
-
-    public boolean isWorldChecked() {
-        return isWorldChecked;
-    }
-
-    public void setIsWorldChecked(boolean value) {
-        this.isWorldChecked = value;
-    }
-
-    public boolean isLocalOnlyChecked() {
-        return isLocalOnlyChecked;
-    }
-
-    public void setIsLocalOnlyChecked(Boolean value) {
-        this.isLocalOnlyChecked = value;
-    }
+	public void unselectStandardModuleExtension(StandardModuleExtension standardModuleExtension) {
+		selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
+	}
 }

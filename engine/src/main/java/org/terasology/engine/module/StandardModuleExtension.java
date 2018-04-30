@@ -16,6 +16,9 @@
 
 package org.terasology.engine.module;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -63,26 +66,6 @@ public enum StandardModuleExtension implements ModuleExtension {
         return getBooleanExtension(module, IS_GAMEPLAY);
     }
 
-    public static boolean isAssetplayModule(Module module) {
-        return getBooleanExtension(module, IS_ASSETPLAY);
-    }
-
-    public static boolean isWorldModule(Module module) {
-        return getBooleanExtension(module, IS_WORLD);
-    }
-
-    public static boolean isLibraryModule(Module module) {
-        return getBooleanExtension(module, IS_LIBRARY);
-    }
-
-    public static boolean isSpecialModule(Module module) {
-        return getBooleanExtension(module, IS_SPECIAL);
-    }
-
-    public static boolean isAugmentationModule(Module module) {
-        return getBooleanExtension(module, IS_AUGMENTATION);
-    }
-
     public static SimpleUri getDefaultWorldGenerator(Module module) {
         String ext = module.getMetadata().getExtension(DEFAULT_WORLD_GENERATOR.getKey(), String.class);
         return ext != null ? new SimpleUri(ext) : null;
@@ -92,4 +75,18 @@ public enum StandardModuleExtension implements ModuleExtension {
         Boolean result = module.getMetadata().getExtension(ext.getKey(), Boolean.class);
         return result != null && result;
     }
+
+	public static Set<StandardModuleExtension> booleanPropertySet() {
+		Set<StandardModuleExtension> booleanPropertySet = EnumSet.noneOf(StandardModuleExtension.class);
+		for (StandardModuleExtension standardModuleExtension : values()) {
+			if (standardModuleExtension.getValueType().equals(Boolean.class)) {
+				booleanPropertySet.add(standardModuleExtension);
+			}
+		}
+		return booleanPropertySet;
+	}
+
+	public boolean isProvidedBy(Module module) {
+		return getBooleanExtension(module, this);
+	}
 }
