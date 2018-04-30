@@ -28,6 +28,7 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
+import org.terasology.recording.EventStorage;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.AWTTextureFormat;
@@ -202,7 +203,20 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     private void loadGame(GameInfo item) {
         try {
+            //this should go to a better place
+            if (EventStorage.recordCount == 0) {
+                EventStorage.isRecording = true;
+            } else if (EventStorage.recordCount == 1) {
+                EventStorage.isReplaying = true;
+            }
+
+            //Get this manifest!
             GameManifest manifest = item.getManifest();
+            if (EventStorage.isRecording) {
+                EventStorage.gameManifest = manifest;
+            } else if (EventStorage.isReplaying) {
+                manifest = EventStorage.gameManifest;
+            }
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());

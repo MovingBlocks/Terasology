@@ -51,6 +51,8 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.recording.EventCatcher;
+import org.terasology.recording.EventStorage;
+import org.terasology.recording.RecordedEvent;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
@@ -88,7 +90,6 @@ public class EventSystemImpl implements EventSystem {
     private NetworkSystem networkSystem;
 
     //Event recording
-    private boolean isRecording = false;
     private EventCatcher eventCatcher;
     private long eventCounter;
 
@@ -99,7 +100,17 @@ public class EventSystemImpl implements EventSystem {
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
         this.eventCounter = 0;
-        this.isRecording = true; //test purposes
+        if (EventStorage.isReplaying) {
+            fillPendingEvents();
+        }
+
+    }
+
+    private void fillPendingEvents() {
+        Collection<RecordedEvent> events = EventStorage.getInstance().getEvents();
+        for (RecordedEvent event : events) {
+            this.pendingEvents.offer(event.getPendingEvent());
+        }
     }
 
     @Override
@@ -269,7 +280,7 @@ public class EventSystemImpl implements EventSystem {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             //event recording
-            if (this.isRecording) {
+            if (EventStorage.isRecording) {
                 eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
                 this.eventCounter++;
             }
@@ -370,11 +381,12 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
+
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             //event recording
-            if (this.isRecording) {
+            if (EventStorage.isRecording) {
                 eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
                 this.eventCounter++;
             }

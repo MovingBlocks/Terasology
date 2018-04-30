@@ -33,14 +33,14 @@ import java.util.Set;
  * Utility class for the construction of a EntityData.EntityStore structure for storing the entities on disk..
  *
  */
-final class EntityStorer {
+public final class EntityStorer {
 
     private final EntitySerializer serializer;
     private final EntityData.EntityStore.Builder entityStoreBuilder;
     private final OwnershipHelper helper;
     private Set<EntityRef> storedEntities = Sets.newHashSet();
 
-    EntityStorer(EngineEntityManager entityManager) {
+    public EntityStorer(EngineEntityManager entityManager) {
         this.entityStoreBuilder = EntityData.EntityStore.newBuilder();
         this.serializer = new EntitySerializer(entityManager);
         this.helper = new OwnershipHelper(entityManager.getComponentLibrary());

@@ -411,7 +411,7 @@ public class TerasologyEngine implements GameEngine {
             /* do nothing */
         }
         PerformanceMonitor.endActivity();
-        EventStorage.getInstance().saveEvents();
+        //EventStorage.getInstance().saveEvents();
         //game is closed here
     }
 
