@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
@@ -99,21 +100,29 @@ public class SelectGameScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "delete", button -> {
-            GameInfo gameInfo = gameList.getSelection();
-            if (gameInfo != null) {
-                Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
-                try {
-                    FilesUtil.recursiveDelete(world);
-                    gameList.getList().remove(gameInfo);
-                    gameList.setSelection(null);
-                } catch (Exception e) {
-                    logger.error("Failed to delete saved game", e);
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
-                }
-            }
+            TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
+            confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
+                    translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
+            confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedGame(gameList));
+            confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+    }
+
+    private void removeSelectedGame(final UIList<GameInfo> gameList) {
+        GameInfo gameInfo = gameList.getSelection();
+        if (gameInfo != null) {
+            Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
+            try {
+                FilesUtil.recursiveDelete(world);
+                gameList.getList().remove(gameInfo);
+                gameList.setSelection(null);
+            } catch (Exception e) {
+                logger.error("Failed to delete saved game", e);
+                getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
+            }
+        }
     }
 
     @Override

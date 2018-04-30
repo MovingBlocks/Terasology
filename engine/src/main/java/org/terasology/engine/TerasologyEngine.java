@@ -79,6 +79,7 @@ import org.terasology.world.block.sounds.BlockSoundsData;
 import org.terasology.world.block.tiles.BlockTile;
 import org.terasology.world.block.tiles.TileData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -117,6 +118,8 @@ public class TerasologyEngine implements GameEngine {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private static final int ONE_MEBIBYTE = 1024 * 1024;
+
+    private final List<Class<?>> classesOnClasspathsToAddToEngine = new ArrayList<>();
 
     private GameState currentState;
     private GameState pendingState;
@@ -171,6 +174,14 @@ public class TerasologyEngine implements GameEngine {
         this.allSubsystems.add(new GameSubsystem());
         this.allSubsystems.add(new I18nSubsystem());
         this.allSubsystems.add(new TelemetrySubSystem());
+    }
+
+    /**
+     * Provide ability to set additional engine classpath locations.   This must be called before initialize() or run().
+     * @param clazz any class that appears in the resource location to treat as an engine classpath.
+     */
+    protected void addToClassesOnClasspathsToAddToEngine(Class<?> clazz) {
+        classesOnClasspathsToAddToEngine.add(clazz);
     }
 
     public void initialize() {
@@ -284,7 +295,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_MODULE_MANAGER);
-        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class));
+        ModuleManager moduleManager = new ModuleManagerImpl(rootContext.get(Config.class), classesOnClasspathsToAddToEngine);
         rootContext.put(ModuleManager.class, moduleManager);
 
         changeStatus(TerasologyEngineStatus.INITIALIZING_LOWLEVEL_OBJECT_MANIPULATION);
