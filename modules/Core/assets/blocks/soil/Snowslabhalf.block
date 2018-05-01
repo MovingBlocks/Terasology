@@ -9,7 +9,7 @@
         "shape": "halfslab"
     },
     "entity" : {
-           "prefab" : "slab"
-     },
+        "prefab" : "slabstack"
+    },
     "sounds": "Core:snow"
 }
