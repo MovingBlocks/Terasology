@@ -1,7 +1,7 @@
 {
     "parent" : "engine:iconItem",
     "DisplayName" : {
-        "name" : "Pop"
+        "name" : "Snow Shoes"
     },
     "Item" : {
         "icon" : "engine:items#snowshoes",
