@@ -1,5 +1,5 @@
  {
-    "displayName": "Eight Snow Slab",
+    "displayName": "Eighth Snow Slab",
     "basedOn": "core:soil",
     "rotation": "attachedToSurface",
     "sides": {
