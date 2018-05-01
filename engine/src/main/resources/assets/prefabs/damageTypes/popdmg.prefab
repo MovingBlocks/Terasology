@@ -1,6 +1,0 @@
-{
-    "parent" : "engine:physicalDamage",
-    "blockDamageModifier" : {
-        "materialDamageMultiplier" : {"information" : 21}
-    }
-}

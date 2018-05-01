@@ -4,7 +4,6 @@
         "name" : "Snow Shoes"
     },
     "Item" : {
-        "icon" : "engine:items#snowshoes",
-        "damageType" : "TutorialAssetSystem:pop"
+        "icon" : "engine:items#snowshoes"
     }
 }
