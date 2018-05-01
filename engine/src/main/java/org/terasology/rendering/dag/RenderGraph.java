@@ -88,6 +88,11 @@ public class RenderGraph {
             Preconditions.checkNotNull(toNode, "toNode cannot be null!");
 
             if (fromNode != null) {
+                SimpleUri toNodeUri = toNode.getUri();
+                if (!nodeMap.containsKey(toNodeUri)) {
+                    throw new RuntimeException("No node with uri " + toNodeUri + " was found!");
+                }
+
                 if (!graph.hasEdgeConnecting(fromNode, toNode)) {
                     graph.putEdge(fromNode, toNode);
                 } else {
