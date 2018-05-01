@@ -11,6 +11,5 @@
     "entity" : {
         "prefab" : "slabstack"
     },
-    "attachmentAllowed": false,
     "sounds": "Core:snow"
 }

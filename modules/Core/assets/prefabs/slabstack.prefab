@@ -1,8 +1,2 @@
 {
-    "PlaySoundAction": {
-        "sounds": "engine:click"
-    },
-    "SlabStack": {},
-    "InteractionTarget": {},
-    "Network": {}
 }

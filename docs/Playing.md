@@ -16,6 +16,8 @@ You can host a local server using the game client and have friends connect to yo
 
 Unlike in single player in a multiplayer setting permissions are enforced for console commands. Several permission types are available, if a command is not allowed it will state which permission is missing.
 
+### Headless Server
+
 You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, for example with a downloaded version:
 
 *Note: This changed to include the `/libs` after stable 49. The name of the .exe also may differ*
@@ -32,7 +34,7 @@ After you have rights to manage *user* permissions you can grant other players s
 
 With *server* rights you can terminate the server gracefully via `shutdownServer` in the console. Otherwise you can kill a headless server with `CTRL-C` in a terminal / command prompt. Running headless with the .exe on Windows is not recommended as it "detaches" from its command prompt so you get no handy logging there or any way to issue a break to the process. If you cannot connect or get "op" you may have to terminate the process manually via Task Manager or comparable.
 
-### Configuring a server
+#### Configuring a server
 
 Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
 
