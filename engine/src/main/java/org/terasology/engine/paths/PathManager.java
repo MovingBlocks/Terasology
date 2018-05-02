@@ -21,6 +21,7 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 
 import org.lwjgl.LWJGLUtil;
+import org.terasology.recording.EventStorage;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public final class PathManager {
     public static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
     private static final String SAVED_GAMES_DIR = "saves";
+    private static final String ALTERNATE_SAVED_GAMES_DIR = "saves2";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
@@ -204,6 +206,10 @@ public final class PathManager {
      * @return Path in which world saves are saved.
      */
     public Path getSavesPath() {
+        if (EventStorage.isReplaying) {
+            return homePath.resolve(ALTERNATE_SAVED_GAMES_DIR);
+        }
+
         return savesPath;
     }
 
@@ -290,6 +296,6 @@ public final class PathManager {
     }
 
     public Path getSavePath(String title) {
-        return savesPath.resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+        return getSavesPath().resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
     }
 }

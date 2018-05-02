@@ -42,12 +42,12 @@ public class EventCatcher {
     }
 
     private boolean filterEvents(PendingEvent pe) {
-        Event event = pe.getEvent();
+        /*Event event = pe.getEvent();
         if ( event instanceof OnActivatedComponent ||
                 event instanceof OnAddedComponent ||
                 event instanceof OnChangedComponent) {
             return false;
-        }
+        }*/
 
         return true;
     }

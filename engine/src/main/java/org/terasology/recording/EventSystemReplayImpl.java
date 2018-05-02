@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.entitySystem.event.internal;
+package org.terasology.recording;
 
+import org.terasology.entitySystem.event.internal.EventReceiver;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
@@ -38,6 +40,8 @@ import org.terasology.entitySystem.event.ConsumableEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.event.internal.EventSystemImpl;
+import org.terasology.entitySystem.event.internal.PendingEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -67,17 +71,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
-/**
- * An implementation of the EventSystem.
- *
- */
-public class EventSystemImpl implements EventSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(EventSystemImpl.class);
+public class EventSystemReplayImpl implements EventSystem {
 
-    private Map<Class<? extends Event>, SetMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
-    private SetMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = HashMultimap.create();
-    private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
+    private static final Logger logger = LoggerFactory.getLogger(EventSystemReplayImpl.class);
+
+    private Map<Class<? extends Event>, SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
+    private SetMultimap<Class<? extends Event>, EventSystemReplayImpl.EventHandlerInfo> generalHandlers = HashMultimap.create();
+    private Comparator<EventSystemReplayImpl.EventHandlerInfo> priorityComparator = new EventSystemReplayImpl.EventHandlerPriorityComparator();
 
     // Event metadata
     private BiMap<SimpleUri, Class<? extends Event>> eventIdMap = HashBiMap.create();
@@ -93,23 +94,93 @@ public class EventSystemImpl implements EventSystem {
     private EventCatcher eventCatcher;
     private long eventCounter;
 
+    //Event replaying
+    private boolean loadedRecordedEvents;
+    private int testCount = 0;
 
-    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
+
+    public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
         this.eventCounter = 0;
+        this.loadedRecordedEvents = false;
 
+
+    }
+
+    //Replay Additions
+
+    private void fillPendingEvents() {
+        Collection<RecordedEvent> events = EventStorage.getInstance().getEvents();
+        for (RecordedEvent event : events) {
+            this.pendingEvents.offer(event.getPendingEvent());
+        }
+        System.out.println(pendingEvents.size() + "ZZZ");
+    }
+
+    private void originalSend(EntityRef entity, Event event) {
+        if (Thread.currentThread() != mainThread) {
+            pendingEvents.offer(new PendingEvent(entity, event));
+        } else {
+            if (EventStorage.beginReplay) {
+                System.out.println("PROCESSING EVENT " + this.testCount);
+                this.testCount++;
+            }
+            //event recording
+            if (EventStorage.isRecording) {
+                eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
+                this.eventCounter++;
+            }
+            networkReplicate(entity, event);
+
+            Set<EventSystemReplayImpl.EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
+            List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
+            Collections.sort(selectedHandlers, priorityComparator);
+
+            if (event instanceof ConsumableEvent) {
+                sendConsumableEvent(entity, event, selectedHandlers);
+            } else {
+                sendStandardEvent(entity, event, selectedHandlers);
+            }
+        }
+    }
+
+    public void originalSend(EntityRef entity, Event event, Component component) {
+
+        if (Thread.currentThread() != mainThread) {
+            pendingEvents.offer(new PendingEvent(entity, event, component));
+        } else {
+            if (EventStorage.beginReplay) {
+                System.out.println("PROCESSING EVENT " + this.testCount);
+                this.testCount++;
+            }
+            //event recording
+            if (EventStorage.isRecording) {
+                eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
+                this.eventCounter++;
+            }
+            SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
+            if (handlers != null) {
+                List<EventSystemReplayImpl.EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
+                Collections.sort(eventHandlers, priorityComparator);
+                for (EventSystemReplayImpl.EventHandlerInfo eventHandler : eventHandlers) {
+                    if (eventHandler.isValidFor(entity)) {
+                        eventHandler.invoke(entity, event);
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void process() {
         for (PendingEvent event = pendingEvents.poll(); event != null; event = pendingEvents.poll()) {
             if (event.getComponent() != null) {
-                send(event.getEntity(), event.getEvent(), event.getComponent());
+                originalSend(event.getEntity(), event.getEvent(), event.getComponent());
             } else {
-                send(event.getEntity(), event.getEvent());
+                originalSend(event.getEntity(), event.getEvent());
             }
         }
     }
@@ -176,7 +247,7 @@ public class EventSystemImpl implements EventSystem {
                     componentParams.add((Class<? extends Component>) types[i]);
                 }
 
-                ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
+                EventSystemReplayImpl.ByteCodeEventHandlerInfo handlerInfo = new EventSystemReplayImpl.ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(),
                         receiveEventAnnotation.activity(), requiredComponents, componentParams);
                 addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }
@@ -185,26 +256,26 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void unregisterEventHandler(ComponentSystem handler) {
-        for (SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlers : componentSpecificHandlers.values()) {
-            Iterator<EventHandlerInfo> eventHandlerIterator = eventHandlers.values().iterator();
+        for (SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> eventHandlers : componentSpecificHandlers.values()) {
+            Iterator<EventSystemReplayImpl.EventHandlerInfo> eventHandlerIterator = eventHandlers.values().iterator();
             while (eventHandlerIterator.hasNext()) {
-                EventHandlerInfo eventHandler = eventHandlerIterator.next();
+                EventSystemReplayImpl.EventHandlerInfo eventHandler = eventHandlerIterator.next();
                 if (eventHandler.getHandler().equals(handler)) {
                     eventHandlerIterator.remove();
                 }
             }
         }
 
-        Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
+        Iterator<EventSystemReplayImpl.EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
         while (eventHandlerIterator.hasNext()) {
-            EventHandlerInfo eventHandler = eventHandlerIterator.next();
+            EventSystemReplayImpl.EventHandlerInfo eventHandler = eventHandlerIterator.next();
             if (eventHandler.getHandler().equals(handler)) {
                 eventHandlerIterator.remove();
             }
         }
     }
 
-    private void addEventHandler(Class<? extends Event> type, EventHandlerInfo handler, Collection<Class<? extends Component>> components) {
+    private void addEventHandler(Class<? extends Event> type, EventSystemReplayImpl.EventHandlerInfo handler, Collection<Class<? extends Component>> components) {
         if (components.isEmpty()) {
             generalHandlers.put(type, handler);
             for (Class<? extends Event> childType : childEvents.get(type)) {
@@ -220,8 +291,8 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private void addToComponentSpecificHandlers(Class<? extends Event> type, EventHandlerInfo handlerInfo, Class<? extends Component> c) {
-        SetMultimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
+    private void addToComponentSpecificHandlers(Class<? extends Event> type, EventSystemReplayImpl.EventHandlerInfo handlerInfo, Class<? extends Component> c) {
+        SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
         if (componentMap == null) {
             componentMap = HashMultimap.create();
             componentSpecificHandlers.put(type, componentMap);
@@ -236,15 +307,15 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes) {
-        EventHandlerInfo info = new ReceiverEventHandlerInfo<>(eventReceiver, priority, componentTypes);
+        EventSystemReplayImpl.EventHandlerInfo info = new EventSystemReplayImpl.ReceiverEventHandlerInfo<>(eventReceiver, priority, componentTypes);
         addEventHandler(eventClass, info, Arrays.asList(componentTypes));
     }
 
     @Override
     public <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
-        SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
+        SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
         if (eventHandlerMap != null) {
-            ReceiverEventHandlerInfo testReceiver = new ReceiverEventHandlerInfo<>(eventReceiver, 0, componentTypes);
+            EventSystemReplayImpl.ReceiverEventHandlerInfo testReceiver = new EventSystemReplayImpl.ReceiverEventHandlerInfo<>(eventReceiver, 0, componentTypes);
             for (Class<? extends Component> c : componentTypes) {
                 eventHandlerMap.remove(c, testReceiver);
                 for (Class<? extends Event> childType : childEvents.get(eventClass)) {
@@ -254,9 +325,9 @@ public class EventSystemImpl implements EventSystem {
         }
 
         if (0 == componentTypes.length) {
-            Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
+            Iterator<EventSystemReplayImpl.EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
             while (eventHandlerIterator.hasNext()) {
-                EventHandlerInfo eventHandler = eventHandlerIterator.next();
+                EventSystemReplayImpl.EventHandlerInfo eventHandler = eventHandlerIterator.next();
                 if (eventHandler.getHandler().equals(eventReceiver)) {
                     eventHandlerIterator.remove();
                 }
@@ -266,30 +337,20 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (Thread.currentThread() != mainThread) {
-            pendingEvents.offer(new PendingEvent(entity, event));
+        if (EventStorage.beginReplay && !this.loadedRecordedEvents) {
+            fillPendingEvents();
+            this.loadedRecordedEvents = true;
+            System.out.println("Loaded!");
+        }
+        if (EventStorage.beginReplay) {
+            process();
         } else {
-            //event recording
-            if (EventStorage.isRecording) {
-                eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
-                this.eventCounter++;
-            }
-            networkReplicate(entity, event);
-
-            Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
-            List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
-            Collections.sort(selectedHandlers, priorityComparator);
-
-            if (event instanceof ConsumableEvent) {
-                sendConsumableEvent(entity, event, selectedHandlers);
-            } else {
-                sendStandardEvent(entity, event, selectedHandlers);
-            }
+            originalSend(entity, event);
         }
     }
 
-    private void sendStandardEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
-        for (EventHandlerInfo handler : selectedHandlers) {
+    private void sendStandardEvent(EntityRef entity, Event event, List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers) {
+        for (EventSystemReplayImpl.EventHandlerInfo handler : selectedHandlers) {
             // Check isValid at each stage in case components were removed.
             if (handler.isValidFor(entity)) {
                 handler.invoke(entity, event);
@@ -297,9 +358,9 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private void sendConsumableEvent(EntityRef entity, Event event, List<EventHandlerInfo> selectedHandlers) {
+    private void sendConsumableEvent(EntityRef entity, Event event, List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers) {
         ConsumableEvent consumableEvent = (ConsumableEvent) event;
-        for (EventHandlerInfo handler : selectedHandlers) {
+        for (EventSystemReplayImpl.EventHandlerInfo handler : selectedHandlers) {
             // Check isValid at each stage in case components were removed.
             if (handler.isValidFor(entity)) {
                 handler.invoke(entity, event);
@@ -371,39 +432,29 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-
-        if (Thread.currentThread() != mainThread) {
-            pendingEvents.offer(new PendingEvent(entity, event, component));
+        if (EventStorage.beginReplay && !this.loadedRecordedEvents) {
+            fillPendingEvents();
+            this.loadedRecordedEvents = true;
+            System.out.println("Loaded!");
+        }
+        if (EventStorage.beginReplay) {
+            process();
         } else {
-            //event recording
-            if (EventStorage.isRecording) {
-                eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
-                this.eventCounter++;
-            }
-            SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
-            if (handlers != null) {
-                List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
-                Collections.sort(eventHandlers, priorityComparator);
-                for (EventHandlerInfo eventHandler : eventHandlers) {
-                    if (eventHandler.isValidFor(entity)) {
-                        eventHandler.invoke(entity, event);
-                    }
-                }
-            }
+            originalSend(entity, event, component);
         }
     }
 
-    private Set<EventHandlerInfo> selectEventHandlers(Class<? extends Event> eventType, EntityRef entity) {
-        Set<EventHandlerInfo> result = Sets.newHashSet();
+    private Set<EventSystemReplayImpl.EventHandlerInfo> selectEventHandlers(Class<? extends Event> eventType, EntityRef entity) {
+        Set<EventSystemReplayImpl.EventHandlerInfo> result = Sets.newHashSet();
         result.addAll(generalHandlers.get(eventType));
-        SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
+        SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
         if (handlers == null) {
             return result;
         }
 
         for (Class<? extends Component> compClass : handlers.keySet()) {
             if (entity.hasComponent(compClass)) {
-                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                for (EventSystemReplayImpl.EventHandlerInfo eventHandler : handlers.get(compClass)) {
                     if (eventHandler.isValidFor(entity)) {
                         result.add(eventHandler);
                     }
@@ -413,10 +464,10 @@ public class EventSystemImpl implements EventSystem {
         return result;
     }
 
-    private static class EventHandlerPriorityComparator implements Comparator<EventHandlerInfo> {
+    private static class EventHandlerPriorityComparator implements Comparator<EventSystemReplayImpl.EventHandlerInfo> {
 
         @Override
-        public int compare(EventHandlerInfo o1, EventHandlerInfo o2) {
+        public int compare(EventSystemReplayImpl.EventHandlerInfo o1, EventSystemReplayImpl.EventHandlerInfo o2) {
             return o2.getPriority() - o1.getPriority();
         }
     }
@@ -431,7 +482,7 @@ public class EventSystemImpl implements EventSystem {
         Object getHandler();
     }
 
-    private static class ReflectedEventHandlerInfo implements EventHandlerInfo {
+    private static class ReflectedEventHandlerInfo implements EventSystemReplayImpl.EventHandlerInfo {
         private ComponentSystem handler;
         private Method method;
         private ImmutableList<Class<? extends Component>> filterComponents;
@@ -439,10 +490,10 @@ public class EventSystemImpl implements EventSystem {
         private int priority;
 
         ReflectedEventHandlerInfo(ComponentSystem handler,
-                                         Method method,
-                                         int priority,
-                                         Collection<Class<? extends Component>> filterComponents,
-                                         Collection<Class<? extends Component>> componentParams) {
+                                  Method method,
+                                  int priority,
+                                  Collection<Class<? extends Component>> filterComponents,
+                                  Collection<Class<? extends Component>> componentParams) {
             this.handler = handler;
             this.method = method;
             this.filterComponents = ImmutableList.copyOf(filterComponents);
@@ -486,7 +537,7 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private static class ByteCodeEventHandlerInfo implements EventHandlerInfo {
+    private static class ByteCodeEventHandlerInfo implements EventSystemReplayImpl.EventHandlerInfo {
         private ComponentSystem handler;
         private String activity;
         private MethodAccess methodAccess;
@@ -496,11 +547,11 @@ public class EventSystemImpl implements EventSystem {
         private int priority;
 
         ByteCodeEventHandlerInfo(ComponentSystem handler,
-                                        Method method,
-                                        int priority,
-                                        String activity,
-                                        Collection<Class<? extends Component>> filterComponents,
-                                        Collection<Class<? extends Component>> componentParams) {
+                                 Method method,
+                                 int priority,
+                                 String activity,
+                                 Collection<Class<? extends Component>> filterComponents,
+                                 Collection<Class<? extends Component>> componentParams) {
 
 
             this.handler = handler;
@@ -557,7 +608,7 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private static class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
+    private static class ReceiverEventHandlerInfo<T extends Event> implements EventSystemReplayImpl.EventHandlerInfo {
         private EventReceiver<T> receiver;
         private Class<? extends Component>[] components;
         private int priority;
@@ -593,8 +644,8 @@ public class EventSystemImpl implements EventSystem {
             if (obj == this) {
                 return true;
             }
-            if (obj instanceof ReceiverEventHandlerInfo) {
-                ReceiverEventHandlerInfo other = (ReceiverEventHandlerInfo) obj;
+            if (obj instanceof EventSystemReplayImpl.ReceiverEventHandlerInfo) {
+                EventSystemReplayImpl.ReceiverEventHandlerInfo other = (EventSystemReplayImpl.ReceiverEventHandlerInfo) obj;
                 if (Objects.equal(receiver, other.receiver)) {
                     return true;
                 }
@@ -612,4 +663,6 @@ public class EventSystemImpl implements EventSystem {
             return receiver;
         }
     }
+
+
 }

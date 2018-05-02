@@ -140,6 +140,10 @@ public class SaveTransaction extends AbstractTask {
             logger.info("Save game finished");
             EventStorage.getInstance().saveEventsString();
             EventStorage.isRecording = false;
+            if (EventStorage.recordCount == 1) {
+                System.out.println("Is Recording!");
+                EventStorage.isReplaying = true;
+            }
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);
             result = SaveTransactionResult.createFailureResult(t);

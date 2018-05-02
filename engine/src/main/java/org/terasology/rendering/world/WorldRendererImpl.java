@@ -32,6 +32,7 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
+import org.terasology.recording.EventStorage;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -636,6 +637,12 @@ public final class WorldRendererImpl implements WorldRenderer {
             List<Node> orderedNodes = renderGraph.getNodesInTopologicalOrder();
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
+
+            System.out.println("HERE!!!");
+            if (EventStorage.isReplaying) {
+                //EventStorage.beginReplay = true;
+            }
+
         }
     }
 
