@@ -105,9 +105,8 @@ public class StateHeadlessSetup implements GameState {
             gameManifest = createGameManifest();
         }
         gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
-
-        // generate blacklist and whitelist files
-        ServerConnectListManager.getInstance().loadLists();
+        // TODO: move this to a subsystem
+        //ServerConnectListManager.getInstance().loadLists();
     }
 
     public GameManifest createGameManifest() {

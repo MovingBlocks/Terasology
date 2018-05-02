@@ -32,10 +32,8 @@ import java.util.Set;
 public class ServerConnectListManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectListManager.class);
-    private static final Path defaultBlacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-    private static final Path defaultWhitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
     private static final Gson gson = new Gson();
-    private static ServerConnectListManager instance = new ServerConnectListManager(defaultBlacklistPath, defaultWhitelistPath);
+    private static ServerConnectListManager instance;
 
     private Set blacklistedIDs;
     private Set whitelistedIDs;
@@ -45,6 +43,7 @@ public class ServerConnectListManager {
     private ServerConnectListManager(Path blacklistFilePath, Path whitelistFilePath) {
         blacklistPath = blacklistFilePath;
         whitelistPath = whitelistFilePath;
+        loadLists();
     }
 
     public void loadLists() {
@@ -58,44 +57,62 @@ public class ServerConnectListManager {
             blacklistedIDs = gson.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
             whitelistedIDs = gson.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
         } catch (IOException e) {
-            logger.error("Whitelist or blacklist files not found:");
-            e.printStackTrace();
+            logger.error("Whitelist or blacklist files not found:", e);
         }
     }
 
+    public String getErrorMessage(String clientID) {
+        if (isClientBlacklisted(clientID)) {
+            return "client on blacklist";
+        }
+        if (!isClientWhitelisted(clientID)) {
+            return "client not on whitelist";
+        }
+        return null;
+    }
+
     public static ServerConnectListManager getInstance() {
+        if (instance == null) {
+            Path defaultBlacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+            Path defaultWhitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
+            instance = new ServerConnectListManager(defaultBlacklistPath, defaultWhitelistPath);
+        }
         return instance;
     }
 
-    public boolean clientWhitelisted(String clientID) {
-        return whitelistedIDs.contains(clientID);
+    public boolean isClientAllowedToConnect(String clientID) {
+        return !isClientBlacklisted(clientID) && isClientWhitelisted(clientID);
     }
 
     public void addToWhitelist(String clientID) {
         whitelistedIDs.add(clientID);
     }
 
+    public void removeFromWhitelist(String clientID) {
+        whitelistedIDs.remove(clientID);
+    }
+
     public Set<String> getWhitelist() {
         return whitelistedIDs;
-    }
-
-    public Path getWhitelistPath() {
-        return whitelistPath;
-    }
-
-    public boolean clientBlacklisted(String clientID) {
-        return blacklistedIDs.contains(clientID);
     }
 
     public void addToBlacklist(String clientID) {
         blacklistedIDs.add(clientID);
     }
 
+    public void removeFromBlacklist(String clientID) {
+        blacklistedIDs.remove(clientID);
+    }
+
     public Set<String> getBlacklist() {
         return blacklistedIDs;
     }
 
-    public Path getBlacklistPath() {
-        return blacklistPath;
+    private boolean isClientBlacklisted(String clientID) {
+        return blacklistedIDs != null && blacklistedIDs.contains(clientID);
+    }
+
+    private boolean isClientWhitelisted(String clientID) {
+        return whitelistedIDs == null || whitelistedIDs.contains(clientID);
     }
 }

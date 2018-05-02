@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntLongHashMap;
@@ -47,7 +46,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.hibernation.HibernationManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -94,15 +92,12 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.generator.WorldGenerator;
 
-import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
@@ -155,6 +150,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
     private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
     private StorageManager storageManager;
+    private String errorMessage;
 
     // Client only
     private ServerImpl server;
@@ -803,31 +799,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void processNewClient(NetClient client) {
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
-        serverConnectListManager.loadLists();
-        Path blacklistPath = ServerConnectListManager.getInstance().getBlacklistPath();
-        Path whitelistPath = ServerConnectListManager.getInstance().getWhitelistPath();
-        try {
-            Set blacklistedIDs = new Gson().fromJson(Files.newBufferedReader(blacklistPath), Set.class);
-            Set whitelistedIDs = new Gson().fromJson(Files.newBufferedReader(whitelistPath), Set.class);
-            System.out.println("BLIDS: " + blacklistedIDs);
-            System.out.println("WLIDS: " + whitelistedIDs);
-            if (blacklistedIDs != null) {
-                if (blacklistedIDs.contains(client.getId())) {
-                    System.out.println("BLID: " + client.getId());
-                    forceDisconnect(client);
-                    return;
-                }
-            }
-            if (whitelistedIDs != null) {
-                if (!whitelistedIDs.contains(client.getId())) {
-                    System.out.println("WLID: " + client.getId());
-                    forceDisconnect(client);
-                    return;
-                }
-            }
-            System.out.println("ID: " + client.getId());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
+            errorMessage = serverConnectListManager.getErrorMessage(client.getId());
+            client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage()).build());
+            forceDisconnect(client);
+            System.out.println("test");
+            // reset error message so the next connection isn't automatically blocked
+            errorMessage = null;
+            return;
         }
 
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
@@ -879,7 +858,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         WorldGenerator worldGen = context.get(WorldGenerator.class);
         if (worldGen != null) {
-            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
+            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel() + 0.5f);
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             if (!StandardModuleExtension.isServerSideOnly(module)) {
@@ -900,17 +879,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         for (BlockFamily registeredBlockFamily : blockManager.listRegisteredBlockFamilies()) {
             serverInfoMessageBuilder.addRegisterBlockFamily(registeredBlockFamily.getURI().toString());
         }
-        Path homePath = PathManager.getInstance().getHomePath();
-        try {
-            for (String line : Files.readAllLines(homePath.resolve("blacklist.json"))) {
-                serverInfoMessageBuilder.addBlackList(line);
-            }
-            for (String line : Files.readAllLines(homePath.resolve("whitelist.json"))) {
-                serverInfoMessageBuilder.addWhiteList(line);
-            }
-        } catch (IOException e) {
-            logger.error("blacklist and/or whitelist files not found");
-            e.printStackTrace();
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            serverInfoMessageBuilder.setErrorMessage(errorMessage);
         }
         serializeComponentInfo(serverInfoMessageBuilder);
         serializeEventInfo(serverInfoMessageBuilder);

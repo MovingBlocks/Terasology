@@ -14824,42 +14824,18 @@ public final class NetData {
         getBiomeIdBytes(int index);
 
     /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
-    com.google.protobuf.ProtocolStringList
-        getBlackListList();
+    boolean hasErrorMessage();
     /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
-    int getBlackListCount();
+    java.lang.String getErrorMessage();
     /**
-     * <code>repeated string blackList = 12;</code>
-     */
-    java.lang.String getBlackList(int index);
-    /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
     com.google.protobuf.ByteString
-        getBlackListBytes(int index);
-
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    com.google.protobuf.ProtocolStringList
-        getWhiteListList();
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    int getWhiteListCount();
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    java.lang.String getWhiteList(int index);
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    com.google.protobuf.ByteString
-        getWhiteListBytes(int index);
+        getErrorMessageBytes();
 
     /**
      * <code>optional string version = 15;</code>
@@ -15116,52 +15092,40 @@ public final class NetData {
             }
             case 98: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              if (!((mutable_bitField0_ & 0x00000800) == 0x00000800)) {
-                blackList_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00000800;
-              }
-              blackList_.add(bs);
-              break;
-            }
-            case 106: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              if (!((mutable_bitField0_ & 0x00001000) == 0x00001000)) {
-                whiteList_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00001000;
-              }
-              whiteList_.add(bs);
+              bitField0_ |= 0x00000001;
+              errorMessage_ = bs;
               break;
             }
             case 122: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000001;
+              bitField0_ |= 0x00000002;
               version_ = bs;
               break;
             }
             case 130: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000002;
+              bitField0_ |= 0x00000004;
               gameName_ = bs;
               break;
             }
             case 136: {
-              bitField0_ |= 0x00000004;
+              bitField0_ |= 0x00000008;
               time_ = input.readInt64();
               break;
             }
             case 149: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               reflectionHeight_ = input.readFloat();
               break;
             }
             case 154: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000020;
               mOTD_ = bs;
               break;
             }
             case 160: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000040;
               onlinePlayersAmount_ = input.readInt32();
               break;
             }
@@ -15205,12 +15169,6 @@ public final class NetData {
         }
         if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
           biomeId_ = biomeId_.getUnmodifiableView();
-        }
-        if (((mutable_bitField0_ & 0x00000800) == 0x00000800)) {
-          blackList_ = blackList_.getUnmodifiableView();
-        }
-        if (((mutable_bitField0_ & 0x00001000) == 0x00001000)) {
-          whiteList_ = whiteList_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -15569,62 +15527,46 @@ public final class NetData {
       return biomeId_.getByteString(index);
     }
 
-    public static final int BLACKLIST_FIELD_NUMBER = 12;
-    private com.google.protobuf.LazyStringList blackList_;
+    public static final int ERRORMESSAGE_FIELD_NUMBER = 12;
+    private java.lang.Object errorMessage_;
     /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
-    public com.google.protobuf.ProtocolStringList
-        getBlackListList() {
-      return blackList_;
+    public boolean hasErrorMessage() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
-    public int getBlackListCount() {
-      return blackList_.size();
+    public java.lang.String getErrorMessage() {
+      java.lang.Object ref = errorMessage_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          errorMessage_ = s;
+        }
+        return s;
+      }
     }
     /**
-     * <code>repeated string blackList = 12;</code>
-     */
-    public java.lang.String getBlackList(int index) {
-      return blackList_.get(index);
-    }
-    /**
-     * <code>repeated string blackList = 12;</code>
+     * <code>optional string errorMessage = 12;</code>
      */
     public com.google.protobuf.ByteString
-        getBlackListBytes(int index) {
-      return blackList_.getByteString(index);
-    }
-
-    public static final int WHITELIST_FIELD_NUMBER = 13;
-    private com.google.protobuf.LazyStringList whiteList_;
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    public com.google.protobuf.ProtocolStringList
-        getWhiteListList() {
-      return whiteList_;
-    }
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    public int getWhiteListCount() {
-      return whiteList_.size();
-    }
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    public java.lang.String getWhiteList(int index) {
-      return whiteList_.get(index);
-    }
-    /**
-     * <code>repeated string whiteList = 13;</code>
-     */
-    public com.google.protobuf.ByteString
-        getWhiteListBytes(int index) {
-      return whiteList_.getByteString(index);
+        getErrorMessageBytes() {
+      java.lang.Object ref = errorMessage_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        errorMessage_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int VERSION_FIELD_NUMBER = 15;
@@ -15633,7 +15575,7 @@ public final class NetData {
      * <code>optional string version = 15;</code>
      */
     public boolean hasVersion() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional string version = 15;</code>
@@ -15675,7 +15617,7 @@ public final class NetData {
      * <code>optional string gameName = 16;</code>
      */
     public boolean hasGameName() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional string gameName = 16;</code>
@@ -15717,7 +15659,7 @@ public final class NetData {
      * <code>optional int64 time = 17;</code>
      */
     public boolean hasTime() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <code>optional int64 time = 17;</code>
@@ -15732,7 +15674,7 @@ public final class NetData {
      * <code>optional float reflectionHeight = 18;</code>
      */
     public boolean hasReflectionHeight() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional float reflectionHeight = 18;</code>
@@ -15747,7 +15689,7 @@ public final class NetData {
      * <code>optional string MOTD = 19;</code>
      */
     public boolean hasMOTD() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional string MOTD = 19;</code>
@@ -15789,7 +15731,7 @@ public final class NetData {
      * <code>optional int32 onlinePlayersAmount = 20;</code>
      */
     public boolean hasOnlinePlayersAmount() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional int32 onlinePlayersAmount = 20;</code>
@@ -15810,8 +15752,7 @@ public final class NetData {
       worldInfo_ = java.util.Collections.emptyList();
       biomeShortId_ = java.util.Collections.emptyList();
       biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      blackList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      whiteList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      errorMessage_ = "";
       version_ = "";
       gameName_ = "";
       time_ = 0L;
@@ -15908,28 +15849,25 @@ public final class NetData {
       for (int i = 0; i < biomeId_.size(); i++) {
         output.writeBytes(11, biomeId_.getByteString(i));
       }
-      for (int i = 0; i < blackList_.size(); i++) {
-        output.writeBytes(12, blackList_.getByteString(i));
-      }
-      for (int i = 0; i < whiteList_.size(); i++) {
-        output.writeBytes(13, whiteList_.getByteString(i));
-      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(15, getVersionBytes());
+        output.writeBytes(12, getErrorMessageBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(16, getGameNameBytes());
+        output.writeBytes(15, getVersionBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt64(17, time_);
+        output.writeBytes(16, getGameNameBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFloat(18, reflectionHeight_);
+        output.writeInt64(17, time_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBytes(19, getMOTDBytes());
+        output.writeFloat(18, reflectionHeight_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(19, getMOTDBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt32(20, onlinePlayersAmount_);
       }
       extensionWriter.writeUntil(536870912, output);
@@ -16036,45 +15974,31 @@ public final class NetData {
         size += dataSize;
         size += 1 * getBiomeIdList().size();
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < blackList_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(blackList_.getByteString(i));
-        }
-        size += dataSize;
-        size += 1 * getBlackListList().size();
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < whiteList_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(whiteList_.getByteString(i));
-        }
-        size += dataSize;
-        size += 1 * getWhiteListList().size();
-      }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, getVersionBytes());
+          .computeBytesSize(12, getErrorMessageBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(16, getGameNameBytes());
+          .computeBytesSize(15, getVersionBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(17, time_);
+          .computeBytesSize(16, getGameNameBytes());
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(18, reflectionHeight_);
+          .computeInt64Size(17, time_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(19, getMOTDBytes());
+          .computeFloatSize(18, reflectionHeight_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(19, getMOTDBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(20, onlinePlayersAmount_);
       }
@@ -16239,22 +16163,20 @@ public final class NetData {
         bitField0_ = (bitField0_ & ~0x00000200);
         biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000400);
-        blackList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        errorMessage_ = "";
         bitField0_ = (bitField0_ & ~0x00000800);
-        whiteList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00001000);
         version_ = "";
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         gameName_ = "";
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         time_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         reflectionHeight_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         mOTD_ = "";
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         onlinePlayersAmount_ = 0;
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         return this;
       }
 
@@ -16354,38 +16276,32 @@ public final class NetData {
           bitField0_ = (bitField0_ & ~0x00000400);
         }
         result.biomeId_ = biomeId_;
-        if (((bitField0_ & 0x00000800) == 0x00000800)) {
-          blackList_ = blackList_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00000800);
-        }
-        result.blackList_ = blackList_;
-        if (((bitField0_ & 0x00001000) == 0x00001000)) {
-          whiteList_ = whiteList_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00001000);
-        }
-        result.whiteList_ = whiteList_;
-        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.version_ = version_;
-        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+        result.errorMessage_ = errorMessage_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.gameName_ = gameName_;
-        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+        result.version_ = version_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.time_ = time_;
-        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+        result.gameName_ = gameName_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.reflectionHeight_ = reflectionHeight_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+        result.time_ = time_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.mOTD_ = mOTD_;
-        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+        result.reflectionHeight_ = reflectionHeight_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
           to_bitField0_ |= 0x00000020;
+        }
+        result.mOTD_ = mOTD_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00000040;
         }
         result.onlinePlayersAmount_ = onlinePlayersAmount_;
         result.bitField0_ = to_bitField0_;
@@ -16578,33 +16494,18 @@ public final class NetData {
           }
           onChanged();
         }
-        if (!other.blackList_.isEmpty()) {
-          if (blackList_.isEmpty()) {
-            blackList_ = other.blackList_;
-            bitField0_ = (bitField0_ & ~0x00000800);
-          } else {
-            ensureBlackListIsMutable();
-            blackList_.addAll(other.blackList_);
-          }
-          onChanged();
-        }
-        if (!other.whiteList_.isEmpty()) {
-          if (whiteList_.isEmpty()) {
-            whiteList_ = other.whiteList_;
-            bitField0_ = (bitField0_ & ~0x00001000);
-          } else {
-            ensureWhiteListIsMutable();
-            whiteList_.addAll(other.whiteList_);
-          }
+        if (other.hasErrorMessage()) {
+          bitField0_ |= 0x00000800;
+          errorMessage_ = other.errorMessage_;
           onChanged();
         }
         if (other.hasVersion()) {
-          bitField0_ |= 0x00002000;
+          bitField0_ |= 0x00001000;
           version_ = other.version_;
           onChanged();
         }
         if (other.hasGameName()) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00002000;
           gameName_ = other.gameName_;
           onChanged();
         }
@@ -16615,7 +16516,7 @@ public final class NetData {
           setReflectionHeight(other.getReflectionHeight());
         }
         if (other.hasMOTD()) {
-          bitField0_ |= 0x00020000;
+          bitField0_ |= 0x00010000;
           mOTD_ = other.mOTD_;
           onChanged();
         }
@@ -18208,188 +18109,78 @@ public final class NetData {
         return this;
       }
 
-      private com.google.protobuf.LazyStringList blackList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureBlackListIsMutable() {
-        if (!((bitField0_ & 0x00000800) == 0x00000800)) {
-          blackList_ = new com.google.protobuf.LazyStringArrayList(blackList_);
-          bitField0_ |= 0x00000800;
-         }
-      }
+      private java.lang.Object errorMessage_ = "";
       /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
-      public com.google.protobuf.ProtocolStringList
-          getBlackListList() {
-        return blackList_.getUnmodifiableView();
+      public boolean hasErrorMessage() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
-      public int getBlackListCount() {
-        return blackList_.size();
+      public java.lang.String getErrorMessage() {
+        java.lang.Object ref = errorMessage_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            errorMessage_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>repeated string blackList = 12;</code>
-       */
-      public java.lang.String getBlackList(int index) {
-        return blackList_.get(index);
-      }
-      /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
       public com.google.protobuf.ByteString
-          getBlackListBytes(int index) {
-        return blackList_.getByteString(index);
+          getErrorMessageBytes() {
+        java.lang.Object ref = errorMessage_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          errorMessage_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
       }
       /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
-      public Builder setBlackList(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureBlackListIsMutable();
-        blackList_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string blackList = 12;</code>
-       */
-      public Builder addBlackList(
+      public Builder setErrorMessage(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureBlackListIsMutable();
-        blackList_.add(value);
+  bitField0_ |= 0x00000800;
+        errorMessage_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
-      public Builder addAllBlackList(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureBlackListIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, blackList_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string blackList = 12;</code>
-       */
-      public Builder clearBlackList() {
-        blackList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder clearErrorMessage() {
         bitField0_ = (bitField0_ & ~0x00000800);
+        errorMessage_ = getDefaultInstance().getErrorMessage();
         onChanged();
         return this;
       }
       /**
-       * <code>repeated string blackList = 12;</code>
+       * <code>optional string errorMessage = 12;</code>
        */
-      public Builder addBlackListBytes(
+      public Builder setErrorMessageBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureBlackListIsMutable();
-        blackList_.add(value);
-        onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.LazyStringList whiteList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureWhiteListIsMutable() {
-        if (!((bitField0_ & 0x00001000) == 0x00001000)) {
-          whiteList_ = new com.google.protobuf.LazyStringArrayList(whiteList_);
-          bitField0_ |= 0x00001000;
-         }
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public com.google.protobuf.ProtocolStringList
-          getWhiteListList() {
-        return whiteList_.getUnmodifiableView();
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public int getWhiteListCount() {
-        return whiteList_.size();
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public java.lang.String getWhiteList(int index) {
-        return whiteList_.get(index);
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public com.google.protobuf.ByteString
-          getWhiteListBytes(int index) {
-        return whiteList_.getByteString(index);
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public Builder setWhiteList(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureWhiteListIsMutable();
-        whiteList_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public Builder addWhiteList(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureWhiteListIsMutable();
-        whiteList_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public Builder addAllWhiteList(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureWhiteListIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, whiteList_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public Builder clearWhiteList() {
-        whiteList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00001000);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string whiteList = 13;</code>
-       */
-      public Builder addWhiteListBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureWhiteListIsMutable();
-        whiteList_.add(value);
+  bitField0_ |= 0x00000800;
+        errorMessage_ = value;
         onChanged();
         return this;
       }
@@ -18399,7 +18190,7 @@ public final class NetData {
        * <code>optional string version = 15;</code>
        */
       public boolean hasVersion() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string version = 15;</code>
@@ -18442,7 +18233,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00002000;
+  bitField0_ |= 0x00001000;
         version_ = value;
         onChanged();
         return this;
@@ -18451,7 +18242,7 @@ public final class NetData {
        * <code>optional string version = 15;</code>
        */
       public Builder clearVersion() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         version_ = getDefaultInstance().getVersion();
         onChanged();
         return this;
@@ -18464,7 +18255,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00002000;
+  bitField0_ |= 0x00001000;
         version_ = value;
         onChanged();
         return this;
@@ -18475,7 +18266,7 @@ public final class NetData {
        * <code>optional string gameName = 16;</code>
        */
       public boolean hasGameName() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional string gameName = 16;</code>
@@ -18518,7 +18309,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00002000;
         gameName_ = value;
         onChanged();
         return this;
@@ -18527,7 +18318,7 @@ public final class NetData {
        * <code>optional string gameName = 16;</code>
        */
       public Builder clearGameName() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         gameName_ = getDefaultInstance().getGameName();
         onChanged();
         return this;
@@ -18540,7 +18331,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00004000;
+  bitField0_ |= 0x00002000;
         gameName_ = value;
         onChanged();
         return this;
@@ -18551,7 +18342,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public boolean hasTime() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       /**
        * <code>optional int64 time = 17;</code>
@@ -18563,7 +18354,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public Builder setTime(long value) {
-        bitField0_ |= 0x00008000;
+        bitField0_ |= 0x00004000;
         time_ = value;
         onChanged();
         return this;
@@ -18572,7 +18363,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public Builder clearTime() {
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00004000);
         time_ = 0L;
         onChanged();
         return this;
@@ -18583,7 +18374,7 @@ public final class NetData {
        * <code>optional float reflectionHeight = 18;</code>
        */
       public boolean hasReflectionHeight() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       /**
        * <code>optional float reflectionHeight = 18;</code>
@@ -18595,7 +18386,7 @@ public final class NetData {
        * <code>optional float reflectionHeight = 18;</code>
        */
       public Builder setReflectionHeight(float value) {
-        bitField0_ |= 0x00010000;
+        bitField0_ |= 0x00008000;
         reflectionHeight_ = value;
         onChanged();
         return this;
@@ -18604,7 +18395,7 @@ public final class NetData {
        * <code>optional float reflectionHeight = 18;</code>
        */
       public Builder clearReflectionHeight() {
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00008000);
         reflectionHeight_ = 0F;
         onChanged();
         return this;
@@ -18615,7 +18406,7 @@ public final class NetData {
        * <code>optional string MOTD = 19;</code>
        */
       public boolean hasMOTD() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       /**
        * <code>optional string MOTD = 19;</code>
@@ -18658,7 +18449,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00020000;
+  bitField0_ |= 0x00010000;
         mOTD_ = value;
         onChanged();
         return this;
@@ -18667,7 +18458,7 @@ public final class NetData {
        * <code>optional string MOTD = 19;</code>
        */
       public Builder clearMOTD() {
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00010000);
         mOTD_ = getDefaultInstance().getMOTD();
         onChanged();
         return this;
@@ -18680,7 +18471,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00020000;
+  bitField0_ |= 0x00010000;
         mOTD_ = value;
         onChanged();
         return this;
@@ -18691,7 +18482,7 @@ public final class NetData {
        * <code>optional int32 onlinePlayersAmount = 20;</code>
        */
       public boolean hasOnlinePlayersAmount() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       /**
        * <code>optional int32 onlinePlayersAmount = 20;</code>
@@ -18703,7 +18494,7 @@ public final class NetData {
        * <code>optional int32 onlinePlayersAmount = 20;</code>
        */
       public Builder setOnlinePlayersAmount(int value) {
-        bitField0_ |= 0x00040000;
+        bitField0_ |= 0x00020000;
         onlinePlayersAmount_ = value;
         onChanged();
         return this;
@@ -18712,7 +18503,7 @@ public final class NetData {
        * <code>optional int32 onlinePlayersAmount = 20;</code>
        */
       public Builder clearOnlinePlayersAmount() {
-        bitField0_ = (bitField0_ & ~0x00040000);
+        bitField0_ = (bitField0_ & ~0x00020000);
         onlinePlayersAmount_ = 0;
         onChanged();
         return this;
@@ -25830,7 +25621,7 @@ public final class NetData {
       "\022\031\n\021viewDistanceLevel\030\003 \001(\021\022\025\n\005color\030\004 \001" +
       "(\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Color\022\014\n\004rgba\030\001" +
       " \001(\r\"2\n\023JoinCompleteMessage\022\020\n\010clientId\030" +
-      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\327\003\n\021ServerInfoMessage\022\033",
+      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\307\003\n\021ServerInfoMessage\022\033",
       "\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007blockId\030\002" +
       " \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tcomponent" +
       "\030\004 \003(\0132\022.SerializationInfo\022!\n\005event\030\005 \003(" +
@@ -25838,31 +25629,31 @@ public final class NetData {
       "\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023registerBlockFam" +
       "ily\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(\0132\n.WorldInfo" +
       "\022\030\n\014biomeShortId\030\n \003(\021B\002\020\001\022\017\n\007biomeId\030\013 " +
-      "\003(\t\022\021\n\tblackList\030\014 \003(\t\022\021\n\twhiteList\030\r \003(" +
-      "\t\022\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001(\t\022\014\n\004" +
-      "time\030\021 \001(\003\022\030\n\020reflectionHeight\030\022 \001(\002\022\014\n\004",
-      "MOTD\030\023 \001(\t\022\033\n\023onlinePlayersAmount\030\024 \001(\005*" +
-      "\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005title\030\001 \001(\t\022\014" +
-      "\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Serialization" +
-      "Info\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfieldN" +
-      "ame\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"@" +
-      "\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t\022\025\n\rmodule" +
-      "Version\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n\rModuleReques" +
-      "t\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"W\n\020Module" +
-      "DataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022" +
-      "\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(\t*\t\010\210\'\020\200\200\200\200\002\"",
-      "\'\n\nModuleData\022\016\n\006module\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002" +
-      "\"-\n\017ModuleSendError\022\017\n\007message\030\001 \001(\t*\t\010\210" +
-      "\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006entity" +
-      "\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 \001(\0132" +
-      "\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEntit" +
-      "yMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022" +
-      "\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntit" +
-      "yMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014Ev" +
-      "entMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005event\030\002 " +
-      "\001(\0132\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132\r.Ve",
-      "ctor3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasology." +
-      "protobufB\007NetDataH\001"
+      "\003(\t\022\024\n\014errorMessage\030\014 \001(\t\022\017\n\007version\030\017 \001" +
+      "(\t\022\020\n\010gameName\030\020 \001(\t\022\014\n\004time\030\021 \001(\003\022\030\n\020re" +
+      "flectionHeight\030\022 \001(\002\022\014\n\004MOTD\030\023 \001(\t\022\033\n\023on",
+      "linePlayersAmount\030\024 \001(\005*\t\010\210\'\020\200\200\200\200\002\"3\n\tWo" +
+      "rldInfo\022\r\n\005title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210" +
+      "\'\020\200\200\200\200\002\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001" +
+      "(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fie" +
+      "ldIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010" +
+      "moduleId\030\001 \001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010" +
+      "\210\'\020\200\200\200\200\002\",\n\rModuleRequest\022\020\n\010moduleId\030\001 " +
+      "\001(\t*\t\010\210\'\020\200\200\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id" +
+      "\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n" +
+      "\005error\030\017 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n",
+      "\006module\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendEr" +
+      "ror\022\017\n\007message\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023Creat" +
+      "eEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedE" +
+      "ntity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t" +
+      "\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEntityMessage\022\035\n\006enti" +
+      "ty\030\001 \001(\0132\r.PackedEntity\022\r\n\005netId\030\002 \001(\005*\t" +
+      "\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netI" +
+      "d\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010ta" +
+      "rgetId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016t" +
+      "argetBlockPos\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020",
+      "\200\200\200\200\002B$\n\027org.terasology.protobufB\007NetDat" +
+      "aH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -25978,7 +25769,7 @@ public final class NetData {
     internal_static_ServerInfoMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ServerInfoMessage_descriptor,
-        new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "BlackList", "WhiteList", "Version", "GameName", "Time", "ReflectionHeight", "MOTD", "OnlinePlayersAmount", });
+        new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "ErrorMessage", "Version", "GameName", "Time", "ReflectionHeight", "MOTD", "OnlinePlayersAmount", });
     internal_static_WorldInfo_descriptor =
       getDescriptor().getMessageTypes().get(17);
     internal_static_WorldInfo_fieldAccessorTable = new

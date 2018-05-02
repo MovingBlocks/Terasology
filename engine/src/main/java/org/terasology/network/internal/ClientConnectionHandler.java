@@ -72,24 +72,13 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
-    private void scheduleTimeout(Channel inputChannel, NetData.NetMessage message) {
+    private void scheduleTimeout(Channel inputChannel) {
         channel = inputChannel;
         timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
         timeoutTimer.schedule(new java.util.TimerTask() {
             @Override
             public void run() {
-                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAA");
                 synchronized (joinStatus) {
-                    if (clientOnBlacklist(message)) {
-                        joinStatus.setErrorMessage("Client on blacklist");
-                        channel.close();
-                    }
-
-                    if (!clientOnWhitelist(message)) {
-                        joinStatus.setErrorMessage("Client not on whitelist");
-                        channel.close();
-                    }
-
                     if (System.currentTimeMillis() > timeoutPoint
                             && joinStatus.getStatus() != JoinStatus.Status.COMPLETE
                             && joinStatus.getStatus() != JoinStatus.Status.FAILED) {
@@ -108,10 +97,19 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {
             return;
         }
+        scheduleTimeout(ctx.getChannel());
 
         // Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
-        scheduleTimeout(ctx.getChannel(), message);
+        /*String errorMessage = message.getServerInfo().getErrorMessage();
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            synchronized (joinStatus) {
+                joinStatus.setErrorMessage(errorMessage);
+                ctx.getChannel().close();
+                return;
+            }
+        }*/
+
         synchronized (joinStatus) {
             timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
             if (message.hasServerInfo()) {
@@ -275,41 +273,6 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
         bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
 
         channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
-    }
-
-    private boolean clientOnBlacklist(NetData.NetMessage netMessage) {
-        Config config = CoreRegistry.get(Config.class);
-        if (config != null) {
-            for (ClientIdentity identity : config.getSecurity().getAllIdentities().values()) {
-                String blacklistString = netMessage.getServerInfo().getBlackListList().toString().substring(1,
-                        netMessage.getServerInfo().getBlackListList().toString().length() - 1);
-                Set blacklist = new Gson().fromJson(blacklistString, Set.class);
-                if (blacklist == null){
-                    return false;
-                } else if (blacklist.contains(identity.getPlayerPublicCertificate().toString())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean clientOnWhitelist(NetData.NetMessage netMessage) {
-        Config config = CoreRegistry.get(Config.class);
-        if (config != null) {
-            for (ClientIdentity identity : config.getSecurity().getAllIdentities().values()) {
-                String whitelistString = netMessage.getServerInfo().getWhiteListList().toString().substring(1,
-                        netMessage.getServerInfo().getWhiteListList().toString().length() - 1);
-                Set whitelist = new Gson().fromJson(whitelistString, Set.class);
-                if (whitelist == null) {
-                    return true;
-                }
-                if (whitelist.contains(identity.getPlayerPublicCertificate().toString()) || whitelist.isEmpty()) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public JoinStatus getJoinStatus() {
