@@ -77,7 +77,7 @@ public class SelectGameScreen extends CoreScreenLayer {
         if (saveGamePath != null) {
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                            PathManager.getInstance().getSavesPath().toAbsolutePath().toString());
+                            PathManager.getInstance().getSavesPath().toAbsolutePath().toString()); //save path
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -135,16 +135,15 @@ public class SelectGameScreen extends CoreScreenLayer {
             //this should go to a better place
             if (EventStorage.recordCount == 0) {
                 EventStorage.isRecording = true;
-            } else if (EventStorage.recordCount == 1) {
-                EventStorage.isReplaying = true;
             }
-
             //Get this manifest!
             GameManifest manifest = item.getManifest();
-            if (EventStorage.isRecording) {
-                EventStorage.gameManifest = manifest;
-            } else if (EventStorage.isReplaying) {
-                manifest = EventStorage.gameManifest;
+            if (EventStorage.isReplaying) {
+                manifest = EventStorage.getInstance().getGameManifest();
+                System.out.println("Manifest Loaded!");
+            } else if (EventStorage.isRecording) {
+                EventStorage.getInstance().copyGameManifest(manifest);
+                System.out.println("Manifest saved!");
             }
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());

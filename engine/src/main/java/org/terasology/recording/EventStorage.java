@@ -15,9 +15,11 @@
  */
 package org.terasology.recording;
 
-import org.terasology.engine.modes.GameState;
+
 import org.terasology.game.GameManifest;
-import org.terasology.input.events.InputEvent;
+import org.terasology.naming.NameVersion;
+import org.terasology.world.internal.WorldInfo;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,8 +32,9 @@ public class EventStorage {
     private List<RecordedEvent> events;
     public static boolean isRecording = false;
     public static boolean isReplaying = false;
+    public static boolean beginReplay = false;
     public static int recordCount;
-    public static GameManifest gameManifest;
+    public GameManifest gameManifest;
 
 
     private EventStorage() {
@@ -44,6 +47,22 @@ public class EventStorage {
             instance = new EventStorage();
         }
         return instance;
+    }
+
+    public void copyGameManifest(GameManifest toBeCopied) {
+        gameManifest = new GameManifest(toBeCopied.getTitle(), toBeCopied.getSeed(), toBeCopied.getTime());
+        gameManifest.setBiomeIdMap(toBeCopied.getBiomeIdMap());
+        gameManifest.setBlockIdMap(toBeCopied.getBlockIdMap());
+        gameManifest.setRegisteredBlockFamilies(toBeCopied.getRegisteredBlockFamilies());
+
+        for (WorldInfo info : toBeCopied.getWorlds()) {
+            gameManifest.addWorld(info);
+        }
+
+        for (NameVersion version : toBeCopied.getModules()) {
+            gameManifest.addModule(version.getName(), version.getVersion());
+        }
+
     }
 
     public boolean add(RecordedEvent event) {
@@ -133,6 +152,10 @@ public class EventStorage {
             sb.append("Component: " + re.getPendingEvent().getComponent().toString() + "\n");
         }
 
+    }
+
+    public GameManifest getGameManifest() {
+        return this.gameManifest;
     }
 
 
