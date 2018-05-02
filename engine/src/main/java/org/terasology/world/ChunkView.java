@@ -188,7 +188,7 @@ public interface ChunkView {
 
     /**
      * @param pos
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     * @return The state of liquid at the given position. This will be 0 outside the view.
      */
     byte getRawLiquid(Vector3i pos);
 
@@ -196,7 +196,7 @@ public interface ChunkView {
      * @param x
      * @param y
      * @param z
-     * @return The state of liquid at the given position. This will be no liquid outside the view.
+     * @return The state of liquid at the given position. This will be 0 outside the view.
      */
     byte getRawLiquid(int x, int y, int z);
 
