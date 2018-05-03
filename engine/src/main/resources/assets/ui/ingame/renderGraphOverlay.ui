@@ -1,0 +1,52 @@
+{
+    "type": "renderGraphOverlay",
+    "skin": "renderGraphOverlay",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "ScrollableArea",
+                "id": "area",
+                "verticalScrollbar": true,
+                "horizontalScrollbar": true,
+                "preferredWidth": 600,
+                "preferredHeight": 600,
+                "contents": [
+		            {
+		                "type": "UITreeView",
+		                "id": "renderGraphTreeView"
+		            }
+		        ],
+                "layoutInfo": {
+                    "use-content-width": true,
+                    "use-content-height": true,
+                    "position-top": {},
+                    "position-left": {
+                        "offset": 8
+                    },
+                    "position-right": {
+                        "offset": 8
+                    },
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 8
+                    }
+                }
+            }
+        ]
+    }
+}
