@@ -15,11 +15,13 @@
  */
 package org.terasology.recording;
 
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.input.events.InputEvent;
 
 public class EventCatcher {
 
@@ -42,13 +44,12 @@ public class EventCatcher {
     }
 
     private boolean filterEvents(PendingEvent pe) {
-        /*Event event = pe.getEvent();
-        if ( event instanceof OnActivatedComponent ||
-                event instanceof OnAddedComponent ||
-                event instanceof OnChangedComponent) {
-            return false;
-        }*/
+        Event event = pe.getEvent();
+        if ( event instanceof PlaySoundEvent ||
+                event instanceof InputEvent) {
+            return true;
+        }
 
-        return true;
+        return false;
     }
 }

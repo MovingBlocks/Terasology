@@ -275,6 +275,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {CharacterComponent.class, CharacterMovementComponent.class})
     public void onJump(JumpButton event, EntityRef entity) {
+        System.out.println("Jump!");
+        System.out.println("Jump event: " + event.toString());
+        System.out.println("Jump entity: " + entity.toString());
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
             event.consume();
