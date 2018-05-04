@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.internal.EventReceiver;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import com.esotericsoftware.reflectasm.MethodAccess;
@@ -45,6 +46,7 @@ import org.terasology.entitySystem.event.internal.PendingEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.input.events.InputEvent;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
@@ -86,6 +88,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     private Thread mainThread;
     private BlockingQueue<PendingEvent> pendingEvents = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<RecordedEvent> recordedEvents = Queues.newLinkedBlockingQueue();
 
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
@@ -97,6 +100,8 @@ public class EventSystemReplayImpl implements EventSystem {
     //Event replaying
     private boolean loadedRecordedEvents;
     private int testCount = 0;
+    private long startTime;
+    private RecordedEvent currentRecordedEvent;
 
 
     public EventSystemReplayImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
@@ -112,12 +117,12 @@ public class EventSystemReplayImpl implements EventSystem {
 
     //Replay Additions
 
-    private void fillPendingEvents() {
+    private void fillRecordedEvents() {
         Collection<RecordedEvent> events = EventStorage.getInstance().getEvents();
         for (RecordedEvent event : events) {
-            this.pendingEvents.offer(event.getPendingEvent());
+            this.recordedEvents.offer(event);
         }
-        System.out.println(pendingEvents.size() + "ZZZ");
+        System.out.println(recordedEvents.size() + "ZZZ");
     }
 
     private void originalSend(EntityRef entity, Event event) {
@@ -176,11 +181,47 @@ public class EventSystemReplayImpl implements EventSystem {
 
     @Override
     public void process() {
+        if (EventStorage.beginReplay && !this.loadedRecordedEvents) {
+            fillRecordedEvents();
+            this.loadedRecordedEvents = true;
+            System.out.println("Loaded Recorded Events!");
+            startTime = System.currentTimeMillis();
+        }
+        if (EventStorage.beginReplay) {
+            processRecordedEvents(100);
+            if (this.recordedEvents.isEmpty()) {
+                EventStorage.beginReplay = false;
+            }
+        }
         for (PendingEvent event = pendingEvents.poll(); event != null; event = pendingEvents.poll()) {
             if (event.getComponent() != null) {
                 originalSend(event.getEntity(), event.getEvent(), event.getComponent());
             } else {
                 originalSend(event.getEntity(), event.getEvent());
+            }
+        }
+    }
+
+    private void processRecordedEvents(long maxtime) {
+        long beginTime = System.currentTimeMillis();
+
+        for (RecordedEvent re = recordedEvents.peek(); re != null; re = recordedEvents.peek()) {
+            long passedTime = System.currentTimeMillis() - this.startTime;
+            while (passedTime < re.getTimestamp()) {
+                passedTime = System.currentTimeMillis() - this.startTime;
+                if ((System.currentTimeMillis() - beginTime) >= maxtime) {
+                    return;
+                }
+            }
+            recordedEvents.poll();
+            PendingEvent event = re.getPendingEvent();
+            if (event.getComponent() != null) {
+                originalSend(event.getEntity(), event.getEvent(), event.getComponent());
+            } else {
+                originalSend(event.getEntity(), event.getEvent());
+            }
+            if ((System.currentTimeMillis() - beginTime) >= maxtime) {
+                return;
             }
         }
     }
@@ -337,16 +378,18 @@ public class EventSystemReplayImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (EventStorage.beginReplay && !this.loadedRecordedEvents) {
-            fillPendingEvents();
-            this.loadedRecordedEvents = true;
-            System.out.println("Loaded!");
-        }
-        if (EventStorage.beginReplay) {
-            process();
-        } else {
+        if (!(EventStorage.beginReplay && isSelectedToReplayEvent(event))) {
             originalSend(entity, event);
         }
+    }
+
+    private boolean isSelectedToReplayEvent(Event event) {
+        if ( event instanceof PlaySoundEvent ||
+                event instanceof InputEvent) {
+            return true;
+        }
+
+        return false;
     }
 
     private void sendStandardEvent(EntityRef entity, Event event, List<EventSystemReplayImpl.EventHandlerInfo> selectedHandlers) {
@@ -432,14 +475,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (EventStorage.beginReplay && !this.loadedRecordedEvents) {
-            fillPendingEvents();
-            this.loadedRecordedEvents = true;
-            System.out.println("Loaded!");
-        }
-        if (EventStorage.beginReplay) {
-            process();
-        } else {
+        if (!(EventStorage.beginReplay && isSelectedToReplayEvent(event))) {
             originalSend(entity, event, component);
         }
     }

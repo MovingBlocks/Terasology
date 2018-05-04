@@ -203,20 +203,8 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     private void loadGame(GameInfo item) {
         try {
-            //this should go to a better place
-            if (EventStorage.recordCount == 0) {
-                EventStorage.isRecording = true;
-            }
-            //Get this manifest!
-            GameManifest manifest = item.getManifest();
-            if (EventStorage.isReplaying) {
-                manifest = EventStorage.getInstance().getGameManifest();
-                System.out.println("Manifest Loaded!");
-            } else if (EventStorage.isRecording) {
-                EventStorage.getInstance().copyGameManifest(manifest);
-                System.out.println("Manifest saved!");
-            }
 
+            GameManifest manifest = item.getManifest();
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

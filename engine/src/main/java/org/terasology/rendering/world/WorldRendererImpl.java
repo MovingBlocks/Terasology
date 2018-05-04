@@ -638,9 +638,14 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
 
+            //this should go to a better place
+            if (EventStorage.recordCount == 0) {
+                EventStorage.isRecording = true;
+            }
             System.out.println("HERE!!!");
             if (EventStorage.isReplaying) {
-                //EventStorage.beginReplay = true;
+                EventStorage.beginReplay = true;
+                System.out.println("beginReplay = true");
             }
 
         }

@@ -371,7 +371,6 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
