@@ -78,9 +78,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
-            o1.getMetadata().getDisplayName().toString().compareTo(
-                    o2.getMetadata().getDisplayName().toString());
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) -> o1.getMetadata()
+            .getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
     @In
@@ -114,7 +113,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor().submit(moduleManager.getInstallManager().updateRemoteRegistry());
+        remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
+                .submit(moduleManager.getInstallManager().updateRemoteRegistry());
 
         selectModulesConfig = config.getSelectModulesConfig();
 
@@ -164,11 +164,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 @Override
                 public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                     String text = getString(value);
-                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
+                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                            canvas.getCurrentStyle().getFont().getLineHeight());
                 }
             });
 
-            //ItemActivateEventListener is triggered by double clicking
+            // ItemActivateEventListener is triggered by double clicking
             moduleList.subscribe((widget, item) -> {
                 if (item.isSelected() && moduleList.getSelection().isExplicitSelection()) {
                     deselect(item);
@@ -219,7 +220,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : translationSystem.translate("${engine:menu#module-version-installed-none}");
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString()
+                                : translationSystem.translate("${engine:menu#module-version-installed-none}");
                     }
                 });
             }
@@ -233,8 +235,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return (sel.getOnlineVersion() != null)
-                                ? sel.getOnlineVersion().getVersion().toString() : "none";
+                        return (sel.getOnlineVersion() != null) ? sel.getOnlineVersion().getVersion().toString()
+                                : "none";
                     }
                 });
             }
@@ -249,12 +251,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             String dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                                dependenciesNames = translationSystem
+                                        .translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
                                 for (DependencyInfo dependency : dependencies) {
                                     dependenciesNames += "   " + dependency.getId().toString() + '\n';
                                 }
                             } else {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
+                                dependenciesNames = translationSystem
+                                        .translate("${engine:menu#module-dependencies-empty}") + ".";
                             }
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
@@ -307,7 +311,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public Boolean get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         return info != null && info.isPresent() && !isSelectedGameplayModule(info)
-                                && (info.isSelected() || info.isValidToSelect());
+                               && (info.isSelected() || info.isValidToSelect());
                     }
                 });
                 toggleActivate.bindText(new ReadOnlyBinding<String>() {
@@ -320,7 +324,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                 return translationSystem.translate("${engine:menu#activate-module}");
                             }
                         }
-                        return translationSystem.translate("${engine:menu#activate-module}");  // button should be disabled
+                        return translationSystem.translate("${engine:menu#activate-module}"); // button should be
+                                                                                             // disabled
                     }
                 });
             }
@@ -362,39 +367,40 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
 
-			for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
-				String checkboxName = checkboxAssociation.getCheckboxName();
-				StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
+            for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
+                String checkboxName = checkboxAssociation.getCheckboxName();
+                StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
 
-				UICheckbox checkBox = find(checkboxName, UICheckbox.class);
-				if (null != checkBox) {
-					checkBox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
-					checkBox.subscribe(e -> {
-						selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
-						checkBox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
-						filterModules();
-					});
-				} else {
-					logger.error("Unable to find checkbox named " + checkboxName + " in " + ASSET_URI.toString());
-					selectModulesConfig.unselectStandardModuleExtension(standardModuleExtension);
-				}
-			}
+                UICheckbox checkBox = find(checkboxName, UICheckbox.class);
+                if (null != checkBox) {
+                    checkBox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                    checkBox.subscribe(e -> {
+                        selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
+                        checkBox.setChecked(
+                                selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                        filterModules();
+                    });
+                } else {
+                    logger.error("Unable to find checkbox named " + checkboxName + " in " + ASSET_URI.toString());
+                    selectModulesConfig.unselectStandardModuleExtension(standardModuleExtension);
+                }
+            }
 
-			UICheckbox localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
-			localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
-			localOnlyCheckbox.subscribe(e -> {
-				selectModulesConfig.setIsLocalOnlyChecked(!selectModulesConfig.isLocalOnlyChecked());
-				localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
-				filterModules();
-			});
+            UICheckbox localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
+            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+            localOnlyCheckbox.subscribe(e -> {
+                selectModulesConfig.setIsLocalOnlyChecked(!selectModulesConfig.isLocalOnlyChecked());
+                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+                filterModules();
+            });
         }
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
-     private void filterModules() {
+    private void filterModules() {
         sortedModules.clear();
         sortedModules.addAll(allSortedModules);
-        if(selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
+        if (selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
             advancedModuleFilter();
         }
         if (selectModulesConfig.isLocalOnlyChecked()) {
@@ -417,21 +423,21 @@ public class SelectModulesScreen extends CoreScreenLayer {
         while (iter.hasNext()) {
             ModuleSelectionInfo m = iter.next();
             Module module;
-            if(m.isPresent()) {
+            if (m.isPresent()) {
                 module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());
-            }
-            else {
+            } else {
                 module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
             }
 
-			boolean matches = false;
-			Collection<StandardModuleExtension> selectedStandardModuleExtensions = selectModulesConfig.getSelectedStandardModuleExtensions();
-			for (StandardModuleExtension standardModuleExtension : selectedStandardModuleExtensions) {
-				if (standardModuleExtension.isProvidedBy(module)) {
-					matches = true;
-					break;
-				}
-			}
+            boolean matches = false;
+            Collection<StandardModuleExtension> selectedStandardModuleExtensions = selectModulesConfig
+                    .getSelectedStandardModuleExtensions();
+            for (StandardModuleExtension standardModuleExtension : selectedStandardModuleExtensions) {
+                if (standardModuleExtension.isProvidedBy(module)) {
+                    matches = true;
+                    break;
+                }
+            }
 
             if (!matches) {
                 iter.remove();
@@ -452,7 +458,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
         Set<Module> modulesToDownload;
         try {
-            modulesToDownload = moduleManager.getInstallManager().getAllModulesToDownloadFor(moduleMetadata.getMetadata().getId());
+            modulesToDownload = moduleManager.getInstallManager()
+                    .getAllModulesToDownloadFor(moduleMetadata.getMetadata().getId());
         } catch (DependencyResolutionFailedException ex) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
             messagePopup.setMessage("Error", ex.getMessage());
@@ -471,7 +478,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 updateValidToSelect();
             }
         });
-        ModuleInstaller operation = moduleManager.getInstallManager().createInstaller(modulesToDownload, new DownloadPopupProgressListener(popup));
+        ModuleInstaller operation = moduleManager.getInstallManager().createInstaller(modulesToDownload,
+                new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
     }
 
@@ -480,8 +488,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
         selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
                 .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info ->
-                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
+        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> info
+                .setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
@@ -507,8 +515,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     info = ModuleSelectionInfo.remote(remote);
                     modulesLookup.put(remote.getId(), info);
                     int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
-                    if (pos < 0) {                             // not yet in the (sorted) list
-                        sortedModules.add(-pos - 1, info);     // use "insertion point" to keep the list sorted
+                    if (pos < 0) { // not yet in the (sorted) list
+                        sortedModules.add(-pos - 1, info); // use "insertion point" to keep the list sorted
                         allSortedModules.clear();
                         allSortedModules.addAll(sortedModules);
                     }
@@ -525,11 +533,13 @@ public class SelectModulesScreen extends CoreScreenLayer {
         if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isLocalOnlyChecked()) {
             needsUpdate = false;
             try {
-                remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+                remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used
+                                                  // instead of a runnable because it can throw exceptions
             } catch (CancellationException | InterruptedException | ExecutionException ex) {
                 logger.warn("Failed to retrieve module list from meta server", ex);
                 MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                message.setMessage("Warning", "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
+                message.setMessage("Warning",
+                        "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
                 return;
             }
             updateModuleInformation();
@@ -542,9 +552,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
         // Fetch all the selected/activated modules using allSortedModules
-        // instead of fetching only selected/activated modules from filtered collection of modules using sortedModules
-        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
-                moduleConfig.addModule(info.getMetadata().getId()));
+        // instead of fetching only selected/activated modules from filtered collection
+        // of modules using sortedModules
+        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection())
+                .forEach(info -> moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
         if (info != null && !info.isSelected()) {
@@ -572,21 +583,22 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private List<Name> getExplicitlySelectedModules() {
-        return allSortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection).map(info ->
-                info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
+        return allSortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection)
+                .map(info -> info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void deselect(ModuleSelectionInfo target) {
-        // only deselect if it is already selected and if it is not the currently selected gameplay module
-        if (target.isExplicitSelection()
-                && !isSelectedGameplayModule(target)) {
+        // only deselect if it is already selected and if it is not the currently
+        // selected gameplay module
+        if (target.isExplicitSelection() && !isSelectedGameplayModule(target)) {
             target.setExplicitSelection(false);
             refreshSelection();
         }
     }
 
     private boolean isSelectedGameplayModule(ModuleSelectionInfo target) {
-        return target.getMetadata().getId().equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
+        return target.getMetadata().getId()
+                .equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
     }
 
     private void refreshSelection() {
@@ -598,31 +610,31 @@ public class SelectModulesScreen extends CoreScreenLayer {
         updateValidToSelect();
     }
 
-    // TODO: should dynamically generate checkbox list from boolean StandardModuleExtensions rather than hardcoding associations here
-    static private enum CheckboxAssociation {
-		IS_LIBRARY ("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
-		IS_ASSETPLAY ("assetCheckbox", StandardModuleExtension.IS_ASSETPLAY),
-		IS_IS_WORLD ("worldCheckbox", StandardModuleExtension.IS_WORLD),
-		IS_GAMEPLAY ("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
-		IS_AUGMENTATION ("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
-		IS_SPECIAL ("specialCheckbox", StandardModuleExtension.IS_SPECIAL),
-		SERVER_SIDE_ONLY ("serverSideOnlyCheckbox", StandardModuleExtension.SERVER_SIDE_ONLY)
-		;
+    // TODO: should dynamically generate checkbox list from boolean
+    // StandardModuleExtensions rather than hardcoding associations here
+    private static enum CheckboxAssociation {
+        IS_LIBRARY("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
+        IS_ASSETPLAY("assetCheckbox", StandardModuleExtension.IS_ASSETPLAY),
+        IS_IS_WORLD("worldCheckbox", StandardModuleExtension.IS_WORLD),
+        IS_GAMEPLAY("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
+        IS_AUGMENTATION("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
+        IS_SPECIAL("specialCheckbox", StandardModuleExtension.IS_SPECIAL),
+        SERVER_SIDE_ONLY("serverSideOnlyCheckbox", StandardModuleExtension.SERVER_SIDE_ONLY);
 
-		private String checkboxName;
-		private StandardModuleExtension standardModuleExtension;
+        private String checkboxName;
+        private StandardModuleExtension standardModuleExtension;
 
-		private CheckboxAssociation(String checkboxName, StandardModuleExtension standardModuleExtension) {
-			this.checkboxName = checkboxName;
-			this.standardModuleExtension = standardModuleExtension;
-		}
+        private CheckboxAssociation(String checkboxName, StandardModuleExtension standardModuleExtension) {
+            this.checkboxName = checkboxName;
+            this.standardModuleExtension = standardModuleExtension;
+        }
 
-		public String getCheckboxName() {
-			return checkboxName;
-		}
+        public String getCheckboxName() {
+            return checkboxName;
+        }
 
-		public StandardModuleExtension getStandardModuleExtension() {
-			return standardModuleExtension;
-		}
+        public StandardModuleExtension getStandardModuleExtension() {
+            return standardModuleExtension;
+        }
     }
 }

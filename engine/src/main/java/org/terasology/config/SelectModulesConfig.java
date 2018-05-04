@@ -22,39 +22,39 @@ import java.util.Set;
 import org.terasology.engine.module.StandardModuleExtension;
 
 public class SelectModulesConfig {
-	private boolean localOnly;
+    private boolean localOnly;
 
-	public boolean isLocalOnlyChecked() {
-		return localOnly;
-	}
+    public boolean isLocalOnlyChecked() {
+        return localOnly;
+    }
 
-	public void setIsLocalOnlyChecked(Boolean flag) {
-		this.localOnly = flag;
-	}
+    public void setIsLocalOnlyChecked(Boolean flag) {
+        this.localOnly = flag;
+    }
 
-	private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
+    private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
 
-	public boolean isAnyStandardModuleExtensionSelected() {
-		return !selectedStandardModuleExtensionEnumSet.isEmpty();
-	}
+    public boolean isAnyStandardModuleExtensionSelected() {
+        return !selectedStandardModuleExtensionEnumSet.isEmpty();
+    }
 
-	public Collection<StandardModuleExtension> getSelectedStandardModuleExtensions() {
-		return Collections.unmodifiableSet(selectedStandardModuleExtensionEnumSet);
-	}
+    public Collection<StandardModuleExtension> getSelectedStandardModuleExtensions() {
+        return Collections.unmodifiableSet(selectedStandardModuleExtensionEnumSet);
+    }
 
-	public boolean isStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
-		return selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension);
-	}
+    public boolean isStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
+        return selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension);
+    }
 
-	public void toggleStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
-		if (selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension)) {
-			selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
-		} else {
-			selectedStandardModuleExtensionEnumSet.add(standardModuleExtension);
-		}
-	}
+    public void toggleStandardModuleExtensionSelected(StandardModuleExtension standardModuleExtension) {
+        if (selectedStandardModuleExtensionEnumSet.contains(standardModuleExtension)) {
+            selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
+        } else {
+            selectedStandardModuleExtensionEnumSet.add(standardModuleExtension);
+        }
+    }
 
-	public void unselectStandardModuleExtension(StandardModuleExtension standardModuleExtension) {
-		selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
-	}
+    public void unselectStandardModuleExtension(StandardModuleExtension standardModuleExtension) {
+        selectedStandardModuleExtensionEnumSet.remove(standardModuleExtension);
+    }
 }

@@ -42,7 +42,6 @@ public enum StandardModuleExtension implements ModuleExtension {
     private final Class<?> valueType;
     private static final Logger logger = LoggerFactory.getLogger(StandardModuleExtension.class);
 
-
     StandardModuleExtension(String key, Class<?> valueType) {
         this.key = key;
         this.valueType = valueType;
@@ -76,17 +75,17 @@ public enum StandardModuleExtension implements ModuleExtension {
         return result != null && result;
     }
 
-	public static Set<StandardModuleExtension> booleanPropertySet() {
-		Set<StandardModuleExtension> booleanPropertySet = EnumSet.noneOf(StandardModuleExtension.class);
-		for (StandardModuleExtension standardModuleExtension : values()) {
-			if (standardModuleExtension.getValueType().equals(Boolean.class)) {
-				booleanPropertySet.add(standardModuleExtension);
-			}
-		}
-		return booleanPropertySet;
-	}
+    public static Set<StandardModuleExtension> booleanPropertySet() {
+        Set<StandardModuleExtension> booleanPropertySet = EnumSet.noneOf(StandardModuleExtension.class);
+        for (StandardModuleExtension standardModuleExtension : values()) {
+            if (standardModuleExtension.getValueType().equals(Boolean.class)) {
+                booleanPropertySet.add(standardModuleExtension);
+            }
+        }
+        return booleanPropertySet;
+    }
 
-	public boolean isProvidedBy(Module module) {
-		return getBooleanExtension(module, this);
-	}
+    public boolean isProvidedBy(Module module) {
+        return getBooleanExtension(module, this);
+    }
 }
