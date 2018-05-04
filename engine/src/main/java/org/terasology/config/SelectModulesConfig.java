@@ -22,7 +22,7 @@ import java.util.Set;
 import org.terasology.engine.module.StandardModuleExtension;
 
 public class SelectModulesConfig {
-	public boolean localOnly;
+	private boolean localOnly;
 
 	public boolean isLocalOnlyChecked() {
 		return localOnly;
