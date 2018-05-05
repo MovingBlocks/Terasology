@@ -18,13 +18,16 @@ package org.terasology.rendering.nui.layers.ingame.metrics;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.input.MouseInput;
 import org.terasology.registry.In;
 import org.terasology.rendering.dag.Node;
 import org.terasology.rendering.dag.RenderGraph;
+import org.terasology.rendering.dag.StateChange;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.layers.ingame.PauseMenu;
-import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.UITreeView;
 import org.terasology.rendering.nui.widgets.treeView.GenericTree;
 import org.terasology.rendering.world.WorldRenderer;
@@ -33,6 +36,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * Displays the content of the WorldRenderer renderGraph.
  */
 public class RenderGraphOverlay extends CoreScreenLayer {
+    private static final Logger logger = LoggerFactory.getLogger(RenderGraphOverlay.class);
 
     @In
     private WorldRenderer worldRenderer;
@@ -43,6 +47,47 @@ public class RenderGraphOverlay extends CoreScreenLayer {
     public void initialise() {
         WidgetUtil.trySubscribe(this, "close", widget -> getManager().closeScreen(RenderGraphOverlay.this));
         renderGraphTreeView = find("renderGraphTreeView", UITreeView.class);
+        renderGraphTreeView.subscribeNodeClick((event, treeNode) -> {
+            if (event.getMouseButton() == MouseInput.MOUSE_LEFT) {
+                RenderNodeInfo renderNodeInfo = (RenderNodeInfo)treeNode.getValue();
+                Node renderNode = renderNodeInfo.getNode();
+                String uriString = renderNode.getUri().toString();
+                logger.info(uriString);
+            }
+        });
+        
+        renderGraphTreeView.setItemRenderer(new StringTextRenderer<RenderNodeInfo>() {
+            @Override
+            public String getString(RenderNodeInfo renderNodeInfo) {
+                Node renderNode = renderNodeInfo.getNode();
+                if (null == renderNode) {
+                    return "ROOT";
+                }
+                String uriString = renderNode.getUri().toString();
+                if (!renderNode.isEnabled()) {
+                    return uriString + " -- DISABLED";
+                }
+
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(uriString);
+                sb.append('\n');
+                sb.append('\n');
+
+                // printing out individual desired state changes
+                for (StateChange desiredStateChange : renderNode.getDesiredStateChanges()) {
+                    sb.append(desiredStateChange.toString());
+                    sb.append('\n');
+                }
+                sb.append('\n');
+
+                sb.append(renderNode);
+                sb.append(": process()");
+                sb.append('\n');
+                return sb.toString();
+            }
+        });
+
     	RenderGraph renderGraph = worldRenderer.getRenderGraph();
     	RenderNodeInfoTree renderGraphTreeModel = new RenderNodeInfoTree(renderGraph);
 		renderGraphTreeView.setModel(renderGraphTreeModel);
@@ -97,7 +142,7 @@ public class RenderGraphOverlay extends CoreScreenLayer {
 			}
 	    }
     }
-    
+
     @Override
     public void update(float delta) {
     	renderGraphTreeView.update(delta);
