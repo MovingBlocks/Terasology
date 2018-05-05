@@ -71,8 +71,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-/**
- */
 public class SelectModulesScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
@@ -324,8 +322,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                 return translationSystem.translate("${engine:menu#activate-module}");
                             }
                         }
-                        return translationSystem.translate("${engine:menu#activate-module}"); // button should be
-                                                                                             // disabled
+                        // button should be disabled
+                        return translationSystem.translate("${engine:menu#activate-module}");
                     }
                 });
             }
@@ -341,11 +339,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                     @Override
                     public Boolean get() {
-                        try {
-                            return moduleList.getSelection().getOnlineVersion() != null;
-                        } catch (NullPointerException e) {
+                        ModuleSelectionInfo selection = moduleList.getSelection();
+                        if (null == selection) {
                             return false;
                         }
+                        return selection.getOnlineVersion() != null;
                     }
                 });
                 downloadButton.bindText(new ReadOnlyBinding<String>() {
@@ -387,10 +385,26 @@ public class SelectModulesScreen extends CoreScreenLayer {
             }
 
             UICheckbox localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
-            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
             localOnlyCheckbox.subscribe(e -> {
-                selectModulesConfig.setIsLocalOnlyChecked(!selectModulesConfig.isLocalOnlyChecked());
-                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlyChecked());
+                selectModulesConfig.toggleIsLocalOnlySelected();
+                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                filterModules();
+            });
+
+            UICheckbox uncategorizedCheckbox = find("uncategorizedCheckbox", UICheckbox.class);
+            uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+            uncategorizedCheckbox.subscribe(e -> {
+                selectModulesConfig.toggleUncategorizedSelected();
+                boolean isUncategorizedSelected = selectModulesConfig.isUncategorizedSelected();
+                uncategorizedCheckbox.setChecked(isUncategorizedSelected);
+                for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
+                    String checkboxName = checkboxAssociation.getCheckboxName();
+                    UICheckbox checkbox = find(checkboxName, UICheckbox.class);
+                    if (null != checkbox) {
+                        checkbox.setEnabled(!isUncategorizedSelected);
+                    }
+                }
                 filterModules();
             });
         }
@@ -400,13 +414,45 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void filterModules() {
         sortedModules.clear();
         sortedModules.addAll(allSortedModules);
-        if (selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
-            advancedModuleFilter();
+        if (selectModulesConfig.isUncategorizedSelected()) {
+            uncategorizedModuleFilter();
+        } else {
+            if (selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
+                advancedModuleFilter();
+            }
         }
-        if (selectModulesConfig.isLocalOnlyChecked()) {
+
+        if (selectModulesConfig.isLocalOnlySelected()) {
             localModuleFilter();
         }
+
         filterText();
+    }
+
+    private void uncategorizedModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            ModuleSelectionInfo m = iter.next();
+            Module module;
+            if (m.isPresent()) {
+                module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());
+            } else {
+                module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+
+            boolean isUncategorized = true;
+            Set<StandardModuleExtension> booleanStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
+            for (StandardModuleExtension standardModuleExtension : booleanStandardModuleExtensionEnumSet) {
+                if (standardModuleExtension.isProvidedBy(module)) {
+                    isUncategorized = false;
+                    break;
+                }
+            }
+
+            if (!isUncategorized) {
+                iter.remove();
+            }
+        }
     }
 
     private void localModuleFilter() {
@@ -530,11 +576,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
     public void update(float delta) {
         super.update(delta);
 
-        if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isLocalOnlyChecked()) {
+        if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isLocalOnlySelected()) {
             needsUpdate = false;
             try {
-                remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used
-                                                  // instead of a runnable because it can throw exceptions
+                // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+                remoteModuleRegistryUpdater.get();
             } catch (CancellationException | InterruptedException | ExecutionException ex) {
                 logger.warn("Failed to retrieve module list from meta server", ex);
                 MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);

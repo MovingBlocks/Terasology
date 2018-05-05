@@ -22,17 +22,33 @@ import java.util.Set;
 import org.terasology.engine.module.StandardModuleExtension;
 
 public class SelectModulesConfig {
+    private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
     private boolean localOnly;
+    private boolean uncategorized;
 
-    public boolean isLocalOnlyChecked() {
+    public boolean isLocalOnlySelected() {
         return localOnly;
     }
 
-    public void setIsLocalOnlyChecked(Boolean flag) {
+    public void setLocalOnlySelected(Boolean flag) {
         this.localOnly = flag;
     }
 
-    private Set<StandardModuleExtension> selectedStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
+    public void toggleIsLocalOnlySelected() {
+        this.localOnly = !localOnly;
+    }
+
+    public boolean isUncategorizedSelected() {
+        return uncategorized;
+    }
+
+    public void setUncategorizedSelected(boolean flag) {
+        this.uncategorized = flag;
+    }
+
+    public void toggleUncategorizedSelected() {
+        this.uncategorized = !uncategorized;
+    }
 
     public boolean isAnyStandardModuleExtensionSelected() {
         return !selectedStandardModuleExtensionEnumSet.isEmpty();
