@@ -22,13 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
-import org.terasology.config.SelectModulesConfig;
 import org.terasology.config.ModuleConfig;
+import org.terasology.config.SelectModulesConfig;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.DependencyResolutionFailedException;
 import org.terasology.engine.module.ModuleInstaller;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.module.DependencyInfo;
@@ -57,6 +58,7 @@ import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -69,16 +71,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-/**
- */
 public class SelectModulesScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectModsScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectModulesScreen.class);
-    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) ->
-            o1.getMetadata().getDisplayName().toString().compareTo(
-                    o2.getMetadata().getDisplayName().toString());
+    private final Comparator<? super ModuleSelectionInfo> moduleInfoComparator = (o1, o2) -> o1.getMetadata()
+            .getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
     @In
     private ModuleManager moduleManager;
     @In
@@ -89,13 +88,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private WorldGeneratorManager worldGenManager;
     @In
     private TranslationSystem translationSystem;
+
     private Map<Name, ModuleSelectionInfo> modulesLookup;
     private List<ModuleSelectionInfo> sortedModules;
     private List<ModuleSelectionInfo> allSortedModules;
     private DependencyResolver resolver;
     private Future<Void> remoteModuleRegistryUpdater;
-    private UICheckbox localOnlyCheckbox;
     private boolean needsUpdate = true;
+    private ResettableUIText moduleSearch;
 
     @Override
     public void onOpened() {
@@ -111,7 +111,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
-        remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor().submit(moduleManager.getInstallManager().updateRemoteRegistry());
+        remoteModuleRegistryUpdater = Executors.newSingleThreadExecutor()
+                .submit(moduleManager.getInstallManager().updateRemoteRegistry());
 
         selectModulesConfig = config.getSelectModulesConfig();
 
@@ -161,11 +162,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 @Override
                 public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                     String text = getString(value);
-                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
+                    return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text),
+                            canvas.getCurrentStyle().getFont().getLineHeight());
                 }
             });
 
-            //ItemActivateEventListener is triggered by double clicking
+            // ItemActivateEventListener is triggered by double clicking
             moduleList.subscribe((widget, item) -> {
                 if (item.isSelected() && moduleList.getSelection().isExplicitSelection()) {
                     deselect(item);
@@ -174,12 +176,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 }
             });
 
-            ResettableUIText moduleSearch = find("moduleSearch", ResettableUIText.class);
+            moduleSearch = find("moduleSearch", ResettableUIText.class);
             if (moduleSearch != null) {
                 moduleSearch.subscribe(new TextChangeEventListener() {
                     @Override
                     public void onTextChange(String oldText, String newText) {
-                        filterText(newText);
+                        filterModules();
                     }
                 });
             }
@@ -216,7 +218,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return sel.isPresent() ? sel.getMetadata().getVersion().toString() : translationSystem.translate("${engine:menu#module-version-installed-none}");
+                        return sel.isPresent() ? sel.getMetadata().getVersion().toString()
+                                : translationSystem.translate("${engine:menu#module-version-installed-none}");
                     }
                 });
             }
@@ -230,8 +233,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         if (sel == null) {
                             return "";
                         }
-                        return (sel.getOnlineVersion() != null)
-                                ? sel.getOnlineVersion().getVersion().toString() : "none";
+                        return (sel.getOnlineVersion() != null) ? sel.getOnlineVersion().getVersion().toString()
+                                : "none";
                     }
                 });
             }
@@ -246,12 +249,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
                             String dependenciesNames;
                             List<DependencyInfo> dependencies = moduleMetadata.getDependencies();
                             if (dependencies != null && dependencies.size() > 0) {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
+                                dependenciesNames = translationSystem
+                                        .translate("${engine:menu#module-dependencies-exist}") + ":" + '\n';
                                 for (DependencyInfo dependency : dependencies) {
                                     dependenciesNames += "   " + dependency.getId().toString() + '\n';
                                 }
                             } else {
-                                dependenciesNames = translationSystem.translate("${engine:menu#module-dependencies-empty}") + ".";
+                                dependenciesNames = translationSystem
+                                        .translate("${engine:menu#module-dependencies-empty}") + ".";
                             }
                             return moduleMetadata.getDescription().toString() + '\n' + '\n' + dependenciesNames;
                         }
@@ -304,7 +309,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public Boolean get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         return info != null && info.isPresent() && !isSelectedGameplayModule(info)
-                                && (info.isSelected() || info.isValidToSelect());
+                               && (info.isSelected() || info.isValidToSelect());
                     }
                 });
                 toggleActivate.bindText(new ReadOnlyBinding<String>() {
@@ -317,7 +322,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                                 return translationSystem.translate("${engine:menu#activate-module}");
                             }
                         }
-                        return translationSystem.translate("${engine:menu#activate-module}");  // button should be disabled
+                        // button should be disabled
+                        return translationSystem.translate("${engine:menu#activate-module}");
                     }
                 });
             }
@@ -333,11 +339,11 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 downloadButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
                     @Override
                     public Boolean get() {
-                        try {
-                            return moduleList.getSelection().getOnlineVersion() != null;
-                        } catch (NullPointerException e) {
+                        ModuleSelectionInfo selection = moduleList.getSelection();
+                        if (null == selection) {
                             return false;
                         }
+                        return selection.getOnlineVersion() != null;
                     }
                 });
                 downloadButton.bindText(new ReadOnlyBinding<String>() {
@@ -359,46 +365,138 @@ public class SelectModulesScreen extends CoreScreenLayer {
                         .filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(this::deselect));
             }
 
-            localOnlyCheckbox = find("localOnly", UICheckbox.class);
-            localOnlyCheckbox.bindChecked(
-                    new Binding<Boolean>() {
+            for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
+                String checkboxName = checkboxAssociation.getCheckboxName();
+                StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
 
-                        @Override
-                        public Boolean get() {
-                            filterText(moduleSearch.getText());
-                            prepareModuleList(selectModulesConfig.isChecked());
-                            return selectModulesConfig.isChecked();
-                        }
+                UICheckbox checkBox = find(checkboxName, UICheckbox.class);
+                if (null != checkBox) {
+                    checkBox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                    checkBox.subscribe(e -> {
+                        selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
+                        checkBox.setChecked(
+                                selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                        filterModules();
+                    });
+                } else {
+                    logger.error("Unable to find checkbox named " + checkboxName + " in " + ASSET_URI.toString());
+                    selectModulesConfig.unselectStandardModuleExtension(standardModuleExtension);
+                }
+            }
 
-                        @Override
-                        public void set(Boolean value) {
-                            selectModulesConfig.setIsChecked(value);
-                            filterText(moduleSearch.getText());
-                            prepareModuleList(value);
-                        }
+            UICheckbox localOnlyCheckbox = find("localOnlyCheckbox", UICheckbox.class);
+            localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+            localOnlyCheckbox.subscribe(e -> {
+                selectModulesConfig.toggleIsLocalOnlySelected();
+                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                filterModules();
+            });
+
+            UICheckbox uncategorizedCheckbox = find("uncategorizedCheckbox", UICheckbox.class);
+            uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+            uncategorizedCheckbox.subscribe(e -> {
+                selectModulesConfig.toggleUncategorizedSelected();
+                boolean isUncategorizedSelected = selectModulesConfig.isUncategorizedSelected();
+                uncategorizedCheckbox.setChecked(isUncategorizedSelected);
+                for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
+                    String checkboxName = checkboxAssociation.getCheckboxName();
+                    UICheckbox checkbox = find(checkboxName, UICheckbox.class);
+                    if (null != checkbox) {
+                        checkbox.setEnabled(!isUncategorizedSelected);
                     }
-            );
+                }
+                filterModules();
+            });
         }
-
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
 
-    private void prepareModuleList(boolean checked) {
-        if (selectModulesConfig.isChecked()) {
-            Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
-            while (iter.hasNext()) {
-                if (!iter.next().isPresent()) {
-                    iter.remove();
+    private void filterModules() {
+        sortedModules.clear();
+        sortedModules.addAll(allSortedModules);
+        if (selectModulesConfig.isUncategorizedSelected()) {
+            uncategorizedModuleFilter();
+        } else {
+            if (selectModulesConfig.isAnyStandardModuleExtensionSelected()) {
+                advancedModuleFilter();
+            }
+        }
+
+        if (selectModulesConfig.isLocalOnlySelected()) {
+            localModuleFilter();
+        }
+
+        filterText();
+    }
+
+    private void uncategorizedModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            ModuleSelectionInfo m = iter.next();
+            Module module;
+            if (m.isPresent()) {
+                module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());
+            } else {
+                module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+
+            boolean isUncategorized = true;
+            Set<StandardModuleExtension> booleanStandardModuleExtensionEnumSet = StandardModuleExtension.booleanPropertySet();
+            for (StandardModuleExtension standardModuleExtension : booleanStandardModuleExtensionEnumSet) {
+                if (standardModuleExtension.isProvidedBy(module)) {
+                    isUncategorized = false;
+                    break;
                 }
+            }
+
+            if (!isUncategorized) {
+                iter.remove();
             }
         }
     }
 
-    private void filterText(String newText) {
-        sortedModules.clear();
-        for (ModuleSelectionInfo m : allSortedModules) {
-            if (m.getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
-                sortedModules.add(m);
+    private void localModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            if (!iter.next().isPresent()) {
+                iter.remove();
+            }
+        }
+    }
+
+    private void advancedModuleFilter() {
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            ModuleSelectionInfo m = iter.next();
+            Module module;
+            if (m.isPresent()) {
+                module = moduleManager.getRegistry().getLatestModuleVersion(m.getMetadata().getId());
+            } else {
+                module = (m.getOnlineVersion() == null) ? m.getLatestVersion() : m.getOnlineVersion();
+            }
+
+            boolean matches = false;
+            Collection<StandardModuleExtension> selectedStandardModuleExtensions = selectModulesConfig
+                    .getSelectedStandardModuleExtensions();
+            for (StandardModuleExtension standardModuleExtension : selectedStandardModuleExtensions) {
+                if (standardModuleExtension.isProvidedBy(module)) {
+                    matches = true;
+                    break;
+                }
+            }
+
+            if (!matches) {
+                iter.remove();
+            }
+        }
+    }
+
+    private void filterText() {
+        String newText = moduleSearch.getText();
+        Iterator<ModuleSelectionInfo> iter = sortedModules.iterator();
+        while (iter.hasNext()) {
+            if (!iter.next().getMetadata().getDisplayName().toString().toLowerCase().contains(newText.toLowerCase())) {
+                iter.remove();
             }
         }
     }
@@ -406,7 +504,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void startDownloadingNewestModulesRequiredFor(ModuleSelectionInfo moduleMetadata) {
         Set<Module> modulesToDownload;
         try {
-            modulesToDownload = moduleManager.getInstallManager().getAllModulesToDownloadFor(moduleMetadata.getMetadata().getId());
+            modulesToDownload = moduleManager.getInstallManager()
+                    .getAllModulesToDownloadFor(moduleMetadata.getMetadata().getId());
         } catch (DependencyResolutionFailedException ex) {
             MessagePopup messagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
             messagePopup.setMessage("Error", ex.getMessage());
@@ -425,7 +524,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 updateValidToSelect();
             }
         });
-        ModuleInstaller operation = moduleManager.getInstallManager().createInstaller(modulesToDownload, new DownloadPopupProgressListener(popup));
+        ModuleInstaller operation = moduleManager.getInstallManager().createInstaller(modulesToDownload,
+                new DownloadPopupProgressListener(popup));
         popup.startOperation(operation, true);
     }
 
@@ -434,8 +534,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
         selectedModules.addAll(sortedModules.stream().filter(ModuleSelectionInfo::isSelected)
                 .map(info -> info.getMetadata().getId()).collect(Collectors.toList()));
         Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
-        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info ->
-                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
+        sortedModules.stream().filter(info -> !info.isSelected()).forEach(info -> info
+                .setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess()));
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
@@ -461,8 +561,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     info = ModuleSelectionInfo.remote(remote);
                     modulesLookup.put(remote.getId(), info);
                     int pos = Collections.binarySearch(sortedModules, info, moduleInfoComparator);
-                    if (pos < 0) {                             // not yet in the (sorted) list
-                        sortedModules.add(-pos - 1, info);     // use "insertion point" to keep the list sorted
+                    if (pos < 0) { // not yet in the (sorted) list
+                        sortedModules.add(-pos - 1, info); // use "insertion point" to keep the list sorted
                         allSortedModules.clear();
                         allSortedModules.addAll(sortedModules);
                     }
@@ -475,15 +575,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        
-        if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isChecked()) {
+
+        if (needsUpdate && remoteModuleRegistryUpdater.isDone() && !selectModulesConfig.isLocalOnlySelected()) {
             needsUpdate = false;
             try {
-                remoteModuleRegistryUpdater.get(); // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+                // it'a a Callable<Void> so just a null is returned, but it's used instead of a runnable because it can throw exceptions
+                remoteModuleRegistryUpdater.get();
             } catch (CancellationException | InterruptedException | ExecutionException ex) {
                 logger.warn("Failed to retrieve module list from meta server", ex);
                 MessagePopup message = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-                message.setMessage("Warning", "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
+                message.setMessage("Warning",
+                        "Failed to retrieve a module list from the master server. Only locally installed modules are available.");
                 return;
             }
             updateModuleInformation();
@@ -496,9 +598,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
         // Fetch all the selected/activated modules using allSortedModules
-        // instead of fetching only selected/activated modules from filtered collection of modules using sortedModules
-        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection()).forEach(info ->
-                moduleConfig.addModule(info.getMetadata().getId()));
+        // instead of fetching only selected/activated modules from filtered collection
+        // of modules using sortedModules
+        allSortedModules.stream().filter(info -> info.isSelected() && info.isExplicitSelection())
+                .forEach(info -> moduleConfig.addModule(info.getMetadata().getId()));
         SimpleUri defaultGenerator = config.getWorldGeneration().getDefaultGenerator();
         ModuleSelectionInfo info = modulesLookup.get(defaultGenerator.getModuleName());
         if (info != null && !info.isSelected()) {
@@ -526,21 +629,22 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private List<Name> getExplicitlySelectedModules() {
-        return allSortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection).map(info ->
-                info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
+        return allSortedModules.stream().filter(ModuleSelectionInfo::isExplicitSelection)
+                .map(info -> info.getMetadata().getId()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void deselect(ModuleSelectionInfo target) {
-        // only deselect if it is already selected and if it is not the currently selected gameplay module
-        if (target.isExplicitSelection()
-                && !isSelectedGameplayModule(target)) {
+        // only deselect if it is already selected and if it is not the currently
+        // selected gameplay module
+        if (target.isExplicitSelection() && !isSelectedGameplayModule(target)) {
             target.setExplicitSelection(false);
             refreshSelection();
         }
     }
 
     private boolean isSelectedGameplayModule(ModuleSelectionInfo target) {
-        return target.getMetadata().getId().equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
+        return target.getMetadata().getId()
+                .equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
     }
 
     private void refreshSelection() {
@@ -550,5 +654,33 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
         setSelectedVersions(resolver.resolve(selectedModules));
         updateValidToSelect();
+    }
+
+    // TODO: should dynamically generate checkbox list from boolean
+    // StandardModuleExtensions rather than hardcoding associations here
+    private static enum CheckboxAssociation {
+        IS_LIBRARY("libraryCheckbox", StandardModuleExtension.IS_LIBRARY),
+        IS_ASSETPLAY("assetCheckbox", StandardModuleExtension.IS_ASSETPLAY),
+        IS_IS_WORLD("worldCheckbox", StandardModuleExtension.IS_WORLD),
+        IS_GAMEPLAY("gameplayCheckbox", StandardModuleExtension.IS_GAMEPLAY),
+        IS_AUGMENTATION("augmentationCheckbox", StandardModuleExtension.IS_AUGMENTATION),
+        IS_SPECIAL("specialCheckbox", StandardModuleExtension.IS_SPECIAL),
+        SERVER_SIDE_ONLY("serverSideOnlyCheckbox", StandardModuleExtension.SERVER_SIDE_ONLY);
+
+        private String checkboxName;
+        private StandardModuleExtension standardModuleExtension;
+
+        private CheckboxAssociation(String checkboxName, StandardModuleExtension standardModuleExtension) {
+            this.checkboxName = checkboxName;
+            this.standardModuleExtension = standardModuleExtension;
+        }
+
+        public String getCheckboxName() {
+            return checkboxName;
+        }
+
+        public StandardModuleExtension getStandardModuleExtension() {
+            return standardModuleExtension;
+        }
     }
 }
