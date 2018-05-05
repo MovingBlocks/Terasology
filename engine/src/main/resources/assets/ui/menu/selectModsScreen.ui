@@ -114,7 +114,7 @@
                                     },
                                     {
                                         "type": "UILabel",
-                                        "text": "Uncategorized Modules",
+                                        "text": "Uncategorized",
                                         "id": "uncategorized"
                                     },
                                     {
