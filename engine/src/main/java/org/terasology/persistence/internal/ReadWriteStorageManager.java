@@ -172,13 +172,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     @Override
     public void deactivatePlayer(Client client) {
-        if (client.getEntity().exists()) {
-            EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
-            PlayerStoreBuilder playerStoreBuilder = createPlayerStore(client, character);
-            EntityData.PlayerStore playerStore = playerStoreBuilder.build(getEntityManager());
-            deactivateOrDestroyEntityRecursive(character);
-            unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
-        }
+        EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
+        PlayerStoreBuilder playerStoreBuilder = createPlayerStore(client, character);
+        EntityData.PlayerStore playerStore = playerStoreBuilder.build(getEntityManager());
+        deactivateOrDestroyEntityRecursive(character);
+        unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
     }
 
     @Override

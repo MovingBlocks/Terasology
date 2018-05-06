@@ -43,13 +43,11 @@ public abstract class AbstractClient implements Client {
 
     @Override
     public void disconnect() {
-        if (clientEntity.exists()) {
-            EntityRef clientInfoEntity = clientEntity.getComponent(ClientComponent.class).clientInfo;
-            ClientInfoComponent clientInfoComp = clientInfoEntity.getComponent(ClientInfoComponent.class);
-            clientInfoComp.client = EntityRef.NULL;
-            clientInfoEntity.saveComponent(clientInfoComp);
-            clientEntity.destroy();
-        }
+        EntityRef clientInfoEntity = clientEntity.getComponent(ClientComponent.class).clientInfo;
+        ClientInfoComponent clientInfoComp = clientInfoEntity.getComponent(ClientInfoComponent.class);
+        clientInfoComp.client = EntityRef.NULL;
+        clientInfoEntity.saveComponent(clientInfoComp);
+        clientEntity.destroy();
     }
 
     private EntityRef findClientEntityRef(EntityManager entityManager) {

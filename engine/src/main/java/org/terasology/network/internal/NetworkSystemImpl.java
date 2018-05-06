@@ -785,6 +785,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void processRemovedClient(Client client) {
         if (client instanceof NetClient) {
+            ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
+            if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
+                return;
+            }
             NetClient netClient = (NetClient) client;
             netClientList.remove(netClient);
         }
@@ -803,9 +807,9 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             errorMessage = serverConnectListManager.getErrorMessage(client.getId());
             client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage()).build());
             forceDisconnect(client);
-            System.out.println("test");
-            // reset error message so the next connection isn't automatically blocked
+            // reset error message and kicked status so the next connection is set correctly
             errorMessage = null;
+            kicked = false;
             return;
         }
 

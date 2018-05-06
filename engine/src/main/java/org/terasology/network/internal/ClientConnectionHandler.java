@@ -101,14 +101,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
         // Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
-        /*String errorMessage = message.getServerInfo().getErrorMessage();
+        String errorMessage = message.getServerInfo().getErrorMessage();
         if (errorMessage != null && !errorMessage.isEmpty()) {
             synchronized (joinStatus) {
                 joinStatus.setErrorMessage(errorMessage);
                 ctx.getChannel().close();
                 return;
             }
-        }*/
+        }
 
         synchronized (joinStatus) {
             timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
