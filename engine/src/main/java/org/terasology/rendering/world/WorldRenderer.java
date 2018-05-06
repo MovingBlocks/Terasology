@@ -41,10 +41,27 @@ public interface WorldRenderer {
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 0.7f;
 
+    /**
+     * @return the number of seconds since last frame, as a float number.
+     */
     float getSecondsSinceLastFrame();
 
+    /**
+     * Returns a Material instance corresponding to the asset identified by the input parameter.
+     *
+     * @param assetId a String uniquely identifying a Material.
+     * @return a Material instance.
+     */
     Material getMaterial(String assetId);
 
+    /**
+     * Informs the caller whether the renderer is in the first or second rendering stage of the current frame.
+     *
+     * In Stereo mode the first rendering stage corresponds to the rendering of the scene for the LEFT eye.
+     * In Mono mode this method always returns True as there is only one rendering stage.
+     *
+     * @return a boolean: True if it is the first rendering stage of the current frame, False otherwise.
+     */
     boolean isFirstRenderingStageForCurrentFrame();
 
     /**

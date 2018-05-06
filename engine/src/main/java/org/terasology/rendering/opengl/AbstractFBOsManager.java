@@ -25,44 +25,7 @@ import org.terasology.utilities.subscribables.AbstractSubscribable;
 import java.util.Map;
 
 /**
- * The FrameBuffersManager generates and maintains a number of Frame Buffer Objects (FBOs) used throughout the
- * rendering engine.
- * <p>
- * In most instances Frame Buffers can be thought of as 2D arrays of pixels in GPU memory: shaders write to them or
- * read from them. Some buffers are static and never change for the lifetime of the manager. Some buffers are dynamic:
- * they get disposed and regenerated, i.e. in case the display resolution changes. Some buffers hold intermediate
- * steps of the rendering process and the content of one buffer, "sceneFinal", is eventually sent to the display.
- * <br/>
- * At this stage no buffer can be added or deleted: the list of buffers and their characteristics is hardcoded.
- * <br/>
- * The existing set of public methods is primarily intended to allow communication between this manager and other parts
- * of the rendering engine, most notably the PostProcessor and the GraphicState instances and the shaders system.
- * <br/>
- * An important exception is the takeScreenshot() method which prompts the renderer to eventually (not immediately)
- * redirect its output to a file. This is the only public method that is intended to be used from outside the
- * rendering engine.
- * <p>
- * Default FBOs:
- * writeOnlyGBuffer: this is the primary FBO and its attachments are the target of a good number of rendering operations, eventually storing most information needed for the deferred rendering.
- * readOnlyGBuffer: this FBO holds attachments that are used as input textures by a number of rendering stages.
- * Note that these two FBOs may be swapped on a node's request (ping-pong technique). See the DisplayResolutionDependentFboManager class for more details.
- * Notice that these two FBOs hold a number of buffers, for color, depth, normals, etc.
- * sceneSkyBand and sceneSkyBand1:  two buffers used to generate a depth cue: things in the distance fades into the atmosphere's color.
- * sceneReflectiveRefractive:  used to render reflective and refractive surfaces, most obvious case being the water surface
- * sceneReflected:  the water surface displays a reflected version of the scene. This version is stored here.
- * outline:  greyscale depth-based rendering of object outlines
- * ssao:  greyscale screen-space ambient occlusion rendering
- * ssaoBlurred:  greyscale screen-space ambient occlusion rendering - blurred version
- * scenePrePost:  intermediate step, combining a number of renderings made available so far
- * lightShafts:  light shafts rendering
- * sceneHighPass:  a number of buffers to create the bloom effect
- * sceneBloom0, sceneBloom1 and sceneBloom2: A number of buffers used to repeatedly blur and downsample the content of the high pass fbo. The resulting blurred version of the high pass is then used for the bloom effect.
- * sceneBlur0, sceneBlur1:  a pair of buffers holding blurred versions of the rendered scene, also used for the bloom effect, but not only.
- * sceneFinal:  the content of this buffer is eventually shown on the display or sent to a file if taking a screenshot
- */
-
-/**
- * TODO: fix above, add javadocs
+ * Abstract class providing the default implementation for a number of FBO manager's methods.
  */
 public abstract class AbstractFBOsManager extends AbstractSubscribable implements BaseFBOsManager {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractFBOsManager.class);
@@ -70,6 +33,23 @@ public abstract class AbstractFBOsManager extends AbstractSubscribable implement
     protected Map<SimpleUri, FBO> fboLookup = Maps.newHashMap();
     protected Map<SimpleUri, Integer> fboUsageCountMap = Maps.newHashMap();
 
+    /**
+     * Generates and returns an FBO as characterized by the FBOConfig and the dimensions arguments.
+     *
+     * Notice that if the name of the FBO being generated matches the name of an FBO already stored
+     * by the manager, the latter will be overwritten. However, the GPU-side Frame Buffer associated
+     * with the overwritten FBO is not disposed by this method.
+     *
+     * As such, this method should be used only after the relevant checks are made and any
+     * pre-existing FBO with the same name as the new one is appropriately disposed.
+     *
+     * This method produces errors in the log in case the FBO generation process results in
+     * FBO.Status.INCOMPLETE or FBO.Status.UNEXPECTED.
+     *
+     * @param fboConfig an FBOConfig object providing FBO configuration details.
+     * @param dimensions an FBO.Dimensions instance providing the dimensions of the FBO.
+     * @return an FBO instance
+     */
     protected FBO generateWithDimensions(FBOConfig fboConfig, FBO.Dimensions dimensions) {
         fboConfig.setDimensions(dimensions);
         FBO fbo = FBO.create(fboConfig);
@@ -86,19 +66,26 @@ public abstract class AbstractFBOsManager extends AbstractSubscribable implement
         return fbo;
     }
 
-    protected void retain(SimpleUri resourceUrn) {
-        if (fboUsageCountMap.containsKey(resourceUrn)) {
-            int usageCount = fboUsageCountMap.get(resourceUrn) + 1;
-            fboUsageCountMap.put(resourceUrn, usageCount);
+    /**
+     * Increases the usage count for a given FBO.
+     *
+     * When the usage count for a given FBO goes down to zero, it can be safely disposed as it is no longer in use.
+     *
+     * @param fboName a SimpleUri uniquely identifying an FBO stored in the manager.
+     */
+    protected void retain(SimpleUri fboName) {
+        if (fboUsageCountMap.containsKey(fboName)) {
+            int usageCount = fboUsageCountMap.get(fboName) + 1;
+            fboUsageCountMap.put(fboName, usageCount);
         } else {
-            fboUsageCountMap.put(resourceUrn, 1);
+            fboUsageCountMap.put(fboName, 1);
         }
     }
 
     /**
-     * TODO: add javadoc
+     * Decreases the usage count for a given FBO and triggers its disposal if the count goes down to zero.
      *
-     * @param fboName
+     * @param fboName a SimpleUri uniquely identifying an FBO stored in the manager.
      */
     @Override
     public void release(SimpleUri fboName) {
@@ -117,95 +104,12 @@ public abstract class AbstractFBOsManager extends AbstractSubscribable implement
     }
 
     /**
-     * Binds the color texture of the FBO with the given name and returns true.
-     *
-     * If no FBO is associated with the given name, false is returned and an error is logged.
-     *
-     * @param fboName the urn of an FBO
-     * @return True if an FBO associated with the given name exists. False otherwise.
-     */
-    public boolean bindFboColorTexture(SimpleUri fboName) {
-        FBO fbo = fboLookup.get(fboName);
-
-        if (fbo != null) {
-            fbo.bindTexture();
-            return true;
-        }
-
-        logger.error("Failed to bind FBO color texture since the requested " + fboName + " FBO could not be found!");
-        return false;
-    }
-
-    /**
-     * Binds the depth texture of the FBO with the given name and returns true.
-     *
-     * If no FBO is associated with the given name, false is returned and an error is logged.
-     *
-     * @param fboName the urn of an FBO
-     * @return True if an FBO associated with the given name exists. False otherwise.
-     */
-    public boolean bindFboDepthTexture(SimpleUri fboName) {
-        FBO fbo = fboLookup.get(fboName);
-
-        if (fbo != null) {
-            fbo.bindDepthTexture();
-            return true;
-        }
-
-        logger.error("Failed to bind FBO depth texture since the requested " + fboName + " FBO could not be found!");
-        return false;
-    }
-
-    /**
-     * Binds the normals texture of the FBO with the given name and returns true.
-     *
-     * If no FBO is associated with the given name, false is returned and an error is logged.
-     *
-     * @param fboName the urn of an FBO
-     * @return True if an FBO associated with the given name exists. False otherwise.
-     */
-    @Override
-    public boolean bindFboNormalsTexture(SimpleUri fboName) {
-        FBO fbo = fboLookup.get(fboName);
-
-        if (fbo != null) {
-            fbo.bindNormalsTexture();
-            return true;
-        }
-
-        logger.error("Failed to bind FBO normals texture since the requested " + fboName + " FBO could not be found!");
-        return false;
-    }
-
-    /**
-     * Binds the light buffer texture of the FBO with the given name and returns true.
-     *
-     * If no FBO is associated with the given name, false is returned and an error is logged.
-     *
-     * @param fboName the urn of an FBO
-     * @return True if an FBO associated with the given name exists. False otherwise.
-     */
-    @Override
-    public boolean bindFboLightBufferTexture(SimpleUri fboName) {
-        FBO fbo = fboLookup.get(fboName);
-
-        if (fbo != null) {
-            fbo.bindLightBufferTexture();
-            return true;
-        }
-
-        logger.error("Failed to bind FBO light buffer texture since the requested " + fboName + " FBO could not be found!");
-        return false;
-    }
-
-
-    /**
      * Returns an FBO given its name.
      *
      * If no FBO maps to the given name, null is returned and an error is logged.
      *
-     * @param fboName
-     * @return an FBO or null
+     * @param fboName a SimpleUri uniquely identifying an FBO stored by the manager.
+     * @return an FBO or null if no FBO with the given name is found.
      */
     @Override
     public FBO get(SimpleUri fboName) {
