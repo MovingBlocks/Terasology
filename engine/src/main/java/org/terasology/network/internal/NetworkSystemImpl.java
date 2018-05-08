@@ -801,7 +801,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void processNewClient(NetClient client) {
-        client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
         if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
             errorMessage = serverConnectListManager.getErrorMessage(client.getId());
@@ -813,6 +812,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             return;
         }
 
+        client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
         client.send(NetData.NetMessage.newBuilder().setJoinComplete(
                 NetData.JoinCompleteMessage.newBuilder().setClientId(client.getEntity().getComponent(NetworkComponent.class).getNetworkId())).build());
         clientList.add(client);
