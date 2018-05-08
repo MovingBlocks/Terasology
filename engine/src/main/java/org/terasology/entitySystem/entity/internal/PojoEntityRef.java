@@ -19,6 +19,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
+import org.terasology.recording.EventStorage;
 
 /**
  */
@@ -72,6 +73,11 @@ public class PojoEntityRef extends BaseEntityRef {
 
     @Override
     public void invalidate() {
+        /*if (!(EventStorage.isRecording || EventStorage.beginReplay)) {
+            System.out.println("Invalidating! (POJO) " + getId());
+            super.invalidate();
+            exists = false;
+        }*/
         super.invalidate();
         exists = false;
     }

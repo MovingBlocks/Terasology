@@ -84,6 +84,9 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
      */
     @ReceiveEvent
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
+        System.out.println("Sound!");
+        System.out.println("Sound event: " + playSoundEvent.toString());
+        System.out.println("Sound entity: " + entity.toString());
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
             audioManager.playSound(playSoundEvent.getSound(), location.getWorldPosition(), playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);

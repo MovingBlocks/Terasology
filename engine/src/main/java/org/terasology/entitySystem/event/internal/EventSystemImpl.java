@@ -92,6 +92,7 @@ public class EventSystemImpl implements EventSystem {
     //Event recording
     private EventCatcher eventCatcher;
     private long eventCounter;
+    private boolean first;
 
 
     public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
@@ -100,6 +101,7 @@ public class EventSystemImpl implements EventSystem {
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
         this.eventCounter = 0;
+        this.first = true;
 
     }
 
@@ -269,8 +271,16 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
+            /*if (this.first) {
+                System.out.println("FIRST!!!");
+                this.first = false;
+            } else {
+                System.out.println("EVENT BEING SENT!");
+            }*/
+
             //event recording
             if (EventStorage.isRecording) {
+                //System.out.println("CATCHING EVENT!");
                 eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
                 this.eventCounter++;
             }
@@ -374,8 +384,15 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
+            /*if (this.first) {
+                System.out.println("FIRST!!!");
+                this.first = false;
+            } else {
+                System.out.println("EVENT BEING SENT!");
+            }*/
             //event recording
             if (EventStorage.isRecording) {
+                //System.out.println("CATCHING EVENT!");
                 eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
                 this.eventCounter++;
             }

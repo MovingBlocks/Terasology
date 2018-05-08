@@ -21,6 +21,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.subsystem.config.BindsManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -67,6 +68,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.recording.EventStorage;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -252,6 +254,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = CharacterComponent.class)
     public void onMouseMove(MouseAxisEvent event, EntityRef entity) {
+        if (EventStorage.beginReplay) {
+            System.out.println("OnMouseMove called!");
+        }
         MouseAxis axis = event.getMouseAxis();
         if (axis == MouseAxis.X) {
             lookYawDelta = event.getValue();
@@ -278,11 +283,20 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         System.out.println("Jump!");
         System.out.println("Jump event: " + event.toString());
         System.out.println("Jump entity: " + entity.toString());
+        if (EventStorage.beginReplay) {
+            System.out.println("OnJump called!");
+        }
         if (event.getState() == ButtonState.DOWN) {
             jump = true;
+            if (EventStorage.beginReplay) {
+                System.out.println("Down!");
+            }
             event.consume();
         } else {
             jump = false;
+            if (EventStorage.beginReplay) {
+                System.out.println("Up!");
+            }
         }
     }
 

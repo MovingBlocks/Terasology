@@ -115,7 +115,7 @@ public final class EntitySystemSetupUtil {
         // Event System
         if (EventStorage.isReplaying) {
             System.out.println("Replay Event System!");
-            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem);
+            eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
         } else {
             System.out.println("Normal Event System!");
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
