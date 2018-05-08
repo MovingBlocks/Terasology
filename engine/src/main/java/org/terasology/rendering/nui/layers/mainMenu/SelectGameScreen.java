@@ -137,6 +137,15 @@ public class SelectGameScreen extends CoreScreenLayer {
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            //EventStorage.isRecording = true; //added for test
+            /*if (EventStorage.recordCount == 0) {
+                EventStorage.isRecording = true;
+            }
+            System.out.println("HERE!!!");
+            if (EventStorage.isReplaying) {
+                EventStorage.beginReplay = true;
+                System.out.println("beginReplay = true");
+            }*/
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
