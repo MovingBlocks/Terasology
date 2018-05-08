@@ -23,30 +23,31 @@ import org.terasology.engine.paths.PathManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Set;
 
 /**
- *
+ * This class provides the methods needed to determine if a client is allowed to connect or not,
+ * based on the blacklist and whitelist files.
  */
 
 public class ServerConnectListManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerConnectListManager.class);
     private static final Gson gson = new Gson();
-    private static ServerConnectListManager instance;
 
     private Set blacklistedIDs;
     private Set whitelistedIDs;
     private final Path blacklistPath;
     private final Path whitelistPath;
 
-    private ServerConnectListManager(Path blacklistFilePath, Path whitelistFilePath) {
-        blacklistPath = blacklistFilePath;
-        whitelistPath = whitelistFilePath;
+    public ServerConnectListManager() {
+        blacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
+        whitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
         loadLists();
     }
 
-    public void loadLists() {
+    private void loadLists() {
         try {
             if (!Files.exists(blacklistPath)) {
                 Files.createFile(blacklistPath);
@@ -71,15 +72,6 @@ public class ServerConnectListManager {
         return null;
     }
 
-    public static ServerConnectListManager getInstance() {
-        if (instance == null) {
-            Path defaultBlacklistPath = PathManager.getInstance().getHomePath().resolve("blacklist.json");
-            Path defaultWhitelistPath = PathManager.getInstance().getHomePath().resolve("whitelist.json");
-            instance = new ServerConnectListManager(defaultBlacklistPath, defaultWhitelistPath);
-        }
-        return instance;
-    }
-
     public boolean isClientAllowedToConnect(String clientID) {
         return !isClientBlacklisted(clientID) && isClientWhitelisted(clientID);
     }
@@ -92,8 +84,8 @@ public class ServerConnectListManager {
         whitelistedIDs.remove(clientID);
     }
 
-    public Set<String> getWhitelist() {
-        return whitelistedIDs;
+    public Set getWhitelist() {
+        return Collections.unmodifiableSet(whitelistedIDs);
     }
 
     public void addToBlacklist(String clientID) {
@@ -104,8 +96,8 @@ public class ServerConnectListManager {
         blacklistedIDs.remove(clientID);
     }
 
-    public Set<String> getBlacklist() {
-        return blacklistedIDs;
+    public Set getBlacklist() {
+        return Collections.unmodifiableSet(blacklistedIDs);
     }
 
     private boolean isClientBlacklisted(String clientID) {

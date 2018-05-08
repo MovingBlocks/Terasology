@@ -105,8 +105,6 @@ public class StateHeadlessSetup implements GameState {
             gameManifest = createGameManifest();
         }
         gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
-        // TODO: move this to a subsystem
-        //ServerConnectListManager.getInstance().loadLists();
     }
 
     public GameManifest createGameManifest() {

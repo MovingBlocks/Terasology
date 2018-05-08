@@ -785,7 +785,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void processRemovedClient(Client client) {
         if (client instanceof NetClient) {
-            ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
+            ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
             if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
                 return;
             }
@@ -802,7 +802,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     private void processNewClient(NetClient client) {
         client.connected(entityManager, entitySerializer, eventSerializer, eventLibrary);
-        ServerConnectListManager serverConnectListManager = ServerConnectListManager.getInstance();
+        ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
         if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
             errorMessage = serverConnectListManager.getErrorMessage(client.getId());
             client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage()).build());
