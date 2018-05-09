@@ -89,7 +89,7 @@ public class EventSystemReplayImpl implements EventSystem {
     private NetworkSystem networkSystem;
 
     //Event recording
-    private EventCatcher eventCatcher;
+    //private EventCatcher eventCatcher;
 
     //Event replaying
     private boolean loadedRecordedEvents;
@@ -103,7 +103,7 @@ public class EventSystemReplayImpl implements EventSystem {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
-        this.eventCatcher = new EventCatcher();
+        //this.eventCatcher = new EventCatcher();
         this.entityManager = entityManager;
         this.loadedRecordedEvents = false;
 
@@ -412,7 +412,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     private boolean isSelectedToReplayEvent(Event event) {
         if ( event instanceof PlaySoundEvent ||
-                event instanceof InputEvent) {
+                event instanceof JumpButton) {
             return true;
         }
 
