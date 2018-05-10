@@ -15,6 +15,8 @@
  */
 package org.terasology.recording;
 
+import javafx.scene.input.MouseButton;
+import org.lwjgl.input.Mouse;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.input.BindAxisEvent;
@@ -24,8 +26,10 @@ import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.*;
+import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.input.events.*;
 import org.terasology.logic.behavior.nui.BTEditorButton;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
@@ -34,10 +38,10 @@ import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
 public class EventCopier {
 
 
-    public static Event copyEvent (Event e) {
-        if(e instanceof PlaySoundEvent) {
+    public static Event copyEvent(Event e) {
+        if (e instanceof PlaySoundEvent) {
             return e;
-        } else if ( e instanceof BindButtonEvent) {
+        } else if (e instanceof BindButtonEvent) {
             BindButtonEvent originalEvent = (BindButtonEvent) e;
             BindButtonEvent newEvent = createNewBindButtonEvent(originalEvent);
             newEvent.prepare(originalEvent.getId(), originalEvent.getState(), originalEvent.getDelta());
@@ -55,9 +59,28 @@ public class EventCopier {
             newEvent.prepare(originalEvent.getId(), originalEvent.getValue(), originalEvent.getDelta());
             inputEventSetup(newEvent, originalEvent);
             return newEvent;
-        } else if (e instanceof MouseAxisEvent){
+        } else if (e instanceof MouseAxisEvent) {
             MouseAxisEvent originalEvent = (MouseAxisEvent) e;
             MouseAxisEvent newEvent = createNewMouseAxisEvent(originalEvent);
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof CameraTargetChangedEvent) {
+            CameraTargetChangedEvent originalEvent = (CameraTargetChangedEvent) e;
+            return new CameraTargetChangedEvent(originalEvent.getOldTarget(), originalEvent.getNewTarget());
+        } else if (e instanceof CharacterMoveInputEvent) {
+            CharacterMoveInputEvent originalEvent = (CharacterMoveInputEvent) e;
+            return  new CharacterMoveInputEvent(originalEvent.getSequenceNumber(), originalEvent.getPitch(),
+                    originalEvent.getYaw(), originalEvent.getMovementDirection(), originalEvent.isRunning(),
+                    originalEvent.isCrouching(), originalEvent.isJumpRequested(), originalEvent.getDeltaMs());
+        } else if (e instanceof MouseButtonEvent) {
+            MouseButtonEvent originalEvent = (MouseButtonEvent) e;
+            MouseButtonEvent newEvent = new MouseButtonEvent(originalEvent.getButton(), originalEvent.getState(), originalEvent.getDelta());
+            newEvent.setMousePosition(originalEvent.getMousePosition());
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof MouseWheelEvent) {
+            MouseWheelEvent originalEvent = (MouseWheelEvent) e;
+            MouseWheelEvent newEvent = new MouseWheelEvent(originalEvent.getMousePosition(), originalEvent.getWheelTurns(), originalEvent.getDelta());
             inputEventSetup(newEvent, originalEvent);
             return newEvent;
         } else {

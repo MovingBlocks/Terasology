@@ -57,7 +57,7 @@ public class MouseButtonEvent extends ButtonEvent {
         this.button = button;
     }
 
-    protected void setMousePosition(Vector2i mousePosition) {
+    public void setMousePosition(Vector2i mousePosition) {
         this.mousePosition.set(mousePosition);
     }
 
