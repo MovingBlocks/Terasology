@@ -23,9 +23,12 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.events.InputEvent;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.persistence.serializers.EventSerializer;
 
 public class EventCatcher {
@@ -59,7 +62,10 @@ public class EventCatcher {
     private boolean filterEvents(PendingEvent pe) {
         Event event = pe.getEvent();
         if ( event instanceof PlaySoundEvent ||
-                event instanceof BindButtonEvent) {
+                event instanceof BindButtonEvent ||
+                event instanceof KeyEvent ||
+                event instanceof BindAxisEvent /*||
+                event instanceof MouseAxisEvent*/) {
             return true;
         }
 
