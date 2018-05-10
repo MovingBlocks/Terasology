@@ -29,6 +29,7 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
+import org.terasology.recording.EventStorage;
 import org.terasology.registry.CoreRegistry;
 
 /**
@@ -48,6 +49,14 @@ public class LocalPlayer {
     // TODO: instance. If that can be avoided the code in the following method
     // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
+
+        if (EventStorage.isReplaying) {
+            EventStorage.replayClientEntityId = entity.getId();
+        } else if (EventStorage.isRecording) {
+            EventStorage.originalClientEntityId = entity.getId();
+        }
+
+
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {

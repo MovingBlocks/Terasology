@@ -47,6 +47,7 @@ import org.terasology.entitySystem.event.internal.PendingEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.input.BindableButton;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.events.InputEvent;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -133,7 +134,7 @@ public class EventSystemReplayImpl implements EventSystem {
         } else {
             if (EventStorage.beginReplay) {
                 System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
-                printComponents(entity);
+                //printComponents(entity);
                 this.testCount++;
             }
             //event recording
@@ -161,7 +162,7 @@ public class EventSystemReplayImpl implements EventSystem {
         } else {
             if (EventStorage.beginReplay) {
                 System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
-                printComponents(entity);
+                //printComponents(entity);
                 this.testCount++;
             }
             //event recording
@@ -224,7 +225,12 @@ public class EventSystemReplayImpl implements EventSystem {
             }
             recordedEvents.poll();
             PendingEvent event = re.getPendingEvent();
-            EntityRef entity = this.entityManager.getEntity(event.getEntity().getId());
+            EntityRef entity;
+            if (event.getEntity().getId() == EventStorage.originalClientEntityId) {
+                entity = this.entityManager.getEntity(EventStorage.replayClientEntityId); // If it is the gameClient id
+            } else {
+                entity = this.entityManager.getEntity(event.getEntity().getId()); // gets entityref from id
+            }
             if (event.getComponent() != null) {
                 originalSend(entity, event.getEvent(), event.getComponent());
             } else {
@@ -412,7 +418,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     private boolean isSelectedToReplayEvent(Event event) {
         if ( event instanceof PlaySoundEvent ||
-                event instanceof JumpButton) {
+                event instanceof BindableButton) {
             return true;
         }
 

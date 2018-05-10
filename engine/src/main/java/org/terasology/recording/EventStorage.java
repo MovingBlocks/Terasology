@@ -36,6 +36,10 @@ public class EventStorage {
     public static int recordCount;
     public GameManifest gameManifest;
 
+    //temp
+    public static long originalClientEntityId;
+    public static long replayClientEntityId;
+
 
     private EventStorage() {
         events = new ArrayList<>();
