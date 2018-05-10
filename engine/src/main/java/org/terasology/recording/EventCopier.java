@@ -17,12 +17,14 @@ package org.terasology.recording;
 
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.general.*;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.*;
+import org.terasology.input.events.*;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
 import org.terasology.logic.players.IncreaseViewDistanceButton;
@@ -37,17 +39,37 @@ public class EventCopier {
             return e;
         } else if ( e instanceof BindButtonEvent) {
             BindButtonEvent originalEvent = (BindButtonEvent) e;
-            //printJumpEventData(originalEvent);
             BindButtonEvent newEvent = createNewBindButtonEvent(originalEvent);
             newEvent.prepare(originalEvent.getId(), originalEvent.getState(), originalEvent.getDelta());
-            newEvent.setTargetInfo(originalEvent.getTarget(),
-                    originalEvent.getTargetBlockPosition(),
-                    originalEvent.getHitPosition(),
-                    originalEvent.getHitNormal());
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof KeyEvent) {
+            KeyEvent originalEvent = (KeyEvent) e;
+            KeyEvent newEvent = createNewKeyEvent(originalEvent);
+            newEvent.setState(originalEvent.getState());
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof BindAxisEvent) {
+            BindAxisEvent originalEvent = (BindAxisEvent) e;
+            BindAxisEvent newEvent = createNewBindAxisEvent(originalEvent);
+            newEvent.prepare(originalEvent.getId(), originalEvent.getValue(), originalEvent.getDelta());
+            inputEventSetup(newEvent, originalEvent);
+            return newEvent;
+        } else if (e instanceof MouseAxisEvent){
+            MouseAxisEvent originalEvent = (MouseAxisEvent) e;
+            MouseAxisEvent newEvent = createNewMouseAxisEvent(originalEvent);
+            inputEventSetup(newEvent, originalEvent);
             return newEvent;
         } else {
             return null;
         }
+    }
+
+    private static void inputEventSetup(InputEvent newEvent, InputEvent originalEvent) {
+        newEvent.setTargetInfo(originalEvent.getTarget(),
+                originalEvent.getTargetBlockPosition(),
+                originalEvent.getHitPosition(),
+                originalEvent.getHitNormal());
     }
 
     // there must be a better way to do this
@@ -108,14 +130,52 @@ public class EventCopier {
         return newEvent;
     }
 
-    private static void printJumpEventData(JumpButton e) {
-        System.out.println("Jump data:");
-        System.out.println("Delta: " + e.getDelta());
-        System.out.println("HitNormal: " + e.getHitNormal());
-        System.out.println("HitPosition: " + e.getHitPosition());
-        System.out.println("Id: " + e.getId());
-        System.out.println("State: " + e.getState());
-        System.out.println("Target: " + e.getTarget());
-        System.out.println("TargetBlockPosition: " + e.getTargetBlockPosition());
+    private static KeyEvent createNewKeyEvent(KeyEvent originalEvent) {
+        KeyEvent newEvent = null;
+        Class c = originalEvent.getClass();
+
+        if (c.equals(KeyDownEvent.class)) {
+            newEvent = KeyDownEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+        } else if (c.equals(KeyRepeatEvent.class)) {
+            newEvent = KeyRepeatEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+        } else if (c.equals(KeyUpEvent.class)) {
+            newEvent = KeyUpEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
+        } else {
+            //Use logger here
+            System.out.println("ERROR!!! Event not Identified");
+        }
+        return newEvent;
     }
+
+    private static BindAxisEvent createNewBindAxisEvent(BindAxisEvent originalEvent) {
+        BindAxisEvent newEvent = null;
+        Class c = originalEvent.getClass();
+
+        if (c.equals(ForwardsMovementAxis.class)) {
+            newEvent = new ForwardsMovementAxis();
+        } else if (c.equals(ForwardsRealMovementAxis.class)) {
+            newEvent = new ForwardsRealMovementAxis();
+        } else if (c.equals(RotationPitchAxis.class)) {
+            newEvent = new RotationPitchAxis();
+        } else if (c.equals(RotationYawAxis.class)) {
+            newEvent = new RotationYawAxis();
+        } else if (c.equals(StrafeMovementAxis.class)) {
+            newEvent = new StrafeMovementAxis();
+        } else if (c.equals(StrafeRealMovementAxis.class)) {
+            newEvent = new StrafeRealMovementAxis();
+        } else if (c.equals(VerticalMovementAxis.class)) {
+            newEvent = new VerticalMovementAxis();
+        } else if (c.equals(VerticalRealMovementAxis.class)) {
+            newEvent = new VerticalRealMovementAxis();
+        } else {
+            //Use logger here
+            System.out.println("ERROR!!! Event not Identified");
+        }
+        return newEvent;
+    }
+
+    private static MouseAxisEvent createNewMouseAxisEvent(MouseAxisEvent originalEvent) {
+        return MouseAxisEvent.create(originalEvent.getMouseAxis(), originalEvent.getValue(), originalEvent.getDelta());
+    }
+
 }
