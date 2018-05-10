@@ -16,7 +16,6 @@
 package org.terasology.network.internal;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -29,8 +28,6 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.identity.ClientIdentity;
-import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.module.ModuleLoader;
 import org.terasology.naming.Name;
 import org.terasology.naming.Version;

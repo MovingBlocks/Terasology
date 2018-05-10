@@ -42,7 +42,6 @@ import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
-import org.terasology.network.internal.ServerConnectListManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.CanvasRenderer;

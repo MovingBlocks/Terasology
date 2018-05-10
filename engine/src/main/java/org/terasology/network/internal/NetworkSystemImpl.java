@@ -150,7 +150,6 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
     private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
     private StorageManager storageManager;
-    private String errorMessage;
 
     // Client only
     private ServerImpl server;
@@ -803,11 +802,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private void processNewClient(NetClient client) {
         ServerConnectListManager serverConnectListManager = context.get(ServerConnectListManager.class);
         if (!serverConnectListManager.isClientAllowedToConnect(client.getId())) {
-            errorMessage = serverConnectListManager.getErrorMessage(client.getId());
-            client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage()).build());
+            String errorMessage = serverConnectListManager.getErrorMessage(client.getId());
+            client.send(NetData.NetMessage.newBuilder().setServerInfo(getServerInfoMessage(errorMessage)).build());
             forceDisconnect(client);
-            // reset error message and kicked status so the next connection is set correctly
-            errorMessage = null;
+            // reset kicked status so the next connection is set correctly
             kicked = false;
             return;
         }
@@ -847,6 +845,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     NetData.ServerInfoMessage getServerInfoMessage() {
+        return getServerInfoMessage(null);
+    }
+
+    private NetData.ServerInfoMessage getServerInfoMessage(String errorMessage) {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
         if (config.getServerMOTD() != null) {

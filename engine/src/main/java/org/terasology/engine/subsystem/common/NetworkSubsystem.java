@@ -44,7 +44,7 @@ public class NetworkSubsystem implements EngineSubsystem {
 
     @Override
     public void postInitialise(Context rootContext) {
-        rootContext.put(ServerConnectListManager.class, new ServerConnectListManager());
+        rootContext.put(ServerConnectListManager.class, new ServerConnectListManager(rootContext));
     }
 
     @Override

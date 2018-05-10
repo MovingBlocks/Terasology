@@ -74,7 +74,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         networkSystem.mockHost();
         networkSystem.connectToEntitySystem(entityManager, context.get(EventLibrary.class), mock(BlockEntityRegistry.class));
         networkSystem.registerNetworkEntity(clientEntity);
-        context.put(ServerConnectListManager.class, new ServerConnectListManager());
+        context.put(ServerConnectListManager.class, new ServerConnectListManager(context));
     }
 
     private void connectClient() {
