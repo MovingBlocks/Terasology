@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.internal.PendingEvent;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.events.InputEvent;
 import org.terasology.persistence.serializers.EventSerializer;
@@ -42,7 +43,8 @@ public class EventCatcher {
     public boolean addEvent(PendingEvent pe, long position) {
         if (filterEvents(pe)) {
             System.out.println("CATCHED EVENT: " + pe.getEvent().toString());
-            printComponents(pe.getEntity());
+            //printComponents(pe.getEntity());
+            System.out.println("ENTITY ID: " + pe.getEntity().getId());
             long timestamp = System.currentTimeMillis() - this.startTime;
             Event e = EventCopier.copyEvent(pe.getEvent());
             PendingEvent newPendingEvent = new PendingEvent(pe.getEntity(), e);
@@ -57,7 +59,7 @@ public class EventCatcher {
     private boolean filterEvents(PendingEvent pe) {
         Event event = pe.getEvent();
         if ( event instanceof PlaySoundEvent ||
-                event instanceof JumpButton) {
+                event instanceof BindButtonEvent) {
             return true;
         }
 
