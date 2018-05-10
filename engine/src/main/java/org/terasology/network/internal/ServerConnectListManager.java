@@ -55,9 +55,10 @@ public class ServerConnectListManager {
 
     private void loadLists() {
         try {
-            createFiles();
-            blacklistedIDs = gson.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
-            whitelistedIDs = gson.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
+            if (createFiles()) {
+                blacklistedIDs = gson.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
+                whitelistedIDs = gson.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
+            }
         } catch (IOException e) {
             logger.error("Whitelist or blacklist files not found:", e);
         }
@@ -65,20 +66,21 @@ public class ServerConnectListManager {
 
     private void saveLists() {
         try {
-            createFiles();
-            Writer blacklistWriter = Files.newBufferedWriter(blacklistPath);
-            Writer whitelistWriter = Files.newBufferedWriter(whitelistPath);
-            blacklistWriter.write(gson.toJson(blacklistedIDs));
-            whitelistWriter.write(gson.toJson(whitelistedIDs));
+            if (createFiles()) {
+                Writer blacklistWriter = Files.newBufferedWriter(blacklistPath);
+                Writer whitelistWriter = Files.newBufferedWriter(whitelistPath);
+                blacklistWriter.write(gson.toJson(blacklistedIDs));
+                whitelistWriter.write(gson.toJson(whitelistedIDs));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void createFiles() throws IOException {
+    private boolean createFiles() throws IOException {
         DisplayDevice display = context.get(DisplayDevice.class);
-        if (!display.isHeadless()) {
-            return;
+        if (display == null || !display.isHeadless()) {
+            return false;
         }
         if (!Files.exists(blacklistPath)) {
             Files.createFile(blacklistPath);
@@ -86,6 +88,7 @@ public class ServerConnectListManager {
         if (!Files.exists(whitelistPath)) {
             Files.createFile(whitelistPath);
         }
+        return true;
     }
 
     public String getErrorMessage(String clientID) {
