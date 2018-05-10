@@ -89,13 +89,30 @@
                         "type":"RelativeLayout",
                         "family":"AdvanceFilter",
                         "contents": [
+                        {
+                            "type": "RowLayout",
+                            "id": "AdvanceFilterTitle",
+                            "verticalSpacing": 4,
+                            "contents": [
+                                {
+                                    "type": "UILabel",
+                                    "text": "${engine:menu#select-modules-filter-title}"
+                                }
+                                ],
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                }
+                            },
                             {
                                 "type":"ColumnLayout",
                                 "id":"advanceFilterItems",
                                 "columns":2,
                                 "column-widths":[0.1,0.90],
                                 "verticalSpacing": 4,
-                                "horizontalSpacing": -32 ,
+                                "horizontalSpacing": -32,
                                 "contents": [
                                     {
                                         "type": "UICheckbox",
@@ -192,7 +209,28 @@
                                     "use-content-height": true,
                                     "position-horizontal-center": {},
                                     "position-top": {
-                                        "target": "TOP"
+                                        "target": "TOP",
+                                            "offset": 32
+                                        }
+                                }
+                            },
+                            {
+                                "type": "RowLayout",
+                                "id": "resetButton",
+                                "horizontalSpacing": 8,
+                                "contents": [
+                                    {
+                                        "type": "UIButton",
+                                        "id": "resetFilters",
+                                        "text": "${engine:menu#select-modules-filter-reset}"
+                                    }
+                                ],
+                                "layoutInfo": {
+                                    "width": 250,
+                                    "height": 24,
+                                    "position-horizontal-center": {},
+                                    "position-bottom": {
+                                        "target": "BOTTOM"
                                     }
                                 }
                             }

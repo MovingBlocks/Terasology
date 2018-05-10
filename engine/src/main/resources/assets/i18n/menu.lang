@@ -238,6 +238,8 @@
     "select-game-title": "select-game-title",
     "select-modules": "select-modules",
     "select-modules-title": "select-modules-title",
+    "select-modules-filter-reset": "select-modules-filter-reset",
+    "select-modules-filter-title": "select-modules-filter-title",
     "select-multiplayer-game-sub-title": "select-multiplayer-game-sub-title",
     "select-singleplayer-game-sub-title": "select-singleplayer-game-sub-title",
     "select-world-gen": "select-world-gen",
