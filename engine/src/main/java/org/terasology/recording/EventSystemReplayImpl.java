@@ -50,9 +50,8 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindableButton;
 import org.terasology.input.binds.movement.JumpButton;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.*;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
@@ -130,9 +129,6 @@ public class EventSystemReplayImpl implements EventSystem {
             System.out.println("ID: " + id);
         }
     }
-    //private boolean timeIsRight() {
-
-    //}
 
     private void originalSend(EntityRef entity, Event event) {
         if (Thread.currentThread() != mainThread) {
@@ -415,7 +411,7 @@ public class EventSystemReplayImpl implements EventSystem {
         //System.out.println("Original:");
         //printComponents(entity);
         //System.out.println("Send called!");
-        if (!(EventStorage.beginReplay && isSelectedToReplayEvent(event) /*&& timeIsRight()*/)) {
+        if (!(EventStorage.beginReplay && isSelectedToReplayEvent(event))) {
             originalSend(entity, event, component);
         } else {
             process();
@@ -423,11 +419,15 @@ public class EventSystemReplayImpl implements EventSystem {
     }
 
     private boolean isSelectedToReplayEvent(Event event) {
+        //MouseAxisEvent should return false for the replay to work, since it is necessary to move the mouse a little
+        //on the begin of a new replay.
         if ( event instanceof PlaySoundEvent ||
                 event instanceof BindableButton ||
                 event instanceof KeyEvent ||
-                event instanceof BindAxisEvent /*||
-                event instanceof MouseAxisEvent*/) {
+                event instanceof BindAxisEvent ||
+                event instanceof CharacterMoveInputEvent ||
+                event instanceof MouseButtonEvent ||
+                event instanceof MouseWheelEvent) {
             return true;
         }
 

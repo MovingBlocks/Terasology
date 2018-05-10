@@ -15,6 +15,7 @@
  */
 package org.terasology.recording;
 
+import javafx.scene.input.MouseButton;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,9 +27,9 @@ import org.terasology.entitySystem.event.internal.PendingEvent;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.movement.JumpButton;
-import org.terasology.input.events.InputEvent;
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
+import org.terasology.input.events.*;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.persistence.serializers.EventSerializer;
 
 public class EventCatcher {
@@ -61,16 +62,11 @@ public class EventCatcher {
 
     private boolean filterEvents(PendingEvent pe) {
         Event event = pe.getEvent();
-        if ( event instanceof PlaySoundEvent ||
-                event instanceof BindButtonEvent ||
-                event instanceof KeyEvent ||
-                event instanceof BindAxisEvent /*||
-                event instanceof MouseAxisEvent*/) {
-            return true;
-        }
+        return (event instanceof PlaySoundEvent
+                || event instanceof InputEvent
+                || event instanceof CameraTargetChangedEvent
+                || event instanceof CharacterMoveInputEvent);
 
-        return false;
-        //return true;
     }
     private void printComponents(EntityRef e) {
         System.out.println("ENTITY: " + e.getId());
