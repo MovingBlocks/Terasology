@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.context.Context;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.i18n.TranslationSystem;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -59,6 +59,12 @@ public class ServerConnectListManager {
             if (createFiles()) {
                 blacklistedIDs = gson.fromJson(Files.newBufferedReader(blacklistPath), Set.class);
                 whitelistedIDs = gson.fromJson(Files.newBufferedReader(whitelistPath), Set.class);
+                if (blacklistedIDs == null) {
+                    blacklistedIDs = new HashSet<>();
+                }
+                if (whitelistedIDs == null) {
+                    whitelistedIDs = new HashSet<>();
+                }
             }
         } catch (IOException e) {
             logger.error("Whitelist or blacklist files not found:", e);
@@ -72,6 +78,8 @@ public class ServerConnectListManager {
                 Writer whitelistWriter = Files.newBufferedWriter(whitelistPath);
                 blacklistWriter.write(gson.toJson(blacklistedIDs));
                 whitelistWriter.write(gson.toJson(whitelistedIDs));
+                blacklistWriter.close();
+                whitelistWriter.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -136,10 +144,10 @@ public class ServerConnectListManager {
     }
 
     private boolean isClientBlacklisted(String clientID) {
-        return blacklistedIDs != null && blacklistedIDs.contains(clientID);
+        return blacklistedIDs.contains(clientID);
     }
 
     private boolean isClientWhitelisted(String clientID) {
-        return whitelistedIDs == null || whitelistedIDs.contains(clientID);
+        return whitelistedIDs.isEmpty() || whitelistedIDs.contains(clientID);
     }
 }
