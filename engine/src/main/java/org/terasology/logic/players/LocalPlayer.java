@@ -30,6 +30,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.EventStorage;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.registry.CoreRegistry;
 
 /**
@@ -50,9 +51,10 @@ public class LocalPlayer {
     // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
 
-        if (EventStorage.isReplaying) {
+        //Gets the client ids for record and replay
+        if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
             EventStorage.replayClientEntityId = entity.getId();
-        } else if (EventStorage.isRecording) {
+        } else if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.RECORDING) {
             EventStorage.originalClientEntityId = entity.getId();
         }
 

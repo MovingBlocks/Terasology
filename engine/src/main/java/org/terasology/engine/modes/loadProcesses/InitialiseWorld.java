@@ -116,7 +116,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
         Path savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
-        System.out.println("Save path updated!");
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled

@@ -188,7 +188,6 @@ public abstract class BaseEntityRef extends EntityRef {
         if (exists()) {
             return entityManager.iterateComponents(getId());
         }
-        System.out.println("Doesn't Exist!");
         return Collections.emptyList();
     }
 

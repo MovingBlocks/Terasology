@@ -40,6 +40,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.recording.EventStorage;
 import org.terasology.recording.EventSystemReplayImpl;
+import org.terasology.recording.RecordAndReplayStatus;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -110,18 +111,14 @@ public final class EntitySystemSetupUtil {
         EntitySystemLibrary library = context.get(EntitySystemLibrary.class);
         entityManager.setComponentLibrary(library.getComponentLibrary());
 
-
-        EventSystem eventSystem = null;
         // Event System
-        if (EventStorage.isReplaying) {
-            System.out.println("Replay Event System!");
+        EventSystem eventSystem;
+        //If it's replaying, should use the proper EventSystem
+        if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
         } else {
-            System.out.println("Normal Event System!");
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
         }
-        //EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
-        //EventSystem eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem);
         entityManager.setEventSystem(eventSystem);
         context.put(EventSystem.class, eventSystem);
 

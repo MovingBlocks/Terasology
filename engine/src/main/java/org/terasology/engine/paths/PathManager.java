@@ -22,6 +22,7 @@ import com.sun.jna.platform.win32.Shell32Util;
 
 import org.lwjgl.LWJGLUtil;
 import org.terasology.recording.EventStorage;
+import org.terasology.recording.RecordAndReplayStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public final class PathManager {
     public static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
     private static final String SAVED_GAMES_DIR = "saves";
-    private static final String ALTERNATE_SAVED_GAMES_DIR = "saves2";
+    private static final String ALTERNATE_SAVED_GAMES_DIR = "saves2"; //the replays should happen on games saved here
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
@@ -206,7 +207,8 @@ public final class PathManager {
      * @return Path in which world saves are saved.
      */
     public Path getSavesPath() {
-        if (EventStorage.isReplaying) {
+        //This is responsible for making it possible to select games on "saves2" for replay
+        if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
             return homePath.resolve(ALTERNATE_SAVED_GAMES_DIR);
         }
 
