@@ -17,11 +17,13 @@ package org.terasology.rendering.nui.layers.mainMenu.savedGames;
 
 import org.terasology.game.GameManifest;
 
+import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Contains information about saved game.
  */
 public class GameInfo {
 
@@ -29,10 +31,12 @@ public class GameInfo {
 
     private Date timestamp;
     private GameManifest manifest;
+    private BufferedImage previewImage;
 
-    public GameInfo(GameManifest manifest, Date timestamp) {
+    public GameInfo(GameManifest manifest, Date timestamp, BufferedImage preview) {
         this.manifest = manifest;
         this.timestamp = timestamp;
+        this.previewImage = preview;
     }
 
     @Override
@@ -47,5 +51,10 @@ public class GameInfo {
 
     public GameManifest getManifest() {
         return manifest;
+    }
+
+    public BufferedImage getPreviewImage()
+    {
+        return previewImage;
     }
 }

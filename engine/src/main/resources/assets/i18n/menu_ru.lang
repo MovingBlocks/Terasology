@@ -189,6 +189,7 @@
     "return-main-menu": "Выход в главное меню",
     "rotation-dead-zone": "Мертвая зона оси вращения",
     "save-game-path": "Нахождение сохранений:",
+    "save-game-details": "Подробнее",
     "screenshot-format": "Формат экранного снимка",
     "screenshot-size": "Разрешение экранного снимка",
     "screenshot-size-double": "двойное",
@@ -255,5 +256,6 @@
     "widget-selection-prompt": "Выбери виджет:",
     "widget-selection-title": "Выбор виджетов",
     "world-config-preview": "Детали ...",
-    "world-seed": "Уникальный посев мира (Seed)"
+    "world-seed": "Уникальный посев мира (Seed)",
+    "world-generator": "Генератор Мира"
 }

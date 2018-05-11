@@ -235,6 +235,7 @@
     "return-main-menu": "Exit to Main Menu",
     "rotation-dead-zone": "Rotation Axis Dead Zone",
     "save-game-path": "Save Game Path:",
+    "save-game-details": "Details",
     "screenshot-format": "Screenshot format",
     "screenshot-size": "Screenshot size",
     "screenshot-size-double": "Double Size",
@@ -346,5 +347,6 @@
     "widget-selection-prompt": "Select the type of the widget:",
     "widget-selection-title": "Widget Selection",
     "world-config-preview": "Details...",
-    "world-seed": "Seed"
+    "world-seed": "Seed",
+    "world-generator": "World Generator"
 }

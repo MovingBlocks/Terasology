@@ -20,29 +20,41 @@ import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.texture.AWTTextureFormat;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
-import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.FilesUtil;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 public class SelectGameScreen extends CoreScreenLayer {
 
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
+    public static final ResourceUrn PREVIEW_IMAGE_URI = new ResourceUrn("engine:savedGamePreview");
+    public static final ResourceUrn DEFAULT_PREVIEW_IMAGE_URI = new ResourceUrn("engine:defaultPreview");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
@@ -53,6 +65,10 @@ public class SelectGameScreen extends CoreScreenLayer {
     private TranslationSystem translationSystem;
 
     private boolean loadingAsServer;
+
+    private UIImage previewImage;
+    private UILabel worldGenerator;
+    private UILabel moduleNames;
 
 
     @Override
@@ -83,6 +99,17 @@ public class SelectGameScreen extends CoreScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
+
+        gameList.subscribeSelection((widget, item) -> {
+            find("load", UIButton.class).setEnabled(item != null);
+            find("delete", UIButton.class).setEnabled(item != null);
+//            find("details", UIButton.class).setEnabled(item != null);
+            updateDescription(item);
+        });
+
+        worldGenerator = find("worldGenerator", UILabel.class);
+        moduleNames = find("moduleNames", UILabel.class);
+
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
 
@@ -108,6 +135,36 @@ public class SelectGameScreen extends CoreScreenLayer {
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+
+    }
+
+    private void updateDescription(GameInfo item)
+    {
+        if (item == null) {
+            worldGenerator.setText("");
+            moduleNames.setText("");
+            loadPreviewImage(null);
+            return;
+        }
+
+        String mainWorldGenerator = item.getManifest()
+          .getWorldInfo(TerasologyConstants.MAIN_WORLD)
+          .getWorldGenerator()
+          .getObjectName()
+          .toString();
+
+        String commaSeparatedModules = item.getManifest()
+          .getModules()
+          .stream()
+          .map(NameVersion::getName)
+          .map(Name::toString)
+          .sorted(String::compareToIgnoreCase)
+          .collect(Collectors.joining(", "));
+
+        worldGenerator.setText(mainWorldGenerator);
+        moduleNames.setText(commaSeparatedModules);
+
+        loadPreviewImage(item);
     }
 
     private void removeSelectedGame(final UIList<GameInfo> gameList) {
@@ -133,6 +190,11 @@ public class SelectGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
+        if (GameProvider.getSavedGames().isEmpty()) {
+            CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
+            screen.setLoadingAsServer(loadingAsServer);
+            getManager().pushScreen(screen);
+        }
         if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
@@ -163,4 +225,21 @@ public class SelectGameScreen extends CoreScreenLayer {
         gameList.setList(GameProvider.getSavedGames());
     }
 
+    private void loadPreviewImage(GameInfo item) {
+        Texture texture;
+        if (item != null && item.getPreviewImage() != null) {
+            TextureData textureData = null;
+            try {
+                textureData = AWTTextureFormat.convertToTextureData(item.getPreviewImage(), Texture.FilterMode.LINEAR);
+            } catch( IOException e ) {
+                logger.error("Converting preview image to texture data {} failed", e);
+            }
+            texture = Assets.generateAsset(PREVIEW_IMAGE_URI, textureData, Texture.class);
+        } else {
+            texture = Assets.getTexture(DEFAULT_PREVIEW_IMAGE_URI).get();
+        }
+
+        previewImage = find("previewImage", UIImage.class);
+        previewImage.setImage(texture);
+    }
 }

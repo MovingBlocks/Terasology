@@ -25,6 +25,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -44,6 +45,7 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.opengl.ScreenGrabber;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.rendering.world.WorldRenderer.RenderingStage;
 import org.terasology.world.chunks.ChunkProvider;
@@ -117,6 +119,9 @@ public class StateIngame implements GameState {
 
     @Override
     public void dispose(boolean shuttingDown) {
+        ScreenGrabber screenGrabber = context.get(ScreenGrabber.class);
+        screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(gameManifest.getTitle()));
+
         ChunkProvider chunkProvider = context.get(ChunkProvider.class);
         chunkProvider.dispose();
 

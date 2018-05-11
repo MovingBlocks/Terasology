@@ -233,7 +233,13 @@ public class CreateGameScreen extends CoreScreenLayer {
             });
         }
 
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            triggerBackAnimation();
+            // get back to main screen if no saved games
+            if (GameProvider.getSavedGames().isEmpty()) {
+                triggerBackAnimation();
+            }
+        });
 
         WidgetUtil.trySubscribe(this, "play", button -> {
             if (worldGenerator.getSelection() == null) {
