@@ -216,7 +216,7 @@
                             },
                             {
                                 "type": "RowLayout",
-                                "id": "resetButton",
+                                "id": "advancedFilterResetButton",
                                 "horizontalSpacing": 8,
                                 "contents": [
                                     {

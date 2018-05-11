@@ -309,7 +309,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public Boolean get() {
                         ModuleSelectionInfo info = moduleList.getSelection();
                         return info != null && info.isPresent() && !isSelectedGameplayModule(info)
-                               && (info.isSelected() || info.isValidToSelect());
+                                && (info.isSelected() || info.isValidToSelect());
                     }
                 });
                 toggleActivate.bindText(new ReadOnlyBinding<String>() {
@@ -407,6 +407,48 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 }
                 filterModules();
             });
+
+            UIButton resetAdvancedFilters = find("resetFilters", UIButton.class);
+            filterModules();
+            if (resetAdvancedFilters != null) {
+
+                //on clicking 'reset filters' button, uncheck all advanced filters
+                localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+
+                resetAdvancedFilters.subscribe(button -> {
+                    if (selectModulesConfig.isLocalOnlySelected()){
+                        selectModulesConfig.toggleIsLocalOnlySelected();
+                        localOnlyCheckbox.setChecked(selectModulesConfig.isLocalOnlySelected());
+                    }
+
+                    if (selectModulesConfig.isUncategorizedSelected()){
+                        selectModulesConfig.toggleUncategorizedSelected();
+                        uncategorizedCheckbox.setChecked(selectModulesConfig.isUncategorizedSelected());
+                    }
+
+                    filterModules();
+                });
+
+                for (CheckboxAssociation checkboxAssociation : CheckboxAssociation.values()) {
+                    StandardModuleExtension standardModuleExtension = checkboxAssociation.getStandardModuleExtension();
+                    String checkboxName = checkboxAssociation.getCheckboxName();
+                    UICheckbox checkbox = find(checkboxName, UICheckbox.class);
+
+                    if (null != checkbox) {
+                        checkbox.setChecked(selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                        resetAdvancedFilters.subscribe(button -> {
+                            checkbox.setEnabled(!selectModulesConfig.isUncategorizedSelected());
+                            if (selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension)){
+                                selectModulesConfig.toggleStandardModuleExtensionSelected(standardModuleExtension);
+                                checkbox.setChecked(
+                                        selectModulesConfig.isStandardModuleExtensionSelected(standardModuleExtension));
+                            }
+                            filterModules();
+                        });
+                    }
+                }
+            }
         }
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }
@@ -414,6 +456,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void filterModules() {
         sortedModules.clear();
         sortedModules.addAll(allSortedModules);
+
         if (selectModulesConfig.isUncategorizedSelected()) {
             uncategorizedModuleFilter();
         } else {
