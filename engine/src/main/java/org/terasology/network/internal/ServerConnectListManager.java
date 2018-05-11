@@ -144,10 +144,10 @@ public class ServerConnectListManager {
     }
 
     private boolean isClientBlacklisted(String clientID) {
-        return blacklistedIDs.contains(clientID);
+        return blacklistedIDs != null && blacklistedIDs.contains(clientID);
     }
 
     private boolean isClientWhitelisted(String clientID) {
-        return whitelistedIDs.isEmpty() || whitelistedIDs.contains(clientID);
+        return whitelistedIDs == null || whitelistedIDs.isEmpty() || whitelistedIDs.contains(clientID);
     }
 }
