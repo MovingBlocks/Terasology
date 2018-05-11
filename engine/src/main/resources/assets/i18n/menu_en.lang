@@ -71,8 +71,6 @@
     "change-keybind-popup-message": "is already bound to an action. Rebind anyway?",
     "change-keybind-popup-title": "Key already bound",
     "clamp-lighting": "Clamp Lighting",
-    "client-on-blacklist": "Client on blacklist",
-    "client-not-on-whitelist": "Client not on whitelist",
     "cloud-shadows": "Cloud Shadows",
     "connecting-to": "Connecting to",
     "connection-failed": "Connection Failed!",

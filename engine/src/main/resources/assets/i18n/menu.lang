@@ -70,8 +70,6 @@
     "change-keybind-popup-message": "change-keybind-popup-message",
     "change-keybind-popup-title": "change-keybind-popup-title",
     "clamp-lighting": "clamp-lighting",
-    "client-on-blacklist": "client-on-blacklist",
-    "client-not-on-whitelist": "client-not-on-whitelist",
     "cloud-shadows": "cloud-shadows",
     "connecting-to": "connecting-to",
     "connection-failed": "connection-failed",

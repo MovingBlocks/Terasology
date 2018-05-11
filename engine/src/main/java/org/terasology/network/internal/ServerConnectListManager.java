@@ -41,8 +41,8 @@ public class ServerConnectListManager {
     private static final Gson gson = new Gson();
 
     private Context context;
-    private Set blacklistedIDs;
-    private Set whitelistedIDs;
+    private Set<String> blacklistedIDs;
+    private Set<String> whitelistedIDs;
     private final Path blacklistPath;
     private final Path whitelistPath;
 
@@ -53,6 +53,7 @@ public class ServerConnectListManager {
         loadLists();
     }
 
+    @SuppressWarnings("unchecked")
     private void loadLists() {
         try {
             if (createFiles()) {
@@ -92,21 +93,20 @@ public class ServerConnectListManager {
     }
 
     public String getErrorMessage(String clientID) {
-        TranslationSystem translationSystem = context.get(TranslationSystem.class);
         if (isClientBlacklisted(clientID)) {
-            return translationSystem.translate("${engine:menu#client-on-blacklist}");
+            return "client on blacklist";
         }
         if (!isClientWhitelisted(clientID)) {
-            return translationSystem.translate("${engine:menu#client-not-on-whitelist}");
+            return "client not on whitelist";
         }
         return null;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isClientAllowedToConnect(String clientID) {
         return !isClientBlacklisted(clientID) && isClientWhitelisted(clientID);
     }
 
-    @SuppressWarnings("unchecked")
     public void addToWhitelist(String clientID) {
         whitelistedIDs.add(clientID);
         saveLists();
@@ -121,7 +121,6 @@ public class ServerConnectListManager {
         return Collections.unmodifiableSet(whitelistedIDs);
     }
 
-    @SuppressWarnings("unchecked")
     public void addToBlacklist(String clientID) {
         blacklistedIDs.add(clientID);
         saveLists();
