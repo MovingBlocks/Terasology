@@ -15,63 +15,50 @@
  */
 package org.terasology.recording;
 
-import javafx.scene.input.MouseButton;
 import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.internal.PendingEvent;
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.*;
+import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
-import org.terasology.persistence.serializers.EventSerializer;
 
+/**
+ * This class is responsible for catching the events during a Record and send the desired ones to the EventStorage.
+ */
 public class EventCatcher {
 
-    private EventStorage storage;
     private long startTime;
-    //private long position;
 
     public EventCatcher() {
-        storage = EventStorage.getInstance();
-        //position = 0;
         startTime = System.currentTimeMillis(); // I have to check for how long I can record using this
     }
 
+    /**
+     * Receives a PendingEvent and add it as a RecordedEvent in the EventStorage if it is an event type that should be
+     * recorded.
+     * @param pe PendingEvent to be checked and added
+     * @param position Position of when the event was catched. Used only for test purposes
+     * @return If the event was added to the EventStorage
+     */
     public boolean addEvent(PendingEvent pe, long position) {
-        if (filterEvents(pe)) {
-            System.out.println("CATCHED EVENT: " + pe.getEvent().toString());
-            //printComponents(pe.getEntity());
-            System.out.println("ENTITY ID: " + pe.getEntity().getId());
+        if (shouldRecordEvent(pe)) {
             long timestamp = System.currentTimeMillis() - this.startTime;
             Event e = EventCopier.copyEvent(pe.getEvent());
             PendingEvent newPendingEvent = new PendingEvent(pe.getEntity(), e);
             RecordedEvent re = new RecordedEvent(newPendingEvent, timestamp, position);
-            //this.position++;
-            return storage.add(re);
+            return EventStorage.add(re);
         } else {
             return false;
         }
     }
 
-    private boolean filterEvents(PendingEvent pe) {
+
+    private boolean shouldRecordEvent(PendingEvent pe) {
         Event event = pe.getEvent();
         return (event instanceof PlaySoundEvent
                 || event instanceof InputEvent
                 || event instanceof CameraTargetChangedEvent
                 || event instanceof CharacterMoveInputEvent);
 
-    }
-    private void printComponents(EntityRef e) {
-        System.out.println("ENTITY: " + e.getId());
-        for (Component c : e.iterateComponents()) {
-            System.out.println("COMPONENTS: " + c.toString());
-        }
     }
 }

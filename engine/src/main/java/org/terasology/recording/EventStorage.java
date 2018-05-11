@@ -15,26 +15,27 @@
  */
 package org.terasology.recording;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.terasology.game.GameManifest;
-import org.terasology.naming.NameVersion;
-import org.terasology.world.internal.WorldInfo;
-
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//this class is a singleton
-public class EventStorage {
+/**
+ * Responsible for saving the recorded events. Also contains the status of the RecordAndReplay.
+ */
+public final class EventStorage {
 
-    private static EventStorage instance = null;
-    private List<RecordedEvent> events;
-    public static boolean isRecording = false;
-    public static boolean isReplaying = false;
-    public static boolean beginReplay = false;
-    public static int recordCount;
-    public GameManifest gameManifest;
+    private static final Logger logger = LoggerFactory.getLogger(EventStorage.class);
+    private static List<RecordedEvent> events = new ArrayList<>();
+    public static RecordAndReplayStatus recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
+    public static boolean beginReplay; //begins as false. This variable is true when the game is rendered and ready to replay events
+    public static int recordCount; //begins as 0
+
 
     //temp
     public static long originalClientEntityId;
@@ -42,112 +43,40 @@ public class EventStorage {
 
 
     private EventStorage() {
-        events = new ArrayList<>();
-        this.recordCount = 0;
-    }
-
-    public static EventStorage getInstance() {
-        if (instance == null) {
-            instance = new EventStorage();
-        }
-        return instance;
-    }
-
-    public void copyGameManifest(GameManifest toBeCopied) {
-        gameManifest = new GameManifest(toBeCopied.getTitle(), toBeCopied.getSeed(), toBeCopied.getTime());
-        gameManifest.setBiomeIdMap(toBeCopied.getBiomeIdMap());
-        gameManifest.setBlockIdMap(toBeCopied.getBlockIdMap());
-        gameManifest.setRegisteredBlockFamilies(toBeCopied.getRegisteredBlockFamilies());
-
-        for (WorldInfo info : toBeCopied.getWorlds()) {
-            gameManifest.addWorld(info);
-        }
-
-        for (NameVersion version : toBeCopied.getModules()) {
-            gameManifest.addModule(version.getName(), version.getVersion());
-        }
 
     }
 
-    public boolean add(RecordedEvent event) {
+
+    public static boolean add(RecordedEvent event) {
         return events.add(event);
     }
 
-    //Testing purposes
-    public List<RecordedEvent> getEvents() {
+    public static List<RecordedEvent> getEvents() {
         return events;
     }
 
-    /*public void saveEvents() {
-        boolean check1 = false;
-        boolean check2 = false;
-        try {
-            FileOutputStream f = new FileOutputStream(new File("EventObjects" + this.recordCount +".txt"));
-            this.recordCount++;
-            ObjectOutputStream o = new ObjectOutputStream(f);
-            for (RecordedEvent re : this.events) {
-                if (re.getPosition() == 0) {
-                    if(check1) {
-                        check2 = true;
-                    } else {
-                        check1 = true;
-                    }
-                }
-                if(re.getPendingEvent().getEvent() instanceof InputEvent) {
-                    continue;
-                }
-                if (check1 && check2) {
-                    System.out.println(re.getPendingEvent().getEvent().toString());
-                    o.writeObject(re);
-                }
-
-            }
-            o.close();
-            f.close();
-            // test
-            loadEvents();
-            saveEventsString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
-    public void loadEvents() {
-        try {
-            this.events = new ArrayList<>();
-            FileInputStream fi = new FileInputStream(new File("EventObjects.txt"));
-            ObjectInputStream oi = new ObjectInputStream(fi);
-            Object aux;
-            while( (aux = oi.readObject()) != null) {
-                RecordedEvent re = (RecordedEvent) aux;
-                add(re);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void saveEventsString() {
+    //This will probably not exist once serialization is done. Saves recorded events as String
+    public static void saveEventsString() {
         StringBuffer sb = new StringBuffer();
-        for (RecordedEvent re : this.events) {
-            saveEventString(re, sb);
+        for (RecordedEvent re : events) {
+            saveOneEventAsString(re, sb);
         }
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("Recorded_Events"+this.recordCount+".txt")));
-            this.recordCount++;
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("Recorded_Events"+recordCount+".txt")));
+            recordCount++;
             writer.write(sb.toString());
             writer.flush();
             writer.close();
 
         } catch (IOException exception) {
-            exception.printStackTrace(); // change this to logger
+            logger.error(exception.getMessage(), exception);
         }
 
 
     }
 
-    private void saveEventString(RecordedEvent re, StringBuffer sb) {
+    //This will probably not exist once serialization is done
+    private static void saveOneEventAsString(RecordedEvent re, StringBuffer sb) {
         sb.append("==================================================\n");
         sb.append("Position: " + re.getPosition() + " Timestamp:" + re.getTimestamp() + "\n");
         sb.append("Event: " + re.getPendingEvent().getEvent().toString() + "\n");
@@ -158,9 +87,6 @@ public class EventStorage {
 
     }
 
-    public GameManifest getGameManifest() {
-        return this.gameManifest;
-    }
 
 
 }
