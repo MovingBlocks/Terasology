@@ -106,6 +106,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
         }
 
         refreshSelection();
+        filterModules();
     }
 
     @Override
@@ -570,6 +571,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 info.setOnlineVersion(remote);
             }
         }
+        filterModules();
     }
 
     @Override
