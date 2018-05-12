@@ -22,6 +22,7 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.network.internal.ServerConnectListManager;
 
 /**
  *
@@ -39,6 +40,11 @@ public class NetworkSubsystem implements EngineSubsystem {
     public void initialise(GameEngine engine, Context rootContext) {
         networkSystem = new NetworkSystemImpl(rootContext.get(Time.class), rootContext);
         rootContext.put(NetworkSystem.class, networkSystem);
+    }
+
+    @Override
+    public void postInitialise(Context rootContext) {
+        rootContext.put(ServerConnectListManager.class, new ServerConnectListManager(rootContext));
     }
 
     @Override

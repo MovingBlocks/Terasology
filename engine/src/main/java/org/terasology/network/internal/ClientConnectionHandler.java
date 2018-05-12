@@ -66,6 +66,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
     public ClientConnectionHandler(JoinStatusImpl joinStatus, NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
         this.joinStatus = joinStatus;
+        // TODO: implement translation of errorMessage in messageReceived once context is available
+        // See https://github.com/MovingBlocks/Terasology/pull/3332#discussion_r187081375
         this.moduleManager = CoreRegistry.get(ModuleManager.class);
     }
 
@@ -98,6 +100,15 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
         // Handle message
         NetData.NetMessage message = (NetData.NetMessage) e.getMessage();
+        String errorMessage = message.getServerInfo().getErrorMessage();
+        if (errorMessage != null && !errorMessage.isEmpty()) {
+            synchronized (joinStatus) {
+                joinStatus.setErrorMessage(errorMessage);
+                ctx.getChannel().close();
+                return;
+            }
+        }
+
         synchronized (joinStatus) {
             timeoutPoint = System.currentTimeMillis() + timeoutThreshold;
             if (message.hasServerInfo()) {
