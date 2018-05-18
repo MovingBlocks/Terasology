@@ -45,7 +45,12 @@ public class EventCatcher {
             long timestamp = System.currentTimeMillis() - this.startTime;
             Event e = EventCopier.copyEvent(pe.getEvent());
             PendingEvent newPendingEvent = new PendingEvent(pe.getEntity(), e);
-            RecordedEvent re = new RecordedEvent(newPendingEvent, timestamp, position);
+            RecordedEvent re;
+            if (pe.getComponent() == null) {
+                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, position);
+            } else {
+                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, position);
+            }
             return EventStorage.add(re);
         } else {
             return false;

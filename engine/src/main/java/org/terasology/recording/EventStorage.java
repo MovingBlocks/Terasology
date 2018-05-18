@@ -17,6 +17,13 @@ package org.terasology.recording;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.context.Context;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.network.serialization.NetEntityRefTypeHandler;
+import org.terasology.persistence.serializers.EventSerializer;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,6 +47,9 @@ public final class EventStorage {
     //temp
     public static long originalClientEntityId;
     public static long replayClientEntityId;
+    public static EventLibrary eventLibrary;
+    public static EntityManager entityManager;
+
 
 
     private EventStorage() {
@@ -71,6 +81,7 @@ public final class EventStorage {
         } catch (IOException exception) {
             logger.error(exception.getMessage(), exception);
         }
+        attemptToSerialize();
 
 
     }
@@ -79,13 +90,33 @@ public final class EventStorage {
     private static void saveOneEventAsString(RecordedEvent re, StringBuffer sb) {
         sb.append("==================================================\n");
         sb.append("Position: " + re.getPosition() + " Timestamp:" + re.getTimestamp() + "\n");
-        sb.append("Event: " + re.getPendingEvent().getEvent().toString() + "\n");
-        sb.append("Entity: " + re.getPendingEvent().getEntity().toString() + "\n");
-        if (re.getPendingEvent().getComponent() != null) {
-            sb.append("Component: " + re.getPendingEvent().getComponent().toString() + "\n");
+        sb.append("Event: " + re.getEvent().toString() + "\n");
+        sb.append("Entity: " + re.getEntityRefId() + "\n");
+        if (re.getComponent() != null) {
+            sb.append("Component: " + re.getComponent().toString() + "\n");
         }
 
     }
+
+    private static void attemptToSerialize() {
+        RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
+        serializer.serializeRecordedEvents(events);
+        System.out.println("Serialization completed!");
+        List<RecordedEvent> recordedEvents = serializer.deserializeRecordedEvents("events.json");
+        System.out.println("Deserialization completed!");
+        for (RecordedEvent re : recordedEvents) {
+            System.out.println("Position: " + re.getPosition() + " Event: " + re.getEvent());
+        }
+    }
+
+    /*
+    private static void attemptToSerialize() {
+        for (Class c : eventLibrary.getClassLookup().keySet()) {
+            System.out.println("SUPPORTED CLASS: " + c.toString());
+        }
+    }
+     */
+
 
 
 

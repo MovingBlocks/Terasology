@@ -129,6 +129,7 @@ public final class EntitySystemSetupUtil {
 
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);
+        EventStorage.entityManager = entityManager;
     }
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {

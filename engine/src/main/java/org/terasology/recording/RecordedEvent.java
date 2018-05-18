@@ -15,24 +15,34 @@
  */
 package org.terasology.recording;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.event.internal.PendingEvent;
 
 public class RecordedEvent {
 
-    private PendingEvent pendingEvent;
+    private long entityRefId;
+    private Event event;
+    private Component component;
     private double timestamp;
     private long position;
 
-    public RecordedEvent(PendingEvent pe, double timestamp, long position) {
-        this.pendingEvent = pe;
+    public RecordedEvent(long entityRefId, Event event, double timestamp, long position) {
+        this.entityRefId = entityRefId;
+        this.event = event;
+        this.timestamp = timestamp;
+        this.position = position;
+    }
+
+    public RecordedEvent(long entityRefId, Event event, Component component, double timestamp, long position) {
+        this.entityRefId = entityRefId;
+        this.event = event;
+        this.component = component;
         this.timestamp = timestamp;
         this.position = position;
     }
 
 
-    public PendingEvent getPendingEvent() {
-        return pendingEvent;
-    }
 
     public double getTimestamp() {
         return timestamp;
@@ -40,5 +50,17 @@ public class RecordedEvent {
 
     public long getPosition() {
         return position;
+    }
+
+    public long getEntityRefId() {
+        return entityRefId;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public Component getComponent() {
+        return component;
     }
 }

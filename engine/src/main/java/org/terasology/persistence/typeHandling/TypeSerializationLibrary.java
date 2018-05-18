@@ -295,4 +295,8 @@ public class TypeSerializationLibrary {
         }
         return handlerMap;
     }
+
+    public TypeHandler<?> getTypeHandlerFromClass (Class c) {
+        return this.typeHandlers.get(c);
+    }
 }
