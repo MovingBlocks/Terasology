@@ -218,19 +218,19 @@ public class EventSystemReplayImpl implements EventSystem {
                 }
             }
             recordedEvents.poll();
-            PendingEvent event = re.getPendingEvent();
+            //PendingEvent event = re.getPendingEvent();
             EntityRef entity;
             // Maps the entities IDs to get the correct entity, even if the id changed from record to replay;
-            if (event.getEntity().getId() == EventStorage.originalClientEntityId) {
+            if (re.getEntityRefId() == EventStorage.originalClientEntityId) {
                 entity = this.entityManager.getEntity(EventStorage.replayClientEntityId); // If it is the gameClient id
             } else {
-                entity = this.entityManager.getEntity(event.getEntity().getId()); // gets entityref from id
+                entity = this.entityManager.getEntity(re.getEntityRefId()); // gets entityref from id
             }
             // Sends recorded event to be processed
-            if (event.getComponent() != null) {
-                originalSend(entity, event.getEvent(), event.getComponent());
+            if (re.getComponent() != null) {
+                originalSend(entity, re.getEvent(), re.getComponent());
             } else {
-                originalSend(entity, event.getEvent());
+                originalSend(entity, re.getEvent());
             }
             // Check if time is up.
             if ((System.currentTimeMillis() - beginTime) >= maxtime) {

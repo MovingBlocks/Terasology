@@ -101,6 +101,8 @@ public class EventSystemImpl implements EventSystem {
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
         this.eventCounter = 0;
+        //extra
+        EventStorage.eventLibrary = eventLibrary;
 
     }
 
