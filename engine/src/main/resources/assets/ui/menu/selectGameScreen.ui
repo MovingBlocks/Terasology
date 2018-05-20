@@ -93,12 +93,14 @@
                     {
                         "type": "UIButton",
                         "id": "load",
-                        "text": "${engine:menu#load-game}"
+                        "text": "${engine:menu#load-game}",
+                        "enabled": false
                     },
                     {
                         "type": "UIButton",
                         "id": "delete",
-                        "text": "${engine:menu#delete-game}"
+                        "text": "${engine:menu#delete-game}",
+                        "enabled": false
                     }
                 ],
                 "layoutInfo": {

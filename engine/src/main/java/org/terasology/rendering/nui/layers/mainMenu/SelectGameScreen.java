@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.animation.MenuAnimationSystems;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.layers.mainMenu.TwoButtonPopup;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -45,6 +46,8 @@ public class SelectGameScreen extends CoreScreenLayer {
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
+    public static final String LOAD_BUTTON_LABEL = "load";
+    public static final String DELETE_BUTTON_LABEL = "delete";
 
     @In
     private Config config;
@@ -85,6 +88,11 @@ public class SelectGameScreen extends CoreScreenLayer {
         refreshList(gameList);
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
+        gameList.subscribeSelection((widget, selectedGame) -> {
+            boolean isGameSelected = selectedGame != null;
+            find(LOAD_BUTTON_LABEL, UIButton.class).setEnabled(isGameSelected);
+            find(DELETE_BUTTON_LABEL, UIButton.class).setEnabled(isGameSelected);
+        });
 
         CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
         WidgetUtil.trySubscribe(this, "create", button -> {
@@ -92,19 +100,31 @@ public class SelectGameScreen extends CoreScreenLayer {
             triggerForwardAnimation(screen);
         });
 
-        WidgetUtil.trySubscribe(this, "load", button -> {
+        WidgetUtil.trySubscribe(this, LOAD_BUTTON_LABEL, button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
                 loadGame(gameInfo);
             }
         });
 
-        WidgetUtil.trySubscribe(this, "delete", button -> {
+        WidgetUtil.trySubscribe(this, DELETE_BUTTON_LABEL, button -> {
             TwoButtonPopup confirmationPopup = getManager().pushScreen(TwoButtonPopup.ASSET_URI, TwoButtonPopup.class);
             confirmationPopup.setMessage(translationSystem.translate("${engine:menu#remove-confirmation-popup-title}"),
                     translationSystem.translate("${engine:menu#remove-confirmation-popup-message}"));
             confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedGame(gameList));
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
+            GameInfo gameInfo = gameList.getSelection();
+            if (gameInfo != null) {
+                Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
+                try {
+                    FilesUtil.recursiveDelete(world);
+                    gameList.getList().remove(gameInfo);
+                    gameList.setSelection(null);
+                } catch (Exception e) {
+                    logger.error("Failed to delete saved game", e);
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
+                }
+            }
         });
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
