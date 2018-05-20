@@ -409,7 +409,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             });
 
             UIButton resetAdvancedFilters = find("resetFilters", UIButton.class);
-            filterModules();
             if (resetAdvancedFilters != null) {
 
                 //on clicking 'reset filters' button, uncheck all advanced filters
