@@ -106,6 +106,10 @@ public class SelectGameScreen extends CoreScreenLayer {
             confirmationPopup.setLeftButton(translationSystem.translate("${engine:menu#dialog-yes}"), () -> removeSelectedGame(gameList));
             confirmationPopup.setRightButton(translationSystem.translate("${engine:menu#dialog-no}"), () -> { });
         });
+        NewGameScreen newGameScreen = getManager().createScreen(NewGameScreen.ASSET_URI, NewGameScreen.class);
+        WidgetUtil.trySubscribe(this, "test", button ->
+            triggerForwardAnimation(newGameScreen)
+        );
 
         WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
     }

@@ -99,6 +99,11 @@
                         "type": "UIButton",
                         "id": "delete",
                         "text": "${engine:menu#delete-game}"
+                    },
+                    {
+                        "type": "UIButton",
+                        "id": "test",
+                        "text": "Test"
                     }
                 ],
                 "layoutInfo": {
