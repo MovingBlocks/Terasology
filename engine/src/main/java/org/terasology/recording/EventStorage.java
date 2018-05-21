@@ -102,11 +102,12 @@ public final class EventStorage {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         serializer.serializeRecordedEvents(events);
         System.out.println("Serialization completed!");
-        List<RecordedEvent> recordedEvents = serializer.deserializeRecordedEvents("events.json");
+    }
+
+    public static void attemptToDeserialize() {
+        RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
+        events = serializer.deserializeRecordedEvents("events.json");
         System.out.println("Deserialization completed!");
-        for (RecordedEvent re : recordedEvents) {
-            System.out.println("Position: " + re.getPosition() + " Event: " + re.getEvent());
-        }
     }
 
     /*

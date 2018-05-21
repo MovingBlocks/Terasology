@@ -647,6 +647,7 @@ public final class WorldRendererImpl implements WorldRenderer {
             //If the game is set to replay, begin the replay process
             if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
                 EventStorage.beginReplay = true;
+                EventStorage.attemptToDeserialize();
             }
 
         }

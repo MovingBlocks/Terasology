@@ -15,8 +15,6 @@
  */
 package org.terasology.recording;
 
-import javafx.scene.input.MouseButton;
-import org.lwjgl.input.Mouse;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.input.BindAxisEvent;
