@@ -244,6 +244,8 @@
     "select-game-title": "Select Game",
     "select-modules": "Modules...",
     "select-modules-title": "Select Modules...",
+    "select-modules-filter-reset": "Reset Filters",
+    "select-modules-filter-title": "Module Categories",
     "select-multiplayer-game-sub-title": "Multiplayer",
     "select-singleplayer-game-sub-title": "Singleplayer",
     "select-world-gen": "Choose World Generator",
