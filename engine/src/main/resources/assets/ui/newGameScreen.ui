@@ -1,0 +1,142 @@
+{
+  "type": "NewGameScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UIImage",
+        "image": "engine:terasology",
+        "id": "title",
+        "layoutInfo": {
+          "width": 512,
+          "height": 128,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "TOP",
+            "offset": 48
+          }
+        }
+      },
+      {
+        "type": "UILabel",
+        "id": "subtitle",
+        "family": "title",
+        "text": "${engine:menu#create-game-title}",
+        "layoutInfo": {
+          "height": 48,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "widget": "title"
+          }
+        }
+      },
+      {
+        "type": "UILabel",
+        "id": "gameTypeTitle",
+        "family": "subtitle",
+        "text": "${engine:menu#select-singleplayer-game-sub-title}",
+        "layoutInfo": {
+          "height": 30,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "widget": "subtitle"
+          }
+        }
+      },
+      {
+        "type": "UIBox",
+        "id":"mainBox",
+        "content": {
+          "type": "ColumnLayout",
+          "columns": 1,
+          "verticalSpacing": 4,
+          "horizontalSpacing": 4,
+          "contents": [
+            {
+              "type": "UILabel",
+              "text": "${engine:menu#game-name}"
+            },
+            {
+              "type": "UIText",
+              "id": "worldName"
+            },
+            {
+              "type": "UISpace",
+              "size": [
+                1,
+                16
+              ]
+            },
+            {
+              "type": "UILabel",
+              "text": "${engine:menu#gameplay}"
+            },
+            {
+              "type": "UIDropdownScrollable",
+              "id": "gameplay",
+              "layoutInfo": {
+                "relativeWidth": 0.7
+              }
+            },
+            {
+              "type": "UISpace",
+              "size": [
+                1,
+                16
+              ]
+            },
+            {
+              "type": "UILabel",
+              "id": "gameplayDescription"
+            }
+          ]
+        },
+        "layoutInfo": {
+          "width": 500,
+          "use-content-height": true,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "offset": 16,
+            "widget": "gameTypeTitle"
+          }
+        }
+      },
+      {
+        "type": "RowLayout",
+        "id": "actionsRow",
+        "horizontalSpacing": 4,
+        "contents": [
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#back}",
+            "id": "close"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#advanced}",
+            "id": "advancedSetup"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#start-game}",
+            "id": "play"
+          }
+        ],
+        "layoutInfo": {
+          "width": 400,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": -48,
+            "widget": "mainBox"
+          }
+        }
+      }
+    ]
+  }
+}
