@@ -2,6 +2,7 @@
     "activate-module": "activate-module",
     "add-server": "add-server",
     "add-server-tip": "add-server-tip",
+    "advanced": "advanced"
     "advanced-usage": "advanced-usage",
     "animate-grass": "animate-grass",
     "animate-water": "animate-water",
