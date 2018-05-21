@@ -19,7 +19,6 @@ package org.terasology.world.sun;
 /**
  * An interface for celestial systems (with only one sun)
  */
-//@FunctionalInterface
 public interface CelestialSystem {
 
     /**
