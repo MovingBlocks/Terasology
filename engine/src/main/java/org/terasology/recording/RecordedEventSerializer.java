@@ -20,14 +20,23 @@ import com.google.gson.stream.JsonWriter;
 import org.lwjgl.input.Mouse;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.input.*;
+import org.terasology.input.binds.general.*;
+import org.terasology.input.binds.interaction.AttackButton;
+import org.terasology.input.binds.interaction.FrobButton;
+import org.terasology.input.binds.inventory.UseItemButton;
+import org.terasology.input.binds.movement.*;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.input.events.*;
+import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.players.DecreaseViewDistanceButton;
+import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.math.geom.Vector2i;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
@@ -42,6 +51,8 @@ import org.terasology.persistence.typeHandling.gson.GsonSerializationContext;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.naming.Name;
+import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
+import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -298,11 +309,159 @@ public class RecordedEventSerializer {
                     objMoveDirection.get("y").getAsFloat(),
                     objMoveDirection.get("z").getAsFloat());
             result = new CharacterMoveInputEvent(sequenceNumber, pitch, yaw, movementDirection, running, crouching, jumpRequested, delta);
-        } else { //input events
-
+        } else if (getInputEventSpecificType(jsonObject, clazz, deserializationContext) != null) { //input events
+            result = getInputEventSpecificType(jsonObject, clazz, deserializationContext);
         }
 
         return result;
+    }
+
+    private InputEvent getInputEventSpecificType(JsonObject jsonObject, String c, GsonDeserializationContext deserializationContext) {
+        InputEvent newEvent;
+
+
+        if (c.equals(ChatButton.class.toString())) { //BindButtonEvent
+            newEvent = new ChatButton();
+        } else if (c.equals(ConsoleButton.class.toString())) {
+            newEvent = new ConsoleButton();
+        } else if (c.equals(HideHUDButton.class.toString())) {
+            newEvent = new HideHUDButton();
+        } else if (c.equals(OnlinePlayersButton.class.toString())) {
+            newEvent = new OnlinePlayersButton();
+        } else if (c.equals(PauseButton.class.toString())) {
+            newEvent = new PauseButton();
+        } else if (c.equals(ScreenshotButton.class.toString())) {
+            newEvent = new ScreenshotButton();
+        } else if (c.equals(AttackButton.class.toString())) {
+            newEvent = new AttackButton();
+        } else if (c.equals(FrobButton.class.toString())) {
+            newEvent = new FrobButton();
+        } else if (c.equals(UseItemButton.class.toString())) {
+            newEvent = new UseItemButton();
+        } else if (c.equals(AutoMoveButton.class.toString())) {
+            newEvent = new AutoMoveButton();
+        } else if (c.equals(BackwardsButton.class.toString())) {
+            newEvent = new BackwardsButton();
+        } else if (c.equals(CrouchButton.class.toString())) {
+            newEvent = new CrouchButton();
+        } else if (c.equals(ForwardsButton.class.toString())) {
+            newEvent = new ForwardsButton();
+        } else if (c.equals(JumpButton.class.toString())) {
+            newEvent = new JumpButton();
+        } else if (c.equals(LeftStrafeButton.class.toString())) {
+            newEvent = new LeftStrafeButton();
+        } else if (c.equals(RightStrafeButton.class.toString())) {
+            newEvent = new RightStrafeButton();
+        } else if (c.equals(ToggleSpeedPermanentlyButton.class.toString())) {
+            newEvent = new ToggleSpeedPermanentlyButton();
+        } else if (c.equals(ToggleSpeedTemporarilyButton.class.toString())) {
+            newEvent = new ToggleSpeedTemporarilyButton();
+        } else if (c.equals(BTEditorButton.class.toString())) {
+            newEvent = new BTEditorButton();
+        } else if (c.equals(DecreaseViewDistanceButton.class.toString())) {
+            newEvent = new DecreaseViewDistanceButton();
+        } else if (c.equals(IncreaseViewDistanceButton.class.toString())) {
+            newEvent = new IncreaseViewDistanceButton();
+        } else if (c.equals(NUIEditorButton.class.toString())) {
+            newEvent = new NUIEditorButton();
+        } else if (c.equals(NUISkinEditorButton.class.toString())) {
+            newEvent = new NUISkinEditorButton();
+        } else if (c.equals(ForwardsMovementAxis.class.toString())) { //BindAxisEvent
+            newEvent = new ForwardsMovementAxis();
+        } else if (c.equals(ForwardsRealMovementAxis.class.toString())) {
+            newEvent = new ForwardsRealMovementAxis();
+        } else if (c.equals(RotationPitchAxis.class.toString())) {
+            newEvent = new RotationPitchAxis();
+        } else if (c.equals(RotationYawAxis.class.toString())) {
+            newEvent = new RotationYawAxis();
+        } else if (c.equals(StrafeMovementAxis.class.toString())) {
+            newEvent = new StrafeMovementAxis();
+        } else if (c.equals(StrafeRealMovementAxis.class.toString())) {
+            newEvent = new StrafeRealMovementAxis();
+        } else if (c.equals(VerticalMovementAxis.class.toString())) {
+            newEvent = new VerticalMovementAxis();
+        } else if (c.equals(VerticalRealMovementAxis.class.toString())) {
+            newEvent = new VerticalRealMovementAxis();
+        } else if (c.equals(KeyDownEvent.class.toString()) || c.equals(KeyRepeatEvent.class.toString()) || c.equals(KeyUpEvent.class.toString())) { //KeyEvent
+            GsonPersistedData data = new GsonPersistedData(jsonObject.get("input"));
+            TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(Keyboard.Key.class);
+            Keyboard.Key input = (Keyboard.Key) typeHandler.deserialize(data, deserializationContext);
+            data = new GsonPersistedData(jsonObject.get("state"));
+            typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
+            ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
+            char keychar = jsonObject.get("keychar").getAsCharacter();
+            float delta = jsonObject.get("delta").getAsFloat();
+            KeyEvent aux;
+            if (c.equals(KeyDownEvent.class.toString())) {
+                aux = KeyDownEvent.create(input, keychar, delta);
+            } else if (c.equals(KeyRepeatEvent.class.toString())) {
+                aux = KeyRepeatEvent.create(input, keychar, delta);
+            } else {
+                aux = KeyUpEvent.create(input, keychar, delta);
+            }
+            aux.setState(state);
+            newEvent = aux;
+        } else if (c.equals(MouseButtonEvent.class.toString())) {
+            GsonPersistedData data = new GsonPersistedData(jsonObject.get("button"));
+            TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(MouseInput.class);
+            MouseInput button = (MouseInput) typeHandler.deserialize(data, deserializationContext);
+            data = new GsonPersistedData(jsonObject.get("state"));
+            typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
+            ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
+            JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
+            Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());
+            float delta = jsonObject.get("delta").getAsFloat();
+            MouseButtonEvent event = new MouseButtonEvent(button, state, delta);
+            event.setMousePosition(mousePosition);
+            newEvent = event;
+        } else if (c.equals(MouseAxisEvent.class.toString())) {
+            GsonPersistedData data = new GsonPersistedData(jsonObject.get("mouseAxis"));
+            TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(MouseAxisEvent.MouseAxis.class);
+            MouseAxisEvent.MouseAxis mouseAxis = (MouseAxisEvent.MouseAxis) typeHandler.deserialize(data, deserializationContext);
+            float value = jsonObject.get("value").getAsFloat();
+            float delta = jsonObject.get("delta").getAsFloat();
+            newEvent = MouseAxisEvent.create(mouseAxis, value, delta);
+        } else if (c.equals(MouseWheelEvent.class.toString())) {
+            JsonObject aux = jsonObject.get("mousePosition").getAsJsonObject();
+            Vector2i mousePosition = new Vector2i(aux.get("x").getAsInt(), aux.get("y").getAsInt());
+            int wheelTurns = jsonObject.get("wheelTurns").getAsInt();
+            float delta = jsonObject.get("delta").getAsFloat();
+            newEvent = new MouseWheelEvent(mousePosition, wheelTurns, delta);
+        } else {
+            System.out.println("Not an Input Event"); // change to logger
+            return null;
+        }
+
+        if (newEvent instanceof BindButtonEvent) {
+            bindButtonEventSetup((BindButtonEvent) newEvent, jsonObject, deserializationContext);
+        } else if (newEvent instanceof BindAxisEvent) {
+            bindAxisEvent((BindAxisEvent) newEvent, jsonObject);
+        }
+
+        inputEventSetup(newEvent, jsonObject);
+        return newEvent;
+    }
+
+    private void bindButtonEventSetup(BindButtonEvent event, JsonObject jsonObject, GsonDeserializationContext deserializationContext) {
+        GsonPersistedData data = new GsonPersistedData(jsonObject.get("state"));
+        TypeHandler typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(ButtonState.class);
+        ButtonState state = (ButtonState) typeHandler.deserialize(data, deserializationContext);
+        float delta = jsonObject.get("delta").getAsFloat();
+        typeHandler = typeSerializationLibrary.getTypeHandlerFromClass(Name.class);
+        JsonObject aux = jsonObject.get("id").getAsJsonObject();
+        data = new GsonPersistedData(aux.get("moduleName"));
+        Name moduleName = (Name) typeHandler.deserialize(data, deserializationContext);
+        data = new GsonPersistedData(aux.get("objectName"));
+        Name objectName = (Name) typeHandler.deserialize(data, deserializationContext);
+        SimpleUri id = new SimpleUri(moduleName, objectName);
+        event.prepare(id, state, delta);
+    }
+
+    private void bindAxisEvent(BindAxisEvent event, JsonObject jsonObject) {
+        String id = jsonObject.get("id").getAsString();
+        float value = jsonObject.get("value").getAsFloat();
+        float delta = jsonObject.get("delta").getAsFloat();
+        event.prepare(id, value, delta);
     }
 
     private void inputEventSetup(InputEvent event, JsonObject jsonObject) {
