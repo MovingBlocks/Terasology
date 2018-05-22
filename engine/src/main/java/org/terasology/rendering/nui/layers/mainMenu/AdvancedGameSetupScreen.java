@@ -31,5 +31,9 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "continue", button ->
                 triggerForwardAnimation(universeSetupScreen)
         );
+
+        WidgetUtil.trySubscribe(this, "close", button ->
+                triggerBackAnimation()
+        );
     }
 }
