@@ -30,6 +30,11 @@ public class UniverseSetupScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
+
+        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
+        WidgetUtil.trySubscribe(this, "worldConfig", button ->
+            triggerForwardAnimation(worldSetupScreen)
+        );
     }
 }
 

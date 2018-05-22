@@ -28,7 +28,7 @@ public class AdvancedGameSetupScreen extends CoreScreenLayer {
     public void initialise(){
 
         UniverseSetupScreen universeSetupScreen = getManager().createScreen(UniverseSetupScreen.ASSET_URI, UniverseSetupScreen.class);
-        WidgetUtil.trySubscribe(this, "close", button ->
+        WidgetUtil.trySubscribe(this, "continue", button ->
                 triggerForwardAnimation(universeSetupScreen)
         );
     }

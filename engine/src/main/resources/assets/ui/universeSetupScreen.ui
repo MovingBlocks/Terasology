@@ -169,8 +169,8 @@
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#advance}",
-            "id": "advancedSetup"
+            "text": "${engine:menu#continue}",
+            "id": "continue"
           }
         ],
         "layoutInfo": {

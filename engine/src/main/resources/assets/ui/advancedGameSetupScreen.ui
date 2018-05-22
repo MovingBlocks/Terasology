@@ -410,8 +410,7 @@
         ]
       },
       {
-        "type": "UIButton",
-        "text": "${engine:menu#back}",
+        "type": "UISpace",
         "id": "close",
         "layoutInfo": {
           "width": 128,
@@ -420,6 +419,33 @@
           "position-bottom": {
             "target": "BOTTOM",
             "offset": 48
+          }
+        }
+      },
+      {
+        "type": "RowLayout",
+        "id": "actionsRow",
+        "horizontalSpacing": 4,
+        "contents": [
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#back}",
+            "id": "close"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#continue}",
+            "id": "continue"
+          }
+        ],
+        "layoutInfo": {
+          "width": 400,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": -48,
+            "widget": "container"
           }
         }
       }
