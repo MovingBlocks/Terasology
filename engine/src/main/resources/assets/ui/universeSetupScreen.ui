@@ -1,5 +1,5 @@
 {
-  "type": "NewGameScreen",
+  "type": "UniverseSetupScreen",
   "skin": "engine:mainMenu",
   "contents": {
     "type": "relativeLayout",
@@ -22,27 +22,13 @@
         "type": "UILabel",
         "id": "subtitle",
         "family": "title",
-        "text": "${engine:menu#create-game-title}",
+        "text": "${engine:menu#universe-setup}",
         "layoutInfo": {
           "height": 48,
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
             "widget": "title"
-          }
-        }
-      },
-      {
-        "type": "UILabel",
-        "id": "gameTypeTitle",
-        "family": "subtitle",
-        "text": "${engine:menu#select-singleplayer-game-sub-title}",
-        "layoutInfo": {
-          "height": 30,
-          "position-horizontal-center": {},
-          "position-top": {
-            "target": "BOTTOM",
-            "widget": "subtitle"
           }
         }
       },
@@ -56,41 +42,107 @@
           "horizontalSpacing": 4,
           "contents": [
             {
-              "type": "UILabel",
-              "text": "${engine:menu#game-name}"
+              "type": "UISpace",
+              "size": [
+                1,
+                8
+              ]
             },
             {
-              "type": "UIText",
-              "id": "worldName"
+              "type": "UILabel",
+              "text": "${engine:menu#game-worlds}:",
+              "family": "left-label"
+            },
+            {
+              "type": "RowLayout",
+              "verticalSpacing": 4,
+              "horizontalSpacing": 4,
+              "contents": [
+                {
+                  "type": "UIDropdownScrollable",
+                  "id": "worlds",
+                  "layoutInfo": {
+                    "relativeWidth": 0.50
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                },
+                {
+                  "type": "UIButton",
+                  "id": "worldConfig",
+                  "text": "${engine:menu#config}",
+                  "layoutInfo": {
+                    "relativeWidth": 0.30
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                }
+              ]
             },
             {
               "type": "UISpace",
               "size": [
                 1,
-                16
+                48
               ]
             },
             {
               "type": "UILabel",
-              "text": "${engine:menu#gameplay}"
+              "text": "${engine:menu#game-world-generators}:",
+              "family": "left-label"
             },
             {
-              "type": "UIDropdownScrollable",
-              "id": "gameplay",
-              "layoutInfo": {
-                "relativeWidth": 0.7
-              }
+              "type": "RowLayout",
+              "verticalSpacing": 4,
+              "horizontalSpacing": 4,
+              "contents": [
+                {
+                  "type": "UIDropdownScrollable",
+                  "id": "worldGenerators",
+                  "layoutInfo": {
+                    "relativeWidth": 0.50
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                },
+                {
+                  "type": "UIButton",
+                  "id": "addGenerator",
+                  "text": "${engine:menu#add}",
+                  "layoutInfo": {
+                    "relativeWidth": 0.30
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                }
+              ]
             },
             {
               "type": "UISpace",
               "size": [
                 1,
-                16
+                8
               ]
-            },
-            {
-              "type": "UILabel",
-              "id": "gameplayDescription"
             }
           ]
         },
@@ -100,8 +152,8 @@
           "position-horizontal-center": {},
           "position-top": {
             "target": "BOTTOM",
-            "offset": 16,
-            "widget": "gameTypeTitle"
+            "offset": 64,
+            "widget": "title"
           }
         }
       },
@@ -117,13 +169,8 @@
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#advanced}",
+            "text": "${engine:menu#advance}",
             "id": "advancedSetup"
-          },
-          {
-            "type": "UIButton",
-            "text": "${engine:menu#start-game}",
-            "id": "play"
           }
         ],
         "layoutInfo": {
