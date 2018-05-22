@@ -1,7 +1,9 @@
 {
     "activate-module": "activate-module",
+    "add": "add",
     "add-server": "add-server",
     "add-server-tip": "add-server-tip",
+    "advance": "advance",
     "advanced": "advanced",
     "advanced-game-setup": "advanced-game-setup",
     "advanced-usage": "advanced-usage",
@@ -73,6 +75,7 @@
     "change-keybind-popup-title": "change-keybind-popup-title",
     "clamp-lighting": "clamp-lighting",
     "cloud-shadows": "cloud-shadows",
+    "config": "config",
     "connecting-to": "connecting-to",
     "connection-failed": "connection-failed",
     "could-not-connect-to-server": "could-not-connect-to-server",
@@ -132,6 +135,7 @@
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",
+    "game-world-generators": "game-world-generators"
     "gameplay": "gameplay",
     "gameplay-info": "gameplay-info",
     "host-multiplayer-game": "host-multiplayer-game",
@@ -304,6 +308,7 @@
     "telemetry-modules": "telemetry-modules",
     "this-language-English": "this-language-English",
     "this-language-native": "this-language-native",
+    "universe-setup": "universe-setup",
     "update-module": "update-module",
     "video-windowed-fullscreen": "video-windowed-fullscreen",
     "video-fullscreen": "video-fullscreen",
