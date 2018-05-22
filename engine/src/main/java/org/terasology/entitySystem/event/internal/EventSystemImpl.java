@@ -50,10 +50,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.recording.EventCatcher;
-import org.terasology.recording.EventStorage;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordedEvent;
+import org.terasology.recording.*;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
@@ -101,9 +98,6 @@ public class EventSystemImpl implements EventSystem {
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
         this.eventCounter = 0;
-        //extra
-        EventStorage.eventLibrary = eventLibrary;
-
     }
 
     @Override
@@ -273,7 +267,7 @@ public class EventSystemImpl implements EventSystem {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             //event recording
-            if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.RECORDING) {
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
                 this.eventCounter++;
             }
@@ -377,7 +371,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
-            if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.RECORDING) {
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
                 eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
                 this.eventCounter++;
             }

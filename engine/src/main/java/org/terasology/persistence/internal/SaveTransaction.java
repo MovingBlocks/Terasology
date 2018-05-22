@@ -30,8 +30,9 @@ import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
-import org.terasology.recording.EventStorage;
+import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -140,12 +141,13 @@ public class SaveTransaction extends AbstractTask {
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
             //Saves events as String and deactivates RecordAndReplayStatus
-            EventStorage.saveEventsString();
-            EventStorage.recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
+            RecordAndReplaySerializer.saveEventsString();
+            RecordAndReplaySerializer.serializeRecordAndReplayData();
+            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             //If finished the first play, change the RecordAndReplayStatus to replaying so when the next game is setted up
             //it will use the correct EventSystem
-            if (EventStorage.recordCount == 1) {
-                EventStorage.recordAndReplayStatus = RecordAndReplayStatus.REPLAYING;
+            if (RecordAndReplayUtils.getRecordCount() == 1) {
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);
             }
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);

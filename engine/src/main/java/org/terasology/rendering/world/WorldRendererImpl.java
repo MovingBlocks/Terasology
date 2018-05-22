@@ -32,8 +32,9 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector3i;
-import org.terasology.recording.EventStorage;
+import org.terasology.recording.RecordAndReplaySerializer;
 import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -640,16 +641,14 @@ public final class WorldRendererImpl implements WorldRenderer {
             requestedTaskListRefresh = false;
 
             //If it is the first game, activates the recording
-            if (EventStorage.recordCount == 0) {
-                EventStorage.recordAndReplayStatus = RecordAndReplayStatus.RECORDING;
+            if (RecordAndReplayUtils.getRecordCount() == 0) {
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.RECORDING);
             }
 
             //If the game is set to replay, begin the replay process
-            if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
-                EventStorage.beginReplay = true;
-                EventStorage.attemptToDeserialize();
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+                RecordAndReplayUtils.setBeginReplay(true);
             }
-
         }
     }
 

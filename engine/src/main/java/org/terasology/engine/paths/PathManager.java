@@ -21,8 +21,8 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 
 import org.lwjgl.LWJGLUtil;
-import org.terasology.recording.EventStorage;
 import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -208,7 +208,7 @@ public final class PathManager {
      */
     public Path getSavesPath() {
         //This is responsible for making it possible to select games on "saves2" for replay
-        if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             return homePath.resolve(ALTERNATE_SAVED_GAMES_DIR);
         }
 

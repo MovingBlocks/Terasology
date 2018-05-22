@@ -23,7 +23,7 @@ import org.terasology.input.events.InputEvent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 
 /**
- * This class is responsible for catching the events during a Record and send the desired ones to the EventStorage.
+ * This class is responsible for catching the events during a Record and send the desired ones to the RecordedEventStore.
  */
 public class EventCatcher {
 
@@ -34,11 +34,11 @@ public class EventCatcher {
     }
 
     /**
-     * Receives a PendingEvent and add it as a RecordedEvent in the EventStorage if it is an event type that should be
+     * Receives a PendingEvent and add it as a RecordedEvent in the RecordedEventStore if it is an event type that should be
      * recorded.
      * @param pe PendingEvent to be checked and added
      * @param position Position of when the event was catched. Used only for test purposes
-     * @return If the event was added to the EventStorage
+     * @return If the event was added to the RecordedEventStore
      */
     public boolean addEvent(PendingEvent pe, long position) {
         if (shouldRecordEvent(pe)) {
@@ -51,7 +51,7 @@ public class EventCatcher {
             } else {
                 re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, position);
             }
-            return EventStorage.add(re);
+            return RecordedEventStore.add(re);
         } else {
             return false;
         }

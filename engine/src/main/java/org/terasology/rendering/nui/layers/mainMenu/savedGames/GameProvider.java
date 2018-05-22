@@ -48,7 +48,6 @@ public final class GameProvider {
     }
 
     public static List<GameInfo> getSavedGames() {
-        System.out.println("GameProvider Activated!");
         Path savedGames = PathManager.getInstance().getSavesPath();
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
         try (DirectoryStream<Path> stream =

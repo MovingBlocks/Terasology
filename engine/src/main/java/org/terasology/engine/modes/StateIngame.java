@@ -42,7 +42,6 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.recording.EventStorage;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;

@@ -38,9 +38,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
-import org.terasology.recording.EventStorage;
-import org.terasology.recording.EventSystemReplayImpl;
-import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.*;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -114,8 +112,9 @@ public final class EntitySystemSetupUtil {
         // Event System
         EventSystem eventSystem;
         //If it's replaying, should use the proper EventSystem
-        if (EventStorage.recordAndReplayStatus == RecordAndReplayStatus.REPLAYING) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
+            RecordAndReplaySerializer.deserializeRecordAndReplayData();
         } else {
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
         }
@@ -129,7 +128,7 @@ public final class EntitySystemSetupUtil {
 
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);
-        EventStorage.entityManager = entityManager;
+        RecordAndReplaySerializer.setEntityManager(entityManager);
     }
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {

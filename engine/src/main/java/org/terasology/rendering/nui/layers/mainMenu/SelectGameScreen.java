@@ -28,7 +28,6 @@ import org.terasology.i18n.TranslationSystem;
 import org.terasology.naming.Name;
 import org.terasology.naming.NameVersion;
 import org.terasology.network.NetworkMode;
-import org.terasology.recording.EventStorage;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.AWTTextureFormat;
@@ -208,13 +207,13 @@ public class SelectGameScreen extends CoreScreenLayer {
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
-            //EventStorage.isRecording = true; //added for test
-            /*if (EventStorage.recordCount == 0) {
-                EventStorage.isRecording = true;
+            //RecordedEventStore.isRecording = true; //added for test
+            /*if (RecordedEventStore.recordCount == 0) {
+                RecordedEventStore.isRecording = true;
             }
             System.out.println("HERE!!!");
-            if (EventStorage.isReplaying) {
-                EventStorage.beginReplay = true;
+            if (RecordedEventStore.isReplaying) {
+                RecordedEventStore.beginReplay = true;
                 System.out.println("beginReplay = true");
             }*/
         } catch (Exception e) {
