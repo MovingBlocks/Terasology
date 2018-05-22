@@ -66,8 +66,17 @@ public final class PathManager {
         try {
             URL urlToSource = PathManager.class.getProtectionDomain().getCodeSource().getLocation();
 
+            // TODO: Probably remove this after a while, confirming via logs that this is no longer needed
             Path codeLocation = Paths.get(urlToSource.toURI());
-            System.out.println("codeLocation: " + codeLocation);
+            System.out.println("PathManager being initialized. Initial code location is " + codeLocation.toAbsolutePath());
+
+            // Theory that whatever reason we needed to get the path that way isn't needed anymore - try just current dir ...
+            codeLocation = Paths.get("").toAbsolutePath();
+            System.out.println("Switched it to expected working dir: " + codeLocation.toAbsolutePath());
+
+            // If that fails in some situations a different approach could test for the following in the path:
+            // if (codeLocation.toString().contains(".gradle") || codeLocation.toString().contains(".m2")) {
+
             if (Files.isRegularFile(codeLocation)) {
                 installPath = findNativesHome(codeLocation.getParent(), 5);
                 if (installPath == null) {
