@@ -1,4 +1,5 @@
 {
+    "accept": "Accept",
     "activate-module": "Activate",
     "add": "Add",
     "add-server": "Add New",
@@ -79,6 +80,7 @@
     "config": "Configure",
     "connecting-to": "Connecting to",
     "connection-failed": "Connection Failed!",
+    "continue": "Continue",
     "could-not-connect-to-server": "Could not connect to server",
     "crash-reporter": "Issue Reporter",
     "non-native-jvm-warn": "WARNING: you are using a 32-bit JVM on a 64-bit system!\nUse a 64-bit Java installation for the best performance.",
@@ -353,5 +355,6 @@
     "widget-selection-prompt": "Select the type of the widget:",
     "widget-selection-title": "Widget Selection",
     "world-config-preview": "Details...",
-    "world-seed": "Seed"
+    "world-seed": "Seed",
+    "world-setup": "World Setup"
 }

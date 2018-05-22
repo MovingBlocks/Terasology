@@ -1,4 +1,5 @@
 {
+    "accept": "accept",
     "activate-module": "activate-module",
     "add": "add",
     "add-server": "add-server",
@@ -78,6 +79,7 @@
     "config": "config",
     "connecting-to": "connecting-to",
     "connection-failed": "connection-failed",
+    "continue": "continue",
     "could-not-connect-to-server": "could-not-connect-to-server",
     "crash-reporter": "crash-reporter",
     "non-native-jvm-warn": "non-native-jvm-warn",
@@ -344,5 +346,6 @@
     "widget-selection-prompt": "widget-selection-prompt",
     "widget-selection-title": "widget-selection-title",
     "world-config-preview": "world-config-preview",
-    "world-seed": "world-seed"
+    "world-seed": "world-seed",
+    "world-setup": "world-setup"
 }
