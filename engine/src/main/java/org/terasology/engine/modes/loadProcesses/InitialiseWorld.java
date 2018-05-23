@@ -35,6 +35,8 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.ReadOnlyStorageManager;
 import org.terasology.persistence.internal.ReadWriteStorageManager;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.backdrop.BackdropRenderer;
 import org.terasology.rendering.backdrop.Skysphere;
@@ -115,12 +117,17 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
-        Path savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        Path saveOrRecordingPath;
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
+        } else {
+            saveOrRecordingPath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        }
         StorageManager storageManager;
         try {
             storageManager = writeSaveGamesEnabled
-                    ? new ReadWriteStorageManager(savePath, environment, entityManager, blockManager, biomeManager)
-                    : new ReadOnlyStorageManager(savePath, environment, entityManager, blockManager, biomeManager);
+                    ? new ReadWriteStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager)
+                    : new ReadOnlyStorageManager(saveOrRecordingPath, environment, entityManager, blockManager, biomeManager);
         } catch (IOException e) {
             logger.error("Unable to create storage manager!", e);
             context.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));

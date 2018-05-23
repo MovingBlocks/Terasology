@@ -112,9 +112,8 @@ public final class EntitySystemSetupUtil {
         // Event System
         EventSystem eventSystem;
         //If it's replaying, should use the proper EventSystem
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             eventSystem = new EventSystemReplayImpl(library.getEventLibrary(), networkSystem, entityManager);
-            RecordAndReplaySerializer.deserializeRecordAndReplayData();
         } else {
             eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
         }

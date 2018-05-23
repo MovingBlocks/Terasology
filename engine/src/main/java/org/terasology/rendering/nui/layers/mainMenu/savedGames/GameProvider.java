@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -48,10 +50,16 @@ public final class GameProvider {
     }
 
     public static List<GameInfo> getSavedGames() {
-        Path savedGames = PathManager.getInstance().getSavesPath();
+        Path saveOrRecordingPath;
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+            saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();
+        } else {
+            saveOrRecordingPath = PathManager.getInstance().getSavesPath();
+        }
+        //Path savedGames = PathManager.getInstance().getSavesPath();
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
         try (DirectoryStream<Path> stream =
-                Files.newDirectoryStream(savedGames)) {
+                Files.newDirectoryStream(saveOrRecordingPath)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
                     savedGamePaths.put(Files.getLastModifiedTime(entry.resolve(GameManifest.DEFAULT_FILE_NAME)), entry);

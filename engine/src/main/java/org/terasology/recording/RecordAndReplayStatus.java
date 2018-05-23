@@ -16,5 +16,5 @@
 package org.terasology.recording;
 
 public enum RecordAndReplayStatus {
-    NOT_ACTIVATED, RECORDING, REPLAYING;
+    NOT_ACTIVATED, PREPARING_RECORD, RECORDING, PREPARING_REPLAY, REPLAYING, REPLAY_FINISHED;
 }

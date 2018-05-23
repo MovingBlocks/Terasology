@@ -641,13 +641,14 @@ public final class WorldRendererImpl implements WorldRenderer {
             requestedTaskListRefresh = false;
 
             //If it is the first game, activates the recording
-            if (RecordAndReplayUtils.getRecordCount() == 0) {
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
                 RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.RECORDING);
             }
 
             //If the game is set to replay, begin the replay process
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-                RecordAndReplayUtils.setBeginReplay(true);
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+                RecordAndReplaySerializer.deserializeRecordAndReplayData();
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);
             }
         }
     }

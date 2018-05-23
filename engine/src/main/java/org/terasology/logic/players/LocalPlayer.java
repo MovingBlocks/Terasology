@@ -53,13 +53,7 @@ public class LocalPlayer {
     public void setClientEntity(EntityRef entity) {
 
         //Gets the client ids for record and replay
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-            EntityRefIdMap.addReplayId("client", entity.getId());
-        } else {
-            EntityRefIdMap.add("client", entity.getId());
-        }
-
-
+        EntityRefIdMap.add("client", entity.getId());
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         if (clientComp != null) {

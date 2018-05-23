@@ -124,7 +124,7 @@ public class EventSystemReplayImpl implements EventSystem {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
             //Addition to replay just to see some data. Should be removed later.
-            if (RecordAndReplayUtils.isBeginReplay()) {
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
                 //System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
                 this.testCount++;
             }
@@ -149,7 +149,7 @@ public class EventSystemReplayImpl implements EventSystem {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             //Addition to replay just to see some data. Should be removed later.
-            if (RecordAndReplayUtils.isBeginReplay()) {
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
                 //System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
                 this.testCount++;
             }
@@ -178,17 +178,17 @@ public class EventSystemReplayImpl implements EventSystem {
     public void process() {
 
         //Load recorded events if they were not loaded and if the game is ready to replay.
-        if (RecordAndReplayUtils.isBeginReplay() && !this.loadedRecordedEvents) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && !this.loadedRecordedEvents) {
             fillRecordedEvents();
             this.loadedRecordedEvents = true;
             logger.info("Loaded Recorded Events!");
             startTime = System.currentTimeMillis();
         }
         //If replay is ready, process some recorded events if the time is right.
-        if (RecordAndReplayUtils.isBeginReplay()) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             processRecordedEvents(10);
             if (this.recordedEvents.isEmpty()) {
-                RecordAndReplayUtils.setBeginReplay(false); // stops the replay if every recorded event was already replayed
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
             }
         }
         //Original process() on EventSystemImpl
@@ -221,8 +221,8 @@ public class EventSystemReplayImpl implements EventSystem {
             //PendingEvent event = re.getPendingEvent();
             EntityRef entity;
             // Maps the entities IDs to get the correct entity, even if the id changed from record to replay;
-            if (re.getEntityRefId() == EntityRefIdMap.getCell("client").getOriginalId()) {
-                entity = this.entityManager.getEntity(EntityRefIdMap.getCell("client").getReplayId()); // If it is the gameClient id
+            if (re.getEntityRefId() == EntityRefIdMap.getIdFromPrevious("client")) {
+                entity = this.entityManager.getEntity(EntityRefIdMap.getId("client")); // If it is the gameClient id
             } else {
                 entity = this.entityManager.getEntity(re.getEntityRefId()); // gets entityref from id
             }
@@ -391,7 +391,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event) {
-        if (RecordAndReplayUtils.isBeginReplay() && isSelectedToReplayEvent(event)) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
             process(); // the process is responsible for calling the replay methods
         } else {
             originalSend(entity, event);
@@ -400,7 +400,7 @@ public class EventSystemReplayImpl implements EventSystem {
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        if (RecordAndReplayUtils.isBeginReplay() && isSelectedToReplayEvent(event)) {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING && isSelectedToReplayEvent(event)) {
             process(); // the process is responsible for calling the replay methods
         } else {
             originalSend(entity, event, component);
