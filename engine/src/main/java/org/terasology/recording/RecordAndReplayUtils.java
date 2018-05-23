@@ -17,8 +17,8 @@ package org.terasology.recording;
 
 public class RecordAndReplayUtils {
     private static RecordAndReplayStatus recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
-    private static boolean beginReplay; //begins as false. This variable is true when the game is rendered and ready to replay events
     private static int recordCount; //begins as 0
+    private static String gameTitle;
 
     private RecordAndReplayUtils() {
 
@@ -32,19 +32,19 @@ public class RecordAndReplayUtils {
         RecordAndReplayUtils.recordAndReplayStatus = recordAndReplayStatus;
     }
 
-    public static boolean isBeginReplay() {
-        return beginReplay;
-    }
-
-    public static void setBeginReplay(boolean beginReplay) {
-        RecordAndReplayUtils.beginReplay = beginReplay;
-    }
-
     public static int getRecordCount() {
         return recordCount;
     }
 
     public static void setRecordCount(int recordCount) {
         RecordAndReplayUtils.recordCount = recordCount;
+    }
+
+    public static String getGameTitle() {
+        return gameTitle;
+    }
+
+    public static void setGameTitle(String gameTitle) {
+        RecordAndReplayUtils.gameTitle = gameTitle;
     }
 }

@@ -20,29 +20,32 @@ import java.util.Map;
 
 public final class EntityRefIdMap {
 
+    private static Map<String, Long> currentMap = new HashMap<>();
+    private static Map<String, Long> previousMap = new HashMap<>();
+
+
     private EntityRefIdMap() {
 
     }
 
-    private static Map<String, EntityRefIdMapCell> map = new HashMap<>();
-
-    public static void add(String key, long originalId) {
-        map.put(key, new EntityRefIdMapCell(originalId));
+    public static void add(String key, long id) {
+        currentMap.put(key, id);
     }
 
-    public static void addReplayId(String key, long replayId) {
-        map.get(key).setReplayId(replayId);
+
+    public static long getId(String key) {
+        return currentMap.get(key);
     }
 
-    public static EntityRefIdMapCell getCell(String key) {
-        return map.get(key);
+    public static long getIdFromPrevious(String key) {
+        return previousMap.get(key);
     }
 
-    public static Map<String, EntityRefIdMapCell> getMap() {
-        return map;
+    public static Map<String, Long> getCurrentMap() {
+        return currentMap;
     }
 
-    public static void setMap(Map<String, EntityRefIdMapCell> map) {
-        EntityRefIdMap.map = map;
+    public static void setPreviousMap(Map<String, Long> map) {
+        previousMap = map;
     }
 }

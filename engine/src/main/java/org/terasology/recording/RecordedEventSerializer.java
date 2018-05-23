@@ -57,6 +57,7 @@ import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,14 +78,14 @@ public class RecordedEventSerializer {
         this.entityManager = entityManager;
     }
 
-    public void serializeRecordedEvents (List<RecordedEvent> events) {
+    public void serializeRecordedEvents (List<RecordedEvent> events, String recordingPath) {
         try {
             /*Writer writer = new FileWriter("Output.json");
             Gson gson = new GsonBuilder().create();
             for (RecordedEvent event : events) {
 
             }*/
-            JsonWriter writer = new JsonWriter(new FileWriter("events.json"));
+            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + "/events.json"));
             writer.beginObject();
             writer.name("events");
             writer.beginArray();

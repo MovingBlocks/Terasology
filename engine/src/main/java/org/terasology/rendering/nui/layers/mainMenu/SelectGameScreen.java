@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.assets.ResourceUrn;
@@ -25,6 +26,8 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.i18n.TranslationSystem;
 import org.terasology.network.NetworkMode;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -37,6 +40,7 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public class SelectGameScreen extends CoreScreenLayer {
@@ -74,9 +78,16 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if (saveGamePath != null) {
+            //this may be temporary
+            Path saveOrRecordingPath;
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+                saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();
+            } else {
+                saveOrRecordingPath = PathManager.getInstance().getSavesPath();
+            }
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                            PathManager.getInstance().getSavesPath().toAbsolutePath().toString()); //save path
+                            saveOrRecordingPath.toAbsolutePath().toString()); //save path
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -101,7 +112,12 @@ public class SelectGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "delete", button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
-                Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
+                Path world;
+                if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
+                    world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
+                } else {
+                    world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
+                }
                 try {
                     FilesUtil.recursiveDelete(world);
                     gameList.getList().remove(gameInfo);
@@ -131,24 +147,30 @@ public class SelectGameScreen extends CoreScreenLayer {
 
     private void loadGame(GameInfo item) {
         try {
-
             GameManifest manifest = item.getManifest();
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
+                copySaveDirectoryToRecordingLibrary(manifest.getTitle());
+            }
+            RecordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
-            //RecordedEventStore.isRecording = true; //added for test
-            /*if (RecordedEventStore.recordCount == 0) {
-                RecordedEventStore.isRecording = true;
-            }
-            System.out.println("HERE!!!");
-            if (RecordedEventStore.isReplaying) {
-                RecordedEventStore.beginReplay = true;
-                System.out.println("beginReplay = true");
-            }*/
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
         }
+    }
+
+    private void copySaveDirectoryToRecordingLibrary(String gameTitle) {
+        File saveDirectory = new File(PathManager.getInstance().getSavePath(gameTitle).toString());
+        Path destinationPath = PathManager.getInstance().getRecordingPath(gameTitle);
+        File destDirectory = new File(destinationPath.toString());
+        try {
+            FileUtils.copyDirectoryStructure(saveDirectory, destDirectory);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
     }
 
     public boolean isLoadingAsServer() {

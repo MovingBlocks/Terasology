@@ -23,13 +23,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 
 import java.io.*;
-//import java.lang.reflect.Type;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Map;
 
 public class RecordAndReplaySerializer {
     private static EntityManager entityManager;
@@ -44,7 +44,7 @@ public class RecordAndReplaySerializer {
     }
 
     //This will probably not exist once serialization is done. Saves recorded events as String
-    public static void saveEventsString() {
+    /*public static void saveEventsString() {
         StringBuffer sb = new StringBuffer();
         for (RecordedEvent re : RecordedEventStore.getEvents()) {
             saveOneEventAsString(re, sb);
@@ -73,30 +73,32 @@ public class RecordAndReplaySerializer {
             sb.append("Component: " + re.getComponent().toString() + "\n");
         }
 
-    }
+    }*/
 
     public static void serializeRecordAndReplayData() {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
-        serializer.serializeRecordedEvents(RecordedEventStore.getEvents());
+        String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+        serializer.serializeRecordedEvents(RecordedEventStore.getEvents(), recordingPath);
         logger.info("RecordedEvents Serialization completed!");
         Gson gson = new GsonBuilder().create();
-        serializeRefIdMap(gson);
+        serializeRefIdMap(gson, recordingPath);
         logger.info("RefIdMap Serialization completed!");
     }
 
     public static void deserializeRecordAndReplayData() {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
-        RecordedEventStore.setEvents(serializer.deserializeRecordedEvents("events.json"));
+        String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+        RecordedEventStore.setEvents(serializer.deserializeRecordedEvents(recordingPath + "/events.json"));
         logger.info("RecordedEvents Deserialization completed!");
         Gson gson = new GsonBuilder().create();
-        deserializeRefIdMap(gson);
+        deserializeRefIdMap(gson, recordingPath);
         logger.info("RefIdMap Deserialization completed!");
     }
 
-    private static void serializeRefIdMap(Gson gson) {
+    private static void serializeRefIdMap(Gson gson, String recordingPath) {
         try {
-            JsonWriter writer = new JsonWriter(new FileWriter("ref_id_map.json"));
-            gson.toJson(EntityRefIdMap.getMap(), HashMap.class, writer);
+            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + "/ref_id_map.json"));
+            gson.toJson(EntityRefIdMap.getCurrentMap(), HashMap.class, writer);
             writer.close();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -104,14 +106,14 @@ public class RecordAndReplaySerializer {
     }
 
     //not working
-    private static void deserializeRefIdMap(Gson gson) {
+    private static void deserializeRefIdMap(Gson gson, String recordingPath) {
         try {
             JsonParser parser = new JsonParser();
-            JsonElement jsonElement = parser.parse(new FileReader("ref_id_map.json"));
-            Type typeOfHashMap = new TypeToken<HashMap<String, EntityRefIdMapCell>>() { }.getType();
-            EntityRefIdMap.setMap(gson.fromJson(jsonElement, typeOfHashMap));
+            JsonElement jsonElement = parser.parse(new FileReader(recordingPath + "/ref_id_map.json"));
+            Type typeOfHashMap = new TypeToken<HashMap<String, Long>>() { }.getType();
+            EntityRefIdMap.setPreviousMap(gson.fromJson(jsonElement, typeOfHashMap));
             //to remove
-            System.out.println("deserialized data: " + EntityRefIdMap.getCell("client").getOriginalId());
+            //System.out.println("deserialized data: " + EntityRefIdMap.getCell("client").getOriginalId());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

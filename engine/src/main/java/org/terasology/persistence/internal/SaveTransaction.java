@@ -123,6 +123,10 @@ public class SaveTransaction extends AbstractTask {
 
     @Override
     public void run() {
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
+            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            return; //if it is a replay, do not save the game
+        }
         try {
             if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
                 // should not happen, as initialization should clean it up
@@ -141,13 +145,13 @@ public class SaveTransaction extends AbstractTask {
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
             //Saves events as String and deactivates RecordAndReplayStatus
-            RecordAndReplaySerializer.saveEventsString();
+            //RecordAndReplaySerializer.saveEventsString();
             RecordAndReplaySerializer.serializeRecordAndReplayData();
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
             //If finished the first play, change the RecordAndReplayStatus to replaying so when the next game is setted up
             //it will use the correct EventSystem
             if (RecordAndReplayUtils.getRecordCount() == 1) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);
+                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
             }
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);

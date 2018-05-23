@@ -43,7 +43,8 @@ public final class PathManager {
     public static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
     private static final String SAVED_GAMES_DIR = "saves";
-    private static final String ALTERNATE_SAVED_GAMES_DIR = "saves2"; //the replays should happen on games saved here
+    private static final String RECORDINGS_LIBRARY_DIR = "recordings_library";
+    //private static final String RECORDINGS_LIBRARY_DIR = "saves2";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
@@ -55,6 +56,7 @@ public final class PathManager {
     private Path installPath;
     private Path homePath;
     private Path savesPath;
+    private Path recordingsPath;
     private Path logPath;
     private Path shaderLogPath;
     private Path currentWorldPath;
@@ -198,12 +200,11 @@ public final class PathManager {
      * @return Path in which world saves are saved.
      */
     public Path getSavesPath() {
-        //This is responsible for making it possible to select games on "saves2" for replay
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-            return homePath.resolve(ALTERNATE_SAVED_GAMES_DIR);
-        }
-
         return savesPath;
+    }
+
+    public Path getRecordingsPath() {
+        return recordingsPath;
     }
 
     /**
@@ -262,6 +263,8 @@ public final class PathManager {
         Files.createDirectories(homePath);
         savesPath = homePath.resolve(SAVED_GAMES_DIR);
         Files.createDirectories(savesPath);
+        recordingsPath = homePath.resolve(RECORDINGS_LIBRARY_DIR);
+        Files.createDirectories(recordingsPath);
         logPath = homePath.resolve(LOG_DIR);
         Files.createDirectories(logPath);
         shaderLogPath = logPath.resolve(SHADER_LOG_DIR);
@@ -290,5 +293,9 @@ public final class PathManager {
 
     public Path getSavePath(String title) {
         return getSavesPath().resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
+    }
+
+    public Path getRecordingPath(String title) {
+        return getRecordingsPath().resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
     }
 }
