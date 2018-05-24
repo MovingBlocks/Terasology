@@ -66,6 +66,7 @@ public class RecordedEventSerializer {
     private TypeSerializationLibrary typeSerializationLibrary;
     private EntityManager entityManager;
 
+
     public RecordedEventSerializer(EntityManager entityManager) {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
@@ -78,14 +79,14 @@ public class RecordedEventSerializer {
         this.entityManager = entityManager;
     }
 
-    public void serializeRecordedEvents (List<RecordedEvent> events, String recordingPath) {
+    public void serializeRecordedEvents (List<RecordedEvent> events, String filePath) {
         try {
             /*Writer writer = new FileWriter("Output.json");
             Gson gson = new GsonBuilder().create();
             for (RecordedEvent event : events) {
 
             }*/
-            JsonWriter writer = new JsonWriter(new FileWriter(recordingPath + "/events.json"));
+            JsonWriter writer = new JsonWriter(new FileWriter(filePath));
             writer.beginObject();
             writer.name("events");
             writer.beginArray();

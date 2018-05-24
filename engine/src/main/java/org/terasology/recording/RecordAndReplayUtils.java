@@ -17,8 +17,10 @@ package org.terasology.recording;
 
 public class RecordAndReplayUtils {
     private static RecordAndReplayStatus recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
-    private static int recordCount; //begins as 0
     private static String gameTitle;
+    private static boolean shutdownRequested;
+    private static int fileCount = 1;
+    private static int fileAmount = 0;
 
     private RecordAndReplayUtils() {
 
@@ -32,14 +34,6 @@ public class RecordAndReplayUtils {
         RecordAndReplayUtils.recordAndReplayStatus = recordAndReplayStatus;
     }
 
-    public static int getRecordCount() {
-        return recordCount;
-    }
-
-    public static void setRecordCount(int recordCount) {
-        RecordAndReplayUtils.recordCount = recordCount;
-    }
-
     public static String getGameTitle() {
         return gameTitle;
     }
@@ -47,4 +41,36 @@ public class RecordAndReplayUtils {
     public static void setGameTitle(String gameTitle) {
         RecordAndReplayUtils.gameTitle = gameTitle;
     }
+
+    public static boolean isShutdownRequested() {
+        return shutdownRequested;
+    }
+
+    public static void setShutdownRequested(boolean shutdownRequested) {
+        RecordAndReplayUtils.shutdownRequested = shutdownRequested;
+    }
+
+    public static int getFileCount() {
+        return fileCount;
+    }
+
+    public static void setFileCount(int fileCount) {
+        RecordAndReplayUtils.fileCount = fileCount;
+    }
+
+    public static int getFileAmount() {
+        return fileAmount;
+    }
+
+    public static void setFileAmount(int fileAmount) {
+        RecordAndReplayUtils.fileAmount = fileAmount;
+    }
+
+    public static void reset() {
+        shutdownRequested = false;
+        fileCount = 1;
+        fileAmount = 0;
+    }
+
+
 }

@@ -146,7 +146,7 @@ public class EventCopier {
             newEvent = new NUISkinEditorButton();
         }  else {
             //Use logger here
-            System.out.println("ERROR!!! Event not Identified");
+            System.out.println("ERROR!!! Event not Identified: " + originalEvent.toString());
         }
         return newEvent;
     }
