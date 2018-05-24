@@ -176,12 +176,10 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public void initialize() {
-        if (RecordAndReplayUtils.getRecordCount() == 0) {
-            //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
-        } else {
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-        }
+        //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_RECORD);
+        RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+        //RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Stopwatch totalInitTime = Stopwatch.createStarted();
         try {

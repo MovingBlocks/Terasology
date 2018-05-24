@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -123,8 +124,8 @@ public class SaveTransaction extends AbstractTask {
 
     @Override
     public void run() {
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED) {
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAY_FINISHED
+                || RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             return; //if it is a replay, do not save the game
         }
         try {
@@ -144,14 +145,15 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
-            //Saves events as String and deactivates RecordAndReplayStatus
-            //RecordAndReplaySerializer.saveEventsString();
-            RecordAndReplaySerializer.serializeRecordAndReplayData();
-            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
-            //If finished the first play, change the RecordAndReplayStatus to replaying so when the next game is setted up
-            //it will use the correct EventSystem
-            if (RecordAndReplayUtils.getRecordCount() == 1) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.PREPARING_REPLAY);
+            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
+                if (RecordAndReplayUtils.isShutdownRequested()) {
+                    RecordAndReplaySerializer.serializeRecordAndReplayData();
+                    RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+                    RecordAndReplayUtils.reset();
+                } else {
+                    String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+                    RecordAndReplaySerializer.serializeRecordedEvents(recordingPath);
+                }
             }
         } catch (IOException | RuntimeException t) {
             logger.error("Save game creation failed", t);

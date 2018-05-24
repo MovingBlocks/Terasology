@@ -41,6 +41,12 @@ public final class RecordedEventStore {
         return events;
     }
 
+    public static List<RecordedEvent> popEvents() {
+        List<RecordedEvent> recordedEvents = events;
+        events = new ArrayList<>();
+        return recordedEvents;
+    }
+
     public static void setEvents(List<RecordedEvent> deserializedEvents) {
         events = deserializedEvents;
     }

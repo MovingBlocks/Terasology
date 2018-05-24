@@ -16,6 +16,7 @@
 package org.terasology.recording;
 
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventReceiver;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -188,7 +189,13 @@ public class EventSystemReplayImpl implements EventSystem {
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             processRecordedEvents(10);
             if (this.recordedEvents.isEmpty()) {
-                RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+                if (RecordAndReplayUtils.getFileCount() <= RecordAndReplayUtils.getFileAmount()) {
+                    String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
+                    RecordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
+                    fillRecordedEvents();
+                } else {
+                    RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAY_FINISHED); // stops the replay if every recorded event was already replayed
+                }
             }
         }
         //Original process() on EventSystemImpl

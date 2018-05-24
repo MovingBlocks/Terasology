@@ -19,6 +19,7 @@ package org.terasology.utilities.concurrency;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.recording.RecordAndReplayUtils;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -119,6 +120,7 @@ public final class TaskMaster<T extends Task> {
     }
 
     public void shutdown(T shutdownTask, boolean awaitComplete) {
+        RecordAndReplayUtils.setShutdownRequested(true);
         if (!shutdownTask.isTerminateSignal()) {
             throw new IllegalArgumentException("Expected task to provide terminate signal");
         }
