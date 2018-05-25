@@ -19,27 +19,15 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 
-public class UniverseSetupScreen extends CoreScreenLayer {
+public class WorldConfigurationScreen extends CoreScreenLayer {
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:universeSetupScreen");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldConfigurationScreen");
 
     @Override
-    public void initialise(){
-
+    public void initialise() {
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
         );
-
-        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
-        WidgetUtil.trySubscribe(this, "worldConfig", button ->
-            triggerForwardAnimation(worldSetupScreen)
-        );
-
-        WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
-        WidgetUtil.trySubscribe(this, "continue", button ->
-                triggerForwardAnimation(worldPreGenerationScreen)
-         );
     }
 }
-
