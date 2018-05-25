@@ -1,0 +1,198 @@
+{
+  "type": "engine:WorldPreGenerationScreen",
+  "skin": "engine:mainMenu",
+  "contents": {
+    "type": "relativeLayout",
+    "contents": [
+      {
+        "type": "UIImage",
+        "image": "engine:terasology",
+        "id": "title",
+        "layoutInfo": {
+          "width": 512,
+          "height": 128,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "TOP",
+            "offset": 48
+          }
+        }
+      },
+      {
+        "type": "UILabel",
+        "id": "subtitle",
+        "family": "title",
+        "text": "${engine:menu#world-pre-generation}",
+        "layoutInfo": {
+          "height": 48,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "widget": "title"
+          }
+        }
+      },
+      {
+        "type": "UIBox",
+        "id": "container",
+        "layoutInfo": {
+          "width": 720,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "BOTTOM",
+            "offset": 16,
+            "widget": "subtitle"
+          },
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "close",
+            "offset": 16
+          }
+        }
+      },
+      {
+        "type": "ColumnLayout",
+        "columns": 2,
+        "horizontalSpacing": 8,
+        "column-widths": [0.53, 0.47],
+        "layoutInfo": {
+          "width": 704,
+          "position-horizontal-center": {},
+          "position-top": {
+            "target": "TOP",
+            "widget": "container",
+            "offset": 8
+          },
+          "position-bottom": {
+            "target": "TOP",
+            "widget": "close",
+            "offset": 24
+          }
+        },
+        "contents": [
+          {
+            "type": "UIImage",
+            "skin": "framed_image",
+            "id": "preview"
+          },
+          {
+            "type": "ColumnLayout",
+            "columns": 1,
+            "verticalSpacing": 4,
+            "contents": [
+              {
+                "type": "UILabel",
+                "text": "${engine:menu#time-progression-during-pre-generation}:",
+                "id": "zoomLabel",
+                "family": "left-label"
+              },
+              {
+                "type": "UISlider",
+                "id": "zoomSlider",
+                "minimum": 1.0,
+                "range": 9.0,
+                "increment": 1.0,
+                "precision": 0,
+                "layoutInfo": {
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "BOTTOM",
+                    "widget": "zoomLabel",
+                    "offset": 0
+                  }
+                }
+              },
+              {
+                "type": "UISpace",
+                "size": [1, 32]
+              },
+              {
+                "type": "UILabel",
+                "text": "${engine:menu#game-world-generators}:",
+                "id": "worldGenLabel",
+                "family": "left-label",
+                "layoutInfo": {
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "BOTTOM",
+                    "widget": "zoomSlider",
+                    "offset": 0
+                  }
+                }
+              },
+              {
+                "type": "UIDropdown",
+                "id": "worldGenerators",
+                "layoutInfo": {
+                  "position-horizontal-center": {},
+                  "position-top": {
+                    "target": "BOTTOM",
+                    "widget": "worldGenLabel",
+                    "offset": 0
+                  }
+                }
+              },
+              {
+                "type": "RowLayout",
+                "id": "worldGenActions",
+                "horizontalSpacing": 4,
+                "contents": [
+                  {
+                    "type": "UIButton",
+                    "text": "${engine:menu#re-roll}",
+                    "id": "reRoll"
+                  },
+                  {
+                    "type": "UIButton",
+                    "text": "${engine:menu#create-preview}",
+                    "id": "accept"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "UISpace",
+        "id": "close",
+        "layoutInfo": {
+          "width": 128,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": 48
+          }
+        }
+      },
+      {
+        "type": "RowLayout",
+        "id": "actionsRow",
+        "horizontalSpacing": 4,
+        "contents": [
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#back}",
+            "id": "close"
+          },
+          {
+            "type": "UIButton",
+            "text": "${engine:menu#continue}",
+            "id": "continue"
+          }
+        ],
+        "layoutInfo": {
+          "width": 400,
+          "height": 32,
+          "position-horizontal-center": {},
+          "position-bottom": {
+            "target": "BOTTOM",
+            "offset": -48,
+            "widget": "container"
+          }
+        }
+      }
+    ]
+  }
+}
