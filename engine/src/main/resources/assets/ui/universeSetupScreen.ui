@@ -42,59 +42,8 @@
           "horizontalSpacing": 4,
           "contents": [
             {
-              "type": "UISpace",
-              "size": [
-                1,
-                8
-              ]
-            },
-            {
               "type": "UILabel",
-              "text": "${engine:menu#game-worlds}:",
-              "family": "left-label"
-            },
-            {
-              "type": "RowLayout",
-              "verticalSpacing": 4,
-              "horizontalSpacing": 4,
-              "contents": [
-                {
-                  "type": "UIDropdownScrollable",
-                  "id": "worlds",
-                  "layoutInfo": {
-                    "relativeWidth": 0.50
-                  }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
-                },
-                {
-                  "type": "UIButton",
-                  "id": "worldConfig",
-                  "text": "${engine:menu#config}",
-                  "layoutInfo": {
-                    "relativeWidth": 0.30
-                  }
-                },
-                {
-                  "type": "UISpace",
-                  "size": [
-                    1,
-                    8
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "UISpace",
-              "size": [
-                1,
-                48
-              ]
+              "text": "Pick a world generator and add it. Then select and configure worlds from the freshly filled Worlds dropdown"
             },
             {
               "type": "UILabel",
@@ -142,6 +91,47 @@
               "size": [
                 1,
                 8
+              ]
+            },
+            {
+              "type": "UILabel",
+              "text": "${engine:menu#game-worlds}:",
+              "family": "left-label"
+            },
+            {
+              "type": "RowLayout",
+              "verticalSpacing": 4,
+              "horizontalSpacing": 4,
+              "contents": [
+                {
+                  "type": "UIDropdownScrollable",
+                  "id": "worlds",
+                  "layoutInfo": {
+                    "relativeWidth": 0.50
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                },
+                {
+                  "type": "UIButton",
+                  "id": "worldConfig",
+                  "text": "${engine:menu#config}",
+                  "layoutInfo": {
+                    "relativeWidth": 0.30
+                  }
+                },
+                {
+                  "type": "UISpace",
+                  "size": [
+                    1,
+                    8
+                  ]
+                }
               ]
             }
           ]

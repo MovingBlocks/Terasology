@@ -101,7 +101,7 @@
           },
           {
             "type": "UIButton",
-            "text": "${engine:menu#continue}",
+            "text": "${engine:menu#start-game}",
             "id": "continue"
           }
         ],
