@@ -97,6 +97,7 @@
                 "range": 9.0,
                 "increment": 1.0,
                 "precision": 0,
+                "value": 0.0,
                 "layoutInfo": {
                   "position-horizontal-center": {},
                   "position-top": {
