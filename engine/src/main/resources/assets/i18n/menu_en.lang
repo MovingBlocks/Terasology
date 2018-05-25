@@ -236,6 +236,7 @@
     "remove-binding": "Remove",
     "remove-server": "Remove",
     "reset-default": "Reset",
+    "re-roll": "Re-Roll",
     "reset-fov-amount": "Reset fov amount",
     "resolution-scale": "Resolution Scale",
     "respawn": "Respawn",
@@ -318,6 +319,7 @@
     "this-language-native": "English",
     "universe-setup": "Universe Setup",
     "update-module": "Update",
+    "time-progression-during-pre-generation": "Time progression during pre-generation",
     "validation-username-max-length": "Username can't be longer then 100 chars",
     "video-display-mode": "Display Mode",
     "video-fullscreen": "Fullscreen",
@@ -355,6 +357,8 @@
     "widget-selection-prompt": "Select the type of the widget:",
     "widget-selection-title": "Widget Selection",
     "world-config-preview": "Details...",
+    "world-configuration": "World Configuration",
     "world-seed": "Seed",
-    "world-setup": "World Setup"
+    "world-setup": "World Setup",
+    "world-pre-generation": "World Pre-generation"
 }

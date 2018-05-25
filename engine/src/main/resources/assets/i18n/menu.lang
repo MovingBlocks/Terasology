@@ -137,7 +137,7 @@
     "game-name": "game-name",
     "game-settings": "game-settings",
     "game-worlds": "game-worlds",
-    "game-world-generators": "game-world-generators"
+    "game-world-generators": "game-world-generators",
     "gameplay": "gameplay",
     "gameplay-info": "gameplay-info",
     "host-multiplayer-game": "host-multiplayer-game",
@@ -229,6 +229,7 @@
     "remove-confirmation-popup-message": "remove-confirmation-popup-message",
     "remove-binding": "remove-binding",
     "remove-server": "remove-server",
+    "re-roll": "re-roll",
     "reset-default": "reset-default",
     "reset-fov-amount": "reset-fov-amount",
     "resolution-scale": "resolution-scale",
@@ -312,6 +313,7 @@
     "this-language-native": "this-language-native",
     "universe-setup": "universe-setup",
     "update-module": "update-module",
+    "time-progression-during-pre-generation": "time-progression-during-pre-generation",
     "video-windowed-fullscreen": "video-windowed-fullscreen",
     "video-fullscreen": "video-fullscreen",
     "video-graphic-settings": "video-graphic-settings",
@@ -346,6 +348,8 @@
     "widget-selection-prompt": "widget-selection-prompt",
     "widget-selection-title": "widget-selection-title",
     "world-config-preview": "world-config-preview",
+    "world-configuration": "world-configuration",
     "world-seed": "world-seed",
-    "world-setup": "world-setup"
+    "world-setup": "world-setup",
+    "world-pre-generation": "world-pre-generation"
 }
