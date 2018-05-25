@@ -111,8 +111,8 @@ public class CreateGameScreen extends CoreScreenLayer {
             });
         }
 
-        final UIText worldName = find("worldName", UIText.class);
-        setGameName(worldName);
+        final UIText gameName = find("gameName", UIText.class);
+        setGameName(gameName);
 
         final UIText seed = find("seed", UIText.class);
         if (seed != null) {
@@ -244,7 +244,7 @@ public class CreateGameScreen extends CoreScreenLayer {
             } else {
                 GameManifest gameManifest = new GameManifest();
 
-                gameManifest.setTitle(worldName.getText());
+                gameManifest.setTitle(gameName.getText());
                 gameManifest.setSeed(seed.getText());
                 DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
                 ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
@@ -297,8 +297,8 @@ public class CreateGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        final UIText worldName = find("worldName", UIText.class);
-        setGameName(worldName);
+        final UIText gameName = find("gameName", UIText.class);
+        setGameName(gameName);
 
         final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
 
@@ -334,8 +334,8 @@ public class CreateGameScreen extends CoreScreenLayer {
         }
     }
 
-    private void setGameName(UIText worldName) {
-        if (worldName != null) {
+    private void setGameName(UIText gameName) {
+        if (gameName != null) {
             int gameNum = 1;
             for (GameInfo info : GameProvider.getSavedGames()) {
                 if (info.getManifest().getTitle().startsWith(DEFAULT_GAME_NAME_PREFIX)) {
@@ -348,7 +348,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 }
             }
 
-            worldName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
+            gameName.setText(DEFAULT_GAME_NAME_PREFIX + gameNum);
         }
     }
 
