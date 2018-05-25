@@ -19,9 +19,9 @@ import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
 
-public class WorldConfigurationScreen extends CoreScreenLayer {
+public class StartPlayingScreen extends CoreScreenLayer {
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:worldConfigurationScreen");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:startPlayingScreen");
 
     @Override
     public void initialise() {

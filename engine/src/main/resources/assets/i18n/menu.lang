@@ -266,6 +266,7 @@
     "ssao": "ssao",
     "start-game": "start-game",
     "start-singleplayer-game": "start-singleplayer-game",
+    "start-playing": "start-playing",
     "storage-service": "storage-service",
     "storage-service-conflict-message": "storage-service-conflict-message",
     "storage-service-conflict-keep-local": "storage-service-conflict-keep-local",

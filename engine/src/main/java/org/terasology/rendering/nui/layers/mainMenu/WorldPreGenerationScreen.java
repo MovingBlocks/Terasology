@@ -26,9 +26,9 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
     @Override
     public void initialise(){
 
-        WorldConfigurationScreen worldConfigurationScreen = getManager().createScreen(WorldConfigurationScreen.ASSET_URI, WorldConfigurationScreen.class);
+        StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button ->
-                triggerForwardAnimation(worldConfigurationScreen)
+                triggerForwardAnimation(startPlayingScreen)
         );
 
         WidgetUtil.trySubscribe(this, "close", button ->
