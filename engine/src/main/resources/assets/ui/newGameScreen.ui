@@ -61,7 +61,7 @@
             },
             {
               "type": "UIText",
-              "id": "worldName"
+              "id": "gameName"
             },
             {
               "type": "UISpace",
