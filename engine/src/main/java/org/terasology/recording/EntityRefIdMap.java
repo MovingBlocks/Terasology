@@ -18,9 +18,15 @@ package org.terasology.recording;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Saves important EntityRef ids so a mapping from recording to replay can be done.
+ */
 public final class EntityRefIdMap {
 
+    // This map saves the ids from the current game, be it a record or replay. If it is a record, this data will be saved in a file.
     private static Map<String, Long> currentMap = new HashMap<>();
+
+    // When a replay begins, this variable is loaded with the Recording's "currentMap".
     private static Map<String, Long> previousMap = new HashMap<>();
 
 
@@ -37,15 +43,15 @@ public final class EntityRefIdMap {
         return currentMap.get(key);
     }
 
-    public static long getIdFromPrevious(String key) {
+    static long getIdFromPrevious(String key) {
         return previousMap.get(key);
     }
 
-    public static Map<String, Long> getCurrentMap() {
+    static Map<String, Long> getCurrentMap() {
         return currentMap;
     }
 
-    public static void setPreviousMap(Map<String, Long> map) {
+    static void setPreviousMap(Map<String, Long> map) {
         previousMap = map;
     }
 }

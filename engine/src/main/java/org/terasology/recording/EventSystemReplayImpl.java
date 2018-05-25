@@ -96,7 +96,6 @@ public class EventSystemReplayImpl implements EventSystem {
 
     //Event replaying
     private boolean loadedRecordedEvents; // if the recorded events were loaded from the RecordedEventStore
-    private int testCount; //begins as 0
     private long startTime; // When the events were loaded. Used to reproduce the events at the correct time
     private EngineEntityManager entityManager; // Necessary to do some entity id mapping from original client and replay client
 
@@ -124,11 +123,6 @@ public class EventSystemReplayImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
-            //Addition to replay just to see some data. Should be removed later.
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-                //System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
-                this.testCount++;
-            }
             networkReplicate(entity, event);
 
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
@@ -149,11 +143,6 @@ public class EventSystemReplayImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
-            //Addition to replay just to see some data. Should be removed later.
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
-                //System.out.println("PROCESSING EVENT " + this.testCount + " " + event.toString());
-                this.testCount++;
-            }
             SetMultimap<Class<? extends Component>, EventSystemReplayImpl.EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 List<EventSystemReplayImpl.EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
@@ -189,7 +178,7 @@ public class EventSystemReplayImpl implements EventSystem {
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.REPLAYING) {
             processRecordedEvents(10);
             if (this.recordedEvents.isEmpty()) {
-                if (RecordAndReplayUtils.getFileCount() <= RecordAndReplayUtils.getFileAmount()) {
+                if (RecordAndReplayUtils.getFileCount() <= RecordAndReplayUtils.getFileAmount()) { //Get next recorded events file
                     String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
                     RecordAndReplaySerializer.deserializeRecordedEvents(recordingPath);
                     fillRecordedEvents();

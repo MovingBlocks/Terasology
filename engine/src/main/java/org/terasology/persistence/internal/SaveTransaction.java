@@ -145,6 +145,7 @@ public class SaveTransaction extends AbstractTask {
             mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
+            //Save Recording Data
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
                 if (RecordAndReplayUtils.isShutdownRequested()) {
                     RecordAndReplaySerializer.serializeRecordAndReplayData();

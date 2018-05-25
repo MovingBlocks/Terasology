@@ -94,7 +94,8 @@ public class SelectGameScreen extends CoreScreenLayer {
 
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if (saveGamePath != null) {
-            //this may be temporary
+            //this is be temporary since there is no UI for Record and Replay yet.
+            //Gets the recordings path if it is a replay, or the saves path otherwise.
             Path saveOrRecordingPath;
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
                 saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();

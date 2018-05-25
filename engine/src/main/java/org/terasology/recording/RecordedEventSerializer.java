@@ -15,9 +15,13 @@
  */
 package org.terasology.recording;
 
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
-import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.SimpleUri;
@@ -25,14 +29,10 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.input.*;
-import org.terasology.input.binds.general.*;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.*;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.*;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
@@ -53,39 +53,73 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.naming.Name;
 import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
 import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.binds.general.ChatButton;
+import org.terasology.input.binds.general.ConsoleButton;
+import org.terasology.input.binds.general.HideHUDButton;
+import org.terasology.input.binds.general.OnlinePlayersButton;
+import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.general.ScreenshotButton;
+import org.terasology.input.binds.movement.AutoMoveButton;
+import org.terasology.input.binds.movement.BackwardsButton;
+import org.terasology.input.binds.movement.CrouchButton;
+import org.terasology.input.binds.movement.ForwardsButton;
+import org.terasology.input.binds.movement.JumpButton;
+import org.terasology.input.binds.movement.RightStrafeButton;
+import org.terasology.input.binds.movement.LeftStrafeButton;
+import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
+import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
+import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.RotationYawAxis;
+import org.terasology.input.binds.movement.RotationPitchAxis;
+import org.terasology.input.binds.movement.StrafeRealMovementAxis;
+import org.terasology.input.binds.movement.StrafeMovementAxis;
+import org.terasology.input.binds.movement.VerticalRealMovementAxis;
+import org.terasology.input.binds.movement.VerticalMovementAxis;
+import org.terasology.input.events.InputEvent;
+import org.terasology.input.events.KeyUpEvent;
+import org.terasology.input.events.KeyRepeatEvent;
+import org.terasology.input.events.KeyDownEvent;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.ButtonState;
+import org.terasology.input.Keyboard;
+import org.terasology.input.MouseInput;
+
 
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Writer;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecordedEventSerializer {
+/**
+ * Serializes RecordedEvents
+ */
+class RecordedEventSerializer {
 
+    private static final Logger logger = LoggerFactory.getLogger(RecordedEventSerializer.class);
     private TypeSerializationLibrary typeSerializationLibrary;
     private EntityManager entityManager;
 
 
-    public RecordedEventSerializer(EntityManager entityManager) {
+    RecordedEventSerializer(EntityManager entityManager) {
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         this.typeSerializationLibrary = TypeSerializationLibrary.createDefaultLibrary(reflectFactory, copyStrategyLibrary);
         typeSerializationLibrary.add(EntityRef.class, new EntityRefTypeHandler((EngineEntityManager) entityManager));
-        typeSerializationLibrary.add(MouseAxisEvent.MouseAxis.class, new EnumTypeHandler<MouseAxisEvent.MouseAxis>(MouseAxisEvent.MouseAxis.class));
-        typeSerializationLibrary.add(ButtonState.class, new EnumTypeHandler<ButtonState>(ButtonState.class));
-        typeSerializationLibrary.add(Keyboard.Key.class, new EnumTypeHandler<Keyboard.Key>(Keyboard.Key.class));
-        typeSerializationLibrary.add(MouseInput.class, new EnumTypeHandler<MouseInput>(MouseInput.class));
+        typeSerializationLibrary.add(MouseAxisEvent.MouseAxis.class, new EnumTypeHandler<>(MouseAxisEvent.MouseAxis.class));
+        typeSerializationLibrary.add(ButtonState.class, new EnumTypeHandler<>(ButtonState.class));
+        typeSerializationLibrary.add(Keyboard.Key.class, new EnumTypeHandler<>(Keyboard.Key.class));
+        typeSerializationLibrary.add(MouseInput.class, new EnumTypeHandler<>(MouseInput.class));
         this.entityManager = entityManager;
     }
 
-    public void serializeRecordedEvents (List<RecordedEvent> events, String filePath) {
+    void serializeRecordedEvents(List<RecordedEvent> events, String filePath) {
         try {
-            /*Writer writer = new FileWriter("Output.json");
-            Gson gson = new GsonBuilder().create();
-            for (RecordedEvent event : events) {
-
-            }*/
             JsonWriter writer = new JsonWriter(new FileWriter(filePath));
             writer.beginObject();
             writer.name("events");
@@ -185,7 +219,7 @@ public class RecordedEventSerializer {
             writer.endObject();
 
         } else {
-            System.out.println("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
+            logger.error("ERROR: EVENT NOT SUPPORTED FOR SERIALIZATION");
         }
     }
 
@@ -250,7 +284,7 @@ public class RecordedEventSerializer {
             writer.name("y").value(array.get(1).getAsInt());
             writer.endObject();
         } else {
-            System.out.println("ERROR, EVENT NOT COMPATIBLE");
+            logger.error("ERROR, EVENT NOT COMPATIBLE");
         }
     }
 
@@ -278,7 +312,7 @@ public class RecordedEventSerializer {
                 events.add(re);
             }
         } catch (Exception e) {
-            e.printStackTrace(); // put this into a logger
+            logger.error(e.getMessage());
         }
 
         return events;
@@ -430,7 +464,7 @@ public class RecordedEventSerializer {
             float delta = jsonObject.get("delta").getAsFloat();
             newEvent = new MouseWheelEvent(mousePosition, wheelTurns, delta);
         } else {
-            System.out.println("Not an Input Event"); // change to logger
+            logger.error("Not an Input Event"); // change to logger
             return null;
         }
 

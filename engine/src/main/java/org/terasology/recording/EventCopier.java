@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,47 @@
  */
 package org.terasology.recording;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindButtonEvent;
-import org.terasology.input.binds.general.*;
+import org.terasology.input.binds.general.ChatButton;
+import org.terasology.input.binds.general.ConsoleButton;
+import org.terasology.input.binds.general.HideHUDButton;
+import org.terasology.input.binds.general.OnlinePlayersButton;
+import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.general.ScreenshotButton;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.*;
+import org.terasology.input.binds.movement.AutoMoveButton;
+import org.terasology.input.binds.movement.BackwardsButton;
+import org.terasology.input.binds.movement.CrouchButton;
+import org.terasology.input.binds.movement.ForwardsButton;
+import org.terasology.input.binds.movement.JumpButton;
+import org.terasology.input.binds.movement.RightStrafeButton;
+import org.terasology.input.binds.movement.LeftStrafeButton;
+import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
+import org.terasology.input.binds.movement.ToggleSpeedPermanentlyButton;
+import org.terasology.input.binds.movement.ForwardsRealMovementAxis;
+import org.terasology.input.binds.movement.ForwardsMovementAxis;
+import org.terasology.input.binds.movement.RotationYawAxis;
+import org.terasology.input.binds.movement.RotationPitchAxis;
+import org.terasology.input.binds.movement.StrafeRealMovementAxis;
+import org.terasology.input.binds.movement.StrafeMovementAxis;
+import org.terasology.input.binds.movement.VerticalRealMovementAxis;
+import org.terasology.input.binds.movement.VerticalMovementAxis;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.input.events.*;
+import org.terasology.input.events.InputEvent;
+import org.terasology.input.events.KeyUpEvent;
+import org.terasology.input.events.KeyRepeatEvent;
+import org.terasology.input.events.KeyDownEvent;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.logic.behavior.nui.BTEditorButton;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.DecreaseViewDistanceButton;
@@ -33,10 +63,19 @@ import org.terasology.logic.players.IncreaseViewDistanceButton;
 import org.terasology.rendering.nui.editor.binds.NUIEditorButton;
 import org.terasology.rendering.nui.editor.binds.NUISkinEditorButton;
 
-public class EventCopier {
+/**
+ * Responsible for making deep copies for the event types supported by Record And Replay.
+ */
+final class EventCopier {
+
+    private static final Logger logger = LoggerFactory.getLogger(EventCopier.class);
 
 
-    public static Event copyEvent(Event e) {
+    private EventCopier() {
+
+    }
+
+    static Event copyEvent(Event e) {
         if (e instanceof PlaySoundEvent) {
             return e;
         } else if (e instanceof BindButtonEvent) {
@@ -145,8 +184,7 @@ public class EventCopier {
         } else if (c.equals(NUISkinEditorButton.class)) {
             newEvent = new NUISkinEditorButton();
         }  else {
-            //Use logger here
-            System.out.println("ERROR!!! Event not Identified: " + originalEvent.toString());
+            logger.error("ERROR!!! Event not Identified: " + originalEvent.toString());
         }
         return newEvent;
     }
@@ -162,8 +200,7 @@ public class EventCopier {
         } else if (c.equals(KeyUpEvent.class)) {
             newEvent = KeyUpEvent.create(originalEvent.getKey(), originalEvent.getKeyCharacter(), originalEvent.getDelta());
         } else {
-            //Use logger here
-            System.out.println("ERROR!!! Event not Identified");
+            logger.error("ERROR!!! Event not Identified");
         }
         return newEvent;
     }
@@ -189,8 +226,7 @@ public class EventCopier {
         } else if (c.equals(VerticalRealMovementAxis.class)) {
             newEvent = new VerticalRealMovementAxis();
         } else {
-            //Use logger here
-            System.out.println("ERROR!!! Event not Identified");
+            logger.error("ERROR!!! Event not Identified");
         }
         return newEvent;
     }

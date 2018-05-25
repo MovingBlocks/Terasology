@@ -17,8 +17,10 @@ package org.terasology.recording;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.PendingEvent;
 
+/**
+ * Data from a Recorded Event.
+ */
 public class RecordedEvent {
 
     private long entityRefId;
@@ -27,14 +29,29 @@ public class RecordedEvent {
     private double timestamp;
     private long position;
 
-    public RecordedEvent(long entityRefId, Event event, double timestamp, long position) {
+    /**
+     *
+     * @param entityRefId Id of the EntityRef which the event was sent against.
+     * @param event The event to be recorded.
+     * @param timestamp The timestamp in which the event was sent.
+     * @param position The position of the RecordedEvent.
+     */
+    RecordedEvent(long entityRefId, Event event, double timestamp, long position) {
         this.entityRefId = entityRefId;
         this.event = event;
         this.timestamp = timestamp;
         this.position = position;
     }
 
-    public RecordedEvent(long entityRefId, Event event, Component component, double timestamp, long position) {
+    /**
+     *
+     * @param entityRefId Id of the EntityRef which the event was sent against.
+     * @param event The event to be recorded.
+     * @param component The component that was sent with the event
+     * @param timestamp The timestamp in which the event was sent.
+     * @param position The position of the RecordedEvent.
+     */
+    RecordedEvent(long entityRefId, Event event, Component component, double timestamp, long position) {
         this.entityRefId = entityRefId;
         this.event = event;
         this.component = component;
@@ -52,7 +69,7 @@ public class RecordedEvent {
         return position;
     }
 
-    public long getEntityRefId() {
+    long getEntityRefId() {
         return entityRefId;
     }
 

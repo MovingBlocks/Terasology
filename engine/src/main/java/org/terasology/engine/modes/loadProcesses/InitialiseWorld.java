@@ -117,6 +117,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) context.get(EntityManager.class);
         boolean writeSaveGamesEnabled = context.get(Config.class).getSystem().isWriteSaveGamesEnabled();
+        //Gets save data from a normal save or from a recording if it is a replay
         Path saveOrRecordingPath;
         if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
             saveOrRecordingPath = PathManager.getInstance().getRecordingPath(gameManifest.getTitle());
