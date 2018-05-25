@@ -149,7 +149,7 @@
                   {
                     "type": "UIButton",
                     "text": "${engine:menu#config}",
-                    "id": "accept"
+                    "id": "config"
                   }
                 ]
               }

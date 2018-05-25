@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.world.generation.World;
 
 public class WorldPreGenerationScreen extends CoreScreenLayer {
 
@@ -29,6 +30,12 @@ public class WorldPreGenerationScreen extends CoreScreenLayer {
         StartPlayingScreen startPlayingScreen = getManager().createScreen(StartPlayingScreen.ASSET_URI, StartPlayingScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button ->
                 triggerForwardAnimation(startPlayingScreen)
+        );
+
+        WorldSetupScreen worldSetupScreen = getManager().createScreen(WorldSetupScreen.ASSET_URI, WorldSetupScreen.class);
+
+        WidgetUtil.trySubscribe(this, "config", button ->
+                triggerForwardAnimation(worldSetupScreen)
         );
 
         WidgetUtil.trySubscribe(this, "close", button ->

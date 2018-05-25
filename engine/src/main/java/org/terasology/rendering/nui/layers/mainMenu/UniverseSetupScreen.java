@@ -36,6 +36,10 @@ public class UniverseSetupScreen extends CoreScreenLayer {
             triggerForwardAnimation(worldSetupScreen)
         );
 
+        WidgetUtil.trySubscribe(this, "addGenerator", button ->
+                triggerForwardAnimation(worldSetupScreen)
+        );
+
         WorldPreGenerationScreen worldPreGenerationScreen = getManager().createScreen(WorldPreGenerationScreen.ASSET_URI, WorldPreGenerationScreen.class);
         WidgetUtil.trySubscribe(this, "continue", button ->
                 triggerForwardAnimation(worldPreGenerationScreen)
