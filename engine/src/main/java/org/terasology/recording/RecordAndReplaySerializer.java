@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,15 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 
-import java.io.*;
+import java.io.FileWriter;
+import java.io.FileReader;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.util.HashMap;
 
-public class RecordAndReplaySerializer {
+/**
+ * Responsible for serializing and saving every Recording data.
+ */
+public final class RecordAndReplaySerializer {
     private static EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(RecordAndReplaySerializer.class);
     private static final String EVENT_DIR = "/events";
@@ -47,38 +50,9 @@ public class RecordAndReplaySerializer {
         entityManager = manager;
     }
 
-    //This will probably not exist once serialization is done. Saves recorded events as String
-    /*public static void saveEventsString() {
-        StringBuffer sb = new StringBuffer();
-        for (RecordedEvent re : RecordedEventStore.getEvents()) {
-            saveOneEventAsString(re, sb);
-        }
-        try {
-            int recordCount = RecordAndReplayUtils.getRecordCount();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File("Recorded_Events"+recordCount+".txt")));
-            recordCount++;
-            RecordAndReplayUtils.setRecordCount(recordCount);
-            writer.write(sb.toString());
-            writer.flush();
-            writer.close();
-
-        } catch (IOException exception) {
-            logger.error(exception.getMessage(), exception);
-        }
-    }
-
-    //This will probably not exist once serialization is done
-    private static void saveOneEventAsString(RecordedEvent re, StringBuffer sb) {
-        sb.append("==================================================\n");
-        sb.append("Position: " + re.getPosition() + " Timestamp:" + re.getTimestamp() + "\n");
-        sb.append("Event: " + re.getEvent().toString() + "\n");
-        sb.append("Entity: " + re.getEntityRefId() + "\n");
-        if (re.getComponent() != null) {
-            sb.append("Component: " + re.getComponent().toString() + "\n");
-        }
-
-    }*/
-
+    /**
+     * Serialize RecordedEvents, EntityRefIdMap and some RecordAndReplayUtils data.
+     */
     public static void serializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
         serializeRecordedEvents(recordingPath);
@@ -87,6 +61,10 @@ public class RecordAndReplaySerializer {
         serializeFileAmount(gson, recordingPath);
     }
 
+    /**
+     * Serialize RecordedEvents.
+     * @param recordingPath path where the data should be saved.
+     */
     public static void serializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
@@ -96,6 +74,9 @@ public class RecordAndReplaySerializer {
         logger.info("RecordedEvents Serialization completed!");
     }
 
+    /**
+     * Deserialize RecordedEvents, EntityRefIdMap and some RecordAndReplayUtils data.
+     */
     public static void deserializeRecordAndReplayData() {
         String recordingPath = PathManager.getInstance().getRecordingPath(RecordAndReplayUtils.getGameTitle()).toString();
         deserializeRecordedEvents(recordingPath);
@@ -104,7 +85,11 @@ public class RecordAndReplaySerializer {
         deserializeFileAmount(gson, recordingPath);
     }
 
-    public static void deserializeRecordedEvents(String recordingPath) {
+    /**
+     * Deserialize RecordedEvents.
+     * @param recordingPath path where the data was saved.
+     */
+    static void deserializeRecordedEvents(String recordingPath) {
         RecordedEventSerializer serializer = new RecordedEventSerializer(entityManager);
         String filepath = recordingPath + EVENT_DIR + RecordAndReplayUtils.getFileCount() + JSON;
         RecordAndReplayUtils.setFileCount(RecordAndReplayUtils.getFileCount() + 1);

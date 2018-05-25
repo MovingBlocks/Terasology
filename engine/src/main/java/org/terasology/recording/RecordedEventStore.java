@@ -15,14 +15,11 @@
  */
 package org.terasology.recording;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Responsible for saving the recorded events. Also contains the status of the RecordAndReplay.
+ * Responsible for saving the recorded events.
  */
 public final class RecordedEventStore {
 
@@ -41,7 +38,7 @@ public final class RecordedEventStore {
         return events;
     }
 
-    public static List<RecordedEvent> popEvents() {
+    static List<RecordedEvent> popEvents() {
         List<RecordedEvent> recordedEvents = events;
         events = new ArrayList<>();
         return recordedEvents;

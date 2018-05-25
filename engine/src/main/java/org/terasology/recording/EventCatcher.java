@@ -28,29 +28,31 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 public class EventCatcher {
 
     private long startTime;
+    private long eventCounter;
 
     public EventCatcher() {
-        startTime = System.currentTimeMillis(); // I have to check for how long I can record using this
+        this.startTime = System.currentTimeMillis();
+        this.eventCounter = 0;
     }
 
     /**
      * Receives a PendingEvent and add it as a RecordedEvent in the RecordedEventStore if it is an event type that should be
      * recorded.
      * @param pe PendingEvent to be checked and added
-     * @param position Position of when the event was catched. Used only for test purposes
      * @return If the event was added to the RecordedEventStore
      */
-    public boolean addEvent(PendingEvent pe, long position) {
+    public boolean addEvent(PendingEvent pe) {
         if (shouldRecordEvent(pe)) {
             long timestamp = System.currentTimeMillis() - this.startTime;
             Event e = EventCopier.copyEvent(pe.getEvent());
             PendingEvent newPendingEvent = new PendingEvent(pe.getEntity(), e);
             RecordedEvent re;
             if (pe.getComponent() == null) {
-                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, position);
+                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), timestamp, this.eventCounter);
             } else {
-                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, position);
+                re = new RecordedEvent(newPendingEvent.getEntity().getId(), newPendingEvent.getEvent(), newPendingEvent.getComponent(), timestamp, this.eventCounter);
             }
+            this.eventCounter++;
             return RecordedEventStore.add(re);
         } else {
             return false;
@@ -64,6 +66,5 @@ public class EventCatcher {
                 || event instanceof InputEvent
                 || event instanceof CameraTargetChangedEvent
                 || event instanceof CharacterMoveInputEvent);
-
     }
 }

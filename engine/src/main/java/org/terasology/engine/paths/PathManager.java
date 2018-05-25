@@ -21,8 +21,6 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 
 import org.lwjgl.LWJGLUtil;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +42,6 @@ public final class PathManager {
 
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String RECORDINGS_LIBRARY_DIR = "recordings_library";
-    //private static final String RECORDINGS_LIBRARY_DIR = "saves2";
     private static final String LOG_DIR = "logs";
     private static final String SHADER_LOG_DIR = "shaders";
     private static final String MOD_DIR = "modules";
@@ -203,6 +200,10 @@ public final class PathManager {
         return savesPath;
     }
 
+    /**
+     *
+     * @return Path in which recordings are saved.
+     */
     public Path getRecordingsPath() {
         return recordingsPath;
     }

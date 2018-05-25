@@ -72,11 +72,6 @@ public class PojoEntityRef extends BaseEntityRef {
 
     @Override
     public void invalidate() {
-        /*if (!(RecordedEventStore.isRecording || RecordedEventStore.beginReplay)) {
-            System.out.println("Invalidating! (POJO) " + getId());
-            super.invalidate();
-            exists = false;
-        }*/
         super.invalidate();
         exists = false;
     }

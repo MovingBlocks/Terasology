@@ -50,7 +50,9 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.recording.*;
+import org.terasology.recording.EventCatcher;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.Method;
@@ -89,7 +91,6 @@ public class EventSystemImpl implements EventSystem {
 
     //Event recording
     private EventCatcher eventCatcher;
-    private long eventCounter;
 
 
     public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
@@ -97,7 +98,6 @@ public class EventSystemImpl implements EventSystem {
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
         this.eventCatcher = new EventCatcher();
-        this.eventCounter = 0;
     }
 
     @Override
@@ -268,8 +268,7 @@ public class EventSystemImpl implements EventSystem {
         } else {
             //event recording
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
-                eventCatcher.addEvent(new PendingEvent(entity, event), this.eventCounter);
-                this.eventCounter++;
+                eventCatcher.addEvent(new PendingEvent(entity, event));
             }
             networkReplicate(entity, event);
 
@@ -372,8 +371,7 @@ public class EventSystemImpl implements EventSystem {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.RECORDING) {
-                eventCatcher.addEvent(new PendingEvent(entity, event, component), this.eventCounter);
-                this.eventCounter++;
+                eventCatcher.addEvent(new PendingEvent(entity, event, component));
             }
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {

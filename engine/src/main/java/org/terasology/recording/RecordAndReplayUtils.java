@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,16 @@
  */
 package org.terasology.recording;
 
-public class RecordAndReplayUtils {
+/**
+ * Saves data important for Record and Replay, such as the RecordAndReplayStatus, the title of the current game, if a
+ * shutdown was requested, and the amount of files used to serialize RecordedEvents.
+ */
+public final class RecordAndReplayUtils {
     private static RecordAndReplayStatus recordAndReplayStatus = RecordAndReplayStatus.NOT_ACTIVATED;
     private static String gameTitle;
     private static boolean shutdownRequested;
     private static int fileCount = 1;
-    private static int fileAmount = 0;
+    private static int fileAmount;
 
     private RecordAndReplayUtils() {
 
@@ -50,22 +54,23 @@ public class RecordAndReplayUtils {
         RecordAndReplayUtils.shutdownRequested = shutdownRequested;
     }
 
-    public static int getFileCount() {
+    static int getFileCount() {
         return fileCount;
     }
 
-    public static void setFileCount(int fileCount) {
+    static void setFileCount(int fileCount) {
         RecordAndReplayUtils.fileCount = fileCount;
     }
 
-    public static int getFileAmount() {
+    static int getFileAmount() {
         return fileAmount;
     }
 
-    public static void setFileAmount(int fileAmount) {
+    static void setFileAmount(int fileAmount) {
         RecordAndReplayUtils.fileAmount = fileAmount;
     }
 
+    //should be called once a Recording ends
     public static void reset() {
         shutdownRequested = false;
         fileCount = 1;

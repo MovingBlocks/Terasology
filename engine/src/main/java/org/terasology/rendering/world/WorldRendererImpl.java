@@ -640,12 +640,12 @@ public final class WorldRendererImpl implements WorldRenderer {
             renderPipelineTaskList = renderTaskListGenerator.generateFrom(orderedNodes);
             requestedTaskListRefresh = false;
 
-            //If it is the first game, activates the recording
+            //Activate record when the preparations are ready
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
                 RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.RECORDING);
             }
 
-            //If the game is set to replay, begin the replay process
+            //Activate the replay when the preparations are ready
             if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
                 RecordAndReplaySerializer.deserializeRecordAndReplayData();
                 RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.REPLAYING);

@@ -30,8 +30,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.recording.EntityRefIdMap;
-import org.terasology.recording.RecordAndReplayStatus;
-import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.registry.CoreRegistry;
 
 /**
