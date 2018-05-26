@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,7 +176,7 @@ public final class EnvironmentSwitchHandler {
 
     private static void loadFamilies(BlockFamilyRegistry registry, ModuleEnvironment environment) {
         registry.clear();
-        for(Class<?> blockFamily : environment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
+        for (Class<?> blockFamily : environment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
             if (!BlockFamily.class.isAssignableFrom(blockFamily)) {
                 logger.error("Cannot load {}, must be a subclass of BlockFamily", blockFamily.getSimpleName());
                 continue;

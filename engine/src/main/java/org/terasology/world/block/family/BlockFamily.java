@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
 /**
- * A collection of blocks that are all different blocks
+ * A collection of related blocks that are all distinct but can collapse to a single "family" block.
  * This will enable such effects as players picking up a block with one orientation and it grouping
  * with the same block with different orientations, and placing it in different directions.
  */

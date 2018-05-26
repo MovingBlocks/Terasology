@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- */
 @RegisterAssetDataProducer
 public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitionData> {
 

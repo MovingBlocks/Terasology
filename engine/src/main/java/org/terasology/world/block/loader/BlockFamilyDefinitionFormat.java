@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * Defines the format used to parse .block files
+ * Defines the format used to parse .block files.
  */
 public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFamilyDefinitionData> {
 
@@ -139,7 +139,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             // Deserialize everything
             BlockFamilyDefinitionData result = new BlockFamilyDefinitionData(base);
             setBoolean(result::setTemplate, jsonObject, "template");
-            setObject(result::setBlockFamily,jsonObject,"family", Class.class, context);
+            setObject(result::setBlockFamily, jsonObject, "family", Class.class, context);
             setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
@@ -380,6 +380,4 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             return null;
         }
     }
-
 }
-

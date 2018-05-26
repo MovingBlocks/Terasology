@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.block.items;
 
 import org.terasology.telemetry.GamePlayStatsComponent;
@@ -47,14 +46,12 @@ import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Map;
 
-/**
- */
 // TODO: Predict placement client-side (and handle confirm/denial)
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockItemSystem extends BaseComponentSystem {
 
     /**
-     * Margin and other allowed penedration is also 0.03 or 0.04.
+     * Margin and other allowed penetration is also 0.03 or 0.04.
      * Since precision is only float it needs to be that high.
      */
     private static final float ADDITIONAL_ALLOWED_PENETRATION = 0.4f;

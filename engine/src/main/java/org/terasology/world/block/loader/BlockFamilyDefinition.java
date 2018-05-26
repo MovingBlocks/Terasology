@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.Collections;
 import java.util.List;
 
-/**
- */
 @API
 public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
 
@@ -55,12 +53,12 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(!isFreeform());
-        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(),this,blockBuilderHelper);
+        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, blockBuilderHelper);
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(isFreeform());
-        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(),this,shape,blockBuilderHelper);
+        return BlockFamilyRegistry.createFamily(getData().getBlockFamily(), this, shape, blockBuilderHelper);
     }
 
 

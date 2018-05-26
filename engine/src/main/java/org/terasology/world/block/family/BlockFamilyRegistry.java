@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,8 +115,9 @@ public class BlockFamilyRegistry {
             return new String[]{};
         }
         BlockSections sections = blockFamily.getAnnotation(BlockSections.class);
-        if (sections == null)
+        if (sections == null) {
             return new String[]{};
+        }
         return sections.value();
     }
     

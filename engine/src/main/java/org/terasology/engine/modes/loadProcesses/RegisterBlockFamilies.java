@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class RegisterBlockFamilies  extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         BlockManager blockManager = context.get(BlockManager.class);
-        for(BlockFamily blockFamily : blockManager.listRegisteredBlockFamilies()) {
+        for (BlockFamily blockFamily : blockManager.listRegisteredBlockFamilies()) {
             InjectionHelper.inject(blockFamily, context);
         }
         return  true;

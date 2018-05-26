@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A multi-section is a section that are loaded and applied to one or more other sections. Example: The Sides multi-section provides data that applies to the Left, Right,
- * Front and Back sections.
+ * A multi-section is a section that are loaded and applied to one or more other sections.
+ * Example: The Sides multi-section provides data that applies to the Left, Right, Front and Back sections.
  * <p>
  *     Each mult-section will  have a collection of sections and each of those sections can override an existing values on the base block when that
  *     family section is used. look in BlockFamilyDefinitionFormat under deserializeSectionDefinitionData for properties that

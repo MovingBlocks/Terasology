@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.block.internal;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -35,7 +34,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.WorldAtlas;
@@ -255,13 +253,11 @@ public class BlockManagerImpl extends BlockManager {
                     }
                     registerFamily(newFamily.get());
 
-                }
-                catch (Exception ex){
+                } catch (Exception ex) {
                     // A family can fail to register if the block is missing uri or list of categories,
                     // but can fail to register if the family throws an error for any reason
-                    logger.error("Failed to register block familiy '{}'",newFamily,ex);
-                }
-                finally {
+                    logger.error("Failed to register block familiy '{}'", newFamily, ex);
+                } finally {
                     lock.unlock();
                 }
                 return newFamily.get();
@@ -373,5 +369,4 @@ public class BlockManagerImpl extends BlockManager {
             this.idByUri = new TObjectShortHashMap<>(oldState.idByUri);
         }
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
@@ -34,8 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * A freeform family is a pseudo block family that can be combined with any block shape to produce an actual block
- * family.
+ * A freeform family is a pseudo block family that can be combined with any block shape to produce an actual block family.
  */
 @RegisterBlockFamily("freeform")
 @FreeFormSupported(true)
@@ -58,7 +56,8 @@ public class FreeformFamily extends AbstractBlockFamily {
         } else {
             for (Rotation rot : Rotation.horizontalRotations()) {
                 Side side = rot.rotate(Side.FRONT);
-                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot, new BlockUri(uri, new Name(side.name())), this);
+                block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot,
+                        new BlockUri(uri, new Name(side.name())), this);
                 if (block == null) {
                     throw new IllegalArgumentException("Missing block for side: " + side.toString());
                 }

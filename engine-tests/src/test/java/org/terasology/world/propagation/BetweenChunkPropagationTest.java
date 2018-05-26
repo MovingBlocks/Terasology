@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -56,8 +54,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- */
 public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     private BlockManagerImpl blockManager;
@@ -74,7 +70,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     private BatchPropagator sunlightPropagator;
     private SunlightRegenBatchPropagator propagator;
 
-
     @Before
     @Override
     public void setup() throws Exception {
@@ -90,7 +85,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
-        solidData.setBlockFamily( SymmetricFamily.class);
+        solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
         solid = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
 
@@ -101,7 +96,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         sunlightPropagator = new StandardBatchPropagator(lightRules, lightWorldView);
         propagator = new SunlightRegenBatchPropagator(regenRules, regenWorldView, sunlightPropagator, lightWorldView);
     }
-
 
     @Test
     public void testBetweenChunksSimple() {
@@ -310,5 +304,4 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
             // do nothing
         }
     }
-
 }

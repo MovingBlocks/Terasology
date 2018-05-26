@@ -216,9 +216,8 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
                 return Byte.parseByte(blockUri.getIdentifier().toString().toLowerCase(Locale.ENGLISH));
-            } catch (IllegalArgumentException e) {
+            } catch (NumberFormatException e) {
                 logger.error("can't find block with URI: {}", blockUri, e);
-                return 0;
             }
         }
         return 0;

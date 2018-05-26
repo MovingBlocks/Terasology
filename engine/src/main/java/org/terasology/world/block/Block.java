@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,8 @@ public final class Block {
     // TODO: Use directional light(s) when rendering instead of this
     private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
 
-    /**
-     * Init. the LUTs.
-     */
+
+     // Initialize the LUTs
     static {
         DIRECTION_LIT_LEVEL.put(BlockPart.TOP, 0.9f);
         DIRECTION_LIT_LEVEL.put(BlockPart.BOTTOM, 0.9f);

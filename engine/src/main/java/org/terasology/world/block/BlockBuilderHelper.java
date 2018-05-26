@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2018 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.SectionDefinitionData;
 import org.terasology.world.block.shapes.BlockShape;
 
-
 public interface BlockBuilderHelper {
 
     Block constructSimpleBlock(BlockFamilyDefinition definition, BlockUri uri, BlockFamily blockFamily);
@@ -41,5 +40,4 @@ public interface BlockBuilderHelper {
     Block constructTransformedBlock(BlockFamilyDefinition definition, BlockShape shape, String section, Rotation rotation, BlockUri uri, BlockFamily blockFamily);
 
     Block constructCustomBlock(String defaultName, BlockShape shape, Rotation rotation, SectionDefinitionData section, BlockUri uri, BlockFamily blockFamily);
-
 }
