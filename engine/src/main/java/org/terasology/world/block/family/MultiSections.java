@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,19 @@
  */
 package org.terasology.world.block.family;
 
-@FunctionalInterface
-public interface BlockFamilyFactoryRegistry {
-    BlockFamilyFactory getBlockFamilyFactory(String blockFamilyFactoryId);
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * This annotations marks available {@link MultiSection} types for the annotated {@link BlockFamily}.
+ * It takes an array of {@link MultiSection}s as its argument.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Inherited
+public @interface MultiSections {
+    MultiSection[] value();
 }

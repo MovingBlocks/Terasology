@@ -34,6 +34,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
+import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.OnBlockItemPlaced;
 
 import java.util.Set;
 
@@ -67,6 +69,22 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
         if (largeBlockUpdateCount == 0) {
             notifyNeighboursOfChangedBlocks();
         }
+    }
+
+    /**
+     * notifies the adjacent block families when a block is placed next to them
+     * @param event
+     * @param entity
+     */
+    @ReceiveEvent
+    public void OnBlockPlaced(OnBlockItemPlaced event, EntityRef entity) {
+        BlockComponent blockComponent = event.getPlacedBlock().getComponent(BlockComponent.class);
+        if (blockComponent == null) {
+            return;
+        }
+
+        Vector3i targetBlock = blockComponent.getPosition();
+        processUpdateForBlockLocation(targetBlock);
     }
 
 
@@ -103,7 +121,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
                 final BlockFamily blockFamily = neighborBlock.getBlockFamily();
                 if (blockFamily instanceof UpdatesWithNeighboursFamily) {
                     UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
-                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
+                    Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(neighborLocation, neighborBlock);
                     if (neighborBlock != neighborBlockAfterUpdate) {
                         worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
                     }

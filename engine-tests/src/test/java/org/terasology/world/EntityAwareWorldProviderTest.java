@@ -51,8 +51,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.HorizontalBlockFamilyFactory;
-import org.terasology.world.block.family.SymmetricBlockFamilyFactory;
+import org.terasology.world.block.family.HorizontalFamily;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.loader.BlockFamilyDefinitionData;
 import org.terasology.world.internal.EntityAwareWorldProvider;
@@ -121,7 +121,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     private Block createBlockWithPrefab(String urn, Prefab prefab, boolean keepActive, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        data.setBlockFamily(SymmetricFamily.class);
         data.getBaseSection().getEntity().setPrefab(prefab);
         data.getBaseSection().getEntity().setKeepActive(keepActive);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
@@ -136,14 +136,14 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     private Block createBlock(String urn, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setFamilyFactory(new SymmetricBlockFamilyFactory());
+        data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
         return blockManager.getBlock(urn);
     }
 
     private BlockFamily createBlockFamily(String urn, Prefab prefab, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setFamilyFactory(new HorizontalBlockFamilyFactory());
+        data.setBlockFamily(HorizontalFamily.class);
         data.getBaseSection().getEntity().setKeepActive(true);
         data.getBaseSection().getEntity().setPrefab(prefab);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);

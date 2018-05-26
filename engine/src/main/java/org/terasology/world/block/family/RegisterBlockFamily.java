@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,24 @@
  */
 package org.terasology.world.block.family;
 
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation is used to mark a {@link BlockFamily} to be registered in the environment.
+ * This annotation takes one argument, which is the name of the BlockFamily to be registered.<br><br>
+ * Examples:<br><br>
+ * <code>@RegisterBlockFamily("example")</code><br>
+ * In this case, a block family named "example" will be registered.<br><br>
+ * <code>@RegisterBlockFamily("painting")</code><br>
+ * <code>@BlockSections({"first", "second", "third"})</code><br>
+ * In this case, a block family named "painting" which has three different sections named "first, "second" and "third" will be registered.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegisterBlockFamilyFactory {
+public @interface RegisterBlockFamily {
     String value();
 }

@@ -47,10 +47,10 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.util.reflection.GenericsUtil;
 import org.terasology.utilities.ReflectionUtil;
-import org.terasology.world.block.family.BlockFamilyFactory;
-import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
-import org.terasology.world.block.family.RegisterBlockFamilyFactory;
+import org.terasology.world.block.family.AbstractBlockFamily;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.RegisterBlockFamily;
 
 /**
  * Handles an environment switch by updating the asset manager, component library, and other context objects.
@@ -98,8 +98,8 @@ public final class EnvironmentSwitchHandler {
         registerComponents(componentLibrary, moduleManager.getEnvironment());
         registerTypeHandlers(context, typeSerializationLibrary, moduleManager.getEnvironment());
 
-        BlockFamilyFactoryRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyFactoryRegistry.class);
-        loadFamilies((DefaultBlockFamilyFactoryRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
+        BlockFamilyRegistry blockFamilyFactoryRegistry = context.get(BlockFamilyRegistry.class);
+        loadFamilies((BlockFamilyRegistry) blockFamilyFactoryRegistry, moduleManager.getEnvironment());
 
         ModuleAwareAssetTypeManager assetTypeManager = context.get(ModuleAwareAssetTypeManager.class);
 
@@ -174,25 +174,19 @@ public final class EnvironmentSwitchHandler {
         }
     }
 
-    private static void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {
+    private static void loadFamilies(BlockFamilyRegistry registry, ModuleEnvironment environment) {
         registry.clear();
-        for (Class<?> blockFamilyFactory : environment.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class)) {
-            if (!BlockFamilyFactory.class.isAssignableFrom(blockFamilyFactory)) {
-                logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamilyFactory.getSimpleName());
+        for(Class<?> blockFamily : environment.getTypesAnnotatedWith(RegisterBlockFamily.class)) {
+            if (!BlockFamily.class.isAssignableFrom(blockFamily)) {
+                logger.error("Cannot load {}, must be a subclass of BlockFamily", blockFamily.getSimpleName());
                 continue;
             }
-
-            RegisterBlockFamilyFactory registerInfo = blockFamilyFactory.getAnnotation(RegisterBlockFamilyFactory.class);
+            RegisterBlockFamily registerInfo = blockFamily.getAnnotation(RegisterBlockFamily.class);
             String id = registerInfo.value();
-            logger.debug("Registering blockFamilyFactory {}", id);
-            try {
-                BlockFamilyFactory newBlockFamilyFactory = (BlockFamilyFactory) blockFamilyFactory.newInstance();
-                registry.setBlockFamilyFactory(id, newBlockFamilyFactory);
-                logger.debug("Loaded blockFamilyFactory {}", id);
-            } catch (InstantiationException | IllegalAccessException e) {
-                logger.error("Failed to load blockFamilyFactory {}", id, e);
-            }
+            logger.debug("Registering blockFamily {}", id);
+            registry.setBlockFamily(id, (Class<? extends AbstractBlockFamily>) blockFamily);
         }
+
     }
 
     private static void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {

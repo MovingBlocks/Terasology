@@ -20,6 +20,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
+ * return the block family based on the registered string id
  */
 public class BlockFamilyTypeHandler extends StringRepresentationTypeHandler<BlockFamily> {
 
