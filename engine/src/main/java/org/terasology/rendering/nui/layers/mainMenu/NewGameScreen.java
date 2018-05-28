@@ -28,6 +28,7 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
 import org.terasology.game.GameManifest;
+import org.terasology.i18n.TranslationSystem;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
@@ -63,7 +64,7 @@ public class NewGameScreen extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
     private static final String DEFAULT_GAME_TEMPLATE_NAME = "JoshariasSurvival";
     private static final String DEFAULT_WORLD_GENERATOR = "Core:FacetedPerlin";
-
+    private boolean loadingAsServer;
 
     @In
     private ModuleManager moduleManager;
@@ -77,10 +78,27 @@ public class NewGameScreen extends CoreScreenLayer {
     @In
     private GameEngine gameEngine;
 
+    @In
+    private TranslationSystem translationSystem;
+
     @Override
     public void initialise(){
 
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
+
+        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
+        if (gameTypeTitle != null) {
+            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    if (loadingAsServer) {
+                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
+                    } else {
+                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
+                    }
+                }
+            });
+        }
         final UIText gameName = find("gameName",UIText.class);
         setGameName(gameName);
 
@@ -161,7 +179,7 @@ public class NewGameScreen extends CoreScreenLayer {
             WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom69",
                     (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
             gameManifest.addWorld(worldInfo);
-            gameEngine.changeState(new StateLoading(gameManifest, (false) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         });
 
         WidgetUtil.trySubscribe(this, "close", button ->
@@ -281,5 +299,14 @@ public class NewGameScreen extends CoreScreenLayer {
             }
         }
     }
+
+    public boolean isLoadingAsServer() {
+        return loadingAsServer;
+    }
+
+    public void setLoadingAsServer(boolean loadingAsServer) {
+        this.loadingAsServer = loadingAsServer;
+    }
+
 }
 
