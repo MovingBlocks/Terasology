@@ -23,11 +23,16 @@ import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.StandardModuleExtension;
+import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
+import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
+import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -45,6 +50,8 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.time.WorldTime;
 
 import java.util.Collections;
 import java.util.List;
@@ -125,6 +132,37 @@ public class NewGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "advancedSetup", button ->
                 triggerForwardAnimation(advancedSetupGameScreen)
         );
+
+        WidgetUtil.trySubscribe(this, "play", button -> {
+            GameManifest gameManifest = new GameManifest();
+
+            gameManifest.setTitle(gameName.getText());
+
+            DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+            ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+            System.out.println(result.getModules());
+            if(!result.isSuccess()) {
+                MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                if (errorMessagePopup != null) {
+                    errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
+                }
+                return;
+            }
+            for(Module module : result.getModules()) {
+                gameManifest.addModule(module.getId(), module.getVersion());
+            }
+
+            SimpleUri uri = StandardModuleExtension.getDefaultWorldGenerator(gameplay.getSelection());
+            if(uri == null) {
+                uri = new SimpleUri(DEFAULT_WORLD_GENERATOR);
+            }
+
+            float timeOffset = 0.25f + 0.025f;
+            WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, "thisisjustrandom69",
+                    (long) (WorldTime.DAY_LENGTH * timeOffset), uri);
+            gameManifest.addWorld(worldInfo);
+            gameEngine.changeState(new StateLoading(gameManifest, (false) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+        });
 
         WidgetUtil.trySubscribe(this, "close", button ->
                 triggerBackAnimation()
