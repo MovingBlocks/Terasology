@@ -22,6 +22,7 @@ package org.terasology.world.biomes;
 final class UnknownBiome implements Biome {
 
     public static final UnknownBiome INSTANCE = new UnknownBiome();
+    private static final String UNKNOWN = "Unknown";
 
     private UnknownBiome() {
     }
@@ -43,7 +44,7 @@ final class UnknownBiome implements Biome {
 
     @Override
     public String getName() {
-        return "Unknown";
+        return UNKNOWN;
     }
 
     @Override
@@ -51,4 +52,8 @@ final class UnknownBiome implements Biome {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return UNKNOWN;
+    }
 }

@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  */
@@ -68,6 +69,15 @@ public interface UIWidget extends Iterable<UIWidget> {
      * @return The widget with the given id and type, or null.
      */
     <T extends UIWidget> T find(String id, Class<T> type);
+
+    /**
+     * Try to find a widget with the given id and type, within the current widget and its contents.
+     *
+     * @param id of widget to search
+     * @param <T> type of widget to cast
+     * @return optional widget with the given id and type
+     */
+    <T extends UIWidget> Optional<T> tryFind(String id, Class<T> type);
 
     <T extends UIWidget> Collection<T> findAll(Class<T> type);
 

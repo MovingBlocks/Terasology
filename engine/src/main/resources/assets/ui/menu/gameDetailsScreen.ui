@@ -1,0 +1,478 @@
+{
+    "type": "engine:gameDetailsScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UILabel",
+                "id": "title",
+                "family": "subtitle",
+                "layoutInfo": {
+                    "height": 30,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                       "target": "TOP",
+                       "offset": 30
+                    }
+                }
+            },
+            {
+                "type": "UIBox",
+                "id": "container",
+                "layoutInfo": {
+                    "width": 1005,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 30,
+                        "widget": "title"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 8
+                    }
+                }
+            },
+            {
+                "id": "body",
+                "type":"RelativeLayout",
+                "layoutInfo": {
+                    "width": 1000,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "widget": "title",
+                        "offset": 24
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 10
+                    }
+                },
+                "contents": [
+                    {
+                        "type": "ColumnLayout",
+                        "columns": 2,
+                        "family": "option-grid",
+                        "column-widths": [
+                            0.5,
+                            0.5
+                        ],
+                        "verticalSpacing": 8,
+                        "horizontalSpacing": 0,
+                        "layoutInfo": {
+
+                            "position-top": {
+                                "target": "TOP"
+                            }
+                        },
+                        "contents": [
+                            {
+                                "id": "leftSide",
+                                "type":"RelativeLayout",
+                                "layoutInfo": {
+                                    "use-content-height": true,
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP"
+                                    }
+                                },
+                                "contents": [
+                                    {
+                                        "type": "UIImage",
+                                        "id": "previewImage",
+                                        "skin": "framed_image",
+                                        "layoutInfo": {
+                                            "height": 280,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "text": "${engine:menu#game-details-general-info}",
+                                        "id": "generalInfoTitle",
+                                        "layoutInfo": {
+                                            "height": 25,
+                                            "use-content-width": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "previewImage"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "id": "generalInfo",
+                                        "preferredHeight": 170,
+                                        "layoutInfo": {
+                                            "height": 120,
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "generalInfoTitle",
+                                                "offset": 1
+                                            }
+                                        },
+                                        "content": {
+                                            "type": "ColumnLayout",
+                                            "columns": 2,
+
+                                            "column-widths": [
+                                                0.17,
+                                                0.8
+                                            ],
+                                            "verticalSpacing": 8,
+                                            "horizontalSpacing": 8,
+                                            "contents": [
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-title}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "gameTitle"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-last-play}:"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "lastAccessDate"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-duration}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "duration"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-seed}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "seed"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-world-generator}:"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "gameWorldGenerator"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "UILabel",
+                                        "id": "descriptionTitle",
+                                        "layoutInfo": {
+                                            "height": 25,
+                                            "use-content-width": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "generalInfo"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "id": "worldDescription",
+                                        "visible": false,
+                                        "layoutInfo": {
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "descriptionTitle",
+                                                "offset": 1
+                                            },
+                                            "position-bottom": {
+                                                "target": "BOTTOM",
+                                                "widget": "leftSide"
+                                            }
+
+                                        },
+                                        "content": {
+                                            "type": "ColumnLayout",
+                                            "columns": 2,
+                                            "family": "option-grid",
+                                            "column-widths": [
+                                                0.15,
+                                                0.8
+                                            ],
+                                            "verticalSpacing": 8,
+                                            "horizontalSpacing": 8,
+                                            "contents": [
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-title}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "worldTitle"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-world-generator}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "worldGenerator"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-seed}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "worldSeed"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "text": "${engine:menu#game-details-game-duration}"
+                                                },
+                                                {
+                                                    "type": "UILabel",
+                                                    "id": "worldTime"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "ScrollableArea",
+                                        "visible": false,
+                                        "id": "descriptionContainer",
+                                        "content": {
+                                            "type": "UIText",
+                                            "multiline": true,
+                                            "id": "description"
+                                        },
+                                        "layoutInfo": {
+                                            "position-top": {
+                                                "target": "BOTTOM",
+                                                "widget": "descriptionTitle"
+                                            },
+                                            "position-bottom": {
+                                                "target": "BOTTOM",
+                                                "widget": "leftSide"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "UITabBox",
+                                "skin": "solid",
+                                "id": "tabs",
+                                "currentTab": 0,
+                                "layoutInfo": {
+                                    "position-horizontal-center": {},
+                                    "position-top": {
+                                        "target": "TOP"
+                                    },
+                                    "position-bottom": {
+                                        "target": "TOP",
+                                        "widget": "close",
+                                        "offset": 10
+                                    }
+                                },
+                                "contents": [
+                                    {
+                                        "type":"RelativeLayout",
+                                        "id": "page1",
+                                        "layoutInfo": {
+                                            "use-content-height": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        },
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "id": "baseInfo",
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    }
+                                                },
+                                                "content":  {
+                                                    "id": "rightSide",
+                                                    "type":"RelativeLayout",
+                                                    "layoutInfo": {
+                                                        "use-content-height": true,
+                                                        "position-horizontal-center": {},
+                                                        "position-top": {
+                                                            "target": "TOP"
+                                                        }
+                                                    },
+                                                    "contents": [
+                                                        {
+                                                            "type": "ScrollableArea",
+                                                            "id": "moduleList",
+                                                            "content": {
+                                                                "type": "ColumnLayout",
+                                                                "columns": 1,
+                                                                "layoutInfo": {
+                                                                    "position-top": {
+                                                                        "target": "TOP"
+                                                                    }
+                                                                },
+                                                                "contents": [
+                                                                    {
+                                                                        "type": "UILabel",
+                                                                        "family": "subheading",
+                                                                        "text": "${engine:menu#game-details-modules}"
+                                                                    },
+                                                                    {
+                                                                        "type": "UIList",
+                                                                        "id": "modules"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "layoutInfo": {
+                                                                "position-top": {
+                                                                    "target": "TOP"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type":"RelativeLayout",
+                                        "id": "page2",
+                                        "layoutInfo": {
+                                            "use-content-height": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        },
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "ColumnLayout",
+                                                    "columns": 1,
+                                                    "layoutInfo": {
+                                                    },
+                                                    "contents": [
+                                                        {
+                                                            "type": "UILabel",
+                                                            "family": "subheading",
+                                                            "text": "${engine:menu#game-details-worlds}"
+                                                        },
+                                                        {
+                                                            "type": "UIList",
+                                                            "id": "worlds"
+                                                        },
+                                                        {
+                                                            "type": "UILabel",
+                                                            "family": "subheading",
+                                                            "text": "${engine:menu#game-details-biomes}"
+                                                        },
+                                                        {
+                                                            "type": "UIList",
+                                                            "id": "biomes"
+                                                        }
+                                                    ]
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type":"RelativeLayout",
+                                        "id": "page3",
+                                        "layoutInfo": {
+                                            "use-content-height": true,
+                                            "position-horizontal-center": {},
+                                            "position-top": {
+                                                "target": "TOP"
+                                            }
+                                        },
+                                        "contents": [
+                                            {
+                                                "type": "ScrollableArea",
+                                                "content": {
+                                                    "type": "ColumnLayout",
+                                                    "columns": 1,
+                                                    "layoutInfo": {
+                                                    },
+                                                    "contents": [
+                                                        {
+                                                            "type": "UILabel",
+                                                            "family": "subheading",
+                                                            "text": "${engine:menu#game-details-blocks}"
+                                                        },
+                                                        {
+                                                            "type": "UIList",
+                                                            "id": "blocks"
+                                                        }
+                                                    ]
+                                                },
+                                                "layoutInfo": {
+                                                    "position-top": {
+                                                        "target": "TOP"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "buttons": [
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#game-details-modules}",
+                                        "id": "button1"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#game-details-worlds-and-biomes}",
+                                        "id": "button2"
+                                    },
+                                    {
+                                        "type": "UIButton",
+                                        "text": "${engine:menu#game-details-blocks}",
+                                        "id": "button3"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 30
+                    }
+                }
+            }
+        ]
+    }
+}
