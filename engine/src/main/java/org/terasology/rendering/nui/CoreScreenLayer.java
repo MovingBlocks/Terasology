@@ -22,6 +22,8 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.geom.Vector2i;
+import org.terasology.recording.RecordAndReplayStatus;
+import org.terasology.recording.RecordAndReplayUtils;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;

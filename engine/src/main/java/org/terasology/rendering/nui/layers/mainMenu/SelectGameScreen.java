@@ -44,7 +44,6 @@ import java.io.File;
 import java.nio.file.Path;
 
 public class SelectGameScreen extends CoreScreenLayer {
-
     public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);

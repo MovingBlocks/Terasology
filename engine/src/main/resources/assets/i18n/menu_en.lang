@@ -260,6 +260,8 @@
     "sound-volume": "Sound Volume",
     "ssao": "SSAO",
     "start-game": "Play",
+    "start-record": "Record",
+    "start-replay": "Replay",
     "start-singleplayer-game": "Singleplayer",
     "storage-service": "Identity storage service",
     "storage-service-conflict-message": "During the last synchronization of the locally stored client identities with the storage service, a conflict was detected. For the server with id %s, the locally stored certificate has id %s while the remote one has id %s. What do you want to do? Please note that keeping one of the versions will delete the other one; ignoring will keep the local identity locally and the remote identity remotely, and the conflict will be detected again during the next synchronization.",
