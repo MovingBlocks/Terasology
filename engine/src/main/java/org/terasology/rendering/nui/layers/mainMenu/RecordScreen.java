@@ -43,11 +43,11 @@ import org.terasology.utilities.FilesUtil;
 import java.io.File;
 import java.nio.file.Path;
 
-public class RecordReplayScreen extends CoreScreenLayer {
+public class RecordScreen extends CoreScreenLayer {
 
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:recordReplayScreen");
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:recordScreen");
 
-    private static final Logger logger = LoggerFactory.getLogger(RecordReplayScreen.class);
+    private static final Logger logger = LoggerFactory.getLogger(RecordScreen.class);
 
     @In
     private Config config;
@@ -55,39 +55,16 @@ public class RecordReplayScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
-    private boolean loadingAsServer;
-
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
-        if (gameTypeTitle != null) {
-            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    if (loadingAsServer) {
-                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
-                    } else {
-                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
-                    }
-                }
-            });
-        }
-
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if (saveGamePath != null) {
-            //this is be temporary since there is no UI for Record and Replay yet.
-            //Gets the recordings path if it is a replay, or the saves path otherwise.
-            Path saveOrRecordingPath;
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();
-            } else {
-                saveOrRecordingPath = PathManager.getInstance().getSavesPath();
-            }
+            Path savePath = PathManager.getInstance().getSavesPath();
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                            saveOrRecordingPath.toAbsolutePath().toString()); //save path
+                            savePath.toAbsolutePath().toString()); //save path
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -103,25 +80,6 @@ public class RecordReplayScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "delete", button -> {
-            GameInfo gameInfo = gameList.getSelection();
-            if (gameInfo != null) {
-                Path world;
-                if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                    world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
-                } else {
-                    world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
-                }
-                try {
-                    FilesUtil.recursiveDelete(world);
-                    gameList.getList().remove(gameInfo);
-                    gameList.setSelection(null);
-                } catch (Exception e) {
-                    logger.error("Failed to delete saved game", e);
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
-                }
-            }
-        });
 
         WidgetUtil.trySubscribe(this, "close", button -> {
             RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
@@ -137,7 +95,7 @@ public class RecordReplayScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
+        if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
     }
@@ -145,13 +103,11 @@ public class RecordReplayScreen extends CoreScreenLayer {
     private void loadGame(GameInfo item) {
         try {
             GameManifest manifest = item.getManifest();
-            if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_RECORD) {
-                copySaveDirectoryToRecordingLibrary(manifest.getTitle());
-            }
+            copySaveDirectoryToRecordingLibrary(manifest.getTitle());
             RecordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
@@ -168,14 +124,6 @@ public class RecordReplayScreen extends CoreScreenLayer {
             logger.error(e.getMessage());
         }
 
-    }
-
-    public boolean isLoadingAsServer() {
-        return loadingAsServer;
-    }
-
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
     }
 
     private void refreshList(UIList<GameInfo> gameList) {

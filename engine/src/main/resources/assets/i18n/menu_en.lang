@@ -243,6 +243,8 @@
     "select-modules": "Modules...",
     "select-modules-title": "Select Modules...",
     "select-multiplayer-game-sub-title": "Multiplayer",
+    "select-record": "Record Game",
+    "select-replay": "Replay Library",
     "select-singleplayer-game-sub-title": "Singleplayer",
     "select-world-gen": "Choose World Generator",
     "select-world-gen-info": "enabling modules may add more",

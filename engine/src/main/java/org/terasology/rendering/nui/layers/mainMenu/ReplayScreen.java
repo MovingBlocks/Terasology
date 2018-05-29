@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,10 +43,11 @@ import org.terasology.utilities.FilesUtil;
 import java.io.File;
 import java.nio.file.Path;
 
-public class SelectGameScreen extends CoreScreenLayer {
-    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:selectGameScreen");
+public class ReplayScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
+    public static final ResourceUrn ASSET_URI = new ResourceUrn("engine:replayScreen");
+
+    private static final Logger logger = LoggerFactory.getLogger(ReplayScreen.class);
 
     @In
     private Config config;
@@ -54,33 +55,17 @@ public class SelectGameScreen extends CoreScreenLayer {
     @In
     private TranslationSystem translationSystem;
 
-    private boolean loadingAsServer;
-
 
     @Override
     public void initialise() {
         setAnimationSystem(MenuAnimationSystems.createDefaultSwipeAnimation());
 
-        UILabel gameTypeTitle = find("gameTypeTitle", UILabel.class);
-        if (gameTypeTitle != null) {
-            gameTypeTitle.bindText(new ReadOnlyBinding<String>() {
-                @Override
-                public String get() {
-                    if (loadingAsServer) {
-                        return translationSystem.translate("${engine:menu#select-multiplayer-game-sub-title}");
-                    } else {
-                        return translationSystem.translate("${engine:menu#select-singleplayer-game-sub-title}");
-                    }
-                }
-            });
-        }
-
         final UILabel saveGamePath = find("saveGamePath", UILabel.class);
         if (saveGamePath != null) {
-            Path savePath = PathManager.getInstance().getSavesPath();
+            Path recordingPath = PathManager.getInstance().getRecordingsPath();
             saveGamePath.setText(
                     translationSystem.translate("${engine:menu#save-game-path} ") +
-                            savePath.toAbsolutePath().toString()); //save path
+                            recordingPath.toAbsolutePath().toString()); //save path
         }
 
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
@@ -88,12 +73,6 @@ public class SelectGameScreen extends CoreScreenLayer {
         refreshList(gameList);
         gameList.select(0);
         gameList.subscribe((widget, item) -> loadGame(item));
-
-        CreateGameScreen screen = getManager().createScreen(CreateGameScreen.ASSET_URI, CreateGameScreen.class);
-        WidgetUtil.trySubscribe(this, "create", button -> {
-            screen.setLoadingAsServer(loadingAsServer);
-            triggerForwardAnimation(screen);
-        });
 
         WidgetUtil.trySubscribe(this, "load", button -> {
             GameInfo gameInfo = gameList.getSelection();
@@ -105,24 +84,22 @@ public class SelectGameScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "delete", button -> {
             GameInfo gameInfo = gameList.getSelection();
             if (gameInfo != null) {
-                Path world;
-                if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-                    world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
-                } else {
-                    world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
-                }
+                Path world = PathManager.getInstance().getRecordingPath(gameInfo.getManifest().getTitle());
                 try {
                     FilesUtil.recursiveDelete(world);
                     gameList.getList().remove(gameInfo);
                     gameList.setSelection(null);
                 } catch (Exception e) {
-                    logger.error("Failed to delete saved game", e);
+                    logger.error("Failed to delete replay", e);
                     getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
                 }
             }
         });
 
-        WidgetUtil.trySubscribe(this, "close", button -> triggerBackAnimation());
+        WidgetUtil.trySubscribe(this, "close", button -> {
+            RecordAndReplayUtils.setRecordAndReplayStatus(RecordAndReplayStatus.NOT_ACTIVATED);
+            triggerBackAnimation();
+        });
     }
 
     @Override
@@ -133,7 +110,7 @@ public class SelectGameScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        if (loadingAsServer && !config.getPlayer().hasEnteredUsername()) {
+        if (!config.getPlayer().hasEnteredUsername()) {
             getManager().pushScreen(EnterUsernamePopup.ASSET_URI, EnterUsernamePopup.class);
         }
     }
@@ -144,23 +121,14 @@ public class SelectGameScreen extends CoreScreenLayer {
             RecordAndReplayUtils.setGameTitle(manifest.getTitle());
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
             getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
         }
     }
 
-    public boolean isLoadingAsServer() {
-        return loadingAsServer;
-    }
-
-    public void setLoadingAsServer(boolean loadingAsServer) {
-        this.loadingAsServer = loadingAsServer;
-    }
-
     private void refreshList(UIList<GameInfo> gameList) {
-        gameList.setList(GameProvider.getSavedGames());
+        gameList.setList(GameProvider.getSavedRecordings());
     }
-
 }

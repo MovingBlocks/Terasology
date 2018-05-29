@@ -44,17 +44,20 @@ public final class GameProvider {
     private GameProvider() {
     }
 
+    public static List<GameInfo> getSavedRecordings() {
+        Path recordingPath = PathManager.getInstance().getRecordingsPath();
+        return getSavedGameOrRecording(recordingPath);
+    }
+
     public static List<GameInfo> getSavedGames() {
-        Path saveOrRecordingPath;
-        if (RecordAndReplayUtils.getRecordAndReplayStatus() == RecordAndReplayStatus.PREPARING_REPLAY) {
-            saveOrRecordingPath = PathManager.getInstance().getRecordingsPath();
-        } else {
-            saveOrRecordingPath = PathManager.getInstance().getSavesPath();
-        }
-        //Path savedGames = PathManager.getInstance().getSavesPath();
+        Path savePath = PathManager.getInstance().getSavesPath();
+        return getSavedGameOrRecording(savePath);
+    }
+
+    private static List<GameInfo> getSavedGameOrRecording(Path saveOrRecordingPath) {
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
         try (DirectoryStream<Path> stream =
-                Files.newDirectoryStream(saveOrRecordingPath)) {
+                     Files.newDirectoryStream(saveOrRecordingPath)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
                     savedGamePaths.put(Files.getLastModifiedTime(entry.resolve(GameManifest.DEFAULT_FILE_NAME)), entry);
